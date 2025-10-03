@@ -363,10 +363,10 @@ fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean =
             .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
             .mapNotNull { folderToMenuFolder[it] }
 
-        folderToMenuFolder[folder] = menuFolder.copy(
-            canBeCollapsed = menuFolder.depth == 0 && validChildren.isNotEmpty(),
-            children = validChildren,
-        )
+        folderToMenuFolder[folder] = menuFolder.apply {
+            canBeCollapsed = menuFolder.depth == 0 && validChildren.isNotEmpty()
+            children = validChildren
+        }
     }
 
     // Step 3: Only return root folders needed for traversal
@@ -375,9 +375,9 @@ fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean =
 
 data class MenuDrawerFolder(
     val folder: Folder,
-    val children: List<MenuDrawerFolder>,
+    var children: List<MenuDrawerFolder>,
     val depth: Int,
-    val canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
+    var canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
 )
 
 /**
