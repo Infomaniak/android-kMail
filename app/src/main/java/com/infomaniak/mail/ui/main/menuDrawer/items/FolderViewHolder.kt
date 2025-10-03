@@ -25,12 +25,11 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import kotlin.math.min
@@ -75,9 +74,8 @@ class FolderViewHolder(
 
         val folderIndent = min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
         binding.root.setFolderUi(
-            folder,
+            folderUi,
             roleDependantParameters,
-            folderUi.canBeCollapsed,
             folderIndent,
             unread,
             currentFolderId,
@@ -89,9 +87,8 @@ class FolderViewHolder(
     }
 
     private fun UnreadFolderItemView.setFolderUi(
-        folder: Folder,
+        folderUi: FolderUi,
         roleDependantParameters: RoleDependantParameters,
-        canBeCollapsed: Boolean,
         folderIndent: Int,
         unread: UnreadDisplay?,
         currentFolderId: String?,
@@ -100,7 +97,7 @@ class FolderViewHolder(
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
-
+        val folder = folderUi.folder
         val folderName = folder.getLocalizedName(context)
         val (iconId, trackerName, trackerValue) = roleDependantParameters
 
@@ -111,7 +108,7 @@ class FolderViewHolder(
         isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
         unreadCount = unread?.count ?: 0
         isCollapsed = folder.isCollapsed
-        this.canBeCollapsed = canBeCollapsed
+        canBeCollapsed = folderUi.canBeCollapsed
 
         setIndent(
             indent = folderIndent,
