@@ -58,6 +58,7 @@ import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -93,17 +94,16 @@ import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
-import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.constructMenuDrawerFolderStructure
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
+import com.infomaniak.mail.utils.extensions.toFolderUi
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -219,15 +219,15 @@ class MainViewModel @Inject constructor(
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
     private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.constructMenuDrawerFolderStructure() }
+        folderController
+            .getMenuDrawerDefaultFoldersAsync()
+            .map { it.list.toFolderUi() }
     }
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerCustomFoldersAsync()
-            .map {
-                it.list.constructMenuDrawerFolderStructure(excludeRoleFolder = true)
-            }
+        folderController
+            .getMenuDrawerCustomFoldersAsync()
+            .map { it.list.toFolderUi(excludeRoleFolder = true) }
     }
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
