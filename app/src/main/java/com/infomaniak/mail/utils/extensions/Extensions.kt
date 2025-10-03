@@ -121,9 +121,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
-import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.ext.isManaged
-import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
@@ -392,25 +389,15 @@ fun <T> List<T>.forEachNestedItem(getChildren: (T) -> List<T>, block: (T, Int) -
 /**
  * This method returns instances of [Folder] that have no relations to other classes such as
  * [com.infomaniak.mail.data.models.thread.Thread.messages] because we copy them from realm with a low depth.
- *
- * @param dismissHiddenChildren A children Folder is hidden if its parent is collapsed. This parameter returns the list without
- * the hidden children when true is provided and return all folders even hidden ones when false is provided.
- * @param excludeRoleFolder Do not return folders with role nor their children. This is used in the menu drawer to not display
- * role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
-fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
-    dismissHiddenChildren: Boolean = false,
-    excludeRoleFolder: Boolean = false,
-): List<Folder> {
+fun List<Folder>.flattenFolderChildrenAndRemoveMessages(): List<Folder> {
 
     if (isEmpty()) return this
 
-    return formatFolderWithAllChildren(dismissHiddenChildren, excludeRoleFolder, toMutableList())
+    return formatFolderWithAllChildren(toMutableList())
 }
 
 private tailrec fun formatFolderWithAllChildren(
-    dismissHiddenChildren: Boolean,
-    excludeRoleFolder: Boolean,
     inputList: MutableList<Folder>,
     outputList: MutableList<Folder> = mutableListOf(),
 ): List<Folder> {
@@ -427,24 +414,13 @@ private tailrec fun formatFolderWithAllChildren(
     *
     * I.e. hides all IK folders with no roles.
     */
-    val shouldThisFolderBeAdded = folder.shouldBeExcluded(excludeRoleFolder).not()
+    val shouldThisFolderBeAdded = folder.shouldBeExcluded(excludeRoleFolder = false).not()
 
-    val children = if (folder.isManaged()) {
-        if (shouldThisFolderBeAdded) {
-            outputList.add(folder.copyFromRealm(depth = 1u))
-            with(folder.children) {
-                (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
-            }
-        } else {
-            null
-        }
+    val children = if (shouldThisFolderBeAdded) {
+        outputList.add(folder)
+        folder.children.sortFolders()
     } else {
-        if (shouldThisFolderBeAdded) {
-            outputList.add(folder)
-            (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
-        } else {
-            null
-        }
+        null
     }
 
     children?.let { inputList.addAll(index = 0, it) }
@@ -452,7 +428,7 @@ private tailrec fun formatFolderWithAllChildren(
     return if (inputList.isEmpty()) {
         outputList
     } else {
-        formatFolderWithAllChildren(dismissHiddenChildren, excludeRoleFolder, inputList, outputList)
+        formatFolderWithAllChildren(inputList, outputList)
     }
 }
 
