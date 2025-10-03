@@ -50,13 +50,14 @@ import com.infomaniak.core.compose.basics.Dimens
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.core.compose.preview.PreviewAllWindows
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.newMessage.mailbox.UserMailboxesUi
+import com.infomaniak.mail.ui.newMessage.mailbox.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.SelectedMailboxPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
 
 @Composable
-fun SelectedMailbox(
+fun SelectedMailboxIndicator(
     modifier: Modifier = Modifier,
-    mailboxSelected: UserMailboxesUi
+    selectedMailbox: SelectedMailboxUi
 ) {
     val context = LocalContext.current
     val unauthenticatedImageLoader = remember(context) { ImageLoaderProvider.newImageLoader(context) }
@@ -74,17 +75,17 @@ fun SelectedMailbox(
             Avatar(
                 modifier = Modifier.size(Dimens.avatarSize),
                 avatarType = AvatarType.getUrlOrInitials(
-                    avatarUrlData = mailboxSelected.avatarUrl?.let { AvatarUrlData(it, unauthenticatedImageLoader) },
-                    initials = mailboxSelected.initials,
+                    avatarUrlData = selectedMailbox.avatarUrl?.let { AvatarUrlData(it, unauthenticatedImageLoader) },
+                    initials = selectedMailbox.initials,
                     colors = AvatarColors(
-                        containerColor = Color(context.getBackgroundColorResBasedOnId(mailboxSelected.userId)),
+                        containerColor = Color(context.getBackgroundColorResBasedOnId(selectedMailbox.userId)),
                         contentColor = if (isSystemInDarkTheme()) Color(0xFF333333) else Color.White
                     )
                 )
             )
             Text(
                 modifier = Modifier.padding(horizontal = Margin.Mini),
-                text = mailboxSelected.mailboxes.first().email
+                text = selectedMailbox.mailbox.email
             )
             Spacer(modifier = Modifier.weight(1f))
             Icon(
@@ -99,10 +100,10 @@ fun SelectedMailbox(
 
 @PreviewAllWindows
 @Composable
-private fun Preview(@PreviewParameter(SelectMailboxPreviewParameter::class) usersWithMailboxes: List<UserMailboxesUi>) {
+private fun Preview(@PreviewParameter(SelectedMailboxPreviewParameter::class) selectedMailbox: SelectedMailboxUi) {
     MailTheme {
         Surface {
-            SelectedMailbox(mailboxSelected = usersWithMailboxes.first())
+            SelectedMailboxIndicator(selectedMailbox = selectedMailbox)
         }
     }
 }

@@ -25,7 +25,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -53,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -67,20 +67,22 @@ import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.core.compose.preview.PreviewAllWindows
 import com.infomaniak.mail.R
+import com.infomaniak.mail.ui.newMessage.mailbox.SelectedMailboxUi
 import com.infomaniak.mail.ui.newMessage.mailbox.UserMailboxesUi
+import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.AccountMailboxesDropdownPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
 
 @Composable
-fun AccountMailboxesMenu(
+fun AccountMailboxesDropdown(
     modifier: Modifier = Modifier,
-    userWithMailboxes: UserMailboxesUi
+    userWithMailboxes: UserMailboxesUi,
+    onClickMailbox: (SelectedMailboxUi) -> Unit
 ) {
     val context = LocalContext.current
     val unauthenticatedImageLoader = remember(context) { ImageLoaderProvider.newImageLoader(context) }
-
+    val isDropDownExpanded = remember { mutableStateOf(false) }
     var rowSize by remember { mutableStateOf(Size.Unspecified) }
 
-    val isDropDownExpanded = remember { mutableStateOf(false) }
     Box(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -113,20 +115,24 @@ fun AccountMailboxesMenu(
                 )
             )
             Column(
-                modifier = Modifier.padding(horizontal = Margin.Mini)
+                modifier = Modifier
+                    .padding(horizontal = Margin.Mini)
+                    .weight(1f)
             ) {
                 Text(
                     text = userWithMailboxes.fullName,
                     style = Typography.bodyMedium,
-                    maxLines = 1
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = userWithMailboxes.userEmail,
-                    maxLines = 1
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
             Icon(
+                modifier = Modifier.weight(0.05f),
                 painter = painterResource(id = R.drawable.ic_chevron_down),
                 contentDescription = null
             )
@@ -157,6 +163,14 @@ fun AccountMailboxesMenu(
                     },
                     onClick = {
                         isDropDownExpanded.value = false
+                        onClickMailbox(
+                            SelectedMailboxUi(
+                                userId = userWithMailboxes.userId,
+                                mailbox = mailbox,
+                                avatarUrl = userWithMailboxes.avatarUrl,
+                                initials = userWithMailboxes.initials,
+                            )
+                        )
                     }
                 )
             }
@@ -166,10 +180,13 @@ fun AccountMailboxesMenu(
 
 @PreviewAllWindows
 @Composable
-private fun Preview(@PreviewParameter(SelectMailboxPreviewParameter::class) usersWithMailboxes: List<UserMailboxesUi>) {
+private fun Preview(@PreviewParameter(AccountMailboxesDropdownPreviewParameter::class) userWithMailboxes: UserMailboxesUi) {
     MailTheme {
         Surface {
-            AccountMailboxesMenu(userWithMailboxes = usersWithMailboxes.first())
+            AccountMailboxesDropdown(
+                userWithMailboxes = userWithMailboxes,
+                onClickMailbox = {}
+            )
         }
     }
 }
