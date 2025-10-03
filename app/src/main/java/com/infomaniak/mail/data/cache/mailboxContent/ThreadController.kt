@@ -95,9 +95,9 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         }
     }
 
-    suspend fun updateIsLocallyMovedOutStatus(threadUids: List<String>, hasBeenMovedOut: Boolean) {
+    suspend fun updateIsLocallyMovedOutStatus(threadsUids: List<String>, hasBeenMovedOut: Boolean) {
         mailboxContentRealm().write {
-            threadUids.forEach {
+            threadsUids.forEach {
                 getThreadBlocking(it, realm = this)?.isLocallyMovedOut = hasBeenMovedOut
             }
         }

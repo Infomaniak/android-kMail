@@ -105,7 +105,7 @@ class Thread : RealmObject, Snoozable {
     @Transient
     var hasAttachable: Boolean = false
     // Has been moved (archived, spammed, deleted, moved) but API call hasn't been done yet.
-    // It's only used to filter locally the Threads' list.
+    // It's only used to locally filter the Threads' list.
     @Transient
     var isLocallyMovedOut: Boolean = false
     // When deserializing threads from the api, this way of initializing the value will compute the correct

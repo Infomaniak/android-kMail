@@ -692,7 +692,7 @@ class MainViewModel @Inject constructor(
         val undoResources = emptyList<String>()
         val uids = messagesToDelete.getUids()
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
+        moveOutThreadsLocally(threadsUids, threads, message)
 
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
@@ -855,7 +855,7 @@ class MainViewModel @Inject constructor(
     ) {
         val mailbox = currentMailbox.value!!
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
+        moveOutThreadsLocally(threadsUids, threads, message)
 
         val apiResponses = moveMessages(
             mailbox = mailbox,
@@ -1532,6 +1532,25 @@ class MainViewModel @Inject constructor(
         isMovedToNewFolder.postValue(true)
     }
     //endregion
+
+    private suspend fun moveOutThreadsLocally(
+        threadsUids: List<String>,
+        threads: List<Thread>,
+        message: Message?,
+    ) {
+        val uidsToMove = if (message == null) {
+            threadsUids
+        } else {
+            mutableListOf<String>().apply {
+                threads.forEach { thread ->
+                    var nbMessagesInCurrentFolder = thread.messages.count { it.folderId == currentFolderId }
+                    if (message.folderId == currentFolderId) nbMessagesInCurrentFolder--
+                    if (nbMessagesInCurrentFolder == 0) add(thread.uid)
+                }
+            }
+        }
+        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
+    }
 
     private fun refreshFoldersAsync(
         mailbox: Mailbox,
