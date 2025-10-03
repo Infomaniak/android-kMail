@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.newMessage.mailbox.compose
+package com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.mail.ui.newMessage.mailbox.MailboxUi
 import com.infomaniak.mail.ui.newMessage.mailbox.UserMailboxesUi
 import java.util.UUID
 
-class SelectMailboxPreviewParameter : PreviewParameterProvider<List<UserMailboxesUi>> {
-    override val values: Sequence<List<UserMailboxesUi>>
-        get() = sequenceOf(usersWithMailboxesPreviewData)
+class AccountMailboxesDropdownPreviewParameter : PreviewParameterProvider<UserMailboxesUi> {
+    override val values: Sequence<UserMailboxesUi>
+        get() = usersWithMailboxesPreviewData.asSequence()
 }
 
-private val usersWithMailboxesPreviewData = listOf(
+val usersWithMailboxesPreviewData = listOf(
     UserMailboxesUi(
         userId = 0,
         userEmail = "chef@infomaniak.com",
@@ -51,14 +51,14 @@ private val usersWithMailboxesPreviewData = listOf(
     ),
     UserMailboxesUi(
         userId = 1,
-        userEmail = "firstname.lastname@infomaniak.com",
+        userEmail = "firstname.lastnameeeeeeeeeeeeee@infomaniak.com",
         avatarUrl = "https://picsum.photos/id/140/200/200",
         initials = "FL",
         fullName = "Firstname Listname",
         mailboxes = listOf(
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
-                email = "firstname.lastname@infomaniak.com"
+                email = "firstname.lastnameeeeeeeeeeeeee@infomaniak.com"
             )
         )
     ),
