@@ -96,6 +96,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.ui.MainViewModel
@@ -341,7 +342,7 @@ fun List<Folder>.toFolderUi(excludeRoleFolder: Boolean = false): List<FolderUi> 
     val folderToMenuFolder = mutableMapOf<Folder, FolderUi>()
 
     // Step 1: Instantiate all FolderUi instances and identify root folders
-    forEachNestedItem(getChildren = { it.children }) { folder, depth ->
+    forEachNestedItem { folder, depth ->
         if (folder.shouldBeExcluded(excludeRoleFolder)) return@forEachNestedItem
 
         // Create placeholder (empty children for now)
@@ -370,20 +371,6 @@ fun List<Folder>.toFolderUi(excludeRoleFolder: Boolean = false): List<FolderUi> 
 
     // Step 3: Only return root folders needed for traversal
     return resultRoots.map { folderToMenuFolder[it.folder]!! } // TODO: Remove!!
-}
-
-/**
- * Traverses a tree structure in a depth-first search manner.
- */
-fun <T> List<T>.forEachNestedItem(getChildren: (T) -> List<T>, block: (T, Int) -> Unit) {
-    val stack = ArrayDeque<Pair<T, Int>>()
-    asReversed().forEach { stack.addLast(it to 0) }
-
-    while (stack.isNotEmpty()) {
-        val (item, depth) = stack.removeLast()
-        getChildren(item).asReversed().forEach { stack.addLast(it to depth + 1) }
-        block(item, depth)
-    }
 }
 
 /**
@@ -459,13 +446,9 @@ fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
     dividerType: Any,
     excludedFolderRoles: Set<FolderRole> = emptySet(),
 ): List<Any> = buildList {
-    default.forEachNestedItem(getChildren = { it.children }) { folder, _ ->
-        if (folder.folder.role !in excludedFolderRoles) add(folder)
-    }
+    default.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
     add(dividerType)
-    custom.forEachNestedItem(getChildren = { it.children }) { folder, _ ->
-        if (folder.folder.role !in excludedFolderRoles) add(folder)
-    }
+    custom.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
 }
 //endregion
 

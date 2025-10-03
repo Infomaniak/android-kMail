@@ -26,6 +26,7 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
+import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
@@ -46,7 +47,6 @@ import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderViewHolder.MailboxesHeader
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.forEachNestedItem
 import javax.inject.Inject
 
 class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
@@ -107,7 +107,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>): Boolean {
         var atLeastOneFolderIsIndented = false
 
-        defaultFolders.forEachNestedItem(getChildren = { it.children }) { defaultFolder, _ ->
+        defaultFolders.forEachNestedItem { defaultFolder, _ ->
             if (defaultFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
             if (defaultFolder.folder.isHidden.not()) add(defaultFolder)
         }
@@ -127,7 +127,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         if (customFolders.isEmpty()) {
             add(ItemType.EMPTY_FOLDERS)
         } else {
-            customFolders.forEachNestedItem(getChildren = { it.children }) { customFolder, _ ->
+            customFolders.forEachNestedItem { customFolder, _ ->
                 if (customFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
                 if (customFolder.folder.isHidden.not()) add(customFolder)
             }
