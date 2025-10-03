@@ -467,20 +467,6 @@ fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
         if (folder.folder.role !in excludedFolderRoles) add(folder)
     }
 }
-
-fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> {
-    val folders = this
-    var needsToAddDivider = true
-    return buildList {
-        folders.forEach { folder ->
-            if (needsToAddDivider && folder.isRootAndCustom) {
-                needsToAddDivider = false
-                add(dividerType)
-            }
-            add(folder)
-        }
-    }
-}
 //endregion
 
 //region Messages
