@@ -242,7 +242,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             is FolderViewHolder -> holder.displayFolder(
                 folderUi = item as FolderUi,
                 currentFolderId = currentFolderId,
-                hasCollapsableFolder = if (item.isInDefaultFolderHalf) hasCollapsableDefaultFolder else hasCollapsableCustomFolder,
+                hasCollapsableFolder = if (item.isInDefaultFolderSection) hasCollapsableDefaultFolder else hasCollapsableCustomFolder,
                 onFolderClicked = callbacks.onFolderClicked,
                 onFolderLongClicked = callbacks.onFolderLongClicked,
                 onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
@@ -313,7 +313,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.folder.unreadCountDisplay == oldItem.folder.unreadCountDisplay &&
                         newItem.folder.threads.count() == oldItem.folder.threads.count() &&
                         newItem.canBeCollapsed == oldItem.canBeCollapsed &&
-                        newItem.depth == oldItem.depth
+                        newItem.depth == oldItem.depth &&
+                        newItem.isInDefaultFolderSection == oldItem.isInDefaultFolderSection
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
                 ItemType.DIVIDER,
                 ItemType.FOLDERS_HEADER,
