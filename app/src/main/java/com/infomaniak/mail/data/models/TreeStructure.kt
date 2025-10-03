@@ -17,9 +17,20 @@
  */
 package com.infomaniak.mail.data.models
 
-data class FolderUi(
-    val folder: Folder,
-    override var children: List<FolderUi>,
-    val depth: Int,
-    var canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
-) : TreeStructure<FolderUi>
+interface TreeStructure<T> {
+    val children: List<T>
+}
+
+/**
+ * Traverses a tree structure in a depth-first search manner.
+ */
+fun <T : TreeStructure<T>> List<T>.forEachNestedItem(block: (T, Int) -> Unit) {
+    val stack = ArrayDeque<Pair<T, Int>>()
+    asReversed().forEach { stack.addLast(it to 0) }
+
+    while (stack.isNotEmpty()) {
+        val (item, depth) = stack.removeLast()
+        item.children.asReversed().forEach { stack.addLast(it to depth + 1) }
+        block(item, depth)
+    }
+}

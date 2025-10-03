@@ -55,7 +55,7 @@ import kotlinx.serialization.UseSerializers
 import kotlin.reflect.KProperty1
 
 @Serializable
-class Folder : RealmObject, Cloneable {
+class Folder : RealmObject, Cloneable, TreeStructure<Folder> {
 
     //region Remote data
     @PrimaryKey
@@ -70,7 +70,7 @@ class Folder : RealmObject, Cloneable {
     @SerialName("unread_count")
     var unreadCountRemote: Int = 0
     var separator: String = ""
-    var children = realmListOf<Folder>()
+    override var children = realmListOf<Folder>()
     //endregion
 
     //region Local data (Transient)
