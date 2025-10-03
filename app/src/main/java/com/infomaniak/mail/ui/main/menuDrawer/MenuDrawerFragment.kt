@@ -48,6 +48,7 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
@@ -147,7 +148,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
                 override var onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit = ::onFolderManage
-                override var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
+                override var onCollapseChildrenClicked: (folderUi: FolderUi, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
                 override var onActionsHeaderClicked: () -> Unit = ::onActionsHeaderClicked
                 override var onActionClicked: (ActionType) -> Unit = ::onActionClicked
                 override var onFeedbackClicked: () -> Unit = ::onFeedbackClicked
@@ -250,8 +251,8 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun onFolderCollapsed(folderId: String, shouldCollapse: Boolean) {
-        menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
+    private fun onFolderCollapsed(folderUi: FolderUi, shouldCollapse: Boolean) {
+        menuDrawerViewModel.toggleFolderCollapsingState(folderUi, shouldCollapse)
     }
 
     private fun onActionsHeaderClicked() {

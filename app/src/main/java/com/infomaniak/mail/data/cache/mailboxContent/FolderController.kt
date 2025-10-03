@@ -197,19 +197,8 @@ class FolderController @Inject constructor(
             realm.write { getFolderBlocking(id, realm = this)?.let { onUpdate(this, it) } }
         }
 
-        suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
-
-            tailrec fun updateChildrenRecursively(inputList: MutableList<Folder>) {
-                val folder = inputList.removeAt(0)
-                onUpdate(folder)
-                inputList.addAll(folder.children)
-
-                if (inputList.isNotEmpty()) updateChildrenRecursively(inputList)
-            }
-
-            realm.write {
-                getFolderBlocking(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
-            }
+        fun MutableRealm.updateFolder(id: String, onUpdate: (Folder) -> Unit) {
+            getFolderBlocking(id, realm = this)?.let { onUpdate(it) }
         }
 
         fun deleteSearchFolderData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {

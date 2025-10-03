@@ -24,7 +24,7 @@ interface TreeStructure<T> {
 /**
  * Traverses a tree structure in a depth-first search manner.
  */
-fun <T : TreeStructure<T>> List<T>.forEachNestedItem(block: (T, Int) -> Unit) {
+inline fun <T : TreeStructure<T>> List<T>.forEachNestedItem(block: (T, Int) -> Unit) {
     val stack = ArrayDeque<Pair<T, Int>>()
     forEach { stack.addFirst(it to 0) }
 
@@ -33,4 +33,8 @@ fun <T : TreeStructure<T>> List<T>.forEachNestedItem(block: (T, Int) -> Unit) {
         item.children.asReversed().forEach { stack.addLast(it to depth + 1) }
         block(item, depth)
     }
+}
+
+inline fun <T : TreeStructure<T>> T.forEachNestedItem(block: (T, Int) -> Unit) {
+    children.forEachNestedItem(block)
 }
