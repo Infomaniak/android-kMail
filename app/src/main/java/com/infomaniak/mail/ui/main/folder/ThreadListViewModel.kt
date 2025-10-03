@@ -22,6 +22,8 @@ import android.text.format.DateUtils
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.emojicomponents.data.Reaction
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
@@ -33,11 +35,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class ThreadListViewModel @Inject constructor(
     application: Application,
+    private val messageController: MessageController,
     private val searchUtils: SearchUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -83,6 +87,12 @@ class ThreadListViewModel @Inject constructor(
         }
 
         isWebViewOutdated.value = canShowWebViewOutdated && hasOutdatedMajorVersion
+    }
+
+    suspend fun getEmojiReactionsFor(messageUid: String): Map<String, Reaction>? = withContext(ioCoroutineContext) {
+        messageController.getMessage(messageUid)?.let { message ->
+            message.emojiReactions.associateBy { it.emoji }
+        }
     }
 
     enum class ContentDisplayMode {
