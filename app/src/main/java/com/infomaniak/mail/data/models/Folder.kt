@@ -124,9 +124,6 @@ class Folder : RealmObject, Cloneable, TreeStructure<Folder> {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
-    val canBeCollapsed: Boolean // For parents only (only a parent can be collapsed, its children will be hidden instead)
-        inline get() = children.isNotEmpty() && isRoot
-
     val isRoot: Boolean
         inline get() = !path.contains(separator)
 
