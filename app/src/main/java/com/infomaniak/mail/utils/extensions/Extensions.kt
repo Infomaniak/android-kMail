@@ -343,7 +343,7 @@ fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean =
 
     // Step 1: Instantiate all MenuDrawerFolder instances and identify root folders
     forEachNestedItem(getChildren = { it.children }) { folder, depth ->
-        if (folder.shouldBeExcluded(excludeRoleFolder) || folder.isHidden) return@forEachNestedItem
+        if (folder.shouldBeExcluded(excludeRoleFolder)) return@forEachNestedItem
 
         // Create placeholder (empty children for now)
         val menu = MenuDrawerFolder(
@@ -359,18 +359,13 @@ fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean =
 
     // Step 2: Link children of MenuDrawerFolder to existing instances + compute collapsibility
     folderToMenuFolder.forEach { (folder, menuFolder) ->
-        // Compute canBeCollapsed using hidden folders as well
         val validChildren = folder.children
             .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
-
-        // Only list children that are visible in the menu drawer
-        val visibleValidChildren = validChildren
-            .filter { !it.isHidden }
             .mapNotNull { folderToMenuFolder[it] }
 
         folderToMenuFolder[folder] = menuFolder.copy(
             canBeCollapsed = menuFolder.depth == 0 && validChildren.isNotEmpty(),
-            children = visibleValidChildren,
+            children = validChildren,
         )
     }
 
