@@ -68,8 +68,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             val (
                 mailboxes,
                 areMailboxesExpanded,
-                defaultFolders,
-                customFolders,
+                displayedFolders,
                 areCustomFoldersExpanded,
                 areActionsExpanded,
                 permissions,
@@ -79,10 +78,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             addMailboxes(mailboxes, areMailboxesExpanded)
 
             add(ItemType.DIVIDER)
-            hasCollapsableDefaultFolder = addDefaultFolders(defaultFolders)
+            hasCollapsableDefaultFolder = addDefaultFolders(displayedFolders.default)
 
             add(ItemType.DIVIDER)
-            hasCollapsableCustomFolder = addCustomFolders(customFolders, areCustomFoldersExpanded)
+            hasCollapsableCustomFolder = addCustomFolders(displayedFolders.custom, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)

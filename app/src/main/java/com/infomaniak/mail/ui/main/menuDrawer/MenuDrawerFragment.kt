@@ -66,7 +66,6 @@ import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.INFOMANIAK
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.Shortcuts
-import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
@@ -328,8 +327,7 @@ class MenuDrawerFragment : Fragment() {
         Utils.waitInitMediator(
             mailboxesLive,
             menuDrawerViewModel.areMailboxesExpanded,
-            defaultFoldersLive,
-            customFoldersLive,
+            displayedFoldersLive,
             menuDrawerViewModel.areCustomFoldersExpanded,
             menuDrawerViewModel.areActionsExpanded,
             currentPermissionsLive,
@@ -339,12 +337,11 @@ class MenuDrawerFragment : Fragment() {
                 MediatorContainer(
                     it[0] as List<Mailbox>,
                     it[1] as Boolean,
-                    it[2] as List<MenuDrawerFolder>,
-                    it[3] as List<MenuDrawerFolder>,
+                    it[2] as MainViewModel.DisplayedFolders,
+                    it[3] as Boolean,
                     it[4] as Boolean,
-                    it[5] as Boolean,
-                    it[6] as MailboxPermissions?,
-                    it[7] as Quotas?,
+                    it[5] as MailboxPermissions?,
+                    it[6] as Quotas?,
                 )
             }
         )
@@ -385,8 +382,7 @@ class MenuDrawerFragment : Fragment() {
     data class MediatorContainer(
         val mailboxes: List<Mailbox>,
         val areMailboxesExpanded: Boolean,
-        val defaultFolders: List<MenuDrawerFolder>,
-        val customFolders: List<MenuDrawerFolder>,
+        val displayedFolders: MainViewModel.DisplayedFolders,
         val areCustomFoldersExpanded: Boolean,
         val areActionsExpanded: Boolean,
         val permissions: MailboxPermissions?,

@@ -93,6 +93,7 @@ import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
+import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
@@ -121,6 +122,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -216,17 +218,23 @@ class MainViewModel @Inject constructor(
 
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
-    val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+    private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerDefaultFoldersAsync()
             .map { it.list.constructMenuDrawerFolderStructure() }
-    }.asLiveData(ioCoroutineContext)
+    }
 
-    val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+    private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerCustomFoldersAsync()
             .map {
                 it.list.constructMenuDrawerFolderStructure(excludeRoleFolder = true)
             }
-    }.asLiveData(ioCoroutineContext)
+    }
+
+    val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
+        DisplayedFolders(default, custom)
+    }
+
+    val displayedFoldersLive = displayedFoldersFlow.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(quotasController::getQuotasAsync) ?: emptyFlow()
@@ -1682,6 +1690,8 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Remove Threads with parental issues")
         threadController.removeThreadsWithParentalIssues()
     }
+
+    data class DisplayedFolders(val default: List<MenuDrawerFolder>, val custom: List<MenuDrawerFolder>)
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
