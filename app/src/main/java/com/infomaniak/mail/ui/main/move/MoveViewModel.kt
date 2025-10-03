@@ -22,11 +22,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.coroutineContext
@@ -57,7 +56,7 @@ class MoveViewModel @Inject constructor(
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
-    private var allFolders = emptyList<Any>()
+    private var allFolderUis = emptyList<Any>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
     val filterResults = MutableLiveData<Pair<List<Any>, Boolean>>()
     var hasAlreadyTrackedSearch = false
@@ -73,7 +72,7 @@ class MoveViewModel @Inject constructor(
     }
 
     fun initFolders(folders: MainViewModel.DisplayedFolders) {
-        allFolders = folders.flattenAndAddDividerBeforeFirstCustomFolder(
+        allFolderUis = folders.flattenAndAddDividerBeforeFirstCustomFolder(
             dividerType = Unit,
             excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
         ).also { folders -> filterResults.postValue(folders to true) }
@@ -84,7 +83,7 @@ class MoveViewModel @Inject constructor(
             searchFolders(query, shouldDebounce)
         } else {
             cancelSearch()
-            filterResults.value = allFolders to true
+            filterResults.value = allFolderUis to true
         }
     }
 
@@ -100,12 +99,12 @@ class MoveViewModel @Inject constructor(
             }
 
             val filteredFolders = mutableListOf<Any>().apply {
-                allFolders.forEach { folder ->
+                allFolderUis.forEach { folderUi ->
                     ensureActive()
-                    if (folder !is Folder) return@forEach
-                    val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
+                    if (folderUi !is FolderUi) return@forEach
+                    val folderName = folderUi.folder.role?.folderNameRes?.let(appContext::getString) ?: folderUi.folder.name
                     val isFound = folderName.standardize().contains(query.standardize())
-                    if (isFound) add(folder)
+                    if (isFound) add(folderUi)
                 }
             }
 
