@@ -109,7 +109,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
         defaultFolders.forEachNestedItem(getChildren = { it.children }) { defaultFolder, _ ->
             if (defaultFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-            add(defaultFolder)
+            if (defaultFolder.folder.isHidden.not()) add(defaultFolder)
         }
 
         return atLeastOneFolderIsIndented
@@ -129,7 +129,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         } else {
             customFolders.forEachNestedItem(getChildren = { it.children }) { customFolder, _ ->
                 if (customFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-                add(customFolder)
+                if (customFolder.folder.isHidden.not()) add(customFolder)
             }
         }
 
