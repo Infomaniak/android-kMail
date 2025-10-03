@@ -30,7 +30,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import kotlin.math.min
@@ -43,14 +43,14 @@ class FolderViewHolder(
     override val binding = super.binding as ItemMenuDrawerFolderBinding
 
     fun displayFolder(
-        menuDrawerFolder: MenuDrawerFolder,
+        folderUi: FolderUi,
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
-        val folder = menuDrawerFolder.folder
+        val folder = folderUi.folder
         SentryLog.d("Bind", "Bind Folder : ${folder.name}")
 
         val roleDependantParameters = folder.role?.let {
@@ -63,7 +63,7 @@ class FolderViewHolder(
             RoleDependantParameters(
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 trackerName = MatomoName.CustomFolder,
-                trackerValue = menuDrawerFolder.depth.toFloat(),
+                trackerValue = folderUi.depth.toFloat(),
             )
         }
 
@@ -73,11 +73,11 @@ class FolderViewHolder(
             else -> folder.unreadCountDisplay
         }
 
-        val folderIndent = min(menuDrawerFolder.depth, MAX_SUB_FOLDERS_INDENT)
+        val folderIndent = min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
         binding.root.setFolderUi(
             folder,
             roleDependantParameters,
-            menuDrawerFolder.canBeCollapsed,
+            folderUi.canBeCollapsed,
             folderIndent,
             unread,
             currentFolderId,

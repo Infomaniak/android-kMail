@@ -31,7 +31,7 @@ import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder.Companion.MAX_SUB_FOLDERS_INDENT
 import com.infomaniak.mail.ui.main.move.MoveAdapter.MoveFolderViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import javax.inject.Inject
@@ -64,7 +64,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (currentList[position]) {
-            is MenuDrawerFolder -> DisplayType.FOLDER.layout
+            is FolderUi -> DisplayType.FOLDER.layout
             else -> DisplayType.DIVIDER.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -90,12 +90,12 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
 
     override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int) = with(holder.binding) {
         if (getItemViewType(position) == DisplayType.FOLDER.layout) {
-            (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as MenuDrawerFolder)
+            (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as FolderUi)
         }
     }
 
-    private fun SelectableFolderItemView.displayFolder(menuDrawerFolder: MenuDrawerFolder) {
-        val folder = menuDrawerFolder.folder
+    private fun SelectableFolderItemView.displayFolder(folderUi: FolderUi) {
+        val folder = folderUi.folder
 
         val iconId = when {
             folder.role != null -> folder.role!!.folderIconRes
@@ -106,7 +106,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
 
         val folderIndent = when {
             !shouldDisplayIndent -> 0
-            else -> min(menuDrawerFolder.depth, MAX_SUB_FOLDERS_INDENT)
+            else -> min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
         }
         setIndent(indent = folderIndent, hasCollapsableFolder = false, canBeCollapsed = false)
 
