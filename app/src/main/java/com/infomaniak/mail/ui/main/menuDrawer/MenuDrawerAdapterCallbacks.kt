@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.menuDrawer
 
 import android.view.View
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
 
@@ -34,7 +35,7 @@ interface MenuDrawerAdapterCallbacks {
 
     var onFolderClicked: (folderId: String) -> Unit
     var onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit
-    var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit
+    var onCollapseChildrenClicked: (folderUi: FolderUi, shouldCollapse: Boolean) -> Unit
 
     var onActionsHeaderClicked: () -> Unit
     var onActionClicked: (ActionType) -> Unit

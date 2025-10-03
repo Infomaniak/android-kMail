@@ -47,7 +47,7 @@ class FolderViewHolder(
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
-        onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
+        onCollapseChildrenClicked: (folderUi: FolderUi, shouldCollapse: Boolean) -> Unit,
     ) {
         val folder = folderUi.folder
         SentryLog.d("Bind", "Bind Folder : ${folder.name}")
@@ -95,7 +95,7 @@ class FolderViewHolder(
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
-        onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
+        onCollapseChildrenClicked: (folderUi: FolderUi, shouldCollapse: Boolean) -> Unit,
     ) {
         val folder = folderUi.folder
         val folderName = folder.getLocalizedName(context)
@@ -103,7 +103,7 @@ class FolderViewHolder(
 
         setFolderUi(folder, iconId, isSelected = folder.id == currentFolderId)
 
-        initOnCollapsableClickListener { onCollapseChildrenClicked(folder.id, isCollapsed) }
+        initOnCollapsableClickListener { onCollapseChildrenClicked(folderUi, isCollapsed) }
 
         isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
         unreadCount = unread?.count ?: 0
