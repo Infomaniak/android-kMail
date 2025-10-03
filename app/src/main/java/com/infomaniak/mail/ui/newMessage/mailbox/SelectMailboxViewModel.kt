@@ -44,6 +44,13 @@ data class MailboxUi(
     val email: String
 )
 
+data class SelectedMailboxUi(
+    val userId: Int,
+    val mailbox: MailboxUi,
+    val avatarUrl: String?,
+    val initials: String,
+)
+
 @HiltViewModel
 class SelectMailboxViewModel @Inject constructor(
     application: Application,
@@ -53,12 +60,12 @@ class SelectMailboxViewModel @Inject constructor(
     private val _usersWithMailboxes = MutableStateFlow<List<UserMailboxesUi>>(emptyList())
     val usersWithMailboxes: StateFlow<List<UserMailboxesUi>> get() = _usersWithMailboxes
 
-    private val _userWithMailboxSelected = MutableStateFlow<UserMailboxesUi?>(null)
-    val userWithMailboxSelected get() = _userWithMailboxSelected
+    private val _selectedMailbox = MutableStateFlow<SelectedMailboxUi?>(null)
+    val selectedMailbox get() = _selectedMailbox
 
     init {
         viewModelScope.launch(ioDispatcher) {
-            getCurrentUserWithMailbox()
+            getDefaultUserWithMailbox()
             getUsersAndMailboxes()
         }
     }
@@ -81,24 +88,43 @@ class SelectMailboxViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getCurrentUserWithMailbox() {
+    private suspend fun getDefaultUserWithMailbox() {
         AccountUtils.currentUser?.let { currentUser ->
-            _userWithMailboxSelected.value = UserMailboxesUi(
+            _selectedMailbox.value = SelectedMailboxUi(
                 userId = currentUser.id,
-                userEmail = currentUser.email,
-                avatarUrl = currentUser.avatar,
-                initials = currentUser.getInitials(),
-                fullName = currentUser.displayName ?: currentUser.run { "$firstname $lastname" },
-                mailboxes = mailboxController.getMailboxes(currentUser.id)
-                    .filter { mailbox ->
+                mailbox = mailboxController.getMailboxes(currentUser.id)
+                    .first { mailbox ->
                         mailbox.email == AccountUtils.currentMailboxEmail
-                    }.map { mailbox ->
+                    }
+                    .let { mailbox ->
                         MailboxUi(
                             mailUuid = mailbox.uuid,
                             email = mailbox.email
                         )
-                    }
+                    },
+                avatarUrl = currentUser.avatar,
+                initials = currentUser.getInitials()
             )
+            // _selectedMailbox.value = UserMailboxesUi(
+            //     userId = currentUser.id,
+            //     userEmail = currentUser.email,
+            //     avatarUrl = currentUser.avatar,
+            //     initials = currentUser.getInitials(),
+            //     fullName = currentUser.displayName ?: currentUser.run { "$firstname $lastname" },
+            //     mailboxes = mailboxController.getMailboxes(currentUser.id)
+            //         .filter { mailbox ->
+            //             mailbox.email == AccountUtils.currentMailboxEmail
+            //         }.map { mailbox ->
+            //             MailboxUi(
+            //                 mailUuid = mailbox.uuid,
+            //                 email = mailbox.email
+            //             )
+            //         }
+            // )
         }
+    }
+
+    fun selectMailbox(selectedMailbox: SelectedMailboxUi?) {
+        _selectedMailbox.value = selectedMailbox
     }
 }
