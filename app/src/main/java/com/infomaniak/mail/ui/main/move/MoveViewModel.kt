@@ -30,7 +30,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.flattenAndAddDividerBeforeFirstCustomFolder
+import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

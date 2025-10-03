@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.forEachNestedItem
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.extensions.IK_FOLDER
 
 /**
@@ -71,4 +72,16 @@ fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
     val isHiddenIkFolder = path.startsWith(IK_FOLDER) && role == null
     val isRoleFolder = role != null
     return isHiddenIkFolder || (excludeRoleFolder && isRoleFolder)
+}
+
+/**
+ * @return A list of [FolderUi] with a single divider of the provided type
+ */
+fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
+    dividerType: Any,
+    excludedFolderRoles: Set<Folder.FolderRole> = emptySet(),
+): List<Any> = buildList {
+    default.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
+    add(dividerType)
+    custom.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
 }
