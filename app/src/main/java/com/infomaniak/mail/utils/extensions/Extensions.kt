@@ -339,7 +339,7 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
  * @param excludeRoleFolder Do not return folders with role nor their children. This is used in the menu drawer to not display
  * role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
-fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean = false): List<FolderUi> {
+fun List<Folder>.toFolderUi(excludeRoleFolder: Boolean = false): List<FolderUi> {
     val resultRoots = mutableListOf<FolderUi>()
     val folderToMenuFolder = mutableMapOf<Folder, FolderUi>()
 
