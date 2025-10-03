@@ -133,7 +133,7 @@ fun AccountMailboxesMenu(
         }
         DropdownMenu(
             modifier = Modifier
-                .background(Color.White)
+                .background(colorResource(R.color.informationBlockBackground))
                 .width(with(LocalDensity.current) { rowSize.width.toDp() }),
             expanded = isDropDownExpanded.value,
             onDismissRequest = {
@@ -143,14 +143,14 @@ fun AccountMailboxesMenu(
             userWithMailboxes.mailboxes.forEachIndexed { index, mailbox ->
                 DropdownMenuItem(
                     text = {
-                        Row {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_envelope),
                                 tint = MaterialTheme.colorScheme.primary,
                                 contentDescription = null
                             )
                             Text(
-                                modifier = Modifier.padding(horizontal = Margin.Mini),
+                                modifier = Modifier.padding(horizontal = Margin.Small),
                                 text = mailbox.email
                             )
                         }
