@@ -334,13 +334,13 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
  * Returns a tree-like list of [FolderUi] where each folder has a reference to its children. This method automatically
  * excludes .ik folders.
  *
- * @param isInDefaultFolderHalf Do not return folders with role nor their children. This is used in the menu drawer to not display
+ * @param isInDefaultFolderSection Do not return folders with role nor their children. This is used in the menu drawer to not display
  * role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
-fun List<Folder>.toFolderUi(isInDefaultFolderHalf: Boolean): List<FolderUi> {
+fun List<Folder>.toFolderUi(isInDefaultFolderSection: Boolean): List<FolderUi> {
     val resultRoots = mutableListOf<FolderUi>()
     val folderToMenuFolder = mutableMapOf<Folder, FolderUi>()
-    val excludeRoleFolder = isInDefaultFolderHalf.not()
+    val excludeRoleFolder = isInDefaultFolderSection.not()
 
     // Step 1: Instantiate all FolderUi instances and identify root folders
     forEachNestedItem { folder, depth ->
@@ -352,7 +352,7 @@ fun List<Folder>.toFolderUi(isInDefaultFolderHalf: Boolean): List<FolderUi> {
             depth = depth,
             canBeCollapsed = false, // will compute below
             children = emptyList(),
-            isInDefaultFolderHalf = isInDefaultFolderHalf,
+            isInDefaultFolderSection = isInDefaultFolderSection,
         )
         folderToMenuFolder[folder] = menu
 
