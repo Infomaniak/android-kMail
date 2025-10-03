@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
@@ -45,7 +46,6 @@ import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderViewHolder.MailboxesHeader
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
 import com.infomaniak.mail.utils.extensions.forEachNestedItem
 import javax.inject.Inject
 
@@ -104,7 +104,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<MenuDrawerFolder>): Boolean {
+    private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>): Boolean {
         var atLeastOneFolderIsIndented = false
 
         defaultFolders.forEachNestedItem(getChildren = { it.children }) { defaultFolder, _ ->
@@ -116,7 +116,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     private fun MutableList<Any>.addCustomFolders(
-        customFolders: List<MenuDrawerFolder>,
+        customFolders: List<FolderUi>,
         areCustomFoldersExpanded: Boolean,
     ): Boolean {
         var atLeastOneFolderIsIndented = false
@@ -183,7 +183,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             is MailboxesHeader -> ItemType.MAILBOXES_HEADER.ordinal
             is Mailbox -> if (item.isAvailable) ItemType.MAILBOX.ordinal else ItemType.INVALID_MAILBOX.ordinal
             ItemType.FOLDERS_HEADER -> ItemType.FOLDERS_HEADER.ordinal
-            is MenuDrawerFolder -> ItemType.FOLDER.ordinal
+            is FolderUi -> ItemType.FOLDER.ordinal
             ItemType.EMPTY_FOLDERS -> ItemType.EMPTY_FOLDERS.ordinal
             ItemType.ACTIONS_HEADER -> ItemType.ACTIONS_HEADER.ordinal
             is MenuDrawerAction -> ItemType.ACTION.ordinal
@@ -240,7 +240,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 onCreateFolderClicked = callbacks.onCreateFolderClicked,
             )
             is FolderViewHolder -> holder.displayFolder(
-                menuDrawerFolder = item as MenuDrawerFolder,
+                folderUi = item as FolderUi,
                 currentFolderId = currentFolderId,
                 // TODO: Fix this
                 hasCollapsableFolder = if (item.folder.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder,
@@ -291,7 +291,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 is MailboxesHeader -> newItem is MailboxesHeader && newItem.mailbox?.objectId == oldItem.mailbox?.objectId
                 is Mailbox -> newItem is Mailbox && newItem.objectId == oldItem.objectId
                 ItemType.FOLDERS_HEADER -> newItem == ItemType.FOLDERS_HEADER
-                is MenuDrawerFolder -> newItem is MenuDrawerFolder && newItem.folder.id == oldItem.folder.id
+                is FolderUi -> newItem is FolderUi && newItem.folder.id == oldItem.folder.id
                 ItemType.EMPTY_FOLDERS -> newItem == ItemType.EMPTY_FOLDERS
                 ItemType.ACTIONS_HEADER -> newItem == ItemType.ACTIONS_HEADER
                 is MenuDrawerAction -> newItem is MenuDrawerAction && newItem.type == oldItem.type
@@ -307,7 +307,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         && newItem.isExpanded == oldItem.isExpanded
                         && newItem.mailbox?.unreadCountDisplay?.count == oldItem.mailbox?.unreadCountDisplay?.count
                 is Mailbox -> newItem is Mailbox && newItem.unreadCountDisplay.count == oldItem.unreadCountDisplay.count
-                is MenuDrawerFolder -> newItem is MenuDrawerFolder &&
+                is FolderUi -> newItem is FolderUi &&
                         newItem.folder.name == oldItem.folder.name &&
                         newItem.folder.isFavorite == oldItem.folder.isFavorite &&
                         newItem.folder.path == oldItem.folder.path &&

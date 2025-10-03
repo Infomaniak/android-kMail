@@ -93,7 +93,7 @@ import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
-import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
@@ -1691,7 +1691,7 @@ class MainViewModel @Inject constructor(
         threadController.removeThreadsWithParentalIssues()
     }
 
-    data class DisplayedFolders(val default: List<MenuDrawerFolder>, val custom: List<MenuDrawerFolder>)
+    data class DisplayedFolders(val default: List<FolderUi>, val custom: List<FolderUi>)
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName

@@ -30,7 +30,7 @@ import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.DIVIDER
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.FOLDER
-import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 
@@ -56,7 +56,7 @@ class SearchFolderAdapter(
         val context = parent!!.context
         return when (getItemViewType(position)) {
             DIVIDER.itemId -> bindDivider(convertView, context, parent)
-            else -> bindFolder(convertView, context, parent, getItem(position) as? MenuDrawerFolder)
+            else -> bindFolder(convertView, context, parent, getItem(position) as? FolderUi)
         }
     }
 
@@ -70,7 +70,7 @@ class SearchFolderAdapter(
         convertView: View?,
         context: Context,
         parent: ViewGroup?,
-        folder: MenuDrawerFolder?,
+        folder: FolderUi?,
     ): View {
         return (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
             findViewById<SelectableFolderItemView>(R.id.simpleFolderItemView).apply {

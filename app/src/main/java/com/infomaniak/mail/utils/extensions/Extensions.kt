@@ -90,6 +90,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -332,22 +333,22 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 
 //region Folders
 /**
- * Returns a tree-like list of MenuDrawerFolder where each folder has a reference to its children. This method automatically
+ * Returns a tree-like list of [FolderUi] where each folder has a reference to its children. This method automatically
  * excludes .ik folders.
  *
  * @param excludeRoleFolder Do not return folders with role nor their children. This is used in the menu drawer to not display
  * role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
-fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean = false): List<MenuDrawerFolder> {
-    val resultRoots = mutableListOf<MenuDrawerFolder>()
-    val folderToMenuFolder = mutableMapOf<Folder, MenuDrawerFolder>()
+fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean = false): List<FolderUi> {
+    val resultRoots = mutableListOf<FolderUi>()
+    val folderToMenuFolder = mutableMapOf<Folder, FolderUi>()
 
-    // Step 1: Instantiate all MenuDrawerFolder instances and identify root folders
+    // Step 1: Instantiate all FolderUi instances and identify root folders
     forEachNestedItem(getChildren = { it.children }) { folder, depth ->
         if (folder.shouldBeExcluded(excludeRoleFolder)) return@forEachNestedItem
 
         // Create placeholder (empty children for now)
-        val menu = MenuDrawerFolder(
+        val menu = FolderUi(
             folder = folder,
             depth = depth,
             canBeCollapsed = false, // will compute below
@@ -358,7 +359,7 @@ fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean =
         if (depth == 0) resultRoots.add(menu)
     }
 
-    // Step 2: Link children of MenuDrawerFolder to existing instances + compute collapsibility
+    // Step 2: Link children of FolderUi to existing instances + compute collapsibility
     folderToMenuFolder.forEach { (folder, menuFolder) ->
         val validChildren = folder.children
             .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
@@ -373,13 +374,6 @@ fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean =
     // Step 3: Only return root folders needed for traversal
     return resultRoots.map { folderToMenuFolder[it.folder]!! } // TODO: Remove!!
 }
-
-data class MenuDrawerFolder(
-    val folder: Folder,
-    var children: List<MenuDrawerFolder>,
-    val depth: Int,
-    var canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
-)
 
 /**
  * Traverses a tree structure in a depth-first search manner.
@@ -483,7 +477,7 @@ fun List<Folder>.sortFolders() = sortedBy { it.sortedName }
     .sortedByDescending { it.roleOrder }
 
 /**
- * @return A list of [MenuDrawerFolder] with a single divider of the provided type
+ * @return A list of [FolderUi] with a single divider of the provided type
  */
 fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
     dividerType: Any,
