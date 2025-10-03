@@ -26,7 +26,7 @@ interface TreeStructure<T> {
  */
 fun <T : TreeStructure<T>> List<T>.forEachNestedItem(block: (T, Int) -> Unit) {
     val stack = ArrayDeque<Pair<T, Int>>()
-    asReversed().forEach { stack.addLast(it to 0) }
+    forEach { stack.addFirst(it to 0) }
 
     while (stack.isNotEmpty()) {
         val (item, depth) = stack.removeLast()
