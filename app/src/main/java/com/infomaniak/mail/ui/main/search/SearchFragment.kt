@@ -38,6 +38,7 @@ import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.showKeyboard
+import com.infomaniak.core.observe
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -48,6 +49,7 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -58,10 +60,10 @@ import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElemen
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
-import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
@@ -225,10 +227,10 @@ class SearchFragment : TwoPaneFragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        searchViewModel.foldersLive.observe(viewLifecycleOwner) { allFolders ->
+        mainViewModel.displayedFoldersFlow.observe(viewLifecycleOwner) { allFolders ->
 
             val folders = allFolders
-                .addDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
+                .flattenAndAddDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
                 .toMutableList()
                 .apply { add(0, SearchFolderElement.ALL_FOLDERS) }
                 .toList()
@@ -240,10 +242,10 @@ class SearchFragment : TwoPaneFragment() {
             popupMenu.setOnItemClickListener { _, _, position, _ ->
                 if (searchAdapter.getItemViewType(position) != SearchFolderElement.DIVIDER.itemId) {
 
-                    val folder = folders[position] as? Folder
-                    val entryName = requireContext().getLocalizedNameOrAllFolders(folder)
+                    val folderUi = folders[position] as? FolderUi
+                    val entryName = requireContext().getLocalizedNameOrAllFolders(folderUi?.folder)
 
-                    onFolderSelected(folder, entryName)
+                    onFolderSelected(folderUi?.folder, entryName)
                     popupMenu.dismiss()
                 }
             }

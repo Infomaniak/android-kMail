@@ -55,7 +55,7 @@ import kotlinx.serialization.UseSerializers
 import kotlin.reflect.KProperty1
 
 @Serializable
-class Folder : RealmObject, Cloneable {
+class Folder : RealmObject, Cloneable, TreeStructure<Folder> {
 
     //region Remote data
     @PrimaryKey
@@ -70,7 +70,7 @@ class Folder : RealmObject, Cloneable {
     @SerialName("unread_count")
     var unreadCountRemote: Int = 0
     var separator: String = ""
-    var children = realmListOf<Folder>()
+    override var children = realmListOf<Folder>()
     //endregion
 
     //region Local data (Transient)
@@ -124,14 +124,8 @@ class Folder : RealmObject, Cloneable {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
-    val canBeCollapsed: Boolean // For parents only (only a parent can be collapsed, its children will be hidden instead)
-        inline get() = children.isNotEmpty() && isRoot
-
     val isRoot: Boolean
         inline get() = !path.contains(separator)
-
-    val isRootAndCustom: Boolean
-        inline get() = role == null && isRoot
 
     val refreshStrategy: RefreshStrategy get() = role?.refreshStrategy ?: defaultRefreshStrategy
 

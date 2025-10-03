@@ -46,7 +46,7 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
@@ -146,7 +146,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
                 override var onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit = ::onFolderManage
-                override var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
+                override var onCollapseChildrenClicked: (folderUi: FolderUi, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
                 override var onActionsHeaderClicked: () -> Unit = ::onActionsHeaderClicked
                 override var onActionClicked: (ActionType) -> Unit = ::onActionClicked
                 override var onFeedbackClicked: () -> Unit = ::onFeedbackClicked
@@ -249,8 +249,8 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun onFolderCollapsed(folderId: String, shouldCollapse: Boolean) {
-        menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
+    private fun onFolderCollapsed(folderUi: FolderUi, shouldCollapse: Boolean) {
+        menuDrawerViewModel.toggleFolderCollapsingState(folderUi, shouldCollapse)
     }
 
     private fun onActionsHeaderClicked() {
@@ -326,8 +326,7 @@ class MenuDrawerFragment : Fragment() {
         Utils.waitInitMediator(
             mailboxesLive,
             menuDrawerViewModel.areMailboxesExpanded,
-            defaultFoldersLive,
-            customFoldersLive,
+            displayedFoldersLive,
             menuDrawerViewModel.areCustomFoldersExpanded,
             menuDrawerViewModel.areActionsExpanded,
             currentPermissionsLive,
@@ -337,12 +336,11 @@ class MenuDrawerFragment : Fragment() {
                 MediatorContainer(
                     it[0] as List<Mailbox>,
                     it[1] as Boolean,
-                    it[2] as List<Folder>,
-                    it[3] as List<Folder>,
+                    it[2] as MainViewModel.DisplayedFolders,
+                    it[3] as Boolean,
                     it[4] as Boolean,
-                    it[5] as Boolean,
-                    it[6] as MailboxPermissions?,
-                    it[7] as Quotas?,
+                    it[5] as MailboxPermissions?,
+                    it[6] as Quotas?,
                 )
             }
         )
@@ -383,8 +381,7 @@ class MenuDrawerFragment : Fragment() {
     data class MediatorContainer(
         val mailboxes: List<Mailbox>,
         val areMailboxesExpanded: Boolean,
-        val defaultFolders: List<Folder>,
-        val customFolders: List<Folder>,
+        val displayedFolders: MainViewModel.DisplayedFolders,
         val areCustomFoldersExpanded: Boolean,
         val areActionsExpanded: Boolean,
         val permissions: MailboxPermissions?,
