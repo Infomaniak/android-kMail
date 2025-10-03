@@ -51,10 +51,13 @@ class FolderController @Inject constructor(
     }
 
     fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getRootFoldersQuery(
-            realm = mailboxContentRealm(),
-            withoutTypes = listOf(FoldersType.DEFAULT),
-        ).asFlow()
+        val rootsQuery = " AND $isRootFolder"
+        val typeQuery = " AND ${Folder.rolePropertyName} == nil"
+        val visibilityQuery = " AND $isVisible"
+        return mailboxContentRealm()
+            .query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}")
+            .sortFolders()
+            .asFlow()
     }
 
     suspend fun getFolder(id: String): Folder? {
@@ -137,14 +140,6 @@ class FolderController @Inject constructor(
     }
     //endregion
 
-    enum class FoldersType {
-        DEFAULT,
-        CUSTOM,
-        SNOOZED,
-        SCHEDULED_DRAFTS,
-        DRAFT,
-    }
-
     companion object {
         const val SEARCH_FOLDER_ID = "search_folder_id"
         private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
@@ -153,25 +148,6 @@ class FolderController @Inject constructor(
         private val isVisible: String = "${Folder::isDisplayed.name} == true"
 
         //region Queries
-        private fun getRootFoldersQuery(
-            realm: TypedRealm,
-            withoutTypes: List<FoldersType> = emptyList(),
-            visibleFoldersOnly: Boolean = true,
-        ): RealmQuery<Folder> {
-            val rootsQuery = " AND $isRootFolder"
-            val typeQuery = withoutTypes.joinToString(separator = "") {
-                when (it) {
-                    FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
-                    FoldersType.CUSTOM -> " AND $hasRole"
-                    FoldersType.SNOOZED -> " AND ${Folder.rolePropertyName} != '${FolderRole.SNOOZED.name}'"
-                    FoldersType.SCHEDULED_DRAFTS -> " AND ${Folder.rolePropertyName} != '${FolderRole.SCHEDULED_DRAFTS.name}'"
-                    FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
-                }
-            }
-            val visibilityQuery = if (visibleFoldersOnly) " AND $isVisible" else ""
-            return realm.query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}").sortFolders()
-        }
-
         /**
          * Returns the complete list of folders with roles. Is used to display the special roles folders in the menu drawer. Also
          * filters out the folders that are not visible in realm.
