@@ -130,9 +130,6 @@ class Folder : RealmObject, Cloneable {
     val isRoot: Boolean
         inline get() = !path.contains(separator)
 
-    val isRootAndCustom: Boolean
-        inline get() = role == null && isRoot
-
     val refreshStrategy: RefreshStrategy get() = role?.refreshStrategy ?: defaultRefreshStrategy
 
     val folderSort get() = role?.folderSort ?: FolderSort.Default
