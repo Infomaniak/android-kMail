@@ -149,11 +149,10 @@ class FolderController @Inject constructor(
 
         //region Queries
         /**
-         * Returns the complete list of folders with roles. Is used to display the special roles folders in the menu drawer. Also
-         * filters out the folders that are not visible in realm.
+         * Returns the complete list of folders with roles. Is used to display the special roles folders in the menu drawer.
          */
         private fun getVisibleRoleFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            return realm.query<Folder>("$hasRole AND $isVisible").sortFolders()
+            return realm.query<Folder>(hasRole).sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
