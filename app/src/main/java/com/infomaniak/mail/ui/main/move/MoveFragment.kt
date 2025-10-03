@@ -64,6 +64,11 @@ class MoveFragment : Fragment() {
     @Inject
     lateinit var moveAdapter: MoveAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lifecycleScope.launch { moveViewModel.initFolders(mainViewModel.displayedFoldersFlow.first()) }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMoveBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -78,7 +83,6 @@ class MoveFragment : Fragment() {
         }
 
         bindAlertToViewLifecycle(createFolderDialog)
-        lifecycleScope.launch { moveViewModel.initFolders(mainViewModel.displayedFoldersFlow.first()) }
         setupRecyclerView()
         setupListeners()
         setupCreateFolderDialog()
