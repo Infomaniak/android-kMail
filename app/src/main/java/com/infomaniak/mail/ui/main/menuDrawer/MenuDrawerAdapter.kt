@@ -108,8 +108,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         var atLeastOneFolderIsIndented = false
 
         defaultFolders.forEachNestedItem { defaultFolder, _ ->
-            if (defaultFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-            if (!defaultFolder.folder.isHidden) add(defaultFolder)
+            if (!defaultFolder.folder.isHidden) {
+                if (defaultFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
+                add(defaultFolder)
+            }
         }
 
         return atLeastOneFolderIsIndented
@@ -128,8 +130,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             add(ItemType.EMPTY_FOLDERS)
         } else {
             customFolders.forEachNestedItem { customFolder, _ ->
-                if (customFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-                if (!customFolder.folder.isHidden) add(customFolder)
+                if (!customFolder.folder.isHidden) {
+                    if (customFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
+                    add(customFolder)
+                }
             }
         }
 
