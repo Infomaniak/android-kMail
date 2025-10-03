@@ -331,53 +331,6 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 //endregion
 
 //region Folders
-
-/**
- * This method returns instances of [Folder] that have no relations to other classes such as
- * [com.infomaniak.mail.data.models.thread.Thread.messages] because we copy them from realm with a low depth.
- */
-fun List<Folder>.flattenFolderChildrenAndRemoveMessages(): List<Folder> {
-
-    if (isEmpty()) return this
-
-    return formatFolderWithAllChildren(toMutableList())
-}
-
-private tailrec fun formatFolderWithAllChildren(
-    inputList: MutableList<Folder>,
-    outputList: MutableList<Folder> = mutableListOf(),
-): List<Folder> {
-
-    val folder = inputList.removeAt(0)
-
-    /*
-    * There are two types of folders:
-    * - user's folders (with or without a role)
-    * - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
-    *
-    * We want to display the user's folders, and also the IK folders for which we handle the role.
-    * IK folders where we don't handle the role are dismissed.
-    *
-    * I.e. hides all IK folders with no roles.
-    */
-    val shouldThisFolderBeAdded = folder.shouldBeExcluded(excludeRoleFolder = false).not()
-
-    val children = if (shouldThisFolderBeAdded) {
-        outputList.add(folder)
-        folder.children.sortFolders()
-    } else {
-        null
-    }
-
-    children?.let { inputList.addAll(index = 0, it) }
-
-    return if (inputList.isEmpty()) {
-        outputList
-    } else {
-        formatFolderWithAllChildren(inputList, outputList)
-    }
-}
-
 /**
  * These 2 `sortFolders()` functions should always implement the same sort logic.
  */
