@@ -103,7 +103,7 @@ import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
-import com.infomaniak.mail.utils.toFolderUi
+import com.infomaniak.mail.utils.toFolderUiTree
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -221,13 +221,13 @@ class MainViewModel @Inject constructor(
     private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.toFolderUi(isInDefaultFolderSection = true) }
+            .map { it.list.toFolderUiTree(isInDefaultFolderSection = true) }
     }
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerCustomFoldersAsync()
-            .map { it.list.toFolderUi(isInDefaultFolderSection = false) }
+            .map { it.list.toFolderUiTree(isInDefaultFolderSection = false) }
     }
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
