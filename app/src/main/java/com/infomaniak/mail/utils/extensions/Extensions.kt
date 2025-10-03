@@ -122,6 +122,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
+import com.infomaniak.mail.utils.shouldBeExcluded
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
@@ -330,50 +331,6 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 //endregion
 
 //region Folders
-/**
- * Returns a tree-like list of [FolderUi] where each folder has a reference to its children. This method automatically
- * excludes .ik folders.
- *
- * @param isInDefaultFolderSection Do not return folders with role nor their children. This is used in the menu drawer to not display
- * role folders in the bottom custom folder section because they are already displayed on the upper section.
- */
-fun List<Folder>.toFolderUi(isInDefaultFolderSection: Boolean): List<FolderUi> {
-    val resultRoots = mutableListOf<FolderUi>()
-    val folderToMenuFolder = mutableMapOf<Folder, FolderUi>()
-    val excludeRoleFolder = isInDefaultFolderSection.not()
-
-    // Step 1: Instantiate all FolderUi instances and identify root folders
-    forEachNestedItem { folder, depth ->
-        if (folder.shouldBeExcluded(excludeRoleFolder)) return@forEachNestedItem
-
-        // Create placeholder (empty children for now)
-        val menu = FolderUi(
-            folder = folder,
-            depth = depth,
-            canBeCollapsed = false, // will compute below
-            children = emptyList(),
-            isInDefaultFolderSection = isInDefaultFolderSection,
-        )
-        folderToMenuFolder[folder] = menu
-
-        if (depth == 0) resultRoots.add(menu)
-    }
-
-    // Step 2: Link children of FolderUi to existing instances + compute collapsibility
-    folderToMenuFolder.forEach { (folder, menuFolder) ->
-        val validChildren = folder.children
-            .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
-            .mapNotNull { folderToMenuFolder[it] }
-
-        folderToMenuFolder[folder] = menuFolder.apply {
-            canBeCollapsed = menuFolder.depth == 0 && validChildren.isNotEmpty()
-            children = validChildren
-        }
-    }
-
-    // Step 3: Only return root folders needed for traversal
-    return resultRoots.map { folderToMenuFolder[it.folder]!! } // TODO: Remove!!
-}
 
 /**
  * This method returns instances of [Folder] that have no relations to other classes such as
@@ -419,12 +376,6 @@ private tailrec fun formatFolderWithAllChildren(
     } else {
         formatFolderWithAllChildren(inputList, outputList)
     }
-}
-
-private fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
-    val isHiddenIkFolder = path.startsWith(IK_FOLDER) && role == null
-    val isRoleFolder = role != null
-    return isHiddenIkFolder || (excludeRoleFolder && isRoleFolder)
 }
 
 /**

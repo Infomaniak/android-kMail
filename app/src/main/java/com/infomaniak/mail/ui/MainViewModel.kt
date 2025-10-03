@@ -103,7 +103,7 @@ import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
-import com.infomaniak.mail.utils.extensions.toFolderUi
+import com.infomaniak.mail.utils.toFolderUi
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
 import com.infomaniak.mail.workers.DraftsActionsWorker
