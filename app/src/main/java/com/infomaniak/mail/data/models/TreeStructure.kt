@@ -36,5 +36,5 @@ inline fun <T : TreeStructure<T>> List<T>.forEachNestedItem(block: (T, Int) -> U
 }
 
 inline fun <T : TreeStructure<T>> T.forEachNestedItem(block: (T, Int) -> Unit) {
-    listOf(this).forEachNestedItem(block)
+    children.forEachNestedItem(block)
 }
