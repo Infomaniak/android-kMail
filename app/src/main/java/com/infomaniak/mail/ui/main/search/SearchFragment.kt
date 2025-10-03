@@ -231,7 +231,6 @@ class SearchFragment : TwoPaneFragment() {
 
             val folders = allFolders
                 .flattenAndAddDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
-                .map { if (it is MenuDrawerFolder) it.folder else it }
                 .toMutableList()
                 .apply { add(0, SearchFolderElement.ALL_FOLDERS) }
                 .toList()
@@ -243,10 +242,10 @@ class SearchFragment : TwoPaneFragment() {
             popupMenu.setOnItemClickListener { _, _, position, _ ->
                 if (searchAdapter.getItemViewType(position) != SearchFolderElement.DIVIDER.itemId) {
 
-                    val folder = folders[position] as? Folder
-                    val entryName = requireContext().getLocalizedNameOrAllFolders(folder)
+                    val folder = folders[position] as? MenuDrawerFolder
+                    val entryName = requireContext().getLocalizedNameOrAllFolders(folder?.folder)
 
-                    onFolderSelected(folder, entryName)
+                    onFolderSelected(folder?.folder, entryName)
                     popupMenu.dismiss()
                 }
             }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.DIVIDER
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.FOLDER
+import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 
@@ -55,7 +56,7 @@ class SearchFolderAdapter(
         val context = parent!!.context
         return when (getItemViewType(position)) {
             DIVIDER.itemId -> bindDivider(convertView, context, parent)
-            else -> bindFolder(convertView, context, parent, getItem(position) as? Folder)
+            else -> bindFolder(convertView, context, parent, getItem(position) as? MenuDrawerFolder)
         }
     }
 
@@ -69,12 +70,12 @@ class SearchFolderAdapter(
         convertView: View?,
         context: Context,
         parent: ViewGroup?,
-        folder: Folder?,
+        folder: MenuDrawerFolder?,
     ): View {
         return (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
             findViewById<SelectableFolderItemView>(R.id.simpleFolderItemView).apply {
-                text = context.getLocalizedNameOrAllFolders(folder)
-                icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_all_folders)
+                text = context.getLocalizedNameOrAllFolders(folder?.folder)
+                icon = AppCompatResources.getDrawable(context, folder?.folder?.getIcon() ?: R.drawable.ic_all_folders)
                 setSelectedState(folder == selectedFolder)
             }
         }
