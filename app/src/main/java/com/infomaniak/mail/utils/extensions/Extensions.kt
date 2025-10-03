@@ -90,16 +90,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -122,7 +119,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
-import com.infomaniak.mail.utils.shouldBeExcluded
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
@@ -345,17 +341,6 @@ fun List<Folder>.sortFolders() = sortedBy { it.sortedName }
     .sortedByDescending { it.isFavorite }
     .sortedByDescending { it.roleOrder }
 
-/**
- * @return A list of [FolderUi] with a single divider of the provided type
- */
-fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
-    dividerType: Any,
-    excludedFolderRoles: Set<FolderRole> = emptySet(),
-): List<Any> = buildList {
-    default.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
-    add(dividerType)
-    custom.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
-}
 //endregion
 
 //region Messages
