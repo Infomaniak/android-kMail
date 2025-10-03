@@ -57,17 +57,6 @@ class FolderController @Inject constructor(
         ).asFlow()
     }
 
-    fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getRootFoldersQuery(mailboxContentRealm()).asFlow()
-    }
-
-    suspend fun getMoveFolders(): RealmResults<Folder> {
-        return getRootFoldersQuery(
-            realm = mailboxContentRealm(),
-            withoutTypes = listOf(FoldersType.SNOOZED, FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
-        ).findSuspend()
-    }
-
     suspend fun getFolder(id: String): Folder? {
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).findSuspend()
     }
