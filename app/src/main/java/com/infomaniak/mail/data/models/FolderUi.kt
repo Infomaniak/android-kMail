@@ -22,4 +22,5 @@ data class FolderUi(
     override var children: List<FolderUi>,
     val depth: Int,
     var canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
+    val isInDefaultFolderHalf: Boolean // Whether the folder is part of the default folder half or the custom folder half
 ) : TreeStructure<FolderUi>

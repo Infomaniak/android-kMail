@@ -221,13 +221,13 @@ class MainViewModel @Inject constructor(
     private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.toFolderUi() }
+            .map { it.list.toFolderUi(isInDefaultFolderHalf = true) }
     }
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerCustomFoldersAsync()
-            .map { it.list.toFolderUi(excludeRoleFolder = true) }
+            .map { it.list.toFolderUi(isInDefaultFolderHalf = false) }
     }
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
