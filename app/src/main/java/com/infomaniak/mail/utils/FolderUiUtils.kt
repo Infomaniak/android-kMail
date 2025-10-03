@@ -24,48 +24,48 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.extensions.IK_FOLDER
 
 /**
- * Returns a tree-like list of [com.infomaniak.mail.data.models.FolderUi] where each folder has a reference to its children. This method automatically
+ * Returns a tree-like list of [FolderUi] where each folder has a reference to its children. This method automatically
  * excludes .ik folders.
  *
- * @param isInDefaultFolderSection Do not return folders with role nor their children. This is used in the menu drawer to not display
- * role folders in the bottom custom folder section because they are already displayed on the upper section.
+ * @param isInDefaultFolderSection Are these [FolderUi] in the upper or lower section of the UI. This is also used in the menu
+ * drawer to not display role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
-fun List<Folder>.toFolderUi(isInDefaultFolderSection: Boolean): List<FolderUi> {
-    val resultRoots = mutableListOf<FolderUi>()
-    val folderToMenuFolder = mutableMapOf<Folder, FolderUi>()
+fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderUi> {
+    val folderToFolderUi = mutableMapOf<Folder, FolderUi>()
     val excludeRoleFolder = isInDefaultFolderSection.not()
 
-    // Step 1: Instantiate all FolderUi instances and identify root folders
+    // Step 1: Instantiate all FolderUi instances
     forEachNestedItem { folder, depth ->
         if (folder.shouldBeExcluded(excludeRoleFolder)) return@forEachNestedItem
 
         // Create placeholder (empty children for now)
-        val menu = FolderUi(
+        val folderUi = FolderUi(
             folder = folder,
             depth = depth,
             canBeCollapsed = false, // will compute below
             children = emptyList(),
             isInDefaultFolderSection = isInDefaultFolderSection,
         )
-        folderToMenuFolder[folder] = menu
-
-        if (depth == 0) resultRoots.add(menu)
+        folderToFolderUi[folder] = folderUi
     }
 
-    // Step 2: Link children of FolderUi to existing instances + compute collapsibility
-    folderToMenuFolder.forEach { (folder, menuFolder) ->
+    // Step 2: Link children of FolderUi to existing instances + compute collapsibility + identify root folders
+    val resultRoots = mutableListOf<FolderUi>()
+    folderToFolderUi.forEach { (folder, folderUi) ->
         val validChildren = folder.children
             .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
-            .mapNotNull { folderToMenuFolder[it] }
+            .mapNotNull { folderToFolderUi[it] }
 
-        folderToMenuFolder[folder] = menuFolder.apply {
-            canBeCollapsed = menuFolder.depth == 0 && validChildren.isNotEmpty()
+        folderUi.apply {
+            canBeCollapsed = folderUi.depth == 0 && validChildren.isNotEmpty()
             children = validChildren
         }
+
+        if (folderUi.depth == 0) resultRoots.add(folderUi)
     }
 
     // Step 3: Only return root folders needed for traversal
-    return resultRoots.map { folderToMenuFolder[it.folder]!! } // TODO: Remove!!
+    return resultRoots
 }
 
 fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
