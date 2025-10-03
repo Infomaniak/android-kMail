@@ -38,6 +38,14 @@ private val usersWithMailboxesPreviewData = listOf(
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
                 email = "chef@infomaniak.com"
+            ),
+            MailboxUi(
+                mailUuid = UUID.randomUUID().toString(),
+                email = "chef@infomaniak.com"
+            ),
+            MailboxUi(
+                mailUuid = UUID.randomUUID().toString(),
+                email = "chef@infomaniak.com"
             )
         )
     ),
