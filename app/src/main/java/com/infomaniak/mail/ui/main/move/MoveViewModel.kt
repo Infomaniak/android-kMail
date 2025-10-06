@@ -30,8 +30,8 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.standardize
+import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -98,17 +98,19 @@ class MoveViewModel @Inject constructor(
                 ensureActive()
             }
 
-            val filteredFolders = mutableListOf<Any>().apply {
+            // We make a map so there's only one FolderUi per Folder.id. When dealing with nested role folders, there can be
+            // multiple FolderUi for the same Folder.id
+            val filteredFolders = buildMap {
                 allFolderUis.forEach { folderUi ->
                     ensureActive()
                     if (folderUi !is FolderUi) return@forEach
                     val folderName = folderUi.folder.role?.folderNameRes?.let(appContext::getString) ?: folderUi.folder.name
                     val isFound = folderName.standardize().contains(query.standardize())
-                    if (isFound) add(folderUi)
+                    if (isFound) set(folderUi.folder.id, folderUi)
                 }
             }
 
-            filterResults.postValue(filteredFolders to false)
+            filterResults.postValue(filteredFolders.values.toList() to false)
         }
     }
 

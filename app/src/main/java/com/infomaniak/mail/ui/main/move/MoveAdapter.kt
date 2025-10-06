@@ -124,7 +124,8 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
                     oldFolder.folder.name == newFolder.folder.name &&
                     oldFolder.folder.isFavorite == newFolder.folder.isFavorite &&
                     oldFolder.folder.path == newFolder.folder.path &&
-                    oldFolder.folder.threads.count() == newFolder.folder.threads.count()
+                    oldFolder.folder.threads.count() == newFolder.folder.threads.count() &&
+                    oldFolder.depth == newFolder.depth
         }.getOrDefault(false)
     }
 }
