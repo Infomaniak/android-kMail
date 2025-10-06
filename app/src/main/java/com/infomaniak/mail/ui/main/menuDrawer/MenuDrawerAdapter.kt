@@ -165,7 +165,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
                 if (getItemViewType(index) != ItemType.FOLDER.ordinal) continue
 
-                val itemId = (currentList[index] as Folder).id
+                val itemId = (currentList[index] as FolderUi).folder.id
                 if (itemId == oldId) {
                     oldIsFound = true
                     notifyItemChanged(index)
