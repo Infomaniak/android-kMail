@@ -73,7 +73,7 @@ class SelectMailboxViewModel @Inject constructor(
                 userId = currentUser.id,
                 mailbox = mailboxController.getMailboxes(currentUser.id)
                     .first { mailbox ->
-                        mailbox.email == AccountUtils.currentMailboxEmail
+                        mailbox.mailboxId == AccountUtils.currentMailboxId
                     }
                     .let { mailbox ->
                         MailboxUi(
