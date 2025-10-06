@@ -31,6 +31,9 @@ import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.CREATE_ACCOUNT_CANCEL_HOST
+import com.infomaniak.mail.CREATE_ACCOUNT_SUCCESS_HOST
+import com.infomaniak.mail.CREATE_ACCOUNT_URL
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
@@ -93,9 +96,9 @@ class NewAccountFragment : Fragment() {
             trackAccountEvent(MatomoName.OpenCreationWebview)
             loginActivity.infomaniakLogin.startCreateAccountWebView(
                 resultLauncher = createAccountResultLauncher,
-                createAccountUrl = BuildConfig.CREATE_ACCOUNT_URL,
-                successHost = BuildConfig.CREATE_ACCOUNT_SUCCESS_HOST,
-                cancelHost = BuildConfig.CREATE_ACCOUNT_CANCEL_HOST,
+                createAccountUrl = CREATE_ACCOUNT_URL,
+                successHost = CREATE_ACCOUNT_SUCCESS_HOST,
+                cancelHost = CREATE_ACCOUNT_CANCEL_HOST,
             )
         }
     }

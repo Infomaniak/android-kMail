@@ -17,10 +17,10 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.core.legacy.BuildConfig.INFOMANIAK_API_V1
+import com.infomaniak.core.network.INFOMANIAK_API_V1
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
-import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.MAIL_API
 import com.infomaniak.mail.utils.Utils
 import java.net.URLEncoder
 import java.util.Date

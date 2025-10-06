@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.firebase
+package com.infomaniak.mail
 
-import com.infomaniak.core.legacy.api.ApiController.ApiMethod.POST
-import com.infomaniak.core.legacy.models.ApiResponse
-import com.infomaniak.core.network.INFOMANIAK_API_V1
-import com.infomaniak.mail.data.api.ApiRepository
-import okhttp3.OkHttpClient
+import com.infomaniak.core.network.ApiEnvironment
 
-object FirebaseApiRepository {
+private val host = ApiEnvironment.current.host
 
-    private val registerDevice = "$INFOMANIAK_API_V1/devices/register"
+val CREATE_ACCOUNT_URL = "https://welcome.$host/signup/ikmail?app=true"
+val CREATE_ACCOUNT_SUCCESS_HOST = "ksuite.$host"
+val CREATE_ACCOUNT_CANCEL_HOST = "welcome.$host"
+val IMPORT_EMAILS_URL = "https://import-email.$host"
+val MAIL_API = "https://mail.$host"
 
-    suspend fun registerForNotifications(registrationInfo: RegistrationInfo, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
-        return ApiRepository.callApi(registerDevice, POST, registrationInfo, okHttpClient)
-    }
-}
+val CHATBOT_URL = "https://www.$host/chatbot"
+val FAQ_URL = "https://www.$host/fr/support/faq/admin2/service-mail"
+val MANAGE_SIGNATURES_URL = "https://mail.$host/0/settings/signatures"
