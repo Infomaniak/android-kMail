@@ -43,6 +43,7 @@ fun LargeButton(
     title: String,
     modifier: Modifier = Modifier,
     style: ButtonType = ButtonType.Primary,
+    enabled: () -> Boolean = { true },
     onClick: () -> Unit
 ) {
     BasicButton(
@@ -51,7 +52,8 @@ fun LargeButton(
         ),
         colors = style.colors(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.textButtonCornerRadius)),
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled,
     ) {
         Text(text = title,  style = MaterialTheme.typography.bodyMedium)
     }
@@ -91,7 +93,7 @@ private fun LargeButtonPreview() {
                         LargeButton(
                             title = stringResource(R.string.buttonContinue),
                             style = it,
-                            onClick = { }
+                            onClick = { },
                         )
                     }
                     Spacer(Modifier.height(Margin.Medium))
