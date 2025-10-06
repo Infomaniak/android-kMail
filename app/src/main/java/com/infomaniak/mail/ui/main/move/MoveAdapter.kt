@@ -79,15 +79,6 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
         return MoveFolderViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-        if (payloads.firstOrNull() == Unit) {
-            val isSelected = selectedFolderId == (currentList[position] as Folder).id
-            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(isSelected)
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
-        }
-    }.getOrDefault(Unit)
-
     override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int) = with(holder.binding) {
         if (getItemViewType(position) == DisplayType.FOLDER.layout) {
             (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as FolderUi)
