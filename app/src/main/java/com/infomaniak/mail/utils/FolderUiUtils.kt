@@ -31,7 +31,7 @@ import com.infomaniak.mail.utils.extensions.IK_FOLDER
  * drawer to not display role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
 fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderUi> {
-    val folderToFolderUi = mutableMapOf<Folder, FolderUi>()
+    val folderToFolderUi = mutableMapOf<Pair<Folder, Int>, FolderUi>()
     val excludeRoleFolder = isInDefaultFolderSection.not()
 
     // Step 1: Instantiate all FolderUi instances
@@ -46,15 +46,16 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
             children = emptyList(),
             isInDefaultFolderSection = isInDefaultFolderSection,
         )
-        folderToFolderUi[folder] = folderUi
+        folderToFolderUi[folder to depth] = folderUi
     }
 
     // Step 2: Link children of FolderUi to existing instances + compute collapsibility + identify root folders
     val resultRoots = mutableListOf<FolderUi>()
-    folderToFolderUi.forEach { (folder, folderUi) ->
+    folderToFolderUi.forEach { (key, folderUi) ->
+        val (folder, depth) = key
         val validChildren = folder.children
             .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
-            .mapNotNull { folderToFolderUi[it] }
+            .mapNotNull { folderToFolderUi[it to depth + 1] }
 
         folderUi.apply {
             canBeCollapsed = folderUi.isRoot && validChildren.isNotEmpty()
