@@ -61,7 +61,8 @@ import com.infomaniak.mail.ui.theme.MailTheme
 @Composable
 fun SelectMailboxScreen(
     viewModel: SelectMailboxViewModel,
-    onNavigationClick: () -> Unit
+    onNavigationTopbarClick: () -> Unit,
+    onContinue: (SelectedMailboxUi) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
@@ -76,7 +77,8 @@ fun SelectMailboxScreen(
         onMailboxSelected = {
             viewModel.selectMailbox(it)
         },
-        onNavigationClick = onNavigationClick
+        onNavigationTopbarClick = onNavigationTopbarClick,
+        onContinue = onContinue
     )
 }
 
@@ -87,7 +89,8 @@ fun SelectMailboxScreen(
     selectingAnotherUser: MutableState<Boolean>,
     snackbarHostState: SnackbarHostState? = null,
     onMailboxSelected: (SelectedMailboxUi?) -> Unit,
-    onNavigationClick: () -> Unit
+    onNavigationTopbarClick: () -> Unit,
+    onContinue: (SelectedMailboxUi) -> Unit
 ) {
     val bottomButton: (@Composable (Modifier) -> Unit)? = { modifier ->
         LargeButton(
@@ -105,7 +108,7 @@ fun SelectMailboxScreen(
         topBar = {
             MailTopAppBar(
                 navigationIcon = {
-                    TopAppBarButtons.Close(onNavigationClick)
+                    TopAppBarButtons.Close(onNavigationTopbarClick)
                 }
             )
         },
@@ -160,9 +163,10 @@ fun SelectMailboxScreen(
         topButton = {
             LargeButton(
                 modifier = it.padding(horizontal = Margin.Medium),
-                title = stringResource(R.string.buttonContinue)
+                title = stringResource(R.string.buttonContinue),
+                enabled = { selectedMailbox != null }
             ) {
-                // TODO: Open newMessageFragment
+                selectedMailbox?.let { onContinue(selectedMailbox) }
             }
         },
         bottomButton = bottomButton.takeIf{ !selectingAnotherUser.value }
@@ -184,7 +188,8 @@ private fun PreviewDefaultMailbox(
                 selectedMailbox = previewData.selectedMailboxUi,
                 selectingAnotherUser = selectingAnotherUser,
                 onMailboxSelected = {},
-                onNavigationClick = {}
+                onNavigationTopbarClick = {},
+                onContinue = {}
             )
         }
     }
