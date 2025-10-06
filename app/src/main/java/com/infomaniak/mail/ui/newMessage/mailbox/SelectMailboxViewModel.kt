@@ -30,27 +30,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class UserMailboxesUi(
-    val userId: Int,
-    val userEmail: String,
-    val avatarUrl: String?,
-    val initials: String,
-    val fullName: String,
-    val mailboxes: List<MailboxUi>,
-)
-
-data class MailboxUi(
-    val mailUuid: String,
-    val email: String
-)
-
-data class SelectedMailboxUi(
-    val userId: Int,
-    val mailbox: MailboxUi,
-    val avatarUrl: String?,
-    val initials: String,
-)
-
 @HiltViewModel
 class SelectMailboxViewModel @Inject constructor(
     application: Application,
@@ -105,26 +84,31 @@ class SelectMailboxViewModel @Inject constructor(
                 avatarUrl = currentUser.avatar,
                 initials = currentUser.getInitials()
             )
-            // _selectedMailbox.value = UserMailboxesUi(
-            //     userId = currentUser.id,
-            //     userEmail = currentUser.email,
-            //     avatarUrl = currentUser.avatar,
-            //     initials = currentUser.getInitials(),
-            //     fullName = currentUser.displayName ?: currentUser.run { "$firstname $lastname" },
-            //     mailboxes = mailboxController.getMailboxes(currentUser.id)
-            //         .filter { mailbox ->
-            //             mailbox.email == AccountUtils.currentMailboxEmail
-            //         }.map { mailbox ->
-            //             MailboxUi(
-            //                 mailUuid = mailbox.uuid,
-            //                 email = mailbox.email
-            //             )
-            //         }
-            // )
         }
     }
 
     fun selectMailbox(selectedMailbox: SelectedMailboxUi?) {
         _selectedMailbox.value = selectedMailbox
     }
+
+    data class UserMailboxesUi(
+        val userId: Int,
+        val userEmail: String,
+        val avatarUrl: String?,
+        val initials: String,
+        val fullName: String,
+        val mailboxes: List<MailboxUi>,
+    )
+
+    data class MailboxUi(
+        val mailUuid: String,
+        val email: String
+    )
+
+    data class SelectedMailboxUi(
+        val userId: Int,
+        val mailbox: MailboxUi,
+        val avatarUrl: String?,
+        val initials: String,
+    )
 }
