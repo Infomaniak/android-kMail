@@ -62,6 +62,7 @@ import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
@@ -108,6 +109,7 @@ import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
@@ -566,7 +568,38 @@ class MainViewModel @Inject constructor(
     private suspend fun updateFolders(mailbox: Mailbox) {
         SentryLog.d(TAG, "Force refresh Folders")
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
-            if (!mailboxContentRealm().isClosed()) folderController.update(mailbox, folders, mailboxContentRealm())
+            if (!mailboxContentRealm().isClosed()) {
+                folderController.update(mailbox, folders, mailboxContentRealm())
+                updateFoldersCollapsedAndHiddenStates()
+            }
+        }
+    }
+
+    /**
+     *  Recomputes the [Folder.isCollapsed] and [Folder.isHidden] states so a parent which has no more children has no more
+     *  children is correctly expanded and so a child that appeared under a collapsed parent is correctly hidden.
+     */
+    private suspend fun updateFoldersCollapsedAndHiddenStates() {
+        val folders = displayedFoldersFlow.first()
+        mailboxContentRealm().write {
+            folders.custom.updateStates(realm = this)
+            folders.default.updateStates(realm = this)
+        }
+    }
+
+    private fun List<FolderUi>.updateStates(realm: MutableRealm) {
+        var isCurrentParentCollapsed = false
+        forEachNestedItem { folder, _ ->
+            if (folder.isRoot) {
+                // If we detect that a folder doesn't have any children anymore, if it was collapsed, automatically expand it
+                val collapseStateNeedsReset = folder.children.isEmpty()
+                if (collapseStateNeedsReset) FolderController.expand(folder.folder.id, realm)
+
+                isCurrentParentCollapsed = folder.folder.isCollapsed
+            } else {
+                // If a new child is added to a collapsed folder, hide it so the UI stays coherent
+                if (isCurrentParentCollapsed && folder.folder.isHidden.not()) FolderController.hide(folder.folder.id, realm)
+            }
         }
     }
 
@@ -1691,6 +1724,10 @@ class MainViewModel @Inject constructor(
         threadController.removeThreadsWithParentalIssues()
     }
 
+    /**
+     *  Contains a list of nested folders. This means each list is only comprised of the root folders and each subfolder is
+     *  stored inside [FolderUi.children].
+     */
     data class DisplayedFolders(val default: List<FolderUi>, val custom: List<FolderUi>)
 
     companion object {
