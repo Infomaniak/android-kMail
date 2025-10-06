@@ -56,6 +56,8 @@ import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
+import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.UserMailboxesUi
 import com.infomaniak.mail.ui.newMessage.mailbox.compose.AccountMailboxesDropdown
 import com.infomaniak.mail.ui.newMessage.mailbox.compose.SelectedMailboxIndicator
 import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.SelectMailboxScreenDataPreview

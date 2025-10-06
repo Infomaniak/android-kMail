@@ -50,7 +50,7 @@ import com.infomaniak.core.compose.basics.Dimens
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.core.compose.preview.PreviewAllWindows
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.newMessage.mailbox.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.SelectedMailboxUi
 import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.SelectedMailboxPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
 

@@ -18,8 +18,8 @@
 package com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.infomaniak.mail.ui.newMessage.mailbox.MailboxUi
-import com.infomaniak.mail.ui.newMessage.mailbox.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.MailboxUi
+import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.SelectedMailboxUi
 import java.util.UUID
 
 class SelectedMailboxPreviewParameter : PreviewParameterProvider<SelectedMailboxUi> {
