@@ -79,6 +79,21 @@ class NewMessageActivity : BaseActivity() {
         setContentView(binding.root)
         addTwoFactorAuthOverlay()
 
+        val navGraph = navController.navInflater.inflate(R.navigation.new_message_navigation)
+        when (intent.action) {
+            Intent.ACTION_SEND,
+            Intent.ACTION_SEND_MULTIPLE,
+            Intent.ACTION_VIEW,
+            Intent.ACTION_SENDTO -> {
+                navGraph.setStartDestination(R.id.selectMailboxFragment)
+                navController.graph = navGraph
+            }
+            else -> {
+                navGraph.setStartDestination(R.id.newMessageFragment)
+            }
+        }
+        navController.graph = navGraph
+
         if (!isAuth()) {
             finish()
             return
