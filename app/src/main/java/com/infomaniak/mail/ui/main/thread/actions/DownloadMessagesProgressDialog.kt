@@ -28,7 +28,7 @@ import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.extensions.goToAppStore
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
@@ -62,7 +62,7 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
 
     private fun observeDownload() {
         downloadThreadsViewModel.downloadMessagesLiveData.observe(this) { messageUris ->
-            messageUris?.openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
+            messageUris?.openKDriveOrAppStore(requireContext())?.let { openKDriveIntent ->
                 setBackNavigationResult(DOWNLOAD_MESSAGES_RESULT, openKDriveIntent)
             } ?: run {
                 clearEmlCacheDir(requireContext())
@@ -71,11 +71,11 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
         }
     }
 
-    private fun List<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
+    private fun List<Uri>.openKDriveOrAppStore(context: Context): Intent? {
         return if (canSaveOnKDrive(context)) {
             saveToDriveIntent()
         } else {
-            context.goToPlayStore(DRIVE_PACKAGE)
+            context.goToAppStore(DRIVE_PACKAGE)
             null
         }
     }

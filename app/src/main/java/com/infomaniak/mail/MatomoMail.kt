@@ -249,7 +249,7 @@ object MatomoMail : Matomo {
         OpenLoginWebview("openLoginWebview"),
         OpenMessage("openMessage"),
         OpenNotificationSettings("openNotificationSettings"),
-        OpenPlayStore("openPlayStore"),
+        OpenAppStore("openPlayStore"),
         OpenRecipientsFields("openRecipientsFields"),
         OpenSwissTransfer("openSwissTransfer"),
         OpenSyncApp("openSyncApp"),

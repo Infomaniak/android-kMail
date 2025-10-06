@@ -21,7 +21,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.extensions.goToAppStore
 import com.infomaniak.core.legacy.stores.StoresSettingsRepository
 import com.infomaniak.core.legacy.stores.StoresViewModel
 import com.infomaniak.core.legacy.utils.context
@@ -49,7 +49,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
                 storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, true)
-                requireContext().goToPlayStore()
+                requireContext().goToAppStore()
                 dismiss()
             }
         }

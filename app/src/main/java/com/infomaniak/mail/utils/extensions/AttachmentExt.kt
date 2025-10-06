@@ -23,7 +23,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
-import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.extensions.goToAppStore
 import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.hasSupportedApplications
 import com.infomaniak.core.sentry.SentryLog
@@ -79,12 +79,12 @@ object AttachmentExt {
         }
     }
 
-    fun Attachment.getIntentOrGoToPlayStore(context: Context, intentType: AttachmentIntentType) = when (intentType) {
+    fun Attachment.getIntentOrGoToAppStore(context: Context, intentType: AttachmentIntentType) = when (intentType) {
         OPEN_WITH -> openWithIntent(context)
         SAVE_TO_DRIVE -> if (canSaveOnKDrive(context)) {
             saveToDriveIntent(context)
         } else {
-            context.goToPlayStore(DRIVE_PACKAGE)
+            context.goToAppStore(DRIVE_PACKAGE)
             null
         }
     }
@@ -95,7 +95,7 @@ object AttachmentExt {
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
     ) {
         if (hasUsableCache(context, getUploadLocalFile()) || isInlineCachedFile(context)) {
-            getIntentOrGoToPlayStore(context, intentType)?.let(context::startActivity)
+            getIntentOrGoToAppStore(context, intentType)?.let(context::startActivity)
         } else {
             navigateToDownloadProgressDialog(this, intentType)
         }
