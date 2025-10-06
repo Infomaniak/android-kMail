@@ -57,11 +57,11 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
             .mapNotNull { folderToFolderUi[it] }
 
         folderUi.apply {
-            canBeCollapsed = folderUi.depth == 0 && validChildren.isNotEmpty()
+            canBeCollapsed = folderUi.isRoot && validChildren.isNotEmpty()
             children = validChildren
         }
 
-        if (folderUi.depth == 0) resultRoots.add(folderUi)
+        if (folderUi.isRoot) resultRoots.add(folderUi)
     }
 
     // Step 3: Only return root folders needed for traversal
