@@ -216,12 +216,6 @@ class FolderController @Inject constructor(
                 folder.isCollapsed = false
             }
         }
-
-        fun hide(folderId: String, realm: MutableRealm) {
-            realm.updateFolder(folderId) { folder ->
-                folder.isHidden = true
-            }
-        }
         //endregion
     }
 }

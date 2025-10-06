@@ -570,35 +570,28 @@ class MainViewModel @Inject constructor(
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
             if (!mailboxContentRealm().isClosed()) {
                 folderController.update(mailbox, folders, mailboxContentRealm())
-                updateFoldersCollapsedAndHiddenStates()
+                updateFoldersCollapsedState()
             }
         }
     }
 
     /**
-     *  Recomputes the [Folder.isCollapsed] and [Folder.isHidden] states so a parent which has no more children has no more
-     *  children is correctly expanded and so a child that appeared under a collapsed parent is correctly hidden.
+     *  Recomputes the [Folder.isCollapsed] state so a parent which has no more children is correctly expanded.
      */
-    private suspend fun updateFoldersCollapsedAndHiddenStates() {
+    private suspend fun updateFoldersCollapsedState() {
         val folders = displayedFoldersFlow.first()
         mailboxContentRealm().write {
-            folders.custom.updateStates(realm = this)
-            folders.default.updateStates(realm = this)
+            folders.custom.updateState(realm = this)
+            folders.default.updateState(realm = this)
         }
     }
 
-    private fun List<FolderUi>.updateStates(realm: MutableRealm) {
-        var isCurrentParentCollapsed = false
+    private fun List<FolderUi>.updateState(realm: MutableRealm) {
         forEachNestedItem { folder, _ ->
             if (folder.isRoot) {
                 // If we detect that a folder doesn't have any children anymore, if it was collapsed, automatically expand it
                 val collapseStateNeedsReset = folder.children.isEmpty()
                 if (collapseStateNeedsReset) FolderController.expand(folder.folder.id, realm)
-
-                isCurrentParentCollapsed = folder.folder.isCollapsed
-            } else {
-                // If a new child is added to a collapsed folder, hide it so the UI stays coherent
-                if (isCurrentParentCollapsed && folder.folder.isHidden.not()) FolderController.hide(folder.folder.id, realm)
             }
         }
     }
