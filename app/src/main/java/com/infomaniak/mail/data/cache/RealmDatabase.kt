@@ -197,7 +197,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 5L
         const val MAILBOX_INFO_SCHEMA_VERSION = 12L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 34L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 35L
         //endregion
 
         //region Configurations names

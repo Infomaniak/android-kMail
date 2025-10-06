@@ -130,7 +130,6 @@ class FolderController @Inject constructor(
                     it.newMessagesUidsToFetch,
                     it.remainingOldMessagesToFetch,
                     it.isDisplayed,
-                    it.isHidden,
                     isCollapsed,
                 )
             }

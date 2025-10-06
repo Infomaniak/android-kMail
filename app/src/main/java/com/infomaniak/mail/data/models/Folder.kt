@@ -101,8 +101,6 @@ class Folder : RealmObject, Cloneable, TreeStructure<Folder> {
     var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
 
     @Transient
-    var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
-    @Transient
     var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
     @Transient
     var roleOrder: Int = role?.order ?: CUSTOM_FOLDER_ROLE_ORDER
@@ -140,7 +138,6 @@ class Folder : RealmObject, Cloneable, TreeStructure<Folder> {
         newMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
         isDisplayed: Boolean,
-        isHidden: Boolean,
         isCollapsed: Boolean,
     ) {
         this.lastUpdatedAt = lastUpdatedAt
@@ -152,7 +149,6 @@ class Folder : RealmObject, Cloneable, TreeStructure<Folder> {
         this.newMessagesUidsToFetch.addAll(newMessagesUidsToFetch)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
         this.isDisplayed = isDisplayed
-        this.isHidden = isHidden
         this.isCollapsed = isCollapsed
 
         this.sortedName = this.name.lowercase().removeAccents()

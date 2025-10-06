@@ -34,7 +34,7 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
     val folderToFolderUi = mutableMapOf<Pair<Folder, Int>, FolderUi>()
     val excludeRoleFolder = isInDefaultFolderSection.not()
 
-    // Step 1: Instantiate all FolderUi instances
+    // Step 1: Instantiate all FolderUi instances and compute visibility
     forEachNestedItem { folder, depth ->
         if (folder.shouldBeExcluded(excludeRoleFolder)) return@forEachNestedItem
 
@@ -43,7 +43,8 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
             folder = folder,
             depth = depth,
             canBeCollapsed = false, // will compute below
-            children = emptyList(),
+            children = emptyList(), // will compute below
+            isHidden = false, // will compute below
             isInDefaultFolderSection = isInDefaultFolderSection,
         )
         folderToFolderUi[folder to depth] = folderUi
@@ -51,15 +52,25 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
 
     // Step 2: Link children of FolderUi to existing instances + compute collapsibility + identify root folders
     val resultRoots = mutableListOf<FolderUi>()
+    var isCurrentParentCollapsed = false
     folderToFolderUi.forEach { (key, folderUi) ->
         val (folder, depth) = key
+
         val validChildren = folder.children
             .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
             .mapNotNull { folderToFolderUi[it to depth + 1] }
 
+        val shouldHide = if (folderUi.isRoot) {
+            isCurrentParentCollapsed = folder.isCollapsed
+            false
+        } else {
+            isCurrentParentCollapsed
+        }
+
         folderUi.apply {
             canBeCollapsed = folderUi.isRoot && validChildren.isNotEmpty()
             children = validChildren
+            isHidden = shouldHide
         }
 
         if (folderUi.isRoot) resultRoots.add(folderUi)

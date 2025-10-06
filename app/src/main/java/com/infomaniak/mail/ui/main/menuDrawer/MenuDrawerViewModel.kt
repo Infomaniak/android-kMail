@@ -23,7 +23,6 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.updateFolder
 import com.infomaniak.mail.data.models.FolderUi
-import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,12 +48,6 @@ class MenuDrawerViewModel @Inject constructor(
         mailboxContentRealm().write {
             updateFolder(rootFolderUi.folder.id) {
                 it.isCollapsed = shouldCollapse
-            }
-
-            rootFolderUi.forEachNestedItem { folderUi, _ ->
-                updateFolder(folderUi.folder.id) {
-                    it.isHidden = shouldCollapse
-                }
             }
         }
     }

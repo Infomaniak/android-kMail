@@ -112,7 +112,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
     }
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
-
+        // TODO: Fix typing
         override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             return when {
                 oldItem is Unit && newItem is Unit -> true // Unit is Divider item. They don't have any content, so always true.
@@ -126,8 +126,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
                     oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
-                    oldFolder.threads.count() == newFolder.threads.count() &&
-                    oldFolder.isHidden == newFolder.isHidden
+                    oldFolder.threads.count() == newFolder.threads.count()
         }.getOrDefault(false)
     }
 }
