@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
@@ -112,21 +111,20 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
     }
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
-        // TODO: Fix typing
         override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             return when {
                 oldItem is Unit && newItem is Unit -> true // Unit is Divider item. They don't have any content, so always true.
-                oldItem is Folder && newItem is Folder && oldItem.id == newItem.id -> true
+                oldItem is FolderUi && newItem is FolderUi && oldItem.folder.id == newItem.folder.id -> true
                 else -> false
             }
         }.getOrDefault(false)
 
         override fun areContentsTheSame(oldFolder: Any, newFolder: Any) = runCatchingRealm {
-            oldFolder is Folder && newFolder is Folder &&
-                    oldFolder.name == newFolder.name &&
-                    oldFolder.isFavorite == newFolder.isFavorite &&
-                    oldFolder.path == newFolder.path &&
-                    oldFolder.threads.count() == newFolder.threads.count()
+            oldFolder is FolderUi && newFolder is FolderUi &&
+                    oldFolder.folder.name == newFolder.folder.name &&
+                    oldFolder.folder.isFavorite == newFolder.folder.isFavorite &&
+                    oldFolder.folder.path == newFolder.folder.path &&
+                    oldFolder.folder.threads.count() == newFolder.folder.threads.count()
         }.getOrDefault(false)
     }
 }
