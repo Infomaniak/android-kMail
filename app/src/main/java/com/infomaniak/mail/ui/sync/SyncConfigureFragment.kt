@@ -28,7 +28,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.extensions.goToAppStore
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.matomo.Matomo.TrackerAction
@@ -76,8 +76,8 @@ class SyncConfigureFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         installButton.setOnClickListener {
-            trackSyncAutoConfigEvent(MatomoName.OpenPlayStore)
-            context.goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
+            trackSyncAutoConfigEvent(MatomoName.OpenAppStore)
+            context.goToAppStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
         }
 
         startButton.setOnClickListener {

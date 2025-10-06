@@ -40,7 +40,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.extensions.goToAppStore
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -660,7 +660,7 @@ class ThreadListFragment : TwoPaneFragment() {
                 displayLoader = false,
                 positiveButtonText = RCore.string.buttonUpdate,
                 negativeButtonText = RCore.string.buttonLater,
-                onPositiveButtonClicked = { requireContext().goToPlayStore(WEBVIEW_PACKAGE_NAME) },
+                onPositiveButtonClicked = { requireContext().goToAppStore(WEBVIEW_PACKAGE_NAME) },
                 onNegativeButtonClicked = {
                     webviewWarning.isVisible = false
                     localSettings.showWebViewOutdated = false

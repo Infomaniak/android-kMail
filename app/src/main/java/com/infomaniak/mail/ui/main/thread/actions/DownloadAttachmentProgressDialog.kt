@@ -28,7 +28,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.extensions.AttachmentExt
-import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToPlayStore
+import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToAppStore
 
 class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
@@ -47,7 +47,7 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
             if (cachedAttachment == null) {
                 popBackStackWithError()
             } else {
-                cachedAttachment.getIntentOrGoToPlayStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
+                cachedAttachment.getIntentOrGoToAppStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
                     setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
                 } ?: run { findNavController().popBackStack() }
             }
