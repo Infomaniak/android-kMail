@@ -60,7 +60,10 @@ import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.Select
 import com.infomaniak.mail.ui.theme.MailTheme
 
 @Composable
-fun SelectMailboxScreen(viewModel: SelectMailboxViewModel) {
+fun SelectMailboxScreen(
+    viewModel: SelectMailboxViewModel,
+    onNavigationClick: () -> Unit
+) {
     val snackbarHostState = remember { SnackbarHostState() }
     val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
     val userWithMailboxSelected by viewModel.selectedMailbox.collectAsStateWithLifecycle()
@@ -73,7 +76,8 @@ fun SelectMailboxScreen(viewModel: SelectMailboxViewModel) {
         snackbarHostState = snackbarHostState,
         onMailboxSelected = {
             viewModel.selectMailbox(it)
-        }
+        },
+        onNavigationClick = onNavigationClick
     )
 }
 
@@ -83,7 +87,8 @@ fun SelectMailboxScreen(
     selectedMailbox: SelectedMailboxUi?,
     selectingAnotherUser: MutableState<Boolean>,
     snackbarHostState: SnackbarHostState? = null,
-    onMailboxSelected: (SelectedMailboxUi?) -> Unit
+    onMailboxSelected: (SelectedMailboxUi?) -> Unit,
+    onNavigationClick: () -> Unit
 ) {
     val bottomButton: (@Composable (Modifier) -> Unit)? = { modifier ->
         LargeButton(
@@ -101,9 +106,7 @@ fun SelectMailboxScreen(
         topBar = {
             MailTopAppBar(
                 navigationIcon = {
-                    TopAppBarButtons.Close {
-                        // TODO: Close NewMessageActivity and go to threadlist
-                    }
+                    TopAppBarButtons.Close(onNavigationClick)
                 }
             )
         },
@@ -188,7 +191,8 @@ private fun PreviewDefaultMailbox(
                 usersWithMailboxes = previewData.usersWithMailboxes,
                 selectedMailbox = previewData.selectedMailboxUi,
                 selectingAnotherUser = selectingAnotherUser,
-                onMailboxSelected = {}
+                onMailboxSelected = {},
+                onNavigationClick = {}
             )
         }
     }

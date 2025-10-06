@@ -40,7 +40,10 @@ class SelectMailboxFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MailTheme {
-                    SelectMailboxScreen(selectMailboxViewModel)
+                    SelectMailboxScreen(
+                        viewModel = selectMailboxViewModel,
+                        onNavigationClick = { activity?.onBackPressedDispatcher?.onBackPressed() }
+                    )
                 }
             }
         }
