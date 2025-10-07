@@ -98,8 +98,8 @@ class MoveViewModel @Inject constructor(
                 ensureActive()
             }
 
-            // We make a map so there's only one FolderUi per Folder.id. When dealing with nested role folders, there can be
-            // multiple FolderUi for the same Folder.id
+            // When dealing with nested role folders, there can be multiple FolderUi for the same Folder.id, that's why we make a
+            // map so there's only one FolderUi per Folder.id
             val filteredFolders = buildMap {
                 allFolderUis.forEach { folderUi ->
                     ensureActive()
