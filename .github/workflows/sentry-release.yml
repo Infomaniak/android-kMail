@@ -2,7 +2,7 @@ name: New Sentry Release
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     tags:
       - '*'
 
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5.0.0
       - name: Create Sentry release
-        uses: getsentry/action-release@v3.2.0
+        uses: getsentry/action-release@v3.3.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
