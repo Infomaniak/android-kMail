@@ -405,7 +405,7 @@ class NewMessageFragment : Fragment() {
     private fun initMailbox() {
         val userId = if (newMessageFragmentArgs.userId == -1) AccountUtils.currentUserId else newMessageFragmentArgs.userId
         val mailboxId = if (newMessageFragmentArgs.mailboxId == -1) AccountUtils.currentMailboxId else newMessageFragmentArgs.mailboxId
-        newMessageViewModel.initMailbox(userId, mailboxId)
+        newMessageViewModel.loadMailbox(userId, mailboxId)
     }
 
     private fun initUi() = with(binding) {
@@ -813,7 +813,7 @@ class NewMessageFragment : Fragment() {
 
     private suspend fun setupSendButtons() = with(binding) {
 
-        val mailbox = newMessageViewModel.currentMailboxNew.first()
+        val mailbox = newMessageViewModel.currentMailbox.first()
 
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
             scheduleButton.isEnabled = it
@@ -834,7 +834,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
-        val mailbox = newMessageViewModel.currentMailboxNew.first()
+        val mailbox = newMessageViewModel.currentMailbox.first()
         safelyNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
