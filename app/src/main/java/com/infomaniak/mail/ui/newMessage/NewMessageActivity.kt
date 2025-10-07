@@ -151,7 +151,7 @@ class NewMessageActivity : BaseActivity() {
             Intent.ACTION_SEND,
             Intent.ACTION_SEND_MULTIPLE,
             Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO -> with(newMessageViewModel.currentMailboxNew.first()) {
+            Intent.ACTION_SENDTO -> with(newMessageViewModel.currentMailbox.first()) {
                 aiViewModel.updateFeatureFlag(objectId, uuid)
             }
         }

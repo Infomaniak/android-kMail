@@ -110,19 +110,21 @@ import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -131,6 +133,7 @@ import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     application: Application,
@@ -220,33 +223,24 @@ class NewMessageViewModel @Inject constructor(
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
-
-    private val _currentMailboxNew = MutableSharedFlow<Mailbox>(
+    private val mailboxRefFlow = MutableSharedFlow<MailboxRef>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val currentMailboxNew: SharedFlow<Mailbox> = _currentMailboxNew.asSharedFlow()
 
-    // val currentMailbox = viewModelScope.suspendLazy {
-    //     val mailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-    //
-    //     if (mailbox == null) {
-    //         exitSignal.complete()
-    //         awaitCancellation()
-    //     }
-    //
-    //     mailbox
-    // }
-
-    fun initMailbox(userId: Int, mailboxId: Int) {
-        viewModelScope.launch(ioDispatcher) {
-            val mailbox = mailboxController.getMailbox(userId, mailboxId)
+    val currentMailbox: Flow<Mailbox> = mailboxRefFlow
+        .mapLatest {
+            val mailbox = mailboxController.getMailbox(it.userId, it.mailboxId)
             if (mailbox == null) {
                 exitSignal.complete()
                 awaitCancellation()
             }
-            _currentMailboxNew.emit(mailbox)
+            mailbox
         }
+        .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
+
+    fun loadMailbox(userId: Int, mailboxId: Int) {
+        mailboxRefFlow.tryEmit(MailboxRef(userId, mailboxId))
     }
 
     // ------------- !IMPORTANT! -------------
@@ -256,10 +250,7 @@ class NewMessageViewModel @Inject constructor(
     suspend fun awaitNoMailboxSignal() = exitSignal.join()
     //endregion
 
-    private val currentMailboxLive = mailboxController.getMailboxAsync(
-        AccountUtils.currentUserId,
-        AccountUtils.currentMailboxId,
-    ).mapNotNull { it.obj }.asLiveData(ioCoroutineContext)
+    private val currentMailboxLive = currentMailbox.asLiveData(ioCoroutineContext)
 
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
@@ -310,10 +301,10 @@ class NewMessageViewModel @Inject constructor(
 
         val draft: Draft? = runCatching {
 
-            signatures = currentMailboxNew.first().signatures
+            signatures = currentMailbox.first().signatures
                 .also { signaturesCount = it.count() }
                 .toMutableList()
-                .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailboxNew.first().email)) }
+                .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox.first().email)) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
             if (isNewMessage) getNewDraft(signatures, intent, realm) else getExistingDraft(draftLocalUuid)
@@ -326,7 +317,7 @@ class NewMessageViewModel @Inject constructor(
             it.flagRecipientsAsAutomaticallyEntered()
 
             dismissNotification()
-            markAsRead(currentMailboxNew.first(), realm)
+            markAsRead(currentMailbox.first(), realm)
 
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.saveSnapshot(initialBody.content)
@@ -343,7 +334,7 @@ class NewMessageViewModel @Inject constructor(
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
-                draft.identityId = currentMailboxNew.first().getDefaultSignatureWithFallback().id.toString()
+                draft.identityId = currentMailbox.first().getDefaultSignatureWithFallback().id.toString()
             }
             splitSignatureAndQuoteFromBody(draft)
         }
@@ -373,7 +364,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         with(draftInitManager) {
-            val signature = chooseSignature(currentMailboxNew.first().email, signatures, draftMode, previousMessage)
+            val signature = chooseSignature(currentMailbox.first().email, signatures, draftMode, previousMessage)
             setSignatureIdentity(signature)
             if (signature.content.isNotEmpty()) {
                 initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
@@ -401,7 +392,7 @@ class NewMessageViewModel @Inject constructor(
         val isAiEnabled = currentMailbox().featureFlags.contains(FeatureFlag.AI)
         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body)
 
-        val isEncryptionEnabled = currentMailboxNew.first().featureFlags.contains(FeatureFlag.ENCRYPTION)
+        val isEncryptionEnabled = currentMailbox.first().featureFlags.contains(FeatureFlag.ENCRYPTION)
         if (isEncryptionEnabled) draft.isEncrypted = fullMessage.isEncrypted
     }
 
@@ -538,7 +529,7 @@ class NewMessageViewModel @Inject constructor(
 
         fromLiveData.postValue(
             UiFrom(
-                signature = draftSignature ?: currentMailboxNew.first().getDefaultSignatureWithFallback(),
+                signature = draftSignature ?: currentMailbox.first().getDefaultSignatureWithFallback(),
                 shouldUpdateBodySignature = false,
             ),
         )
@@ -862,7 +853,7 @@ class NewMessageViewModel @Inject constructor(
         } ?: return@launch
 
         runCatching {
-            uploadAttachmentsWithMutex(localUuid, currentMailboxNew.first(), realm)
+            uploadAttachmentsWithMutex(localUuid, currentMailbox.first(), realm)
         }.cancellable().onFailure(Sentry::captureException)
     }
 
@@ -932,7 +923,7 @@ class NewMessageViewModel @Inject constructor(
             to = toLiveData.valueOrEmpty(),
             cc = ccLiveData.valueOrEmpty(),
             bcc = bccLiveData.valueOrEmpty(),
-            externalMailFlagEnabled = currentMailboxNew.first().externalMailFlagEnabled,
+            externalMailFlagEnabled = currentMailbox.first().externalMailFlagEnabled,
         )
     }
 
@@ -1092,6 +1083,8 @@ class NewMessageViewModel @Inject constructor(
         SUCCESS,
         ATTACHMENTS_TOO_BIG,
     }
+
+    data class MailboxRef(val userId: Int, val mailboxId: Int)
 
     data class InitResult(
         val draft: Draft,
