@@ -30,7 +30,7 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MANAGE_SIGNATURES_URL
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
@@ -61,7 +61,7 @@ class SignatureSettingFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch { setupAdapter(mailbox()) }
 
         binding.manageSignatures.setOnClickListener {
-            requireContext().openUrl(BuildConfig.MANAGE_SIGNATURES_URL)
+            requireContext().openUrl(MANAGE_SIGNATURES_URL)
         }
 
         updateSignatures()

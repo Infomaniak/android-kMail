@@ -73,6 +73,7 @@ import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.removeAccents
 import com.infomaniak.core.legacy.utils.showToast
+import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.endOfTheWeek
 import com.infomaniak.core.utils.isEmailRfc5321Compliant
@@ -129,7 +130,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import kotlin.math.roundToInt
-import com.infomaniak.core.auth.BuildConfig as AuthBuildConfig
 
 const val IK_FOLDER = ".ik"
 
@@ -479,7 +479,7 @@ fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
 
 fun Context.getInfomaniakLogin() = InfomaniakLogin(
     context = this,
-    loginUrl = AuthBuildConfig.LOGIN_ENDPOINT_URL,
+    loginUrl = LOGIN_ENDPOINT_URL,
     appUID = BuildConfig.APPLICATION_ID,
     clientID = BuildConfig.CLIENT_ID,
     accessType = null,

@@ -25,10 +25,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.infomaniak.core.legacy.BuildConfig.AUTOLOG_URL
-import com.infomaniak.core.legacy.BuildConfig.TERMINATE_ACCOUNT_URL
 import com.infomaniak.core.legacy.ui.WebViewActivity
 import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.network.AUTOLOG_URL
+import com.infomaniak.core.network.TERMINATE_ACCOUNT_URL
 import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -80,6 +80,6 @@ class AccountManagementSettingsFragment : Fragment() {
 
     companion object {
         private const val URL_REDIRECT_SUCCESSFUL_ACCOUNT_DELETION = "login.infomaniak.com"
-        private const val TERMINATE_ACCOUNT_FULL_URL = "$AUTOLOG_URL/?url=$TERMINATE_ACCOUNT_URL"
+        private val TERMINATE_ACCOUNT_FULL_URL = "$AUTOLOG_URL/?url=$TERMINATE_ACCOUNT_URL"
     }
 }

@@ -39,6 +39,8 @@ import com.infomaniak.core.legacy.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.CHATBOT_URL
+import com.infomaniak.mail.IMPORT_EMAILS_URL
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackManageFolderEvent
@@ -275,7 +277,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onImportMailsClicked() {
         trackMenuDrawerEvent(MatomoName.ImportEmails)
-        context?.openUrl(BuildConfig.IMPORT_EMAILS_URL)
+        context?.openUrl(IMPORT_EMAILS_URL)
         closeDrawer()
     }
 
@@ -309,7 +311,7 @@ class MenuDrawerFragment : Fragment() {
     private fun onHelpClicked() {
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SUPPORT.id)
         trackMenuDrawerEvent(MatomoName.Help)
-        context?.openUrl(BuildConfig.CHATBOT_URL)
+        context?.openUrl(CHATBOT_URL)
         closeDrawer()
     }
 

@@ -24,7 +24,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
-import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.CHATBOT_URL
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
@@ -115,7 +115,7 @@ object Utils {
 
     fun openShortcutHelp(context: Context) {
         ShortcutManagerCompat.reportShortcutUsed(context, Shortcuts.SUPPORT.id)
-        context.openUrl(BuildConfig.CHATBOT_URL)
+        context.openUrl(CHATBOT_URL)
     }
 
     enum class MailboxErrorCode {
