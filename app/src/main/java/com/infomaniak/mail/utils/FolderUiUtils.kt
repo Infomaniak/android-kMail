@@ -54,11 +54,11 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
     val resultRoots = mutableListOf<FolderUi>()
     var isCurrentParentCollapsed = false
     folderToFolderUi.forEach { (key, folderUi) ->
-        val (folder, depth) = key
+        val (folder, parentDepth) = key
 
         val validChildren = folder.children
             .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
-            .mapNotNull { folderToFolderUi[it to depth + 1] }
+            .mapNotNull { folderToFolderUi[it to parentDepth + 1] } // children are stored at the parent's depth +1
 
         val shouldHide = if (folderUi.isRoot) {
             isCurrentParentCollapsed = folder.isCollapsed
