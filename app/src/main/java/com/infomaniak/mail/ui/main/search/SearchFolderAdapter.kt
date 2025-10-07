@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import android.widget.ListAdapter
 import androidx.appcompat.content.res.AppCompatResources
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.DIVIDER
@@ -55,7 +56,7 @@ class SearchFolderAdapter(
         val context = parent!!.context
         return when (getItemViewType(position)) {
             DIVIDER.itemId -> bindDivider(convertView, context, parent)
-            else -> bindFolder(convertView, context, parent, getItem(position) as? Folder)
+            else -> bindFolderUi(convertView, context, parent, getItem(position) as? FolderUi)
         }
     }
 
@@ -65,17 +66,17 @@ class SearchFolderAdapter(
         }
     }
 
-    private fun bindFolder(
+    private fun bindFolderUi(
         convertView: View?,
         context: Context,
         parent: ViewGroup?,
-        folder: Folder?,
+        folderUi: FolderUi?,
     ): View {
         return (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
             findViewById<SelectableFolderItemView>(R.id.simpleFolderItemView).apply {
-                text = context.getLocalizedNameOrAllFolders(folder)
-                icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_all_folders)
-                setSelectedState(folder == selectedFolder)
+                text = context.getLocalizedNameOrAllFolders(folderUi?.folder)
+                icon = AppCompatResources.getDrawable(context, folderUi?.folder?.getIcon() ?: R.drawable.ic_all_folders)
+                setSelectedState(folderUi == selectedFolder)
             }
         }
     }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
-import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder
+import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder.Companion.MAX_SUB_FOLDERS_INDENT
 import com.infomaniak.mail.ui.main.move.MoveAdapter.MoveFolderViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
@@ -63,7 +63,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (currentList[position]) {
-            is Folder -> DisplayType.FOLDER.layout
+            is FolderUi -> DisplayType.FOLDER.layout
             else -> DisplayType.DIVIDER.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -78,22 +78,14 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
         return MoveFolderViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-        if (payloads.firstOrNull() == Unit) {
-            val isSelected = selectedFolderId == (currentList[position] as Folder).id
-            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(isSelected)
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
-        }
-    }.getOrDefault(Unit)
-
     override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int) = with(holder.binding) {
         if (getItemViewType(position) == DisplayType.FOLDER.layout) {
-            (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as Folder)
+            (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as FolderUi)
         }
     }
 
-    private fun SelectableFolderItemView.displayFolder(folder: Folder) {
+    private fun SelectableFolderItemView.displayFolder(folderUi: FolderUi) {
+        val folder = folderUi.folder
 
         val iconId = when {
             folder.role != null -> folder.role!!.folderIconRes
@@ -104,8 +96,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
 
         val folderIndent = when {
             !shouldDisplayIndent -> 0
-            folder.role != null -> 0
-            else -> min(folder.path.split(folder.separator).size - 1, FolderViewHolder.MAX_SUB_FOLDERS_INDENT)
+            else -> min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
         }
         setIndent(indent = folderIndent, hasCollapsableFolder = false, canBeCollapsed = false)
 
@@ -120,23 +111,21 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
     }
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
-
         override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             return when {
                 oldItem is Unit && newItem is Unit -> true // Unit is Divider item. They don't have any content, so always true.
-                oldItem is Folder && newItem is Folder && oldItem.id == newItem.id -> true
+                oldItem is FolderUi && newItem is FolderUi && oldItem.folder.id == newItem.folder.id -> true
                 else -> false
             }
         }.getOrDefault(false)
 
         override fun areContentsTheSame(oldFolder: Any, newFolder: Any) = runCatchingRealm {
-            oldFolder is Folder && newFolder is Folder &&
-                    oldFolder.name == newFolder.name &&
-                    oldFolder.isFavorite == newFolder.isFavorite &&
-                    oldFolder.path == newFolder.path &&
-                    oldFolder.threads.count() == newFolder.threads.count() &&
-                    oldFolder.isHidden == newFolder.isHidden &&
-                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed
+            oldFolder is FolderUi && newFolder is FolderUi &&
+                    oldFolder.folder.name == newFolder.folder.name &&
+                    oldFolder.folder.isFavorite == newFolder.folder.isFavorite &&
+                    oldFolder.folder.path == newFolder.folder.path &&
+                    oldFolder.folder.threads.count() == newFolder.folder.threads.count() &&
+                    oldFolder.depth == newFolder.depth
         }.getOrDefault(false)
     }
 }

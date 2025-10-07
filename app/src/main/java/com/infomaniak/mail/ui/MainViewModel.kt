@@ -58,6 +58,7 @@ import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -98,11 +99,11 @@ import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
+import com.infomaniak.mail.utils.toFolderUiTree
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -121,6 +122,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -216,25 +218,23 @@ class MainViewModel @Inject constructor(
 
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
-    val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerDefaultFoldersAsync()
-            .map {
-                it.list.flattenFolderChildrenAndRemoveMessages(
-                    dismissHiddenChildren = true,
-                    shouldFilterOutFolderWithRole = false
-                )
-            }
-    }.asLiveData(ioCoroutineContext)
+    private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+        folderController
+            .getMenuDrawerDefaultFoldersAsync()
+            .map { it.list.toFolderUiTree(isInDefaultFolderSection = true) }
+    }
 
-    val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerCustomFoldersAsync()
-            .map {
-                it.list.flattenFolderChildrenAndRemoveMessages(
-                    dismissHiddenChildren = true,
-                    shouldFilterOutFolderWithRole = true
-                )
-            }
-    }.asLiveData(ioCoroutineContext)
+    private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+        folderController
+            .getMenuDrawerCustomFoldersAsync()
+            .map { it.list.toFolderUiTree(isInDefaultFolderSection = false) }
+    }
+
+    val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
+        DisplayedFolders(default, custom)
+    }
+
+    val displayedFoldersLive = displayedFoldersFlow.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(quotasController::getQuotasAsync) ?: emptyFlow()
@@ -1690,6 +1690,8 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Remove Threads with parental issues")
         threadController.removeThreadsWithParentalIssues()
     }
+
+    data class DisplayedFolders(val default: List<FolderUi>, val custom: List<FolderUi>)
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName

@@ -26,8 +26,8 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.findSuspend
-import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.sortFolders
+import com.infomaniak.mail.utils.shouldBeExcluded
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -47,31 +47,17 @@ class FolderController @Inject constructor(
 
     //region Get data
     fun getMenuDrawerDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(
-            realm = mailboxContentRealm(),
-            withoutTypes = listOf(FoldersType.CUSTOM),
-            withoutChildren = true,
-        ).asFlow()
+        return getVisibleRoleFoldersQuery(realm = mailboxContentRealm()).asFlow()
     }
 
     fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(
-            realm = mailboxContentRealm(),
-            withoutTypes = listOf(FoldersType.DEFAULT),
-            withoutChildren = true,
-        ).asFlow()
-    }
-
-    fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
-    }
-
-    suspend fun getMoveFolders(): RealmResults<Folder> {
-        return getFoldersQuery(
-            realm = mailboxContentRealm(),
-            withoutTypes = listOf(FoldersType.SNOOZED, FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
-            withoutChildren = true,
-        ).findSuspend()
+        val rootsQuery = " AND $isRootFolder"
+        val typeQuery = " AND ${Folder.rolePropertyName} == nil"
+        val visibilityQuery = " AND $isVisible"
+        return mailboxContentRealm()
+            .query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}")
+            .sortFolders()
+            .asFlow()
     }
 
     suspend fun getFolder(id: String): Folder? {
@@ -92,8 +78,12 @@ class FolderController @Inject constructor(
     //endregion
 
     //region Edit data
+    suspend fun updateFolder(id: String, onUpdate: (Folder) -> Unit) {
+        mailboxContentRealm().write { getFolderBlocking(id, realm = this)?.let { onUpdate(it) } }
+    }
+
     suspend fun update(mailbox: Mailbox, remoteFolders: List<Folder>, realm: Realm) {
-        val remoteFoldersWithChildren = remoteFolders.flattenFolderChildrenAndRemoveMessages()
+        val remoteFoldersWithChildren = remoteFolders.flattenFolderChildren()
 
         realm.write {
 
@@ -144,7 +134,6 @@ class FolderController @Inject constructor(
                     it.newMessagesUidsToFetch,
                     it.remainingOldMessagesToFetch,
                     it.isDisplayed,
-                    it.isHidden,
                     isCollapsed,
                 )
             }
@@ -154,38 +143,19 @@ class FolderController @Inject constructor(
     }
     //endregion
 
-    enum class FoldersType {
-        DEFAULT,
-        CUSTOM,
-        SNOOZED,
-        SCHEDULED_DRAFTS,
-        DRAFT,
-    }
-
     companion object {
         const val SEARCH_FOLDER_ID = "search_folder_id"
         private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
         private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
+        private val hasRole: String = "${Folder.rolePropertyName} != nil"
+        private val isVisible: String = "${Folder::isDisplayed.name} == true"
 
         //region Queries
-        private fun getFoldersQuery(
-            realm: TypedRealm,
-            withoutTypes: List<FoldersType> = emptyList(),
-            withoutChildren: Boolean = false,
-            visibleFoldersOnly: Boolean = true,
-        ): RealmQuery<Folder> {
-            val rootsQuery = if (FoldersType.DEFAULT in withoutTypes && withoutChildren) " AND $isRootFolder" else ""
-            val typeQuery = withoutTypes.joinToString(separator = "") {
-                when (it) {
-                    FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
-                    FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != nil"
-                    FoldersType.SNOOZED -> " AND ${Folder.rolePropertyName} != '${FolderRole.SNOOZED.name}'"
-                    FoldersType.SCHEDULED_DRAFTS -> " AND ${Folder.rolePropertyName} != '${FolderRole.SCHEDULED_DRAFTS.name}'"
-                    FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
-                }
-            }
-            val visibilityQuery = if (visibleFoldersOnly) " AND ${Folder::isDisplayed.name} == true" else ""
-            return realm.query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}").sortFolders()
+        /**
+         * Returns the complete list of folders with roles. Is used to display the special roles folders in the menu drawer.
+         */
+        private fun getVisibleRoleFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+            return realm.query<Folder>(hasRole).sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
@@ -230,21 +200,6 @@ class FolderController @Inject constructor(
             realm.write { getFolderBlocking(id, realm = this)?.let { onUpdate(this, it) } }
         }
 
-        suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
-
-            tailrec fun updateChildrenRecursively(inputList: MutableList<Folder>) {
-                val folder = inputList.removeAt(0)
-                onUpdate(folder)
-                inputList.addAll(folder.children)
-
-                if (inputList.isNotEmpty()) updateChildrenRecursively(inputList)
-            }
-
-            realm.write {
-                getFolderBlocking(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
-            }
-        }
-
         fun deleteSearchFolderData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
             threads.clear()
         }
@@ -256,5 +211,44 @@ class FolderController @Inject constructor(
             }
         }
         //endregion
+    }
+}
+
+private fun List<Folder>.flattenFolderChildren(): List<Folder> {
+    return if (isEmpty()) this else formatFolderWithAllChildren(toMutableList())
+}
+
+private tailrec fun formatFolderWithAllChildren(
+    inputList: MutableList<Folder>,
+    outputList: MutableList<Folder> = mutableListOf(),
+): List<Folder> {
+
+    val folder = inputList.removeAt(0)
+
+    /*
+    * There are two types of folders:
+    * - user's folders (with or without a role)
+    * - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
+    *
+    * We want to display the user's folders, and also the IK folders for which we handle the role.
+    * IK folders where we don't handle the role are dismissed.
+    *
+    * I.e. hides all IK folders with no roles.
+    */
+    val shouldThisFolderBeAdded = folder.shouldBeExcluded(excludeRoleFolder = false).not()
+
+    val children = if (shouldThisFolderBeAdded) {
+        outputList.add(folder)
+        folder.children.sortFolders()
+    } else {
+        null
+    }
+
+    children?.let { inputList.addAll(index = 0, it) }
+
+    return if (inputList.isEmpty()) {
+        outputList
+    } else {
+        formatFolderWithAllChildren(inputList, outputList)
     }
 }

@@ -25,8 +25,8 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
@@ -42,13 +42,14 @@ class FolderViewHolder(
     override val binding = super.binding as ItemMenuDrawerFolderBinding
 
     fun displayFolder(
-        folder: Folder,
+        folderUi: FolderUi,
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
+        val folder = folderUi.folder
         SentryLog.d("Bind", "Bind Folder : ${folder.name}")
 
         val roleDependantParameters = folder.role?.let {
@@ -56,15 +57,12 @@ class FolderViewHolder(
                 iconId = it.folderIconRes,
                 trackerName = it.matomoName,
                 trackerValue = null,
-                folderIndent = 0,
             )
         } ?: run {
-            val indentLevel = folder.path.split(folder.separator).size - 1
             RoleDependantParameters(
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 trackerName = MatomoName.CustomFolder,
-                trackerValue = indentLevel.toFloat(),
-                folderIndent = min(indentLevel, MAX_SUB_FOLDERS_INDENT),
+                trackerValue = folderUi.depth.toFloat(),
             )
         }
 
@@ -74,9 +72,11 @@ class FolderViewHolder(
             else -> folder.unreadCountDisplay
         }
 
+        val folderIndent = min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
         binding.root.setFolderUi(
-            folder,
+            folderUi,
             roleDependantParameters,
+            folderIndent,
             unread,
             currentFolderId,
             hasCollapsableFolder,
@@ -87,8 +87,9 @@ class FolderViewHolder(
     }
 
     private fun UnreadFolderItemView.setFolderUi(
-        folder: Folder,
+        folderUi: FolderUi,
         roleDependantParameters: RoleDependantParameters,
+        folderIndent: Int,
         unread: UnreadDisplay?,
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
@@ -96,18 +97,18 @@ class FolderViewHolder(
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
-
+        val folder = folderUi.folder
         val folderName = folder.getLocalizedName(context)
-        val (iconId, trackerName, trackerValue, folderIndent) = roleDependantParameters
+        val (iconId, trackerName, trackerValue) = roleDependantParameters
 
         setFolderUi(folder, iconId, isSelected = folder.id == currentFolderId)
 
-        initOnCollapsableClickListener { onCollapseChildrenClicked(folder.id, isCollapsed) }
+        initOnCollapsableClickListener { onCollapseChildrenClicked(folderUi.folder.id, isCollapsed) }
 
         isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
         unreadCount = unread?.count ?: 0
         isCollapsed = folder.isCollapsed
-        canBeCollapsed = folder.canBeCollapsed
+        canBeCollapsed = folderUi.canBeCollapsed
 
         setIndent(
             indent = folderIndent,
@@ -134,7 +135,6 @@ class FolderViewHolder(
         @DrawableRes var iconId: Int,
         var trackerName: MatomoName,
         var trackerValue: Float?,
-        var folderIndent: Int,
     )
 
     companion object {

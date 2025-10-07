@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderUi
+import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
@@ -66,8 +68,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             val (
                 mailboxes,
                 areMailboxesExpanded,
-                defaultFolders,
-                customFolders,
+                displayedFolders,
                 areCustomFoldersExpanded,
                 areActionsExpanded,
                 permissions,
@@ -77,10 +78,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             addMailboxes(mailboxes, areMailboxesExpanded)
 
             add(ItemType.DIVIDER)
-            hasCollapsableDefaultFolder = addDefaultFolders(defaultFolders)
+            hasCollapsableDefaultFolder = addDefaultFolders(displayedFolders.default)
 
             add(ItemType.DIVIDER)
-            hasCollapsableCustomFolder = addCustomFolders(customFolders, areCustomFoldersExpanded)
+            hasCollapsableCustomFolder = addCustomFolders(displayedFolders.custom, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
@@ -103,18 +104,23 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<Folder>): Boolean {
+    private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>): Boolean {
         var atLeastOneFolderIsIndented = false
 
-        defaultFolders.forEach { defaultFolder ->
-            if (defaultFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-            add(defaultFolder)
+        defaultFolders.forEachNestedItem { defaultFolderUi, _ ->
+            if (!defaultFolderUi.isHidden) {
+                if (defaultFolderUi.canBeCollapsed) atLeastOneFolderIsIndented = true
+                add(defaultFolderUi)
+            }
         }
 
         return atLeastOneFolderIsIndented
     }
 
-    private fun MutableList<Any>.addCustomFolders(customFolders: List<Folder>, areCustomFoldersExpanded: Boolean): Boolean {
+    private fun MutableList<Any>.addCustomFolders(
+        customFolders: List<FolderUi>,
+        areCustomFoldersExpanded: Boolean,
+    ): Boolean {
         var atLeastOneFolderIsIndented = false
 
         add(ItemType.FOLDERS_HEADER)
@@ -123,9 +129,11 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         if (customFolders.isEmpty()) {
             add(ItemType.EMPTY_FOLDERS)
         } else {
-            customFolders.forEach { customFolder ->
-                if (customFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-                add(customFolder)
+            customFolders.forEachNestedItem { customFolderUi, _ ->
+                if (!customFolderUi.isHidden) {
+                    if (customFolderUi.canBeCollapsed) atLeastOneFolderIsIndented = true
+                    add(customFolderUi)
+                }
             }
         }
 
@@ -157,7 +165,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
                 if (getItemViewType(index) != ItemType.FOLDER.ordinal) continue
 
-                val itemId = (currentList[index] as Folder).id
+                // The following cast as FolderUi can never fail if we've got a ItemType.FOLDER view type
+                val itemId = (currentList[index] as? FolderUi)?.folder?.id
                 if (itemId == oldId) {
                     oldIsFound = true
                     notifyItemChanged(index)
@@ -179,7 +188,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             is MailboxesHeader -> ItemType.MAILBOXES_HEADER.ordinal
             is Mailbox -> if (item.isAvailable) ItemType.MAILBOX.ordinal else ItemType.INVALID_MAILBOX.ordinal
             ItemType.FOLDERS_HEADER -> ItemType.FOLDERS_HEADER.ordinal
-            is Folder -> ItemType.FOLDER.ordinal
+            is FolderUi -> ItemType.FOLDER.ordinal
             ItemType.EMPTY_FOLDERS -> ItemType.EMPTY_FOLDERS.ordinal
             ItemType.ACTIONS_HEADER -> ItemType.ACTIONS_HEADER.ordinal
             is MenuDrawerAction -> ItemType.ACTION.ordinal
@@ -236,9 +245,9 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 onCreateFolderClicked = callbacks.onCreateFolderClicked,
             )
             is FolderViewHolder -> holder.displayFolder(
-                folder = item as Folder,
+                folderUi = item as FolderUi,
                 currentFolderId = currentFolderId,
-                hasCollapsableFolder = if (item.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder,
+                hasCollapsableFolder = if (item.isInDefaultFolderSection) hasCollapsableDefaultFolder else hasCollapsableCustomFolder,
                 onFolderClicked = callbacks.onFolderClicked,
                 onFolderLongClicked = callbacks.onFolderLongClicked,
                 onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
@@ -286,7 +295,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 is MailboxesHeader -> newItem is MailboxesHeader && newItem.mailbox?.objectId == oldItem.mailbox?.objectId
                 is Mailbox -> newItem is Mailbox && newItem.objectId == oldItem.objectId
                 ItemType.FOLDERS_HEADER -> newItem == ItemType.FOLDERS_HEADER
-                is Folder -> newItem is Folder && newItem.id == oldItem.id
+                is FolderUi -> newItem is FolderUi && newItem.folder.id == oldItem.folder.id
                 ItemType.EMPTY_FOLDERS -> newItem == ItemType.EMPTY_FOLDERS
                 ItemType.ACTIONS_HEADER -> newItem == ItemType.ACTIONS_HEADER
                 is MenuDrawerAction -> newItem is MenuDrawerAction && newItem.type == oldItem.type
@@ -302,13 +311,15 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         && newItem.isExpanded == oldItem.isExpanded
                         && newItem.mailbox?.unreadCountDisplay?.count == oldItem.mailbox?.unreadCountDisplay?.count
                 is Mailbox -> newItem is Mailbox && newItem.unreadCountDisplay.count == oldItem.unreadCountDisplay.count
-                is Folder -> newItem is Folder &&
-                        newItem.name == oldItem.name &&
-                        newItem.isFavorite == oldItem.isFavorite &&
-                        newItem.path == oldItem.path &&
-                        newItem.unreadCountDisplay == oldItem.unreadCountDisplay &&
-                        newItem.threads.count() == oldItem.threads.count() &&
-                        newItem.canBeCollapsed == oldItem.canBeCollapsed
+                is FolderUi -> newItem is FolderUi &&
+                        newItem.folder.name == oldItem.folder.name &&
+                        newItem.folder.isFavorite == oldItem.folder.isFavorite &&
+                        newItem.folder.path == oldItem.folder.path &&
+                        newItem.folder.unreadCountDisplay == oldItem.folder.unreadCountDisplay &&
+                        newItem.folder.threads.count() == oldItem.folder.threads.count() &&
+                        newItem.canBeCollapsed == oldItem.canBeCollapsed &&
+                        newItem.depth == oldItem.depth &&
+                        newItem.isInDefaultFolderSection == oldItem.isInDefaultFolderSection
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
                 ItemType.DIVIDER,
                 ItemType.FOLDERS_HEADER,

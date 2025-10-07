@@ -29,7 +29,6 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -42,7 +41,6 @@ import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
@@ -61,7 +59,6 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
-    folderController: FolderController,
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
@@ -82,10 +79,6 @@ class SearchViewModel @Inject constructor(
         private set
     var currentSearchQuery: String = ""
         private set
-
-    val foldersLive = folderController.getSearchFoldersAsync()
-        .map { it.list.flattenFolderChildrenAndRemoveMessages() }
-        .asLiveData(ioCoroutineContext)
 
     private var currentFilters = mutableSetOf<ThreadFilter>()
 

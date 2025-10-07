@@ -119,9 +119,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
-import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.ext.isManaged
-import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
@@ -330,88 +327,6 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 //endregion
 
 //region Folders
-suspend fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
-    dismissHiddenChildren: Boolean = false,
-    shouldFilterOutFolderWithRole: Boolean = false,
-): List<Folder> {
-
-    if (isEmpty()) return this
-
-    return formatFolderWithAllChildren(
-        dismissHiddenChildren = dismissHiddenChildren,
-        inputList = toMutableList(),
-        shouldFilterOutFolderWithRole = shouldFilterOutFolderWithRole
-    )
-}
-
-/* There are two types of folders:
-* - user's folders (with or without a role)
-* - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
-*
-* We want to display the user's folders, and also the IK folders for which we handle the role.
-* IK folders where we don't handle the role are dismissed.
-*/
-fun shouldThisFolderBeAdded(folder: Folder, shouldFilterOutFolderWithRole: Boolean): Boolean {
-    return if (shouldFilterOutFolderWithRole) {
-        folder.role == null || folder.children.isNotEmpty()
-    } else {
-        folder.path.startsWith(IK_FOLDER).not() || folder.role != null
-    }
-}
-
-private suspend fun actionForFolder(
-    isManaged: Boolean,
-    folder: Folder,
-    shouldFilterOutFolderWithRole: Boolean,
-    dismissHiddenChildren: Boolean,
-    outputList: MutableList<Folder>
-): List<Folder> {
-    when {
-        shouldThisFolderBeAdded(folder, shouldFilterOutFolderWithRole) && isManaged -> folder.copyFromRealm(depth = 1u)
-        shouldThisFolderBeAdded(folder, shouldFilterOutFolderWithRole) && !isManaged -> folder
-        else -> null
-    }?.let { outputList.add(it) }
-
-    if (isManaged) {
-        with(folder.children) {
-            val folderChildrenQuery = if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()
-            return folderChildrenQuery.sortFolders().findSuspend()
-        }
-    }
-
-    val folderChildren = if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children
-    return folderChildren.sortFolders()
-}
-
-private tailrec suspend fun formatFolderWithAllChildren(
-    dismissHiddenChildren: Boolean,
-    inputList: MutableList<Folder>,
-    outputList: MutableList<Folder> = mutableListOf(),
-    shouldFilterOutFolderWithRole: Boolean,
-): List<Folder> {
-    val folder = inputList.removeAt(0)
-    val children = actionForFolder(
-        isManaged = folder.isManaged(),
-        folder = folder,
-        shouldFilterOutFolderWithRole = shouldFilterOutFolderWithRole,
-        dismissHiddenChildren = dismissHiddenChildren,
-        outputList = outputList
-    )
-
-    inputList.addAll(index = 0, children)
-
-    return if (inputList.isEmpty()) {
-        outputList
-    } else {
-        formatFolderWithAllChildren(
-            dismissHiddenChildren,
-            inputList,
-            outputList,
-            shouldFilterOutFolderWithRole
-        )
-    }
-}
-
 /**
  * These 2 `sortFolders()` functions should always implement the same sort logic.
  */
@@ -426,19 +341,6 @@ fun List<Folder>.sortFolders() = sortedBy { it.sortedName }
     .sortedByDescending { it.isFavorite }
     .sortedByDescending { it.roleOrder }
 
-fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> {
-    val folders = this
-    var needsToAddDivider = true
-    return buildList {
-        folders.forEach { folder ->
-            if (needsToAddDivider && folder.isRootAndCustom) {
-                needsToAddDivider = false
-                add(dividerType)
-            }
-            add(folder)
-        }
-    }
-}
 //endregion
 
 //region Messages

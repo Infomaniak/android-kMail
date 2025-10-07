@@ -55,7 +55,7 @@ import kotlinx.serialization.UseSerializers
 import kotlin.reflect.KProperty1
 
 @Serializable
-class Folder : RealmObject, Cloneable {
+class Folder : RealmObject, Cloneable, TreeStructure<Folder> {
 
     //region Remote data
     @PrimaryKey
@@ -70,7 +70,7 @@ class Folder : RealmObject, Cloneable {
     @SerialName("unread_count")
     var unreadCountRemote: Int = 0
     var separator: String = ""
-    var children = realmListOf<Folder>()
+    override var children = realmListOf<Folder>()
     //endregion
 
     //region Local data (Transient)
@@ -101,8 +101,6 @@ class Folder : RealmObject, Cloneable {
     var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
 
     @Transient
-    var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
-    @Transient
     var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
     @Transient
     var roleOrder: Int = role?.order ?: CUSTOM_FOLDER_ROLE_ORDER
@@ -124,14 +122,8 @@ class Folder : RealmObject, Cloneable {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
-    val canBeCollapsed: Boolean // For parents only (only a parent can be collapsed, its children will be hidden instead)
-        inline get() = children.isNotEmpty() && isRoot
-
     val isRoot: Boolean
         inline get() = !path.contains(separator)
-
-    val isRootAndCustom: Boolean
-        inline get() = role == null && isRoot
 
     val refreshStrategy: RefreshStrategy get() = role?.refreshStrategy ?: defaultRefreshStrategy
 
@@ -146,7 +138,6 @@ class Folder : RealmObject, Cloneable {
         newMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
         isDisplayed: Boolean,
-        isHidden: Boolean,
         isCollapsed: Boolean,
     ) {
         this.lastUpdatedAt = lastUpdatedAt
@@ -158,7 +149,6 @@ class Folder : RealmObject, Cloneable {
         this.newMessagesUidsToFetch.addAll(newMessagesUidsToFetch)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
         this.isDisplayed = isDisplayed
-        this.isHidden = isHidden
         this.isCollapsed = isCollapsed
 
         this.sortedName = this.name.lowercase().removeAccents()

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.menuDrawer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
@@ -31,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MenuDrawerViewModel @Inject constructor(
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val folderController: FolderController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -41,9 +40,9 @@ class MenuDrawerViewModel @Inject constructor(
     val areCustomFoldersExpanded = MutableLiveData(true)
     val areActionsExpanded = MutableLiveData(false)
 
-    fun toggleFolderCollapsingState(folderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
-        FolderController.updateFolderAndChildren(folderId, mailboxContentRealm()) {
-            if (it.isRoot) it.isCollapsed = shouldCollapse else it.isHidden = shouldCollapse
+    fun toggleFolderCollapsingState(rootFolderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+        folderController.updateFolder(rootFolderId) {
+            it.isCollapsed = shouldCollapse
         }
     }
 

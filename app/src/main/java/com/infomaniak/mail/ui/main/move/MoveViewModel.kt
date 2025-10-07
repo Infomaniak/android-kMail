@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,16 +22,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.standardize
+import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -44,7 +44,6 @@ import javax.inject.Inject
 class MoveViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
-    private val folderController: FolderController,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -57,7 +56,7 @@ class MoveViewModel @Inject constructor(
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
-    private var allFolders = emptyList<Any>()
+    private var allFolderUis = emptyList<Any>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
     val filterResults = MutableLiveData<Pair<List<Any>, Boolean>>()
     var hasAlreadyTrackedSearch = false
@@ -69,12 +68,14 @@ class MoveViewModel @Inject constructor(
                 ?: threadController.getThread(threadsUids.first())!!.folderId
 
             sourceFolderIdLiveData.postValue(sourceFolderId)
-
-            allFolders = folderController.getMoveFolders()
-                .flattenFolderChildrenAndRemoveMessages()
-                .addDividerBeforeFirstCustomFolder(dividerType = Unit)
-                .also { folders -> filterResults.postValue(folders to true) }
         }
+    }
+
+    fun initFolders(folders: MainViewModel.DisplayedFolders) {
+        allFolderUis = folders.flattenAndAddDividerBeforeFirstCustomFolder(
+            dividerType = Unit,
+            excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
+        ).also { folders -> filterResults.postValue(folders to true) }
     }
 
     fun filterFolders(query: CharSequence?, shouldDebounce: Boolean) {
@@ -82,7 +83,7 @@ class MoveViewModel @Inject constructor(
             searchFolders(query, shouldDebounce)
         } else {
             cancelSearch()
-            filterResults.value = allFolders to true
+            filterResults.value = allFolderUis to true
         }
     }
 
@@ -97,17 +98,19 @@ class MoveViewModel @Inject constructor(
                 ensureActive()
             }
 
-            val filteredFolders = mutableListOf<Any>().apply {
-                allFolders.forEach { folder ->
+            // When dealing with nested role folders, there can be multiple FolderUi for the same Folder.id, that's why we make a
+            // map so there's only one FolderUi per Folder.id
+            val filteredFolders = buildMap {
+                allFolderUis.forEach { folderUi ->
                     ensureActive()
-                    if (folder !is Folder) return@forEach
-                    val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
+                    if (folderUi !is FolderUi) return@forEach
+                    val folderName = folderUi.folder.role?.folderNameRes?.let(appContext::getString) ?: folderUi.folder.name
                     val isFound = folderName.standardize().contains(query.standardize())
-                    if (isFound) add(folder)
+                    if (isFound) set(folderUi.folder.id, folderUi)
                 }
             }
 
-            filterResults.postValue(filteredFolders to false)
+            filterResults.postValue(filteredFolders.values.toList() to false)
         }
     }
 
