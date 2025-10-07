@@ -227,7 +227,7 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun openAiPrompt() = fragment.lifecycleScope.launch {
-        val mailbox = newMessageViewModel.currentMailboxNew.first()
+        val mailbox = newMessageViewModel.currentMailbox.first()
         val kSuite = mailbox.kSuite
         val matomoName = MatomoName.AiWriter.value
         when (kSuite) {

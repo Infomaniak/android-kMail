@@ -232,7 +232,7 @@ class AiPropositionFragment : Fragment() {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
             lifecycleScope.launch {
-                currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailboxNew.first().uuid)
+                currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox.first().uuid)
             }
         }
     }
@@ -257,7 +257,7 @@ class AiPropositionFragment : Fragment() {
             .joinToString(separator = ", ") { it.name }
             .takeIf { it.isNotBlank() }
         lifecycleScope.launch {
-            val currentMailboxUuid = newMessageViewModel.currentMailboxNew.first().uuid
+            val currentMailboxUuid = newMessageViewModel.currentMailbox.first().uuid
             currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
         }
     }
