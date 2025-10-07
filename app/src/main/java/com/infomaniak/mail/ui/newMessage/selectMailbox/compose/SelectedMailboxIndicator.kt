@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.newMessage.mailbox.compose
+package com.infomaniak.mail.ui.newMessage.selectMailbox.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -49,8 +49,8 @@ import com.infomaniak.core.compose.basics.Dimens
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.core.compose.preview.PreviewAllWindows
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.SelectedMailboxUi
-import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.SelectedMailboxPreviewParameter
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectedMailboxPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
 
 @Composable

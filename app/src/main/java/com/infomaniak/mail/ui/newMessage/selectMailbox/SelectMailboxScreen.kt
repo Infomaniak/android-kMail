@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.newMessage.mailbox
+package com.infomaniak.mail.ui.newMessage.selectMailbox
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -50,12 +50,12 @@ import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
-import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.SelectedMailboxUi
-import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.UserMailboxesUi
-import com.infomaniak.mail.ui.newMessage.mailbox.compose.AccountMailboxesDropdown
-import com.infomaniak.mail.ui.newMessage.mailbox.compose.SelectedMailboxIndicator
-import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.SelectMailboxScreenDataPreview
-import com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter.SelectMailboxScreenPreviewParameter
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.AccountMailboxesDropdown
+import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.SelectedMailboxIndicator
+import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectMailboxScreenDataPreview
+import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectMailboxScreenPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
 
 @Composable
