@@ -107,10 +107,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>): Boolean {
         var atLeastOneFolderIsIndented = false
 
-        defaultFolders.forEachNestedItem { defaultFolder, _ ->
-            if (!defaultFolder.isHidden) {
-                if (defaultFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-                add(defaultFolder)
+        defaultFolders.forEachNestedItem { defaultFolderUi, _ ->
+            if (!defaultFolderUi.isHidden) {
+                if (defaultFolderUi.canBeCollapsed) atLeastOneFolderIsIndented = true
+                add(defaultFolderUi)
             }
         }
 
@@ -129,10 +129,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         if (customFolders.isEmpty()) {
             add(ItemType.EMPTY_FOLDERS)
         } else {
-            customFolders.forEachNestedItem { customFolder, _ ->
-                if (!customFolder.isHidden) {
-                    if (customFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
-                    add(customFolder)
+            customFolders.forEachNestedItem { customFolderUi, _ ->
+                if (!customFolderUi.isHidden) {
+                    if (customFolderUi.canBeCollapsed) atLeastOneFolderIsIndented = true
+                    add(customFolderUi)
                 }
             }
         }
