@@ -45,6 +45,7 @@ import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
@@ -78,21 +79,7 @@ class NewMessageActivity : BaseActivity() {
         ShortcutManagerCompat.reportShortcutUsed(this@NewMessageActivity, Shortcuts.NEW_MESSAGE.id)
         setContentView(binding.root)
         addTwoFactorAuthOverlay()
-
-        val navGraph = navController.navInflater.inflate(R.navigation.new_message_navigation)
-        when (intent.action) {
-            Intent.ACTION_SEND,
-            Intent.ACTION_SEND_MULTIPLE,
-            Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO -> {
-                navGraph.setStartDestination(R.id.selectMailboxFragment)
-                navController.graph = navGraph
-            }
-            else -> {
-                navGraph.setStartDestination(R.id.newMessageFragment)
-            }
-        }
-        navController.graph = navGraph
+        setupNagGraphStartDestination()
 
         if (!isAuth()) {
             finish()
@@ -120,6 +107,30 @@ class NewMessageActivity : BaseActivity() {
         return true
     }
 
+    private fun setupNagGraphStartDestination() {
+        val navGraph = navController.navInflater.inflate(R.navigation.new_message_navigation)
+        lifecycleScope.launch {
+            when (intent.action) {
+                Intent.ACTION_SEND,
+                Intent.ACTION_SEND_MULTIPLE,
+                Intent.ACTION_VIEW,
+                Intent.ACTION_SENDTO -> {
+                    navGraph.setStartDestination(
+                        if (newMessageViewModel.hasMultiMailboxes()) {
+                            R.id.selectMailboxFragment
+                        } else {
+                            R.id.newMessageFragment
+                        }
+                    )
+                }
+                else -> {
+                    navGraph.setStartDestination(R.id.newMessageFragment)
+                }
+            }
+            navController.graph = navGraph
+        }
+    }
+
     private fun setupSnackbar() {
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
             R.id.newMessageFragment -> findViewById(R.id.editorToolbar)
@@ -141,7 +152,7 @@ class NewMessageActivity : BaseActivity() {
             Intent.ACTION_SEND,
             Intent.ACTION_SEND_MULTIPLE,
             Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO -> with(newMessageViewModel.currentMailbox()) {
+            Intent.ACTION_SENDTO -> with(newMessageViewModel.currentMailboxNew.first()) {
                 aiViewModel.updateFeatureFlag(objectId, uuid)
             }
         }

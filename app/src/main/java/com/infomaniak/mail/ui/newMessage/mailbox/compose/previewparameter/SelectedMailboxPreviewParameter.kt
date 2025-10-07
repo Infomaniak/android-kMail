@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.MailboxUi
 import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.SelectedMailboxUi
-import java.util.UUID
 
 class SelectedMailboxPreviewParameter : PreviewParameterProvider<SelectedMailboxUi> {
     override val values: Sequence<SelectedMailboxUi>
@@ -32,7 +31,7 @@ val selectedMailboxPreviewData = SelectedMailboxUi(
     avatarUrl = "https://picsum.photos/id/110/200/200",
     initials = "CH",
     mailbox = MailboxUi(
-        mailUuid = UUID.randomUUID().toString(),
+        mailboxId = 0,
         email = "chef@infomaniak.com"
     )
 )
