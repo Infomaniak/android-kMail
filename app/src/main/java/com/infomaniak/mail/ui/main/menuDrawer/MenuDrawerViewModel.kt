@@ -20,9 +20,7 @@ package com.infomaniak.mail.ui.main.menuDrawer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.updateFolder
-import com.infomaniak.mail.data.models.FolderUi
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MenuDrawerViewModel @Inject constructor(
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val folderController: FolderController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -42,13 +40,9 @@ class MenuDrawerViewModel @Inject constructor(
     val areCustomFoldersExpanded = MutableLiveData(true)
     val areActionsExpanded = MutableLiveData(false)
 
-    fun toggleFolderCollapsingState(rootFolderUi: FolderUi, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
-        // When subfolders are set as folders with specific roles, they are not truly root according to Folder.isRoot but yet
-        // they are the ones that can be collapsed. Therefore we must not rely on Folder.isRoot here.
-        mailboxContentRealm().write {
-            updateFolder(rootFolderUi.folder.id) {
-                it.isCollapsed = shouldCollapse
-            }
+    fun toggleFolderCollapsingState(rootFolderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+        folderController.updateFolder(rootFolderId) {
+            it.isCollapsed = shouldCollapse
         }
     }
 

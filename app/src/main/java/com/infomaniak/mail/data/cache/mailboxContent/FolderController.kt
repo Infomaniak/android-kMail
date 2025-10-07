@@ -78,6 +78,10 @@ class FolderController @Inject constructor(
     //endregion
 
     //region Edit data
+    suspend fun updateFolder(id: String, onUpdate: (Folder) -> Unit) {
+        mailboxContentRealm().write { getFolderBlocking(id, realm = this)?.let { onUpdate(it) } }
+    }
+
     suspend fun update(mailbox: Mailbox, remoteFolders: List<Folder>, realm: Realm) {
         val remoteFoldersWithChildren = remoteFolders.flattenFolderChildren()
 
@@ -194,10 +198,6 @@ class FolderController @Inject constructor(
         //region Edit data
         suspend fun updateFolder(id: String, realm: Realm, onUpdate: (MutableRealm, Folder) -> Unit) {
             realm.write { getFolderBlocking(id, realm = this)?.let { onUpdate(this, it) } }
-        }
-
-        fun MutableRealm.updateFolder(id: String, onUpdate: (Folder) -> Unit) {
-            getFolderBlocking(id, realm = this)?.let { onUpdate(it) }
         }
 
         fun deleteSearchFolderData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
