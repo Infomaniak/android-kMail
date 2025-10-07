@@ -581,17 +581,17 @@ class MainViewModel @Inject constructor(
     private suspend fun updateFoldersCollapsedState() {
         val folders = displayedFoldersFlow.first()
         mailboxContentRealm().write {
-            folders.custom.updateState(realm = this)
-            folders.default.updateState(realm = this)
+            folders.custom.updateCollapsedState(realm = this)
+            folders.default.updateCollapsedState(realm = this)
         }
     }
 
-    private fun List<FolderUi>.updateState(realm: MutableRealm) {
-        forEachNestedItem { folder, _ ->
-            if (folder.isRoot) {
+    private fun List<FolderUi>.updateCollapsedState(realm: MutableRealm) {
+        forEachNestedItem { folderUi, _ ->
+            if (folderUi.isRoot) {
                 // If we detect that a folder doesn't have any children anymore, if it was collapsed, automatically expand it
-                val collapseStateNeedsReset = folder.children.isEmpty()
-                if (collapseStateNeedsReset) FolderController.expand(folder.folder.id, realm)
+                val collapseStateNeedsReset = folderUi.children.isEmpty()
+                if (collapseStateNeedsReset) FolderController.expand(folderUi.folder.id, realm)
             }
         }
     }
