@@ -381,7 +381,7 @@ fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
 
 fun Context.getInfomaniakLogin() = InfomaniakLogin(
     context = this,
-    loginUrl = LOGIN_ENDPOINT_URL,
+    loginUrl = "${LOGIN_ENDPOINT_URL}/",
     appUID = BuildConfig.APPLICATION_ID,
     clientID = BuildConfig.CLIENT_ID,
     accessType = null,
