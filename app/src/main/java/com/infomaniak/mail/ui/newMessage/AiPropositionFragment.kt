@@ -62,6 +62,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
@@ -234,7 +235,7 @@ class AiPropositionFragment : Fragment() {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
             lifecycleScope.launch {
-                currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox().uuid)
+                currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox.first().uuid)
             }
         }
     }
@@ -259,7 +260,7 @@ class AiPropositionFragment : Fragment() {
             .joinToString(separator = ", ") { it.name }
             .takeIf { it.isNotBlank() }
         lifecycleScope.launch {
-            val currentMailboxUuid = newMessageViewModel.currentMailbox().uuid
+            val currentMailboxUuid = newMessageViewModel.currentMailbox.first().uuid
             currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
         }
     }

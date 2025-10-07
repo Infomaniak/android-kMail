@@ -25,13 +25,12 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.mail.ui.theme.MailTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SelectMailboxFragment : Fragment() {
-
-    //private val navigationArgs: SelectMailboxFragmentArgs by navArgs()
 
     private val selectMailboxViewModel: SelectMailboxViewModel by activityViewModels()
 
@@ -40,7 +39,17 @@ class SelectMailboxFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MailTheme {
-                    SelectMailboxScreen(selectMailboxViewModel)
+                    SelectMailboxScreen(
+                        viewModel = selectMailboxViewModel,
+                        onNavigationTopbarClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
+                        onContinue = { selectedMailbox ->
+                            val direction = SelectMailboxFragmentDirections.actionSelectMailboxFragmentToNewMessageFragment(
+                                userId = selectedMailbox.userId,
+                                mailboxId = selectedMailbox.mailbox.mailboxId
+                            )
+                            safelyNavigate(direction)
+                        }
+                    )
                 }
             }
         }
