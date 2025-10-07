@@ -27,8 +27,8 @@ android {
         applicationId = "com.infomaniak.mail"
         minSdk = appMinSdk
         targetSdk = appCompileSdk
-        versionCode = 1_18_002_01
-        versionName = "1.18.2"
+        versionCode = 1_18_003_01
+        versionName = "1.18.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
         testInstrumentationRunnerArguments["useTestStorageService"] = "true"
@@ -72,7 +72,11 @@ android {
         val uiTestAccountPassword = uiTestEnvProperties?.getProperty("uiTestAccountPassword").takeUnless { it.isNullOrBlank() }
 
         buildConfigField("String", "UI_TEST_ACCOUNT_EMAIL", "\"${System.getenv("UI_TEST_ACCOUNT_EMAIL") ?: uiTestAccountEmail}\"")
-        buildConfigField("String", "UI_TEST_ACCOUNT_PASSWORD", "\"${System.getenv("UI_TEST_ACCOUNT_PASSWORD") ?: uiTestAccountPassword}\"")
+        buildConfigField(
+            "String",
+            "UI_TEST_ACCOUNT_PASSWORD",
+            "\"${System.getenv("UI_TEST_ACCOUNT_PASSWORD") ?: uiTestAccountPassword}\""
+        )
 
         resValue("string", "ATTACHMENTS_AUTHORITY", "com.infomaniak.mail.attachments")
         resValue("string", "EML_AUTHORITY", "com.infomaniak.mail.eml")

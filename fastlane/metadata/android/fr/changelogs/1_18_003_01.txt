@@ -1,0 +1,5 @@
+- Correction de l'affichage des sous-dossiers dans l'application
+- Désactivation du repliement des messages s'il s'agit du seul message du fil de discussion
+- Déplacement des fils de discussion uniquement si nous sommes certains que le serveur les déplacera
+- Prise en charge des réactions par emoji dans les fils de discussion de recherche
+- Correction d'un plantage lorsqu'une pièce jointe téléchargée avait déjà été supprimée d'un brouillon

@@ -1,0 +1,5 @@
+- Fix sub folders display throughout the app
+- Disable Message collapsing if it's the only one in the thread
+- Only move out Threads if we're sure the server will move them
+- Support emoji reaction in the search threads
+- Fix a crash when an uploaded Attachment was already removed from a Draft
