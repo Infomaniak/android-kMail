@@ -42,7 +42,11 @@ class SelectMailboxFragment : Fragment() {
                         viewModel = selectMailboxViewModel,
                         onNavigationTopbarClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
                         onContinue = { selectedMailbox ->
-                            safelyNavigate(SelectMailboxFragmentDirections.actionSelectMailboxFragmentToNewMessageFragment())
+                            val direction = SelectMailboxFragmentDirections.actionSelectMailboxFragmentToNewMessageFragment(
+                                userId = selectedMailbox.userId,
+                                mailboxId = selectedMailbox.mailbox.mailboxId
+                            )
+                            safelyNavigate(direction)
                         }
                     )
                 }
