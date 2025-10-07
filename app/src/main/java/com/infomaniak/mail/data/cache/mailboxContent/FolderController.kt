@@ -121,10 +121,6 @@ class FolderController @Inject constructor(
             if (remoteFolder.role == FolderRole.SCHEDULED_DRAFTS && localFolder == null) remoteFolder.isDisplayed = false
 
             localFolder?.let {
-
-                val collapseStateNeedsReset = remoteFolder.isRoot && remoteFolder.children.isEmpty()
-                val isCollapsed = if (collapseStateNeedsReset) false else it.isCollapsed
-
                 remoteFolder.initLocalValues(
                     it.lastUpdatedAt,
                     it.cursor,
@@ -134,7 +130,7 @@ class FolderController @Inject constructor(
                     it.newMessagesUidsToFetch,
                     it.remainingOldMessagesToFetch,
                     it.isDisplayed,
-                    isCollapsed,
+                    it.isCollapsed,
                 )
             }
         }
@@ -209,6 +205,16 @@ class FolderController @Inject constructor(
             updateFolder(folderId, realm) { _, folder ->
                 folder.threads.remove(thread)
             }
+        }
+
+        fun expand(folderId: String, realm: MutableRealm) {
+            realm.updateFolder(folderId) { folder ->
+                folder.isCollapsed = false
+            }
+        }
+
+        private fun MutableRealm.updateFolder(id: String, onUpdate: (Folder) -> Unit) {
+            getFolderBlocking(id, realm = this)?.let { onUpdate(it) }
         }
         //endregion
     }
