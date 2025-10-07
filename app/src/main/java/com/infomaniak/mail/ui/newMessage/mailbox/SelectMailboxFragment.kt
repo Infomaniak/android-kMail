@@ -32,8 +32,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SelectMailboxFragment : Fragment() {
 
-    //private val navigationArgs: SelectMailboxFragmentArgs by navArgs()
-
     private val selectMailboxViewModel: SelectMailboxViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -45,7 +43,11 @@ class SelectMailboxFragment : Fragment() {
                         viewModel = selectMailboxViewModel,
                         onNavigationTopbarClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
                         onContinue = { selectedMailbox ->
-                            safelyNavigate(SelectMailboxFragmentDirections.actionSelectMailboxFragmentToNewMessageFragment())
+                            val direction = SelectMailboxFragmentDirections.actionSelectMailboxFragmentToNewMessageFragment(
+                                userId = selectedMailbox.userId,
+                                mailboxId = selectedMailbox.mailbox.mailboxId
+                            )
+                            safelyNavigate(direction)
                         }
                     )
                 }
