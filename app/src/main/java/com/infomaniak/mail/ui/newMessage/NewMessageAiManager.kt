@@ -46,6 +46,7 @@ import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
@@ -226,7 +227,7 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun openAiPrompt() = fragment.lifecycleScope.launch {
-        val mailbox = newMessageViewModel.currentMailbox()
+        val mailbox = newMessageViewModel.currentMailboxNew.first()
         val kSuite = mailbox.kSuite
         val matomoName = MatomoName.AiWriter.value
         when (kSuite) {

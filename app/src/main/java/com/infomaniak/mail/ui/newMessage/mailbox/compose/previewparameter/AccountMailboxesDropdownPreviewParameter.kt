@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.MailboxUi
 import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.UserMailboxesUi
-import java.util.UUID
 
 class AccountMailboxesDropdownPreviewParameter : PreviewParameterProvider<UserMailboxesUi> {
     override val values: Sequence<UserMailboxesUi>
@@ -57,7 +56,7 @@ val usersWithMailboxesPreviewData = listOf(
         fullName = "Firstname Listname",
         mailboxes = listOf(
             MailboxUi(
-                mailUuid = UUID.randomUUID().toString(),
+                mailboxId = 0,
                 email = "firstname.lastnameeeeeeeeeeeeee@infomaniak.com"
             )
         )
@@ -70,7 +69,7 @@ val usersWithMailboxesPreviewData = listOf(
         fullName = "Android",
         mailboxes = listOf(
             MailboxUi(
-                mailUuid = UUID.randomUUID().toString(),
+                mailboxId = 0,
                 email = "android@infomaniak.com"
             )
         )
