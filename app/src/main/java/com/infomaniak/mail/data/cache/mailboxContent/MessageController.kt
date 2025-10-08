@@ -78,34 +78,6 @@ class MessageController @Inject constructor(
         return getMessagesByUids(uids, mailboxContentRealm())
     }
 
-    private suspend fun getLastMessageToExecuteActionWithExtraQuery(
-        messages: RealmList<Message>,
-        extraQuery: String? = null
-    ): Message? {
-        suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
-
-        fun RealmQuery<Message>.appendNullableExtraQuery(extra: String?): RealmQuery<Message> {
-            return if (extra.isNullOrEmpty()) this else this.query(extra)
-        }
-
-        val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
-
-        val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
-                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
-
-        val (start, end) = AccountUtils.currentMailboxEmail.getStartAndEndOfPlusEmail()
-        val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
-                " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
-                " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
-                ").@count < 1"
-
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe")
-            .appendNullableExtraQuery(extraQuery).last()
-            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").appendNullableExtraQuery(extraQuery).last()
-            ?: messages.query(isNotScheduledDraft).appendNullableExtraQuery(extraQuery).last()
-            ?: extraQuery?.let { messages.query(extraQuery).last() }
-    }
-
     suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
         val messages = thread.getDisplayedMessages(featureFlags, this@MessageController.localSettings)
         return getLastMessageToExecuteActionWithExtraQuery(messages = messages) ?: messages.last()
@@ -235,6 +207,34 @@ class MessageController @Inject constructor(
 
         private fun getMessagesByFolderIdQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
             return realm.query<Message>("${Message::folderId.name} == '$folderId'")
+        }
+
+        private suspend fun getLastMessageToExecuteActionWithExtraQuery(
+            messages: RealmList<Message>,
+            extraQuery: String? = null
+        ): Message? {
+            suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
+
+            fun RealmQuery<Message>.appendNullableExtraQuery(extra: String?): RealmQuery<Message> {
+                return if (extra.isNullOrEmpty()) this else this.query(extra)
+            }
+
+            val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
+
+            val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+                    "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
+
+            val (start, end) = AccountUtils.currentMailboxEmail.getStartAndEndOfPlusEmail()
+            val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
+                    " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
+                    " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
+                    ").@count < 1"
+
+            return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe")
+                .appendNullableExtraQuery(extraQuery).last()
+                ?: messages.query("$isNotDraft AND $isNotScheduledDraft").appendNullableExtraQuery(extraQuery).last()
+                ?: messages.query(isNotScheduledDraft).appendNullableExtraQuery(extraQuery).last()
+                ?: extraQuery?.let { messages.query(extraQuery).last() }
         }
         //endregion
 
