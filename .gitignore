@@ -1,10 +1,13 @@
 *.aab
 *.apk
 /app/release/baselineProfiles
+/app/src/androidTest/java/com/infomaniak/drive/utils/Env.kt
+/app/src/standard/java/com/infomaniak/drive/GeniusScanEnv.kt
 **/build
 **/captures
 .cxx
 .DS_Store
+env.properties
 uitest-env.properties
 .externalNativeBuild
 .gradle
