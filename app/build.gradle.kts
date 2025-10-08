@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.realm.kotlin)
+    alias(core.plugins.sentry.plugin)
 }
 
 val enableLeakCanary = false
@@ -128,6 +129,49 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xjspecify-annotations=strict")
     }
+}
+
+val isRelease = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
+
+val envProperties = rootProject.file("env.properties")
+    .takeIf { it.exists() }
+    ?.let { file -> Properties().also { it.load(file.reader()) } }
+
+val sentryAuthToken = envProperties?.getProperty("sentryAuthToken")
+    .takeUnless { it.isNullOrBlank() }
+    ?: if (isRelease) error("The `sentryAuthToken` property in `env.properties` must be specified (see `env.example.properties`).") else ""
+
+configurations.configureEach {
+    // The Matomo SDK logs network issues to Timber, and the Sentry plugin detects the Timber dependency,
+    // and adds its integration, which generates noise.
+    // Since we're not using Timber for anything else, it's safe to completely disabled it,
+    // as specified in Sentry's documentation: https://docs.sentry.io/platforms/android/integrations/timber/#disable
+    exclude(group = "io.sentry", module = "sentry-android-timber")
+}
+
+sentry {
+    autoInstallation.sentryVersion.set(core.versions.sentry)
+    org = "sentry"
+    projectName = "mail-android"
+    authToken = sentryAuthToken
+    url = "https://sentry-mobile.infomaniak.com"
+    includeDependenciesReport = false
+    includeSourceContext = isRelease
+
+    // Enables or disables the automatic upload of mapping files during a build.
+    // If you disable this, you'll need to manually upload the mapping files with sentry-cli when you do a release.
+    // Default is enabled.
+    autoUploadProguardMapping = true
+
+    // Disables or enables the automatic configuration of Native Symbols for Sentry.
+    // This executes sentry-cli automatically so you don't need to do it manually.
+    // Default is disabled.
+    uploadNativeSymbols = isRelease
+
+    // Does or doesn't include the source code of native code for Sentry.
+    // This executes sentry-cli with the --include-sources param. automatically so you don't need to do it manually.
+    // Default is disabled.
+    includeNativeSources = isRelease
 }
 
 dependencies {
