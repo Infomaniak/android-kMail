@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import com.infomaniak.mail.utils.extensions.readRawResource
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
-import com.google.android.material.R as RMaterial
+import androidx.appcompat.R as RAndroid
 
 class HtmlFormatter(private val html: String) {
 
@@ -216,7 +216,7 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getCustomStyle(): String = loadCss(
             R.raw.style,
-            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary)),
+            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary)),
         )
 
         fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)

@@ -32,6 +32,7 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.SwipeAction
+import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
 class LocalSettings private constructor(context: Context) : SharedValues {
@@ -127,7 +128,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
 
         fun getPrimary(context: Context): Int {
             val baseThemeContext = ContextThemeWrapper(context, theme)
-            return MaterialColors.getColor(baseThemeContext, RMaterial.attr.colorPrimary, 0)
+            return MaterialColors.getColor(baseThemeContext, RAndroid.attr.colorPrimary, 0)
         }
 
         fun getOnPrimary(context: Context): Int {
@@ -142,7 +143,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
 
         fun getRipple(context: Context): Int {
             val baseThemeContext = ContextThemeWrapper(context, theme)
-            return MaterialColors.getColor(baseThemeContext, RMaterial.attr.colorControlHighlight, 0)
+            return MaterialColors.getColor(baseThemeContext, RAndroid.attr.colorControlHighlight, 0)
         }
 
         override fun toString() = name.lowercase()

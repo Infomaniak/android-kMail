@@ -130,7 +130,7 @@ import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
-import com.google.android.material.R as RMaterial
+import androidx.appcompat.R as RAndroid
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -465,7 +465,7 @@ class NewMessageFragment : Fragment() {
         enableAlgorithmicDarkening(isEnabled = true)
         if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
 
-        val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
+        val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RAndroid.attr.colorPrimary))
         addCss(context.loadCss(R.raw.style, customColors))
         addCss(context.loadCss(R.raw.editor_style, customColors))
     }

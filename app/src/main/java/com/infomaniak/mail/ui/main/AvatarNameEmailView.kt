@@ -40,7 +40,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarNameEmailBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.google.android.material.R as RMaterial
+import androidx.appcompat.R as RAndroid
 
 class AvatarNameEmailView @JvmOverloads constructor(
     context: Context,
@@ -173,7 +173,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun TextView.highlight(
         startIndex: Int,
         endIndex: Int,
-        @ColorInt color: Int = context.getAttributeColor(RMaterial.attr.colorPrimary),
+        @ColorInt color: Int = context.getAttributeColor(RAndroid.attr.colorPrimary),
     ) {
         val highlightedText = text.toSpannable()
         highlightedText.setSpan(ForegroundColorSpan(color), startIndex, endIndex, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)

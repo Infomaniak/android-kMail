@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSettingRadioButtonBinding
 import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.google.android.material.R as RMaterial
+import androidx.appcompat.R as RAndroid
 
 class SettingRadioButtonView @JvmOverloads constructor(
     context: Context,
@@ -50,7 +50,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 val textString = getString(R.styleable.SettingRadioButtonView_text)
                 val checkMarkColor = getColor(
                     R.styleable.SettingRadioButtonView_checkMarkColor,
-                    context.getAttributeColor(RMaterial.attr.colorPrimary),
+                    context.getAttributeColor(RAndroid.attr.colorPrimary),
                 )
                 associatedValue = getString(R.styleable.SettingRadioButtonView_value)
 

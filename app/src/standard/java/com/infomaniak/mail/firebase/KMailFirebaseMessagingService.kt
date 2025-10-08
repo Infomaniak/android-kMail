@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,7 @@
  */
 package com.infomaniak.mail.firebase
 
-import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.infomaniak.core.sentry.SentryLog
@@ -98,7 +96,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     private fun processMessageInForeground(userId: Int, mailboxId: Int) {
         SentryLog.i(TAG, "processMessageInForeground: called")
         if (AccountUtils.currentUserId == userId && AccountUtils.currentMailboxId == mailboxId) {
-            LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(ACTION_MESSAGE_RECEIVED))
+            FirebaseNotificationReceiver.emitNotificationTrigger()
         }
     }
 
@@ -114,6 +112,5 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
         private const val TAG = "KMailFirebaseMessagingService"
-        const val ACTION_MESSAGE_RECEIVED = "action_message_received"
     }
 }

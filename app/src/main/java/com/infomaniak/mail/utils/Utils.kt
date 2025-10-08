@@ -30,7 +30,6 @@ import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
-import okhttp3.internal.toHexString
 import java.nio.charset.StandardCharsets
 
 object Utils {
