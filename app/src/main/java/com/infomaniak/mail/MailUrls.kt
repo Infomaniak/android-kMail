@@ -28,5 +28,4 @@ val IMPORT_EMAILS_URL = "https://import-email.$host"
 val MAIL_API = "https://mail.$host"
 
 val CHATBOT_URL = "https://www.$host/chatbot"
-val FAQ_URL = "https://www.$host/fr/support/faq/admin2/service-mail"
 val MANAGE_SIGNATURES_URL = "https://mail.$host/0/settings/signatures"
