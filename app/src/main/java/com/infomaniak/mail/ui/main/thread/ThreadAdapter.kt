@@ -96,6 +96,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
 import java.util.Date
+import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
@@ -390,7 +391,7 @@ class ThreadAdapter(
             val color = context.getColor(R.color.background_color_dark)
             webViewsFrameLayout.setBackgroundColor(color)
             quoteButtonFrameLayout.setBackgroundColor(color)
-            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
+            quoteButton.setTextColor(context.getAttributeColor(RAndroid.attr.colorPrimary))
         } else {
             val color = context.getColor(R.color.background_color_light)
             webViewsFrameLayout.setBackgroundColor(color)

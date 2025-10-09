@@ -49,6 +49,7 @@ import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.Utils.toEnumOrThrow
 import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
@@ -66,7 +67,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityMainBinding
-import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
+import com.infomaniak.mail.firebase.FirebaseNotificationReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
@@ -116,7 +117,6 @@ class MainActivity : BaseActivity() {
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
-    private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
     private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let(MainActivityArgs::fromBundle) }
 
     private var previousDestinationId: Int? = null
@@ -230,7 +230,6 @@ class MainActivity : BaseActivity() {
         observeDraftWorkerResults()
 
         binding.drawerLayout.addDrawerListener(drawerListener)
-        registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
         setupSnackbar()
         setupNavController()
@@ -247,6 +246,8 @@ class MainActivity : BaseActivity() {
         initAppUpdateManager()
         initAppReviewManager()
         syncDiscoveryManager.init(::showSyncDiscovery)
+
+        observeNotificationToRefresh()
     }
 
     private fun handleMenuDrawerEdgeToEdge() {
@@ -586,6 +587,12 @@ class MainActivity : BaseActivity() {
     private fun showSyncDiscovery() = with(localSettings) {
         if (!showPermissionsOnboarding && !isUserAlreadySynchronized()) {
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
+        }
+    }
+
+    private fun observeNotificationToRefresh() {
+        FirebaseNotificationReceiver.refreshThreadInForegroundTrigger?.observe(lifecycleOwner = this) {
+            mainViewModel.refreshEverything()
         }
     }
 

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
-import com.google.android.material.R
 import com.google.android.material.textfield.TextInputEditText
+import androidx.appcompat.R as RAndroid
 
 /**
  * Allows IME behavior for multiline text fields to be overridden so that
@@ -32,7 +32,7 @@ import com.google.android.material.textfield.TextInputEditText
 class ComposeSubject @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.editTextStyle,
+    defStyleAttr: Int = RAndroid.attr.editTextStyle,
 ) : TextInputEditText(context, attrs, defStyleAttr) {
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
         val connection = super.onCreateInputConnection(outAttrs)

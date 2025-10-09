@@ -32,7 +32,7 @@ import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.google.android.material.R as RMaterial
+import androidx.appcompat.R as RAndroid
 
 @FragmentScoped
 class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: InsertLinkDialog) : NewMessageManager() {
@@ -120,7 +120,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         if (isExpanded) editorWebView.requestFocus()
 
         val color = if (isExpanded) {
-            context.getAttributeColor(RMaterial.attr.colorPrimary)
+            context.getAttributeColor(RAndroid.attr.colorPrimary)
         } else {
             context.getColor(R.color.iconColor)
         }

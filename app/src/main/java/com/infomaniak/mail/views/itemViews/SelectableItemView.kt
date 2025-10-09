@@ -29,6 +29,7 @@ import androidx.core.widget.TextViewCompat
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.extensions.getAttributeColor
+import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
 sealed class SelectableItemView @JvmOverloads constructor(
@@ -39,7 +40,7 @@ sealed class SelectableItemView @JvmOverloads constructor(
 
     private val checkIcon by lazy {
         AppCompatResources.getDrawable(context, R.drawable.ic_check)?.apply {
-            setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
+            setTint(context.getAttributeColor(RAndroid.attr.colorPrimary))
         }
     }
 
@@ -54,7 +55,7 @@ sealed class SelectableItemView @JvmOverloads constructor(
         } else {
             ColorState(
                 backgroundColor = Color.TRANSPARENT,
-                decoratorsColor = context.getAttributeColor(RMaterial.attr.colorPrimary),
+                decoratorsColor = context.getAttributeColor(RAndroid.attr.colorPrimary),
                 textColor = context.getColor(R.color.primaryTextColor),
                 textAppearance = if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body,
             )

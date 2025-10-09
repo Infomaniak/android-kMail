@@ -142,7 +142,7 @@ import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
-import com.google.android.material.R as RMaterial
+import androidx.appcompat.R as RAndroid
 
 @AndroidEntryPoint
 class ThreadFragment : Fragment() {
@@ -531,7 +531,7 @@ class ThreadFragment : Fragment() {
                 val color = if (thread.isFavorite) {
                     context.getColor(R.color.favoriteYellow)
                 } else {
-                    context.getAttributeColor(RMaterial.attr.colorPrimary)
+                    context.getAttributeColor(RAndroid.attr.colorPrimary)
                 }
                 iconTint = ColorStateList.valueOf(color)
             }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.google.android.material.R as RMaterial
+import androidx.appcompat.R as RAndroid
 
 abstract class UnreadItemView @JvmOverloads constructor(
     context: Context,
@@ -35,7 +35,7 @@ abstract class UnreadItemView @JvmOverloads constructor(
 
     private val pastille by lazy {
         AppCompatResources.getDrawable(context, R.drawable.ic_pastille)?.apply {
-            setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
+            setTint(context.getAttributeColor(RAndroid.attr.colorPrimary))
         }
     }
 
