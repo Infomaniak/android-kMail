@@ -111,6 +111,7 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmResults
@@ -121,6 +122,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -223,13 +225,16 @@ class MainViewModel @Inject constructor(
     private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.toFolderUiTree(isInDefaultFolderSection = true) }
+            .map { it.list.copyFromRealm(1u) }
+            .removeRolesThatHideWhenEmpty()
+            .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
     }
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerCustomFoldersAsync()
-            .map { it.list.toFolderUiTree(isInDefaultFolderSection = false) }
+            .map { it.list.copyFromRealm(1u) }
+            .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
     }
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
@@ -1731,4 +1736,10 @@ class MainViewModel @Inject constructor(
 
         private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
+}
+
+private val HIDDEN_ROLES_WHEN_EMPTY = setOf(FolderRole.SCHEDULED_DRAFTS, FolderRole.SNOOZED)
+
+private fun Flow<List<Folder>>.removeRolesThatHideWhenEmpty(): Flow<List<Folder>> = map {
+    it.filterNot { folder -> folder.role in HIDDEN_ROLES_WHEN_EMPTY && folder.threads.isEmpty() }
 }
