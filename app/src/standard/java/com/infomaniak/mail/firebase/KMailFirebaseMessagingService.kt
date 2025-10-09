@@ -31,6 +31,8 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -56,6 +58,9 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var registerUserDeviceWorkerScheduler: RegisterUserDeviceWorker.Scheduler
+
+    @Inject
+    lateinit var applicationScope: CoroutineScope
 
     override fun onNewToken(token: String) {
         SentryLog.i(TAG, "onNewToken: new token received")
@@ -96,7 +101,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     private fun processMessageInForeground(userId: Int, mailboxId: Int) {
         SentryLog.i(TAG, "processMessageInForeground: called")
         if (AccountUtils.currentUserId == userId && AccountUtils.currentMailboxId == mailboxId) {
-            FirebaseNotificationReceiver.emitNotificationTrigger()
+            applicationScope.launch { FirebaseNotificationReceiver.emitNotificationTrigger() }
         }
     }
 

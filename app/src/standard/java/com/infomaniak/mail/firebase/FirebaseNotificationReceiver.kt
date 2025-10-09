@@ -18,19 +18,16 @@
 package com.infomaniak.mail.firebase
 
 import com.infomaniak.mail.utils.IFirebaseNotificationReceiver
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 
 object FirebaseNotificationReceiver : IFirebaseNotificationReceiver {
 
     private val _refreshThreadInForegroundTrigger = MutableSharedFlow<Unit>()
     override val refreshThreadInForegroundTrigger: SharedFlow<Unit>? = _refreshThreadInForegroundTrigger.asSharedFlow()
 
-    fun emitNotificationTrigger() {
-        CoroutineScope(Dispatchers.Default).launch { _refreshThreadInForegroundTrigger.emit(Unit) }
+    suspend fun emitNotificationTrigger() {
+        _refreshThreadInForegroundTrigger.emit(Unit)
     }
 }
