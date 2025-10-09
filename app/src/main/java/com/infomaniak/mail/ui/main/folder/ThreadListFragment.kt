@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -266,7 +265,6 @@ class ThreadListFragment : TwoPaneFragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.i("Vincent", "onResume ThreadListFragment€")
         refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
     }
