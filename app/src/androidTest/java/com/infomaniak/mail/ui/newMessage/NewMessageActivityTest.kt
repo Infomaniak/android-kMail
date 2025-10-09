@@ -112,11 +112,11 @@ class NewMessageActivityTest {
         onView(withId(R.id.sendButton)).perform(click())
 
         // Waiting for the email to be received
-        onView(isRoot()).perform(waitFor(5.seconds))
+        onView(isRoot()).perform(waitFor(10.seconds))
 
         onView(withId(R.id.threadsList)).perform(swipeDown())
 
-        onView(isRoot()).perform(waitFor(5.seconds))
+        onView(isRoot()).perform(waitFor(10.seconds))
 
         // Checking if the email with a specific ID to be received
         onView(withId(R.id.threadsList))
