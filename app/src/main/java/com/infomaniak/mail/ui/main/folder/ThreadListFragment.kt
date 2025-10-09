@@ -78,7 +78,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget.ThreadList
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -692,7 +692,7 @@ class ThreadListFragment : TwoPaneFragment() {
     }
 
     private fun observePickedEmoji() {
-        getBackNavigationResult<PickedEmojiPayload>(ThreadList.name) { (emoji, messageUid) ->
+        getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.ThreadList.name) { (emoji, messageUid) ->
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             viewLifecycleOwner.lifecycleScope.launch {
                 threadListViewModel.getEmojiReactionsFor(messageUid)?.let { reactions ->

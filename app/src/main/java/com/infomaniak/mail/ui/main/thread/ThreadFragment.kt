@@ -83,8 +83,6 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Compani
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget.Thread
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget.ThreadList
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
@@ -229,6 +227,7 @@ class ThreadFragment : Fragment() {
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
+
         observePickedEmoji()
 
         observeDraftWorkerResults()
@@ -411,7 +410,7 @@ class ThreadFragment : Fragment() {
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
                 onAddReaction = {
                     trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
-                    navigateToEmojiPicker(it.uid, Thread)
+                    navigateToEmojiPicker(it.uid, EmojiPickerObserverTarget.Thread)
                 },
                 onAddEmoji = { emoji, messageUid ->
                     val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@ThreadAdapterCallbacks
@@ -664,7 +663,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observePickedEmoji() {
-        getBackNavigationResult<PickedEmojiPayload>(Thread.name) { (emoji, messageUid) ->
+        getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.Thread.name) { (emoji, messageUid) ->
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult
             mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
@@ -751,7 +750,10 @@ class ThreadFragment : Fragment() {
         }
 
         getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
-            navigateToEmojiPicker(messageUid, if (twoPaneViewModel.isThreadOpen) Thread else ThreadList)
+            navigateToEmojiPicker(
+                messageUid,
+                emojiPickerObserverTarget = if (twoPaneViewModel.isThreadOpen) EmojiPickerObserverTarget.Thread else EmojiPickerObserverTarget.ThreadList
+            )
         }
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
