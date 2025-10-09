@@ -1,17 +1,17 @@
 import java.util.Properties
 
 plugins {
-    alias(core.plugins.compose.compiler)
-    alias(core.plugins.sentry.plugin)
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.application) // This line should be 1st, or you'll have Gradle sync issue
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.realm.kotlin)
+    alias(core.plugins.compose.compiler)
+    alias(core.plugins.kotlin.parcelize)
+    alias(core.plugins.sentry.plugin)
 }
 
 val enableLeakCanary = false
