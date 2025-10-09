@@ -23,7 +23,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.core.legacy.utils.isNightModeEnabled
+import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent

@@ -23,7 +23,7 @@ import androidx.annotation.ColorInt
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.color.utilities.Hct
-import com.infomaniak.core.legacy.utils.isNightModeEnabled
+import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.utils.extensions.changePathColor

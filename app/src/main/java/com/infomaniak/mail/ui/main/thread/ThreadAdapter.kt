@@ -40,8 +40,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
+import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.legacy.utils.isNightModeEnabled
 import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.format

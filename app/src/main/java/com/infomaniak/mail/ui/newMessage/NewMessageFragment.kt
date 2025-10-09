@@ -46,13 +46,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.core.legacy.utils.FilePicker
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
-import com.infomaniak.core.legacy.utils.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.showToast
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
