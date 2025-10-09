@@ -19,8 +19,6 @@
 
     <style name="AppThemeLauncher" parent="AppTheme.LauncherBase" />
 
-    <style name="AppThemeLogin" parent="AppThemeLoginBase27" />
-
     <style name="AppThemeLock" parent="AppThemeLockBase" />
 
 </resources>
