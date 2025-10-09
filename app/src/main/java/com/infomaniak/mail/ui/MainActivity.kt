@@ -103,7 +103,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.getValue
 import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
