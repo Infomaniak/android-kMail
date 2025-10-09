@@ -397,7 +397,6 @@
     <!-- Bottom sheet -->
 
     <style name="BottomSheetDialogThemeBase" parent="ThemeOverlay.Material3.BottomSheetDialog">
-        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowIsFloating">false</item>
         <item name="bottomSheetStyle">@style/BottomSheetDialogThemeModalStyle</item>
     </style>
