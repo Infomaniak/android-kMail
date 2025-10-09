@@ -142,7 +142,6 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import androidx.appcompat.R as RAndroid
 
-
 @AndroidEntryPoint
 class ThreadFragment : Fragment() {
 
