@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -49,8 +48,6 @@ class ExternalContentSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
-
         initBijectionTable(
             R.id.always to ALWAYS,
             R.id.askMe to ASK_ME,

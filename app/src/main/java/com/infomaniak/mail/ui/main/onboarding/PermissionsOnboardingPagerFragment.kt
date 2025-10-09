@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.R
@@ -59,8 +58,6 @@ class PermissionsOnboardingPagerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         applyWindowInsetsListener(shouldConsume = false) { root, insets -> root.applySideAndBottomSystemInsets(insets) }
-
-        requireActivity().window.statusBarColor = localSettings.accentColor.getOnboardingSecondaryBackground(context)
 
         permissionUtils.apply {
             registerReadContactsPermission(fragment = this@PermissionsOnboardingPagerFragment)

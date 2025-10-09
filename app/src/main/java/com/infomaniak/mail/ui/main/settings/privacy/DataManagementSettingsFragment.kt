@@ -32,7 +32,6 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.databinding.FragmentDataManagementSettingsBinding
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,7 +50,6 @@ class DataManagementSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
         setupListeners()
     }
 

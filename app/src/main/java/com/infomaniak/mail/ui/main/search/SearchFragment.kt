@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
-import androidx.annotation.ColorRes
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -68,7 +67,6 @@ import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -111,7 +109,6 @@ class SearchFragment : TwoPaneFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         handleEdgeToEdge()
 
@@ -156,9 +153,6 @@ class SearchFragment : TwoPaneFragment() {
         super.onDestroyView()
         _binding = null
     }
-
-    @ColorRes
-    override fun getStatusBarColor(): Int = R.color.backgroundColor
 
     override fun getLeftPane(): View? = _binding?.threadsCoordinatorLayout
 

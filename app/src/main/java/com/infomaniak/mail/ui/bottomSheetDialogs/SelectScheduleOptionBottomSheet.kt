@@ -59,7 +59,7 @@ import java.util.Calendar
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 
-abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
+abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
 

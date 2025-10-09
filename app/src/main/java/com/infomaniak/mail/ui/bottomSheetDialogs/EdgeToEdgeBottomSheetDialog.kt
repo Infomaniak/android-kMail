@@ -15,28 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings
+package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
-import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuiteDashboardFragment
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.observeNotNull
-import com.infomaniak.mail.utils.getDashboardData
-import dagger.hilt.android.AndroidEntryPoint
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-@AndroidEntryPoint
-class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
-
-    private val myKSuiteViewModel: MykSuiteViewModel by viewModels()
+abstract class EdgeToEdgeBottomSheetDialog: BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        myKSuiteViewModel.refreshMyKSuite()
-        myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { myKSuiteData ->
-            AccountUtils.currentUser?.let { resetContent(dashboardData = getDashboardData(myKSuiteData, user = it)) }
-        }
+        if (SDK_INT >= 29) dialog?.window?.isNavigationBarContrastEnforced = false
     }
 }

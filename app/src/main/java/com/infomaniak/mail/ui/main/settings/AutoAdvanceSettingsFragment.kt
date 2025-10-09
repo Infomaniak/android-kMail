@@ -29,7 +29,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.databinding.FragmentAutoAdvanceSettingsBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -47,7 +46,6 @@ class AutoAdvanceSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
 
         radioGroup.initBijectionTable(
             R.id.lastAction to AutoAdvanceMode.NATURAL_THREAD,

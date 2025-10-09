@@ -21,10 +21,10 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
@@ -97,7 +97,6 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
@@ -155,10 +154,6 @@ class ThreadListFragment : TwoPaneFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
         navigateFromNotificationToNewMessage()
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(
-            statusBarColor = R.color.backgroundHeaderColor,
-            navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
-        )
 
         handleEdgeToEdge()
 
@@ -195,9 +190,6 @@ class ThreadListFragment : TwoPaneFragment() {
         observeContentDisplayMode()
         observeShareUrlResult()
     }.getOrDefault(Unit)
-
-    @ColorRes
-    override fun getStatusBarColor(): Int = R.color.backgroundHeaderColor
 
     override fun getLeftPane(): View? = _binding?.threadsConstraintLayout
 
@@ -274,6 +266,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
     override fun onResume() {
         super.onResume()
+        Log.i("Vincent", "onResume ThreadListFragment€")
         refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
     }

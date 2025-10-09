@@ -406,6 +406,8 @@
 
     <style name="BottomSheetDialogThemeModalStyle" parent="Widget.Material3.BottomSheet">
         <item name="backgroundTint">@color/bottomSheetBackgroundColor</item>
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
     </style>
 

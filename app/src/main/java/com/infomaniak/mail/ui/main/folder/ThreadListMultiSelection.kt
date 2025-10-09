@@ -37,7 +37,6 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import kotlinx.coroutines.launch
 
 class ThreadListMultiSelection {
@@ -171,8 +170,6 @@ class ThreadListMultiSelection {
     private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(threadListFragment.binding) {
         newMessageFab.isGone = isMultiSelectOn
         quickActionBar.isVisible = isMultiSelectOn
-        val navBarColor = context.getColor(if (isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor)
-        threadListFragment.requireActivity().window.updateNavigationBarColor(navBarColor)
     }
 
     private fun updateSelectedCount(selectedThreads: Set<Thread>) {

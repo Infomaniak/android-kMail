@@ -20,7 +20,6 @@
     <!-- AppTheme -->
 
     <style name="AppTheme.LauncherBase">
-        <item name="android:statusBarColor">@color/backgroundColor</item>
         <item name="android:windowBackground">@drawable/splashscreen_legacy</item>
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>
@@ -39,7 +38,6 @@
         <item name="android:includeFontPadding">false</item>
         <item name="android:listPopupWindowStyle">@style/ListPopupMenuStyle</item>
         <item name="android:popupWindowStyle">@style/PopupWindowStyle</item>
-        <item name="android:statusBarColor">@color/backgroundColor</item>
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:textColorHighlight">@color/color_primary_translucent_text_highlight</item>
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
@@ -178,7 +176,6 @@
     <style name="AppThemeLogin" parent="AppThemeLoginBase" />
 
     <style name="WebViewThemeBase" parent="AppThemeLogin">
-        <item name="android:statusBarColor">@color/backgroundLoginWebviewColor</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorCloseIcon">@color/title</item>
         <item name="colorPrimary">@color/backgroundColor</item>

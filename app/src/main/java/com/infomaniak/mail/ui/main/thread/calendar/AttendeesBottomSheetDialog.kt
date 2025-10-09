@@ -23,15 +23,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetAttendeesBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.EdgeToEdgeBottomSheetDialog
 import com.infomaniak.mail.utils.UiUtils
 
-class AttendeesBottomSheetDialog : BottomSheetDialogFragment() {
+class AttendeesBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: BottomSheetAttendeesBinding by safeBinding()
     private val navigationArgs: AttendeesBottomSheetDialogArgs by navArgs()

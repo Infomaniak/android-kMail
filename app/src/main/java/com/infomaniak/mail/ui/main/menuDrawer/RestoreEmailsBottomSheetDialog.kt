@@ -40,12 +40,13 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.EdgeToEdgeBottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @AndroidEntryPoint
-class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
+class RestoreEmailsBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: BottomSheetRestoreEmailsBinding by safeBinding()
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()

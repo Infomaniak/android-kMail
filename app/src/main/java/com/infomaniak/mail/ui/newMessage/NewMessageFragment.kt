@@ -113,7 +113,6 @@ import com.infomaniak.mail.utils.extensions.ime
 import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
@@ -205,8 +204,6 @@ class NewMessageFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = R.color.newMessageBackgroundColor)
-
         handleEdgeToEdge()
 
         SentryDebug.addNavigationBreadcrumb(

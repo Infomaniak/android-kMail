@@ -26,7 +26,6 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentDataManagementMatomoSettingBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -44,8 +43,6 @@ class DataManagementMatomoSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.settingsTrackingSwitchMatomo) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
-
         isChecked = localSettings.isMatomoTrackingEnabled
 
         setOnClickListener {

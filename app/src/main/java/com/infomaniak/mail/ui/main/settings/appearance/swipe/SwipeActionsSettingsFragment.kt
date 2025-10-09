@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -55,8 +54,6 @@ class SwipeActionsSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
-
         with(localSettings) {
             swipeRightView.setSubtitle(swipeRight.nameRes)
             swipeLeftView.setSubtitle(swipeLeft.nameRes)

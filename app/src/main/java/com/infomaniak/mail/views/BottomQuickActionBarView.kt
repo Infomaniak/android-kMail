@@ -75,6 +75,8 @@ class BottomQuickActionBarView @JvmOverloads constructor(
         }
     }
 
+    fun getRoot() = binding.root
+
     fun setOnItemClickListener(callback: (menuId: Int) -> Unit) {
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener { callback(menu[index].itemId) }

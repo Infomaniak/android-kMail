@@ -25,7 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetInformationBinding
 
-open class InformationBottomSheetDialog : BottomSheetDialogFragment() {
+open class InformationBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     protected var binding: BottomSheetInformationBinding by safeBinding()
 

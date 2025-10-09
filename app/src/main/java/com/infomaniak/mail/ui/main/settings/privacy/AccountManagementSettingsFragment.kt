@@ -31,7 +31,6 @@ import com.infomaniak.core.network.AUTOLOG_URL
 import com.infomaniak.core.network.TERMINATE_ACCOUNT_URL
 import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -53,8 +52,6 @@ class AccountManagementSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
-
         setUi()
         setDeleteAccountClickListener()
     }

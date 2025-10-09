@@ -121,12 +121,10 @@ import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.infomaniak.mail.utils.extensions.isAtTheTop
 import com.infomaniak.mail.utils.extensions.isTabletInLandscape
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toDate
-import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ALL_EMOJI_SENT_STATUS
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
@@ -143,6 +141,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
 import androidx.appcompat.R as RAndroid
+
 
 @AndroidEntryPoint
 class ThreadFragment : Fragment() {
@@ -247,7 +246,7 @@ class ThreadFragment : Fragment() {
             mainAppBar.applyStatusBarInsets(insets)
             appBar.applySideAndBottomSystemInsets(insets, withBottom = false)
             messagesListNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
-            quickActionBar.applySideAndBottomSystemInsets(insets)
+            quickActionBar.getRoot().applySideAndBottomSystemInsets(insets)
         }
     }
 
@@ -790,11 +789,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
-
-        if (twoPaneFragment.isOnlyOneShown()) {
-            requireActivity().window.updateNavigationBarColor(context.getColor(R.color.elevatedBackground))
-        }
-
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
@@ -1035,8 +1029,6 @@ class ThreadFragment : Fragment() {
     private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
 
     fun getAnchor(): View? = _binding?.quickActionBar
-
-    fun isScrolledToTheTop(): Boolean? = _binding?.messagesListNestedScrollView?.isAtTheTop()
 
     private fun safeNavigate(@IdRes resId: Int, args: Bundle) {
         twoPaneViewModel.safelyNavigate(resId, args)

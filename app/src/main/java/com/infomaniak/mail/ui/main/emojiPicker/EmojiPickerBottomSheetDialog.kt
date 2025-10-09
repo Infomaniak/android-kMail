@@ -22,12 +22,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.FragmentEmojiPickerBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.EdgeToEdgeBottomSheetDialog
 
-class EmojiPickerBottomSheetDialog : BottomSheetDialogFragment() {
+class EmojiPickerBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: FragmentEmojiPickerBinding by safeBinding()
     private val navigationArgs: EmojiPickerBottomSheetDialogArgs by navArgs()
