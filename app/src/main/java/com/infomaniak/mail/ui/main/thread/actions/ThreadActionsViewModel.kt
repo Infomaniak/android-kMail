@@ -57,12 +57,12 @@ class ThreadActionsViewModel @Inject constructor(
     private val threadMessageToExecuteAction: Flow<ThreadMessageInteraction.Action> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
 
-    private val messageToExecuteReaction: Flow<ThreadMessageInteraction.Reaction?> = threadController.getThreadAsync(threadUid)
+    private val threadMessageToExecuteReaction: Flow<ThreadMessageInteraction.Reaction?> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj }
         .map { getMessageToExecuteReaction(it) }
 
     val threadMessagesWithActionAndReaction: SharedFlow<ThreadMessageToExecuteInteraction> =
-        combine(threadMessageToExecuteAction, messageToExecuteReaction) { messageToExecuteActions, messageToExecuteReaction ->
+        combine(threadMessageToExecuteAction, threadMessageToExecuteReaction) { messageToExecuteActions, messageToExecuteReaction ->
             ThreadMessageToExecuteInteraction(
                 messageToExecuteActions.thread,
                 messageToExecuteActions.messageUid,
@@ -85,7 +85,7 @@ class ThreadActionsViewModel @Inject constructor(
 
     private suspend fun getMessageToExecuteReaction(thread: Thread): ThreadMessageInteraction.Reaction? {
         val messageUid = ioDispatcher { messageController.getLastMessageToExecuteReaction(thread, featureFlagsLive.value)?.uid }
-        return messageUid?.let { ThreadMessageInteraction.Reaction(it) }
+        return messageUid?.let(ThreadMessageInteraction::Reaction)
     }
 
     private sealed class ThreadMessageInteraction(open val messageUid: String) {
