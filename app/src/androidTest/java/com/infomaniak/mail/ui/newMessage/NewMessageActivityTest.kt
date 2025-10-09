@@ -41,6 +41,7 @@ import com.infomaniak.mail.ui.Scenarios.grantPermissions
 import com.infomaniak.mail.ui.Scenarios.login
 import com.infomaniak.mail.ui.Scenarios.startLoginWebviewActivity
 import com.infomaniak.mail.ui.Scenarios.waitFor
+import com.infomaniak.mail.ui.Utils.onViewWithTimeout
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import org.hamcrest.core.AllOf.allOf
@@ -49,6 +50,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
@@ -111,16 +113,14 @@ class NewMessageActivityTest {
         onView(withId(R.id.editorWebView)).perform(click(), typeText("This is an email from UI test"), closeSoftKeyboard())
         onView(withId(R.id.sendButton)).perform(click())
 
-        // Waiting for the email to be received
-        onView(isRoot()).perform(waitFor(10.seconds))
-
         onView(withId(R.id.threadsList)).perform(swipeDown())
 
-        onView(isRoot()).perform(waitFor(10.seconds))
-
         // Checking if the email with a specific ID to be received
-        onView(withId(R.id.threadsList))
-            .check(matches(hasDescendant(withText(subject))))
+        onViewWithTimeout(
+            retryInterval = 5_000.milliseconds,
+            matcher = withId(R.id.threadsList),
+            assertion = matches(hasDescendant(withText(subject))),
+        )
     }
 
     private fun enterEmailToField(fieldResId: Int, suggestionListResId: Int) {
