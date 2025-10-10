@@ -234,7 +234,7 @@ class MainViewModel @Inject constructor(
         folderController
             .getMenuDrawerCustomFoldersAsync()
             .map { it.list.copyFromRealm(1u) }
-            .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
+            .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
     }
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
