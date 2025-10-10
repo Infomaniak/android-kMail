@@ -29,7 +29,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import androidx.work.WorkerParameters
@@ -176,11 +176,10 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         suspend fun isRunning(): Boolean {
             val workQuery = WorkQuery.Builder
                 .fromTags(listOf(TAG))
-                .addStates(listOf(WorkInfo.State.BLOCKED, WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING))
+                .addStates(listOf(State.BLOCKED, State.ENQUEUED, State.RUNNING))
                 .build()
             return workManager.getWorkInfosFlow(workQuery).firstOrNull() != null
         }
-
     }
 
     companion object {
