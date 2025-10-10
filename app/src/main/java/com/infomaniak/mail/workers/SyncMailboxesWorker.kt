@@ -29,6 +29,7 @@ import androidx.work.WorkerParameters
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FetchMessagesManager
 import com.infomaniak.mail.utils.NotificationUtils
@@ -55,11 +56,17 @@ class SyncMailboxesWorker @AssistedInject constructor(
     private val fetchMessagesManager: FetchMessagesManager,
     private val mailboxController: MailboxController,
     private val notificationUtils: NotificationUtils,
+    private val processMessageNotificationsWorkerScheduler: ProcessMessageNotificationsWorker.Scheduler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
-        SentryLog.d(TAG, "Work launched")
+        SentryLog.i(TAG, "Work launched")
+
+        if (processMessageNotificationsWorkerScheduler.isRunning()) {
+            SentryLog.i(TAG, "Work skipped because ProcessMessageNotificationsWorker is running")
+            return@withContext Result.success()
+        }
 
         // Refresh current User and its Mailboxes
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
@@ -70,7 +77,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
             }
         }
 
-        SentryLog.d(TAG, "Work finished")
+        SentryLog.i(TAG, "Work finished")
 
         Result.success()
     }
