@@ -24,10 +24,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 object FirebaseNotificationReceiver : IFirebaseNotificationReceiver {
 
-    private val _refreshThreadInForegroundTrigger = MutableSharedFlow<Unit>()
+    private val _refreshThreadInForegroundTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     override val refreshThreadInForegroundTrigger: SharedFlow<Unit>? = _refreshThreadInForegroundTrigger.asSharedFlow()
 
-    suspend fun emitNotificationTrigger() {
-        _refreshThreadInForegroundTrigger.emit(Unit)
+    fun emitNotificationTrigger() {
+        _refreshThreadInForegroundTrigger.tryEmit(Unit)
     }
 }
