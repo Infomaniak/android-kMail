@@ -61,13 +61,6 @@ class SyncMailboxesWorker @AssistedInject constructor(
 ) : BaseCoroutineWorker(appContext, params) {
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
-
-        suspend fun shouldSkip(): Boolean {
-            return processMessageNotificationsWorkerScheduler.isRunning().also {
-                if (it) SentryLog.i(TAG, "Work skipped because ProcessMessageNotificationsWorker is running")
-            }
-        }
-
         SentryLog.i(TAG, "Work launched")
 
         if (shouldSkip()) return@withContext Result.success()
@@ -85,6 +78,12 @@ class SyncMailboxesWorker @AssistedInject constructor(
         SentryLog.i(TAG, "Work finished")
 
         Result.success()
+    }
+
+    private suspend fun shouldSkip(): Boolean {
+        return processMessageNotificationsWorkerScheduler.isRunning().also {
+            if (it) SentryLog.i(TAG, "Work skipped because ProcessMessageNotificationsWorker is running")
+        }
     }
 
     @Singleton
