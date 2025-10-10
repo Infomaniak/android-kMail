@@ -49,6 +49,8 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -143,7 +145,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
 
             // TODO: If the generic new mails notification still pops up too often, maybe
             //  put back this log and the breadcrumbs in `sendFailedNotification()`.
-            // Sentry.captureMessage("Send a generic notification", SentryLevel.INFO)
+            Sentry.captureMessage("Send a generic notification", SentryLevel.INFO)
         }
     }
 
