@@ -105,7 +105,6 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
-import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
@@ -357,6 +356,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun setReplyForwardDraftValues(draft: Draft, fullMessage: Message) {
+
         with(draftInitManager) {
             draft.setPreviousMessage(draftMode = draftMode, previousMessage = fullMessage)
         }
@@ -366,9 +366,10 @@ class NewMessageViewModel @Inject constructor(
 
         if (fullMessage.body == null) {
             SentryLog.e(TAG, "The message we're trying to reply to has an unexpected null body") { scope ->
-                scope.addBreadcrumb(Breadcrumb.info("message resource: ${fullMessage.resource}"))
+                scope.setExtra("Message resource", fullMessage.resource)
             }
         }
+
         val isAiEnabled = currentMailbox().featureFlags.contains(FeatureFlag.AI)
         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body)
 
