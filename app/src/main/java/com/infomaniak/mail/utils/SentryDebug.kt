@@ -257,7 +257,7 @@ object SentryDebug {
         // TODO: If the generic new mails notification still pops up too often, maybe put back
         //  these breadcrumbs and the Sentry log in `displayGenericNewMailsNotification()`.
         // addInfoBreadcrumb(
-        //     category = category,
+        //     category = message,
         //     data = mutableMapOf(
         //         "1_userId" to "${userId?.toString()}",
         //         "2_currentUserId" to "[${AccountUtils.currentUserId}]",
