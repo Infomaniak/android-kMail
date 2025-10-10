@@ -35,11 +35,9 @@ import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ClickableSpan
 import android.view.View
-import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
 import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
@@ -82,7 +80,6 @@ import com.infomaniak.core.utils.startOfTheWeek
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -455,20 +452,6 @@ fun Fragment.changeToolbarColorOnScroll(
         }
     }
 }
-
-fun Fragment.setSystemBarsColors(
-    @ColorRes statusBarColor: Int? = R.color.backgroundHeaderColor,
-    @ColorRes navigationBarColor: Int? = R.color.backgroundColor,
-) {
-    statusBarColor?.let(requireContext()::getColor)?.let { requireActivity().window.statusBarColor = it }
-    navigationBarColor?.let(requireContext()::getColor)?.let(requireActivity().window::updateNavigationBarColor)
-}
-
-fun Window.updateNavigationBarColor(@ColorInt color: Int) {
-    navigationBarColor = color
-}
-
-fun Activity.getMainApplication() = (application as MainApplication)
 
 fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     val textColor = context?.getColor(R.color.primaryTextColor)?.let(Utils::colorToHexRepresentation)

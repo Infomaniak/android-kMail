@@ -28,7 +28,6 @@ import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
-import androidx.annotation.FloatRange
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -83,8 +82,6 @@ import com.infomaniak.mail.utils.NotificationUtils.Companion.GENERIC_NEW_MAILS_N
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.WorkerUtils
@@ -114,9 +111,6 @@ class MainActivity : BaseActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
-    private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
-    private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let(MainActivityArgs::fromBundle) }
 
     private var previousDestinationId: Int? = null
@@ -183,13 +177,10 @@ class MainActivity : BaseActivity() {
 
         var hasDragged = false
 
-        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            colorSystemBarsWithMenuDrawer(slideOffset)
-        }
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) = Unit
 
         override fun onDrawerOpened(drawerView: View) {
             if (hasDragged) trackMenuDrawerEvent(MatomoName.OpenByGesture, TrackerAction.DRAG)
-            colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
             binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment?>()?.onDrawerOpened()
         }
 
@@ -457,7 +448,6 @@ class MainActivity : BaseActivity() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
         notificationManagerCompat.cancel(GENERIC_NEW_MAILS_NOTIFICATION_ID)
-        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
 
     private fun handleOnBackPressed() = with(binding) {
@@ -543,16 +533,6 @@ class MainActivity : BaseActivity() {
     fun setDrawerLockMode(isLocked: Boolean) {
         val drawerLockMode = if (isLocked) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED
         binding.drawerLayout.setDrawerLockMode(drawerLockMode)
-    }
-
-    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float) {
-        window.progressivelyColorSystemBars(
-            slideOffset = slideOffset,
-            statusBarColorFrom = backgroundHeaderColor,
-            statusBarColorTo = menuDrawerBackgroundColor,
-            navBarColorFrom = backgroundColor,
-            navBarColorTo = menuDrawerBackgroundColor,
-        )
     }
 
     private fun managePermissionsRequesting() {

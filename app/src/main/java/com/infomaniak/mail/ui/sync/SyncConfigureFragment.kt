@@ -34,14 +34,12 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncConfigureBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 
 class SyncConfigureFragment : Fragment() {
 
@@ -54,8 +52,6 @@ class SyncConfigureFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
-
         handleEdgeToEdge()
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }

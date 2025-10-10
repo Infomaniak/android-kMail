@@ -18,10 +18,10 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.content.res.Configuration
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.annotation.ColorRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -51,7 +51,6 @@ import com.infomaniak.mail.utils.extensions.isPhone
 import com.infomaniak.mail.utils.extensions.isTabletInLandscape
 import com.infomaniak.mail.utils.extensions.isTabletInPortrait
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import io.realm.kotlin.types.RealmInstant
 import javax.inject.Inject
 
@@ -70,9 +69,6 @@ abstract class TwoPaneFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     abstract val substituteClassName: String
-
-    @ColorRes
-    abstract fun getStatusBarColor(): Int
     abstract fun getLeftPane(): View?
     abstract fun getRightPane(): FragmentContainerView?
     abstract fun getAnchor(): View?
@@ -94,7 +90,6 @@ abstract class TwoPaneFragment : Fragment() {
         super.onConfigurationChanged(newConfig)
         updateTwoPaneVisibilities()
         updateDrawerLockMode()
-        updateStatusBarColor()
     }
 
     private fun observeCurrentFolder() = with(twoPaneViewModel) {
@@ -122,12 +117,7 @@ abstract class TwoPaneFragment : Fragment() {
         twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
             updateTwoPaneVisibilities()
             updateDrawerLockMode()
-            val isOpeningThread = threadUid != null
-            if (isOpeningThread) {
-                if (isOnlyRightShown()) setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
-            } else {
-                resetPanes()
-            }
+            if (threadUid == null) resetPanes()
         }
     }
 
@@ -150,7 +140,10 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun handleOnBackPressed() {
         when {
-            isOnlyRightShown() -> twoPaneViewModel.closeThread()
+            isOnlyRightShown() -> {
+                if (SDK_INT >= 29) requireActivity().window.isNavigationBarContrastEnforced = true
+                twoPaneViewModel.closeThread()
+            }
             this is ThreadListFragment -> requireActivity().finish()
             else -> findNavController().popBackStack()
         }
@@ -166,16 +159,12 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     fun openThreadAndResetItsState(threadUid: String) {
+        if (SDK_INT >= 29) requireActivity().window.isNavigationBarContrastEnforced = false
         getRightPane()?.getFragment<ThreadFragment?>()?.resetThreadState()
         twoPaneViewModel.openThread(threadUid)
     }
 
     private fun resetPanes() {
-
-        if (isOnlyLeftShown()) {
-            setSystemBarsColors(statusBarColor = getStatusBarColor(), navigationBarColor = R.color.backgroundColor)
-        }
-
         threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
 
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
@@ -223,21 +212,6 @@ abstract class TwoPaneFragment : Fragment() {
         if (this is ThreadListFragment) {
             (requireActivity() as MainActivity).setDrawerLockMode(isLocked = isOnlyRightShown())
         }
-    }
-
-    private fun updateStatusBarColor() {
-
-        val statusBarColor = if (isOnlyRightShown()) { // Thread (in Phone mode)
-            if (getRightPane()?.getFragment<ThreadFragment?>()?.isScrolledToTheTop() == true) {
-                R.color.toolbarLoweredColor
-            } else {
-                R.color.toolbarElevatedColor
-            }
-        } else { // ThreadList or Search
-            getStatusBarColor()
-        }
-
-        setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
     }
 
     protected fun updateAutoAdvanceNaturalThread(currentPosition: Int, previousPosition: Int) {

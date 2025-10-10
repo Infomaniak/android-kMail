@@ -26,7 +26,6 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -59,7 +58,7 @@ import java.util.Calendar
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 
-abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
+abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
 

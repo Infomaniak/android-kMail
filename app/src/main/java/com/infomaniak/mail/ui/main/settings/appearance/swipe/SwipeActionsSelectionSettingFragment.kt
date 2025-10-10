@@ -46,7 +46,6 @@ import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBindi
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -66,7 +65,6 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
         handleEdgeToEdge()
 
         val actionResId = navigationArgs.titleResId

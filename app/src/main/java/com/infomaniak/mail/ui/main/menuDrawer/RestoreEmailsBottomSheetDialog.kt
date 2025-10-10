@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -40,12 +39,13 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.EdgeToEdgeBottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @AndroidEntryPoint
-class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
+class RestoreEmailsBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: BottomSheetRestoreEmailsBinding by safeBinding()
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()

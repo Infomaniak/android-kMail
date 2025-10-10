@@ -18,10 +18,10 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.bottomSheetDialogs.EdgeToEdgeBottomSheetDialog
 
-abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
+abstract class ActionsBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     abstract val mainViewModel: MainViewModel?
 

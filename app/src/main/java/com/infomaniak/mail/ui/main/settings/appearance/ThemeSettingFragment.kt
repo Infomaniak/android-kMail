@@ -35,7 +35,6 @@ import com.infomaniak.mail.data.LocalSettings.Theme.DARK
 import com.infomaniak.mail.data.LocalSettings.Theme.LIGHT
 import com.infomaniak.mail.data.LocalSettings.Theme.SYSTEM
 import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -53,7 +52,6 @@ class ThemeSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
 
         setSystemThemeVisibility()
 

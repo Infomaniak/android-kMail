@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.safeNavigate
@@ -53,7 +52,7 @@ import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AccountBottomSheetDialog : BottomSheetDialogFragment() {
+class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: BottomSheetAccountBinding by safeBinding()
 

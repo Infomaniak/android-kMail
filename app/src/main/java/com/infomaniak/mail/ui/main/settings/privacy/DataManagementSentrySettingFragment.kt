@@ -25,7 +25,6 @@ import androidx.fragment.app.Fragment
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentDataManagementSentrySettingBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -43,8 +42,6 @@ class DataManagementSentrySettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.settingsTrackingSwitchSentry) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
-
         isChecked = localSettings.isSentryTrackingEnabled
 
         setOnClickListener {

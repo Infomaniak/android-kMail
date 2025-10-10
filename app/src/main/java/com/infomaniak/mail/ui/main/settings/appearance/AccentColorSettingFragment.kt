@@ -36,7 +36,6 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
 import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.data.LocalSettings.AccentColor.SYSTEM
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -54,8 +53,6 @@ class AccentColorSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors()
-
         setSystemAccentUi()
 
         initBijectionTable(

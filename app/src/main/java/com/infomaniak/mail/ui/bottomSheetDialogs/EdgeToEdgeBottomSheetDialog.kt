@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,16 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.mail.databinding.BottomSheetInformationBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-open class InformationBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
+abstract class EdgeToEdgeBottomSheetDialog : BottomSheetDialogFragment() {
 
-    protected var binding: BottomSheetInformationBinding by safeBinding()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return BottomSheetInformationBinding.inflate(inflater, container, false).also { binding = it }.root
+        if (SDK_INT >= 29) dialog?.window?.isNavigationBarContrastEnforced = false
     }
 }

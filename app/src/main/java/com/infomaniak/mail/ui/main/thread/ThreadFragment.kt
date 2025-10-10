@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -121,12 +122,10 @@ import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.infomaniak.mail.utils.extensions.isAtTheTop
 import com.infomaniak.mail.utils.extensions.isTabletInLandscape
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toDate
-import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ALL_EMOJI_SENT_STATUS
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
@@ -247,7 +246,7 @@ class ThreadFragment : Fragment() {
             mainAppBar.applyStatusBarInsets(insets)
             appBar.applySideAndBottomSystemInsets(insets, withBottom = false)
             messagesListNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
-            quickActionBar.applySideAndBottomSystemInsets(insets)
+            quickActionBar.getRoot().applySideAndBottomSystemInsets(insets)
         }
     }
 
@@ -291,7 +290,10 @@ class ThreadFragment : Fragment() {
         threadSubject.movementMethod = LinkMovementMethod.getInstance()
 
         updateNavigationIcon()
-        toolbar.setNavigationOnClickListener { twoPaneViewModel.closeThread() }
+        toolbar.setNavigationOnClickListener {
+            if (SDK_INT >= 29) requireActivity().window.isNavigationBarContrastEnforced = true
+            twoPaneViewModel.closeThread()
+        }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -790,11 +792,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
-
-        if (twoPaneFragment.isOnlyOneShown()) {
-            requireActivity().window.updateNavigationBarColor(context.getColor(R.color.elevatedBackground))
-        }
-
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
@@ -1035,8 +1032,6 @@ class ThreadFragment : Fragment() {
     private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
 
     fun getAnchor(): View? = _binding?.quickActionBar
-
-    fun isScrolledToTheTop(): Boolean? = _binding?.messagesListNestedScrollView?.isAtTheTop()
 
     private fun safeNavigate(@IdRes resId: Int, args: Bundle) {
         twoPaneViewModel.safelyNavigate(resId, args)

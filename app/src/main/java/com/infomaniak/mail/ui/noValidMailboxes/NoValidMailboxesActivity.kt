@@ -56,12 +56,6 @@ class NoValidMailboxesActivity : BaseActivity() {
 
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
 
-        window.statusBarColor = if (destination.id == R.id.noValidMailboxesFragment) {
-            R.color.backgroundColor
-        } else {
-            R.color.backgroundHeaderColor
-        }.let(::getColor)
-
         trackDestination(destination)
     }
 }

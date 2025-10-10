@@ -41,8 +41,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
-import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -190,21 +188,13 @@ class NewMessageAiManager @Inject constructor(
                     ?: context.getColor(R.color.backgroundColor)
 
                 scrim.alpha = alpha
-                activity.window.statusBarColor = UiUtils.pointBetweenColors(toolbarColor, black, alpha)
             }
             start()
         }
     }
 
     private fun setAiPromptVisibility(isVisible: Boolean) {
-
-        fun updateNavigationBarColor() {
-            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
-            activity.window.updateNavigationBarColor(context.getColor(backgroundColorRes))
-        }
-
         binding.aiPromptLayout.isVisible = isVisible
-        updateNavigationBarColor()
     }
 
     fun observeAiFeatureFlagUpdates() {

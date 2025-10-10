@@ -21,13 +21,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuiteDashboardFragment
-import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.observeNotNull
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.getDashboardData
 import dagger.hilt.android.AndroidEntryPoint
-import com.infomaniak.core.ksuite.myksuite.R as RMyKSuite
 
 @AndroidEntryPoint
 class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
@@ -36,11 +33,6 @@ class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setSystemBarsColors(
-            statusBarColor = RMyKSuite.color.dashboardBackground,
-            navigationBarColor = R.color.backgroundColorSecondary,
-        )
 
         myKSuiteViewModel.refreshMyKSuite()
         myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { myKSuiteData ->
