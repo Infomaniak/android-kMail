@@ -20,8 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
-import android.os.Build
-import android.os.Build.VERSION.*
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
