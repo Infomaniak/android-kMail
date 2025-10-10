@@ -73,6 +73,10 @@ class SyncMailboxesWorker @AssistedInject constructor(
 
         AccountUtils.getAllUsersSync().forEach { user ->
             mailboxController.getMailboxes(user.id).forEach { mailbox ->
+                if (processMessageNotificationsWorkerScheduler.isRunning()) {
+                    SentryLog.i(TAG, "Work skipped because ProcessMessageNotificationsWorker is running")
+                    return@withContext Result.success()
+                }
                 fetchMessagesManager.execute(scope = this, user.id, mailbox)
             }
         }
