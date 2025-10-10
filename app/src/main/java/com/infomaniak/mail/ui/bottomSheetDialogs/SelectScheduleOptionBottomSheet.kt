@@ -26,7 +26,6 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding

@@ -62,11 +62,11 @@ import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
-import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
+import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

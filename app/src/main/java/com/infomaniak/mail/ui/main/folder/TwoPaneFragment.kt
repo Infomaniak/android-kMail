@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.view.View
