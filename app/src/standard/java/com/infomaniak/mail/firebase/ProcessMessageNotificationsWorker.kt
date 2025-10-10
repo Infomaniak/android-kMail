@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.FetchMessagesManager
+import com.infomaniak.mail.utils.IFirebaseProcessNotificationsScheduler
 import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.GENERIC_NEW_MAILS_NOTIFICATION_ID
 import com.infomaniak.mail.utils.SentryDebug
@@ -156,7 +157,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     }
 
     @Singleton
-    class Scheduler @Inject constructor(private val workManager: WorkManager) {
+    class Scheduler @Inject constructor(private val workManager: WorkManager) : IFirebaseProcessNotificationsScheduler {
 
         fun scheduleWork(userId: Int, mailboxId: Int, messageUid: String) {
             SentryLog.i(TAG, "Work scheduled")
@@ -173,7 +174,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             workManager.enqueueUniqueWork(workName, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
-        suspend fun isRunning(): Boolean {
+        override suspend fun isRunning(): Boolean {
             val workQuery = WorkQuery.Builder
                 .fromTags(listOf(TAG))
                 .addStates(listOf(State.BLOCKED, State.ENQUEUED, State.RUNNING))

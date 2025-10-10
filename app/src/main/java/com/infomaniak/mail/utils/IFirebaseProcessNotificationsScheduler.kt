@@ -15,17 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.firebase
+package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.utils.IFirebaseProcessNotificationsScheduler
-import javax.inject.Inject
-import javax.inject.Singleton
-
-object ProcessMessageNotificationsWorker {
-
-    @Singleton
-    class Scheduler @Inject constructor() : IFirebaseProcessNotificationsScheduler {
-
-        override suspend fun isRunning() = false
-    }
+fun interface IFirebaseProcessNotificationsScheduler {
+    suspend fun isRunning(): Boolean
 }
