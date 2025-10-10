@@ -29,7 +29,9 @@ import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.WorkQuery
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.infomaniak.core.cancellable
@@ -50,6 +52,7 @@ import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -168,6 +171,14 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
                 .build()
 
             workManager.enqueueUniqueWork(workName, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+        }
+
+        suspend fun isRunning(): Boolean {
+            val workQuery = WorkQuery.Builder
+                .fromTags(listOf(TAG))
+                .addStates(listOf(WorkInfo.State.BLOCKED, WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING))
+                .build()
+            return workManager.getWorkInfosFlow(workQuery).firstOrNull() != null
         }
 
     }
