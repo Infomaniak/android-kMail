@@ -178,7 +178,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
                 .fromTags(listOf(TAG))
                 .addStates(listOf(State.BLOCKED, State.ENQUEUED, State.RUNNING))
                 .build()
-            return workManager.getWorkInfosFlow(workQuery).firstOrNull() != null
+            return workManager.getWorkInfosFlow(workQuery).firstOrNull()?.isNotEmpty() == true
         }
     }
 
