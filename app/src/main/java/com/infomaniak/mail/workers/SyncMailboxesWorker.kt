@@ -61,22 +61,23 @@ class SyncMailboxesWorker @AssistedInject constructor(
 ) : BaseCoroutineWorker(appContext, params) {
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
+
+        suspend fun shouldSkip(): Boolean {
+            return processMessageNotificationsWorkerScheduler.isRunning().also {
+                if (it) SentryLog.i(TAG, "Work skipped because ProcessMessageNotificationsWorker is running")
+            }
+        }
+
         SentryLog.i(TAG, "Work launched")
 
-        if (processMessageNotificationsWorkerScheduler.isRunning()) {
-            SentryLog.i(TAG, "Work skipped because ProcessMessageNotificationsWorker is running")
-            return@withContext Result.success()
-        }
+        if (shouldSkip()) return@withContext Result.success()
 
         // Refresh current User and its Mailboxes
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         AccountUtils.getAllUsersSync().forEach { user ->
             mailboxController.getMailboxes(user.id).forEach { mailbox ->
-                if (processMessageNotificationsWorkerScheduler.isRunning()) {
-                    SentryLog.i(TAG, "Work skipped because ProcessMessageNotificationsWorker is running")
-                    return@withContext Result.success()
-                }
+                if (shouldSkip()) return@withContext Result.success()
                 fetchMessagesManager.execute(scope = this, user.id, mailbox)
             }
         }
