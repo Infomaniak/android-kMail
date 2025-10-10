@@ -82,7 +82,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogAr
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
@@ -227,6 +227,7 @@ class ThreadFragment : Fragment() {
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
+
         observePickedEmoji()
 
         observeDraftWorkerResults()
@@ -409,7 +410,7 @@ class ThreadFragment : Fragment() {
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
                 onAddReaction = {
                     trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
-                    navigateToEmojiPicker(it.uid)
+                    navigateToEmojiPicker(it.uid, EmojiPickerObserverTarget.Thread)
                 },
                 onAddEmoji = { emoji, messageUid ->
                     val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@ThreadAdapterCallbacks
@@ -662,7 +663,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observePickedEmoji() {
-        getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
+        getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.Thread.name) { (emoji, messageUid) ->
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult
             mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
@@ -745,6 +746,13 @@ class ThreadFragment : Fragment() {
                     executeSavedSnoozeScheduleType(timestamp)
                 },
                 onAbort = { navigateToSnoozeBottomSheet(twoPaneViewModel.snoozeScheduleType) },
+            )
+        }
+
+        getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
+            navigateToEmojiPicker(
+                messageUid,
+                emojiPickerObserverTarget = if (twoPaneViewModel.isThreadOpen) EmojiPickerObserverTarget.Thread else EmojiPickerObserverTarget.ThreadList
             )
         }
 
@@ -1075,10 +1083,10 @@ class ThreadFragment : Fragment() {
         return direction?.let { getNextThread(startingThreadIndex, direction) }
     }
 
-    private fun Fragment.navigateToEmojiPicker(messageUid: String) {
+    private fun Fragment.navigateToEmojiPicker(messageUid: String, emojiPickerObserverTarget: EmojiPickerObserverTarget) {
         safelyNavigate(
             resId = R.id.emojiPickerBottomSheetDialog,
-            args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
+            args = EmojiPickerBottomSheetDialogArgs(messageUid, emojiPickerObserverTarget).toBundle(),
             substituteClassName = twoPaneFragment.substituteClassName,
         )
     }
@@ -1098,6 +1106,8 @@ class ThreadFragment : Fragment() {
         private const val NEXT_CHRONOLOGICAL_THREAD = 1
 
         private const val MAXIMUM_SUBJECT_LENGTH = 30
+
+        const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"

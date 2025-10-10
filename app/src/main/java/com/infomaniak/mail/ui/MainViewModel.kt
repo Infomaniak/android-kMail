@@ -1412,7 +1412,7 @@ class MainViewModel @Inject constructor(
      * If sending is allowed, the caller place can fake the emoji reaction locally thanks to [onAllowed].
      * If sending is not allowed, it will display the error directly to the user and avoid doing the api call.
      */
-    fun trySendEmojiReply(emoji: String, messageUid: String, reactions: Map<String, Reaction>, onAllowed: () -> Unit) {
+    fun trySendEmojiReply(emoji: String, messageUid: String, reactions: Map<String, Reaction>, onAllowed: () -> Unit = {}) {
         viewModelScope.launch {
             when (val status = reactions.getEmojiSendStatus(emoji)) {
                 EmojiSendStatus.Allowed -> {
