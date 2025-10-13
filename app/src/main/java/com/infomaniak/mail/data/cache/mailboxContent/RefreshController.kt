@@ -61,7 +61,6 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -89,11 +88,10 @@ class RefreshController @Inject constructor(
     private var okHttpClient: OkHttpClient? = null
     private var onStart: (() -> Unit)? = null
     private var onStop: (() -> Unit)? = null
-    private var endOfMessagesReached: Boolean = false
 
     //region Fetch Messages
     fun cancelRefresh() {
-        refreshThreadsJob?.cancel(ForcedCancellationException())
+        refreshThreadsJob?.cancel()
     }
 
     private fun clearCallbacks() {
@@ -155,7 +153,6 @@ class RefreshController @Inject constructor(
             this.onStart = it.onStart
             this.onStop = it.onStop
         }
-        this.endOfMessagesReached = false
     }
 
     private suspend fun refreshWithRunCatching(job: Job): Pair<Set<Thread>?, Throwable?> = runCatching {
@@ -836,8 +833,6 @@ class RefreshController @Inject constructor(
     }
 
     private class ReturnThreadsException(val threads: Set<Thread>, val exception: Throwable) : Exception()
-
-    private class ForcedCancellationException : CancellationException()
 
     data class RefreshCallbacks(
         val onStart: (() -> Unit),
