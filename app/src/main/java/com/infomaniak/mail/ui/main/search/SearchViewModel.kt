@@ -186,7 +186,10 @@ class SearchViewModel @Inject constructor(
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
 
-            refreshController.cancelRefresh()
+            mailboxController
+                .getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+                ?.objectId
+                ?.let(refreshController::cancelRefresh)
 
             if (!shouldGetNextPage) resetPaginationData()
 
