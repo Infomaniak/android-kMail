@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import android.content.Context
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -88,7 +89,11 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         } else {
             remoteMessage.toThread()
         }
-        newThread?.let { impactedThreadsManaged += realm.putNewThreadInRealm(it) }
+        newThread?.let {
+            realm.putNewThreadInRealm(it)?.let { managedThread ->
+                impactedThreadsManaged += managedThread
+            }
+        }
     }
 
     private fun MutableRealm.handleAddedMessage(
@@ -193,8 +198,16 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         }
     }
 
-    private fun MutableRealm.putNewThreadInRealm(newThread: Thread): Thread {
-        return ThreadController.upsertThread(newThread, realm = this)
+    /**
+     * We make sure that the thread added to the database is present in a folder.
+     * This prevents a situation where the thread becomes orphaned.
+     * And this avoids having an empty backlink on an unmanaged instance.
+     */
+    private fun MutableRealm.putNewThreadInRealm(newThread: Thread): Thread? {
+        val folderId = newThread.folderId
+        val folderReceivingNewThread = FolderController.getFolderBlocking(folderId, realm = this)
+        folderReceivingNewThread?.threads?.add(newThread)
+        return ThreadController.getThreadBlocking(newThread.uid, this)
     }
 
     private fun getExistingMessages(existingThreads: List<Thread>): Set<Message> {
