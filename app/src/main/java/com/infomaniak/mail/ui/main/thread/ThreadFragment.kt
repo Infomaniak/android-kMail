@@ -85,6 +85,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
+import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
@@ -144,7 +145,7 @@ import kotlin.math.roundToInt
 import androidx.appcompat.R as RAndroid
 
 @AndroidEntryPoint
-class ThreadFragment : Fragment() {
+class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     @Inject
     lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
@@ -662,7 +663,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observePickedEmoji() {
+    override fun observePickedEmoji() {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.Thread.name) { (emoji, messageUid) ->
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult

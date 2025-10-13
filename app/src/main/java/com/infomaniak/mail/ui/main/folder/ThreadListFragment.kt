@@ -80,6 +80,7 @@ import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
+import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -110,7 +111,7 @@ import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
-class ThreadListFragment : TwoPaneFragment() {
+class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -691,7 +692,7 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun observePickedEmoji() {
+    override fun observePickedEmoji() {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.ThreadList.name) { (emoji, messageUid) ->
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             viewLifecycleOwner.lifecycleScope.launch {
