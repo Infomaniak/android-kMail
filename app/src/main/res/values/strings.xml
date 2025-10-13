@@ -22,10 +22,6 @@
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
     <string name="notification_channel_id_sync_messages_service" translatable="false">sync_messages_service_channel_id</string>
 
-    <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">Delete %d conversation</item>
-        <item quantity="other">Delete %d conversations</item>
-    </plurals>
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>
     <string name="accentColorSystemTitle">System color</string>
@@ -650,6 +646,10 @@
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Are you sure you want to delete this conversation permanently?</item>
         <item quantity="other">Are you sure you want to delete these conversations permanently?</item>
+    </plurals>
+    <plurals name="threadListDeletionConfirmationAlertTitle">
+        <item quantity="one">Delete %d conversation</item>
+        <item quantity="other">Delete %d conversations</item>
     </plurals>
     <string name="threadListEmptyFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>
     <string name="threadListEmptySpamButton">Empty spam</string>
