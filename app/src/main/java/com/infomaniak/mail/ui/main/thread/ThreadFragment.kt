@@ -752,7 +752,11 @@ class ThreadFragment : Fragment() {
         getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
             navigateToEmojiPicker(
                 messageUid,
-                emojiPickerObserverTarget = if (twoPaneViewModel.isThreadOpen) EmojiPickerObserverTarget.Thread else EmojiPickerObserverTarget.ThreadList
+                emojiPickerObserverTarget = if (twoPaneViewModel.isThreadOpen) {
+                    EmojiPickerObserverTarget.Thread
+                } else {
+                    EmojiPickerObserverTarget.ThreadList
+                }
             )
         }
 
