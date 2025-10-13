@@ -16,10 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">Borrar %d conversación</item>
-        <item quantity="other">Borrar %d conversaciones</item>
-    </plurals>
     <string name="accentColorBlueTitle">Azul</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Color del sistema</string>
@@ -644,6 +640,10 @@
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">¿Estás seguro de que quieres borrar este conversación permanentemente?</item>
         <item quantity="other">¿Estás seguro de que quieres borrar estos conversaciones permanentemente?</item>
+    </plurals>
+    <plurals name="threadListDeletionConfirmationAlertTitle">
+        <item quantity="one">Borrar %d conversación</item>
+        <item quantity="other">Borrar %d conversaciones</item>
     </plurals>
     <string name="threadListEmptyFolderAlertDescription">¿Estás seguro de que quieres borrar definitivamente todos los mensajes de esta carpeta?</string>
     <string name="threadListEmptySpamButton">Spam vacío</string>

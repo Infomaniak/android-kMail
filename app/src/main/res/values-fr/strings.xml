@@ -16,11 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
-    <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">Supprimer %d conversation</item>
-        <item quantity="other">Supprimer %d conversations</item>
-        <item quantity="many">Supprimer %d de conversations</item>
-    </plurals>
     <string name="accentColorBlueTitle">Bleu</string>
     <string name="accentColorPinkTitle">Rose</string>
     <string name="accentColorSystemTitle">Couleur du système</string>
@@ -662,6 +657,11 @@
         <item quantity="one">Êtes-vous sûr de vouloir supprimer cette conversation définitivement ?</item>
         <item quantity="other">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
         <item quantity="many">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
+    </plurals>
+    <plurals name="threadListDeletionConfirmationAlertTitle">
+        <item quantity="one">Supprimer %d conversation</item>
+        <item quantity="other">Supprimer %d conversations</item>
+        <item quantity="many">Supprimer %d de conversations</item>
     </plurals>
     <string name="threadListEmptyFolderAlertDescription">Êtes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
     <string name="threadListEmptySpamButton">Vider les spams</string>
