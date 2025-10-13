@@ -215,9 +215,10 @@ class MessageController @Inject constructor(
         ): Message? {
             suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
 
-            fun RealmQuery<Message>.appendNullableExtraQuery(extra: String?): RealmQuery<Message> {
-                return if (extra.isNullOrEmpty()) this else this.query(extra)
-            }
+            val appendableExtraQuery = extraQuery
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { " AND $it" } 
+                ?: ""
 
             val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
 
@@ -230,11 +231,12 @@ class MessageController @Inject constructor(
                     " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                     ").@count < 1"
 
-            return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe")
-                .appendNullableExtraQuery(extraQuery).last()
-                ?: messages.query("$isNotDraft AND $isNotScheduledDraft").appendNullableExtraQuery(extraQuery).last()
-                ?: messages.query(isNotScheduledDraft).appendNullableExtraQuery(extraQuery).last()
-                ?: extraQuery?.let { messages.query(extraQuery).last() }
+            return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe $appendableExtraQuery").last()
+                ?: messages.query("$isNotDraft AND $isNotScheduledDraft $appendableExtraQuery").last()
+                ?: messages.query(isNotScheduledDraft + appendableExtraQuery).last()
+                ?: extraQuery
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { messages.query(it).last() }
         }
         //endregion
 
