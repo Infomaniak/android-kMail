@@ -81,22 +81,9 @@ class RefreshController @Inject constructor(
 
     private val refreshThreadsJobs = mutableMapOf<String, Job>()
 
-    private lateinit var refreshMode: RefreshMode
-    private lateinit var mailbox: Mailbox
-    private lateinit var initialFolder: Folder
-    private lateinit var realm: Realm
-    private var okHttpClient: OkHttpClient? = null
-    private var onStart: (() -> Unit)? = null
-    private var onStop: (() -> Unit)? = null
-
     //region Fetch Messages
     fun cancelRefresh(mailboxObjectId: String) {
         refreshThreadsJobs[mailboxObjectId]?.cancel()
-    }
-
-    private fun clearCallbacks() {
-        onStart = null
-        onStop = null
     }
 
     suspend fun refreshThreads(
@@ -126,48 +113,39 @@ class RefreshController @Inject constructor(
             refreshThreadsJobs.put(mailboxObjectId, it)
         }
 
-        setupConfiguration(refreshMode, mailbox, folder, realm, okHttpClient, callbacks)
+        val refreshScope = RefreshScope(
+            refreshMode = refreshMode,
+            mailbox = mailbox,
+            initialFolder = folder,
+            realmReadOnly = realm,
+            okHttpClient = okHttpClient,
+            onStart = callbacks?.onStart,
+            onStop = callbacks?.onStop,
+        )
 
-        return refreshWithRunCatching(job).also { (threads, _) ->
+        return with(refreshScope) {
+            refreshWithRunCatching(job).also { (threads, _) ->
 
-            ThreadController.deleteEmptyThreadsInFolder(folder.id, realm)
+                ThreadController.deleteEmptyThreadsInFolder(folder.id, realm)
 
-            if (threads != null) {
-                onStop?.invoke()
-                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
+                if (threads != null) {
+                    onStop?.invoke()
+                    SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
+                }
             }
         }
     }
 
-    private fun setupConfiguration(
-        refreshMode: RefreshMode,
-        mailbox: Mailbox,
-        initialFolder: Folder,
-        realm: Realm,
-        okHttpClient: OkHttpClient?,
-        callbacks: RefreshCallbacks? = null,
-    ) {
-        this.refreshMode = refreshMode
-        this.mailbox = mailbox
-        this.initialFolder = initialFolder
-        this.realm = realm
-        this.okHttpClient = okHttpClient
-        callbacks?.let {
-            this.onStart = it.onStart
-            this.onStop = it.onStop
-        }
-    }
-
-    private suspend fun refreshWithRunCatching(job: Job): Pair<Set<Thread>?, Throwable?> = runCatching {
+    private suspend fun RefreshScope.refreshWithRunCatching(job: Job): Pair<Set<Thread>?, Throwable?> = runCatching {
         withContext(Dispatchers.IO + job) {
             onStart?.invoke()
-            realm.handleRefreshMode(scope = this) to null
+            handleRefreshMode(scope = this) to null
         }
     }.getOrElse {
         handleRefreshFailure(throwable = it)
     }
 
-    private fun handleRefreshFailure(throwable: Throwable): Pair<Set<Thread>?, Throwable?> {
+    private fun RefreshScope.handleRefreshFailure(throwable: Throwable): Pair<Set<Thread>?, Throwable?> {
 
         val (returnThreads, exception) = if (throwable is ReturnThreadsException) {
             throwable.threads to throwable.exception
@@ -180,7 +158,7 @@ class RefreshController @Inject constructor(
         return returnThreads to exception
     }
 
-    private suspend fun Realm.handleRefreshMode(scope: CoroutineScope): Set<Thread> {
+    private suspend fun RefreshScope.handleRefreshMode(scope: CoroutineScope): Set<Thread> {
 
         SentryLog.d(
             "API",
@@ -192,7 +170,6 @@ class RefreshController @Inject constructor(
             REFRESH_FOLDER -> {
                 refresh(scope, initialFolder).also {
                     onStop?.invoke()
-                    clearCallbacks()
                 }
             }
             ONE_PAGE_OF_OLD_MESSAGES -> {
@@ -202,11 +179,10 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.refreshWithRoleConsideration(scope: CoroutineScope): Set<Thread> {
+    private suspend fun RefreshScope.refreshWithRoleConsideration(scope: CoroutineScope): Set<Thread> {
 
         val impactedThreads = refresh(scope, initialFolder)
         onStop?.invoke()
-        clearCallbacks()
 
         if (initialFolder.role in FOLDER_ROLES_TO_REFRESH_TOGETHER) {
             for (role in FOLDER_ROLES_TO_REFRESH_TOGETHER) {
@@ -215,7 +191,7 @@ class RefreshController @Inject constructor(
                 if (initialFolder.role == role) continue
 
                 runCatching {
-                    FolderController.getFolder(role, realm = this)?.let {
+                    FolderController.getFolder(role, realmReadOnly)?.let {
                         refresh(scope, folder = it)
                     }
                 }.cancellable().onFailure {
@@ -227,14 +203,14 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private suspend fun Realm.refresh(scope: CoroutineScope, folder: Folder): Set<Thread> {
+    private suspend fun RefreshScope.refresh(scope: CoroutineScope, folder: Folder): Set<Thread> {
         val impactedThreads = mainRefresh(scope, folder)
         extraRefresh(scope, folder)
 
         return impactedThreads
     }
 
-    private suspend fun Realm.mainRefresh(scope: CoroutineScope, folder: Folder): MutableSet<Thread> {
+    private suspend fun RefreshScope.mainRefresh(scope: CoroutineScope, folder: Folder): MutableSet<Thread> {
         val previousCursor = folder.cursor
         val impactedThreads = mutableSetOf<Thread>()
 
@@ -255,8 +231,8 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private suspend fun Realm.resetFolder(folderId: String) {
-        write {
+    private suspend fun RefreshScope.resetFolder(folderId: String) {
+        realmReadOnly.write {
             val folder = getUpToDateFolderBlocking(folderId)
 
             MessageController.deleteMessages(appContext, mailbox, folder.messagesBlocking(realm = this), realm = this)
@@ -271,16 +247,16 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.extraRefresh(scope: CoroutineScope, folder: Folder) {
+    private suspend fun RefreshScope.extraRefresh(scope: CoroutineScope, folder: Folder) {
         // No need to check realm, there can't be any snoozed thread with a new message when there's a single message per thread
         if (localSettings.threadMode == ThreadMode.MESSAGE) return
 
         val impactedFolders = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
-        impactedFolders.getFolderIds(realm = this).forEach { folderId ->
+        impactedFolders.getFolderIds(realmReadOnly).forEach { folderId ->
             scope.ensureActive()
 
             runCatching {
-                FolderController.getFolderBlocking(folderId, realm = this)?.let {
+                FolderController.getFolderBlocking(folderId, realmReadOnly)?.let {
                     mainRefresh(scope, folder = it)
                 }
             }.cancellable().onFailure {
@@ -289,13 +265,16 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): ImpactedFolders {
+    private suspend fun RefreshScope.removeSnoozeStateOfThreadsWithNewMessages(
+        scope: CoroutineScope,
+        folder: Folder,
+    ): ImpactedFolders {
         if (folder.role != FolderRole.INBOX) return ImpactedFolders()
 
         val impactedFolders = ImpactedFolders()
         val cannotBeUnsnoozedThreadUids = mutableListOf<String>()
 
-        ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm).forEach { snoozedThreadWithNewMessage ->
+        ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realmReadOnly).forEach { snoozedThreadWithNewMessage ->
             scope.ensureActive()
 
             val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)
@@ -306,7 +285,7 @@ class RefreshController @Inject constructor(
             }
         }
 
-        write {
+        realmReadOnly.write {
             cannotBeUnsnoozedThreadUids.forEach { manuallyUnsnoozeOutOfSyncThread(it) }
 
             if (cannotBeUnsnoozedThreadUids.isNotEmpty()) {
@@ -323,7 +302,7 @@ class RefreshController @Inject constructor(
         ThreadController.getThreadBlocking(threadUid, realm = this)?.manuallyUnsnooze()
     }
 
-    private suspend fun Realm.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {
+    private suspend fun RefreshScope.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {
 
         var totalNewThreads = 0
         var upToDateFolder = getUpToDateFolder(folderId)
@@ -341,19 +320,19 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.fetchOldMessagesUids(scope: CoroutineScope, folder: Folder) {
+    private suspend fun RefreshScope.fetchOldMessagesUids(scope: CoroutineScope, folder: Folder) {
 
         val result = getDateOrderedMessagesUids(folder.id)!!
         scope.ensureActive()
 
-        FolderController.updateFolder(folder.id, realm = this) { _, it ->
+        FolderController.updateFolder(folder.id, realmReadOnly) { _, it ->
             it.oldMessagesUidsToFetch.replaceContent(result.addedShortUids)
             it.lastUpdatedAt = Date().toRealmInstant()
             it.cursor = result.cursor
         }
     }
 
-    private suspend fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String): Boolean {
+    private suspend fun RefreshScope.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String): Boolean {
 
         val activities = when (folder.role) {
             FolderRole.SNOOZED -> getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
@@ -371,13 +350,13 @@ class RefreshController @Inject constructor(
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
         var inboxUnreadCount: Int? = null
-        write {
+        realmReadOnly.write {
             val refreshStrategy = folder.refreshStrategy
             val impactedFolders = ImpactedFolders()
-            impactedFolders += handleDeletedUids(scope, activities.deletedShortUids, folder.id, refreshStrategy)
+            impactedFolders += handleDeletedUids(scope, activities.deletedShortUids, mailbox, folder.id, refreshStrategy)
             impactedFolders += handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy)
 
-            inboxUnreadCount = updateFoldersUnreadCount(impactedFolders, realm = this)
+            inboxUnreadCount = updateFoldersUnreadCount(impactedFolders)
 
             getUpToDateFolderBlocking(folder.id).let {
                 it.newMessagesUidsToFetch.addAll(activities.addedShortUids)
@@ -411,7 +390,7 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.fetchAllNewPages(scope: CoroutineScope, folderId: String): Set<Thread> {
+    private suspend fun RefreshScope.fetchAllNewPages(scope: CoroutineScope, folderId: String): Set<Thread> {
 
         val impactedThreads = mutableSetOf<Thread>()
         var folder = getUpToDateFolder(folderId)
@@ -426,7 +405,7 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private suspend fun Realm.fetchAllOldPages(scope: CoroutineScope, folderId: String) {
+    private suspend fun RefreshScope.fetchAllOldPages(scope: CoroutineScope, folderId: String) {
 
         var folder = getUpToDateFolder(folderId)
 
@@ -438,13 +417,13 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.fetchOnePage(scope: CoroutineScope, folder: Folder, direction: Direction): Set<Thread> {
+    private suspend fun RefreshScope.fetchOnePage(scope: CoroutineScope, folder: Folder, direction: Direction): Set<Thread> {
         val (addedUids, remainingUids) = computeUids(folder, direction)
 
         val impactedThreads = handleAddedUids(scope, folder, addedUids)
 
         var inboxUnreadCount: Int? = null
-        write {
+        realmReadOnly.write {
             recomputeTwinFoldersThreadsDependantProperties(
                 folderId = folder.id,
                 extraFolderUpdates = { updateDirectionDependentData(direction, remainingUids, addedUids) },
@@ -453,7 +432,6 @@ class RefreshController @Inject constructor(
             inboxUnreadCount = updateFoldersUnreadCount(
                 // `impactedThreads` may not contain `folder.id` in special folders cases (i.e. snooze)
                 folders = ImpactedFolders(folderIds = impactedThreads.mapTo(mutableSetOf(folder.id)) { it.folderId }),
-                realm = this,
             )
         }
 
@@ -491,12 +469,12 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun updateFoldersUnreadCount(folders: ImpactedFolders, realm: MutableRealm): Int? {
+    private fun MutableRealm.updateFoldersUnreadCount(folders: ImpactedFolders): Int? {
 
         var inboxUnreadCount: Int? = null
 
-        folders.getFolderIdsBlocking(realm).forEach {
-            val folder = realm.getUpToDateFolderBlocking(it)
+        folders.getFolderIdsBlocking(realm = this).forEach {
+            val folder = getUpToDateFolderBlocking(it)
 
             val unreadCount = ThreadController.getUnreadThreadsCountBlocking(folder)
             folder.unreadCountLocal = unreadCount
@@ -507,7 +485,7 @@ class RefreshController @Inject constructor(
         return inboxUnreadCount
     }
 
-    private suspend fun updateMailboxUnreadCount(unreadCount: Int?) {
+    private suspend fun RefreshScope.updateMailboxUnreadCount(unreadCount: Int?) {
         if (unreadCount == null) return
 
         mailboxController.updateMailbox(mailbox.objectId) {
@@ -515,7 +493,7 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.getUpToDateFolder(id: String) = FolderController.getFolder(id, realm = this)!!
+    private suspend fun RefreshScope.getUpToDateFolder(id: String) = FolderController.getFolder(id, realmReadOnly)!!
     private fun MutableRealm.getUpToDateFolderBlocking(id: String) = FolderController.getFolderBlocking(id, realm = this)!!
 
     private fun TypedRealm.getUpToDateFolderBlocking(folderRole: FolderRole): Folder? {
@@ -524,7 +502,7 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Added Messages
-    private suspend fun Realm.handleAddedUids(
+    private suspend fun RefreshScope.handleAddedUids(
         scope: CoroutineScope,
         folder: Folder,
         uids: List<Int>,
@@ -544,7 +522,7 @@ class RefreshController @Inject constructor(
         return apiResponse.data?.messages?.let { messages ->
             reportMalformedSnoozeMessages(messages)
 
-            return@let write {
+            return@let realmReadOnly.write {
 
                 val upToDateFolder = getUpToDateFolderBlocking(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
@@ -575,6 +553,7 @@ class RefreshController @Inject constructor(
     private fun MutableRealm.handleDeletedUids(
         scope: CoroutineScope,
         shortUids: List<String>,
+        mailbox: Mailbox,
         folderId: String,
         currentFolderRefreshStrategy: RefreshStrategy,
     ): ImpactedFolders {
@@ -693,14 +672,14 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region API calls
-    private suspend fun getDateOrderedMessagesUids(folderId: String): NewMessagesResult? {
+    private suspend fun RefreshScope.getDateOrderedMessagesUids(folderId: String): NewMessagesResult? {
         return with(ApiRepository.getDateOrderedMessagesUids(mailbox.uuid, folderId, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }
     }
 
-    private suspend inline fun <reified T : MessageFlags> getMessagesUidsDelta(
+    private suspend inline fun <reified T : MessageFlags> RefreshScope.getMessagesUidsDelta(
         folderId: String,
         previousCursor: String,
     ): ActivitiesResult<T>? {
@@ -712,14 +691,13 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Handle errors
-    private fun handleAllExceptions(throwable: Throwable) {
+    private fun RefreshScope.handleAllExceptions(throwable: Throwable) {
         SentryLog.w(TAG, "Throwable during thread algorithm", throwable)
 
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
 
         // This is the end. The `onStop` callback should be called before we are gone.
         onStop?.invoke()
-        clearCallbacks()
     }
 
     private fun ApiErrorException.handleOtherApiErrors() {
@@ -730,8 +708,8 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.sendOrphanMessages(folder: Folder, previousCursor: String? = null) {
-        write {
+    private suspend fun RefreshScope.sendOrphanMessages(folder: Folder, previousCursor: String? = null) {
+        realmReadOnly.write {
             val upToDateFolder = getUpToDateFolderBlocking(folder.id)
             SentryDebug.sendOrphanMessagesBlocking(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->
                 MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
@@ -840,6 +818,16 @@ class RefreshController @Inject constructor(
     data class RefreshCallbacks(
         val onStart: (() -> Unit),
         val onStop: (() -> Unit),
+    )
+
+    private data class RefreshScope(
+        val refreshMode: RefreshMode,
+        val mailbox: Mailbox,
+        val initialFolder: Folder,
+        val realmReadOnly: Realm,
+        val okHttpClient: OkHttpClient? = null,
+        val onStart: (() -> Unit)? = null,
+        val onStop: (() -> Unit)? = null,
     )
 
     companion object {
