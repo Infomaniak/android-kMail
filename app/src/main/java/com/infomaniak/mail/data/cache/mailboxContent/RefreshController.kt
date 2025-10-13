@@ -79,7 +79,7 @@ class RefreshController @Inject constructor(
     private val delayApiCallManager: DelayApiCallManager,
 ) {
 
-    private var refreshThreadsJob: Job? = null
+    private val refreshThreadsJobs = mutableMapOf<String, Job>()
 
     private lateinit var refreshMode: RefreshMode
     private lateinit var mailbox: Mailbox
@@ -90,8 +90,8 @@ class RefreshController @Inject constructor(
     private var onStop: (() -> Unit)? = null
 
     //region Fetch Messages
-    fun cancelRefresh() {
-        refreshThreadsJob?.cancel()
+    fun cancelRefresh(mailboxObjectId: String) {
+        refreshThreadsJobs[mailboxObjectId]?.cancel()
     }
 
     private fun clearCallbacks() {
@@ -120,12 +120,15 @@ class RefreshController @Inject constructor(
 
         SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.displayForSentry()})")
 
-        refreshThreadsJob?.cancel()
-        refreshThreadsJob = Job()
+        val mailboxObjectId = mailbox.objectId
+        refreshThreadsJobs[mailboxObjectId]?.cancel()
+        val job = Job().also {
+            refreshThreadsJobs.put(mailboxObjectId, it)
+        }
 
         setupConfiguration(refreshMode, mailbox, folder, realm, okHttpClient, callbacks)
 
-        return refreshWithRunCatching(refreshThreadsJob!!).also { (threads, _) ->
+        return refreshWithRunCatching(job).also { (threads, _) ->
 
             ThreadController.deleteEmptyThreadsInFolder(folder.id, realm)
 
