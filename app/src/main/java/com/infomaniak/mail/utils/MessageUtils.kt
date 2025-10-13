@@ -50,5 +50,4 @@ object MessageUtils {
     }
 }
 
-data class ThreadMessageToExecuteAction(val thread: Thread, val messageUid: String)
 data class JunkMessagesData(val junkMessages: List<Message>, val messagesFromUsersToBlock: Map<Recipient, Message>)

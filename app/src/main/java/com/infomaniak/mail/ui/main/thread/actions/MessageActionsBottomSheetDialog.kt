@@ -25,6 +25,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
@@ -35,6 +36,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
@@ -70,6 +72,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setMarkAsReadUi(message.isSeen)
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
             setFavoriteUi(message.isFavorite)
+            setReactionUi(message.isValidReactionTarget)
 
             if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {
@@ -149,6 +152,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         currentClassName = currentClassName,
                     )
                 }
+            }
+
+            override fun onAddReaction() {
+                trackBottomSheetMessageActionsEvent(MatomoName.OpenEmojiPicker)
+                setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUid)
             }
 
             override fun onSnooze() = Unit

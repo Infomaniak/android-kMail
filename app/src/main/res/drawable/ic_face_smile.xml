@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2025 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,23.25C18.213,23.25 23.25,18.213 23.25,12C23.25,5.787 18.213,0.75 12,0.75C5.787,0.75 0.75,5.787 0.75,12C0.75,18.213 5.787,23.25 12,23.25Z"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M8.25,9.375C8.043,9.375 7.875,9.207 7.875,9C7.875,8.793 8.043,8.625 8.25,8.625"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F" />
+    <path
+        android:pathData="M8.25,9.375C8.457,9.375 8.625,9.207 8.625,9C8.625,8.793 8.457,8.625 8.25,8.625"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F" />
+    <path
+        android:pathData="M15.75,9.375C15.543,9.375 15.375,9.207 15.375,9C15.375,8.793 15.543,8.625 15.75,8.625"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F" />
+    <path
+        android:pathData="M15.75,9.375C15.957,9.375 16.125,9.207 16.125,9C16.125,8.793 15.957,8.625 15.75,8.625"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F" />
+    <path
+        android:pathData="M18.048,15C17.489,16.127 16.627,17.076 15.558,17.739C14.489,18.403 13.256,18.754 11.998,18.754C10.74,18.754 9.507,18.403 8.438,17.739C7.369,17.076 6.507,16.127 5.948,15"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

@@ -40,11 +40,18 @@ class EmojiPickerBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.emojiPicker.setOnEmojiPickedListener {
-            setBackNavigationResult(PICKED_EMOJI, PickedEmojiPayload(it.emoji, navigationArgs.messageUid))
+            setBackNavigationResult(
+                key = navigationArgs.pickedEmojiNavigationKey.name,
+                value = PickedEmojiPayload(it.emoji, navigationArgs.messageUid)
+            )
         }
     }
 
-    companion object {
-        const val PICKED_EMOJI = "PICKED_EMOJI"
+    // The enum is used to determine where the emoji sending logic will be processed.
+    // If the thread is open, then the logic in ThreadViewModel must always be used so that FakeEmoji can be used, even in tablet mode.
+    // Otherwise, use the logic in ThreadListViewModel.
+    enum class EmojiPickerObserverTarget {
+        Thread,
+        ThreadList
     }
 }

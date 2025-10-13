@@ -58,6 +58,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onArchive() = Unit
         override fun onReadUnread() = Unit
         override fun onMove() = Unit
+        override fun onAddReaction() = Unit
         override fun onSnooze() = Unit
         override fun onModifySnooze() = Unit
         override fun onCancelSnooze() = Unit
@@ -85,6 +86,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         move.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onMove() }
         // Not a setClosingOnClickListener because we need to send a setBackNavigationResult,
         // and setClosingOnClickListener closes before we had time to set the result
+        addReaction.setOnClickListener { onClickListener.onAddReaction() }
         snooze.setOnClickListener { onClickListener.onSnooze() }
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
@@ -157,6 +159,10 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
+    fun setReactionUi(canBeReactedTo: Boolean) = with(binding.addReaction) {
+        isVisible = canBeReactedTo
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
@@ -166,6 +172,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onArchive()
         fun onReadUnread()
         fun onMove()
+        fun onAddReaction()
         fun onSnooze()
         fun onModifySnooze()
         fun onCancelSnooze()

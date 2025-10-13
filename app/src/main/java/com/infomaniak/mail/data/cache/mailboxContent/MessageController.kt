@@ -42,6 +42,7 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -78,24 +79,15 @@ class MessageController @Inject constructor(
     }
 
     suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
-        suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
+        val messages = thread.getDisplayedMessages(featureFlags, this@MessageController.localSettings)
+        return getLastMessageToExecuteActionWithExtraQuery(messages = messages) ?: messages.last()
+    }
 
-        val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
+    suspend fun getLastMessageToExecuteReaction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message? {
+        val canBeReactedTo = "${Message::_emojiReactionNotAllowedReason.name} == null"
 
-        val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
-                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
-
-        val (start, end) = AccountUtils.currentMailboxEmail.getStartAndEndOfPlusEmail()
-        val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
-                " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
-                " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
-                ").@count < 1"
-
-        val messages = thread.getDisplayedMessages(featureFlags, localSettings)
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").last()
-            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").last()
-            ?: messages.query(isNotScheduledDraft).last()
-            ?: messages.last()
+        val messages = thread.getDisplayedMessages(featureFlags, this@MessageController.localSettings)
+        return getLastMessageToExecuteActionWithExtraQuery(messages, extraQuery = canBeReactedTo)
     }
 
     suspend fun getLastMessageAndItsDuplicatesToExecuteAction(
@@ -215,6 +207,36 @@ class MessageController @Inject constructor(
 
         private fun getMessagesByFolderIdQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
             return realm.query<Message>("${Message::folderId.name} == '$folderId'")
+        }
+
+        private suspend fun getLastMessageToExecuteActionWithExtraQuery(
+            messages: RealmList<Message>,
+            extraQuery: String? = null
+        ): Message? {
+            suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
+
+            val appendableExtraQuery = extraQuery
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { " AND $it" } 
+                ?: ""
+
+            val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
+
+            val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+                    "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
+
+            val (start, end) = AccountUtils.currentMailboxEmail.getStartAndEndOfPlusEmail()
+            val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
+                    " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
+                    " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
+                    ").@count < 1"
+
+            return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe $appendableExtraQuery").last()
+                ?: messages.query("$isNotDraft AND $isNotScheduledDraft $appendableExtraQuery").last()
+                ?: messages.query(isNotScheduledDraft + appendableExtraQuery).last()
+                ?: extraQuery
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { messages.query(it).last() }
         }
         //endregion
 

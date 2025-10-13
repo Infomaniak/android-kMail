@@ -41,13 +41,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.extensions.goToAppStore
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
+import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -57,6 +58,7 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.MatomoMail.trackKSuiteProEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -76,6 +78,9 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
+import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
+import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -106,7 +111,7 @@ import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
-class ThreadListFragment : TwoPaneFragment() {
+class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -188,6 +193,7 @@ class ThreadListFragment : TwoPaneFragment() {
         observeLoadMoreTriggers()
         observeContentDisplayMode()
         observeShareUrlResult()
+        observePickedEmoji()
     }.getOrDefault(Unit)
 
     override fun getLeftPane(): View? = _binding?.threadsConstraintLayout
@@ -681,6 +687,17 @@ class ThreadListFragment : TwoPaneFragment() {
             repeatOnLifecycle(State.STARTED) {
                 mainViewModel.shareThreadUrlResult.collect { url ->
                     if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
+                }
+            }
+        }
+    }
+
+    override fun observePickedEmoji() {
+        getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.ThreadList.name) { (emoji, messageUid) ->
+            trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
+            viewLifecycleOwner.lifecycleScope.launch {
+                threadListViewModel.getEmojiReactionsFor(messageUid)?.let { reactions ->
+                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions)
                 }
             }
         }
