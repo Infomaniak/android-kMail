@@ -1,0 +1,3 @@
+- Add reaction action on Messages & Threads
+- Several fixes about notifications not showing
+- Several fixes about silent notification
