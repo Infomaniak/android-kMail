@@ -219,7 +219,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             appBarLayout.applyStatusBarInsets(insets)
             swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
 
-            threadsList.updatePaddingRelative(bottom = resources.getDimensionPixelSize(RCore.dimen.recyclerViewPaddingBottom) + insets.safeArea().bottom)
+            val recyclerViewPaddingBottom = resources.getDimensionPixelSize(RCore.dimen.recyclerViewPaddingBottom)
+            threadsList.updatePaddingRelative(bottom = recyclerViewPaddingBottom + insets.safeArea().bottom)
 
             val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
             with(insets.safeArea()) {
