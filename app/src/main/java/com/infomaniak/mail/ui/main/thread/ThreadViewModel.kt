@@ -635,7 +635,8 @@ class ThreadViewModel @Inject constructor(
         }
         val fakedReaction = EmojiReactionStateUi(
             emoji = state.emoji,
-            authors = if (shouldFake) authors + EmojiReactionAuthorUi.FakeMe else authors, hasReacted = state.hasReacted || shouldFake,
+            authors = if (shouldFake) authors + EmojiReactionAuthorUi.FakeMe else authors,
+            hasReacted = state.hasReacted || shouldFake,
         )
 
         return fakedReaction
