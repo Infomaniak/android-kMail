@@ -10,14 +10,12 @@ espressoContrib = "3.7.0"
 firebaseMessagingKtx = "24.1.2"
 flexbox = "3.0.0"
 fragmentTesting = "1.8.9"
-googleServices = "4.4.3"
+googleServices = "4.4.4"
 hamcrest = "3.0"
 hiltAndroid = "2.57.2"
 hiltAndroidx = "1.3.0"
 jsoup = "1.21.2"
 junitKtx = "1.3.0"
-kotlin = "2.2.0" # Keep the same version as the one in Realm-Kotlin
-ksp = "2.2.0-2.0.2" # Keep the same version as the one in Realm-Kotlin
 leakcanaryAndroid = "2.14"
 lifecycleProcess = "2.9.4"
 mockk = "1.14.6"
@@ -60,7 +58,6 @@ fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref 
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espressoContrib" }
 
 [plugins]
@@ -68,8 +65,5 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 google-services = { id = "com.google.gms.google-services" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
 realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }
