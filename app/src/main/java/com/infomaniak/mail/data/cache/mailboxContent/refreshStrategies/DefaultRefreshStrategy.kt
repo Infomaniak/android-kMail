@@ -89,11 +89,10 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         } else {
             remoteMessage.toThread()
         }
-        newThread?.let {
-            realm.putNewThreadInRealm(it)?.let { managedThread ->
-                impactedThreadsManaged += managedThread
-            }
-        }
+
+        newThread
+            ?.let { realm.putNewThreadInRealm(it) }
+            ?.let { impactedThreadsManaged += it }
     }
 
     private fun MutableRealm.handleAddedMessage(
