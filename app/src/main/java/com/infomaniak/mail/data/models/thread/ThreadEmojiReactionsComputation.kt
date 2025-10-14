@@ -53,7 +53,7 @@ private fun MutableMap<String, MutableMap<String, EmojiReactionState>>.addReacti
                     sourceMessageUid = message.uid,
                 )
             )
-            isSeen = isSeen || message.isSeen
+            isSeen = isSeen && message.isSeen
         }
     }
 }
