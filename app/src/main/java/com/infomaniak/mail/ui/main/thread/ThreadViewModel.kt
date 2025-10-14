@@ -61,7 +61,6 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -232,7 +231,7 @@ class ThreadViewModel @Inject constructor(
 
                 if (threadState.isFirstOpening) {
                     threadState.isFirstOpening = false
-                    sendMatomoAndSentryAboutThreadMessagesCount(thread, featureFlags)
+                    sendMatomoAboutThreadMessagesCount(thread, featureFlags)
                     if (thread.isSeen.not()) markThreadAsSeen(thread)
                 }
             }
@@ -376,18 +375,15 @@ class ThreadViewModel @Inject constructor(
         sharedUtils.markAsSeen(mailbox(), listOf(thread))
     }
 
-    private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {
+    private fun sendMatomoAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {
 
         val nbMessages = thread.getDisplayedMessages(featureFlags, localSettings).count()
 
         trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
-        when (nbMessages) {
-            0 -> viewModelScope.launch(ioDispatcher) {
-                SentryDebug.sendEmptyThreadBlocking(thread, "No Message in the Thread when opening it", mailboxContentRealm())
-            }
-            1 -> trackUserInfo(MatomoName.OneMessagesInThread)
-            else -> trackUserInfo(MatomoName.MultipleMessagesInThread, nbMessages)
+        when {
+            nbMessages == 1 -> trackUserInfo(MatomoName.OneMessagesInThread)
+            nbMessages > 1 -> trackUserInfo(MatomoName.MultipleMessagesInThread, nbMessages)
         }
     }
 
