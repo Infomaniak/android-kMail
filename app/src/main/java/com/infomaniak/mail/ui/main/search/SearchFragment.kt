@@ -27,6 +27,7 @@ import android.widget.PopupWindow
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
@@ -140,6 +141,11 @@ class SearchFragment : TwoPaneFragment() {
             }
             chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
             swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
+
+            with(insets.safeArea()) {
+                recentSearchesRecyclerView.updatePaddingRelative(bottom = bottom)
+                mailRecyclerView.updatePaddingRelative(bottom = bottom)
+            }
         }
     }
 
