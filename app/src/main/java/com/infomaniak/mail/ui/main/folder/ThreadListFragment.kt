@@ -30,6 +30,7 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
@@ -217,6 +218,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         applyWindowInsetsListener(shouldConsume = false) { _, insets ->
             appBarLayout.applyStatusBarInsets(insets)
             swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
+
+            val recyclerViewPaddingBottom = resources.getDimensionPixelSize(RCore.dimen.recyclerViewPaddingBottom)
+            threadsList.updatePaddingRelative(bottom = recyclerViewPaddingBottom + insets.safeArea().bottom)
 
             val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
             with(insets.safeArea()) {
