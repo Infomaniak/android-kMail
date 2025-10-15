@@ -172,11 +172,7 @@ fun SelectMailboxScreen(
                 // TODO: Open newMessageFragment
             }
         },
-        bottomButton = if (!selectingAnotherUser.value) {
-            bottomButton
-        } else {
-            null
-        }
+        bottomButton = bottomButton.takeIf{ !selectingAnotherUser.value }
     )
 }
 
