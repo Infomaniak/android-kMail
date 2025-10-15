@@ -29,7 +29,7 @@ class SelectedMailboxPreviewParameter : PreviewParameterProvider<SelectedMailbox
 
 val selectedMailboxPreviewData = SelectedMailboxUi(
     userId = 0,
-    avatarUrl = "https://picsum.photos/id/140/200/200",
+    avatarUrl = "https://picsum.photos/id/110/200/200",
     initials = "CH",
     mailbox = MailboxUi(
         mailUuid = UUID.randomUUID().toString(),
