@@ -1,12 +1,15 @@
 import java.util.Properties
 
+/**
+ * Don't change the order in this `plugins` block, it will mess things up.
+ */
 plugins {
-    alias(libs.plugins.android.application) // This line should be 1st, or you'll have Gradle sync issue
+    alias(libs.plugins.android.application)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.ksp)
+    alias(core.plugins.kotlin.android)
+    alias(core.plugins.kotlin.serialization)
+    alias(core.plugins.ksp)
     alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.realm.kotlin)
     alias(core.plugins.compose.compiler)
@@ -248,12 +251,12 @@ dependencies {
     androidTestImplementation(core.androidx.test.core)
     androidTestImplementation(core.androidx.test.core.ktx)
     androidTestImplementation(core.junit)
+    androidTestImplementation(core.stdlib)
     androidTestImplementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.espresso.web)
     androidTestImplementation(libs.hamcrest)
     androidTestImplementation(libs.junit.ktx)
-    androidTestImplementation(libs.stdlib)
     androidTestImplementation(libs.uiautomator)
 
     androidTestUtil(libs.orchestrator)
@@ -261,7 +264,5 @@ dependencies {
     debugImplementation(libs.fragment.testing)
 
     // Debug
-    if (enableLeakCanary) {
-        debugImplementation(libs.leakcanary.android)
-    }
+    if (enableLeakCanary) debugImplementation(libs.leakcanary.android)
 }
