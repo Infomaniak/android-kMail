@@ -19,11 +19,12 @@ package com.infomaniak.mail.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.basics.bottomsheet.BottomSheetThemeDefaults
-import com.infomaniak.core.compose.basics.bottomsheet.ProvideBottomSheetTheme
+import com.infomaniak.core.compose.basics.bottomsheet.LocalBottomSheetTheme
 import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.mail.R
 
@@ -32,14 +33,16 @@ fun MailTheme(content: @Composable () -> Unit) {
     MaterialThemeFromXml {
         val cornerSize = dimensionResource(R.dimen.bottomSheetCornerSize)
 
-        ProvideBottomSheetTheme(
-            theme = BottomSheetThemeDefaults.theme(
-                shape = RoundedCornerShape(topStart = cornerSize, topEnd = cornerSize),
-                dragHandleColor = colorResource(R.color.dragHandleColor),
-                titleTextStyle = Typography.bodyMedium,
-                titleColor = colorResource(R.color.primaryTextColor),
-            ),
-            content = content,
+        val bottomSheetTheme = BottomSheetThemeDefaults.theme(
+            shape = RoundedCornerShape(topStart = cornerSize, topEnd = cornerSize),
+            dragHandleColor = colorResource(R.color.dragHandleColor),
+            titleTextStyle = Typography.bodyMedium,
+            titleColor = colorResource(R.color.primaryTextColor),
+        )
+
+        CompositionLocalProvider(
+            LocalBottomSheetTheme provides bottomSheetTheme,
+            content = content
         )
     }
 }
