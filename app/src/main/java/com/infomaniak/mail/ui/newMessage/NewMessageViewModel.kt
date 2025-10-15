@@ -389,7 +389,7 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        val isAiEnabled = currentMailbox().featureFlags.contains(FeatureFlag.AI)
+        val isAiEnabled = currentMailbox.first().featureFlags.contains(FeatureFlag.AI)
         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body)
 
         val isEncryptionEnabled = currentMailbox.first().featureFlags.contains(FeatureFlag.ENCRYPTION)
