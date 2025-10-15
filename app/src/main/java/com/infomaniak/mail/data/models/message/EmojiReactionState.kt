@@ -27,6 +27,7 @@ class EmojiReactionState constructor() : Reaction, EmbeddedRealmObject {
     override var emoji: String = ""
     var authors: RealmList<EmojiReactionAuthor> = realmListOf()
     override var hasReacted: Boolean = false
+    var isSeen: Boolean = true
 
     @Ignore
     override val count: Int by authors::size

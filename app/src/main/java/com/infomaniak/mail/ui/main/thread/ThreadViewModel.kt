@@ -308,7 +308,7 @@ class ThreadViewModel @Inject constructor(
     private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
 
         val firstDefaultIndex = list.count() - 2
-        val firstUnreadIndex = if (thread.isSeen) null else list.indexOfFirstOrNull { !it.isSeen }
+        val firstUnreadIndex = if (thread.isSeen) null else list.indexOfFirstOrNull { it.hasUnreadContent() }
         val notNullFirstUnreadIndex = firstUnreadIndex ?: firstDefaultIndex
 
         return minOf(notNullFirstUnreadIndex, firstDefaultIndex)

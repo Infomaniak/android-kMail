@@ -424,7 +424,9 @@ class Message : RealmObject, Snoozable {
         else -> FormatedPreview.Body(preview.trim())
     }
 
-    fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
+    fun hasUnreadContent() = !isSeen || emojiReactions.any { !it.isSeen }
+
+    fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (hasUnreadContent() || index == lastIndex)
 
     fun toThread() = Thread().apply {
         uid = this@Message.uid

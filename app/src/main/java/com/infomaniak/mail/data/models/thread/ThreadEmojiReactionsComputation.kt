@@ -46,12 +46,15 @@ private fun MutableMap<String, MutableMap<String, EmojiReactionState>>.addReacti
             emojis[emoji] = EmojiReactionState(emoji)
         }
 
-        emojis[emoji]!!.addAuthor(
-            newAuthor = EmojiReactionAuthor(
-                recipient = message.from.firstOrNull() ?: continue,
-                sourceMessageUid = message.uid,
+        emojis[emoji]?.run {
+            addAuthor(
+                newAuthor = EmojiReactionAuthor(
+                    recipient = message.from.firstOrNull() ?: continue,
+                    sourceMessageUid = message.uid,
+                )
             )
-        )
+            isSeen = isSeen && message.isSeen
+        }
     }
 }
 
