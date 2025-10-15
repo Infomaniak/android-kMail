@@ -109,8 +109,7 @@ fun SelectMailboxScreen(
         },
         content = {
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -166,11 +165,7 @@ fun SelectMailboxScreen(
                 // TODO: Open newMessageFragment
             }
         },
-        bottomButton = if (!selectingAnotherUser.value) {
-            bottomButton
-        } else {
-            null
-        }
+        bottomButton = bottomButton.takeIf{ !selectingAnotherUser.value }
     )
 }
 
