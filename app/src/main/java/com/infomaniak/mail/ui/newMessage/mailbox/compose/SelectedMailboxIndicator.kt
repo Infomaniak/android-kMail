@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.newMessage.mailbox.compose
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -79,7 +78,7 @@ fun SelectedMailboxIndicator(
                     initials = selectedMailbox.initials,
                     colors = AvatarColors(
                         containerColor = Color(context.getBackgroundColorResBasedOnId(selectedMailbox.userId)),
-                        contentColor = if (isSystemInDarkTheme()) Color(0xFF333333) else Color.White
+                        contentColor = Color(context.getColor(R.color.onColorfulBackground))
                     )
                 )
             )

@@ -21,7 +21,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -110,7 +109,7 @@ fun AccountMailboxesDropdown(
                     initials = userWithMailboxes.initials,
                     colors = AvatarColors(
                         containerColor = Color(context.getBackgroundColorResBasedOnId(userWithMailboxes.userId)),
-                        contentColor = if (isSystemInDarkTheme()) Color(0xFF333333) else Color.White
+                        contentColor = Color(context.getColor(R.color.onColorfulBackground))
                     )
                 )
             )
