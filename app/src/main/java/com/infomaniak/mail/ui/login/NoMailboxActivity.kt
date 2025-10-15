@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,17 @@
 package com.infomaniak.mail.ui.login
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import com.infomaniak.core.legacy.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
+import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
+import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.BaseActivity
+import com.infomaniak.mail.ui.TwoFactorAuthViewModel
 import com.infomaniak.mail.ui.login.IlluColors.Category
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
@@ -72,6 +76,8 @@ class NoMailboxActivity : BaseActivity() {
 
         with(binding) {
             setContentView(root)
+            val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
+            addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
 
             noMailboxIconLayout.apply {
                 getAccentIndependentIlluColors().forEach(::changePathColor)
