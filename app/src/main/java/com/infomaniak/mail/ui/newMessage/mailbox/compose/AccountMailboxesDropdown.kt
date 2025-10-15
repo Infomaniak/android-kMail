@@ -146,7 +146,7 @@ fun AccountMailboxesDropdown(
                 isDropDownExpanded.value = false
             }
         ) {
-            userWithMailboxes.mailboxes.forEachIndexed { index, mailbox ->
+            userWithMailboxes.mailboxes.forEach { mailbox ->
                 DropdownMenuItem(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {

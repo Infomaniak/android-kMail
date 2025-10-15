@@ -31,28 +31,28 @@ val usersWithMailboxesPreviewData = listOf(
     UserMailboxesUi(
         userId = 0,
         userEmail = "chef@infomaniak.com",
-        avatarUrl = "https://picsum.photos/id/140/200/200",
+        avatarUrl = "https://picsum.photos/id/120/200/200",
         initials = "CH",
         fullName = "Chef",
         mailboxes = listOf(
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
-                email = "chef@infomaniak.com"
+                email = "chef-1@infomaniak.com"
             ),
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
-                email = "chef@infomaniak.com"
+                email = "chef-2@infomaniak.com"
             ),
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
-                email = "chef@infomaniak.com"
+                email = "chef-3@infomaniak.com"
             )
         )
     ),
     UserMailboxesUi(
         userId = 1,
         userEmail = "firstname.lastnameeeeeeeeeeeeee@infomaniak.com",
-        avatarUrl = "https://picsum.photos/id/140/200/200",
+        avatarUrl = "https://picsum.photos/id/130/200/200",
         initials = "FL",
         fullName = "Firstname Listname",
         mailboxes = listOf(
