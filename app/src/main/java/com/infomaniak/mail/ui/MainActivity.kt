@@ -208,9 +208,7 @@ class MainActivity : BaseActivity() {
 
         setContentView(binding.root)
         val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
-        addComposeOverlay {
-            TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel)
-        }
+        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
         handleOnBackPressed()
         handleMenuDrawerEdgeToEdge()
         registerMainPermissions()
