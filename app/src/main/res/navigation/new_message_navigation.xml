@@ -19,7 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/new_message_navigation"
-    app:startDestination="@id/selectMailboxFragment">
+    app:startDestination="@id/newMessageFragment">
 
     <include app:graph="@navigation/my_ksuite_navigation" />
 
@@ -27,6 +27,10 @@
         android:id="@+id/selectMailboxFragment"
         android:name="com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxFragment"
         android:label="SelectMailboxFragment">
+
+        <action
+            android:id="@+id/action_selectMailboxFragment_to_newMessageFragment"
+            app:destination="@id/newMessageFragment" />
     </fragment>
 
     <fragment
@@ -43,6 +47,16 @@
         <action
             android:id="@+id/action_newMessageFragment_to_encryptionActionsBottomSheetDialog"
             app:destination="@id/encryptionActionsBottomSheetDialog" />
+
+        <argument
+            android:name="userId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+
+        <argument
+            android:name="mailboxId"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
 
     <fragment
