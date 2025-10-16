@@ -205,6 +205,7 @@ class MainActivity : BaseActivity() {
         enableEdgeToEdge()
 
         setContentView(binding.root)
+        addTwoFactorAuthOverlay()
         handleOnBackPressed()
         handleMenuDrawerEdgeToEdge()
         registerMainPermissions()

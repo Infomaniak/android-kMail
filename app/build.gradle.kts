@@ -199,6 +199,7 @@ dependencies {
     implementation(project(":Core:Matomo"))
     implementation(project(":Core:Network"))
     implementation(project(":Core:Sentry"))
+    implementation(project(":Core:TwoFactorAuth:Front"))
     implementation(project(":EmojiComponents"))
     implementation(project(":HtmlCleaner"))
 

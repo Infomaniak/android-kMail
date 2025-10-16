@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,13 @@
 package com.infomaniak.mail.ui
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
 import com.infomaniak.core.legacy.applock.LockActivity
+import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
+import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.AccountUtils
@@ -29,9 +33,31 @@ import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
 
+    private val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
+
     // TODO: Try to replace this with a dependency injection.
     //  Currently, it crashes because the lateinit value isn't initialized when the `MainActivity.onCreate()` calls its super.
     protected val localSettings by lazy { LocalSettings.getInstance(context = this) }
+
+    /**
+     * Enables the auto-managed 2 factor authentication challenge overlay for View-based Activities.
+     *
+     * ### 2 important things:
+     *
+     * 1. **Always call this after [setContentView].**
+     * 2. If you need to use it inside a compose-based Activity (i.e. w/ `setContent`), use [TwoFactorAuthAutoManagedBottomSheet]
+     */
+    protected fun addTwoFactorAuthOverlay() {
+        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
+    }
+
+    /**
+     * Enables the auto-managed 2 factor authentication challenge overlay for Compose-based Activities.
+     */
+    @Composable
+    protected fun TwoFactorAuthAutoManagedBottomSheet() {
+        TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(localSettings.accentColor.theme)

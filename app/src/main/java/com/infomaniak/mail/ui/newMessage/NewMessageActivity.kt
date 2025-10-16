@@ -77,6 +77,7 @@ class NewMessageActivity : BaseActivity() {
 
         ShortcutManagerCompat.reportShortcutUsed(this@NewMessageActivity, Shortcuts.NEW_MESSAGE.id)
         setContentView(binding.root)
+        addTwoFactorAuthOverlay()
 
         if (!isAuth()) {
             finish()
