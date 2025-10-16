@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.newMessage.mailbox
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -130,13 +129,11 @@ fun SelectMailboxScreen(
                     text = stringResource(R.string.composeMailboxCurrentTitle)
                 )
                 if (!selectingAnotherUser.value) {
-                    AnimatedVisibility(!selectingAnotherUser.value) {
-                        selectedMailbox?.let {
-                            SelectedMailboxIndicator(
-                                modifier = Modifier.padding(Margin.Medium),
-                                selectedMailbox = it
-                            )
-                        }
+                    selectedMailbox?.let {
+                        SelectedMailboxIndicator(
+                            modifier = Modifier.padding(Margin.Medium),
+                            selectedMailbox = it
+                        )
                     }
                 } else {
                     Column {
