@@ -50,8 +50,6 @@ import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
-import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
 import com.infomaniak.mail.BuildConfig
@@ -207,8 +205,7 @@ class MainActivity : BaseActivity() {
         enableEdgeToEdge()
 
         setContentView(binding.root)
-        val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
-        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
+        addTwoFactorAuthOverlay()
         handleOnBackPressed()
         handleMenuDrawerEdgeToEdge()
         registerMainPermissions()

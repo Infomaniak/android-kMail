@@ -30,8 +30,6 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
-import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
@@ -40,7 +38,6 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.ui.TwoFactorAuthViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
@@ -80,8 +77,7 @@ class NewMessageActivity : BaseActivity() {
 
         ShortcutManagerCompat.reportShortcutUsed(this@NewMessageActivity, Shortcuts.NEW_MESSAGE.id)
         setContentView(binding.root)
-        val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
-        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
+        addTwoFactorAuthOverlay()
 
         if (!isAuth()) {
             finish()

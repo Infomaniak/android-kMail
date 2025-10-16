@@ -19,15 +19,11 @@ package com.infomaniak.mail.ui.sync
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
-import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivitySyncAutoConfigBinding
 import com.infomaniak.mail.ui.BaseActivity
-import com.infomaniak.mail.ui.TwoFactorAuthViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -48,8 +44,7 @@ class SyncAutoConfigActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
-        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
+        addTwoFactorAuthOverlay()
         setupSnackbar()
         setupNavController()
     }

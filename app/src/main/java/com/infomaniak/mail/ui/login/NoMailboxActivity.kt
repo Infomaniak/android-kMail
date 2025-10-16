@@ -18,17 +18,13 @@
 package com.infomaniak.mail.ui.login
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import com.infomaniak.core.legacy.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
-import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
-import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.BaseActivity
-import com.infomaniak.mail.ui.TwoFactorAuthViewModel
 import com.infomaniak.mail.ui.login.IlluColors.Category
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
@@ -76,8 +72,7 @@ class NoMailboxActivity : BaseActivity() {
 
         with(binding) {
             setContentView(root)
-            val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
-            addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
+            addTwoFactorAuthOverlay()
 
             noMailboxIconLayout.apply {
                 getAccentIndependentIlluColors().forEach(::changePathColor)

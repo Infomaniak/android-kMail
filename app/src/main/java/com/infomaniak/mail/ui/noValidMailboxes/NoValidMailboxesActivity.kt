@@ -19,16 +19,12 @@ package com.infomaniak.mail.ui.noValidMailboxes
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
-import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoValidMailboxesBinding
 import com.infomaniak.mail.ui.BaseActivity
-import com.infomaniak.mail.ui.TwoFactorAuthViewModel
 import com.infomaniak.mail.utils.SentryDebug
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -46,8 +42,7 @@ class NoValidMailboxesActivity : BaseActivity() {
 
         setContentView(binding.root)
         setupNavController()
-        val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
-        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
+        addTwoFactorAuthOverlay()
     }
 
     private fun setupNavController() {
