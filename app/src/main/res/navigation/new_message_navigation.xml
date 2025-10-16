@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/selectMailboxFragment"
-        android:name="com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxFragment"
         android:label="SelectMailboxFragment">
 
         <action
