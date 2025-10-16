@@ -35,15 +35,15 @@ val usersWithMailboxesPreviewData = listOf(
         fullName = "Chef",
         mailboxes = listOf(
             MailboxUi(
-                mailUuid = UUID.randomUUID().toString(),
+                mailboxId = 0,
                 email = "chef-1@infomaniak.com"
             ),
             MailboxUi(
-                mailUuid = UUID.randomUUID().toString(),
+                mailboxId = 1,
                 email = "chef-2@infomaniak.com"
             ),
             MailboxUi(
-                mailUuid = UUID.randomUUID().toString(),
+                mailboxId = 2,
                 email = "chef-3@infomaniak.com"
             )
         )
