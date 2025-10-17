@@ -27,6 +27,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.TypedArray
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
 import android.text.Html
@@ -34,6 +35,7 @@ import android.text.Spannable
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
@@ -59,6 +61,7 @@ import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
+import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
@@ -95,7 +98,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
-import com.infomaniak.mail.ui.login.IlluColors.IlluColors
+import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
@@ -247,9 +250,21 @@ fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     })
 }
 
-fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
-    addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
-        SimpleColorFilter(illuColors.color)
+fun LottieAnimationView.changePathColor(illuColors: IlluColors.IlluColors) {
+    Log.e("gibran", "changePathColor - illuColors.keyPath.keysToString(): ${illuColors.keyPath.keysToString()}")
+
+    // val resolvedKeyPath = resolveKeyPath(KeyPath("LETTER", "*", "Fond 1"))
+    // Log.e("gibran", "changePathColor - resolvedKeyPath.size: ${resolvedKeyPath.size}")
+    // resolvedKeyPath.forEach {
+    //     Log.e("gibran", it.keysToString())
+    // }
+
+    addValueCallback(KeyPath("COLOR-LIGHT", "**"), LottieProperty.COLOR_FILTER) {
+        SimpleColorFilter(Color.GREEN)
+    }
+
+    addValueCallback(KeyPath("COLOR-DARK", "**"), LottieProperty.COLOR_FILTER) {
+        SimpleColorFilter(0xFF22BB22.toInt())
     }
 }
 
