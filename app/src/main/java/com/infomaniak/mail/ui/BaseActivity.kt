@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
@@ -27,13 +26,13 @@ import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedB
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.twoFactorAuthManager
 import com.infomaniak.mail.utils.AccountUtils
 import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
 
-    private val twoFactorAuthViewModel: TwoFactorAuthViewModel by viewModels()
 
     // TODO: Try to replace this with a dependency injection.
     //  Currently, it crashes because the lateinit value isn't initialized when the `MainActivity.onCreate()` calls its super.
@@ -48,7 +47,7 @@ open class BaseActivity : AppCompatActivity() {
      * 2. If you need to use it inside a compose-based Activity (i.e. w/ `setContent`), use [TwoFactorAuthAutoManagedBottomSheet]
      */
     protected fun addTwoFactorAuthOverlay() {
-        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel) }
+        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthManager) }
     }
 
     /**
@@ -56,7 +55,7 @@ open class BaseActivity : AppCompatActivity() {
      */
     @Composable
     protected fun TwoFactorAuthAutoManagedBottomSheet() {
-        TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthViewModel = twoFactorAuthViewModel)
+        TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthManager)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
