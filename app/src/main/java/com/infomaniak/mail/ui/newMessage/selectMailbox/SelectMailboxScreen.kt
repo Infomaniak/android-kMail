@@ -71,7 +71,7 @@ fun SelectMailboxScreen(
 
     SelectMailboxScreen(
         usersWithMailboxes = usersWithMailboxes,
-        selectedMailbox = userWithMailboxSelected,
+        selectedMailbox = { userWithMailboxSelected },
         selectingAnotherUser = selectingAnotherUser,
         snackbarHostState = snackbarHostState,
         onMailboxSelected = {
@@ -85,7 +85,7 @@ fun SelectMailboxScreen(
 @Composable
 fun SelectMailboxScreen(
     usersWithMailboxes: List<UserMailboxesUi>,
-    selectedMailbox: SelectedMailboxUi?,
+    selectedMailbox: () -> SelectedMailboxUi?,
     selectingAnotherUser: MutableState<Boolean>,
     snackbarHostState: SnackbarHostState? = null,
     onMailboxSelected: (SelectedMailboxUi?) -> Unit,
@@ -130,7 +130,7 @@ fun SelectMailboxScreen(
                     text = stringResource(R.string.composeMailboxCurrentTitle)
                 )
                 if (!selectingAnotherUser.value) {
-                    selectedMailbox?.let {
+                    selectedMailbox()?.let {
                         SelectedMailboxIndicator(
                             modifier = Modifier.padding(Margin.Medium),
                             selectedMailbox = it
@@ -152,7 +152,7 @@ fun SelectMailboxScreen(
                             }
                         }
                         Spacer(modifier = Modifier.weight(1f))
-                        selectedMailbox?.let {
+                        selectedMailbox()?.let {
                             SelectedMailboxIndicator(
                                 modifier = Modifier.padding(Margin.Medium),
                                 selectedMailbox = it
@@ -166,9 +166,9 @@ fun SelectMailboxScreen(
             LargeButton(
                 modifier = it.padding(horizontal = Margin.Medium),
                 title = stringResource(R.string.buttonContinue),
-                enabled = { selectedMailbox != null }
+                enabled = { selectedMailbox() != null }
             ) {
-                selectedMailbox?.let { onContinue(selectedMailbox) }
+                selectedMailbox()?.let { onContinue(it) }
             }
         },
         bottomButton = bottomButton.takeIf{ !selectingAnotherUser.value }
@@ -187,7 +187,7 @@ private fun PreviewDefaultMailbox(
         Surface(Modifier.fillMaxSize()) {
             SelectMailboxScreen(
                 usersWithMailboxes = previewData.usersWithMailboxes,
-                selectedMailbox = previewData.selectedMailboxUi,
+                selectedMailbox = { previewData.selectedMailboxUi },
                 selectingAnotherUser = selectingAnotherUser,
                 onMailboxSelected = {},
                 onNavigationTopbarClick = {},
