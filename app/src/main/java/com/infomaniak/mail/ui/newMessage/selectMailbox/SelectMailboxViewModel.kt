@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.newMessage.selectMailbox
 
 import android.app.Application
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel

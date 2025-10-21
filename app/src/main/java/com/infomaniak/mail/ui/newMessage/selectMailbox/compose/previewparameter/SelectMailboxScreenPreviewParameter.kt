@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
 import kotlinx.coroutines.flow.MutableStateFlow
