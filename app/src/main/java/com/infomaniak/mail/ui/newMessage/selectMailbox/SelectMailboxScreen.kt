@@ -18,11 +18,18 @@
 package com.infomaniak.mail.ui.newMessage.selectMailbox
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,9 +37,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +56,7 @@ import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
-import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
-import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.*
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.AccountMailboxesDropdown
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.SelectedMailboxIndicator
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectMailboxScreenDataPreview
@@ -66,42 +71,47 @@ fun SelectMailboxScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
-    val userWithMailboxSelected by viewModel.selectedMailbox.collectAsStateWithLifecycle()
-    val selectingAnotherUser = remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SelectMailboxScreen(
+    SelectMailboxScreenContent(
         usersWithMailboxes = usersWithMailboxes,
-        selectedMailbox = { userWithMailboxSelected },
-        selectingAnotherUser = selectingAnotherUser,
+        uiState = { uiState },
         snackbarHostState = snackbarHostState,
-        onMailboxSelected = {
-            viewModel.selectMailbox(it)
-        },
+        onMailboxSelected = viewModel::selectMailbox,
+        onChooseAnotherMailbox = viewModel::chooseAnotherMailbox,
         onNavigationTopbarClick = onNavigationTopbarClick,
-        onContinue = onContinue
+        onContinueWithMailbox = onContinue
     )
 }
 
 @Composable
-fun SelectMailboxScreen(
+fun SelectMailboxScreenContent(
     usersWithMailboxes: List<UserMailboxesUi>,
-    selectedMailbox: () -> SelectedMailboxUi?,
-    selectingAnotherUser: MutableState<Boolean>,
+    uiState: () -> UiState,
     snackbarHostState: SnackbarHostState? = null,
     onMailboxSelected: (SelectedMailboxUi?) -> Unit,
+    onChooseAnotherMailbox: (Boolean) -> Unit,
     onNavigationTopbarClick: () -> Unit,
-    onContinue: (SelectedMailboxUi) -> Unit
+    onContinueWithMailbox: (SelectedMailboxUi) -> Unit
 ) {
-    val bottomButton: (@Composable (Modifier) -> Unit)? = { modifier ->
-        LargeButton(
-            modifier = modifier.padding(horizontal = Margin.Medium),
-            title = stringResource(R.string.buttonSendWithDifferentAddress),
-            style = ButtonType.Tertiary,
-            onClick = {
-                selectingAnotherUser.value = true
-                onMailboxSelected(null)
-            }
-        )
+    val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectMailbox)?.selectedMailbox?.value } }
+
+    // val bottomButton: (@Composable (Modifier) -> Unit)? = { modifier ->
+    //     LargeButton(
+    //         modifier = modifier.padding(horizontal = Margin.Medium),
+    //         title = stringResource(R.string.buttonSendWithDifferentAddress),
+    //         style = ButtonType.Tertiary
+    //     ) {
+    //         selectingAnotherUser.value = true
+    //         onMailboxSelected(null)
+    //     }
+    // }
+
+    BackHandler(
+        enabled = uiState() is UiState.SelectMailbox
+    ) {
+        onChooseAnotherMailbox(false)
+        onMailboxSelected(null)
     }
 
     BottomStickyButtonScaffold(
@@ -130,50 +140,98 @@ fun SelectMailboxScreen(
                     maxLines = 1,
                     text = stringResource(R.string.composeMailboxCurrentTitle)
                 )
-                if (!selectingAnotherUser.value) {
-                    selectedMailbox()?.let {
-                        SelectedMailboxIndicator(
-                            modifier = Modifier.padding(Margin.Medium),
-                            selectedMailbox = it
-                        )
-                    }
-                } else {
-                    Column {
-                        LazyColumn(
-                            modifier = Modifier.padding(Margin.Medium),
-                            verticalArrangement = Arrangement.spacedBy(Margin.Mini),
-                        ) {
-                            items(usersWithMailboxes) { userWithMailboxes ->
-                                AccountMailboxesDropdown(
-                                    userWithMailboxes = userWithMailboxes,
-                                    onClickMailbox = { mailbox ->
-                                        onMailboxSelected(mailbox)
-                                    }
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        selectedMailbox()?.let {
+                AnimatedContent(uiState()) { targetState ->
+                    when (targetState) {
+                        is UiState.Loading -> {}
+                        is UiState.DefaultMailbox -> {
                             SelectedMailboxIndicator(
-                                modifier = Modifier.padding(Margin.Medium),
-                                selectedMailbox = it
+                                modifier = Modifier
+                                    .padding(Margin.Medium),
+                                selectedMailbox = targetState.defaultMailbox
                             )
                         }
+                        is UiState.SelectMailbox -> {
+                            Column {
+                                LazyColumn(
+                                    modifier = Modifier.padding(Margin.Medium),
+                                    verticalArrangement = Arrangement.spacedBy(Margin.Mini),
+                                ) {
+                                    items(usersWithMailboxes) { userWithMailboxes ->
+                                        AccountMailboxesDropdown(
+                                            userWithMailboxes = userWithMailboxes,
+                                            onClickMailbox = { mailbox ->
+                                                onMailboxSelected(mailbox)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                AnimatedContent(
+                    targetState = selectedMailbox,
+                    transitionSpec = { slideInHorizontally().togetherWith(slideOutHorizontally()) }
+                ) { selectedMailbox ->
+                    if (selectedMailbox != null) {
+                        SelectedMailboxIndicator(
+                            modifier = Modifier.padding(Margin.Medium),
+                            selectedMailbox = selectedMailbox
+                        )
                     }
                 }
             }
         },
-        topButton = {
-            LargeButton(
-                modifier = it.padding(horizontal = Margin.Medium),
-                title = stringResource(R.string.buttonContinue),
-                enabled = { selectedMailbox() != null }
-            ) {
-                selectedMailbox()?.let { onContinue(it) }
-            }
+        topButton = { modifier ->
+            TopButton(modifier, uiState, onContinueWithMailbox)
         },
-        bottomButton = bottomButton.takeIf{ !selectingAnotherUser.value }
+        bottomButton = { modifier ->
+            BottomButton(modifier, uiState, onMailboxSelected, onChooseAnotherMailbox)
+        }
     )
+}
+
+@Composable
+private fun TopButton(
+    modifier: Modifier,
+    uiState: () -> UiState,
+    onContinueWithMailbox: (SelectedMailboxUi) -> Unit
+) {
+    val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectMailbox)?.selectedMailbox?.value } }
+
+    LargeButton(
+        modifier = modifier.padding(horizontal = Margin.Medium),
+        title = stringResource(R.string.buttonContinue),
+        enabled = { uiState() !is UiState.SelectMailbox || (uiState() as UiState.SelectMailbox).selectedMailbox.value != null }
+    ) {
+        selectedMailbox?.let { selectedMailboxUi ->
+            onContinueWithMailbox(selectedMailboxUi)
+        }
+    }
+}
+
+@Composable
+private fun BottomButton(
+    modifier: Modifier,
+    uiState: () -> UiState,
+    onMailboxSelected: (SelectedMailboxUi?) -> Unit,
+    onChooseAnotherMailbox: (Boolean) -> Unit,
+) {
+    AnimatedVisibility(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Margin.Medium),
+        visible = uiState() is UiState.DefaultMailbox
+    ) {
+        LargeButton(
+            title = stringResource(R.string.buttonSendWithDifferentAddress),
+            style = ButtonType.Tertiary,
+        ) {
+            onChooseAnotherMailbox(true)
+            onMailboxSelected(null)
+        }
+    }
 }
 
 @Composable
@@ -182,17 +240,17 @@ fun SelectMailboxScreen(
 private fun PreviewDefaultMailbox(
     @PreviewParameter(SelectMailboxScreenPreviewParameter::class) previewData: SelectMailboxScreenDataPreview
 ) {
-    val selectingAnotherUser = remember { mutableStateOf(previewData.selectingAnotherUser) }
+    val uiState by previewData.uiState.collectAsStateWithLifecycle()
 
     MailTheme {
         Surface(Modifier.fillMaxSize()) {
-            SelectMailboxScreen(
+            SelectMailboxScreenContent(
                 usersWithMailboxes = previewData.usersWithMailboxes,
-                selectedMailbox = { previewData.selectedMailboxUi },
-                selectingAnotherUser = selectingAnotherUser,
+                uiState = { uiState },
                 onMailboxSelected = {},
+                onChooseAnotherMailbox = {},
                 onNavigationTopbarClick = {},
-                onContinue = {}
+                onContinueWithMailbox = {}
             )
         }
     }

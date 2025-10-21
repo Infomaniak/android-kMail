@@ -17,9 +17,14 @@
  */
 package com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class SelectMailboxScreenPreviewParameter : PreviewParameterProvider<SelectMailboxScreenDataPreview> {
     override val values: Sequence<SelectMailboxScreenDataPreview>
@@ -28,24 +33,20 @@ class SelectMailboxScreenPreviewParameter : PreviewParameterProvider<SelectMailb
 
 data class SelectMailboxScreenDataPreview(
     val usersWithMailboxes: List<UserMailboxesUi>,
-    val selectedMailboxUi: SelectedMailboxUi?,
-    val selectingAnotherUser: Boolean
+    val uiState: StateFlow<UiState>,
 )
 
 val selectMailboxScreenDataPreview = listOf(
     SelectMailboxScreenDataPreview(
-        usersWithMailboxesPreviewData,
-        selectedMailboxPreviewData,
-        false
+        usersWithMailboxes = usersWithMailboxesPreviewData,
+        uiState = MutableStateFlow(UiState.DefaultMailbox(selectedMailboxPreviewData)).asStateFlow()
     ),
     SelectMailboxScreenDataPreview(
         usersWithMailboxesPreviewData,
-        null,
-        true
+        uiState = MutableStateFlow(UiState.SelectMailbox(mutableStateOf(null))).asStateFlow()
     ),
     SelectMailboxScreenDataPreview(
         usersWithMailboxesPreviewData,
-        selectedMailboxPreviewData,
-        true
+        uiState = MutableStateFlow(UiState.SelectMailbox(mutableStateOf(selectedMailboxPreviewData))).asStateFlow()
     ),
 )
