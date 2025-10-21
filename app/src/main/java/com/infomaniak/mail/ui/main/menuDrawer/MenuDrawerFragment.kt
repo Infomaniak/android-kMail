@@ -140,7 +140,7 @@ class MenuDrawerFragment : Fragment() {
             callbacks = object : MenuDrawerAdapterCallbacks {
                 override var onMailboxesHeaderClicked: () -> Unit = ::onMailboxesHeaderClicked
                 override var onValidMailboxClicked: (Int) -> Unit = ::onValidMailboxClicked
-                override var onLockedMailboxClicked: (String) -> Unit = ::onLockedMailboxClicked
+                override var onInvalidMailboxClicked: (String) -> Unit = ::onInvalidMailboxClicked
                 override var onFoldersHeaderClicked: (Boolean) -> Unit = ::onFoldersHeaderClicked
                 override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
@@ -185,7 +185,7 @@ class MenuDrawerFragment : Fragment() {
         )
     }
 
-    private fun onLockedMailboxClicked(mailboxEmail: String) {
+    private fun onInvalidMailboxClicked(mailboxEmail: String) {
         safeNavigate(
             resId = R.id.lockedMailboxBottomSheetDialog,
             args = LockedMailboxBottomSheetDialogArgs(mailboxEmail).toBundle(),

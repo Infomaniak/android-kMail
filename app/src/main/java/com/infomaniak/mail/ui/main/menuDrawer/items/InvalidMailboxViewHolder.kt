@@ -34,7 +34,7 @@ class InvalidMailboxViewHolder(
 
     fun displayInvalidMailbox(
         mailbox: Mailbox,
-        onLockedMailboxClicked: (String) -> Unit,
+        onInvalidMailboxClicked: (String) -> Unit,
     ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Invalid Mailbox (${mailbox.email})")
 
@@ -46,6 +46,6 @@ class InvalidMailboxViewHolder(
 
         computeEndIconVisibility()
 
-        initSetOnClickListener(onLockedMailboxClicked = { onLockedMailboxClicked(mailbox.email) })
+        initSetOnClickListener(onInvalidMailboxClicked = { onInvalidMailboxClicked(mailbox.email) })
     }
 }

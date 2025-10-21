@@ -132,7 +132,7 @@ class MailboxesAdapter(
 
         computeEndIconVisibility()
 
-        initSetOnClickListener(onLockedMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.email) })
+        initSetOnClickListener(onInvalidMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.email) })
     }
 
     private enum class DisplayType(val layout: Int) {

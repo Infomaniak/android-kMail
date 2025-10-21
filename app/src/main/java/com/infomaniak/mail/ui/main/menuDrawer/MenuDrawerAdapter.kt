@@ -234,7 +234,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             )
             is InvalidMailboxViewHolder -> holder.displayInvalidMailbox(
                 mailbox = item as Mailbox,
-                onLockedMailboxClicked = callbacks.onLockedMailboxClicked,
+                onInvalidMailboxClicked = callbacks.onInvalidMailboxClicked,
             )
             is FoldersHeaderViewHolder -> holder.displayFoldersHeader(
                 onFoldersHeaderClicked = callbacks.onFoldersHeaderClicked,
