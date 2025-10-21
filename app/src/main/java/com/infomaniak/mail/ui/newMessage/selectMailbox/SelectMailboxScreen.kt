@@ -137,7 +137,7 @@ fun SelectMailboxScreenContent(
                 )
                 AnimatedContent(uiState()) { uiState ->
                     when (uiState) {
-                        is UiState.Loading -> {}
+                        is UiState.Loading -> { }
                         is UiState.DefaultMailbox -> {
                             SelectedMailboxIndicator(
                                 modifier = Modifier
@@ -146,19 +146,17 @@ fun SelectMailboxScreenContent(
                             )
                         }
                         is UiState.SelectMailbox -> {
-                            Column {
-                                LazyColumn(
-                                    modifier = Modifier.padding(Margin.Medium),
-                                    verticalArrangement = Arrangement.spacedBy(Margin.Mini),
-                                ) {
-                                    items(usersWithMailboxes) { userWithMailboxes ->
-                                        AccountMailboxesDropdown(
-                                            userWithMailboxes = userWithMailboxes,
-                                            onClickMailbox = { mailbox ->
-                                                onMailboxSelected(mailbox)
-                                            }
-                                        )
-                                    }
+                            LazyColumn(
+                                modifier = Modifier.padding(Margin.Medium),
+                                verticalArrangement = Arrangement.spacedBy(Margin.Mini),
+                            ) {
+                                items(usersWithMailboxes) { userWithMailboxes ->
+                                    AccountMailboxesDropdown(
+                                        userWithMailboxes = userWithMailboxes,
+                                        onClickMailbox = { mailbox ->
+                                            onMailboxSelected(mailbox)
+                                        }
+                                    )
                                 }
                             }
                         }
