@@ -31,22 +31,20 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
-import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
+class NoValidMailboxesFragment : Fragment() {
 
     private var binding: FragmentNoValidMailboxesBinding by safeBinding()
     private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
 
     private val isInMenuDrawer = false
 
-    override val currentClassName: String = NoValidMailboxesFragment::class.java.name
-    override val hasValidMailboxes = false
+    private val hasValidMailboxes = false
 
-    override val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as MailboxesAdapter
+    private val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as MailboxesAdapter
 
     private val invalidPasswordMailboxesAdapter
         inline get() = binding.invalidPasswordMailboxesRecyclerView.adapter as MailboxesAdapter
