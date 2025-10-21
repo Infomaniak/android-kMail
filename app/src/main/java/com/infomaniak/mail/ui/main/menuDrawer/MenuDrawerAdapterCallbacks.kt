@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.menuDrawer
 
 import android.view.View
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
 
 interface MenuDrawerAdapterCallbacks {

@@ -31,7 +31,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.InvalidMailboxesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -40,14 +40,10 @@ class NoValidMailboxesFragment : Fragment() {
     private var binding: FragmentNoValidMailboxesBinding by safeBinding()
     private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
 
-    private val isInMenuDrawer = false
-
-    private val hasValidMailboxes = false
-
-    private val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as MailboxesAdapter
+    private val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as InvalidMailboxesAdapter
 
     private val invalidPasswordMailboxesAdapter
-        inline get() = binding.invalidPasswordMailboxesRecyclerView.adapter as MailboxesAdapter
+        inline get() = binding.invalidPasswordMailboxesRecyclerView.adapter as InvalidMailboxesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -63,13 +59,8 @@ class NoValidMailboxesFragment : Fragment() {
     }
 
     private fun setupAdapters() = with(binding) {
-
-        invalidPasswordMailboxesRecyclerView.adapter = MailboxesAdapter(
-            isInMenuDrawer = isInMenuDrawer,
-            hasValidMailboxes = hasValidMailboxes,
-        )
-
-        lockedMailboxesRecyclerView.adapter = MailboxesAdapter(isInMenuDrawer, hasValidMailboxes)
+        invalidPasswordMailboxesRecyclerView.adapter = InvalidMailboxesAdapter()
+        lockedMailboxesRecyclerView.adapter = InvalidMailboxesAdapter()
     }
 
     private fun setupListeners() = with(binding) {
