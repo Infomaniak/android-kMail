@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : DecoratedItemView(context, attrs, defStyleAttr) {
 
-    private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
     private val warningIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_warning) }
 
     var hasNoValidMailboxes = false
@@ -38,7 +37,6 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     fun computeEndIconVisibility() {
         val (endIcon, contentDescription) = when {
             !hasNoValidMailboxes -> warningIcon to R.string.contentDescriptionWarningIcon
-            !isMailboxLocked && isPasswordOutdated -> chevronIcon to R.string.contentDescriptionIconInvalidPassword
             else -> null to null
         }
 
