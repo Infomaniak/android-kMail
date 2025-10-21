@@ -180,11 +180,6 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-
-        addMailbox.setOnClickListener {
-            animatedNavigation(resId = R.id.attachMailboxFragment)
-        }
-
         settingsAppLock.apply {
             isVisible = LockActivity.hasBiometrics()
             isChecked = localSettings.isAppLocked

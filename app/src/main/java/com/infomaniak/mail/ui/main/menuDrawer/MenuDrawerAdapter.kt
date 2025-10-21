@@ -98,10 +98,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
 
         add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
-        if (areMailboxesExpanded) {
-            addAll(otherMailboxes)
-            add(ADD_MAILBOX_ACTION)
-        }
+        if (areMailboxesExpanded) addAll(otherMailboxes)
     }
 
     private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>): Boolean {
@@ -339,12 +336,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     companion object {
-        private val ADD_MAILBOX_ACTION = MenuDrawerAction(
-            type = ActionType.ADD_MAILBOX,
-            icon = R.drawable.ic_add_circle_thin,
-            text = R.string.buttonAddExistingAddress,
-            maxLines = 1,
-        )
+
         private val SYNC_AUTO_CONFIG_ACTION = MenuDrawerAction(
             type = ActionType.SYNC_AUTO_CONFIG,
             icon = R.drawable.ic_synchronize,
