@@ -116,7 +116,6 @@
     <string name="buttonAccountSwitch">Changer de compte</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="buttonAddEmailAddress">Ajouter une adresse mail</string>
-    <string name="buttonAddExistingAddress">Ajouter une adresse existante</string>
     <string name="buttonAttachMailbox">Ajouter l’adresse mail</string>
     <string name="buttonAttachment">Ajouter une pièce jointe</string>
     <string name="buttonAttendees">Participants</string>
@@ -132,7 +131,6 @@
     <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
     <string name="buttonCustomSchedule">Horaire personnalisé</string>
-    <string name="buttonDetachMailbox">détacher l’adresse</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
     <string name="buttonFeedback">Feedback</string>
@@ -152,7 +150,6 @@
     <string name="buttonNo">Non</string>
     <string name="buttonOpenMyCalendar">Ouvrir dans mon calendrier</string>
     <string name="buttonRefuse">Refuser</string>
-    <string name="buttonRequestPassword">Demander le mot de passe</string>
     <string name="buttonReschedule">Reprogrammer</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
@@ -212,7 +209,6 @@
     <string name="contentDescriptionIconFavorite">Est favori</string>
     <string name="contentDescriptionIconFolderSelected">Dossier sélectionné</string>
     <string name="contentDescriptionIconForward">Transféré</string>
-    <string name="contentDescriptionIconInvalidPassword">Débloquer l’adresse</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
@@ -290,9 +286,6 @@
     <string name="encryptedStatePanelIncomplete">Un mot de passe est requis pour finaliser l’envoi.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partiel</string>
     <string name="encryptedStatePanelTitle">Chiffrement</string>
-    <string name="enterPasswordDescription1">Votre mot de passe a été modifié. Si vous n’en êtes pas à l’origine, veuillez contacter votre administrateur.</string>
-    <string name="enterPasswordDescription2">Veuillez saisir le nouveau mot de passe de l’adresse mail %s</string>
-    <string name="enterPasswordOrDescription">ou</string>
     <string name="enterPasswordTitle">Saisir le mot de passe</string>
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
@@ -319,12 +312,10 @@
     <string name="errorInvalidAttachment">Pièce jointe non valide</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorInvalidEmailAddress">Adresse mail invalide</string>
-    <string name="errorInvalidMailboxPassword">Mot de passe de l’adresse mail incorrect</string>
     <string name="errorLoadingMessage">Ce message n’a pas pu être téléchargé depuis le serveur.</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="errorMailboxLocked">Cette adresse est bloquée</string>
-    <string name="errorMailboxPasswordLength">Le mot de passe doit comporter entre 6 et 80 caractères</string>
     <string name="errorMaxNumberOfScheduledSnoozeReached">Vous avez atteint le nombre maximal de mises en attente programmées</string>
     <string name="errorMessageCannotBeSnoozed">Ce message ne peut pas être mis en attente</string>
     <string name="errorMessageNotSnoozed">Ce message n’est pas mis en attente</string>
@@ -431,7 +422,7 @@
     <string name="noBodyDescription">Ce message est vide.</string>
     <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noFolderTitle">Vous n’avez pas encore de dossier…</string>
-    <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
+    <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak.</string>
     <string name="noMailboxTitle">Pas d’adresse mail associée à ce compte</string>
     <string name="noNetwork">Pas de signal</string>
     <string name="noSubjectTitle">(aucun sujet)</string>
@@ -459,8 +450,6 @@
     <string name="organizationName">Organisation : %s</string>
     <string name="otherOrganisation">Autre</string>
     <string name="pickerNoSelection">Aucune sélection</string>
-    <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
-    <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
     <string name="previewReaction">%2$s %1$s a réagi</string>
     <string name="readFAQ">Consulter les FAQ</string>
     <string name="readMore">En savoir plus</string>
@@ -585,7 +574,6 @@
     <string name="snackbarEmailSent">E-mail envoyé</string>
     <string name="snackbarInvalidUrl">URL invalide</string>
     <string name="snackbarLinkCopiedToClipboard">Lien copié dans le presse-papiers</string>
-    <string name="snackbarMailboxPasswordRequested">Demande transmise à l’administrateur</string>
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
