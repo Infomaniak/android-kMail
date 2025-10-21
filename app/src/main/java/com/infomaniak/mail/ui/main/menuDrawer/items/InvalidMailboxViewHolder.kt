@@ -40,8 +40,6 @@ class InvalidMailboxViewHolder(
 
         text = mailbox.email
         itemStyle = DecoratedItemView.SelectionStyle.MENU_DRAWER
-        isPasswordOutdated = !mailbox.hasValidPassword
-        isMailboxLocked = mailbox.isLocked
         hasNoValidMailboxes = false
 
         computeEndIconVisibility()

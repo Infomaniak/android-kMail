@@ -31,13 +31,12 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     private val warningIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_warning) }
 
     var hasNoValidMailboxes = false
-    var isPasswordOutdated = false
-    var isMailboxLocked = false
 
     fun computeEndIconVisibility() {
-        val (endIcon, contentDescription) = when {
-            !hasNoValidMailboxes -> warningIcon to R.string.contentDescriptionWarningIcon
-            else -> null to null
+        val (endIcon, contentDescription) = if (!hasNoValidMailboxes) {
+            warningIcon to R.string.contentDescriptionWarningIcon
+        } else {
+            null to null
         }
 
         setEndIcon(endIcon, contentDescription)
