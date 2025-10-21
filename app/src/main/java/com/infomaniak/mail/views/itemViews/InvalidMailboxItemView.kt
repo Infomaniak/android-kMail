@@ -45,14 +45,9 @@ class InvalidMailboxItemView @JvmOverloads constructor(
         setEndIcon(endIcon, contentDescription)
     }
 
-    fun initSetOnClickListener(onLockedMailboxClicked: (() -> Unit)?, onInvalidPasswordMailboxClicked: (() -> Unit)?) {
+    fun initSetOnClickListener(onLockedMailboxClicked: (() -> Unit)?) {
         if (hasNoValidMailboxes && isMailboxLocked) return
 
-        super.setOnClickListener {
-            when {
-                isMailboxLocked -> onLockedMailboxClicked?.invoke()
-                isPasswordOutdated -> onInvalidPasswordMailboxClicked?.invoke()
-            }
-        }
+        super.setOnClickListener { if (isMailboxLocked || isPasswordOutdated) onLockedMailboxClicked?.invoke() }
     }
 }

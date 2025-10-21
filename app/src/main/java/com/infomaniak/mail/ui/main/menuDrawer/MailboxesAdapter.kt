@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ class MailboxesAdapter(
     private val isInMenuDrawer: Boolean,
     private val hasValidMailboxes: Boolean,
     private val onValidMailboxClicked: ((Int) -> Unit)? = null,
-    private val onInvalidPasswordMailboxClicked: ((Mailbox) -> Unit)? = null,
     private val onLockedMailboxClicked: ((String) -> Unit)? = null,
     private var mailboxes: List<Mailbox> = emptyList(),
 ) : Adapter<MailboxesViewHolder>() {
@@ -133,10 +132,7 @@ class MailboxesAdapter(
 
         computeEndIconVisibility()
 
-        initSetOnClickListener(
-            onLockedMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.email) },
-            onInvalidPasswordMailboxClicked = { onInvalidPasswordMailboxClicked?.invoke(mailbox) },
-        )
+        initSetOnClickListener(onLockedMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.email) })
     }
 
     private enum class DisplayType(val layout: Int) {

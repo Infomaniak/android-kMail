@@ -27,7 +27,6 @@ interface MenuDrawerAdapterCallbacks {
 
     var onValidMailboxClicked: (Int) -> Unit
     var onLockedMailboxClicked: (String) -> Unit
-    var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit
 
     var onFoldersHeaderClicked: (Boolean) -> Unit
     var onCreateFolderClicked: () -> Unit

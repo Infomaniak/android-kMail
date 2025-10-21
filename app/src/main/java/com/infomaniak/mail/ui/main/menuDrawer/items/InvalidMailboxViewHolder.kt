@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,6 @@ class InvalidMailboxViewHolder(
     fun displayInvalidMailbox(
         mailbox: Mailbox,
         onLockedMailboxClicked: (String) -> Unit,
-        onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
     ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Invalid Mailbox (${mailbox.email})")
 
@@ -47,9 +46,6 @@ class InvalidMailboxViewHolder(
 
         computeEndIconVisibility()
 
-        initSetOnClickListener(
-            onLockedMailboxClicked = { onLockedMailboxClicked(mailbox.email) },
-            onInvalidPasswordMailboxClicked = { onInvalidPasswordMailboxClicked(mailbox) },
-        )
+        initSetOnClickListener(onLockedMailboxClicked = { onLockedMailboxClicked(mailbox.email) })
     }
 }
