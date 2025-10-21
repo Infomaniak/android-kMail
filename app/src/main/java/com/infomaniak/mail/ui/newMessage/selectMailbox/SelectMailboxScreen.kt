@@ -39,6 +39,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -137,29 +138,15 @@ fun SelectMailboxScreenContent(
                 )
                 AnimatedContent(uiState()) { uiState ->
                     when (uiState) {
-                        is UiState.Loading -> { }
-                        is UiState.DefaultMailbox -> {
-                            SelectedMailboxIndicator(
-                                modifier = Modifier
-                                    .padding(Margin.Medium),
-                                selectedMailbox = uiState.defaultMailbox
-                            )
-                        }
-                        is UiState.SelectMailbox -> {
-                            LazyColumn(
-                                modifier = Modifier.padding(Margin.Medium),
-                                verticalArrangement = Arrangement.spacedBy(Margin.Mini),
-                            ) {
-                                items(usersWithMailboxes) { userWithMailboxes ->
-                                    AccountMailboxesDropdown(
-                                        userWithMailboxes = userWithMailboxes,
-                                        onClickMailbox = { mailbox ->
-                                            onMailboxSelected(mailbox)
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                        is UiState.Loading -> {}
+                        is UiState.DefaultMailbox -> SelectedMailboxIndicator(
+                            modifier = Modifier.padding(Margin.Medium),
+                            selectedMailbox = uiState.defaultMailbox
+                        )
+                        is UiState.SelectMailbox -> AccountMailboxesList(
+                            usersWithMailboxes,
+                            onMailboxSelected
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -183,6 +170,26 @@ fun SelectMailboxScreenContent(
             BottomButton(modifier, uiState, onMailboxSelected, onChooseAnotherMailbox)
         }
     )
+}
+
+@Composable
+private fun AccountMailboxesList(
+    usersWithMailboxes: List<UserMailboxesUi>,
+    onMailboxSelected: (SelectedMailboxUi?) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.padding(Margin.Medium),
+        verticalArrangement = Arrangement.spacedBy(Margin.Mini),
+    ) {
+        items(usersWithMailboxes) { userWithMailboxes ->
+            AccountMailboxesDropdown(
+                userWithMailboxes = userWithMailboxes,
+                onClickMailbox = { mailbox ->
+                    onMailboxSelected(mailbox)
+                }
+            )
+        }
+    }
 }
 
 @Composable
