@@ -96,17 +96,6 @@ fun SelectMailboxScreenContent(
 ) {
     val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectMailbox)?.selectedMailbox?.value } }
 
-    // val bottomButton: (@Composable (Modifier) -> Unit)? = { modifier ->
-    //     LargeButton(
-    //         modifier = modifier.padding(horizontal = Margin.Medium),
-    //         title = stringResource(R.string.buttonSendWithDifferentAddress),
-    //         style = ButtonType.Tertiary
-    //     ) {
-    //         selectingAnotherUser.value = true
-    //         onMailboxSelected(null)
-    //     }
-    // }
-
     BackHandler(
         enabled = uiState() is UiState.SelectMailbox
     ) {
