@@ -242,6 +242,7 @@ dependencies {
     // Compose
     implementation(platform(core.compose.bom))
     implementation(libs.compose.ui.android)
+    implementation(core.activity.compose)
     implementation(core.compose.runtime)
     implementation(core.compose.material3)
     implementation(core.compose.ui.tooling.preview)
