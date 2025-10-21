@@ -135,14 +135,14 @@ fun SelectMailboxScreenContent(
                     maxLines = 1,
                     text = stringResource(R.string.composeMailboxCurrentTitle)
                 )
-                AnimatedContent(uiState()) { targetState ->
-                    when (targetState) {
+                AnimatedContent(uiState()) { uiState ->
+                    when (uiState) {
                         is UiState.Loading -> {}
                         is UiState.DefaultMailbox -> {
                             SelectedMailboxIndicator(
                                 modifier = Modifier
                                     .padding(Margin.Medium),
-                                selectedMailbox = targetState.defaultMailbox
+                                selectedMailbox = uiState.defaultMailbox
                             )
                         }
                         is UiState.SelectMailbox -> {
@@ -168,11 +168,11 @@ fun SelectMailboxScreenContent(
                 AnimatedContent(
                     targetState = selectedMailbox,
                     transitionSpec = { (slideInHorizontally() + fadeIn()).togetherWith(slideOutHorizontally() + fadeOut()) }
-                ) { selectedMailbox ->
-                    if (selectedMailbox != null) {
+                ) { mailbox ->
+                    if (mailbox != null) {
                         SelectedMailboxIndicator(
                             modifier = Modifier.padding(Margin.Medium),
-                            selectedMailbox = selectedMailbox
+                            selectedMailbox = mailbox
                         )
                     }
                 }
