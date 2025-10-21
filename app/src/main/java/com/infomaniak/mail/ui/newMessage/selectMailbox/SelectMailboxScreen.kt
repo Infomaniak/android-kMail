@@ -21,6 +21,8 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -108,7 +110,11 @@ fun SelectMailboxScreenContent(
         topBar = {
             MailTopAppBar(
                 navigationIcon = {
-                    TopAppBarButtons.Close(onNavigationTopbarClick)
+                    if (uiState() is UiState.SelectMailbox) {
+                        TopAppBarButtons.Back(onNavigationTopbarClick)
+                    } else {
+                        TopAppBarButtons.Close(onNavigationTopbarClick)
+                    }
                 }
             )
         },
@@ -161,7 +167,7 @@ fun SelectMailboxScreenContent(
                 Spacer(modifier = Modifier.weight(1f))
                 AnimatedContent(
                     targetState = selectedMailbox,
-                    transitionSpec = { slideInHorizontally().togetherWith(slideOutHorizontally()) }
+                    transitionSpec = { (slideInHorizontally() + fadeIn()).togetherWith(slideOutHorizontally() + fadeOut()) }
                 ) { selectedMailbox ->
                     if (selectedMailbox != null) {
                         SelectedMailboxIndicator(
