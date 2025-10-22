@@ -191,7 +191,7 @@ class ThreadViewModel @Inject constructor(
 
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> = messagesFlow.asLiveData(ioCoroutineContext)
 
-    val messagesIsCollapsableFlow: StateFlow<Boolean> = messagesFlow
+    val messagesAreCollapsiblesFlow: StateFlow<Boolean> = messagesFlow
         .map { (items, _) -> items.count() > 1 }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 

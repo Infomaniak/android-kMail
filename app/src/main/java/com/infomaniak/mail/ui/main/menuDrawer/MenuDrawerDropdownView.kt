@@ -25,13 +25,13 @@ import androidx.core.view.isVisible
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMenuDrawerDropdownBinding
-import com.infomaniak.mail.views.CollapsableItem
+import com.infomaniak.mail.views.CollapsibleItem
 
 class MenuDrawerDropdownView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr), CollapsableItem {
+) : FrameLayout(context, attrs, defStyleAttr), CollapsibleItem {
 
     override val binding by lazy { ViewMenuDrawerDropdownBinding.inflate(LayoutInflater.from(context), this, true) }
 
@@ -59,7 +59,7 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
     }
 
     override fun setOnClickListener(listener: OnClickListener?) = with(binding) {
-        root.setOnCollapsableItemClickListener(listener, collapseButton)
+        root.setOnCollapsibleItemClickListener(listener, collapseButton)
     }
 
     fun setOnActionClickListener(listener: OnClickListener) {

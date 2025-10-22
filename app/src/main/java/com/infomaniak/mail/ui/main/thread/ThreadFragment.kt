@@ -222,7 +222,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         observeLightThemeToggle()
         observeThreadLive()
         observeMessagesLive()
-        observeMessagesIsCollapsable()
+        observeMessagesAreCollapsibles()
         observeFailedMessages()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
@@ -338,7 +338,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
-            areMessagesCollapsable = { threadViewModel.messagesIsCollapsableFlow.value },
+            areMessagesCollapsibles = { threadViewModel.messagesAreCollapsiblesFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
@@ -583,9 +583,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
     }
 
-    private fun observeMessagesIsCollapsable() {
+    private fun observeMessagesAreCollapsibles() {
         viewLifecycleOwner.lifecycleScope.launch {
-            threadViewModel.messagesIsCollapsableFlow.collect(threadAdapter::messagesCollapseStateChange)
+            threadViewModel.messagesAreCollapsiblesFlow.collect(threadAdapter::messagesCollapseStateChange)
         }
     }
 

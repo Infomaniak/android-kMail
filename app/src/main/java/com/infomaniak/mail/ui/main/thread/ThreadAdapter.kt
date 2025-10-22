@@ -103,7 +103,7 @@ class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
     private val isSpamFilterActivated: () -> Boolean = { false },
-    private val areMessagesCollapsable: () -> Boolean,
+    private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
@@ -178,7 +178,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 is NotifyType.MessagesCollapseStateChanged -> {
-                    holder.handleMessagesCollapseStatePayload(item.message, isCollapsable = payload.isCollapsable)
+                    holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
                 }
             }
         }
@@ -204,9 +204,9 @@ class ThreadAdapter(
         emojiReactions.bindEmojiReactions(message)
     }
 
-    private fun MessageViewHolder.handleMessagesCollapseStatePayload(message: Message, isCollapsable: Boolean) {
-        handleHeaderClick(message, isCollapsable)
-        if (!isCollapsable) {
+    private fun MessageViewHolder.handleMessagesCollapseStatePayload(message: Message, isCollapsible: Boolean) {
+        handleHeaderClick(message, isCollapsible)
+        if (!isCollapsible) {
             threadAdapterState.isExpandedMap[message.uid] = true
             onExpandOrCollapseMessage(message, shouldTrack = false)
         }
@@ -436,7 +436,7 @@ class ThreadAdapter(
 
         setDetailedFieldsVisibility(message)
 
-        handleHeaderClick(message, areMessagesCollapsable())
+        handleHeaderClick(message, areMessagesCollapsibles())
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -448,10 +448,10 @@ class ThreadAdapter(
         bccGroup.isVisible = message.bcc.isNotEmpty()
     }
 
-    private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsable: Boolean) = with(threadAdapterState) {
-        // Disable ripple animation of `messageHeader` if `isCollapsable` is false
-        binding.messageHeader.isEnabled = isCollapsable
-        if (isCollapsable) {
+    private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsible: Boolean) = with(threadAdapterState) {
+        // Disable ripple animation of `messageHeader` if `isCollapsible` is false
+        binding.messageHeader.isEnabled = isCollapsible
+        if (isCollapsible) {
             binding.messageHeader.setOnClickListener {
                 if (isExpandedMap[message.uid] == true) {
                     isExpandedMap[message.uid] = false
@@ -906,8 +906,8 @@ class ThreadAdapter(
         indexOfMessage?.let { notifyItemChanged(it, NotifyType.OnlyRebindCalendarAttendance) }
     }
 
-    fun messagesCollapseStateChange(isCollapsable: Boolean) {
-        notifyItemRangeChanged(0, itemCount, NotifyType.MessagesCollapseStateChanged(isCollapsable))
+    fun messagesCollapseStateChange(isCollapsible: Boolean) {
+        notifyItemRangeChanged(0, itemCount, NotifyType.MessagesCollapseStateChanged(isCollapsible))
     }
 
     // Only public because it's accessed inside of a test file
@@ -918,7 +918,7 @@ class ThreadAdapter(
         data object OnlyRebindCalendarAttendance : NotifyType
         data object OnlyRebindEmojiReactions : NotifyType
         @JvmInline
-        value class MessagesCollapseStateChanged(val isCollapsable: Boolean) : NotifyType
+        value class MessagesCollapseStateChanged(val isCollapsible: Boolean) : NotifyType
     }
 
     enum class ContextMenuType {

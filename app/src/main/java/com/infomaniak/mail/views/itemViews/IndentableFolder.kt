@@ -28,13 +28,13 @@ interface IndentableFolder {
 
     val binding: ViewDecoratedTextItemBinding
 
-    fun setIndent(indent: Int, hasCollapsableFolder: Boolean = false, canBeCollapsed: Boolean = false) {
-        updateConstraintLayoutMarginStart(hasCollapsableFolder)
-        updateItemNameMarginStart(indent, hasCollapsableFolder, canBeCollapsed)
+    fun setIndent(indent: Int, hasCollapsibleFolder: Boolean = false, canBeCollapsed: Boolean = false) {
+        updateConstraintLayoutMarginStart(hasCollapsibleFolder)
+        updateItemNameMarginStart(indent, hasCollapsibleFolder, canBeCollapsed)
     }
 
-    private fun updateConstraintLayoutMarginStart(hasCollapsableFolder: Boolean) = with(binding) {
-        val marginStart = if (hasCollapsableFolder) {
+    private fun updateConstraintLayoutMarginStart(hasCollapsibleFolder: Boolean) = with(binding) {
+        val marginStart = if (hasCollapsibleFolder) {
             0
         } else {
             context.resources.getDimension(R.dimen.decoratedItemConstraintMarginStart).toInt()
@@ -42,15 +42,15 @@ interface IndentableFolder {
         constraintLayout.setMarginsRelative(start = marginStart)
     }
 
-    private fun updateItemNameMarginStart(indent: Int, hasCollapsableFolder: Boolean, canBeCollapsed: Boolean) {
-        val totalMarginStart = computeMarginStart(hasCollapsableFolder, canBeCollapsed) + computeIndent(indent)
+    private fun updateItemNameMarginStart(indent: Int, hasCollapsibleFolder: Boolean, canBeCollapsed: Boolean) {
+        val totalMarginStart = computeMarginStart(hasCollapsibleFolder, canBeCollapsed) + computeIndent(indent)
         binding.itemName.apply { setMarginsRelative(start = totalMarginStart, end = marginEnd) }
     }
 
-    private fun computeMarginStart(hasCollapsableFolder: Boolean, canBeCollapsed: Boolean): Int = with(binding.context) {
+    private fun computeMarginStart(hasCollapsibleFolder: Boolean, canBeCollapsed: Boolean): Int = with(binding.context) {
         return when {
-            hasCollapsableFolder && !canBeCollapsed -> resources.getDimension(R.dimen.folderChevronSize).toInt()
-            hasCollapsableFolder -> 0
+            hasCollapsibleFolder && !canBeCollapsed -> resources.getDimension(R.dimen.folderChevronSize).toInt()
+            hasCollapsibleFolder -> 0
             else -> resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt()
         }
     }
