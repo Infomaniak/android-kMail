@@ -225,7 +225,7 @@ class MainViewModel @Inject constructor(
     private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.copyFromRealm(1u) }
+            .map { it.list.copyFromRealm() }
             .removeRolesThatHideWhenEmpty()
             .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
     }
@@ -233,7 +233,7 @@ class MainViewModel @Inject constructor(
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerCustomFoldersAsync()
-            .map { it.list.copyFromRealm(1u) }
+            .map { it.list.copyFromRealm() }
             .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
     }
 
