@@ -25,17 +25,7 @@
         android:id="@+id/noValidMailboxesFragment"
         android:name="com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesFragment"
         android:label="NoValidMailboxesFragment"
-        tools:layout="@layout/fragment_no_valid_mailboxes">
-        <action
-            android:id="@+id/action_noValidMailboxesFragment_to_attachMailboxFragment"
-            app:destination="@id/attachMailboxFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/attachMailboxFragment"
-        android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
-        android:label="AttachMailboxFragment"
-        tools:layout="@layout/fragment_attach_mailbox" />
+        tools:layout="@layout/fragment_no_valid_mailboxes" />
 
     <dialog
         android:id="@+id/accountBottomSheetDialog"

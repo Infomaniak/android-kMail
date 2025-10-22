@@ -73,11 +73,6 @@ class NoValidMailboxesFragment : Fragment() {
             trackNoValidMailboxesEvent(MatomoName.SwitchAccount)
             safeNavigate(resId = R.id.accountBottomSheetDialog)
         }
-
-        attachNewMailboxButton.setOnClickListener {
-            trackNoValidMailboxesEvent(MatomoName.AddMailbox)
-            safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment())
-        }
     }
 
     private fun observeMailboxesLive() = with(binding) {

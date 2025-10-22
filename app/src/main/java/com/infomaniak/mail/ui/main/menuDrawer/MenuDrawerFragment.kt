@@ -178,13 +178,6 @@ class MenuDrawerFragment : Fragment() {
         lifecycleScope.launch { AccountUtils.switchToMailbox(mailboxId) }
     }
 
-    private fun onAddMailboxClicked() {
-        safeNavigate(
-            resId = R.id.attachMailboxFragment,
-            currentClassName = currentClassName,
-        )
-    }
-
     private fun onInvalidMailboxClicked(mailboxEmail: String) {
         safeNavigate(
             resId = R.id.lockedMailboxBottomSheetDialog,
@@ -251,7 +244,6 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onActionClicked(type: ActionType) {
         when (type) {
-            ActionType.ADD_MAILBOX -> onAddMailboxClicked()
             ActionType.SYNC_AUTO_CONFIG -> onSyncAutoConfigClicked()
             ActionType.IMPORT_MAILS -> onImportMailsClicked()
             ActionType.RESTORE_MAILS -> onRestoreMailsClicked()
