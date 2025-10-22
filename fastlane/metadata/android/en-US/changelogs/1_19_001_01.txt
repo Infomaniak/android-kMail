@@ -1,0 +1,1 @@
+- Fix issue when displaying folders
