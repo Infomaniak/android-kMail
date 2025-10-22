@@ -78,9 +78,11 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
         return MoveFolderViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int) = with(holder.binding) {
-        if (getItemViewType(position) == DisplayType.FOLDER.layout) {
-            (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as FolderUi)
+    override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int): Unit = with(holder.binding) {
+        runCatchingRealm {
+            if (getItemViewType(position) == DisplayType.FOLDER.layout) {
+                (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as FolderUi)
+            }
         }
     }
 
