@@ -28,6 +28,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.TextViewCompat
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
@@ -74,9 +75,11 @@ sealed class SelectableItemView @JvmOverloads constructor(
 }
 
 fun SelectableItemView.setFolderUi(folder: Folder, @DrawableRes iconId: Int, isSelected: Boolean) {
-    text = folder.getLocalizedName(context)
-    icon = AppCompatResources.getDrawable(context, iconId)
-    setSelectedState(isSelected)
+    runCatchingRealm {
+        text = folder.getLocalizedName(context)
+        icon = AppCompatResources.getDrawable(context, iconId)
+        setSelectedState(isSelected)
+    }
 }
 
 private data class ColorState(

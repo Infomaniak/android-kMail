@@ -125,6 +125,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -227,14 +228,14 @@ class MainViewModel @Inject constructor(
             .map { it.list }
             .removeRolesThatHideWhenEmpty()
             .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
-    }
+    }.catch {}
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerCustomFoldersAsync()
             .map { it.list }
             .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
-    }
+    }.catch {}
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
         DisplayedFolders(default, custom)
