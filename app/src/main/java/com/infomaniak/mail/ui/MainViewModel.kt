@@ -111,7 +111,6 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmResults
@@ -225,7 +224,7 @@ class MainViewModel @Inject constructor(
     private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.copyFromRealm() }
+            .map { it.list }
             .removeRolesThatHideWhenEmpty()
             .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
     }
@@ -233,7 +232,7 @@ class MainViewModel @Inject constructor(
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerCustomFoldersAsync()
-            .map { it.list.copyFromRealm() }
+            .map { it.list }
             .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
     }
 
