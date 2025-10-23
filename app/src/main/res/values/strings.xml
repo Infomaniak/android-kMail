@@ -120,7 +120,6 @@
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
     <string name="buttonAddEmailAddress">Add an email address</string>
-    <string name="buttonAddExistingAddress">Add an existing address</string>
     <string name="buttonAttachMailbox">Add this email address</string>
     <string name="buttonAttachment">Add an attachment</string>
     <string name="buttonAttendees">Attendees</string>
@@ -136,7 +135,6 @@
     <string name="buttonCreateAccount">Create an account</string>
     <string name="buttonCreateFolder">Add a folder</string>
     <string name="buttonCustomSchedule">Custom schedule</string>
-    <string name="buttonDetachMailbox">detach mailbox</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedback">Feedback</string>
@@ -156,7 +154,6 @@
     <string name="buttonNo">No</string>
     <string name="buttonOpenMyCalendar">Open in my calendar</string>
     <string name="buttonRefuse">Refuse</string>
-    <string name="buttonRequestPassword">Request password</string>
     <string name="buttonReschedule">Reschedule</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
@@ -216,7 +213,6 @@
     <string name="contentDescriptionIconFavorite">Is favorite</string>
     <string name="contentDescriptionIconFolderSelected">Folder selected</string>
     <string name="contentDescriptionIconForward">Forwarded</string>
-    <string name="contentDescriptionIconInvalidPassword">Unblock mailbox</string>
     <string name="contentDescriptionIconNewMail">New</string>
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
@@ -294,9 +290,6 @@
     <string name="encryptedStatePanelIncomplete">A password is required to finalize the sending.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partial</string>
     <string name="encryptedStatePanelTitle">Encryption</string>
-    <string name="enterPasswordDescription1">Your password has been changed. If you are not the cause, please contact your administrator.</string>
-    <string name="enterPasswordDescription2">Please enter the new password for the email address %s</string>
-    <string name="enterPasswordOrDescription">or</string>
     <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
@@ -323,12 +316,10 @@
     <string name="errorInvalidAttachment">Invalid attachment</string>
     <string name="errorInvalidCredentials">Invalid email or password</string>
     <string name="errorInvalidEmailAddress">Invalid mail address</string>
-    <string name="errorInvalidMailboxPassword">Invalid mailbox password</string>
     <string name="errorLoadingMessage">This message could not be downloaded from the server.</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="errorMailboxLocked">This mailbox is locked</string>
-    <string name="errorMailboxPasswordLength">The password must be between 6 and 80 characters</string>
     <string name="errorMaxNumberOfScheduledSnoozeReached">You’ve reached the maximum number of scheduled snoozes</string>
     <string name="errorMessageCannotBeSnoozed">This message cannot be snoozed</string>
     <string name="errorMessageNotSnoozed">This message is not currently snoozed</string>
@@ -429,7 +420,7 @@
     <string name="noBodyDescription">This message is empty.</string>
     <string name="noConversationSelected">No conversation selected in %s</string>
     <string name="noFolderTitle">You don’t have any folder yet…</string>
-    <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
+    <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account.</string>
     <string name="noMailboxTitle">No email address associated with this account</string>
     <string name="noNetwork">No signal</string>
     <string name="noSubjectTitle">(no subject)</string>
@@ -457,8 +448,6 @@
     <string name="organizationName">Organization: %s</string>
     <string name="otherOrganisation">Other</string>
     <string name="pickerNoSelection">No selection</string>
-    <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
-    <string name="popupDetachMailboxTitle">Detach mailbox</string>
     <string name="previewReaction">%2$s %1$s reacted</string>
     <string name="readFAQ">Read FAQ</string>
     <string name="readMore">Read more</string>
@@ -583,7 +572,6 @@
     <string name="snackbarEmailSent">Email sent</string>
     <string name="snackbarInvalidUrl">Invalid URL</string>
     <string name="snackbarLinkCopiedToClipboard">Link copied to clipboard</string>
-    <string name="snackbarMailboxPasswordRequested">Request sent to administrator</string>
     <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>

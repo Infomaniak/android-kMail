@@ -114,7 +114,6 @@
     <string name="buttonAccountSwitch">Modifica account</string>
     <string name="buttonAddAccount">Aggiungi un account</string>
     <string name="buttonAddEmailAddress">Aggiungi un indirizzo e-mail</string>
-    <string name="buttonAddExistingAddress">Aggiungi un indirizzo esistente</string>
     <string name="buttonAttachMailbox">Aggiungi l’indirizzo e-mail</string>
     <string name="buttonAttachment">Aggiungi un allegato</string>
     <string name="buttonAttendees">Partecipanti</string>
@@ -130,7 +129,6 @@
     <string name="buttonCreateAccount">Crea un account</string>
     <string name="buttonCreateFolder">Aggiungi una cartella</string>
     <string name="buttonCustomSchedule">Programma personalizzato</string>
-    <string name="buttonDetachMailbox">stacca l’indirizzo</string>
     <string name="buttonDownload">Scarica</string>
     <string name="buttonDownloadAll">Scarica tutti</string>
     <string name="buttonFeedback">Feedback</string>
@@ -150,7 +148,6 @@
     <string name="buttonNo">No</string>
     <string name="buttonOpenMyCalendar">Apri nel mio calendario</string>
     <string name="buttonRefuse">Rifiuta</string>
-    <string name="buttonRequestPassword">Richiesta password</string>
     <string name="buttonReschedule">Riprogrammare</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
@@ -210,7 +207,6 @@
     <string name="contentDescriptionIconFavorite">È il preferito</string>
     <string name="contentDescriptionIconFolderSelected">Cartella selezionata</string>
     <string name="contentDescriptionIconForward">Inoltrato</string>
-    <string name="contentDescriptionIconInvalidPassword">Sbloccare l’indirizzo e-mail</string>
     <string name="contentDescriptionIconNewMail">Nuovo</string>
     <string name="contentDescriptionIconReply">Risposta</string>
     <string name="contentDescriptionIconStorage">Stato di conservazione</string>
@@ -288,9 +284,6 @@
     <string name="encryptedStatePanelIncomplete">Per completare la trasmissione è necessaria una password.</string>
     <string name="encryptedStatePanelStatePartialLabel">Parziale</string>
     <string name="encryptedStatePanelTitle">Crittografia</string>
-    <string name="enterPasswordDescription1">La password è stata modificata. Se non sei responsabile, contatta l’amministratore.</string>
-    <string name="enterPasswordDescription2">Inserisci la nuova password per l’indirizzo e-mail %s</string>
-    <string name="enterPasswordOrDescription">o</string>
     <string name="enterPasswordTitle">Inserisci la password</string>
     <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
@@ -317,12 +310,10 @@
     <string name="errorInvalidAttachment">Allegato non valido</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
     <string name="errorInvalidEmailAddress">Indirizzo e-mail non valido</string>
-    <string name="errorInvalidMailboxPassword">Password errata per l’indirizzo e-mail</string>
     <string name="errorLoadingMessage">Non è stato possibile scaricare questo messaggio dal server.</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
     <string name="errorLoginTitle">Errore di accesso</string>
     <string name="errorMailboxLocked">Questo indirizzo e-mail è bloccato</string>
-    <string name="errorMailboxPasswordLength">La password deve essere compresa tra 6 e 80 caratteri</string>
     <string name="errorMaxNumberOfScheduledSnoozeReached">Hai raggiunto il numero massimo di posticipi programmati</string>
     <string name="errorMessageCannotBeSnoozed">Questo messaggio non può essere posticipato</string>
     <string name="errorMessageNotSnoozed">Questo messaggio non è stato posticipato</string>
@@ -368,7 +359,7 @@
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="kSuiteProQuotasAlertDescription">Lo spazio di archiviazione della posta è quasi esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Lo spazio di archiviazione della posta è esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>
-    <string name="kSuiteProQuotasAlertFullTitle">Lo spazio di archiviazione della posta è pieno</string>
+    <string name="kSuiteProQuotasAlertFullTitle">Lo spazio di archiviazione di Mail è pieno</string>
     <string name="lastSelectedSchedule">Ultimo programma selezionato</string>
     <string name="laterThisMorning">Più tardi stamattina</string>
     <string name="linkingWord">e</string>
@@ -423,7 +414,7 @@
     <string name="noBodyDescription">Questo messaggio è vuoto.</string>
     <string name="noConversationSelected">Nessuna conversazione selezionata in %s</string>
     <string name="noFolderTitle">Non hai ancora nessuna cartella…</string>
-    <string name="noMailboxDescription">Non hai un indirizzo e-mail associato al tuo account Infomaniak. Per aggiungere un indirizzo, toccare il pulsante sottostante.</string>
+    <string name="noMailboxDescription">Non hai un indirizzo e-mail associato al tuo account Infomaniak.</string>
     <string name="noMailboxTitle">Nessun indirizzo e-mail associato a questo account</string>
     <string name="noNetwork">Nessun segnale</string>
     <string name="noSubjectTitle">(senza soggetto)</string>
@@ -451,8 +442,6 @@
     <string name="organizationName">Organizzazione: %s</string>
     <string name="otherOrganisation">Altro</string>
     <string name="pickerNoSelection">Nessuna selezione</string>
-    <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>
-    <string name="popupDetachMailboxTitle">Staccare l’indirizzo</string>
     <string name="previewReaction">%2$s %1$s ha reagito</string>
     <string name="readFAQ">Leggi le FAQ</string>
     <string name="readMore">Per saperne di più</string>
@@ -577,7 +566,6 @@
     <string name="snackbarEmailSent">Email inviata</string>
     <string name="snackbarInvalidUrl">URL non valido</string>
     <string name="snackbarLinkCopiedToClipboard">Link copiato negli appunti</string>
-    <string name="snackbarMailboxPasswordRequested">Richiesta inviata all’amministratore</string>
     <string name="snackbarMessageDeletedPermanently">Messaggio cancellato</string>
     <string name="snackbarMessageMoved">Messaggio spostato a %s</string>
     <string name="snackbarMoveCancelled">Spostamento annullato</string>

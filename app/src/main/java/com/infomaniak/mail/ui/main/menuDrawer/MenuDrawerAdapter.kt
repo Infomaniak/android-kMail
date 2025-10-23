@@ -98,10 +98,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
 
         add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
-        if (areMailboxesExpanded) {
-            addAll(otherMailboxes)
-            add(ADD_MAILBOX_ACTION)
-        }
+        if (areMailboxesExpanded) addAll(otherMailboxes)
     }
 
     private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>): Boolean {
@@ -151,7 +148,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    fun notifySelectedFolder(currentFolder: Folder) {
+    fun notifySelectedFolder(currentFolder: Folder) = runCatchingRealm {
 
         val oldId = currentFolderId
         val newId = currentFolder.id
@@ -224,47 +221,48 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int) {
-        val item = currentList[position]
+        runCatchingRealm {
+            val item = currentList[position]
 
-        when (holder) {
-            is MailboxesHeaderViewHolder -> holder.displayMailboxesHeader(
-                header = item as MailboxesHeader,
-                onMailboxesHeaderClicked = callbacks.onMailboxesHeaderClicked,
-            )
-            is MailboxViewHolder -> holder.displayMailbox(
-                mailbox = item as Mailbox,
-                onValidMailboxClicked = callbacks.onValidMailboxClicked,
-            )
-            is InvalidMailboxViewHolder -> holder.displayInvalidMailbox(
-                mailbox = item as Mailbox,
-                onLockedMailboxClicked = callbacks.onLockedMailboxClicked,
-                onInvalidPasswordMailboxClicked = callbacks.onInvalidPasswordMailboxClicked,
-            )
-            is FoldersHeaderViewHolder -> holder.displayFoldersHeader(
-                onFoldersHeaderClicked = callbacks.onFoldersHeaderClicked,
-                onCreateFolderClicked = callbacks.onCreateFolderClicked,
-            )
-            is FolderViewHolder -> holder.displayFolder(
-                folderUi = item as FolderUi,
-                currentFolderId = currentFolderId,
-                hasCollapsableFolder = if (item.isInDefaultFolderSection) hasCollapsableDefaultFolder else hasCollapsableCustomFolder,
-                onFolderClicked = callbacks.onFolderClicked,
-                onFolderLongClicked = callbacks.onFolderLongClicked,
-                onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
-            )
-            is ActionsHeaderViewHolder -> holder.displayActionsHeader(
-                onActionsHeaderClicked = callbacks.onActionsHeaderClicked,
-            )
-            is ActionViewHolder -> holder.displayAction(
-                action = item as MenuDrawerAction,
-                onActionClicked = callbacks.onActionClicked,
-            )
-            is FooterViewHolder -> holder.displayFooter(
-                footer = item as MenuDrawerFooter,
-                onFeedbackClicked = callbacks.onFeedbackClicked,
-                onHelpClicked = callbacks.onHelpClicked,
-                onAppVersionClicked = callbacks.onAppVersionClicked,
-            )
+            when (holder) {
+                is MailboxesHeaderViewHolder -> holder.displayMailboxesHeader(
+                    header = item as MailboxesHeader,
+                    onMailboxesHeaderClicked = callbacks.onMailboxesHeaderClicked,
+                )
+                is MailboxViewHolder -> holder.displayMailbox(
+                    mailbox = item as Mailbox,
+                    onValidMailboxClicked = callbacks.onValidMailboxClicked,
+                )
+                is InvalidMailboxViewHolder -> holder.displayInvalidMailbox(
+                    mailbox = item as Mailbox,
+                    onInvalidMailboxClicked = callbacks.onInvalidMailboxClicked,
+                )
+                is FoldersHeaderViewHolder -> holder.displayFoldersHeader(
+                    onFoldersHeaderClicked = callbacks.onFoldersHeaderClicked,
+                    onCreateFolderClicked = callbacks.onCreateFolderClicked,
+                )
+                is FolderViewHolder -> holder.displayFolder(
+                    folderUi = item as FolderUi,
+                    currentFolderId = currentFolderId,
+                    hasCollapsableFolder = if (item.isInDefaultFolderSection) hasCollapsableDefaultFolder else hasCollapsableCustomFolder,
+                    onFolderClicked = callbacks.onFolderClicked,
+                    onFolderLongClicked = callbacks.onFolderLongClicked,
+                    onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
+                )
+                is ActionsHeaderViewHolder -> holder.displayActionsHeader(
+                    onActionsHeaderClicked = callbacks.onActionsHeaderClicked,
+                )
+                is ActionViewHolder -> holder.displayAction(
+                    action = item as MenuDrawerAction,
+                    onActionClicked = callbacks.onActionClicked,
+                )
+                is FooterViewHolder -> holder.displayFooter(
+                    footer = item as MenuDrawerFooter,
+                    onFeedbackClicked = callbacks.onFeedbackClicked,
+                    onHelpClicked = callbacks.onHelpClicked,
+                    onAppVersionClicked = callbacks.onAppVersionClicked,
+                )
+            }
         }
     }
 
@@ -340,12 +338,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     companion object {
-        private val ADD_MAILBOX_ACTION = MenuDrawerAction(
-            type = ActionType.ADD_MAILBOX,
-            icon = R.drawable.ic_add_circle_thin,
-            text = R.string.buttonAddExistingAddress,
-            maxLines = 1,
-        )
+
         private val SYNC_AUTO_CONFIG_ACTION = MenuDrawerAction(
             type = ActionType.SYNC_AUTO_CONFIG,
             icon = R.drawable.ic_synchronize,

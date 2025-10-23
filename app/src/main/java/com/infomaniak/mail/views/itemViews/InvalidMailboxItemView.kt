@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,31 +28,21 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : DecoratedItemView(context, attrs, defStyleAttr) {
 
-    private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
     private val warningIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_warning) }
 
     var hasNoValidMailboxes = false
-    var isPasswordOutdated = false
-    var isMailboxLocked = false
 
     fun computeEndIconVisibility() {
-        val (endIcon, contentDescription) = when {
-            !hasNoValidMailboxes -> warningIcon to R.string.contentDescriptionWarningIcon
-            !isMailboxLocked && isPasswordOutdated -> chevronIcon to R.string.contentDescriptionIconInvalidPassword
-            else -> null to null
+        val (endIcon, contentDescription) = if (!hasNoValidMailboxes) {
+            warningIcon to R.string.contentDescriptionWarningIcon
+        } else {
+            null to null
         }
 
         setEndIcon(endIcon, contentDescription)
     }
 
-    fun initSetOnClickListener(onLockedMailboxClicked: (() -> Unit)?, onInvalidPasswordMailboxClicked: (() -> Unit)?) {
-        if (hasNoValidMailboxes && isMailboxLocked) return
-
-        super.setOnClickListener {
-            when {
-                isMailboxLocked -> onLockedMailboxClicked?.invoke()
-                isPasswordOutdated -> onInvalidPasswordMailboxClicked?.invoke()
-            }
-        }
+    fun initSetOnClickListener(onInvalidMailboxClicked: (() -> Unit)?) {
+        super.setOnClickListener { onInvalidMailboxClicked?.invoke() }
     }
 }

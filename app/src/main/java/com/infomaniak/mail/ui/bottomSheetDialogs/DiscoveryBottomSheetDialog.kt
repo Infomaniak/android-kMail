@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.infomaniak.core.legacy.utils.toPx
@@ -66,10 +67,12 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         when (val illustration = illustration) {
             is Illustration.Static -> infoIllustration.apply {
                 isVisible = true
+                infoAnimation.isGone = true
                 setBackgroundResource(illustration.resId)
             }
             is Illustration.Animated -> infoAnimation.apply {
                 isVisible = true
+                infoIllustration.isGone = true
 
                 updateLayoutParams { height = illustration.heightDp.toPx() }
                 infoAnimation.setAnimation(illustration.resId)

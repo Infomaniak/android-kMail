@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,25 +31,19 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
-import com.infomaniak.mail.ui.main.MailboxListFragment
-import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.InvalidMailboxesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
+class NoValidMailboxesFragment : Fragment() {
 
     private var binding: FragmentNoValidMailboxesBinding by safeBinding()
     private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
 
-    private val isInMenuDrawer = false
-
-    override val currentClassName: String = NoValidMailboxesFragment::class.java.name
-    override val hasValidMailboxes = false
-
-    override val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as MailboxesAdapter
+    private val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as InvalidMailboxesAdapter
 
     private val invalidPasswordMailboxesAdapter
-        inline get() = binding.invalidPasswordMailboxesRecyclerView.adapter as MailboxesAdapter
+        inline get() = binding.invalidPasswordMailboxesRecyclerView.adapter as InvalidMailboxesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -65,14 +59,8 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     }
 
     private fun setupAdapters() = with(binding) {
-
-        invalidPasswordMailboxesRecyclerView.adapter = MailboxesAdapter(
-            isInMenuDrawer = isInMenuDrawer,
-            hasValidMailboxes = hasValidMailboxes,
-            onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
-        )
-
-        lockedMailboxesRecyclerView.adapter = MailboxesAdapter(isInMenuDrawer, hasValidMailboxes)
+        invalidPasswordMailboxesRecyclerView.adapter = InvalidMailboxesAdapter()
+        lockedMailboxesRecyclerView.adapter = InvalidMailboxesAdapter()
     }
 
     private fun setupListeners() = with(binding) {
@@ -84,11 +72,6 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         changeAccountButton.setOnClickListener {
             trackNoValidMailboxesEvent(MatomoName.SwitchAccount)
             safeNavigate(resId = R.id.accountBottomSheetDialog)
-        }
-
-        attachNewMailboxButton.setOnClickListener {
-            trackNoValidMailboxesEvent(MatomoName.AddMailbox)
-            safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment())
         }
     }
 

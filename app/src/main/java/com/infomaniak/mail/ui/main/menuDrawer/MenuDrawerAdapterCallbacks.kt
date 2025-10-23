@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.menuDrawer
 
 import android.view.View
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
 
 interface MenuDrawerAdapterCallbacks {
@@ -26,8 +25,7 @@ interface MenuDrawerAdapterCallbacks {
     var onMailboxesHeaderClicked: () -> Unit
 
     var onValidMailboxClicked: (Int) -> Unit
-    var onLockedMailboxClicked: (String) -> Unit
-    var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit
+    var onInvalidMailboxClicked: (String) -> Unit
 
     var onFoldersHeaderClicked: (Boolean) -> Unit
     var onCreateFolderClicked: () -> Unit

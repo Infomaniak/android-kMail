@@ -120,7 +120,7 @@ object ErrorCode {
         // Mailbox
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
         ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.errorAlreadyLinkedMailbox),
-        ApiErrorCode(INVALID_MAILBOX_PASSWORD, R.string.errorInvalidMailboxPassword),
+        ApiErrorCode(INVALID_MAILBOX_PASSWORD, R.string.errorMailboxLocked),
 
         // Folder
         ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),

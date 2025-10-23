@@ -34,7 +34,6 @@
             android:layout_marginBottom="@dimen/marginStandardMedium"
             android:importantForAccessibility="no"
             android:maxHeight="@dimen/discoveryIllustrationHeight"
-            android:visibility="gone"
             tools:src="@drawable/ic_update_logo"
             tools:visibility="visible" />
 

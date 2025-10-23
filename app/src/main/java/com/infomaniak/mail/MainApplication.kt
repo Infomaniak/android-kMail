@@ -49,6 +49,7 @@ import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.legacy.utils.showToast
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
+import com.infomaniak.core.twofactorauth.back.TwoFactorAuthManager
 import com.infomaniak.mail.TokenInterceptorListenerProvider.legacyTokenInterceptorListener
 import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
@@ -75,6 +76,13 @@ import kotlinx.coroutines.withContext
 import splitties.init.injectAsAppCtx
 import java.util.UUID
 import javax.inject.Inject
+
+/**
+ * Singleton for incoming 2FA (two factor authentication) challenges.
+ *
+ * Not a ViewModel because the state needs to be scoped for the entire app.
+ */
+val twoFactorAuthManager = TwoFactorAuthManager { userId -> AccountUtils.getHttpClient(userId) }
 
 @HiltAndroidApp
 open class MainApplication : Application(), SingletonImageLoader.Factory, DefaultLifecycleObserver, Configuration.Provider {

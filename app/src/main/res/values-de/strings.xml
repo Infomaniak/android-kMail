@@ -114,7 +114,6 @@
     <string name="buttonAccountSwitch">Konto ändern</string>
     <string name="buttonAddAccount">Account hinzufügen</string>
     <string name="buttonAddEmailAddress">Eine E-Mail-Adresse hinzufügen</string>
-    <string name="buttonAddExistingAddress">Eine bestehende Adresse hinzufügen</string>
     <string name="buttonAttachMailbox">Mailadresse hinzufügen</string>
     <string name="buttonAttachment">Einen Anhang hinzufügen</string>
     <string name="buttonAttendees">Teilnehmer</string>
@@ -130,7 +129,6 @@
     <string name="buttonCreateAccount">Ein Konto erstellen</string>
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
     <string name="buttonCustomSchedule">Benutzerdefinierter Zeitplan</string>
-    <string name="buttonDetachMailbox">adresse abtrennen</string>
     <string name="buttonDownload">Herunterladen</string>
     <string name="buttonDownloadAll">Alle herunterladen</string>
     <string name="buttonFeedback">Rückmeldung</string>
@@ -150,7 +148,6 @@
     <string name="buttonNo">Nein</string>
     <string name="buttonOpenMyCalendar">In meinem Kalender öffnen</string>
     <string name="buttonRefuse">Abfälle</string>
-    <string name="buttonRequestPassword">Passwort anfordern</string>
     <string name="buttonReschedule">Neu planen</string>
     <string name="buttonRestoreEmails">E-Mails wiederherstellen</string>
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
@@ -210,7 +207,6 @@
     <string name="contentDescriptionIconFavorite">Ist Favorit</string>
     <string name="contentDescriptionIconFolderSelected">Ordner ausgewählt</string>
     <string name="contentDescriptionIconForward">Weitergeleitet</string>
-    <string name="contentDescriptionIconInvalidPassword">E-Mail-Adresse entsperren</string>
     <string name="contentDescriptionIconNewMail">Neu</string>
     <string name="contentDescriptionIconReply">Antwort</string>
     <string name="contentDescriptionIconStorage">Speicherstatus</string>
@@ -288,9 +284,6 @@
     <string name="encryptedStatePanelIncomplete">Ein Passwort ist erforderlich, um den Versand abzuschliessen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Teilweise</string>
     <string name="encryptedStatePanelTitle">Verschlüsselung</string>
-    <string name="enterPasswordDescription1">Ihr Passwort wurde geändert. Wenn es nicht von Ihnen stammt, wenden Sie sich bitte an Ihren Administrator.</string>
-    <string name="enterPasswordDescription2">Bitte geben Sie das neue Passwort für die E-Mail-Adresse %s ein</string>
-    <string name="enterPasswordOrDescription">oder</string>
     <string name="enterPasswordTitle">Geben Sie das Passwort ein</string>
     <string name="errorAlreadyLinkedMailbox">Diese E-Mail-Adresse ist bereits mit Ihrem Konto verknüpft</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
@@ -317,12 +310,10 @@
     <string name="errorInvalidAttachment">Dateianhang ungültig</string>
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
     <string name="errorInvalidEmailAddress">Ungültige E-Mail-Adresse</string>
-    <string name="errorInvalidMailboxPassword">Falsches Passwort für die E-Mail-Adresse</string>
     <string name="errorLoadingMessage">Diese Nachricht konnte nicht vom Server heruntergeladen werden.</string>
     <string name="errorLoginDescription">Die Verbindung ist fehlgeschlagen.</string>
     <string name="errorLoginTitle">Login-Fehler</string>
     <string name="errorMailboxLocked">Diese Mailbox ist gesperrt</string>
-    <string name="errorMailboxPasswordLength">Das Passwort muss zwischen 6 und 80 Zeichen lang sein</string>
     <string name="errorMaxNumberOfScheduledSnoozeReached">Sie haben die maximale Anzahl geplanter Schlummerzeiten erreicht</string>
     <string name="errorMessageCannotBeSnoozed">Diese Nachricht kann nicht in den Schlummermodus versetzt werden</string>
     <string name="errorMessageNotSnoozed">Diese Nachricht ist derzeit nicht im Schlummermodus</string>
@@ -423,7 +414,7 @@
     <string name="noBodyDescription">Diese Nachricht ist leer.</string>
     <string name="noConversationSelected">Keine Unterhaltung in %s ausgewählt</string>
     <string name="noFolderTitle">Sie haben noch keinen Ordner…</string>
-    <string name="noMailboxDescription">Sie haben noch keine E-Mail-Adresse, die mit Ihrem Infomaniak-Konto verknüpft ist. Um eine Adresse hinzuzufügen, tippen Sie auf die Schaltfläche unten.</string>
+    <string name="noMailboxDescription">Sie haben noch keine E-Mail-Adresse, die mit Ihrem Infomaniak-Konto verknüpft ist.</string>
     <string name="noMailboxTitle">Keine E-Mail-Adresse mit diesem Konto verbunden</string>
     <string name="noNetwork">Kein Signal</string>
     <string name="noSubjectTitle">(ohne Betreff)</string>
@@ -451,8 +442,6 @@
     <string name="organizationName">Organisation: %s</string>
     <string name="otherOrganisation">Andere</string>
     <string name="pickerNoSelection">Keine Auswahl</string>
-    <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>
-    <string name="popupDetachMailboxTitle">Adresse abtrennen</string>
     <string name="previewReaction">%2$s %1$s reagierte</string>
     <string name="readFAQ">FAQ lesen</string>
     <string name="readMore">Mehr erfahren</string>
@@ -577,7 +566,6 @@
     <string name="snackbarEmailSent">E-Mail gesendet</string>
     <string name="snackbarInvalidUrl">Ungültige URL</string>
     <string name="snackbarLinkCopiedToClipboard">Link in die Zwischenablage kopiert</string>
-    <string name="snackbarMailboxPasswordRequested">Antrag an den Administrator weitergeleitet</string>
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>

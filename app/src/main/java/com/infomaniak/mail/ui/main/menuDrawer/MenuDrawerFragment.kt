@@ -58,7 +58,6 @@ import com.infomaniak.mail.ui.alertDialogs.ConfirmDeleteFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.InvalidPasswordFragmentArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
 import com.infomaniak.mail.utils.AccountUtils
@@ -141,8 +140,7 @@ class MenuDrawerFragment : Fragment() {
             callbacks = object : MenuDrawerAdapterCallbacks {
                 override var onMailboxesHeaderClicked: () -> Unit = ::onMailboxesHeaderClicked
                 override var onValidMailboxClicked: (Int) -> Unit = ::onValidMailboxClicked
-                override var onLockedMailboxClicked: (String) -> Unit = ::onLockedMailboxClicked
-                override var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit = ::onInvalidPasswordMailboxClicked
+                override var onInvalidMailboxClicked: (String) -> Unit = ::onInvalidMailboxClicked
                 override var onFoldersHeaderClicked: (Boolean) -> Unit = ::onFoldersHeaderClicked
                 override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
@@ -180,22 +178,7 @@ class MenuDrawerFragment : Fragment() {
         lifecycleScope.launch { AccountUtils.switchToMailbox(mailboxId) }
     }
 
-    private fun onAddMailboxClicked() {
-        safeNavigate(
-            resId = R.id.attachMailboxFragment,
-            currentClassName = currentClassName,
-        )
-    }
-
-    private fun onInvalidPasswordMailboxClicked(mailbox: Mailbox) {
-        safeNavigate(
-            resId = R.id.invalidPasswordFragment,
-            args = InvalidPasswordFragmentArgs(mailbox.mailboxId, mailbox.objectId, mailbox.email).toBundle(),
-            currentClassName = currentClassName,
-        )
-    }
-
-    private fun onLockedMailboxClicked(mailboxEmail: String) {
+    private fun onInvalidMailboxClicked(mailboxEmail: String) {
         safeNavigate(
             resId = R.id.lockedMailboxBottomSheetDialog,
             args = LockedMailboxBottomSheetDialogArgs(mailboxEmail).toBundle(),
@@ -261,7 +244,6 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onActionClicked(type: ActionType) {
         when (type) {
-            ActionType.ADD_MAILBOX -> onAddMailboxClicked()
             ActionType.SYNC_AUTO_CONFIG -> onSyncAutoConfigClicked()
             ActionType.IMPORT_MAILS -> onImportMailsClicked()
             ActionType.RESTORE_MAILS -> onRestoreMailsClicked()

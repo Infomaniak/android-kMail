@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
 import com.infomaniak.core.legacy.auth.CredentialManager
 import com.infomaniak.core.legacy.auth.TokenAuthenticator
 import com.infomaniak.core.legacy.models.ApiResponseStatus
@@ -111,6 +112,7 @@ object AccountUtils : CredentialManager() {
 
     suspend fun addUser(user: User) {
         currentUser = user
+        DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
         userDatabase.userDao().insert(user)
     }
 
@@ -132,6 +134,7 @@ object AccountUtils : CredentialManager() {
     }
 
     suspend fun removeUser(user: User) {
+        DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
         userDatabase.userDao().delete(user)
     }
 

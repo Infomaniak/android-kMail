@@ -54,7 +54,6 @@ object MatomoMail : Matomo {
         HomeScreenShortcuts("homeScreenShortcuts"),
         InAppReview("inAppReview"),
         InAppUpdate("inAppUpdate"),
-        InvalidPasswordMailbox("invalidPasswordMailbox"),
         ManageFolder("manageFolder"),
         MenuDrawer("menuDrawer"),
         Message("message"),
@@ -71,7 +70,6 @@ object MatomoMail : Matomo {
         Search("search"),
         SettingsAccentColor("settingsAccentColor"),
         SettingsAutoAdvance("settingsAutoAdvance"),
-        SettingsCancelPeriod("settingsCancelPeriod"),
         SettingsDataManagement("settingsDataManagement"),
         SettingsDensity("settingsDensity"),
         SettingsDisplayExternalContent("settingsDisplayExternalContent"),
@@ -340,7 +338,6 @@ object MatomoMail : Matomo {
         Undo("undo"),
         UnorderedList("unorderedList"),
         UnreadFilter("unreadFilter"),
-        UpdatePassword("updatePassword"),
         ValidateSearch("validateSearch"),
         WriteEmail("writeEmail"),
         Xmas("xmas"),
@@ -503,10 +500,6 @@ object MatomoMail : Matomo {
 
     fun trackNoValidMailboxesEvent(name: MatomoName) {
         trackEvent(MatomoCategory.NoValidMailboxes, name)
-    }
-
-    fun trackInvalidPasswordMailboxEvent(name: MatomoName) {
-        trackEvent(MatomoCategory.InvalidPasswordMailbox, name)
     }
 
     fun trackExternalEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {

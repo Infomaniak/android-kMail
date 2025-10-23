@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023-2024 Infomaniak Network SA
+  ~ Copyright (C) 2023-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/attachNewMailboxButton"
+        app:layout_constraintBottom_toTopOf="@id/changeAccountButton"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -128,23 +128,11 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/attachNewMailboxButton"
+        android:id="@+id/changeAccountButton"
         style="@style/TextButtonPrimary"
         android:layout_width="0dp"
         android:layout_marginHorizontal="@dimen/marginStandard"
         android:layout_marginTop="@dimen/marginStandardSmall"
-        android:text="@string/buttonAddEmailAddress"
-        app:iconGravity="textStart"
-        app:iconPadding="@dimen/marginStandardSmall"
-        app:layout_constraintBottom_toTopOf="@id/changeAccountButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/changeAccountButton"
-        style="@style/TextButtonSecondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="@string/buttonAccountSwitch"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
