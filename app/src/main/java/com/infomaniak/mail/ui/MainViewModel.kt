@@ -111,7 +111,6 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmResults
@@ -126,6 +125,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -225,17 +225,17 @@ class MainViewModel @Inject constructor(
     private val defaultFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.copyFromRealm() }
+            .map { it.list }
             .removeRolesThatHideWhenEmpty()
             .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
-    }
+    }.catch {}
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
             .getMenuDrawerCustomFoldersAsync()
-            .map { it.list.copyFromRealm() }
+            .map { it.list }
             .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
-    }
+    }.catch {}
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
         DisplayedFolders(default, custom)

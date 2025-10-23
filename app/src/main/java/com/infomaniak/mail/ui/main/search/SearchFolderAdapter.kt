@@ -31,6 +31,7 @@ import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.DIVIDER
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.FOLDER
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 
@@ -72,13 +73,15 @@ class SearchFolderAdapter(
         parent: ViewGroup?,
         folderUi: FolderUi?,
     ): View {
-        return (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
-            findViewById<SelectableFolderItemView>(R.id.simpleFolderItemView).apply {
-                text = context.getLocalizedNameOrAllFolders(folderUi?.folder)
-                icon = AppCompatResources.getDrawable(context, folderUi?.folder?.getIcon() ?: R.drawable.ic_all_folders)
-                setSelectedState(folderUi == selectedFolder)
+        return runCatchingRealm {
+            (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply<View> {
+                findViewById<SelectableFolderItemView>(R.id.simpleFolderItemView).apply<SelectableFolderItemView> {
+                    text = context.getLocalizedNameOrAllFolders(folderUi?.folder)
+                    icon = AppCompatResources.getDrawable(context, folderUi?.folder?.getIcon() ?: R.drawable.ic_all_folders)
+                    setSelectedState(folderUi == selectedFolder)
+                }
             }
-        }
+        }.getOrElse { View(context) }
     }
 
     override fun getItemViewType(position: Int): Int = when (val item = getItem(position)) {
