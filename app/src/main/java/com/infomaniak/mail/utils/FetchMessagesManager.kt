@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.data.models.message.FormatedPreview
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -202,6 +202,15 @@ class FetchMessagesManager @Inject constructor(
         okHttpClient: OkHttpClient,
     ): Boolean {
 
+        suspend fun Message.getNotificationBody(): String? = body?.let {
+            val content = MessageBodyUtils.splitContentAndQuote(it).content
+            val dirtyDocument = content.removeLineBreaksFromHtml()
+            val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
+            return@let cleanedDocument.wholeText().trim()
+        }
+
+        fun Message.getNotificationPreview(): String = getFormattedPreview(appContext).content
+
         ThreadController.fetchMessagesHeavyData(getDisplayedMessages(mailbox.featureFlags, localSettings), realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
@@ -213,19 +222,7 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        val formattedPreview = message.getFormattedPreview(appContext)
-        val notificationBody = if (formattedPreview is FormatedPreview.Body) {
-            message.body
-                ?.let {
-                    val content = MessageBodyUtils.splitContentAndQuote(it).content
-                    val dirtyDocument = content.removeLineBreaksFromHtml()
-                    val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
-                    return@let cleanedDocument.wholeText().trim()
-                }
-                ?: formattedPreview.content
-        } else {
-            formattedPreview.content
-        }
+        val notificationBody = message.getNotificationBody() ?: message.getNotificationPreview()
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces
