@@ -17,19 +17,16 @@
  */
 package com.infomaniak.mail.ui.newMessage.selectMailbox
 
-import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -47,18 +44,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.bottomstickybuttonscaffolds.BottomStickyButtonScaffold
 import com.infomaniak.core.compose.margin.Margin
+import com.infomaniak.core.compose.preview.PreviewLargeWindow
+import com.infomaniak.core.compose.preview.PreviewSmallWindow
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
-import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.*
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.AccountMailboxesDropdown
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.SelectedMailboxIndicator
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectMailboxScreenDataPreview
@@ -119,47 +119,13 @@ fun SelectMailboxScreenContent(
             )
         },
         content = {
-            Column(
-                modifier = Modifier
-                    .padding(Margin.Medium)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Margin.Medium)
-            ) {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.illustration_mailbox_ellipsis_bubble),
-                    contentDescription = null
+            Column {
+                ScrollableContent(
+                    uiState,
+                    usersWithMailboxes,
+                    onMailboxSelected
                 )
-                Text(
-                    style = Typography.h2,
-                    maxLines = 1,
-                    text = stringResource(R.string.composeMailboxCurrentTitle)
-                )
-                AnimatedContent(uiState()) { uiState ->
-                    when (uiState) {
-                        is UiState.Loading -> {}
-                        is UiState.DefaultMailbox -> SelectedMailboxIndicator(
-                            modifier = Modifier.padding(Margin.Medium),
-                            selectedMailbox = uiState.defaultMailbox
-                        )
-                        is UiState.SelectMailbox -> AccountMailboxesList(
-                            usersWithMailboxes,
-                            onMailboxSelected
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                AnimatedContent(
-                    targetState = selectedMailbox,
-                    transitionSpec = { (slideInHorizontally() + fadeIn()).togetherWith(slideOutHorizontally() + fadeOut()) }
-                ) { mailbox ->
-                    if (mailbox != null) {
-                        SelectedMailboxIndicator(
-                            modifier = Modifier.padding(Margin.Medium),
-                            selectedMailbox = mailbox
-                        )
-                    }
-                }
+                SelectedMailboxBottom(selectedMailbox)
             }
         },
         topButton = { modifier ->
@@ -172,20 +138,73 @@ fun SelectMailboxScreenContent(
 }
 
 @Composable
-private fun AccountMailboxesList(
+private fun Header() {
+    Image(
+        imageVector = ImageVector.vectorResource(R.drawable.illustration_mailbox_ellipsis_bubble),
+        contentDescription = null
+    )
+    Text(
+        style = Typography.h2,
+        maxLines = 1,
+        text = stringResource(R.string.composeMailboxCurrentTitle)
+    )
+}
+
+@Composable
+private fun ColumnScope.ScrollableContent(
+    uiState: () -> UiState,
     usersWithMailboxes: List<UserMailboxesUi>,
     onMailboxSelected: (SelectedMailboxUi?) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.padding(Margin.Medium),
-        verticalArrangement = Arrangement.spacedBy(Margin.Mini),
-    ) {
-        items(usersWithMailboxes) { userWithMailboxes ->
-            AccountMailboxesDropdown(
-                userWithMailboxes = userWithMailboxes,
-                onClickMailbox = { mailbox ->
-                    onMailboxSelected(mailbox)
+    uiState().let { uiState ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(horizontal = Margin.Medium)
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Margin.Medium),
+        ) {
+            item {
+                Header()
+            }
+            when (uiState) {
+                is UiState.Loading -> {}
+                is UiState.DefaultMailbox -> item {
+                    SelectedMailboxIndicator(
+                        modifier = Modifier.animateItem(),
+                        selectedMailbox = uiState.defaultMailbox
+                    )
                 }
+                is UiState.SelectMailbox -> items(
+                    items = usersWithMailboxes,
+                    key = { it.userId }
+                ) { userWithMailboxes ->
+                    AccountMailboxesDropdown(
+                        modifier = Modifier.animateItem(),
+                        userWithMailboxes = userWithMailboxes,
+                        onClickMailbox = { mailbox ->
+                            onMailboxSelected(mailbox)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SelectedMailboxBottom(selectedMailbox: SelectedMailboxUi?) {
+    AnimatedContent(
+        targetState = selectedMailbox,
+        transitionSpec = { (fadeIn()).togetherWith(fadeOut()) }
+    ) { mailbox ->
+        if (mailbox != null) {
+            SelectedMailboxIndicator(
+                modifier = Modifier
+                    .padding(horizontal = Margin.Medium)
+                    .padding(top = Margin.Medium),
+                selectedMailbox = mailbox
             )
         }
     }
@@ -200,7 +219,7 @@ private fun TopButton(
     val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectMailbox)?.selectedMailbox?.value } }
 
     LargeButton(
-        modifier = modifier.padding(horizontal = Margin.Medium),
+        modifier = modifier.fillMaxWidth(),
         title = stringResource(R.string.buttonContinue),
         enabled = { uiState() !is UiState.SelectMailbox || (uiState() as UiState.SelectMailbox).selectedMailbox.value != null }
     ) {
@@ -218,9 +237,7 @@ private fun BottomButton(
     onChooseAnotherMailbox: (Boolean) -> Unit,
 ) {
     AnimatedVisibility(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = Margin.Medium),
+        modifier = modifier.fillMaxWidth(),
         visible = uiState() is UiState.DefaultMailbox
     ) {
         LargeButton(
@@ -234,8 +251,8 @@ private fun BottomButton(
 }
 
 @Composable
-@Preview(name = "(1) Light")
-@Preview(name = "(2) Dark", uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@PreviewSmallWindow
+@PreviewLargeWindow
 private fun PreviewDefaultMailbox(
     @PreviewParameter(SelectMailboxScreenPreviewParameter::class) previewData: SelectMailboxScreenDataPreview
 ) {
