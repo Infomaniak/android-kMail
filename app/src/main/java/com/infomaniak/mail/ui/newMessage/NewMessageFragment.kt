@@ -46,6 +46,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
@@ -91,6 +92,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.SentryDebug
@@ -123,6 +125,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -141,6 +144,7 @@ class NewMessageFragment : Fragment() {
         // extras aren't yet initialized, so we don't use the `navArgs` here.
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
+    private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
@@ -216,6 +220,7 @@ class NewMessageFragment : Fragment() {
         bindAlertToViewLifecycle(descriptionDialog)
 
         setWebViewReference()
+        initMailbox()
         initUi()
         initializeDraft()
 
@@ -395,6 +400,12 @@ class NewMessageFragment : Fragment() {
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
         }
+    }
+
+    private fun initMailbox() {
+        val userId = if (newMessageFragmentArgs.userId == -1) AccountUtils.currentUserId else newMessageFragmentArgs.userId
+        val mailboxId = if (newMessageFragmentArgs.mailboxId == -1) AccountUtils.currentMailboxId else newMessageFragmentArgs.mailboxId
+        newMessageViewModel.loadMailbox(userId, mailboxId)
     }
 
     private fun initUi() = with(binding) {
@@ -802,7 +813,7 @@ class NewMessageFragment : Fragment() {
 
     private suspend fun setupSendButtons() = with(binding) {
 
-        val mailbox = newMessageViewModel.currentMailbox()
+        val mailbox = newMessageViewModel.currentMailbox.first()
 
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
             scheduleButton.isEnabled = it
@@ -823,7 +834,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
-        val mailbox = newMessageViewModel.currentMailbox()
+        val mailbox = newMessageViewModel.currentMailbox.first()
         safelyNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
