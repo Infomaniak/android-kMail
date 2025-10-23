@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.newMessage.mailbox
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -61,11 +61,13 @@ fun SelectMailboxScreen() {
         },
         content = {
             Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier
+                    .padding(Margin.Medium)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Margin.Medium)
             ) {
                 Image(
-                    modifier = Modifier.padding(Margin.Medium),
                     imageVector = ImageVector.vectorResource(R.drawable.illustration_mailbox_ellipsis_bubble),
                     contentDescription = null
                 )
@@ -101,7 +103,7 @@ fun SelectMailboxScreen() {
 @Preview(name = "(2) Dark", uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 private fun Preview() {
     MailTheme {
-        Surface(Modifier.fillMaxSize(), color = Color.White) {
+        Surface(Modifier.fillMaxSize()) {
             SelectMailboxScreen()
         }
     }
