@@ -25,6 +25,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.basics.bottomsheet.BottomSheetThemeDefaults
 import com.infomaniak.core.compose.basics.bottomsheet.LocalBottomSheetTheme
+import com.infomaniak.core.compose.basics.bottomsheet.ProvideBottomSheetTheme
 import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.mail.R
 
@@ -40,9 +41,6 @@ fun MailTheme(content: @Composable () -> Unit) {
             titleColor = colorResource(R.color.primaryTextColor),
         )
 
-        CompositionLocalProvider(
-            LocalBottomSheetTheme provides bottomSheetTheme,
-            content = content
-        )
+        ProvideBottomSheetTheme(theme = bottomSheetTheme, content = content)
     }
 }
