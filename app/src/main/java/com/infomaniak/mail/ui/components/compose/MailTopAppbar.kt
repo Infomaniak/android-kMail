@@ -38,17 +38,16 @@ import com.infomaniak.mail.ui.theme.MailTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MailTopAppBar(
-    title: String = "",
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.primary
+            navigationIconContentColor = MaterialTheme.colorScheme.primary,
+            actionIconContentColor = MaterialTheme.colorScheme.primary
         ),
-        title = { Text(text = title, style = Typography.h2) },
+        title = {},
         navigationIcon = navigationIcon,
         actions = actions
     )
@@ -87,7 +86,6 @@ object TopAppBarButtons {
 private fun BrandTopAppBarPreview() {
     MailTheme {
         MailTopAppBar(
-            title = "Title",
             navigationIcon = {
                 TopAppBarButtons.Close {  }
             }
