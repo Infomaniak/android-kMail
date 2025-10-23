@@ -22,13 +22,13 @@ import android.util.AttributeSet
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.toggleChevron
-import com.infomaniak.mail.views.CollapsableItem
+import com.infomaniak.mail.views.CollapsibleItem
 
 class UnreadFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsableItem {
+) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsibleItem {
 
     private var onCollapsedFolderClicked: OnClickListener? = null
 
@@ -43,7 +43,7 @@ class UnreadFolderItemView @JvmOverloads constructor(
             field = value
             binding.collapseCustomFolderButton.apply {
                 isVisible = value
-                setOnCollapsableItemClickListener(if (canBeCollapsed) onCollapsedFolderClicked else null)
+                setOnCollapsibleItemClickListener(if (canBeCollapsed) onCollapsedFolderClicked else null)
             }
         }
 
@@ -52,7 +52,7 @@ class UnreadFolderItemView @JvmOverloads constructor(
         binding.collapseCustomFolderButton.contentDescription = contentDescription
     }
 
-    fun initOnCollapsableClickListener(onClickListener: OnClickListener?) {
+    fun initOnCollapsibleClickListener(onClickListener: OnClickListener?) {
         onCollapsedFolderClicked = onClickListener
     }
 }

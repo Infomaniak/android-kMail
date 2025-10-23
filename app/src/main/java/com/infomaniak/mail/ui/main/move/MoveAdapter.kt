@@ -100,7 +100,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
             !shouldDisplayIndent -> 0
             else -> min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
         }
-        setIndent(indent = folderIndent, hasCollapsableFolder = false, canBeCollapsed = false)
+        setIndent(indent = folderIndent, hasCollapsibleFolder = false, canBeCollapsed = false)
 
         setOnClickListener { if (folder.id != selectedFolderId) onFolderClicked.invoke(folder.id) }
     }

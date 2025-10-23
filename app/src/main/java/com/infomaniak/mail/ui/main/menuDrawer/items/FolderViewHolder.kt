@@ -44,7 +44,7 @@ class FolderViewHolder(
     fun displayFolder(
         folderUi: FolderUi,
         currentFolderId: String?,
-        hasCollapsableFolder: Boolean,
+        hasCollapsibleFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
@@ -79,7 +79,7 @@ class FolderViewHolder(
             folderIndent,
             unread,
             currentFolderId,
-            hasCollapsableFolder,
+            hasCollapsibleFolder,
             onFolderClicked,
             onFolderLongClicked,
             onCollapseChildrenClicked,
@@ -92,7 +92,7 @@ class FolderViewHolder(
         folderIndent: Int,
         unread: UnreadDisplay?,
         currentFolderId: String?,
-        hasCollapsableFolder: Boolean,
+        hasCollapsibleFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
@@ -103,7 +103,7 @@ class FolderViewHolder(
 
         setFolderUi(folder, iconId, isSelected = folder.id == currentFolderId)
 
-        initOnCollapsableClickListener { onCollapseChildrenClicked(folderUi.folder.id, isCollapsed) }
+        initOnCollapsibleClickListener { onCollapseChildrenClicked(folderUi.folder.id, isCollapsed) }
 
         isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
         unreadCount = unread?.count ?: 0
@@ -112,7 +112,7 @@ class FolderViewHolder(
 
         setIndent(
             indent = folderIndent,
-            hasCollapsableFolder = hasCollapsableFolder,
+            hasCollapsibleFolder = hasCollapsibleFolder,
             canBeCollapsed = canBeCollapsed,
         )
 

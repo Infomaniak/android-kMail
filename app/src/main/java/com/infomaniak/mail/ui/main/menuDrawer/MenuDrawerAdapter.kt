@@ -52,8 +52,8 @@ import javax.inject.Inject
 class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
 
     private var currentFolderId: String? = null
-    private var hasCollapsableDefaultFolder = false
-    private var hasCollapsableCustomFolder = false
+    private var hasCollapsibleDefaultFolder = false
+    private var hasCollapsibleCustomFolder = false
 
     private lateinit var callbacks: MenuDrawerAdapterCallbacks
 
@@ -78,10 +78,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             addMailboxes(mailboxes, areMailboxesExpanded)
 
             add(ItemType.DIVIDER)
-            hasCollapsableDefaultFolder = addDefaultFolders(displayedFolders.default)
+            hasCollapsibleDefaultFolder = addDefaultFolders(displayedFolders.default)
 
             add(ItemType.DIVIDER)
-            hasCollapsableCustomFolder = addCustomFolders(displayedFolders.custom, areCustomFoldersExpanded)
+            hasCollapsibleCustomFolder = addCustomFolders(displayedFolders.custom, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
@@ -244,7 +244,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 is FolderViewHolder -> holder.displayFolder(
                     folderUi = item as FolderUi,
                     currentFolderId = currentFolderId,
-                    hasCollapsableFolder = if (item.isInDefaultFolderSection) hasCollapsableDefaultFolder else hasCollapsableCustomFolder,
+                    hasCollapsibleFolder = if (item.isInDefaultFolderSection) hasCollapsibleDefaultFolder else hasCollapsibleCustomFolder,
                     onFolderClicked = callbacks.onFolderClicked,
                     onFolderLongClicked = callbacks.onFolderLongClicked,
                     onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
