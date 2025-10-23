@@ -53,7 +53,7 @@ fun LargeButton(
         contentPadding = ButtonDefaults.ContentPadding,
         onClick = onClick
     ) {
-        Text(text = title)
+        Text(text = title,  style = MaterialTheme.typography.bodyMedium)
     }
 }
 
