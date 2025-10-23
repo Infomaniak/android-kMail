@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.infomaniak.core.compose.basicbutton.BasicButton
-import com.infomaniak.core.compose.basics.Dimens
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.core.compose.preview.PreviewLightAndDark
 import com.infomaniak.mail.R
@@ -41,16 +40,15 @@ import com.infomaniak.mail.ui.theme.MailTheme
 
 @Composable
 fun LargeButton(
-    modifier: Modifier = Modifier,
     title: String,
+    modifier: Modifier = Modifier,
     style: ButtonType = ButtonType.Primary,
     onClick: () -> Unit
 ) {
     BasicButton(
         modifier = modifier.height(dimensionResource(R.dimen.textButtonPrimaryHeight)),
         colors = style.colors(),
-        shape = RoundedCornerShape(Dimens.largeCornerRadius),
-        contentPadding = ButtonDefaults.ContentPadding,
+        shape = RoundedCornerShape(dimensionResource(R.dimen.textButtonCornerRadius)),
         onClick = onClick
     ) {
         Text(text = title,  style = MaterialTheme.typography.bodyMedium)
@@ -64,12 +62,7 @@ enum class ButtonType(val colors: @Composable () -> ButtonColors) {
             contentColor = MaterialTheme.colorScheme.onPrimary
         )
     }),
-    Secondary({
-        ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        )
-    }),
+    // There is no “secondary” button because the “secondary” theme is not defined in the app.
     Tertiary({
         ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
