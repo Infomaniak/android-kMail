@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023-2024 Infomaniak Network SA
+  ~ Copyright (C) 2023-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -25,36 +25,7 @@
         android:id="@+id/noValidMailboxesFragment"
         android:name="com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesFragment"
         android:label="NoValidMailboxesFragment"
-        tools:layout="@layout/fragment_no_valid_mailboxes">
-        <action
-            android:id="@+id/action_noValidMailboxesFragment_to_attachMailboxFragment"
-            app:destination="@id/attachMailboxFragment" />
-        <action
-            android:id="@+id/action_noValidMailboxesFragment_to_invalidPasswordFragment"
-            app:destination="@id/invalidPasswordFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/attachMailboxFragment"
-        android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
-        android:label="AttachMailboxFragment"
-        tools:layout="@layout/fragment_attach_mailbox" />
-
-    <fragment
-        android:id="@+id/invalidPasswordFragment"
-        android:name="com.infomaniak.mail.ui.main.InvalidPasswordFragment"
-        android:label="InvalidPasswordFragment"
-        tools:layout="@layout/fragment_invalid_password">
-        <argument
-            android:name="mailboxId"
-            app:argType="integer" />
-        <argument
-            android:name="mailboxObjectId"
-            app:argType="string" />
-        <argument
-            android:name="mailboxEmail"
-            app:argType="string" />
-    </fragment>
+        tools:layout="@layout/fragment_no_valid_mailboxes" />
 
     <dialog
         android:id="@+id/accountBottomSheetDialog"

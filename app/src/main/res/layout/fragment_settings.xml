@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -79,13 +79,6 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_settings_mailbox" />
-
-            <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/addMailbox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:itemAction="chevron"
-                app:title="@string/buttonAddExistingAddress" />
 
             <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 

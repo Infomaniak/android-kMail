@@ -149,16 +149,6 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.manageMailboxes(), POST, mapOf("mail" to mailAddress, "password" to password))
     }
 
-    suspend fun detachMailbox(mailboxId: Int): ApiResponse<Boolean> = callApi(ApiRoutes.manageMailbox(mailboxId), DELETE)
-
-    suspend fun updateMailboxPassword(mailboxId: Int, password: String): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.updateMailboxPassword(mailboxId), PUT, mapOf("password" to password))
-    }
-
-    suspend fun requestMailboxPassword(mailboxHostingId: Int, mailboxName: String): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.requestMailboxPassword(mailboxHostingId, mailboxName), POST)
-    }
-
     suspend fun isInfomaniakMailboxes(emails: Set<String>): ApiResponse<List<MailboxHostingStatus>> {
         return callApi(ApiRoutes.isInfomaniakMailboxes(emails), GET)
     }

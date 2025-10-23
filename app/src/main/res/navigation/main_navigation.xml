@@ -54,9 +54,6 @@
         <!-- Endregion -->
 
         <action
-            android:id="@+id/action_threadListFragment_to_attachMailboxFragment"
-            app:destination="@id/attachMailboxFragment" />
-        <action
             android:id="@+id/action_threadListFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
@@ -74,9 +71,6 @@
         <action
             android:id="@+id/action_threadListFragment_to_lockedMailboxBottomSheetDialog"
             app:destination="@id/lockedMailboxBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
-            app:destination="@id/invalidPasswordFragment" />
     </fragment>
 
     <activity
@@ -296,12 +290,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/attachMailboxFragment"
-        android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
-        android:label="AttachMailboxFragment"
-        tools:layout="@layout/fragment_attach_mailbox" />
-
-    <fragment
         android:id="@+id/settingsFragment"
         android:name="com.infomaniak.mail.ui.main.settings.SettingsFragment"
         android:label="SettingsFragment"
@@ -496,22 +484,6 @@
         android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementSentrySettingFragment"
         android:label="DataManagementSentrySettingFragment"
         tools:layout="@layout/fragment_data_management_sentry_setting" />
-
-    <fragment
-        android:id="@+id/invalidPasswordFragment"
-        android:name="com.infomaniak.mail.ui.main.InvalidPasswordFragment"
-        android:label="InvalidPasswordFragment"
-        tools:layout="@layout/fragment_invalid_password">
-        <argument
-            android:name="mailboxId"
-            app:argType="integer" />
-        <argument
-            android:name="mailboxObjectId"
-            app:argType="string" />
-        <argument
-            android:name="mailboxEmail"
-            app:argType="string" />
-    </fragment>
 
     <activity
         android:id="@+id/launchActivity"

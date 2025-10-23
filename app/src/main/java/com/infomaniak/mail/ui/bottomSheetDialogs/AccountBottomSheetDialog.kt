@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.utils.year
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -93,7 +92,6 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         recyclerViewAccount.adapter = accountsAdapter
-        addAccount.setOnClickListener { safeNavigate(resId = R.id.attachMailboxFragment) }
         logout.setOnClickListener {
             trackAccountEvent(MatomoName.LogOut)
             descriptionDialog.show(
