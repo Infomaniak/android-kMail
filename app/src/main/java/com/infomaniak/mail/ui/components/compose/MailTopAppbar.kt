@@ -24,13 +24,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.preview.PreviewAllWindows
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.theme.MailTheme
