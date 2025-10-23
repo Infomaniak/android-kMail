@@ -46,7 +46,9 @@ fun LargeButton(
     onClick: () -> Unit
 ) {
     BasicButton(
-        modifier = modifier.height(dimensionResource(R.dimen.textButtonPrimaryHeight)),
+        modifier = modifier.height(
+            dimensionResource(R.dimen.textButtonPrimaryHeight) - dimensionResource(R.dimen.textButtonPrimaryVerticalInset) * 2
+        ),
         colors = style.colors(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.textButtonCornerRadius)),
         onClick = onClick
