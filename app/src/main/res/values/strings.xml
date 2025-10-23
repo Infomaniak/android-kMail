@@ -159,6 +159,7 @@
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
+    <string name="buttonSendWithDifferentAddress">Send with a different address</string>
     <string name="buttonShare">Share</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synchronization</string>
@@ -178,6 +179,7 @@
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
+    <string name="composeMailboxCurrentTitle">Send a message with the address:</string>
     <string name="confirmLogoutDescription">Are you sure you want to log out from %s?</string>
     <string name="confirmLogoutTitle">Log out</string>
     <string name="confirmationToBlockAnExpeditorText">All future messages from %s will be moved to the Junk Mail folder.</string>

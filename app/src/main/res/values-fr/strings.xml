@@ -155,6 +155,7 @@
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
     <string name="buttonSee">Consulter</string>
     <string name="buttonSelectAll">Tout</string>
+    <string name="buttonSendWithDifferentAddress">Envoyer avec une autre adresse</string>
     <string name="buttonShare">Partager</string>
     <string name="buttonStart">Commencer</string>
     <string name="buttonStartSync">Commencer la synchronisation</string>
@@ -174,6 +175,7 @@
     <string name="ccTitle">Cc :</string>
     <string name="comingSoon">À venir…</string>
     <string name="commercialFolder">Promotions</string>
+    <string name="composeMailboxCurrentTitle">Envoyer un message avec l’adresse :</string>
     <string name="confirmLogoutDescription">Êtes-vous sûr de vouloir vous déconnecter du compte %s ?</string>
     <string name="confirmLogoutTitle">Me déconnecter</string>
     <string name="confirmationToBlockAnExpeditorText">Tous les futurs messages de %s seront déplacés dans le dossier Courrier indésirable.</string>
