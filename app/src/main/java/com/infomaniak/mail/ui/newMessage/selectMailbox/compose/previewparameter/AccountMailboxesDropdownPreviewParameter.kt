@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.newMessage.mailbox.compose.previewparameter
+package com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.MailboxUi
-import com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxViewModel.UserMailboxesUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.MailboxUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
 
 class AccountMailboxesDropdownPreviewParameter : PreviewParameterProvider<UserMailboxesUi> {
     override val values: Sequence<UserMailboxesUi>
