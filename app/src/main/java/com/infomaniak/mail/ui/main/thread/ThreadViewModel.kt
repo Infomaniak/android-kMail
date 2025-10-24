@@ -161,8 +161,8 @@ class ThreadViewModel @Inject constructor(
         .map { it.obj }
         .asLiveData(ioCoroutineContext)
 
-    // To each message id we associate a set of emojis that are added for fake so we can instantly apply clicked emojis without
-    // having to wait for the api call to return
+    // To each Message ID, we associate a set of emojis that are added for fake so we can
+    // instantly apply clicked emojis without having to wait for the API call to return.
     private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -255,45 +255,12 @@ class ThreadViewModel @Inject constructor(
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
         superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
 
-        suspend fun formatListWithNewBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
-            return formatLists(messages) { index, _ ->
-                when (index) {
-                    0 -> MessageBehavior.DISPLAYED // First Message
-                    in 1 until firstIndexAfterBlock -> MessageBehavior.COLLAPSED // All Messages that should go in block
-                    firstIndexAfterBlock -> MessageBehavior.FIRST_AFTER_BLOCK // First Message not in block
-                    else -> MessageBehavior.DISPLAYED // All following Messages
-                }
-            }
-        }
-
-        suspend fun formatListWithExistingBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
-
-            var isStillInBlock = true
-            val previousBlock = superCollapsedBlock!!.messagesUids.toSet()
-
-            superCollapsedBlock!!.messagesUids.clear()
-
-            return formatLists(messages) { index, messageUid ->
-                when {
-                    index == 0 -> { // First Message
-                        MessageBehavior.DISPLAYED
-                    }
-                    previousBlock.contains(messageUid) && isStillInBlock -> { // All Messages already in block
-                        MessageBehavior.COLLAPSED
-                    }
-                    !previousBlock.contains(messageUid) && isStillInBlock -> { // First Message not in block
-                        isStillInBlock = false
-                        MessageBehavior.FIRST_AFTER_BLOCK
-                    }
-                    else -> { // All following Messages
-                        MessageBehavior.DISPLAYED
-                    }
-                }
-            }
-        }
-
         return if (superCollapsedBlock!!.shouldBeDisplayed) {
-            if (superCollapsedBlock!!.isFirstTime()) formatListWithNewBlock() else formatListWithExistingBlock()
+            if (superCollapsedBlock!!.isFirstTime()) {
+                formatListWithNewBlock(messages, firstIndexAfterBlock)
+            } else {
+                formatListWithExistingBlock(messages)
+            }
         } else {
             formatLists(messages) { _, _ -> MessageBehavior.DISPLAYED }
         }
@@ -321,11 +288,54 @@ class ThreadViewModel @Inject constructor(
      * - If there's any unread Message in between, it will be displayed (hence, all following Messages will be displayed too).
      * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the Block.
      */
-    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean = with(threadState) {
-        return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden, we mustn't ever display it again
-                !hasSuperCollapsedBlockBeenClicked.value && // Block hasn't been expanded by the user
+    private fun shouldBlockBeDisplayed(
+        messagesCount: Int,
+        firstIndexAfterBlock: Int,
+    ): Boolean = threadState.superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden, we mustn't ever display it again
+                !threadState.hasSuperCollapsedBlockBeenClicked.value && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
+
+    private suspend fun formatListWithNewBlock(
+        messages: RealmResults<Message>,
+        firstIndexAfterBlock: Int,
+    ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+        return formatLists(messages) { index, _ ->
+            when (index) {
+                0 -> MessageBehavior.DISPLAYED // First Message
+                in 1 until firstIndexAfterBlock -> MessageBehavior.COLLAPSED // All Messages that should go in block
+                firstIndexAfterBlock -> MessageBehavior.FIRST_AFTER_BLOCK // First Message not in block
+                else -> MessageBehavior.DISPLAYED // All following Messages
+            }
+        }
+    }
+
+    private suspend fun formatListWithExistingBlock(
+        messages: RealmResults<Message>,
+    ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+
+        var isStillInBlock = true
+        val previousBlock = threadState.superCollapsedBlock!!.messagesUids.toSet()
+
+        threadState.superCollapsedBlock!!.messagesUids.clear()
+
+        return formatLists(messages) { index, messageUid ->
+            when {
+                index == 0 -> { // First Message
+                    MessageBehavior.DISPLAYED
+                }
+                previousBlock.contains(messageUid) && isStillInBlock -> { // All Messages already in block
+                    MessageBehavior.COLLAPSED
+                }
+                !previousBlock.contains(messageUid) && isStillInBlock -> { // First Message not in block
+                    isStillInBlock = false
+                    MessageBehavior.FIRST_AFTER_BLOCK
+                }
+                else -> { // All following Messages
+                    MessageBehavior.DISPLAYED
+                }
+            }
+        }
     }
 
     private suspend fun formatLists(
