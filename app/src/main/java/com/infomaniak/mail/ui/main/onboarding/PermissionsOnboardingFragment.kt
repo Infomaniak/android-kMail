@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.onboarding
 
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,6 +34,7 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingBinding
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.statusBar
+import com.infomaniak.mail.utils.pauseOnLastFrame
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -47,6 +49,11 @@ class PermissionsOnboardingFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentPermissionsOnboardingBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.iconLayout.play() // Avoid making the animation disappear on config change
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
@@ -67,7 +74,7 @@ class PermissionsOnboardingFragment : Fragment() {
 
     private fun setPermissionUi() = with(binding) {
         val permission = if (navigationArgs.position == 0) PermissionType.CONTACTS else PermissionType.NOTIFICATIONS
-        iconLayout.setImageResource(getIconResWithAccentColor(permission))
+        iconLayout.pauseOnLastFrame()
         title.setText(permission.titleRes)
         description.setText(permission.descritionRes)
         waveBackground.apply {
