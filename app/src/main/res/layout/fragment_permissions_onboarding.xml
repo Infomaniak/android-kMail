@@ -81,14 +81,10 @@
             app:layout_constraintTop_toBottomOf="@id/dummyToolbarEdgeToEdge"
             app:layout_constraintVertical_chainStyle="packed" />
 
-        <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
+        <FrameLayout
             android:id="@+id/iconLayout"
             android:layout_width="0dp"
             android:layout_height="250dp"
-            android:importantForAccessibility="no"
-            app:dotLottie_autoplay="true"
-            app:dotLottie_src="note_persons_bubble.lottie"
-            app:dotLottie_useFrameInterpolation="true"
             app:layout_constraintBottom_toBottomOf="@id/bottomWave"
             app:layout_constraintEnd_toEndOf="@id/end"
             app:layout_constraintHeight_max="250dp"

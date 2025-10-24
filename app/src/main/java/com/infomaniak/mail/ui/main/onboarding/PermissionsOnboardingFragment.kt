@@ -25,6 +25,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -34,7 +39,10 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingBinding
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.statusBar
-import com.infomaniak.mail.utils.pauseOnLastFrame
+import com.lottiefiles.dotlottie.core.compose.runtime.DotLottieController
+import com.lottiefiles.dotlottie.core.compose.ui.DotLottieAnimation
+import com.lottiefiles.dotlottie.core.util.DotLottieEventListener
+import com.lottiefiles.dotlottie.core.util.DotLottieSource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -53,7 +61,7 @@ class PermissionsOnboardingFragment : Fragment() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.iconLayout.play() // Avoid making the animation disappear on config change
+        // binding.iconLayout.play() // Avoid making the animation disappear on config change
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
@@ -74,7 +82,30 @@ class PermissionsOnboardingFragment : Fragment() {
 
     private fun setPermissionUi() = with(binding) {
         val permission = if (navigationArgs.position == 0) PermissionType.CONTACTS else PermissionType.NOTIFICATIONS
-        iconLayout.pauseOnLastFrame()
+        iconLayout.addView(
+            ComposeView(requireContext()).apply {
+                setContent {
+                    val controller = remember { DotLottieController() }
+
+                    Column {
+                        DotLottieAnimation(
+                            source = DotLottieSource.Asset("note_persons_bubble.lottie"),
+                            autoplay = true,
+                            controller = controller,
+                            eventListeners = listOf(
+                                object : DotLottieEventListener {
+                                    override fun onLoad() {
+                                        // controller.setThemeData(theme)
+                                        controller.setTheme("Pink-Dark")
+                                    }
+                                }
+                            ),
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+                }
+            }
+        )
         title.setText(permission.titleRes)
         description.setText(permission.descritionRes)
         waveBackground.apply {
