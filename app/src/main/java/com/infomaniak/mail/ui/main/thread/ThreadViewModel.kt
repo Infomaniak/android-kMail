@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSplittiesApi::class)
+@file:OptIn(ExperimentalSplittiesApi::class, ExperimentalCoroutinesApi::class)
 
 package com.infomaniak.mail.ui.main.thread
 
@@ -80,7 +80,9 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,11 +94,14 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import splitties.coroutines.suspendLazy
@@ -184,7 +189,7 @@ class ThreadViewModel @Inject constructor(
             },
         ).flatMapLatest { (mode, featureFlags, fakeReactions) ->
             val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
-            mode.getMessages(featureFlags).map { (items, messagesToFetch) ->
+            mode.getMessages(featureFlags).mapLatest { (items, messagesToFetch) ->
                 items.toUiMessages(fakeReactions, isReactionsAvailable) to messagesToFetch
             }
         }
@@ -249,27 +254,34 @@ class ThreadViewModel @Inject constructor(
 
         if (messages.isEmpty()) return emptyList<Any>() to emptyList()
 
-        superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
+        val newBlock = superCollapsedBlock?.let {
+            it.copy(messagesUids = it.messagesUids.toMutableSet())
+        } ?: SuperCollapsedBlock()
 
         val thread = messages.first().threads.single { it.uid == threadUid }
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
-        superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
+        newBlock.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), newBlock, firstIndexAfterBlock)
 
-        return if (superCollapsedBlock!!.shouldBeDisplayed) {
-            if (superCollapsedBlock!!.isFirstTime()) {
-                formatListWithNewBlock(messages, firstIndexAfterBlock)
+        val result = if (newBlock.shouldBeDisplayed) {
+            if (newBlock.isFirstTime()) {
+                formatListWithNewBlock(messages, newBlock, firstIndexAfterBlock)
             } else {
-                formatListWithExistingBlock(messages)
+                formatListWithExistingBlock(messages, newBlock)
             }
         } else {
-            formatLists(messages) { _, _ -> MessageBehavior.DISPLAYED }
+            formatLists(messages, newBlock) { _, _ -> MessageBehavior.DISPLAYED }
         }
+
+        currentCoroutineContext().ensureActive()
+        superCollapsedBlock = newBlock
+
+        return result
     }
 
     private suspend fun mapRealmMessagesResultWithoutSuperCollapsedBlock(
         message: Message,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
-        return formatLists(listOf(message)) { _, _ -> MessageBehavior.DISPLAYED }
+        return formatLists(listOf(message), threadState.superCollapsedBlock) { _, _ -> MessageBehavior.DISPLAYED }
     }
 
     private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
@@ -290,17 +302,19 @@ class ThreadViewModel @Inject constructor(
      */
     private fun shouldBlockBeDisplayed(
         messagesCount: Int,
+        block: SuperCollapsedBlock,
         firstIndexAfterBlock: Int,
-    ): Boolean = threadState.superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden, we mustn't ever display it again
-                !threadState.hasSuperCollapsedBlockBeenClicked.value && // Block hasn't been expanded by the user
-                messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
-                firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
+    ): Boolean = block.shouldBeDisplayed && // If the Block was hidden, we mustn't ever display it again
+            !threadState.hasSuperCollapsedBlockBeenClicked.value && // Block hasn't been expanded by the user
+            messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
+            firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
 
     private suspend fun formatListWithNewBlock(
         messages: RealmResults<Message>,
+        block: SuperCollapsedBlock,
         firstIndexAfterBlock: Int,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
-        return formatLists(messages) { index, _ ->
+        return formatLists(messages, block) { index, _ ->
             when (index) {
                 0 -> MessageBehavior.DISPLAYED // First Message
                 in 1 until firstIndexAfterBlock -> MessageBehavior.COLLAPSED // All Messages that should go in block
@@ -312,14 +326,15 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun formatListWithExistingBlock(
         messages: RealmResults<Message>,
+        block: SuperCollapsedBlock,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
         var isStillInBlock = true
-        val previousBlock = threadState.superCollapsedBlock!!.messagesUids.toSet()
+        val previousBlock = block.messagesUids.toSet()
 
-        threadState.superCollapsedBlock!!.messagesUids.clear()
+        block.messagesUids.clear()
 
-        return formatLists(messages) { index, messageUid ->
+        return formatLists(messages, block) { index, messageUid ->
             when {
                 index == 0 -> { // First Message
                     MessageBehavior.DISPLAYED
@@ -340,6 +355,7 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun formatLists(
         messages: List<Message>,
+        block: SuperCollapsedBlock?,
         computeBehavior: (Int, String) -> MessageBehavior,
     ): Pair<MutableList<Any>, MutableList<Message>> = with(threadState) {
 
@@ -354,11 +370,12 @@ class ThreadViewModel @Inject constructor(
         }
 
         messages.forEachIndexed { index, message ->
+            currentCoroutineContext().ensureActive()
             when (computeBehavior(index, message.uid)) {
                 MessageBehavior.DISPLAYED -> addMessage(message)
-                MessageBehavior.COLLAPSED -> superCollapsedBlock!!.messagesUids.add(message.uid)
+                MessageBehavior.COLLAPSED -> block?.messagesUids?.add(message.uid)
                 MessageBehavior.FIRST_AFTER_BLOCK -> {
-                    items += superCollapsedBlock!!
+                    block?.let { items += it }
                     addMessage(message.apply { shouldHideDivider = true })
                 }
             }
@@ -705,7 +722,7 @@ class ThreadViewModel @Inject constructor(
         override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
             return messageController
                 .getSortedAndNotDeletedMessagesAsync(threadUid, featureFlags)
-                .map { mapRealmMessagesResult(it.list, threadUid) }
+                .mapLatest { mapMessagesMutex.withLock { mapRealmMessagesResult(it.list, threadUid) } }
         }
     }
 
@@ -720,5 +737,7 @@ class ThreadViewModel @Inject constructor(
     companion object {
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
+
+        private val mapMessagesMutex = Mutex()
     }
 }
