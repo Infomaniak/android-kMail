@@ -212,6 +212,7 @@ dependencies {
     "standardImplementation"(libs.firebase.messaging.ktx)
 
     implementation(core.lottie)
+    implementation(core.dotlottie)
     implementation(libs.dragdropswipe.recyclerview)
     implementation(libs.dotsindicator)
     implementation(libs.emoji2.emojipicker)
