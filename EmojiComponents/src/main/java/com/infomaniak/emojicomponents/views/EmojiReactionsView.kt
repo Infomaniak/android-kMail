@@ -66,8 +66,6 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     init {
         val composeView = ComposeView(context)
-        composeView.setContent { ComposeViewContent() }
-        addView(composeView)
 
         context.obtainStyledAttributes(attrs, R.styleable.EmojiReactionsView, defStyleAttr, 0).apply {
             chipCornerRadius = getDimensionOrNull(R.styleable.EmojiReactionsView_chipCornerRadius)
@@ -77,6 +75,9 @@ class EmojiReactionsView @JvmOverloads constructor(
             composeView.setViewCompositionStrategy(viewCompositionStrategyIndex.toViewCompositionStrategy())
             recycle()
         }
+
+        composeView.setContent { ComposeViewContent() }
+        addView(composeView)
     }
 
     private fun TypedArray.getDimensionOrNull(@StyleableRes index: Int): Float? {
