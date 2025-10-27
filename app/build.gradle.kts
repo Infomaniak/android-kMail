@@ -200,6 +200,7 @@ dependencies {
     implementation(project(":Core:Network"))
     implementation(project(":Core:Sentry"))
     implementation(project(":Core:TwoFactorAuth:Front"))
+    implementation(project(":Core:TwoFactorAuth:Back:WithUserDb"))
     implementation(project(":EmojiComponents"))
     implementation(project(":HtmlCleaner"))
 

@@ -49,6 +49,7 @@ include(
     ":Core:Sentry",
     ":Core:TwoFactorAuth:Front",
     ":Core:TwoFactorAuth:Back",
+    ":Core:TwoFactorAuth:Back:WithUserDb",
     ":EmojiComponents",
     ":HtmlCleaner",
 )
