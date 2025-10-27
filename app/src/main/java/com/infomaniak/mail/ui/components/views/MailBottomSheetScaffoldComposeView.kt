@@ -43,6 +43,8 @@ import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.mail.ui.theme.MailTheme
 import kotlinx.coroutines.launch
 
+// This view extends FrameLayout instead of a ComposeView to avoid system initiated animations that try to call addView() on this
+// custom view which throws a UnsupportedOperationException when called on a ComposeView.
 abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
