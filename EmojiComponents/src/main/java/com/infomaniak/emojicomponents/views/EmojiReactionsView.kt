@@ -20,6 +20,7 @@ package com.infomaniak.emojicomponents.views
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
+import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.StyleableRes
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.vectorResource
 import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
@@ -43,11 +44,13 @@ import com.infomaniak.emojicomponents.components.EmojiReactions
 import com.infomaniak.emojicomponents.components.EmojiReactionsDefaults
 import com.infomaniak.emojicomponents.data.Reaction
 
+// This view extends FrameLayout instead of a ComposeView to avoid system initiated animations that try to call addView() on this
+// custom view which throws a UnsupportedOperationException when called on a ComposeView.
 class EmojiReactionsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : AbstractComposeView(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val reactionsState = mutableStateListOf<Reaction>()
     private var isAddReactionEnabled by mutableStateOf(true)
@@ -62,14 +65,19 @@ class EmojiReactionsView @JvmOverloads constructor(
     private var addReactionDisabledColor: Int? = null
 
     init {
+        val composeView = ComposeView(context)
+
         context.obtainStyledAttributes(attrs, R.styleable.EmojiReactionsView, defStyleAttr, 0).apply {
             chipCornerRadius = getDimensionOrNull(R.styleable.EmojiReactionsView_chipCornerRadius)
             addReactionIconRes = getResourceIdOrNull(R.styleable.EmojiReactionsView_addReactionIcon)
             addReactionDisabledColor = getColorOrNull(R.styleable.EmojiReactionsView_addReactionDisabledColor)
             val viewCompositionStrategyIndex = getInteger(R.styleable.EmojiReactionsView_viewCompositionStrategy, 0)
-            setViewCompositionStrategy(viewCompositionStrategyIndex.toViewCompositionStrategy())
+            composeView.setViewCompositionStrategy(viewCompositionStrategyIndex.toViewCompositionStrategy())
             recycle()
         }
+
+        composeView.setContent { ComposeViewContent() }
+        addView(composeView)
     }
 
     private fun TypedArray.getDimensionOrNull(@StyleableRes index: Int): Float? {
@@ -86,7 +94,7 @@ class EmojiReactionsView @JvmOverloads constructor(
     }
 
     @Composable
-    override fun Content() {
+    private fun ComposeViewContent() {
         MaterialThemeFromXml {
             val addReactionIcon = addReactionIconRes?.let { ImageVector.vectorResource(it) }
                 ?: EmojiReactionsDefaults.addReactionIcon
@@ -146,7 +154,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 }
 
 private fun Int.toViewCompositionStrategy(): ViewCompositionStrategy {
-    return when(this) {
+    return when (this) {
         0 -> ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
         else -> error("Trying to set a ViewCompositionStrategy that has not been mapped to an instance")
     }
