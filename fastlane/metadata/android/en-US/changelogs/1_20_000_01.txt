@@ -1,3 +1,4 @@
 - Make the app a secondary 2FA method (2 factor authentication)
 - Improve the behaviour of new emoji email reactions
+- Remove 'Add mailbox' button
 - Bug fixes
