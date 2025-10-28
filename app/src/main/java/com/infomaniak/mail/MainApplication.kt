@@ -89,6 +89,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
     init {
         injectAsAppCtx() // Ensures it is always initialized
+        configureInfomaniakCore() // Must be run before hilt initializes injected properties, or login always hits production.
     }
 
     var isAppInBackground = true
@@ -150,7 +151,6 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         enforceAppTheme()
         configureRoomDatabases()
         configureAppReloading()
-        configureInfomaniakCore()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
 
