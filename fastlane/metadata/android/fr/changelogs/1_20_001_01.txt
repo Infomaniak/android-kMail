@@ -1,0 +1,5 @@
+- L'application est désormais une méthode d'authentification à 2 facteurs secondaire
+- Amélioration du comportement des nouvelles réactions emoji d'emails
+- Retrait du bouton pour ajouter une adresse
+- Corrections de bugs
+- Support du login inter app pour la prochaine app
