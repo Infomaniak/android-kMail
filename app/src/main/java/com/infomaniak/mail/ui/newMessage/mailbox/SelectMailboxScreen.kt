@@ -80,20 +80,22 @@ fun SelectMailboxScreen() {
         },
         topButton = {
             LargeButton(
+                title = stringResource(R.string.buttonContinue),
                 modifier = it,
-                title = stringResource(R.string.buttonContinue)
-            ) {
-                // TODO: Open newMessageFragment
-            }
+                onClick = {
+                    // TODO: Open newMessageFragment
+                }
+            )
         },
         bottomButton = {
             LargeButton(
-                modifier = it,
                 title = stringResource(R.string.buttonSendWithDifferentAddress),
+                modifier = it,
+                onClick = {
+                    // TODO: Open screen choose account and mailbox
+                },
                 style = ButtonType.Tertiary
-            ) {
-                // TODO: Open screen choose account and mailbox
-            }
+            )
         },
     )
 }
