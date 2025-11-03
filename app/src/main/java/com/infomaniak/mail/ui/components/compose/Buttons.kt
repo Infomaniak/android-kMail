@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.infomaniak.core.compose.basicbutton.BasicButton
+import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.core.compose.preview.PreviewLightAndDark
 import com.infomaniak.mail.R
@@ -41,9 +42,9 @@ import com.infomaniak.mail.ui.theme.MailTheme
 @Composable
 fun LargeButton(
     title: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    style: ButtonType = ButtonType.Primary,
-    onClick: () -> Unit
+    style: ButtonType = ButtonType.Primary
 ) {
     BasicButton(
         modifier = modifier.height(
@@ -53,7 +54,7 @@ fun LargeButton(
         shape = RoundedCornerShape(dimensionResource(R.dimen.textButtonCornerRadius)),
         onClick = onClick
     ) {
-        Text(text = title,  style = MaterialTheme.typography.bodyMedium)
+        Text(text = title,  style = Typography.bodyMedium)
     }
 }
 

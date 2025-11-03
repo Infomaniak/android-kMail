@@ -32,13 +32,14 @@ fun MailTheme(content: @Composable () -> Unit) {
     MaterialThemeFromXml {
         val cornerSize = dimensionResource(R.dimen.bottomSheetCornerSize)
 
-        val bottomSheetTheme = BottomSheetThemeDefaults.theme(
-            shape = RoundedCornerShape(topStart = cornerSize, topEnd = cornerSize),
-            dragHandleColor = colorResource(R.color.dragHandleColor),
-            titleTextStyle = Typography.bodyMedium,
-            titleColor = colorResource(R.color.primaryTextColor),
+        ProvideBottomSheetTheme(
+            theme = BottomSheetThemeDefaults.theme(
+                shape = RoundedCornerShape(topStart = cornerSize, topEnd = cornerSize),
+                dragHandleColor = colorResource(R.color.dragHandleColor),
+                titleTextStyle = Typography.bodyMedium,
+                titleColor = colorResource(R.color.primaryTextColor),
+            ),
+            content = content
         )
-
-        ProvideBottomSheetTheme(theme = bottomSheetTheme, content = content)
     }
 }
