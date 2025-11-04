@@ -26,7 +26,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -71,14 +70,13 @@ fun SelectMailboxScreen(
     onNavigationTopbarClick: () -> Unit,
     onContinue: (SelectedMailboxUi) -> Unit
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
     val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SelectMailboxScreenContent(
         usersWithMailboxes = usersWithMailboxes,
         uiState = { uiState },
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = remember { SnackbarHostState() },
         onMailboxSelected = viewModel::selectMailbox,
         onChooseAnotherMailbox = viewModel::chooseAnotherMailbox,
         onNavigationTopbarClick = onNavigationTopbarClick,
@@ -87,22 +85,19 @@ fun SelectMailboxScreen(
 }
 
 @Composable
-fun SelectMailboxScreenContent(
+private fun SelectMailboxScreenContent(
     usersWithMailboxes: List<UserMailboxesUi>,
     uiState: () -> UiState,
-    snackbarHostState: SnackbarHostState? = null,
-    onMailboxSelected: (SelectedMailboxUi?) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    onMailboxSelected: (SelectedMailboxUi) -> Unit,
     onChooseAnotherMailbox: (Boolean) -> Unit,
     onNavigationTopbarClick: () -> Unit,
     onContinueWithMailbox: (SelectedMailboxUi) -> Unit
 ) {
-    val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectMailbox)?.selectedMailbox?.value } }
+    val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectionScreen.Selected)?.mailbox } }
 
-    BackHandler(
-        enabled = uiState() is UiState.SelectMailbox
-    ) {
+    BackHandler(uiState() is UiState.SelectionScreen) {
         onChooseAnotherMailbox(false)
-        onMailboxSelected(null)
     }
 
     BottomStickyButtonScaffold(
@@ -110,7 +105,7 @@ fun SelectMailboxScreenContent(
         topBar = {
             MailTopAppBar(
                 navigationIcon = {
-                    if (uiState() is UiState.SelectMailbox) {
+                    if (uiState() is UiState.SelectionScreen) {
                         TopAppBarButtons.Back(onNavigationTopbarClick)
                     } else {
                         TopAppBarButtons.Close(onNavigationTopbarClick)
@@ -123,7 +118,11 @@ fun SelectMailboxScreenContent(
                 ScrollableContent(
                     uiState,
                     usersWithMailboxes,
-                    onMailboxSelected
+                    onMailboxSelected,
+                    Modifier
+                        .padding(horizontal = Margin.Medium)
+                        .fillMaxWidth()
+                        .weight(1f),
                 )
                 SelectedMailboxBottom(selectedMailbox)
             }
@@ -132,7 +131,7 @@ fun SelectMailboxScreenContent(
             TopButton(modifier, uiState, onContinueWithMailbox)
         },
         bottomButton = { modifier ->
-            BottomButton(modifier, uiState, onMailboxSelected, onChooseAnotherMailbox)
+            BottomButton(modifier, uiState, onChooseAnotherMailbox)
         }
     )
 }
@@ -151,43 +150,41 @@ private fun Header() {
 }
 
 @Composable
-private fun ColumnScope.ScrollableContent(
+private fun ScrollableContent(
     uiState: () -> UiState,
     usersWithMailboxes: List<UserMailboxesUi>,
-    onMailboxSelected: (SelectedMailboxUi?) -> Unit
+    onMailboxSelected: (SelectedMailboxUi) -> Unit,
+    modifier: Modifier,
 ) {
-    uiState().let { uiState ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(horizontal = Margin.Medium)
-                .fillMaxWidth()
-                .weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Margin.Medium),
-        ) {
-            item {
-                Header()
+    val uiState = uiState()
+
+    LazyColumn(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Margin.Medium),
+    ) {
+        item {
+            Header()
+        }
+        when (uiState) {
+            is UiState.Loading -> {}
+            is UiState.DefaultScreen -> item {
+                SelectedMailboxIndicator(
+                    modifier = Modifier.animateItem(),
+                    selectedMailbox = uiState.mailbox
+                )
             }
-            when (uiState) {
-                is UiState.Loading -> {}
-                is UiState.DefaultMailbox -> item {
-                    SelectedMailboxIndicator(
-                        modifier = Modifier.animateItem(),
-                        selectedMailbox = uiState.defaultMailbox
-                    )
-                }
-                is UiState.SelectMailbox -> items(
-                    items = usersWithMailboxes,
-                    key = { it.userId }
-                ) { userWithMailboxes ->
-                    AccountMailboxesDropdown(
-                        modifier = Modifier.animateItem(),
-                        userWithMailboxes = userWithMailboxes,
-                        onClickMailbox = { mailbox ->
-                            onMailboxSelected(mailbox)
-                        }
-                    )
-                }
+            UiState.SelectionScreen.NoSelection, is UiState.SelectionScreen.Selected -> items(
+                items = usersWithMailboxes,
+                key = { it.userId }
+            ) { userWithMailboxes ->
+                AccountMailboxesDropdown(
+                    modifier = Modifier.animateItem(),
+                    userWithMailboxes = userWithMailboxes,
+                    onClickMailbox = { mailbox ->
+                        onMailboxSelected(mailbox)
+                    }
+                )
             }
         }
     }
@@ -216,17 +213,18 @@ private fun TopButton(
     uiState: () -> UiState,
     onContinueWithMailbox: (SelectedMailboxUi) -> Unit
 ) {
-    val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectMailbox)?.selectedMailbox?.value } }
+    val uiState = uiState()
+    val selectedMailbox by remember { derivedStateOf { (uiState as? SelectMailboxViewModel.SelectedMailboxState)?.mailbox } }
 
     LargeButton(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         title = stringResource(R.string.buttonContinue),
         onClick = {
             selectedMailbox?.let { selectedMailboxUi ->
                 onContinueWithMailbox(selectedMailboxUi)
             }
         },
-        enabled = { uiState() !is UiState.SelectMailbox || (uiState() as UiState.SelectMailbox).selectedMailbox.value != null }
+        enabled = { uiState is SelectMailboxViewModel.SelectedMailboxState },
     )
 }
 
@@ -234,20 +232,16 @@ private fun TopButton(
 private fun BottomButton(
     modifier: Modifier,
     uiState: () -> UiState,
-    onMailboxSelected: (SelectedMailboxUi?) -> Unit,
     onChooseAnotherMailbox: (Boolean) -> Unit,
 ) {
     AnimatedVisibility(
-        modifier = modifier.fillMaxWidth(),
-        visible = uiState() is UiState.DefaultMailbox
+        modifier = modifier,
+        visible = uiState() is UiState.DefaultScreen
     ) {
         LargeButton(
             title = stringResource(R.string.buttonSendWithDifferentAddress),
             style = ButtonType.Tertiary,
-            onClick = {
-                onChooseAnotherMailbox(true)
-                onMailboxSelected(null)
-            }
+            onClick = { onChooseAnotherMailbox(true) },
         )
     }
 }
@@ -258,13 +252,12 @@ private fun BottomButton(
 private fun PreviewDefaultMailbox(
     @PreviewParameter(SelectMailboxScreenPreviewParameter::class) previewData: SelectMailboxScreenDataPreview
 ) {
-    val uiState by previewData.uiState.collectAsStateWithLifecycle()
-
     MailTheme {
         Surface(Modifier.fillMaxSize()) {
             SelectMailboxScreenContent(
                 usersWithMailboxes = previewData.usersWithMailboxes,
-                uiState = { uiState },
+                uiState = { previewData.uiState },
+                snackbarHostState = remember { SnackbarHostState() },
                 onMailboxSelected = {},
                 onChooseAnotherMailbox = {},
                 onNavigationTopbarClick = {},

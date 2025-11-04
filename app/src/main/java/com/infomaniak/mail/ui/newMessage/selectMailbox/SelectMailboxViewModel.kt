@@ -18,8 +18,6 @@
 package com.infomaniak.mail.ui.newMessage.selectMailbox
 
 import android.app.Application
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -44,7 +42,6 @@ class SelectMailboxViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
-    val selectedMailboxState = mutableStateOf<SelectedMailboxUi?>(null)
 
     private var defaultMailbox: SelectedMailboxUi? = null
 
@@ -91,20 +88,20 @@ class SelectMailboxViewModel @Inject constructor(
                 initials = currentUser.getInitials()
             )
             defaultMailbox = selectedMailbox
-            _uiState.value = UiState.DefaultMailbox(selectedMailbox)
+            _uiState.value = UiState.DefaultScreen(selectedMailbox)
         }
     }
 
     fun chooseAnotherMailbox(choosingAnotherMailbox: Boolean) {
         if (choosingAnotherMailbox) {
-            _uiState.value = UiState.SelectMailbox(selectedMailboxState)
+            _uiState.value = UiState.SelectionScreen.NoSelection
         } else {
-            defaultMailbox?.let { _uiState.value = UiState.DefaultMailbox(it) }
+            defaultMailbox?.let { _uiState.value = UiState.DefaultScreen(it) }
         }
     }
 
-    fun selectMailbox(selectedMailbox: SelectedMailboxUi?) {
-        selectedMailboxState.value = selectedMailbox
+    fun selectMailbox(selectedMailbox: SelectedMailboxUi) {
+        _uiState.value = UiState.SelectionScreen.Selected(selectedMailbox)
     }
 
     data class UserMailboxesUi(
@@ -128,9 +125,18 @@ class SelectMailboxViewModel @Inject constructor(
         val initials: String,
     )
 
+    interface SelectedMailboxState {
+        val mailbox: SelectedMailboxUi
+    }
+
     sealed interface UiState {
         data object Loading : UiState
-        data class DefaultMailbox(val defaultMailbox: SelectedMailboxUi) : UiState
-        data class SelectMailbox(val selectedMailbox: State<SelectedMailboxUi?>) : UiState
+
+        data class DefaultScreen(override val mailbox: SelectedMailboxUi) : UiState, SelectedMailboxState
+
+        sealed interface SelectionScreen : UiState {
+            data class Selected(override val mailbox: SelectedMailboxUi) : SelectionScreen, SelectedMailboxState
+            data object NoSelection : SelectionScreen
+        }
     }
 }
