@@ -92,8 +92,8 @@ class SelectMailboxViewModel @Inject constructor(
         }
     }
 
-    fun showSelectionScreen(show: Boolean) {
-        if (show) {
+    fun showSelectionScreen(isShown: Boolean) {
+        if (isShown) {
             _uiState.value = UiState.SelectionScreen.NoSelection
         } else {
             defaultMailbox?.let { _uiState.value = UiState.DefaultScreen(it) }

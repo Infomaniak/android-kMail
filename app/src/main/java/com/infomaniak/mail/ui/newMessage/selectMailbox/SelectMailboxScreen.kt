@@ -75,7 +75,11 @@ fun SelectMailboxScreen(
     val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SelectMailboxScreenContent(
+    BackHandler(uiState is UiState.SelectionScreen) {
+        viewModel.showSelectionScreen(false)
+    }
+
+    SelectMailboxScreen(
         usersWithMailboxes = usersWithMailboxes,
         uiState = { uiState },
         snackbarHostState = remember { SnackbarHostState() },
@@ -87,7 +91,7 @@ fun SelectMailboxScreen(
 }
 
 @Composable
-private fun SelectMailboxScreenContent(
+private fun SelectMailboxScreen(
     usersWithMailboxes: List<UserMailboxesUi>,
     uiState: () -> UiState,
     snackbarHostState: SnackbarHostState,
@@ -97,10 +101,6 @@ private fun SelectMailboxScreenContent(
     onContinueWithMailbox: (SelectedMailboxUi) -> Unit
 ) {
     val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectionScreen.Selected)?.mailbox } }
-
-    BackHandler(uiState() is UiState.SelectionScreen) {
-        showSelectionScreen(false)
-    }
 
     BottomStickyButtonScaffold(
         snackbarHostState = snackbarHostState,
@@ -129,10 +129,10 @@ private fun SelectMailboxScreenContent(
             }
         },
         topButton = { modifier ->
-            TopButton(modifier, uiState, onContinueWithMailbox)
+            ContinueButton(modifier, uiState, onContinueWithMailbox)
         },
         bottomButton = { modifier ->
-            BottomButton(modifier, uiState, showSelectionScreen)
+            DifferentAddressButton(modifier, uiState, showSelectionScreen)
         }
     )
 }
@@ -176,7 +176,7 @@ private fun ScrollableContent(
                     selectedMailbox = uiState.mailbox
                 )
             }
-            UiState.SelectionScreen.NoSelection, is UiState.SelectionScreen.Selected -> items(
+            is UiState.SelectionScreen -> items(
                 items = usersWithMailboxes,
                 key = { it.userId }
             ) { userWithMailboxes ->
@@ -210,7 +210,7 @@ private fun SelectedMailboxBottom(selectedMailbox: SelectedMailboxUi?) {
 }
 
 @Composable
-private fun TopButton(
+private fun ContinueButton(
     modifier: Modifier,
     uiState: () -> UiState,
     onContinueWithMailbox: (SelectedMailboxUi) -> Unit
@@ -231,7 +231,7 @@ private fun TopButton(
 }
 
 @Composable
-private fun BottomButton(
+private fun DifferentAddressButton(
     modifier: Modifier,
     uiState: () -> UiState,
     showSelectionScreen: (Boolean) -> Unit,
@@ -256,7 +256,7 @@ private fun PreviewDefaultMailbox(
 ) {
     MailTheme {
         Surface(Modifier.fillMaxSize()) {
-            SelectMailboxScreenContent(
+            SelectMailboxScreen(
                 usersWithMailboxes = previewData.usersWithMailboxes,
                 uiState = { previewData.uiState },
                 snackbarHostState = remember { SnackbarHostState() },
