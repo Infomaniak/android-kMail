@@ -42,6 +42,7 @@
     <dimen name="maxAttachmentChipWidth">220dp</dimen>
     <dimen name="contactPopupMaxWidth">300dp</dimen>
     <dimen name="textButtonPrimaryHeight">56dp</dimen>
+    <dimen name="textButtonPrimaryVerticalInset">@dimen/m3_btn_inset</dimen>
     <dimen name="textButtonPrimaryMediumHeight">40dp</dimen>
     <dimen name="mediumButtonHorizontalMargin">20dp</dimen>
     <dimen name="threadHorizontalMargin">@dimen/marginStandardMedium</dimen>
