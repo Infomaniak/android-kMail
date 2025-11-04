@@ -221,12 +221,13 @@ private fun TopButton(
     LargeButton(
         modifier = modifier.fillMaxWidth(),
         title = stringResource(R.string.buttonContinue),
+        onClick = {
+            selectedMailbox?.let { selectedMailboxUi ->
+                onContinueWithMailbox(selectedMailboxUi)
+            }
+        },
         enabled = { uiState() !is UiState.SelectMailbox || (uiState() as UiState.SelectMailbox).selectedMailbox.value != null }
-    ) {
-        selectedMailbox?.let { selectedMailboxUi ->
-            onContinueWithMailbox(selectedMailboxUi)
-        }
-    }
+    )
 }
 
 @Composable
@@ -243,10 +244,11 @@ private fun BottomButton(
         LargeButton(
             title = stringResource(R.string.buttonSendWithDifferentAddress),
             style = ButtonType.Tertiary,
-        ) {
-            onChooseAnotherMailbox(true)
-            onMailboxSelected(null)
-        }
+            onClick = {
+                onChooseAnotherMailbox(true)
+                onMailboxSelected(null)
+            }
+        )
     }
 }
 
