@@ -26,8 +26,10 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -78,7 +80,7 @@ fun SelectMailboxScreen(
         uiState = { uiState },
         snackbarHostState = remember { SnackbarHostState() },
         onMailboxSelected = viewModel::selectMailbox,
-        onChooseAnotherMailbox = viewModel::chooseAnotherMailbox,
+        showSelectionScreen = viewModel::showSelectionScreen,
         onNavigationTopbarClick = onNavigationTopbarClick,
         onContinueWithMailbox = onContinue
     )
@@ -90,14 +92,14 @@ private fun SelectMailboxScreenContent(
     uiState: () -> UiState,
     snackbarHostState: SnackbarHostState,
     onMailboxSelected: (SelectedMailboxUi) -> Unit,
-    onChooseAnotherMailbox: (Boolean) -> Unit,
+    showSelectionScreen: (Boolean) -> Unit,
     onNavigationTopbarClick: () -> Unit,
     onContinueWithMailbox: (SelectedMailboxUi) -> Unit
 ) {
     val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectionScreen.Selected)?.mailbox } }
 
     BackHandler(uiState() is UiState.SelectionScreen) {
-        onChooseAnotherMailbox(false)
+        showSelectionScreen(false)
     }
 
     BottomStickyButtonScaffold(
@@ -105,10 +107,9 @@ private fun SelectMailboxScreenContent(
         topBar = {
             MailTopAppBar(
                 navigationIcon = {
-                    if (uiState() is UiState.SelectionScreen) {
-                        TopAppBarButtons.Back(onNavigationTopbarClick)
-                    } else {
-                        TopAppBarButtons.Close(onNavigationTopbarClick)
+                    when(uiState()) {
+                        is UiState.SelectionScreen -> TopAppBarButtons.Back(onNavigationTopbarClick)
+                        is UiState.DefaultScreen, UiState.Loading -> TopAppBarButtons.Close(onNavigationTopbarClick)
                     }
                 }
             )
@@ -131,7 +132,7 @@ private fun SelectMailboxScreenContent(
             TopButton(modifier, uiState, onContinueWithMailbox)
         },
         bottomButton = { modifier ->
-            BottomButton(modifier, uiState, onChooseAnotherMailbox)
+            BottomButton(modifier, uiState, showSelectionScreen)
         }
     )
 }
@@ -142,6 +143,7 @@ private fun Header() {
         imageVector = ImageVector.vectorResource(R.drawable.illustration_mailbox_ellipsis_bubble),
         contentDescription = null
     )
+    Spacer(Modifier.height(Margin.Medium))
     Text(
         style = Typography.h2,
         maxLines = 1,
@@ -232,7 +234,7 @@ private fun TopButton(
 private fun BottomButton(
     modifier: Modifier,
     uiState: () -> UiState,
-    onChooseAnotherMailbox: (Boolean) -> Unit,
+    showSelectionScreen: (Boolean) -> Unit,
 ) {
     AnimatedVisibility(
         modifier = modifier,
@@ -241,7 +243,7 @@ private fun BottomButton(
         LargeButton(
             title = stringResource(R.string.buttonSendWithDifferentAddress),
             style = ButtonType.Tertiary,
-            onClick = { onChooseAnotherMailbox(true) },
+            onClick = { showSelectionScreen(true) },
         )
     }
 }
@@ -259,7 +261,7 @@ private fun PreviewDefaultMailbox(
                 uiState = { previewData.uiState },
                 snackbarHostState = remember { SnackbarHostState() },
                 onMailboxSelected = {},
-                onChooseAnotherMailbox = {},
+                showSelectionScreen = {},
                 onNavigationTopbarClick = {},
                 onContinueWithMailbox = {}
             )
