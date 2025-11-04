@@ -39,7 +39,7 @@ fun MailTheme(content: @Composable () -> Unit) {
                 titleTextStyle = Typography.bodyMedium,
                 titleColor = colorResource(R.color.primaryTextColor),
             ),
-            content = content
+            content = content,
         )
     }
 }
