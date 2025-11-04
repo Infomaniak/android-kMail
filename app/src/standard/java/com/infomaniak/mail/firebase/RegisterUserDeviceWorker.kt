@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,91 +19,49 @@ package com.infomaniak.mail.firebase
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.infomaniak.core.legacy.api.ApiController.NetworkException
-import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.firebase.RegisterUserDeviceWorker.Companion.INITIAL_DELAY
+import com.infomaniak.core.notifications.registration.AbstractNotificationsRegistrationWorker
+import com.infomaniak.core.twofactorauth.back.notifications.TwoFactorAuthNotifications
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.throwErrorAsException
-import com.infomaniak.mail.workers.BaseCoroutineWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import io.sentry.Sentry
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @HiltWorker
 class RegisterUserDeviceWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val localSettings: LocalSettings,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : BaseCoroutineWorker(appContext, params) {
+    private val mailboxController: MailboxController,
+) : AbstractNotificationsRegistrationWorker(appContext, params) {
 
-    override suspend fun launchWork(): Result = withContext(ioDispatcher) {
+    override suspend fun getConnectedHttpClient(userId: Int) = AccountUtils.getHttpClient(userId)
 
-        SentryLog.i(TAG, "Work started")
+    override suspend fun currentTopicsForUser(userId: Int) = getNotificationTopicsForUser(mailboxController, userId)
+}
 
-        val firebaseToken = localSettings.firebaseToken!!
+fun notificationTopicsForUser(
+    mailboxController: MailboxController,
+    userId: Int
+): Flow<List<String>> = mailboxController.getMailboxesAsync(userId = userId).map {
+    getNotificationTopicsForUser(it)
+}
 
-        AccountUtils.getAllUsersSync().forEach { user ->
-            val okHttpClient = AccountUtils.getHttpClient(user.id)
-            val registrationInfo = RegistrationInfo(applicationContext, firebaseToken)
-            val apiResponse = FirebaseApiRepository.registerForNotifications(registrationInfo, okHttpClient)
+private suspend fun getNotificationTopicsForUser(
+    mailboxController: MailboxController,
+    userId: Int
+): List<String> {
+    val mailboxes = mailboxController.getMailboxes(userId = userId)
+    return getNotificationTopicsForUser(mailboxes)
+}
 
-            if (apiResponse.isSuccess()) {
-                SentryLog.i(TAG, "launchWork: ${user.id} has been registered")
-                localSettings.markUserAsRegisteredByFirebase(user.id)
-            } else {
-                runCatching {
-                    apiResponse.throwErrorAsException()
-                }.onFailure { exception ->
-                    if (exception !is NetworkException) Sentry.captureException(exception)
-                    SentryLog.w(TAG, "launchWork: register ${user.id} failed", exception)
-                    return@withContext Result.retry()
-                }
-            }
-        }
-
-        SentryLog.i(TAG, "Work finished")
-
-        Result.success()
+private fun getNotificationTopicsForUser(
+    mailboxes: List<Mailbox>
+): List<String> = buildList(mailboxes.size + 1) {
+    mailboxes.forEach { mailbox ->
+        add("mailbox-${mailbox.mailboxId}")
     }
-
-    @Singleton
-    class Scheduler @Inject constructor(private val workManager: WorkManager) {
-
-        /**
-         * Schedule RegisterUserDeviceWorker
-         *
-         * To avoid problems with the refreshToken at login time, we delay the register by [INITIAL_DELAY].
-         * For future launches, we'll reset the register to the same duration, as this method is also used in the [com.infomaniak.mail.MainApplication].
-         * so when the app is relaunched several times, only the last relaunch is taken into account.
-         */
-        fun scheduleWork() {
-            SentryLog.i(TAG, "Work scheduled")
-
-            val workRequest = OneTimeWorkRequestBuilder<RegisterUserDeviceWorker>()
-                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
-                .build()
-
-            workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
-        }
-    }
-
-    companion object {
-        private const val TAG = "RegisterUserDeviceWorker"
-        private const val INITIAL_DELAY = 15L // 15s
-    }
+    add(TwoFactorAuthNotifications.TOPIC)
 }

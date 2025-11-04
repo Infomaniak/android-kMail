@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
 package com.infomaniak.mail
 
 import androidx.lifecycle.LifecycleOwner
-import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.core.notifications.registration.NotificationsRegistrationManager
 import com.infomaniak.mail.di.StandardEntryPoint
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
+import com.infomaniak.mail.firebase.notificationTopicsForUser
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.launch
 
 class StandardMainApplication : MainApplication() {
 
@@ -39,11 +41,10 @@ class StandardMainApplication : MainApplication() {
     }
 
     private fun registerUserDeviceIfNeeded() {
-        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID &&
-            playServicesUtils.areGooglePlayServicesAvailable() &&
-            localSettings.firebaseToken != null
-        ) {
-            hiltEntryPoint.registerUserDeviceWorkerScheduler().scheduleWork()
+        applicationScope.launch {
+            NotificationsRegistrationManager.sharedInstance.scheduleWorkerOnUpdate<RegisterUserDeviceWorker>(
+                latestNotificationTopics = { notificationTopicsForUser(mailboxController, it) }
+            )
         }
     }
 }

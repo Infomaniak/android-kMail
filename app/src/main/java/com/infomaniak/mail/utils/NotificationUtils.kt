@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ import com.infomaniak.core.legacy.utils.NotificationUtilsCore
 import com.infomaniak.core.legacy.utils.NotificationUtilsCore.Companion.PENDING_INTENT_FLAGS
 import com.infomaniak.core.legacy.utils.clearStack
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.twofactorauth.back.notifications.TwoFactorAuthNotifications
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
@@ -94,6 +95,8 @@ class NotificationUtils @Inject constructor(
             NotificationManager.IMPORTANCE_MIN,
         )
         channelList.add(syncMessagesChannel)
+
+        channelList.add(TwoFactorAuthNotifications.channel())
 
         createNotificationChannels(channelList)
     }

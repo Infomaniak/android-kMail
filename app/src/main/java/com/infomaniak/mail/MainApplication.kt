@@ -54,6 +54,7 @@ import com.infomaniak.mail.TokenInterceptorListenerProvider.legacyTokenIntercept
 import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.services.DeviceInfoUpdateWorker
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -117,6 +118,9 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     lateinit var playServicesUtils: PlayServicesUtils
 
     @Inject
+    lateinit var mailboxController: MailboxController
+
+    @Inject
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
 
     @Inject
@@ -136,7 +140,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
-    private val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName("MainApplication"))
+    protected val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName("MainApplication"))
 
     override fun onCreate() {
         super<Application>.onCreate()

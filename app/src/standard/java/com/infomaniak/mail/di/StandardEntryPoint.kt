@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.infomaniak.mail.di
 
 import androidx.work.WorkManager
-import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -26,8 +25,6 @@ import dagger.hilt.components.SingletonComponent
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface StandardEntryPoint {
-
-    fun registerUserDeviceWorkerScheduler(): RegisterUserDeviceWorker.Scheduler
 
     fun workManager(): WorkManager
 }

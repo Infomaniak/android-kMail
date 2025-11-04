@@ -25,6 +25,7 @@ import com.infomaniak.core.legacy.models.ApiResponseStatus
 import com.infomaniak.core.legacy.models.user.User
 import com.infomaniak.core.legacy.networking.HttpClient
 import com.infomaniak.core.legacy.room.UserDatabase
+import com.infomaniak.core.notifications.registration.NotificationsRegistrationManager
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -113,6 +114,7 @@ object AccountUtils : CredentialManager() {
     suspend fun addUser(user: User) {
         currentUser = user
         DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
+        NotificationsRegistrationManager.sharedInstance.resetForUser(user.id.toLong())
         userDatabase.userDao().insert(user)
     }
 
@@ -135,6 +137,7 @@ object AccountUtils : CredentialManager() {
 
     suspend fun removeUser(user: User) {
         DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
+        NotificationsRegistrationManager.sharedInstance.resetForUser(user.id.toLong())
         userDatabase.userDao().delete(user)
     }
 
