@@ -46,7 +46,6 @@ fun LargeButton(
     modifier: Modifier = Modifier,
     style: ButtonType = ButtonType.Primary,
     enabled: () -> Boolean = { true },
-    onClick: () -> Unit
 ) {
     BasicButton(
         modifier = modifier.height(

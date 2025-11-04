@@ -167,10 +167,11 @@ fun SelectMailboxScreen(
             LargeButton(
                 modifier = it.padding(horizontal = Margin.Medium),
                 title = stringResource(R.string.buttonContinue),
-                enabled = { selectedMailbox != null }
-            ) {
-                selectedMailbox?.let { onContinue(selectedMailbox) }
-            }
+                enabled = { selectedMailbox != null },
+                onClick = {
+                    selectedMailbox?.let { onContinue(selectedMailbox) }
+                }
+            )
         },
         bottomButton = bottomButton.takeIf{ !selectingAnotherUser.value }
     )
