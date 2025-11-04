@@ -88,11 +88,12 @@ fun SelectMailboxScreen(
         LargeButton(
             modifier = modifier.padding(horizontal = Margin.Medium),
             title = stringResource(R.string.buttonSendWithDifferentAddress),
-            style = ButtonType.Tertiary
-        ) {
-            selectingAnotherUser.value = true
-            onMailboxSelected(null)
-        }
+            style = ButtonType.Tertiary,
+            onClick = {
+                selectingAnotherUser.value = true
+                onMailboxSelected(null)
+            }
+        )
     }
 
     BottomStickyButtonScaffold(
@@ -159,10 +160,11 @@ fun SelectMailboxScreen(
         topButton = {
             LargeButton(
                 modifier = it.padding(horizontal = Margin.Medium),
-                title = stringResource(R.string.buttonContinue)
-            ) {
-                // TODO: Open newMessageFragment
-            }
+                title = stringResource(R.string.buttonContinue),
+                onClick = {
+                    // TODO: Open newMessageFragment
+                }
+            )
         },
         bottomButton = bottomButton.takeIf{ !selectingAnotherUser.value }
     )
