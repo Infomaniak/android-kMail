@@ -73,6 +73,9 @@
     <color name="threadCountBorderRead">@color/shark</color>
     <color name="threadCountBorderUnread">@color/rabbit</color>
 
+    <!-- Dropdown -->
+    <color name="dropdownBorderColor">@color/orca</color>
+
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/orca</color>
 
