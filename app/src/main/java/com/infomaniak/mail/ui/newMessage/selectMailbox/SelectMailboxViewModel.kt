@@ -27,6 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,8 +40,10 @@ class SelectMailboxViewModel @Inject constructor(
     private val _usersWithMailboxes = MutableStateFlow<List<UserMailboxesUi>>(emptyList())
     val usersWithMailboxes: StateFlow<List<UserMailboxesUi>> get() = _usersWithMailboxes
 
-    private val _selectedMailbox = MutableStateFlow<SelectedMailboxUi?>(null)
-    val selectedMailbox get() = _selectedMailbox
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    val uiState = _uiState.asStateFlow()
+
+    private var defaultMailbox: SelectedMailboxUi? = null
 
     init {
         viewModelScope.launch(ioDispatcher) {
@@ -69,7 +72,7 @@ class SelectMailboxViewModel @Inject constructor(
 
     private suspend fun getDefaultUserWithMailbox() {
         AccountUtils.currentUser?.let { currentUser ->
-            _selectedMailbox.value = SelectedMailboxUi(
+            val selectedMailbox = SelectedMailboxUi(
                 userId = currentUser.id,
                 mailbox = mailboxController.getMailboxes(currentUser.id)
                     .first { mailbox ->
@@ -84,11 +87,21 @@ class SelectMailboxViewModel @Inject constructor(
                 avatarUrl = currentUser.avatar,
                 initials = currentUser.getInitials()
             )
+            defaultMailbox = selectedMailbox
+            _uiState.value = UiState.DefaultScreen(selectedMailbox)
         }
     }
 
-    fun selectMailbox(selectedMailbox: SelectedMailboxUi?) {
-        _selectedMailbox.value = selectedMailbox
+    fun showSelectionScreen(isShown: Boolean) {
+        if (isShown) {
+            _uiState.value = UiState.SelectionScreen.NoSelection
+        } else {
+            defaultMailbox?.let { _uiState.value = UiState.DefaultScreen(it) }
+        }
+    }
+
+    fun selectMailbox(selectedMailbox: SelectedMailboxUi) {
+        _uiState.value = UiState.SelectionScreen.Selected(selectedMailbox)
     }
 
     data class UserMailboxesUi(
@@ -111,4 +124,19 @@ class SelectMailboxViewModel @Inject constructor(
         val avatarUrl: String?,
         val initials: String,
     )
+
+    interface SelectedMailboxState {
+        val mailbox: SelectedMailboxUi
+    }
+
+    sealed interface UiState {
+        data object Loading : UiState
+
+        data class DefaultScreen(override val mailbox: SelectedMailboxUi) : UiState, SelectedMailboxState
+
+        sealed interface SelectionScreen : UiState {
+            data class Selected(override val mailbox: SelectedMailboxUi) : SelectionScreen, SelectedMailboxState
+            data object NoSelection : SelectionScreen
+        }
+    }
 }

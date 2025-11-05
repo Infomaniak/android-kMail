@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
 
 class SelectMailboxScreenPreviewParameter : PreviewParameterProvider<SelectMailboxScreenDataPreview> {
@@ -28,24 +28,20 @@ class SelectMailboxScreenPreviewParameter : PreviewParameterProvider<SelectMailb
 
 data class SelectMailboxScreenDataPreview(
     val usersWithMailboxes: List<UserMailboxesUi>,
-    val selectedMailboxUi: SelectedMailboxUi?,
-    val selectingAnotherUser: Boolean
+    val uiState: UiState,
 )
 
 val selectMailboxScreenDataPreview = listOf(
     SelectMailboxScreenDataPreview(
-        usersWithMailboxesPreviewData,
-        selectedMailboxPreviewData,
-        false
+        usersWithMailboxes = usersWithMailboxesPreviewData,
+        uiState = UiState.DefaultScreen(selectedMailboxPreviewData)
     ),
     SelectMailboxScreenDataPreview(
         usersWithMailboxesPreviewData,
-        null,
-        true
+        uiState = UiState.SelectionScreen.NoSelection
     ),
     SelectMailboxScreenDataPreview(
         usersWithMailboxesPreviewData,
-        selectedMailboxPreviewData,
-        true
+        uiState = UiState.SelectionScreen.Selected(selectedMailboxPreviewData)
     ),
 )
