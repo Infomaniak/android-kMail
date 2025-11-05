@@ -30,6 +30,7 @@ import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessag
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.scopes.FragmentScoped
+import kotlinx.coroutines.flow.first
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
@@ -56,7 +57,7 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
     }
 
     suspend fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {
-        val mailbox = currentMailbox()
+        val mailbox = currentMailbox.first()
         Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
             val shouldWarnForExternal = mailbox.externalMailFlagEnabled && !arrivedFromExistingDraft
             val externalData = ExternalData(

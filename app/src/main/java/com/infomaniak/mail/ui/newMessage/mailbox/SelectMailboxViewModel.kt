@@ -59,7 +59,7 @@ class SelectMailboxViewModel @Inject constructor(
                 fullName = user.displayName ?: user.run { "$firstname $lastname" },
                 mailboxes = mailboxController.getMailboxes(user.id).map { mailbox ->
                     MailboxUi(
-                        mailUuid = mailbox.uuid,
+                        mailboxId = mailbox.mailboxId,
                         email = mailbox.email
                     )
                 }
@@ -73,11 +73,11 @@ class SelectMailboxViewModel @Inject constructor(
                 userId = currentUser.id,
                 mailbox = mailboxController.getMailboxes(currentUser.id)
                     .first { mailbox ->
-                        mailbox.email == AccountUtils.currentMailboxEmail
+                        mailbox.mailboxId == AccountUtils.currentMailboxId
                     }
                     .let { mailbox ->
                         MailboxUi(
-                            mailUuid = mailbox.uuid,
+                            mailboxId = mailbox.mailboxId,
                             email = mailbox.email
                         )
                     },
@@ -101,7 +101,7 @@ class SelectMailboxViewModel @Inject constructor(
     )
 
     data class MailboxUi(
-        val mailUuid: String,
+        val mailboxId: Int,
         val email: String
     )
 
