@@ -24,9 +24,11 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.VisibleForTesting
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.colorResource
 import androidx.core.os.bundleOf
@@ -36,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel.Companion.filterSelectedAccounts
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
+import com.infomaniak.core.extensions.capitalizeFirstChar
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.Utils
@@ -44,7 +47,10 @@ import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -85,6 +91,9 @@ class LoginFragment : Fragment() {
     lateinit var mainDispatcher: CoroutineDispatcher
 
     @Inject
+    lateinit var localSettings: LocalSettings
+
+    @Inject
     lateinit var loginUtils: LoginUtils
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -112,6 +121,12 @@ class LoginFragment : Fragment() {
             val accounts by crossAppLoginViewModel.accountsCheckingState.collectAsStateWithLifecycle()
             val skippedIds by crossAppLoginViewModel.skippedAccountIds.collectAsStateWithLifecycle()
 
+            var accentColor by rememberSaveable { mutableStateOf(AccentColor.PINK) }
+
+            LaunchedEffect(accentColor) {
+                localSettings.accentColor = accentColor // TODO: Check if logic stores accent color correctly
+            }
+
             MailTheme {
                 // The color can't be overridden at the theme level because it's used elsewhere inside the app like the threadlist
                 Surface(color = colorResource(R.color.backgroundColor)) {
@@ -125,6 +140,11 @@ class LoginFragment : Fragment() {
                         onCreateAccount = { openAccountCreation() },
                         onUseAnotherAccountClicked = { openLoginWebView() },
                         onSaveSkippedAccounts = { crossAppLoginViewModel.skippedAccountIds.value = it },
+                        accentColor = { accentColor },
+                        onSelectAccentColor = {
+                            accentColor = it
+                            trackOnBoardingEvent("${MatomoName.SwitchColor.value}${it.toString().capitalizeFirstChar()}")
+                        },
                     )
                 }
             }

@@ -92,15 +92,17 @@ fun OnboardingScreen(
     onCreateAccount: () -> Unit,
     onUseAnotherAccountClicked: () -> Unit,
     onSaveSkippedAccounts: (Set<Long>) -> Unit,
+    accentColor: () -> AccentColor,
+    onSelectAccentColor: (AccentColor) -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { Page.entries.size })
-    var accentColor by rememberSaveable { mutableStateOf(AccentColor.PINK) }
+    val onboardingColor = accentColor()
 
     val context = LocalContext.current
-    val animatedPrimaryColor by animateColorAsState(Color(accentColor.getPrimary(context)), tween(600))
-    val animatedOnPrimaryColor by animateColorAsState(Color(accentColor.getOnPrimary(context)), tween(600))
+    val animatedPrimaryColor by animateColorAsState(Color(onboardingColor.getPrimary(context)), tween(600))
+    val animatedOnPrimaryColor by animateColorAsState(Color(onboardingColor.getOnPrimary(context)), tween(600))
     val animatedOnboardingSecondaryBackground by animateColorAsState(
-        targetValue = Color(accentColor.getOnboardingSecondaryBackground(context)),
+        targetValue = Color(onboardingColor.getOnboardingSecondaryBackground(context)),
         animationSpec = tween(600),
     )
 
@@ -116,8 +118,8 @@ fun OnboardingScreen(
                 page.toOnboardingPage(
                     pagerState = pagerState,
                     index = index,
-                    accentColor = { accentColor },
-                    onSelectAccentColor = { accentColor = it },
+                    accentColor = accentColor,
+                    onSelectAccentColor = onSelectAccentColor,
                     animatedOnboardingSecondaryBackground = { animatedOnboardingSecondaryBackground },
                 )
             },
@@ -316,18 +318,21 @@ private fun Page.CustomRepeatableLottieIllustration(pagerState: PagerState, inde
 @Preview
 @Composable
 private fun Preview(@PreviewParameter(AccountsCheckingStatePreviewParameter::class) accounts: AccountsCheckingState) {
+    var accentColor by rememberSaveable { mutableStateOf(AccentColor.PINK) }
     MailTheme {
         Surface(color = colorResource(R.color.backgroundColor)) {
             OnboardingScreen(
                 accounts = { accounts },
                 skippedIds = { emptySet() },
+                isLoginButtonLoading = { false },
+                isSignUpButtonLoading = { false },
                 onLogin = {},
                 onContinueWithSelectedAccounts = {},
                 onCreateAccount = {},
                 onUseAnotherAccountClicked = {},
                 onSaveSkippedAccounts = {},
-                isLoginButtonLoading = { false },
-                isSignUpButtonLoading = { false },
+                accentColor = { accentColor },
+                onSelectAccentColor = { accentColor = it },
             )
         }
     }
