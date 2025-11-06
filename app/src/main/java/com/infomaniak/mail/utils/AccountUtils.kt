@@ -113,8 +113,8 @@ object AccountUtils : CredentialManager() {
 
     suspend fun addUser(user: User) {
         currentUser = user
-        DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
-        NotificationsRegistrationManager.sharedInstance.resetForUser(user.id.toLong())
+        DeviceInfoUpdateManager.resetInfoKey(user.id.toLong())
+        NotificationsRegistrationManager.resetForUser(user.id.toLong())
         userDatabase.userDao().insert(user)
     }
 
@@ -136,8 +136,8 @@ object AccountUtils : CredentialManager() {
     }
 
     suspend fun removeUser(user: User) {
-        DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
-        NotificationsRegistrationManager.sharedInstance.resetForUser(user.id.toLong())
+        DeviceInfoUpdateManager.resetInfoKey(user.id.toLong())
+        NotificationsRegistrationManager.resetForUser(user.id.toLong())
         userDatabase.userDao().delete(user)
     }
 

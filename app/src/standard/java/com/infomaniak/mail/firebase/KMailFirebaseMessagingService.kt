@@ -59,7 +59,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         SentryLog.i(TAG, "onNewToken: new token received")
-        NotificationsRegistrationManager.sharedInstance.onNewToken(token)
+        NotificationsRegistrationManager.onNewToken(token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {

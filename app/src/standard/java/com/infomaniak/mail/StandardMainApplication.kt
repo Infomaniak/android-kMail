@@ -42,7 +42,7 @@ class StandardMainApplication : MainApplication() {
 
     private fun registerUserDeviceIfNeeded() {
         applicationScope.launch {
-            NotificationsRegistrationManager.sharedInstance.scheduleWorkerOnUpdate<RegisterUserDeviceWorker>(
+            NotificationsRegistrationManager.scheduleWorkerOnUpdate<RegisterUserDeviceWorker>(
                 latestNotificationTopics = { notificationTopicsForUser(mailboxController, it) }
             )
         }

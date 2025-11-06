@@ -159,7 +159,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         configureHttpClient()
 
         applicationScope.launch {
-            DeviceInfoUpdateManager.sharedInstance.scheduleWorkerOnDeviceInfoUpdate<DeviceInfoUpdateWorker>()
+            DeviceInfoUpdateManager.scheduleWorkerOnDeviceInfoUpdate<DeviceInfoUpdateWorker>()
         }
 
         localSettings.storageBannerDisplayAppLaunches++
