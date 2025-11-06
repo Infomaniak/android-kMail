@@ -37,6 +37,7 @@ import androidx.test.runner.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
+import com.infomaniak.mail.ui.Scenarios.deactivateAnimations
 import com.infomaniak.mail.ui.Scenarios.grantPermissions
 import com.infomaniak.mail.ui.Scenarios.login
 import com.infomaniak.mail.ui.Scenarios.startLoginWebviewActivity
@@ -66,6 +67,7 @@ class NewMessageActivityTest {
     @Before
     fun setUp() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        device.deactivateAnimations()
 
         val permissions = listOf(
             Manifest.permission.READ_CONTACTS,
