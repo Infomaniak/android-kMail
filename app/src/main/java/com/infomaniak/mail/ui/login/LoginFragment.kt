@@ -145,6 +145,7 @@ class LoginFragment : Fragment() {
                             accentColor = it
                             trackOnBoardingEvent("${MatomoName.SwitchColor.value}${it.toString().capitalizeFirstChar()}")
                         },
+                        displayOnlyLastPage = navigationArgs.isFirstAccount.not(),
                     )
                 }
             }
