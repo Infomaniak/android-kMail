@@ -76,6 +76,7 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
+import com.infomaniak.mail.ui.login.components.Page.Companion.toOnboardingPage
 import com.infomaniak.mail.ui.theme.MailTheme
 import com.infomaniak.mail.utils.extensions.repeatFrame
 
@@ -168,13 +169,29 @@ private sealed interface Page {
     @get:StringRes
     val titleRes: Int
 
-    fun toOnboardingPage(
-        pagerState: PagerState,
-        index: Int,
-        accentColor: () -> AccentColor,
-        onSelectAccentColor: (AccentColor) -> Unit,
-        animatedOnboardingSecondaryBackground: () -> Color
-    ): OnboardingPage
+    @Composable
+    fun Page.Background(animatedOnboardingSecondaryBackground: () -> Color)
+
+    @Composable
+    fun Page.Illustration(pagerState: PagerState, index: Int, accentColor: () -> AccentColor)
+
+    @Composable
+    fun Page.Text(accentColor: () -> AccentColor, onSelectAccentColor: (AccentColor) -> Unit)
+
+    sealed interface BasePage : Page {
+        @Composable
+        override fun Page.Background(animatedOnboardingSecondaryBackground: () -> Color) {
+            DefaultBackground(
+                ImageVector.vectorResource(backgroundRes),
+                modifier = Modifier.padding(bottom = 300.dp),
+                colorFilter = ColorFilter.tint(animatedOnboardingSecondaryBackground()),
+            )
+        }
+        @Composable
+        override fun Page.Illustration(pagerState: PagerState, index: Int, accentColor: () -> AccentColor) {
+            CustomRepeatableLottieIllustration(pagerState, index, accentColor)
+        }
+    }
 
     sealed class SimplePage(
         @DrawableRes override val backgroundRes: Int,
@@ -183,33 +200,16 @@ private sealed interface Page {
         override val repeatFrameEnd: Int,
         @StringRes override val titleRes: Int,
         @StringRes val descriptionRes: Int,
-    ) : Page {
-        override fun toOnboardingPage(
-            pagerState: PagerState,
-            index: Int,
-            accentColor: () -> AccentColor,
-            onSelectAccentColor: (AccentColor) -> Unit,
-            animatedOnboardingSecondaryBackground: () -> Color
-        ): OnboardingPage = OnboardingPage(
-            background = {
-                DefaultBackground(
-                    ImageVector.vectorResource(backgroundRes),
-                    modifier = Modifier.padding(bottom = 300.dp),
-                    colorFilter = ColorFilter.tint(animatedOnboardingSecondaryBackground()),
-                )
-            },
-            illustration = {
-                CustomRepeatableLottieIllustration(pagerState, index, accentColor)
-            },
-            text = {
-                DefaultTitleAndDescription(
-                    title = stringResource(titleRes),
-                    description = stringResource(descriptionRes),
-                    titleStyle = Typography.h2.copy(color = colorResource(R.color.primaryTextColor)),
-                    descriptionStyle = Typography.bodyRegular.copy(color = colorResource(R.color.secondaryTextColor)),
-                )
-            }
-        )
+    ) : BasePage {
+        @Composable
+        override fun Page.Text(accentColor: () -> AccentColor, onSelectAccentColor: (AccentColor) -> Unit) {
+            DefaultTitleAndDescription(
+                title = stringResource(titleRes),
+                description = stringResource(descriptionRes),
+                titleStyle = Typography.h2.copy(color = colorResource(R.color.primaryTextColor)),
+                descriptionStyle = Typography.bodyRegular.copy(color = colorResource(R.color.secondaryTextColor)),
+            )
+        }
     }
 
     sealed class ThemePage(
@@ -218,41 +218,24 @@ private sealed interface Page {
         override val repeatFrameStart: Int,
         override val repeatFrameEnd: Int,
         @StringRes override val titleRes: Int,
-    ) : Page {
-        override fun toOnboardingPage(
-            pagerState: PagerState,
-            index: Int,
-            accentColor: () -> AccentColor,
-            onSelectAccentColor: (AccentColor) -> Unit,
-            animatedOnboardingSecondaryBackground: () -> Color,
-        ): OnboardingPage = OnboardingPage(
-            background = {
-                DefaultBackground(
-                    background = ImageVector.vectorResource(backgroundRes),
-                    modifier = Modifier.padding(bottom = 300.dp),
-                    colorFilter = ColorFilter.tint(animatedOnboardingSecondaryBackground()),
+    ) : BasePage {
+        @Composable
+        override fun Page.Text(accentColor: () -> AccentColor, onSelectAccentColor: (AccentColor) -> Unit) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = Margin.Large)
+                    .widthIn(max = 300.dp),
+                verticalArrangement = Arrangement.spacedBy(Margin.Medium),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = stringResource(titleRes),
+                    style = Typography.h2.copy(color = colorResource(R.color.primaryTextColor)),
                 )
-            },
-            illustration = {
-                CustomRepeatableLottieIllustration(pagerState, index, accentColor)
-            },
-            text = {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = Margin.Large)
-                        .widthIn(max = 300.dp),
-                    verticalArrangement = Arrangement.spacedBy(Margin.Medium),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = stringResource(titleRes),
-                        style = Typography.h2.copy(color = colorResource(R.color.primaryTextColor)),
-                    )
-                    AccentColorSelector(accentColor, onSelectAccentColor)
-                }
+                AccentColorSelector(accentColor, onSelectAccentColor)
             }
-        )
+        }
     }
 
     data object ThemeChoice : ThemePage(
@@ -292,6 +275,18 @@ private sealed interface Page {
 
     companion object {
         val entries: Array<Page> get() = arrayOf(ThemeChoice, SwipeActions, MultiSelect, GetStarted)
+
+        fun Page.toOnboardingPage(
+            pagerState: PagerState,
+            index: Int,
+            accentColor: () -> AccentColor,
+            onSelectAccentColor: (AccentColor) -> Unit,
+            animatedOnboardingSecondaryBackground: () -> Color
+        ): OnboardingPage = OnboardingPage(
+            background = { Background(animatedOnboardingSecondaryBackground) },
+            illustration = { Illustration(pagerState, index, accentColor) },
+            text = { Text(accentColor, onSelectAccentColor) }
+        )
     }
 }
 
