@@ -92,8 +92,10 @@ fun OnboardingScreen(
     onSaveSkippedAccounts: (Set<Long>) -> Unit,
     accentColor: () -> AccentColor,
     onSelectAccentColor: (AccentColor) -> Unit,
+    displayOnlyLastPage: Boolean = false,
 ) {
-    val pagerState = rememberPagerState(pageCount = { Page.entries.size })
+    val entries = if (displayOnlyLastPage) listOf(Page.entries.last()) else Page.entries
+    val pagerState = rememberPagerState(pageCount = { entries.size })
     val onboardingColor = accentColor()
 
     val context = LocalContext.current
@@ -112,7 +114,7 @@ fun OnboardingScreen(
     ) {
         OnboardingScaffold(
             pagerState = pagerState,
-            onboardingPages = Page.entries.mapIndexed { index, page ->
+            onboardingPages = entries.mapIndexed { index, page ->
                 page.toOnboardingPage(
                     pagerState = pagerState,
                     index = index,
@@ -271,7 +273,7 @@ private sealed interface Page {
     )
 
     companion object {
-        val entries: Array<Page> get() = arrayOf(ThemeChoice, SwipeActions, MultiSelect, GetStarted)
+        val entries: List<Page> get() = listOf(ThemeChoice, SwipeActions, MultiSelect, GetStarted)
 
         fun Page.toOnboardingPage(
             pagerState: PagerState,
