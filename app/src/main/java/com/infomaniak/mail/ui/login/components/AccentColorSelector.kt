@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.login.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -95,6 +96,8 @@ fun AccentColorSelector(
 @Composable
 private fun AccentColorTab(accentColor: AccentColor, selectedTabIndex: Int, onClick: () -> Unit) {
     val isSelected = selectedTabIndex == accentColor.introTabIndex
+    val textColor by animateColorAsState(getTextColor(isSelected))
+
     Tab(
         modifier = Modifier
             .zIndex(1f)
@@ -102,7 +105,7 @@ private fun AccentColorTab(accentColor: AccentColor, selectedTabIndex: Int, onCl
         selected = isSelected,
         onClick = onClick,
     ) {
-        Text(stringResource(accentColor.tabNameRes), color = getTextColor(isSelected))
+        Text(stringResource(accentColor.tabNameRes), color = textColor)
     }
 }
 
