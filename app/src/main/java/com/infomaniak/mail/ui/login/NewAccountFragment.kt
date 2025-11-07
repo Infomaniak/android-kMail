@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -36,6 +35,7 @@ import com.infomaniak.mail.CREATE_ACCOUNT_URL
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentNewAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -49,7 +49,6 @@ import javax.inject.Inject
 class NewAccountFragment : Fragment() {
 
     private var binding: FragmentNewAccountBinding by safeBinding()
-    private val introViewModel: IntroViewModel by activityViewModels()
 
     private val loginActivity by lazy { requireActivity() as LoginActivity }
 
@@ -60,6 +59,9 @@ class NewAccountFragment : Fragment() {
     @Inject
     @MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     @Inject
     lateinit var loginUtils: LoginUtils
@@ -73,7 +75,7 @@ class NewAccountFragment : Fragment() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        introViewModel.updatedAccentColor.value?.first?.theme?.let(requireActivity()::setTheme)
+        requireActivity().setTheme(localSettings.accentColor.theme)
         super.onCreate(savedInstanceState)
     }
 
@@ -101,9 +103,7 @@ class NewAccountFragment : Fragment() {
     }
 
     private fun selectIllustrationAccordingToTheme() {
-        val accentColor = introViewModel.updatedAccentColor.value?.first ?: return
-
-        val drawableRes = when (accentColor) {
+        val drawableRes = when (localSettings.accentColor) {
             AccentColor.PINK -> R.drawable.new_account_illustration_pink
             AccentColor.BLUE -> R.drawable.new_account_illustration_blue
             AccentColor.SYSTEM -> R.drawable.new_account_illustration_material
