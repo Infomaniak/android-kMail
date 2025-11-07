@@ -422,7 +422,7 @@
     <string name="noFolderTitle">You don’t have any folder yet…</string>
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account.</string>
     <string name="noMailboxTitle">No email address associated with this account</string>
-    <string name="noNetwork">No signal</string>
+    <string name="noNetwork">No internet connection</string>
     <string name="noSubjectTitle">(no subject)</string>
     <string name="noUpdatedAt">Never updated</string>
     <string name="notificationGeneralChannelName">General notifications</string>

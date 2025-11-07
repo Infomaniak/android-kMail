@@ -416,7 +416,7 @@
     <string name="noFolderTitle">Non hai ancora nessuna cartella…</string>
     <string name="noMailboxDescription">Non hai un indirizzo e-mail associato al tuo account Infomaniak.</string>
     <string name="noMailboxTitle">Nessun indirizzo e-mail associato a questo account</string>
-    <string name="noNetwork">Nessun segnale</string>
+    <string name="noNetwork">Nessuna connessione internet</string>
     <string name="noSubjectTitle">(senza soggetto)</string>
     <string name="noUpdatedAt">Mai aggiornato</string>
     <string name="notificationGeneralChannelName">Notifiche generali</string>
