@@ -72,7 +72,6 @@ class LoginFragment : Fragment() {
 
     private var binding: FragmentLoginBinding by safeBinding()
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(requireActivity().intent.extras ?: bundleOf()) }
-    private val introViewModel: IntroViewModel by activityViewModels()
 
     private val crossAppLoginViewModel: CrossAppLoginViewModel by activityViewModels()
 
@@ -112,7 +111,7 @@ class LoginFragment : Fragment() {
         return FragmentLoginBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.root.setContent {
@@ -151,14 +150,6 @@ class LoginFragment : Fragment() {
             }
         }
 
-        // applyWindowInsetsListener(shouldConsume = false) { root, insets ->
-        //     root.applySideAndBottomSystemInsets(insets)
-        //     dummyToolbarEdgeToEdge.layoutParams = ViewGroup.LayoutParams(
-        //         ViewGroup.LayoutParams.MATCH_PARENT,
-        //         insets.statusBar().top,
-        //     )
-        // }
-
         loginUtils.initShowError(::showError)
 
         // val introPagerAdapter = IntroPagerAdapter(
@@ -195,11 +186,6 @@ class LoginFragment : Fragment() {
         //     safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
         // }
 
-        introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, oldAccentColor) ->
-            // updateUi(newAccentColor, oldAccentColor)
-        }
-
-        observeAccentColor()
         observeCrossLoginAccounts()
         setCrossLoginClickListener()
         initCrossLogin()
@@ -224,24 +210,9 @@ class LoginFragment : Fragment() {
         super.onDestroyView()
     }
 
-    // private fun handleOnBackPressed() = with(requireActivity()) {
-    //     onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-    //         if (getViewPagerCurrentItem() == 0) finish() else goBackAPage()
-    //     }
-    // }
-
-    private fun observeAccentColor() {
-        introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, _) ->
-            // TODO
-            // binding.crossLoginSelection.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
-            // binding.crossLoginSelection.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
-        }
-    }
-
     private fun observeCrossLoginAccounts() {
         crossAppLoginViewModel.availableAccounts.observe(viewLifecycleOwner) { accounts ->
             SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
-            // binding.crossLoginSelection.setAccounts(accounts)
         }
     }
 
@@ -326,48 +297,6 @@ class LoginFragment : Fragment() {
         safelyNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
     }
 
-    // private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-    //     animatePrimaryColorElements(newAccentColor, oldAccentColor)
-    //     animateOnPrimaryColorElements(newAccentColor, oldAccentColor)
-    //     animateSecondaryColorElements(newAccentColor, oldAccentColor)
-    // }
-    //
-    // private fun animatePrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
-    //     val newPrimary = newAccentColor.getPrimary(context)
-    //     val oldPrimary = oldAccentColor.getPrimary(context)
-    //     val ripple = newAccentColor.getRipple(context)
-    //
-    //     animateColorChange(oldPrimary, newPrimary) { color ->
-    //         dotsIndicator.selectedDotColor = color
-    //         connectButton.backgroundTintList = colorStateList {
-    //             addForState(state = android.R.attr.state_enabled, color = color)
-    //             addForRemainingStates(color = requireContext().getColor(R.color.backgroundDisabledPrimaryButton))
-    //         }
-    //         nextButton.backgroundTintList = ColorStateList.valueOf(color)
-    //         signUpButton.setTextColor(color)
-    //         signUpButton.rippleColor = ColorStateList.valueOf(ripple)
-    //     }
-    // }
-    //
-    // private fun animateOnPrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
-    //     val newOnPrimary = newAccentColor.getOnPrimary(context)
-    //     val oldOnPrimary = oldAccentColor.getOnPrimary(context)
-    //
-    //     animateColorChange(oldOnPrimary, newOnPrimary) { color ->
-    //         connectButton.setTextColor(color)
-    //         nextButton.imageTintList = ColorStateList.valueOf(color)
-    //     }
-    // }
-    //
-    // private fun animateSecondaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-    //     val newSecondaryBackground = newAccentColor.getOnboardingSecondaryBackground(requireContext())
-    //     val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
-    //
-    //     animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
-    //         binding.dummyToolbarEdgeToEdge.setBackgroundColor(color)
-    //     }
-    // }
-    //
     private fun showError(error: String) {
         showSnackbar(error)
         // resetLoginButtons()
@@ -378,18 +307,10 @@ class LoginFragment : Fragment() {
         // connectButton.hideProgressCatching(connectButtonText)
         // signUpButton.isEnabled = true
     }
-    //
-    // private fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
-    //
-    // private fun goBackAPage() {
-    //     binding.introViewpager.currentItem -= 1
-    // }
-    //
+
     private fun startProgress() {
         // binding.connectButton.showProgressCatching(getCurrentOnPrimary())
     }
-
-    private fun getCurrentOnPrimary(): Int? = introViewModel.updatedAccentColor.value?.first?.getOnPrimary(requireContext())
 
     companion object {
         private val TAG = LoginFragment::class.java.simpleName
