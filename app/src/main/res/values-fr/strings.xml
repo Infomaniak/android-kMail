@@ -424,7 +424,7 @@
     <string name="noFolderTitle">Vous n’avez pas encore de dossier…</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak.</string>
     <string name="noMailboxTitle">Pas d’adresse mail associée à ce compte</string>
-    <string name="noNetwork">Pas de signal</string>
+    <string name="noNetwork">Aucune connexion internet</string>
     <string name="noSubjectTitle">(aucun sujet)</string>
     <string name="noUpdatedAt">Jamais mis à jour</string>
     <string name="notificationGeneralChannelName">Notifications générales</string>
