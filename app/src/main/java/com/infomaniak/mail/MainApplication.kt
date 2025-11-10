@@ -35,6 +35,7 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
+import com.infomaniak.core.AssociatedUserDataCleanable
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.coil.ImageLoaderProvider
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
@@ -144,6 +145,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
     override fun onCreate() {
         super<Application>.onCreate()
+        userDataCleanableList = listOf<AssociatedUserDataCleanable>(DeviceInfoUpdateManager)
 
         HttpClientConfig.cacheDir = applicationContext.cacheDir
 
@@ -296,5 +298,9 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
     companion object {
         private const val FIRST_LAUNCH_TIME = 0L
+
+        @JvmStatic
+        var userDataCleanableList: List<AssociatedUserDataCleanable> = emptyList()
+            protected set
     }
 }
