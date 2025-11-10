@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,36 +19,23 @@ package com.infomaniak.mail
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import com.infomaniak.core.legacy.utils.showToast
-import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
-import io.sentry.Sentry
-import io.sentry.SentryLevel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StandardPlayServicesUtils @Inject constructor(
     private val appContext: Context,
-    private val localSettings: LocalSettings,
-    private val registerUserDeviceWorkerScheduler: RegisterUserDeviceWorker.Scheduler,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PlayServicesUtils {
 
     override fun checkPlayServices(fragmentActivity: FragmentActivity): Unit = with(GoogleApiAvailability.getInstance()) {
         val errorCode = isGooglePlayServicesAvailable(fragmentActivity)
         when {
-            errorCode == ConnectionResult.SUCCESS -> fragmentActivity.checkFirebaseRegistration()
+            errorCode == ConnectionResult.SUCCESS -> Unit
             isUserResolvableError(errorCode) -> makeGooglePlayServicesAvailable(fragmentActivity)
             else -> fragmentActivity.showToast(R.string.googlePlayServicesAreRequired)
         }
@@ -60,41 +47,5 @@ class StandardPlayServicesUtils @Inject constructor(
 
     override fun deleteFirebaseToken() {
         FirebaseMessaging.getInstance().deleteToken()
-    }
-
-    private fun FragmentActivity.checkFirebaseRegistration() = lifecycleScope.launch(ioDispatcher) {
-
-        val registeredUsersIds = localSettings.firebaseRegisteredUsers.mapTo(mutableSetOf()) { it.toInt() }
-        val noNeedUsersRegistration = AccountUtils.getAllUsersSync().map { it.id }.minus(registeredUsersIds).isEmpty()
-
-        SentryLog.d("firebase", "checkFirebaseRegistration: (skip users registration): $noNeedUsersRegistration")
-        if (noNeedUsersRegistration) return@launch
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                if (task.exception?.message?.contains(SERVICE_NOT_AVAILABLE_EXCEPTION) != true) {
-                    Sentry.captureMessage("Fetching FCM registration token failed", SentryLevel.ERROR) { scope ->
-                        scope.setExtra("task.exception", task.exception.toString())
-                    }
-                }
-                SentryLog.w("firebase", "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
-            if (task.result == null) {
-                Sentry.captureMessage("FirebaseMessaging token is null", SentryLevel.ERROR)
-                return@addOnCompleteListener
-            }
-
-            val token = task.result
-            SentryLog.d("firebase", "checkFirebaseRegistration: token is different ${token != localSettings.firebaseToken}")
-            if (token != localSettings.firebaseToken) localSettings.clearRegisteredFirebaseUsers()
-
-            localSettings.firebaseToken = token
-            registerUserDeviceWorkerScheduler.scheduleWork()
-        }
-    }
-
-    companion object {
-        private const val SERVICE_NOT_AVAILABLE_EXCEPTION = "SERVICE_NOT_AVAILABLE"
     }
 }

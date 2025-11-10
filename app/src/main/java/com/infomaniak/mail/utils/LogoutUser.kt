@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,6 @@ class LogoutUser @Inject constructor(
         myKSuiteDataUtils.deleteData(user.id)
         RealmDatabase.removeUserData(appContext, user.id)
         mailboxController.deleteUserMailboxes(user.id)
-        localSettings.removeRegisteredFirebaseUser(userId = user.id)
 
         if (user.id == AccountUtils.currentUserId) {
             AccountUtils.currentUser = null // Inform that there is no more current user

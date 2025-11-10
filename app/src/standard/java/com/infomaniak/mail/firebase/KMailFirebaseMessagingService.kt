@@ -20,7 +20,9 @@ package com.infomaniak.mail.firebase
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.infomaniak.core.notifications.registration.NotificationsRegistrationManager
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.twofactorauth.back.notifications.TwoFactorAuthNotifications
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -28,6 +30,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.twoFactorAuthManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,16 +57,9 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var processMessageNotificationsScheduler: ProcessMessageNotificationsWorker.Scheduler
 
-    @Inject
-    lateinit var registerUserDeviceWorkerScheduler: RegisterUserDeviceWorker.Scheduler
-
     override fun onNewToken(token: String) {
         SentryLog.i(TAG, "onNewToken: new token received")
-        localSettings.apply {
-            firebaseToken = token
-            clearRegisteredFirebaseUsers()
-        }
-        registerUserDeviceWorkerScheduler.scheduleWork()
+        NotificationsRegistrationManager.onNewToken(token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -73,6 +69,22 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
             playServicesUtils.deleteFirebaseToken()
             return
         }
+
+        val type = message.data["type"]
+        SentryLog.i(TAG, "onMessageReceived: type=$type")
+
+        when (type) {
+            TwoFactorAuthNotifications.TYPE -> twoFactorAuthManager.onApprovalChallengePushed(
+                remoteMessageData = message.data,
+                remoteMessageSentTimeUtcMillis = message.sentTime,
+                remoteMessageTimeToLiveSeconds = message.ttl // Note: could be 0 if not set.
+            )
+            "mail_app_new_email" -> onEmailMessageReceived(message)
+            else -> SentryLog.e(TAG, "Unexpected notification type")
+        }
+    }
+
+    private fun onEmailMessageReceived(message: RemoteMessage) {
 
         val userId = message.data["user_id"]?.toInt() ?: return
         val mailboxId = message.data["mailbox_id"]?.toInt() ?: return

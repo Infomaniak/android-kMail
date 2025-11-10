@@ -209,6 +209,7 @@ dependencies {
     implementation(libs.realm.kotlin.base)
     implementation(libs.junit.ktx)
 
+    "standardImplementation"(project(":Core:Notifications:Registration"))
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
 

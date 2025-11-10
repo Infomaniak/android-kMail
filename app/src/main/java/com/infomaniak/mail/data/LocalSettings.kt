@@ -28,7 +28,6 @@ import com.infomaniak.core.legacy.networking.AccessTokenUsageInterceptor.ApiCall
 import com.infomaniak.core.legacy.utils.SharedValues
 import com.infomaniak.core.legacy.utils.sharedValue
 import com.infomaniak.core.legacy.utils.transaction
-import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.SwipeAction
@@ -53,8 +52,8 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var threadMode by sharedValue("threadModeKey", ThreadMode.CONVERSATION)
     var externalContent by sharedValue("externalContentKey", ExternalContent.ALWAYS)
     var recentSearches: List<String> by sharedValue("recentSearchesKey", emptyList())
-    var firebaseToken by sharedValueNullable("firebaseTokenKey", null)
-    var firebaseRegisteredUsers by sharedValue("firebaseRegisteredUsersKey", emptySet())
+    // firebaseToken: String? was removed.
+    // firebaseRegisteredUsersKey: Set<String> was removed.
     var showAiDiscoveryBottomSheet by sharedValue("showEuriaDiscoveryBottomSheetKey", true)
     var showEncryptionDiscoveryBottomSheet by sharedValue("showEncryptionDiscoveryBottomSheetKey", true)
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
@@ -75,20 +74,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         R.string.settingsSwipeRight -> swipeRight
         R.string.settingsSwipeLeft -> swipeLeft
         else -> throw IllegalArgumentException()
-    }
-
-    fun markUserAsRegisteredByFirebase(userId: Int) {
-        SentryLog.i(TAG, "markUserAsRegisteredByFirebase: $userId has been registered")
-        firebaseRegisteredUsers = firebaseRegisteredUsers.toMutableSet().apply { add(userId.toString()) }
-    }
-
-    fun removeRegisteredFirebaseUser(userId: Int) {
-        firebaseRegisteredUsers = firebaseRegisteredUsers.filterNotTo(mutableSetOf()) { it == userId.toString() }
-    }
-
-    fun clearRegisteredFirebaseUsers() {
-        SentryLog.i(TAG, "clearRegisteredFirebaseUsers: called")
-        firebaseRegisteredUsers = mutableSetOf()
     }
 
     fun resetStorageBannerAppLaunches() {

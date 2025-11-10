@@ -18,13 +18,13 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
 import com.infomaniak.core.legacy.auth.CredentialManager
 import com.infomaniak.core.legacy.auth.TokenAuthenticator
 import com.infomaniak.core.legacy.models.ApiResponseStatus
 import com.infomaniak.core.legacy.models.user.User
 import com.infomaniak.core.legacy.networking.HttpClient
 import com.infomaniak.core.legacy.room.UserDatabase
+import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -112,7 +112,8 @@ object AccountUtils : CredentialManager() {
 
     suspend fun addUser(user: User) {
         currentUser = user
-        DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
+        val userId = user.id.toLong()
+        MainApplication.userDataCleanableList.forEach { it.resetForUser(userId) }
         userDatabase.userDao().insert(user)
     }
 
@@ -134,7 +135,8 @@ object AccountUtils : CredentialManager() {
     }
 
     suspend fun removeUser(user: User) {
-        DeviceInfoUpdateManager.sharedInstance.resetInfoKey(user.id.toLong())
+        val userId = user.id.toLong()
+        MainApplication.userDataCleanableList.forEach { it.resetForUser(userId) }
         userDatabase.userDao().delete(user)
     }
 

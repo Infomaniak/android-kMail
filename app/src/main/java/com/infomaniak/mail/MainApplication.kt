@@ -35,6 +35,7 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
+import com.infomaniak.core.AssociatedUserDataCleanable
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.coil.ImageLoaderProvider
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
@@ -54,6 +55,7 @@ import com.infomaniak.mail.TokenInterceptorListenerProvider.legacyTokenIntercept
 import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.services.DeviceInfoUpdateWorker
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -117,6 +119,9 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     lateinit var playServicesUtils: PlayServicesUtils
 
     @Inject
+    lateinit var mailboxController: MailboxController
+
+    @Inject
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
 
     @Inject
@@ -136,10 +141,11 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
-    private val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName("MainApplication"))
+    protected val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName("MainApplication"))
 
     override fun onCreate() {
         super<Application>.onCreate()
+        userDataCleanableList = listOf<AssociatedUserDataCleanable>(DeviceInfoUpdateManager)
 
         HttpClientConfig.cacheDir = applicationContext.cacheDir
 
@@ -155,7 +161,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         configureHttpClient()
 
         applicationScope.launch {
-            DeviceInfoUpdateManager.sharedInstance.scheduleWorkerOnDeviceInfoUpdate<DeviceInfoUpdateWorker>()
+            DeviceInfoUpdateManager.scheduleWorkerOnDeviceInfoUpdate<DeviceInfoUpdateWorker>()
         }
 
         localSettings.storageBannerDisplayAppLaunches++
@@ -292,5 +298,9 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
     companion object {
         private const val FIRST_LAUNCH_TIME = 0L
+
+        @JvmStatic
+        var userDataCleanableList: List<AssociatedUserDataCleanable> = emptyList()
+            protected set
     }
 }
