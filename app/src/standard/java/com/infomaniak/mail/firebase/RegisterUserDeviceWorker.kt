@@ -20,6 +20,8 @@ package com.infomaniak.mail.firebase
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
+import com.infomaniak.core.isChannelEnabled
+import com.infomaniak.core.isChannelEnabledFlow
 import com.infomaniak.core.notifications.registration.AbstractNotificationsRegistrationWorker
 import com.infomaniak.core.twofactorauth.back.notifications.TwoFactorAuthNotifications
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -28,7 +30,8 @@ import com.infomaniak.mail.utils.AccountUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import splitties.systemservices.notificationManager
 
 @HiltWorker
 class RegisterUserDeviceWorker @AssistedInject constructor(
@@ -44,24 +47,40 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
 
 fun notificationTopicsForUser(
     mailboxController: MailboxController,
-    userId: Int
-): Flow<List<String>> = mailboxController.getMailboxesAsync(userId = userId).map {
-    getNotificationTopicsForUser(it)
+    userId: Int,
+): Flow<List<String>> {
+    return combine(
+        mailboxController.getMailboxesAsync(userId = userId),
+        notificationManager.isChannelEnabledFlow(TwoFactorAuthNotifications.CHANNEL_ID)
+    ) { mailboxes, canShow2faNotifications ->
+        getNotificationTopicsForUser(
+            mailboxes = mailboxes,
+            canShow2faNotifications = canShow2faNotifications
+        )
+    }
 }
 
 private suspend fun getNotificationTopicsForUser(
     mailboxController: MailboxController,
-    userId: Int
+    userId: Int,
 ): List<String> {
-    val mailboxes = mailboxController.getMailboxes(userId = userId)
-    return getNotificationTopicsForUser(mailboxes)
+    return getNotificationTopicsForUser(
+        mailboxes = mailboxController.getMailboxes(userId = userId),
+        canShow2faNotifications = notificationManager.isChannelEnabled(TwoFactorAuthNotifications.CHANNEL_ID)
+    )
 }
 
 private fun getNotificationTopicsForUser(
-    mailboxes: List<Mailbox>
+    mailboxes: List<Mailbox>,
+    canShow2faNotifications: Boolean?,
 ): List<String> = buildList(mailboxes.size + 1) {
     mailboxes.forEach { mailbox ->
         add("mailbox-${mailbox.mailboxId}")
     }
-    add(TwoFactorAuthNotifications.TOPIC)
+    when (canShow2faNotifications) {
+        true, null -> { // Should not be null if channels are created before, and are not deleted.
+            add(TwoFactorAuthNotifications.TOPIC)
+        }
+        false -> Unit
+    }
 }
