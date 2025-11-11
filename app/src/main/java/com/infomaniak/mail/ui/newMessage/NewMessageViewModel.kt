@@ -228,7 +228,7 @@ class NewMessageViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    val currentMailbox: Flow<Mailbox> = mailboxRefFlow
+    private val _currentMailboxFlow: Flow<Mailbox> = mailboxRefFlow
         .mapLatest {
             val mailbox = mailboxController.getMailbox(it.userId, it.mailboxId)
             if (mailbox == null) {
@@ -238,6 +238,8 @@ class NewMessageViewModel @Inject constructor(
             mailbox
         }
         .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
+
+    suspend fun currentMailbox() = _currentMailboxFlow.first()
 
     fun loadMailbox(userId: Int, mailboxId: Int) {
         mailboxRefFlow.tryEmit(MailboxRef(userId, mailboxId))
@@ -250,7 +252,7 @@ class NewMessageViewModel @Inject constructor(
     suspend fun awaitNoMailboxSignal() = exitSignal.join()
     //endregion
 
-    private val currentMailboxLive = currentMailbox.asLiveData(ioCoroutineContext)
+    private val currentMailboxLive = _currentMailboxFlow.asLiveData(ioCoroutineContext)
 
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
@@ -301,10 +303,10 @@ class NewMessageViewModel @Inject constructor(
 
         val draft: Draft? = runCatching {
 
-            signatures = currentMailbox.first().signatures
+            signatures = currentMailbox().signatures
                 .also { signaturesCount = it.count() }
                 .toMutableList()
-                .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox.first().email)) }
+                .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox().email)) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
             if (isNewMessage) getNewDraft(signatures, intent, realm) else getExistingDraft(draftLocalUuid)
@@ -317,7 +319,7 @@ class NewMessageViewModel @Inject constructor(
             it.flagRecipientsAsAutomaticallyEntered()
 
             dismissNotification()
-            markAsRead(currentMailbox.first(), realm)
+            markAsRead(currentMailbox(), realm)
 
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.saveSnapshot(initialBody.content)
@@ -334,7 +336,7 @@ class NewMessageViewModel @Inject constructor(
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
-                draft.identityId = currentMailbox.first().getDefaultSignatureWithFallback().id.toString()
+                draft.identityId = currentMailbox().getDefaultSignatureWithFallback().id.toString()
             }
             splitSignatureAndQuoteFromBody(draft)
         }
@@ -364,7 +366,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         with(draftInitManager) {
-            val signature = chooseSignature(currentMailbox.first().email, signatures, draftMode, previousMessage)
+            val signature = chooseSignature(currentMailbox().email, signatures, draftMode, previousMessage)
             setSignatureIdentity(signature)
             if (signature.content.isNotEmpty()) {
                 initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
@@ -389,10 +391,10 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        val isAiEnabled = currentMailbox.first().featureFlags.contains(FeatureFlag.AI)
+        val isAiEnabled = currentMailbox().featureFlags.contains(FeatureFlag.AI)
         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body)
 
-        val isEncryptionEnabled = currentMailbox.first().featureFlags.contains(FeatureFlag.ENCRYPTION)
+        val isEncryptionEnabled = currentMailbox().featureFlags.contains(FeatureFlag.ENCRYPTION)
         if (isEncryptionEnabled) draft.isEncrypted = fullMessage.isEncrypted
     }
 
@@ -529,7 +531,7 @@ class NewMessageViewModel @Inject constructor(
 
         fromLiveData.postValue(
             UiFrom(
-                signature = draftSignature ?: currentMailbox.first().getDefaultSignatureWithFallback(),
+                signature = draftSignature ?: currentMailbox().getDefaultSignatureWithFallback(),
                 shouldUpdateBodySignature = false,
             ),
         )
@@ -853,7 +855,7 @@ class NewMessageViewModel @Inject constructor(
         } ?: return@launch
 
         runCatching {
-            uploadAttachmentsWithMutex(localUuid, currentMailbox.first(), realm)
+            uploadAttachmentsWithMutex(localUuid, currentMailbox(), realm)
         }.cancellable().onFailure(Sentry::captureException)
     }
 
@@ -923,7 +925,7 @@ class NewMessageViewModel @Inject constructor(
             to = toLiveData.valueOrEmpty(),
             cc = ccLiveData.valueOrEmpty(),
             bcc = bccLiveData.valueOrEmpty(),
-            externalMailFlagEnabled = currentMailbox.first().externalMailFlagEnabled,
+            externalMailFlagEnabled = currentMailbox().externalMailFlagEnabled,
         )
     }
 
