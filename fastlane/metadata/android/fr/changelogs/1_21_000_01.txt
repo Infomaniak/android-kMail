@@ -1,0 +1,2 @@
+- Ajouter une notification pour l'authentification à deux facteurs
+- Ajouter un sélecteur de comptes et de boîtes mail lors de l'envoi d'un e-mail à partir d'un lien

@@ -1,0 +1,2 @@
+- Add two factor authentification's notification
+- Add accounts and mailboxes' selector when sending a mail from a link
