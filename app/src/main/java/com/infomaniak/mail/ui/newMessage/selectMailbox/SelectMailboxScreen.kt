@@ -40,9 +40,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -59,12 +61,15 @@ import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState.*
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.AccountMailboxesDropdown
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.SelectedMailboxIndicator
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectMailboxScreenDataPreview
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectMailboxScreenPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
+import kotlinx.coroutines.launch
+import com.infomaniak.core.R as RCore
 
 @Composable
 fun SelectMailboxScreen(
@@ -75,7 +80,7 @@ fun SelectMailboxScreen(
     val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    BackHandler(uiState is UiState.SelectionScreen) {
+    BackHandler(uiState is SelectionScreen) {
         viewModel.showSelectionScreen(false)
     }
 
@@ -100,7 +105,7 @@ private fun SelectMailboxScreen(
     onNavigationTopbarClick: () -> Unit,
     onContinueWithMailbox: (SelectedMailboxUi) -> Unit
 ) {
-    val selectedMailbox by remember { derivedStateOf { (uiState() as? UiState.SelectionScreen.Selected)?.mailbox } }
+    val selectedMailbox by remember { derivedStateOf { (uiState() as? SelectionScreen.Selected)?.mailboxUi } }
 
     BottomStickyButtonScaffold(
         snackbarHostState = snackbarHostState,
@@ -108,8 +113,8 @@ private fun SelectMailboxScreen(
             MailTopAppBar(
                 navigationIcon = {
                     when(uiState()) {
-                        is UiState.SelectionScreen -> TopAppBarButtons.Back(onNavigationTopbarClick)
-                        is UiState.DefaultScreen, UiState.Loading -> TopAppBarButtons.Close(onNavigationTopbarClick)
+                        is SelectionScreen -> TopAppBarButtons.Back(onNavigationTopbarClick)
+                        is DefaultScreen, Loading, Error -> TopAppBarButtons.Close(onNavigationTopbarClick)
                     }
                 }
             )
@@ -118,6 +123,7 @@ private fun SelectMailboxScreen(
             Column {
                 ScrollableContent(
                     uiState,
+                    snackbarHostState,
                     usersWithMailboxes,
                     onMailboxSelected,
                     Modifier
@@ -154,39 +160,44 @@ private fun Header() {
 @Composable
 private fun ScrollableContent(
     uiState: () -> UiState,
+    snackbarHostState: SnackbarHostState,
     usersWithMailboxes: List<UserMailboxesUi>,
     onMailboxSelected: (SelectedMailboxUi) -> Unit,
     modifier: Modifier,
 ) {
+    val scope = rememberCoroutineScope()
     val uiState = uiState()
+
+    val context = LocalContext.current
 
     LazyColumn(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Margin.Medium),
     ) {
-        item {
-            Header()
-        }
+        item { Header() }
+
         when (uiState) {
-            is UiState.Loading -> {}
-            is UiState.DefaultScreen -> item {
-                SelectedMailboxIndicator(
-                    modifier = Modifier.animateItem(),
-                    selectedMailbox = uiState.mailbox
-                )
+            is Loading -> Unit
+            is Error -> scope.launch {
+                snackbarHostState.showSnackbar(message = context.getString(RCore.string.anErrorHasOccurred))
             }
-            is UiState.SelectionScreen -> items(
-                items = usersWithMailboxes,
-                key = { it.userId }
-            ) { userWithMailboxes ->
-                AccountMailboxesDropdown(
-                    modifier = Modifier.animateItem(),
-                    userWithMailboxes = userWithMailboxes,
-                    onClickMailbox = { mailbox ->
-                        onMailboxSelected(mailbox)
-                    }
-                )
+            is DefaultScreen -> {
+                item { SelectedMailboxIndicator(modifier = Modifier.animateItem(), selectedMailbox = uiState.mailboxUi) }
+            }
+            is SelectionScreen -> {
+                items(
+                    items = usersWithMailboxes,
+                    key = { it.userId }
+                ) { userWithMailboxes ->
+                    AccountMailboxesDropdown(
+                        modifier = Modifier.animateItem(),
+                        userWithMailboxes = userWithMailboxes,
+                        onClickMailbox = { mailbox ->
+                            onMailboxSelected(mailbox)
+                        }
+                    )
+                }
             }
         }
     }
@@ -216,16 +227,12 @@ private fun ContinueButton(
     onContinueWithMailbox: (SelectedMailboxUi) -> Unit
 ) {
     val uiState = uiState()
-    val selectedMailbox by remember { derivedStateOf { (uiState as? SelectMailboxViewModel.SelectedMailboxState)?.mailbox } }
+    val selectedMailbox by remember { derivedStateOf { (uiState as? SelectMailboxViewModel.SelectedMailboxState)?.mailboxUi } }
 
     LargeButton(
         modifier = modifier,
         title = stringResource(R.string.buttonContinue),
-        onClick = {
-            selectedMailbox?.let { selectedMailboxUi ->
-                onContinueWithMailbox(selectedMailboxUi)
-            }
-        },
+        onClick = { selectedMailbox?.let { selectedMailboxUi -> onContinueWithMailbox(selectedMailboxUi) } },
         enabled = { uiState is SelectMailboxViewModel.SelectedMailboxState },
     )
 }
@@ -238,7 +245,7 @@ private fun DifferentAddressButton(
 ) {
     AnimatedVisibility(
         modifier = modifier,
-        visible = uiState() is UiState.DefaultScreen
+        visible = uiState() is DefaultScreen
     ) {
         LargeButton(
             title = stringResource(R.string.buttonSendWithDifferentAddress),

@@ -33,19 +33,10 @@ val usersWithMailboxesPreviewData = listOf(
         avatarUrl = "https://picsum.photos/id/120/200/200",
         initials = "CH",
         fullName = "Chef",
-        mailboxes = listOf(
-            MailboxUi(
-                mailboxId = 0,
-                email = "chef-1@infomaniak.com"
-            ),
-            MailboxUi(
-                mailboxId = 1,
-                email = "chef-2@infomaniak.com"
-            ),
-            MailboxUi(
-                mailboxId = 2,
-                email = "chef-3@infomaniak.com"
-            )
+        mailboxesUi = listOf(
+            MailboxUi(mailboxId = 0, email = "chef-1@infomaniak.com"),
+            MailboxUi(mailboxId = 1, email = "chef-2@infomaniak.com"),
+            MailboxUi(mailboxId = 2, email = "chef-3@infomaniak.com")
         )
     ),
     UserMailboxesUi(
@@ -54,12 +45,7 @@ val usersWithMailboxesPreviewData = listOf(
         avatarUrl = "https://picsum.photos/id/130/200/200",
         initials = "FL",
         fullName = "Firstname Listname",
-        mailboxes = listOf(
-            MailboxUi(
-                mailboxId = 0,
-                email = "firstname.lastnameeeeeeeeeeeeee@infomaniak.com"
-            )
-        )
+        mailboxesUi = listOf(MailboxUi(mailboxId = 0, email = "firstname.lastnameeeeeeeeeeeeee@infomaniak.com"))
     ),
     UserMailboxesUi(
         userId = 2,
@@ -67,11 +53,6 @@ val usersWithMailboxesPreviewData = listOf(
         avatarUrl = "https://picsum.photos/id/140/200/200",
         initials = "AD",
         fullName = "Android",
-        mailboxes = listOf(
-            MailboxUi(
-                mailboxId = 0,
-                email = "android@infomaniak.com"
-            )
-        )
+        mailboxesUi = listOf(MailboxUi(mailboxId = 0, email = "android@infomaniak.com"))
     ),
 )
