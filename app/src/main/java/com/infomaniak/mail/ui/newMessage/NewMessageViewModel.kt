@@ -110,23 +110,30 @@ import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
-import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     application: Application,
@@ -216,15 +223,26 @@ class NewMessageViewModel @Inject constructor(
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
-    val currentMailbox = viewModelScope.suspendLazy {
-        val mailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+    private val mailboxRefFlow = MutableSharedFlow<MailboxRef>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
-        if (mailbox == null) {
-            exitSignal.complete()
-            awaitCancellation()
+    private val _currentMailboxFlow: Flow<Mailbox> = mailboxRefFlow
+        .mapLatest {
+            val mailbox = mailboxController.getMailbox(it.userId, it.mailboxId)
+            if (mailbox == null) {
+                exitSignal.complete()
+                awaitCancellation()
+            }
+            mailbox
         }
+        .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
-        mailbox
+    suspend fun currentMailbox() = _currentMailboxFlow.first()
+
+    fun loadMailbox(userId: Int, mailboxId: Int) {
+        mailboxRefFlow.tryEmit(MailboxRef(userId, mailboxId))
     }
 
     // ------------- !IMPORTANT! -------------
@@ -234,10 +252,7 @@ class NewMessageViewModel @Inject constructor(
     suspend fun awaitNoMailboxSignal() = exitSignal.join()
     //endregion
 
-    private val currentMailboxLive = mailboxController.getMailboxAsync(
-        AccountUtils.currentUserId,
-        AccountUtils.currentMailboxId,
-    ).mapNotNull { it.obj }.asLiveData(ioCoroutineContext)
+    private val currentMailboxLive = _currentMailboxFlow.asLiveData(ioCoroutineContext)
 
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
@@ -274,6 +289,12 @@ class NewMessageViewModel @Inject constructor(
     fun draftLocalUuid() = draftLocalUuid
     fun draftMode() = draftMode
     fun shouldLoadDistantResources() = shouldLoadDistantResources
+
+    suspend fun hasMultiMailboxes() = withContext(ioDispatcher) {
+        AccountUtils.getAllUsersSync().flatMap { user ->
+            mailboxController.getMailboxes(user.id)
+        }.size > 1
+    }
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
 
@@ -1064,6 +1085,8 @@ class NewMessageViewModel @Inject constructor(
         SUCCESS,
         ATTACHMENTS_TOO_BIG,
     }
+
+    data class MailboxRef(val userId: Int, val mailboxId: Int)
 
     data class InitResult(
         val draft: Draft,

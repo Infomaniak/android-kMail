@@ -78,6 +78,7 @@ class NewMessageActivity : BaseActivity() {
         ShortcutManagerCompat.reportShortcutUsed(this@NewMessageActivity, Shortcuts.NEW_MESSAGE.id)
         setContentView(binding.root)
         addTwoFactorAuthOverlay()
+        setupNagGraphStartDestination()
 
         if (!isAuth()) {
             finish()
@@ -103,6 +104,30 @@ class NewMessageActivity : BaseActivity() {
         }
 
         return true
+    }
+
+    private fun setupNagGraphStartDestination() {
+        val navGraph = navController.navInflater.inflate(R.navigation.new_message_navigation)
+        lifecycleScope.launch {
+            when (intent.action) {
+                Intent.ACTION_SEND,
+                Intent.ACTION_SEND_MULTIPLE,
+                Intent.ACTION_VIEW,
+                Intent.ACTION_SENDTO -> {
+                    navGraph.setStartDestination(
+                        if (newMessageViewModel.hasMultiMailboxes()) {
+                            R.id.selectMailboxFragment
+                        } else {
+                            R.id.newMessageFragment
+                        }
+                    )
+                }
+                else -> {
+                    navGraph.setStartDestination(R.id.newMessageFragment)
+                }
+            }
+            navController.graph = navGraph
+        }
     }
 
     private fun setupSnackbar() {
