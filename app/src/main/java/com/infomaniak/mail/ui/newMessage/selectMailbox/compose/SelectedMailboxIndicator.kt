@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.newMessage.selectMailbox.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import coil3.ImageLoader
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.avatar.models.AvatarColors
@@ -71,30 +73,39 @@ fun SelectedMailboxIndicator(
                 .padding(horizontal = Margin.Medium),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Avatar(
-                modifier = Modifier.size(Dimens.avatarSize),
-                avatarType = AvatarType.getUrlOrInitials(
-                    avatarUrlData = selectedMailbox.avatarUrl?.let { AvatarUrlData(it, unauthenticatedImageLoader) },
-                    initials = selectedMailbox.initials,
-                    colors = AvatarColors(
-                        containerColor = Color(context.getBackgroundColorResBasedOnId(selectedMailbox.userId)),
-                        contentColor = Color(context.getColor(R.color.onColorfulBackground))
-                    )
-                )
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = Margin.Mini),
-                text = selectedMailbox.mailbox.email
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                painter = painterResource(R.drawable.ic_check_rounded),
-                tint = colorResource(R.color.greenSuccess),
-                contentDescription = null
-            )
+            SelectedMailboxIndicatorContent(selectedMailbox, unauthenticatedImageLoader)
         }
-
     }
+}
+
+@Composable
+private fun RowScope.SelectedMailboxIndicatorContent(
+    selectedMailbox: SelectedMailboxUi,
+    unauthenticatedImageLoader: ImageLoader,
+) {
+    val context = LocalContext.current
+
+    Avatar(
+        modifier = Modifier.size(Dimens.avatarSize),
+        avatarType = AvatarType.getUrlOrInitials(
+            avatarUrlData = selectedMailbox.avatarUrl?.let { AvatarUrlData(it, unauthenticatedImageLoader) },
+            initials = selectedMailbox.initials,
+            colors = AvatarColors(
+                containerColor = Color(context.getBackgroundColorResBasedOnId(selectedMailbox.userId)),
+                contentColor = Color(context.getColor(R.color.onColorfulBackground))
+            )
+        )
+    )
+    Text(
+        modifier = Modifier.padding(horizontal = Margin.Mini),
+        text = selectedMailbox.mailboxUi.email
+    )
+    Spacer(modifier = Modifier.weight(1f))
+    Icon(
+        painter = painterResource(R.drawable.ic_check_rounded),
+        tint = colorResource(R.color.greenSuccess),
+        contentDescription = null
+    )
 }
 
 @PreviewAllWindows

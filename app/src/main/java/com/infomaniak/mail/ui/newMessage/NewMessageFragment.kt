@@ -813,7 +813,7 @@ class NewMessageFragment : Fragment() {
 
     private suspend fun setupSendButtons() = with(binding) {
 
-        val mailbox = newMessageViewModel.currentMailbox.first()
+        val mailbox = newMessageViewModel.currentMailbox()
 
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
             scheduleButton.isEnabled = it
@@ -834,7 +834,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
-        val mailbox = newMessageViewModel.currentMailbox.first()
+        val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
