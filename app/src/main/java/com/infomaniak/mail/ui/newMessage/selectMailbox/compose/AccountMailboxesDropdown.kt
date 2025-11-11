@@ -101,7 +101,7 @@ fun AccountMailboxesDropdown(
                 .onGloballyPositioned { layoutCoordinates -> rowSize = layoutCoordinates.size.toSize() }
                 .padding(horizontal = Margin.Medium)
         ) {
-            AccountDropdownSelector(userWithMailboxes, unauthenticatedImageLoader, context)
+            AccountDropdownSelector(userWithMailboxes, unauthenticatedImageLoader)
         }
         AccountDropdownMenu({ rowSize }, isDropDownExpanded, userWithMailboxes, onClickMailbox)
     }
@@ -111,8 +111,9 @@ fun AccountMailboxesDropdown(
 private fun RowScope.AccountDropdownSelector(
     userWithMailboxes: UserMailboxesUi,
     unauthenticatedImageLoader: ImageLoader,
-    context: Context
 ) {
+    val context = LocalContext.current
+
     Avatar(
         modifier = Modifier.size(Dimens.avatarSize),
         avatarType = AvatarType.getUrlOrInitials(
