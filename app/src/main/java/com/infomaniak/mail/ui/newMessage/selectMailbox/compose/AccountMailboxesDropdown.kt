@@ -100,7 +100,6 @@ fun AccountMailboxesDropdown(
                     rowSize = layoutCoordinates.size.toSize()
                 }
                 .padding(horizontal = Margin.Medium)
-
         ) {
             Avatar(
                 modifier = Modifier.size(Dimens.avatarSize),
@@ -145,7 +144,7 @@ fun AccountMailboxesDropdown(
                 isDropDownExpanded.value = false
             }
         ) {
-            userWithMailboxes.mailboxes.forEach { mailbox ->
+            userWithMailboxes.mailboxesUi.forEach { mailbox ->
                 DropdownMenuItem(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -165,7 +164,7 @@ fun AccountMailboxesDropdown(
                         onClickMailbox(
                             SelectedMailboxUi(
                                 userId = userWithMailboxes.userId,
-                                mailbox = mailbox,
+                                mailboxUi = mailbox,
                                 avatarUrl = userWithMailboxes.avatarUrl,
                                 initials = userWithMailboxes.initials,
                             )

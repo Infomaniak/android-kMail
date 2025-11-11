@@ -84,7 +84,7 @@ fun SelectedMailboxIndicator(
             )
             Text(
                 modifier = Modifier.padding(horizontal = Margin.Mini),
-                text = selectedMailbox.mailbox.email
+                text = selectedMailbox.mailboxUi.email
             )
             Spacer(modifier = Modifier.weight(1f))
             Icon(
@@ -93,7 +93,6 @@ fun SelectedMailboxIndicator(
                 contentDescription = null
             )
         }
-
     }
 }
 

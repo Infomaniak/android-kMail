@@ -44,7 +44,7 @@ class SelectMailboxFragment : Fragment() {
                         onContinue = { selectedMailbox ->
                             val direction = SelectMailboxFragmentDirections.actionSelectMailboxFragmentToNewMessageFragment(
                                 userId = selectedMailbox.userId,
-                                mailboxId = selectedMailbox.mailbox.mailboxId
+                                mailboxId = selectedMailbox.mailboxUi.mailboxId
                             )
                             safelyNavigate(direction)
                         }
