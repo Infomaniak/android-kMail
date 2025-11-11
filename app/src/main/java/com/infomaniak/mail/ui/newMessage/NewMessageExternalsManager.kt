@@ -30,7 +30,6 @@ import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessag
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.scopes.FragmentScoped
-import kotlinx.coroutines.flow.first
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
