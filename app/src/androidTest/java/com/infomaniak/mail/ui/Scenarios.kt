@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui
 
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -74,12 +75,13 @@ object Scenarios {
         }
     }
 
-    fun UiDevice.deactivateAnimations() {
-        executeShellCommand("settings put global window_animation_scale 0")
-        executeShellCommand("settings put global transition_animation_scale 0")
-        executeShellCommand("settings put global animator_duration_scale 0")
-        executeShellCommand("settings put global layout_animation_duration_scale 0")
-        executeShellCommand("settings put global force_animator_hardware_acceleration false")
+    fun UiDevice.toggleAnimations(activate: Boolean) {
+        val enable = if (activate) 1 else 0
+        executeShellCommand("settings put global window_animation_scale $enable")
+        executeShellCommand("settings put global transition_animation_scale $enable")
+        executeShellCommand("settings put global animator_duration_scale $enable")
+        executeShellCommand("settings put global layout_animation_duration_scale $enable")
+        executeShellCommand("settings put global force_animator_hardware_acceleration $activate")
     }
 
     fun grantPermissions(device: UiDevice, permissions: List<String>, packageName: String) {
