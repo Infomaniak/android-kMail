@@ -30,6 +30,7 @@ include(
     ":Core:Coil",
     ":Core:CrossAppLogin:Back",
     ":Core:CrossAppLogin:Front",
+    ":Core:DotLottie",
     ":Core:FragmentNavigation",
     ":Core:KSuite",
     ":Core:KSuite:KSuitePro",

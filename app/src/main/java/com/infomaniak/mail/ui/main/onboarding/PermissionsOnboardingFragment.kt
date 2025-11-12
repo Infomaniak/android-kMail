@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingBinding
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.statusBar
@@ -67,7 +66,10 @@ class PermissionsOnboardingFragment : Fragment() {
 
     private fun setPermissionUi() = with(binding) {
         val permission = if (navigationArgs.position == 0) PermissionType.CONTACTS else PermissionType.NOTIFICATIONS
-        iconLayout.setImageResource(getIconResWithAccentColor(permission))
+        animationLayout.apply {
+            animationRes = permission.animationRes
+            theme = localSettings.accentColor.getDotLottieTheme(requireContext())
+        }
         title.setText(permission.titleRes)
         description.setText(permission.descritionRes)
         waveBackground.apply {
@@ -76,32 +78,20 @@ class PermissionsOnboardingFragment : Fragment() {
         }
     }
 
-    private fun getIconResWithAccentColor(permission: PermissionType) = when (localSettings.accentColor) {
-        AccentColor.PINK -> permission.pinkIconRes
-        AccentColor.BLUE -> permission.blueIconRes
-        AccentColor.SYSTEM -> permission.systemIconRes
-    }
-
     enum class PermissionType(
-        @DrawableRes val pinkIconRes: Int,
-        @DrawableRes val blueIconRes: Int,
-        @DrawableRes val systemIconRes: Int,
+        @DrawableRes val animationRes: Int,
         @StringRes val titleRes: Int,
         @StringRes val descritionRes: Int,
         @DrawableRes val waveRes: Int,
     ) {
         CONTACTS(
-            pinkIconRes = R.drawable.illustration_onboarding_contacts,
-            blueIconRes = R.drawable.illustration_onboarding_contacts_blue,
-            systemIconRes = R.drawable.illustration_onboarding_contacts_material,
+            animationRes = R.raw.book_persons,
             titleRes = R.string.onBoardingContactsTitle,
             descritionRes = R.string.onBoardingContactsDescription,
             waveRes = R.drawable.ic_back_wave_1,
         ),
         NOTIFICATIONS(
-            pinkIconRes = R.drawable.illustration_onboarding_notifications,
-            blueIconRes = R.drawable.illustration_onboarding_notifications_blue,
-            systemIconRes = R.drawable.illustration_onboarding_notifications_material,
+            animationRes = R.raw.phone_notification,
             titleRes = R.string.onBoardingNotificationsTitle,
             descritionRes = R.string.onBoardingNotificationsDescription,
             waveRes = R.drawable.ic_back_wave_2,

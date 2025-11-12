@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023-2024 Infomaniak Network SA
+  ~ Copyright (C) 2023-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
   -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -28,20 +27,20 @@
         android:layout_height="match_parent"
         android:paddingHorizontal="@dimen/marginStandard">
 
-        <ImageView
+        <com.infomaniak.core.dotlottie.DotLottieView
             android:id="@+id/illustration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="290dp"
+            android:layout_height="290dp"
             android:layout_marginTop="@dimen/marginStandard"
             android:importantForAccessibility="no"
+            app:animationRes="@raw/phone_emails_products"
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toTopOf="@id/title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_min="150dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:src="@drawable/new_account_illustration_pink" />
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <TextView
             android:id="@+id/title"
