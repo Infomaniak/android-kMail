@@ -205,6 +205,7 @@
     <string name="contentDescriptionIconFavorite">Est favori</string>
     <string name="contentDescriptionIconFolderSelected">Dossier sélectionné</string>
     <string name="contentDescriptionIconForward">Transféré</string>
+    <string name="contentDescriptionIconInvalidPassword">Débloquer l’adresse</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
@@ -374,6 +375,9 @@
     </plurals>
     <string name="lockedMailboxViewDescription">Pour plus d’informations :</string>
     <string name="lockedMailboxViewTitle">Certaines de vos adresses mail sont bloquées</string>
+    <string name="mailPremiumUpgradeDescription">Obtenez plus dʼespace de stockage et de nouvelles fonctionnalités avec votre adresse mail.</string>
+    <string name="mailPremiumUpgradeDetails">Pour bénéficier de Premium, modifiez votre offre depuis votre interface web.</string>
+    <string name="mailPremiumUpgradeTitle">Passez à la vitesse supérieure avec le plan Premium</string>
     <string name="manageSignatures">Gérer mes signatures</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>

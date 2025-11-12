@@ -210,6 +210,7 @@
     <string name="contentDescriptionIconFavorite">Is favorite</string>
     <string name="contentDescriptionIconFolderSelected">Folder selected</string>
     <string name="contentDescriptionIconForward">Forwarded</string>
+    <string name="contentDescriptionIconInvalidPassword">Unblock mailbox</string>
     <string name="contentDescriptionIconNewMail">New</string>
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
@@ -375,6 +376,9 @@
     </plurals>
     <string name="lockedMailboxViewDescription">For further information:</string>
     <string name="lockedMailboxViewTitle">Some of your mailboxes are blocked</string>
+    <string name="mailPremiumUpgradeDescription">Get more storage and new features with your email address.</string>
+    <string name="mailPremiumUpgradeDetails">To benefit from Premium, modify your offer from your web interface.</string>
+    <string name="mailPremiumUpgradeTitle">Take it to the next level with the Premium plan</string>
     <string name="manageSignatures">Manage my signatures</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
