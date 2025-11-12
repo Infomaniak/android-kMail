@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
 import com.infomaniak.mail.utils.extensions.findFirstSuspend
 import com.infomaniak.mail.utils.extensions.findSuspend
@@ -46,6 +47,7 @@ import javax.inject.Singleton
 @Singleton
 class MailboxController @Inject constructor(
     private val appContext: Context,
+    private val notificationUtils: NotificationUtils,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
 ) {
 
@@ -104,6 +106,9 @@ class MailboxController @Inject constructor(
 
     //region Edit data
     suspend fun updateMailboxes(remoteMailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
+        remoteMailboxes.forEach { mailbox ->
+            notificationUtils.initMailNotificationChannel(mailbox)
+        }
 
         mailboxInfoRealm.write {
             val remoteMailboxesIds = remoteMailboxes.map { remoteMailbox ->

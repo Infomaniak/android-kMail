@@ -454,7 +454,6 @@ class MainViewModel @Inject constructor(
             AccountUtils.currentMailboxEmail = mailbox.email
             _currentMailboxObjectId.value = mailbox.objectId
             _currentFolderId.value = null
-            notificationUtils.initMailNotificationChannel(mailbox)
         }
     }
 
