@@ -166,6 +166,7 @@ dependencies {
     implementation(project(":Core:Coil"))
     implementation(project(":Core:CrossAppLogin:Back"))
     implementation(project(":Core:CrossAppLogin:Front"))
+    implementation(project(":Core:DotLottie"))
     implementation(project(":Core:FragmentNavigation"))
     implementation(project(":Core:KSuite"))
     implementation(project(":Core:KSuite:KSuitePro"))

@@ -25,8 +25,12 @@ import android.view.ContextThemeWrapper
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.graphics.Color
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.core.auth.AccessTokenUsageInterceptor.ApiCallRecord
+import com.infomaniak.core.dotlottie.model.DotLottieTheme
+import com.infomaniak.core.dotlottie.model.LottieColor
+import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.SharedValues
 import com.infomaniak.core.legacy.utils.sharedValue
 import com.infomaniak.core.legacy.utils.transaction
@@ -132,6 +136,22 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         fun getRipple(context: Context): Int {
             val baseThemeContext = ContextThemeWrapper(context, theme)
             return MaterialColors.getColor(baseThemeContext, RAndroid.attr.colorControlHighlight, 0)
+        }
+
+        fun getDotLottieTheme(context: Context): DotLottieTheme {
+            val isNightMode = context.isNightModeEnabled()
+            return when (this) {
+                PINK -> if (isNightMode) DotLottieTheme.Embedded("Pink-Dark") else DotLottieTheme.Embedded(null)
+                BLUE -> if (isNightMode) DotLottieTheme.Embedded("Blue-Dark") else DotLottieTheme.Embedded("Blue-Light")
+                SYSTEM -> DotLottieTheme.Custom(getThemeColorMap(isNightMode, context))
+            }
+        }
+
+        private fun getThemeColorMap(isNightMode: Boolean, context: Context): Map<String, Color> = buildMap {
+            set("AccentPrimary", if (isNightMode) LottieColor.primary80(context) else LottieColor.primary40(context))
+            set("Fond1", if (isNightMode) Color(0xFF1A1A1A) else Color(0xFFFFFFFF))
+            set("Shape1", if (isNightMode) Color(0xFF666666) else Color(0xFFF1F1F1))
+            set("Stroke", if (isNightMode) Color(0xFFE0E0E0) else Color(0xFF9f9f9f))
         }
 
         override fun toString() = name.lowercase()
