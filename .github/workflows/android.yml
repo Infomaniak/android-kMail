@@ -29,6 +29,13 @@ jobs:
       - name: Clean gradle cache
         run: ./gradlew clean
 
+      - name: Run UI tests
+        env:
+          UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
+          UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
+        run: |
+          ./gradlew ui-testStandardDebugAndroidTest --enable-display
+
       - name: Build with Gradle
         run: ./gradlew build
 
