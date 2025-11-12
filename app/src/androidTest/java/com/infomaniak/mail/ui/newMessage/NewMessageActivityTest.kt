@@ -36,16 +36,17 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.Scenarios.deactivateAnimations
 import com.infomaniak.mail.ui.Scenarios.grantPermissions
 import com.infomaniak.mail.ui.Scenarios.login
 import com.infomaniak.mail.ui.Scenarios.startLoginWebviewActivity
+import com.infomaniak.mail.ui.Scenarios.toggleAnimations
 import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.ui.Utils.onViewWithTimeout
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.Env
 import org.hamcrest.core.AllOf.allOf
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -67,7 +68,7 @@ class NewMessageActivityTest {
     @Before
     fun setUp() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.deactivateAnimations()
+        device.toggleAnimations(activate = false)
 
         val permissions = listOf(
             Manifest.permission.READ_CONTACTS,
@@ -120,6 +121,11 @@ class NewMessageActivityTest {
             matcher = withId(R.id.threadsList),
             assertion = matches(hasDescendant(withText(subject))),
         )
+    }
+
+    @After
+    fun cleanUp() {
+        device.toggleAnimations(activate = true)
     }
 
     private fun enterEmailToField(fieldResId: Int, suggestionListResId: Int) {

@@ -28,13 +28,13 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.Scenarios
-import com.infomaniak.mail.ui.Scenarios.deactivateAnimations
+import com.infomaniak.mail.ui.Scenarios.toggleAnimations
 import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.utils.Env
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,8 +53,7 @@ class LoginActivityTest {
     @Before
     fun setUp() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-
-        device.deactivateAnimations()
+        device.toggleAnimations(activate = false)
     }
 
     @Test
@@ -71,5 +70,10 @@ class LoginActivityTest {
 
         // Contacts synchronization is displayed so login worked
         onView(withId(R.id.continueButton)).check(matches(isDisplayed()))
+    }
+
+    @After
+    fun cleanUp() {
+        device.toggleAnimations(activate = true)
     }
 }
