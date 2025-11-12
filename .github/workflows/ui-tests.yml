@@ -12,6 +12,11 @@ jobs:
   instrumentation-tests:
     runs-on: [ self-hosted, Android ]
 
+    env:
+      ENV_PATH: "app/src/androidTest/java/com/infomaniak/mail/utils/Env.kt"
+      UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
+      UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
+
     steps:
       - name: Checkout the code
         uses: actions/checkout@v5.0.0
@@ -20,7 +25,10 @@ jobs:
           submodules: recursive
 
       - name: Create test env
-        run: touch uitest-env.properties
+        run: |
+          mkdir -p "$(dirname "$ENV_PATH")"
+          touch $ENV_PATH
+          echo "package com.infomaniak.mail.utils; object Env { const val UI_TEST_ACCOUNT_EMAIL: String = \"$UI_TEST_ACCOUNT_EMAIL\"; const val UI_TEST_ACCOUNT_PASSWORD: String = \"$UI_TEST_ACCOUNT_PASSWORD\" }" > $ENV_PATH
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -29,11 +37,8 @@ jobs:
         run: ./gradlew clean
 
       - name: Run UI tests
-        env:
-          UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
-          UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
         run: |
-          ./gradlew ui-testStandardDebugAndroidTest --enable-display
+          ./gradlew ui-testStandardDebugAndroidTest
 
       - name: Upload Test Report
         if: failure()

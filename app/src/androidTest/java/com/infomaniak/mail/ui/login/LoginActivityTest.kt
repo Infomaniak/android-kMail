@@ -34,6 +34,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.Scenarios
 import com.infomaniak.mail.ui.Scenarios.deactivateAnimations
 import com.infomaniak.mail.ui.Scenarios.waitFor
+import com.infomaniak.mail.utils.Env
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,16 +59,13 @@ class LoginActivityTest {
 
     @Test
     fun login() {
-        val email = BuildConfig.UI_TEST_ACCOUNT_EMAIL
-        val password = BuildConfig.UI_TEST_ACCOUNT_PASSWORD
-
         // Going through the onboarding
         onView(withId(R.id.nextButton)).perform(click())
         onView(withId(R.id.nextButton)).perform(click())
         onView(withId(R.id.nextButton)).perform(click())
         onView(withId(R.id.connectButton)).perform(click())
 
-        Scenarios.login(email, password)
+        Scenarios.login(Env.UI_TEST_ACCOUNT_EMAIL, Env.UI_TEST_ACCOUNT_PASSWORD)
 
         onView(isRoot()).perform(waitFor(3.seconds))
 

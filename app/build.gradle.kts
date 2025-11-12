@@ -63,25 +63,6 @@ android {
         buildConfigField("String", "GITHUB_REPO", "\"android-mail\"")
         buildConfigField("String", "GITHUB_REPO_URL", "\"https://github.com/Infomaniak/android-kMail\"")
 
-        //noinspection WrongGradleMethod
-        val isRelease = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
-
-        val uiTestEnvProperties = rootProject.file("uitest-env.properties").takeIf { it.exists() }?.let { file ->
-            Properties().also { it.load(file.reader()) }
-        }
-
-        if (!isRelease && uiTestEnvProperties == null) error("The `uitest-env.properties` file must exist (see `uitest-env.example.properties`).")
-
-        val uiTestAccountEmail = uiTestEnvProperties?.getProperty("uiTestAccountEmail").takeUnless { it.isNullOrBlank() }
-        val uiTestAccountPassword = uiTestEnvProperties?.getProperty("uiTestAccountPassword").takeUnless { it.isNullOrBlank() }
-
-        buildConfigField("String", "UI_TEST_ACCOUNT_EMAIL", "\"${System.getenv("UI_TEST_ACCOUNT_EMAIL") ?: uiTestAccountEmail}\"")
-        buildConfigField(
-            "String",
-            "UI_TEST_ACCOUNT_PASSWORD",
-            "\"${System.getenv("UI_TEST_ACCOUNT_PASSWORD") ?: uiTestAccountPassword}\""
-        )
-
         resValue("string", "ATTACHMENTS_AUTHORITY", "com.infomaniak.mail.attachments")
         resValue("string", "EML_AUTHORITY", "com.infomaniak.mail.eml")
         resValue("string", "FILES_AUTHORITY", "com.infomaniak.mail.attachments;com.infomaniak.mail.eml")

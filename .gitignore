@@ -1,8 +1,7 @@
 *.aab
 *.apk
 /app/release/baselineProfiles
-/app/src/androidTest/java/com/infomaniak/drive/utils/Env.kt
-/app/src/standard/java/com/infomaniak/drive/GeniusScanEnv.kt
+/app/src/androidTest/java/com/infomaniak/mail/utils/Env.kt
 **/build
 **/captures
 .cxx
