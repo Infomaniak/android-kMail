@@ -35,7 +35,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.Scenarios.deactivateAnimations
 import com.infomaniak.mail.ui.Scenarios.grantPermissions
@@ -45,6 +44,7 @@ import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.ui.Utils.onViewWithTimeout
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
+import com.infomaniak.mail.utils.Env
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Before
 import org.junit.Rule
@@ -76,14 +76,11 @@ class NewMessageActivityTest {
 
         grantPermissions(device, permissions, packageName)
 
-        val email = BuildConfig.UI_TEST_ACCOUNT_EMAIL
-        val password = BuildConfig.UI_TEST_ACCOUNT_PASSWORD
-
         loginActivityScenarioRule.scenario.onActivity { activity ->
             activity.startLoginWebviewActivity()
         }
 
-        login(email, password)
+        login(Env.UI_TEST_ACCOUNT_EMAIL, Env.UI_TEST_ACCOUNT_PASSWORD)
         loginActivityScenarioRule.scenario.close()
     }
 
@@ -131,7 +128,7 @@ class NewMessageActivityTest {
                 withId(R.id.textInput),
                 isDescendantOfA(withId(fieldResId)),
             )
-        ).perform(click(), typeText(BuildConfig.UI_TEST_ACCOUNT_EMAIL))
+        ).perform(click(), typeText(Env.UI_TEST_ACCOUNT_EMAIL))
         onView(withId(suggestionListResId))
             .perform(RecyclerViewActions.actionOnItemAtPosition<ContactViewHolder>(0, click()))
     }
