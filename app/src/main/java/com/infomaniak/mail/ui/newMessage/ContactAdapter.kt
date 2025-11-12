@@ -165,7 +165,7 @@ class ContactAdapter(
     }
 
     fun addFirstAvailableItem() {
-        matchedContacts.firstOrNull()?.let { onContactClicked(it.contact as MergedContact) } ?: onAddUnrecognizedContact()
+        matchedContacts.firstOrNull()?.let { onContactClicked(it.contact) } ?: onAddUnrecognizedContact()
     }
 
     fun clear() {
