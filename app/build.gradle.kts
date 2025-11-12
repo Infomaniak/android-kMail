@@ -166,6 +166,7 @@ dependencies {
     implementation(project(":Core:Compose:Basics"))
     implementation(project(":Core:Compose:BasicButton"))
     implementation(project(":Core:Compose:BottomStickyButtonScaffolds"))
+    implementation(project(":Core:Compose:DotLottie"))
     implementation(project(":Core:Compose:Margin"))
     implementation(project(":Core:Compose:MaterialThemeFromXml"))
     implementation(project(":Core:Compose:Preview"))

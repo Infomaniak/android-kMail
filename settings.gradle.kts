@@ -29,6 +29,7 @@ include(
     ":Core:Coil",
     ":Core:Compose:BasicButton",
     ":Core:Compose:Basics",
+    ":Core:Compose:DotLottie",
     ":Core:Compose:Margin",
     ":Core:Compose:BottomStickyButtonScaffolds",
     ":Core:Compose:MaterialThemeFromXml",
