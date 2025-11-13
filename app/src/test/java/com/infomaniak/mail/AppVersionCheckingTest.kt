@@ -22,7 +22,12 @@ import com.infomaniak.core.appversionchecker.data.models.AppPublishedVersion
 import com.infomaniak.core.appversionchecker.data.models.AppVersion
 import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.compareVersionTo
 import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.toVersionNumbers
+import com.infomaniak.core.sentry.SentryLog
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 
 /**
@@ -55,6 +60,14 @@ class AppVersionCheckingTest {
         minimalAcceptedVersion = invalidCommaVersion,
         publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
     )
+
+    val sentryLog = mockk<SentryLog>(relaxed = true)
+
+    @Before
+    fun setup() {
+        mockkObject(SentryLog)
+        every { SentryLog.e(any(), any(), any(), any()) } returns sentryLog.e("", "")
+    }
 
     //region toVersionNumbers()
     @Test
