@@ -19,8 +19,8 @@
 
 package com.infomaniak.mail.data.models.draft
 
-import com.infomaniak.core.legacy.api.ApiController
 import com.infomaniak.core.legacy.utils.Utils.enumValueOfOrNull
+import com.infomaniak.core.network.api.ApiController
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient

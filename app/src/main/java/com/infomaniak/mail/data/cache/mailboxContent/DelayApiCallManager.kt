@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.core.legacy.models.ApiResponse
+import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import kotlinx.coroutines.CoroutineScope

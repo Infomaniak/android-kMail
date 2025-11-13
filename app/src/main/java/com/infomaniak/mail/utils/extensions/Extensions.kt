@@ -64,14 +64,14 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.infomaniak.core.legacy.api.ApiController
-import com.infomaniak.core.legacy.models.ApiResponse
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.removeAccents
 import com.infomaniak.core.legacy.utils.showToast
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
+import com.infomaniak.core.network.api.ApiController
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.endOfTheWeek
 import com.infomaniak.core.utils.isEmailRfc5321Compliant

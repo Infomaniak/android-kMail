@@ -26,7 +26,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
-import com.infomaniak.core.legacy.networking.AccessTokenUsageInterceptor.ApiCallRecord
+import com.infomaniak.core.auth.AccessTokenUsageInterceptor.ApiCallRecord
 import com.infomaniak.core.legacy.utils.SharedValues
 import com.infomaniak.core.legacy.utils.sharedValue
 import com.infomaniak.core.legacy.utils.transaction

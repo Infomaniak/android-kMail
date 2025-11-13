@@ -22,12 +22,12 @@ import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.legacy.R
-import com.infomaniak.core.legacy.models.ApiResponse
-import com.infomaniak.core.legacy.models.user.User
-import com.infomaniak.core.legacy.networking.HttpClient
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.networking.HttpClient
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -108,7 +108,7 @@ class LoginUtils @Inject constructor(
         lifecycleScope.launch {
             runCatching {
                 val tokenResult = infomaniakLogin.getToken(
-                    okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+                    okHttpClient = HttpClient.okHttpClient,
                     code = authCode,
                 )
                 when (tokenResult) {
@@ -165,7 +165,7 @@ class LoginUtils @Inject constructor(
     private suspend fun logout(infomaniakLogin: InfomaniakLogin, apiToken: ApiToken) {
         runCatching {
             val errorStatus = infomaniakLogin.deleteToken(
-                okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+                okHttpClient = HttpClient.okHttpClient,
                 token = apiToken,
             )
 

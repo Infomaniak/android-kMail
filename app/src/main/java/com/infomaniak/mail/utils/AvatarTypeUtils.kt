@@ -20,12 +20,12 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import coil3.imageLoader
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.avatar.models.AvatarUrlData
 import com.infomaniak.core.coil.ImageLoaderProvider.simpleImageLoader
-import com.infomaniak.core.legacy.models.user.User
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Bimi
