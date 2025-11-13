@@ -20,10 +20,10 @@ package com.infomaniak.mail.utils
 import android.app.NotificationManager
 import android.content.Context
 import androidx.work.WorkManager
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
-import com.infomaniak.core.legacy.models.user.User
-import com.infomaniak.core.legacy.networking.HttpClient
 import com.infomaniak.core.legacy.stores.StoresSettingsRepository
+import com.infomaniak.core.network.networking.HttpClient
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -79,7 +79,7 @@ class LogoutUser @Inject constructor(
     private fun User.logoutToken() = globalCoroutineScope.launch(ioDispatcher) {
         runCatching {
             appContext.getInfomaniakLogin().deleteToken(
-                okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+                okHttpClient = HttpClient.okHttpClient,
                 token = apiToken,
             )?.let { errorStatus ->
                 SentryLog.i(TAG, "API response error: $errorStatus")

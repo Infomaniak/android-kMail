@@ -30,11 +30,11 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.models.ApiResponse
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.DownloadManagerUtils
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.NetworkAvailability
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.MatomoMail.MatomoName

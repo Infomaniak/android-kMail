@@ -21,8 +21,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager

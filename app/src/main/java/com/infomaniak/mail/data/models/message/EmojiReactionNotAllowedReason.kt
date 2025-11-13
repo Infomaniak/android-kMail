@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.core.legacy.utils.ErrorCodeTranslated
+import com.infomaniak.core.network.utils.ErrorCodeTranslated
 import com.infomaniak.core.utils.ApiEnum
 import com.infomaniak.mail.R
 

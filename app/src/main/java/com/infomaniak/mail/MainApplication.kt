@@ -36,25 +36,22 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
 import com.infomaniak.core.AssociatedUserDataCleanable
+import com.infomaniak.core.auth.AccessTokenUsageInterceptor
 import com.infomaniak.core.auth.AuthConfiguration
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.auth.networking.HttpClient
 import com.infomaniak.core.coil.ImageLoaderProvider
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
-import com.infomaniak.core.legacy.InfomaniakCore
-import com.infomaniak.core.legacy.models.user.User
-import com.infomaniak.core.legacy.networking.AccessTokenUsageInterceptor
-import com.infomaniak.core.legacy.networking.HttpClient
-import com.infomaniak.core.legacy.networking.HttpClientConfig
 import com.infomaniak.core.legacy.stores.AppUpdateScheduler
 import com.infomaniak.core.legacy.utils.clearStack
 import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.legacy.utils.showToast
 import com.infomaniak.core.network.NetworkConfiguration
+import com.infomaniak.core.network.networking.HttpClientConfig
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import com.infomaniak.core.twofactorauth.back.TwoFactorAuthManager
-import com.infomaniak.mail.TokenInterceptorListenerProvider.legacyTokenInterceptorListener
 import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.services.DeviceInfoUpdateWorker
 import com.infomaniak.mail.di.IoDispatcher
@@ -233,23 +230,11 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).clearStack()
 
     private fun configureInfomaniakCore() {
-        // Legacy configuration
-        InfomaniakCore.apply {
-            init(
-                appId = BuildConfig.APPLICATION_ID,
-                appVersionCode = BuildConfig.VERSION_CODE,
-                appVersionName = BuildConfig.VERSION_NAME,
-                clientId = BuildConfig.CLIENT_ID,
-            )
-            apiErrorCodes = ErrorCode.apiErrorCodes
-            accessType = null
-        }
-
-        // New modules configuration
         NetworkConfiguration.init(
             appId = BuildConfig.APPLICATION_ID,
             appVersionCode = BuildConfig.VERSION_CODE,
             appVersionName = BuildConfig.VERSION_NAME,
+            apiErrorCodes = ErrorCode.apiErrorCodes,
         )
 
         AuthConfiguration.init(
@@ -257,14 +242,14 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
             appVersionCode = BuildConfig.VERSION_CODE,
             appVersionName = BuildConfig.VERSION_NAME,
             clientId = BuildConfig.CLIENT_ID,
+            accessType = null,
         )
     }
 
     private fun configureHttpClient() {
         AccountUtils.onRefreshTokenError = refreshTokenError
-        val tokenInterceptorListener = legacyTokenInterceptorListener(refreshTokenError, globalCoroutineScope)
+        val tokenInterceptorListener = tokenInterceptorListener(refreshTokenError, globalCoroutineScope)
         HttpClientConfig.customInterceptors = listOf(
-            UrlTraceInterceptor(),
             AccessTokenUsageInterceptor(
                 previousApiCall = localSettings.accessTokenApiCallRecord,
                 updateLastApiCall = { localSettings.accessTokenApiCallRecord = it },

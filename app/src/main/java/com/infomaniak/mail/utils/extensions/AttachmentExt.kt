@@ -24,8 +24,8 @@ import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.core.extensions.goToAppStore
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.hasSupportedApplications
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository

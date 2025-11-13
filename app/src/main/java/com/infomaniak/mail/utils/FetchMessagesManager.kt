@@ -19,7 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.infomaniak.core.legacy.api.ApiController.NetworkException
+import com.infomaniak.core.network.models.exceptions.NetworkException
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R

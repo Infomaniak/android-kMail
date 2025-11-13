@@ -271,9 +271,13 @@ class MenuDrawerFragment : Fragment() {
 
         if (AccountUtils.currentUser?.isStaff == true) {
             Intent(requireContext(), BugTrackerActivity::class.java).apply {
+                val user = AccountUtils.currentUser!!
                 putExtras(
                     BugTrackerActivityArgs(
-                        user = AccountUtils.currentUser!!,
+                        userId = user.id,
+                        userCurrentOrganizationId = user.preferences.organizationPreference.currentOrganizationId,
+                        userEmail = user.email,
+                        userDisplayName = user.displayName,
                         appBuildNumber = BuildConfig.VERSION_NAME,
                         bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
                         projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,

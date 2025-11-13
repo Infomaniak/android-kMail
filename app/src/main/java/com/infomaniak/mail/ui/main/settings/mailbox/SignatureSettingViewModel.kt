@@ -23,8 +23,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.SignatureController

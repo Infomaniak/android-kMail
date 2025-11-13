@@ -17,9 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.core.legacy.api.ApiController
-import com.infomaniak.core.legacy.models.ApiResponse
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.models.exceptions.NetworkException
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -169,7 +169,7 @@ class SharedUtils @Inject constructor(
                     null
                 } else {
                     val apiException = getApiException()
-                    if (apiException !is ApiController.NetworkException) {
+                    if (apiException !is NetworkException) {
                         Sentry.captureException(SignatureException(apiException.message, apiException))
                     }
                     translateError()

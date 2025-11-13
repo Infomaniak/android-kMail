@@ -29,8 +29,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.core.legacy.models.ApiResponse
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
+import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.emojicomponents.data.ReactionDetail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackUserInfo
