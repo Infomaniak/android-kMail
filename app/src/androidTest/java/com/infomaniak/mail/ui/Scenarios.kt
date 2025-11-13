@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui
 
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
