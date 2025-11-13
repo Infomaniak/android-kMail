@@ -17,15 +17,16 @@
  */
 package com.infomaniak.mail
 
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppPublishedVersion
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion.Companion.compareVersionTo
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion.Companion.toVersionNumbers
+
+import com.infomaniak.core.appversionchecker.data.models.AppPublishedVersion
+import com.infomaniak.core.appversionchecker.data.models.AppVersion
+import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.compareVersionTo
+import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.toVersionNumbers
 import org.junit.Assert
 import org.junit.Test
 
 /**
- * Tests for the [com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion] methods to compare two App Versions
+ * Tests for the [com.infomaniak.core.appversionchecker.data.models.AppVersion] methods to compare two App Versions
  */
 class AppVersionCheckingTest {
 
@@ -42,9 +43,18 @@ class AppVersionCheckingTest {
     private val invalidParseVersion = "invalid_parse_version"
     private val invalidEmptyVersion = ""
 
-    private val defaultAppVersion = AppVersion(mediumVersion, listOf(AppPublishedVersion(tag = greatVersion)))
-    private val invalidMinimalAppVersion = AppVersion(mediumVersion, listOf(AppPublishedVersion(tag = basicVersion)))
-    private val invalidFormatAppVersion = AppVersion(invalidCommaVersion, listOf(AppPublishedVersion(tag = basicVersion)))
+    private val defaultAppVersion = AppVersion(
+        minimalAcceptedVersion = mediumVersion,
+        publishedVersions = listOf(AppPublishedVersion(tag = greatVersion))
+    )
+    private val invalidMinimalAppVersion = AppVersion(
+        minimalAcceptedVersion = mediumVersion,
+        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+    )
+    private val invalidFormatAppVersion = AppVersion(
+        minimalAcceptedVersion = invalidCommaVersion,
+        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+    )
 
     //region toVersionNumbers()
     @Test
@@ -124,14 +134,16 @@ class AppVersionCheckingTest {
     //region isMinimalVersionValid
     @Test
     fun isMinimalVersionValid_correct() {
-        val minimalVersionNumbers = defaultAppVersion.minimalAcceptedVersion.toVersionNumbers()
+        val minimalAcceptedVersion = defaultAppVersion.minimalAcceptedVersion ?: throw IllegalStateException()
+        val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
         Assert.assertTrue(defaultAppVersion.isMinimalVersionValid(minimalVersionNumbers))
         Assert.assertTrue(invalidMinimalAppVersion.isMinimalVersionValid(negativeVersion.toVersionNumbers()))
     }
 
     @Test
     fun isMinimalVersionValid_wrongMinimalVersion() {
-        val minimalVersionNumbers = invalidMinimalAppVersion.minimalAcceptedVersion.toVersionNumbers()
+        val minimalAcceptedVersion = invalidMinimalAppVersion.minimalAcceptedVersion ?: throw IllegalStateException()
+        val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
         Assert.assertFalse(invalidMinimalAppVersion.isMinimalVersionValid(minimalVersionNumbers))
     }
 
