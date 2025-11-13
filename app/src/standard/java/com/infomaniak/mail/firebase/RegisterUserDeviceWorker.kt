@@ -15,20 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.infomaniak.mail.firebase
 
 import android.content.Context
+import android.os.Build.VERSION.SDK_INT
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
+import com.infomaniak.core.areChannelsEnabledFlow
+import com.infomaniak.core.isChannelEnabledFlow
 import com.infomaniak.core.notifications.registration.AbstractNotificationsRegistrationWorker
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.twofactorauth.back.notifications.TwoFactorAuthNotifications
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import splitties.systemservices.notificationManager
 
 @HiltWorker
 class RegisterUserDeviceWorker @AssistedInject constructor(
@@ -39,29 +51,47 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
 
     override suspend fun getConnectedHttpClient(userId: Int) = AccountUtils.getHttpClient(userId)
 
-    override suspend fun currentTopicsForUser(userId: Int) = getNotificationTopicsForUser(mailboxController, userId)
+    override suspend fun currentTopicsForUser(userId: Int) = notificationTopicsForUser(mailboxController, userId).first()
 }
 
 fun notificationTopicsForUser(
     mailboxController: MailboxController,
-    userId: Int
-): Flow<List<String>> = mailboxController.getMailboxesAsync(userId = userId).map {
-    getNotificationTopicsForUser(it)
+    userId: Int,
+): Flow<List<String>> = if (SDK_INT >= 28) {
+    mailboxController.getMailboxesAsync(userId = userId).flatMapLatest { mailboxes ->
+        val notificationChannelIds = mailboxes.map { it.channelId }
+        notificationManager.areChannelsEnabledFlow(notificationChannelIds).map { channelEnabledStates ->
+            buildList(capacity = mailboxes.size + 1) {
+                mailboxes.forEach { mailbox ->
+                    if (channelEnabledStates[mailbox.channelId] == true) add(mailbox.notificationTopic())
+                }
+
+                when (channelEnabledStates[TwoFactorAuthNotifications.CHANNEL_ID]) {
+                    true -> add(TwoFactorAuthNotifications.TOPIC)
+                    false -> Unit
+                    null -> SentryLog.wtf(TAG, errorMessageNull2faChannel)
+                }
+            }
+        }
+    }.distinctUntilChanged()
+} else {
+    combine(
+        mailboxController.getMailboxesAsync(userId = userId),
+        notificationManager.isChannelEnabledFlow(TwoFactorAuthNotifications.CHANNEL_ID)
+    ) { mailboxes, canShow2faNotifications ->
+        buildList(mailboxes.size + 1) {
+            mailboxes.forEach { mailbox -> add(mailbox.notificationTopic()) }
+
+            when (canShow2faNotifications) {
+                true -> add(TwoFactorAuthNotifications.TOPIC)
+                false -> Unit
+                null -> SentryLog.wtf(TAG, errorMessageNull2faChannel)
+            }
+        }
+    }.distinctUntilChanged()
 }
 
-private suspend fun getNotificationTopicsForUser(
-    mailboxController: MailboxController,
-    userId: Int
-): List<String> {
-    val mailboxes = mailboxController.getMailboxes(userId = userId)
-    return getNotificationTopicsForUser(mailboxes)
-}
+private fun Mailbox.notificationTopic() = "mailbox-$mailboxId"
 
-private fun getNotificationTopicsForUser(
-    mailboxes: List<Mailbox>
-): List<String> = buildList(mailboxes.size + 1) {
-    mailboxes.forEach { mailbox ->
-        add("mailbox-${mailbox.mailboxId}")
-    }
-    add(TwoFactorAuthNotifications.TOPIC)
-}
+private const val TAG = "RegisterUserDeviceWorker"
+private const val errorMessageNull2faChannel = "The channel was created too late, or was deleted by the app!"
