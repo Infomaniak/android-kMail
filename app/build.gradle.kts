@@ -160,6 +160,7 @@ sentry {
 
 dependencies {
     implementation(project(":Core"))
+    implementation(project(":Core:AppVersionChecker"))
     implementation(project(":Core:Auth"))
     implementation(project(":Core:Avatar"))
     implementation(project(":Core:Coil"))
