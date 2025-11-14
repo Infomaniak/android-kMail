@@ -20,12 +20,17 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
+import com.infomaniak.core.auth.TokenAuthenticator.Companion.changeAccessToken
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.legacy.R
+import com.infomaniak.core.network.api.ApiController.toApiError
+import com.infomaniak.core.network.api.InternalTranslatedErrorCode
 import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.core.network.networking.HttpClient
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.network.utils.ErrorCodeTranslated
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -33,6 +38,7 @@ import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.lib.login.InfomaniakLogin.TokenResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -42,6 +48,7 @@ import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -85,11 +92,57 @@ class LoginUtils @Inject constructor(
                 is TokenResult.Success -> Unit
             }
 
-            val loginOutcome = handleApiTokens(listOf(tokenResult.apiToken)).single()
+            val userResult = authenticateUsers(listOf(tokenResult.apiToken)).single()
+            when (userResult) {
+                is UserResult.Failure -> {
+                    context.apiError(userResult.apiResponse)
+                    return@run
+                }
+                is UserResult.Success -> Unit
+            }
+
+            val loginOutcome = fetchMailboxes(listOf(userResult.user)).single()
             loginOutcome.handle(context, infomaniakLogin)
         }
 
         resetLoginButtons()
+    }
+
+    suspend fun authenticateUsers(apiTokens: List<ApiToken>): List<UserResult> = apiTokens.map { apiToken ->
+        authenticateUserShared(apiToken)
+    }
+
+    private suspend fun authenticateUserShared(apiToken: ApiToken): UserResult {
+        // TODO: add runCatching like previously
+        if (AccountUtils.getUserById(apiToken.userId) != null) return UserResult.Failure(
+            getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
+        )
+
+        val okhttpClient = HttpClient.okHttpClient.newBuilder().addInterceptor { chain ->
+            val newRequest = changeAccessToken(chain.request(), apiToken)
+            chain.proceed(newRequest)
+        }.build()
+
+        val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(okhttpClient) }
+
+        if (userProfileResponse.result == ApiResponseStatus.ERROR) return UserResult.Failure(userProfileResponse)
+        if (userProfileResponse.data == null) return UserResult.Failure(getErrorResponse(InternalTranslatedErrorCode.UnknownError))
+
+        val user = userProfileResponse.data!!.apply {
+            this.apiToken = apiToken
+            this.organizations = arrayListOf()
+        }
+
+        return UserResult.Success(user)
+    }
+
+    private suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
+        // TODO: add runCatching like previously
+        computeLoginOutcome(user.apiToken, LoginActivity.fetchMailbox(user, mailboxController))
+    }
+
+    private fun getErrorResponse(error: ErrorCodeTranslated): ApiResponse<Any> {
+        return ApiResponse(result = ApiResponseStatus.ERROR, error = error.toApiError())
     }
 
     suspend fun handleApiTokens(tokens: List<ApiToken>): List<LoginOutcome> = tokens.map { token ->
@@ -111,17 +164,17 @@ class LoginUtils @Inject constructor(
 
     private suspend fun authenticateUser(token: ApiToken): LoginOutcome {
         return runCatching {
-            computeLoginOutcome(token)
+            computeLoginOutcome(token, LoginActivity.authenticateUser(token, this.mailboxController))
         }.cancellable().onFailure { exception ->
             SentryLog.e("authenticateUser", "Failure on getToken", exception)
         }.getOrElse { LoginOutcome.Failure.Other(token) }
     }
 
-    private suspend fun computeLoginOutcome(apiToken: ApiToken): LoginOutcome {
-        return when (val returnValue = LoginActivity.authenticateUser(apiToken, mailboxController)) {
-            is User -> LoginOutcome.Success(returnValue, apiToken)
-            is MailboxErrorCode -> LoginOutcome.Failure.NoMailbox(returnValue, apiToken)
-            is ApiResponse<*> -> LoginOutcome.Failure.ApiError(returnValue, apiToken)
+    private fun computeLoginOutcome(apiToken: ApiToken, mailboxFetchResult: Any): LoginOutcome {
+        return when (mailboxFetchResult) {
+            is User -> LoginOutcome.Success(mailboxFetchResult, apiToken)
+            is MailboxErrorCode -> LoginOutcome.Failure.NoMailbox(mailboxFetchResult, apiToken)
+            is ApiResponse<*> -> LoginOutcome.Failure.ApiError(mailboxFetchResult, apiToken)
             else -> LoginOutcome.Failure.Other(apiToken)
         }
     }
@@ -209,4 +262,9 @@ sealed class LoginOutcome(val initiatesNavigation: Boolean) {
 
         data class Other(override val apiToken: ApiToken) : Failure(initiatesNavigation = false)
     }
+}
+
+sealed interface UserResult {
+    data class Success(val user: User) : UserResult
+    data class Failure(val apiResponse: ApiResponse<*>) : UserResult
 }
