@@ -277,10 +277,10 @@ class MenuDrawerFragment : Fragment() {
                         userCurrentOrganizationId = user.preferences.organizationPreference.currentOrganizationId,
                         userEmail = user.email,
                         userDisplayName = user.displayName,
+                        appId = BuildConfig.APPLICATION_ID,
                         appBuildNumber = BuildConfig.VERSION_NAME,
                         bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
                         projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,
-                        repoGitHub = BuildConfig.GITHUB_REPO,
                     ).toBundle(),
                 )
             }.also(::startActivity)
