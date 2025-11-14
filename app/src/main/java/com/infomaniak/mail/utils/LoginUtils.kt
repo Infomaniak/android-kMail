@@ -84,20 +84,11 @@ class LoginUtils @Inject constructor(
     suspend fun Fragment.authenticateUser(
         token: ApiToken,
         infomaniakLogin: InfomaniakLogin,
-        withRedirection: Boolean = true,
+        preventNavigation: Boolean = false,
     ) {
-        val context = requireContext()
         runCatching {
-            when (val returnValue = LoginActivity.authenticateUser(token, mailboxController)) {
-                is User -> {
-                    if (withRedirection) loginSuccess(returnValue)
-                    return
-                }
-                is MailboxErrorCode -> if (withRedirection) context.mailboxError(returnValue)
-                is ApiResponse<*> -> context.apiError(returnValue)
-                else -> context.otherError()
-            }
-            logout(infomaniakLogin, token)
+            val outcome = computeLoginOutcome(token)
+            if (preventNavigation && outcome.initiatesNavigation) outcome.handle(requireContext(), infomaniakLogin, token)
         }.cancellable().onFailure { exception ->
             onAuthenticateUserError(ErrorStatus.UNKNOWN)
             SentryLog.e("authenticateUser", "Failure on getToken", exception)
@@ -112,7 +103,10 @@ class LoginUtils @Inject constructor(
                     code = authCode,
                 )
                 when (tokenResult) {
-                    is TokenResult.Success -> onAuthenticateUserSuccess(tokenResult.apiToken, infomaniakLogin)
+                    is TokenResult.Success -> {
+                        val token = tokenResult.apiToken
+                        computeLoginOutcome(token).handle(requireContext(), infomaniakLogin, token)
+                    }
                     is TokenResult.Error -> onAuthenticateUserError(tokenResult.errorStatus)
                 }
             }.cancellable().onFailure { exception ->
@@ -122,18 +116,31 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    private fun Fragment.onAuthenticateUserSuccess(
-        apiToken: ApiToken,
-        infomaniakLogin: InfomaniakLogin,
-    ) = lifecycleScope.launch {
+    private sealed class LoginOutcome(val initiatesNavigation: Boolean) {
+        data class Success(val user: User) : LoginOutcome(initiatesNavigation = true)
 
-        val context = requireContext()
+        sealed class Failure(initiatesNavigation: Boolean) : LoginOutcome(initiatesNavigation) {
+            data class NoMailbox(val errorCode: MailboxErrorCode) : Failure(initiatesNavigation = true)
+            data class ApiError(val apiResponse: ApiResponse<*>) : Failure(initiatesNavigation = false)
+            data object Other : Failure(initiatesNavigation = false)
+        }
+    }
 
-        when (val returnValue = LoginActivity.authenticateUser(apiToken, mailboxController)) {
-            is User -> return@launch loginSuccess(returnValue)
-            is MailboxErrorCode -> context.mailboxError(returnValue)
-            is ApiResponse<*> -> context.apiError(returnValue)
-            else -> context.otherError()
+    private suspend fun computeLoginOutcome(apiToken: ApiToken): LoginOutcome {
+        return when (val returnValue = LoginActivity.authenticateUser(apiToken, mailboxController)) {
+            is User -> LoginOutcome.Success(returnValue)
+            is MailboxErrorCode -> LoginOutcome.Failure.NoMailbox(returnValue)
+            is ApiResponse<*> -> LoginOutcome.Failure.ApiError(returnValue)
+            else -> LoginOutcome.Failure.Other
+        }
+    }
+
+    private suspend fun LoginOutcome.handle(context: Context, infomaniakLogin: InfomaniakLogin, apiToken: ApiToken) {
+        when (this) {
+            is LoginOutcome.Success -> return loginSuccess(user)
+            is LoginOutcome.Failure.NoMailbox -> context.mailboxError(errorCode)
+            is LoginOutcome.Failure.ApiError -> context.apiError(apiResponse)
+            LoginOutcome.Failure.Other -> context.otherError()
         }
 
         logout(infomaniakLogin, apiToken)
