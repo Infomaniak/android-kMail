@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.core.auth.TokenAuthenticator.Companion.changeAccessToken
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.legacy.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.core.network.api.ApiController.toApiError
 import com.infomaniak.core.network.api.InternalTranslatedErrorCode
@@ -109,6 +110,29 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
+        suspend fun fetchMailbox(user: User, mailboxController: MailboxController): Any {
+            val okhttpClient = HttpClient.okHttpClient.newBuilder().addInterceptor { chain ->
+                val newRequest = changeAccessToken(chain.request(), user.apiToken)
+                chain.proceed(newRequest)
+            }.build()
+
+            val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(okhttpClient) }
+
+            return when {
+                !apiResponse.isSuccess() -> apiResponse
+                apiResponse.data?.isEmpty() == true -> MailboxErrorCode.NO_MAILBOX
+                else -> {
+                    apiResponse.data?.let { mailboxes ->
+                        trackUserInfo(MatomoName.NbMailboxes, mailboxes.count())
+                        AccountUtils.addUser(user)
+                        mailboxController.updateMailboxes(mailboxes)
+                        return@let if (mailboxes.none { it.isAvailable }) MailboxErrorCode.NO_VALID_MAILBOX else user
+                    } ?: run {
+                        getErrorResponse(InternalTranslatedErrorCode.UnknownError)
+                    }
+                }
+            }
+        }
 
         suspend fun authenticateUser(apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
