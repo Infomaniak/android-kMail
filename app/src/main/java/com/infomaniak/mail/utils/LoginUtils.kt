@@ -20,8 +20,6 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.legacy.R
@@ -45,7 +43,6 @@ import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -62,85 +59,79 @@ class LoginUtils @Inject constructor(
         this.showError = showError
     }
 
-    fun handleWebViewLoginResult(
-        fragment: Fragment,
+    suspend fun handleWebViewLoginResult(
+        context: Context,
         result: ActivityResult,
         infomaniakLogin: InfomaniakLogin,
         resetLoginButtons: () -> Unit,
-    ) = with(fragment) {
-        if (result.resultCode == AppCompatActivity.RESULT_OK) {
-            val authCode = result.data?.getStringExtra(InfomaniakLogin.CODE_TAG)
-            val translatedError = result.data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
-            when {
-                translatedError?.isNotBlank() == true -> showError(translatedError)
-                authCode?.isNotBlank() == true -> authenticateUser(authCode, infomaniakLogin)
-                else -> showError(requireContext().getString(R.string.anErrorHasOccurred))
+    ) {
+        run {
+            val authCodeResult = result.toAuthCodeResult(context)
+            when (authCodeResult) {
+                is AuthCodeResult.Error -> {
+                    showError(authCodeResult.message)
+                    return@run
+                }
+                is AuthCodeResult.Canceled -> return@run
+                is AuthCodeResult.Success -> Unit
             }
+
+            val tokenResult = infomaniakLogin.getToken(okHttpClient = HttpClient.okHttpClient, code = authCodeResult.code)
+            when (tokenResult) {
+                is TokenResult.Error -> {
+                    context.showUserAuthenticationError(tokenResult.errorStatus)
+                    return@run
+                }
+                is TokenResult.Success -> Unit
+            }
+
+            val loginOutcome = handleApiTokens(listOf(tokenResult.apiToken)).single()
+            loginOutcome.handle(context, infomaniakLogin)
         }
 
         resetLoginButtons()
     }
 
-    suspend fun Fragment.authenticateUser(
-        token: ApiToken,
-        infomaniakLogin: InfomaniakLogin,
-        preventNavigation: Boolean = false,
-    ) {
-        runCatching {
-            val outcome = computeLoginOutcome(token)
-            if (preventNavigation && outcome.initiatesNavigation) outcome.handle(requireContext(), infomaniakLogin, token)
+    suspend fun handleApiTokens(tokens: List<ApiToken>): List<LoginOutcome> = tokens.map { token ->
+        authenticateUser(token)
+    }
+
+    private fun ActivityResult.toAuthCodeResult(context: Context): AuthCodeResult {
+        if (resultCode != AppCompatActivity.RESULT_OK) return AuthCodeResult.Canceled
+
+        val authCode = data?.getStringExtra(InfomaniakLogin.CODE_TAG)
+        val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
+
+        return when {
+            translatedError?.isNotBlank() == true -> AuthCodeResult.Error(translatedError)
+            authCode?.isNotBlank() == true -> AuthCodeResult.Success(authCode)
+            else -> AuthCodeResult.Error(context.getString(R.string.anErrorHasOccurred))
+        }
+    }
+
+    private suspend fun authenticateUser(token: ApiToken): LoginOutcome {
+        return runCatching {
+            computeLoginOutcome(token)
         }.cancellable().onFailure { exception ->
-            onAuthenticateUserError(ErrorStatus.UNKNOWN)
             SentryLog.e("authenticateUser", "Failure on getToken", exception)
-        }
-    }
-
-    private fun Fragment.authenticateUser(authCode: String, infomaniakLogin: InfomaniakLogin) {
-        lifecycleScope.launch {
-            runCatching {
-                val tokenResult = infomaniakLogin.getToken(
-                    okHttpClient = HttpClient.okHttpClient,
-                    code = authCode,
-                )
-                when (tokenResult) {
-                    is TokenResult.Success -> {
-                        val token = tokenResult.apiToken
-                        computeLoginOutcome(token).handle(requireContext(), infomaniakLogin, token)
-                    }
-                    is TokenResult.Error -> onAuthenticateUserError(tokenResult.errorStatus)
-                }
-            }.cancellable().onFailure { exception ->
-                onAuthenticateUserError(ErrorStatus.UNKNOWN)
-                SentryLog.e("authenticateUser", "Failure on getToken", exception)
-            }
-        }
-    }
-
-    private sealed class LoginOutcome(val initiatesNavigation: Boolean) {
-        data class Success(val user: User) : LoginOutcome(initiatesNavigation = true)
-
-        sealed class Failure(initiatesNavigation: Boolean) : LoginOutcome(initiatesNavigation) {
-            data class NoMailbox(val errorCode: MailboxErrorCode) : Failure(initiatesNavigation = true)
-            data class ApiError(val apiResponse: ApiResponse<*>) : Failure(initiatesNavigation = false)
-            data object Other : Failure(initiatesNavigation = false)
-        }
+        }.getOrElse { LoginOutcome.Failure.Other(token) }
     }
 
     private suspend fun computeLoginOutcome(apiToken: ApiToken): LoginOutcome {
         return when (val returnValue = LoginActivity.authenticateUser(apiToken, mailboxController)) {
-            is User -> LoginOutcome.Success(returnValue)
-            is MailboxErrorCode -> LoginOutcome.Failure.NoMailbox(returnValue)
-            is ApiResponse<*> -> LoginOutcome.Failure.ApiError(returnValue)
-            else -> LoginOutcome.Failure.Other
+            is User -> LoginOutcome.Success(returnValue, apiToken)
+            is MailboxErrorCode -> LoginOutcome.Failure.NoMailbox(returnValue, apiToken)
+            is ApiResponse<*> -> LoginOutcome.Failure.ApiError(returnValue, apiToken)
+            else -> LoginOutcome.Failure.Other(apiToken)
         }
     }
 
-    private suspend fun LoginOutcome.handle(context: Context, infomaniakLogin: InfomaniakLogin, apiToken: ApiToken) {
+    suspend fun LoginOutcome.handle(context: Context, infomaniakLogin: InfomaniakLogin) {
         when (this) {
             is LoginOutcome.Success -> return loginSuccess(user)
             is LoginOutcome.Failure.NoMailbox -> context.mailboxError(errorCode)
             is LoginOutcome.Failure.ApiError -> context.apiError(apiResponse)
-            LoginOutcome.Failure.Other -> context.otherError()
+            is LoginOutcome.Failure.Other -> context.otherError()
         }
 
         logout(infomaniakLogin, apiToken)
@@ -184,12 +175,38 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    private fun Fragment.onAuthenticateUserError(errorStatus: ErrorStatus) {
+    private fun Context.showUserAuthenticationError(errorStatus: ErrorStatus) {
         val errorResId = when (errorStatus) {
             ErrorStatus.SERVER -> R.string.serverError
             ErrorStatus.CONNECTION -> R.string.connectionError
             else -> R.string.anErrorHasOccurred
         }
-        showError(requireContext().getString(errorResId))
+        showError(getString(errorResId))
+    }
+}
+
+private sealed interface AuthCodeResult {
+    data class Success(val code: String) : AuthCodeResult
+    data class Error(val message: String) : AuthCodeResult
+    data object Canceled : AuthCodeResult
+}
+
+sealed class LoginOutcome(val initiatesNavigation: Boolean) {
+    abstract val apiToken: ApiToken
+
+    data class Success(val user: User, override val apiToken: ApiToken) : LoginOutcome(initiatesNavigation = true)
+
+    sealed class Failure(initiatesNavigation: Boolean) : LoginOutcome(initiatesNavigation) {
+        data class NoMailbox(
+            val errorCode: MailboxErrorCode,
+            override val apiToken: ApiToken,
+        ) : Failure(initiatesNavigation = true)
+
+        data class ApiError(
+            val apiResponse: ApiResponse<*>,
+            override val apiToken: ApiToken,
+        ) : Failure(initiatesNavigation = false)
+
+        data class Other(override val apiToken: ApiToken) : Failure(initiatesNavigation = false)
     }
 }

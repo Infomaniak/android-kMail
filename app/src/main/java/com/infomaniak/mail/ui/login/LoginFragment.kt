@@ -104,7 +104,9 @@ class LoginFragment : Fragment() {
     lateinit var loginUtils: LoginUtils
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::resetLoginButtons)
+        lifecycleScope.launch {
+            loginUtils.handleWebViewLoginResult(context = requireContext(), result, loginActivity.infomaniakLogin, ::resetLoginButtons)
+        }
     }
 
     private lateinit var connectButtonText: String
@@ -243,17 +245,13 @@ class LoginFragment : Fragment() {
                 openLoginWebView()
             } else {
                 val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
-
                 with(loginUtils) {
-                    loginResult.tokens.forEachIndexed { index, token ->
-                        authenticateUser(
-                            token = token,
-                            infomaniakLogin = loginActivity.infomaniakLogin,
-                            preventNavigation = index != loginResult.tokens.lastIndex,
-                        )
+                    val loginOutcomes = handleApiTokens(loginResult.tokens)
+                    loginOutcomes.forEachIndexed { index, outcome ->
+                        val preventNavigation = index != loginOutcomes.lastIndex
+                        if (preventNavigation && outcome.initiatesNavigation) outcome.handle(requireContext(), loginActivity.infomaniakLogin)
                     }
                 }
-
                 loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
 
                 delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
