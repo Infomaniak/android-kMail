@@ -249,7 +249,7 @@ class LoginFragment : Fragment() {
                         authenticateUser(
                             token = token,
                             infomaniakLogin = loginActivity.infomaniakLogin,
-                            withRedirection = index == loginResult.tokens.lastIndex,
+                            preventNavigation = index != loginResult.tokens.lastIndex,
                         )
                     }
                 }
