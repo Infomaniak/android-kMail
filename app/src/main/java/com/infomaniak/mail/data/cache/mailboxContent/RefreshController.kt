@@ -336,8 +336,16 @@ class RefreshController @Inject constructor(
     private suspend fun RefreshScope.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String): Boolean {
 
         val activities = when (folder.role) {
-            FolderRole.SNOOZED -> getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
-            else -> getMessagesUidsDelta<DefaultMessageFlags>(folder.id, previousCursor, uids = getMessagesUidsRanges(folder.id))
+            FolderRole.SNOOZED -> {
+                getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
+            }
+            else -> {
+                getMessagesUidsDelta<DefaultMessageFlags>(
+                    folderId = folder.id,
+                    previousCursor = previousCursor,
+                    uids = realmReadOnly.getMessagesUidsRanges(folder.id),
+                )
+            }
         } ?: return false
         scope.ensureActive()
 
