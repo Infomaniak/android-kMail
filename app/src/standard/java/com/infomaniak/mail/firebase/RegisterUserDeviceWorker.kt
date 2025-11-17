@@ -59,7 +59,7 @@ fun notificationTopicsForUser(
     userId: Int,
 ): Flow<List<String>> = if (SDK_INT >= 28) {
     mailboxController.getMailboxesAsync(userId = userId).flatMapLatest { mailboxes ->
-        val notificationChannelIds = mailboxes.map { it.channelId }
+        val notificationChannelIds = mailboxes.map { it.channelId } + TwoFactorAuthNotifications.CHANNEL_ID
         notificationManager.areChannelsEnabledFlow(notificationChannelIds).map { channelEnabledStates ->
             buildNotificationTopicsList(
                 mailboxes = mailboxes,
