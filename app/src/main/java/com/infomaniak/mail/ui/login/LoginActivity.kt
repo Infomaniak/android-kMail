@@ -24,14 +24,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.core.legacy.api.ApiController.toApiError
-import com.infomaniak.core.legacy.api.InternalTranslatedErrorCode
-import com.infomaniak.core.legacy.auth.TokenAuthenticator.Companion.changeAccessToken
-import com.infomaniak.core.legacy.models.ApiResponse
-import com.infomaniak.core.legacy.models.ApiResponseStatus
-import com.infomaniak.core.legacy.networking.HttpClient
-import com.infomaniak.core.legacy.utils.ErrorCodeTranslated
+import com.infomaniak.core.auth.TokenAuthenticator.Companion.changeAccessToken
 import com.infomaniak.core.legacy.utils.Utils.lockOrientationForSmallScreens
+import com.infomaniak.core.network.api.ApiController.toApiError
+import com.infomaniak.core.network.api.InternalTranslatedErrorCode
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.models.ApiResponseStatus
+import com.infomaniak.core.network.networking.HttpClient
+import com.infomaniak.core.network.utils.ErrorCodeTranslated
 import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
 import com.infomaniak.lib.login.ApiToken
@@ -113,7 +113,7 @@ class LoginActivity : AppCompatActivity() {
         suspend fun authenticateUser(apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
 
-            val okhttpClient = HttpClient.okHttpClientNoTokenInterceptor.newBuilder().addInterceptor { chain ->
+            val okhttpClient = HttpClient.okHttpClient.newBuilder().addInterceptor { chain ->
                 val newRequest = changeAccessToken(chain.request(), apiToken)
                 chain.proceed(newRequest)
             }.build()

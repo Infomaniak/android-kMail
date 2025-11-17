@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.core.legacy.utils.ApiErrorCode
+import com.infomaniak.core.network.utils.ApiErrorCode
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.EmojiReactionNotAllowedReason
 import com.infomaniak.core.legacy.R as RCore

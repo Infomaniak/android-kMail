@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.data.models.snooze
 
-import com.infomaniak.core.legacy.models.ApiResponse
-import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 
