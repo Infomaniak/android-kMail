@@ -109,11 +109,10 @@ class LoginUtils @Inject constructor(
     }
 
     suspend fun authenticateUsers(apiTokens: List<ApiToken>): List<UserResult> = apiTokens.map { apiToken ->
-        authenticateUserShared(apiToken)
+        runCatching { authenticateUserShared(apiToken) }.getOrDefault(UserResult.Failure.Unknown)
     }
 
     private suspend fun authenticateUserShared(apiToken: ApiToken): UserResult {
-        // TODO: add runCatching like previously
         if (AccountUtils.getUserById(apiToken.userId) != null) return UserResult.Failure(
             getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
         )
@@ -126,7 +125,7 @@ class LoginUtils @Inject constructor(
         val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(okhttpClient) }
 
         if (userProfileResponse.result == ApiResponseStatus.ERROR) return UserResult.Failure(userProfileResponse)
-        if (userProfileResponse.data == null) return UserResult.Failure(getErrorResponse(InternalTranslatedErrorCode.UnknownError))
+        if (userProfileResponse.data == null) return UserResult.Failure.Unknown
 
         val user = userProfileResponse.data!!.apply {
             this.apiToken = apiToken
@@ -137,8 +136,11 @@ class LoginUtils @Inject constructor(
     }
 
     private suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
-        // TODO: add runCatching like previously
-        computeLoginOutcome(user.apiToken, LoginActivity.fetchMailbox(user, mailboxController))
+        val mailboxFetchResult = runCatching {
+            LoginActivity.fetchMailbox(user, mailboxController)
+        }.getOrDefault(LoginOutcome.Failure.Other(user.apiToken))
+
+        computeLoginOutcome(user.apiToken, mailboxFetchResult)
     }
 
     private fun getErrorResponse(error: ErrorCodeTranslated): ApiResponse<Any> {
@@ -266,5 +268,12 @@ sealed class LoginOutcome(val initiatesNavigation: Boolean) {
 
 sealed interface UserResult {
     data class Success(val user: User) : UserResult
-    data class Failure(val apiResponse: ApiResponse<*>) : UserResult
+    open class Failure(val apiResponse: ApiResponse<*>) : UserResult {
+        data object Unknown : Failure(
+            ApiResponse<Unit>(
+                result = ApiResponseStatus.ERROR,
+                error = InternalTranslatedErrorCode.UnknownError.toApiError()
+            )
+        )
+    }
 }
