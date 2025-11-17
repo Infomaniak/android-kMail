@@ -35,15 +35,15 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
+import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
+import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager.Companion.APP_UPDATE_TAG
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.stores.StoreUtils
-import com.infomaniak.core.legacy.stores.StoreUtils.checkUpdateIsRequired
-import com.infomaniak.core.legacy.stores.reviewmanagers.InAppReviewManager
-import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.Utils.toEnumOrThrow
 import com.infomaniak.core.legacy.utils.hasPermissions
@@ -208,12 +208,19 @@ class MainActivity : BaseActivity() {
         handleMenuDrawerEdgeToEdge()
         registerMainPermissions()
 
-        checkUpdateIsRequired(
-            BuildConfig.APPLICATION_ID,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE,
-            localSettings.accentColor.theme,
-        )
+        lifecycleScope.launch {
+            inAppUpdateManager.isUpdateRequired.collect { isUpdateRequired ->
+                initAppUpdateManager(isUpdateRequired)
+            }
+        }
+
+        // TODO: remove
+        // checkUpdateIsRequired(
+        //     BuildConfig.APPLICATION_ID,
+        //     BuildConfig.VERSION_NAME,
+        //     BuildConfig.VERSION_CODE,
+        //     localSettings.accentColor.theme,
+        // )
 
         observeDeletedMessages()
         observeActivityDialogLoaderReset()
@@ -233,8 +240,9 @@ class MainActivity : BaseActivity() {
 
         handleShortcuts()
 
-        initAppUpdateManager()
-        initAppReviewManager()
+        //initAppUpdateManager()
+        //TODO: initAppReviewManager
+        //initAppReviewManager()
         syncDiscoveryManager.init(::showSyncDiscovery)
 
         observeNotificationToRefresh()
@@ -263,13 +271,14 @@ class MainActivity : BaseActivity() {
         setupMenuDrawerCallbacks()
     }
 
-    private fun initAppReviewManager() {
-        inAppReviewManager.init(
-            onDialogShown = { trackInAppReviewEvent(MatomoName.PresentAlert) },
-            onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
-            onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
-        )
-    }
+    // TODO: Init inAppReviewManager
+    // private fun initAppReviewManager() {
+    //     inAppReviewManager.init(
+    //         onDialogShown = { trackInAppReviewEvent(MatomoName.PresentAlert) },
+    //         onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
+    //         onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
+    //     )
+    // }
 
     private fun observeDeletedMessages() = with(mainViewModel) {
         deletedMessages.observe(owner = this@MainActivity) {
@@ -546,7 +555,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun initAppUpdateManager() {
+    private fun initAppUpdateManager(isUpdateRequired: Boolean) {
         inAppUpdateManager.init(
             onUserChoice = { isWantingUpdate ->
                 trackInAppUpdateEvent(if (isWantingUpdate) MatomoName.DiscoverNow else MatomoName.DiscoverLater)
@@ -554,12 +563,16 @@ class MainActivity : BaseActivity() {
             onInstallStart = { trackInAppUpdateEvent(MatomoName.InstallUpdate) },
             onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
-                SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
-                mainViewModel.canInstallUpdate.value = isUpdateDownloaded
+                SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
+                lifecycleScope.launch {
+                    mainViewModel.canInstallUpdate.value = isUpdateDownloaded
+                }
             },
             onFDroidResult = { updateIsAvailable ->
-                if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+                //if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+                if (updateIsAvailable) binding.updateAvailableBottomSheet.showBottomSheet()
             },
+            isUpdateRequired = isUpdateRequired
         )
     }
 
@@ -601,9 +614,10 @@ class MainActivity : BaseActivity() {
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
-        val intent = Intent(this, NewMessageActivity::class.java)
-        args?.let(intent::putExtras)
-        newMessageActivityResultLauncher.launch(intent)
+        binding.updateAvailableBottomSheet.showBottomSheet()
+        // val intent = Intent(this, NewMessageActivity::class.java)
+        // args?.let(intent::putExtras)
+        // newMessageActivityResultLauncher.launch(intent)
     }
 
     fun navigateToSyncAutoConfigActivity() {
