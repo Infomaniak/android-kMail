@@ -147,17 +147,23 @@ class AppVersionCheckingTest {
     //region isMinimalVersionValid
     @Test
     fun isMinimalVersionValid_correct() {
-        val minimalAcceptedVersion = defaultAppVersion.minimalAcceptedVersion ?: throw IllegalStateException()
-        val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
-        Assert.assertTrue(defaultAppVersion.isMinimalVersionValid(minimalVersionNumbers))
-        Assert.assertTrue(invalidMinimalAppVersion.isMinimalVersionValid(negativeVersion.toVersionNumbers()))
+        val minimalAcceptedVersion = defaultAppVersion.minimalAcceptedVersion
+        Assert.assertNotNull(minimalAcceptedVersion)
+        if (minimalAcceptedVersion != null) {
+            val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
+            Assert.assertTrue(defaultAppVersion.isMinimalVersionValid(minimalVersionNumbers))
+            Assert.assertTrue(invalidMinimalAppVersion.isMinimalVersionValid(negativeVersion.toVersionNumbers()))
+        }
     }
 
     @Test
     fun isMinimalVersionValid_wrongMinimalVersion() {
-        val minimalAcceptedVersion = invalidMinimalAppVersion.minimalAcceptedVersion ?: throw IllegalStateException()
-        val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
-        Assert.assertFalse(invalidMinimalAppVersion.isMinimalVersionValid(minimalVersionNumbers))
+        val minimalAcceptedVersion = invalidMinimalAppVersion.minimalAcceptedVersion
+        Assert.assertNotNull(minimalAcceptedVersion)
+        if (minimalAcceptedVersion != null) {
+            val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
+            Assert.assertFalse(invalidMinimalAppVersion.isMinimalVersionValid(minimalVersionNumbers))
+        }
     }
 
     @Test
