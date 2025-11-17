@@ -17,15 +17,21 @@
  */
 package com.infomaniak.mail
 
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppPublishedVersion
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion.Companion.compareVersionTo
-import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion.Companion.toVersionNumbers
+
+import com.infomaniak.core.appversionchecker.data.models.AppPublishedVersion
+import com.infomaniak.core.appversionchecker.data.models.AppVersion
+import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.compareVersionTo
+import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.toVersionNumbers
+import com.infomaniak.core.sentry.SentryLog
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 
 /**
- * Tests for the [com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion] methods to compare two App Versions
+ * Tests for the [com.infomaniak.core.appversionchecker.data.models.AppVersion] methods to compare two App Versions
  */
 class AppVersionCheckingTest {
 
@@ -42,9 +48,26 @@ class AppVersionCheckingTest {
     private val invalidParseVersion = "invalid_parse_version"
     private val invalidEmptyVersion = ""
 
-    private val defaultAppVersion = AppVersion(mediumVersion, listOf(AppPublishedVersion(tag = greatVersion)))
-    private val invalidMinimalAppVersion = AppVersion(mediumVersion, listOf(AppPublishedVersion(tag = basicVersion)))
-    private val invalidFormatAppVersion = AppVersion(invalidCommaVersion, listOf(AppPublishedVersion(tag = basicVersion)))
+    private val defaultAppVersion = AppVersion(
+        minimalAcceptedVersion = mediumVersion,
+        publishedVersions = listOf(AppPublishedVersion(tag = greatVersion))
+    )
+    private val invalidMinimalAppVersion = AppVersion(
+        minimalAcceptedVersion = mediumVersion,
+        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+    )
+    private val invalidFormatAppVersion = AppVersion(
+        minimalAcceptedVersion = invalidCommaVersion,
+        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+    )
+
+    val sentryLog = mockk<SentryLog>(relaxed = true)
+
+    @Before
+    fun setup() {
+        mockkObject(SentryLog)
+        every { SentryLog.e(any(), any(), any(), any()) } returns sentryLog.e("", "")
+    }
 
     //region toVersionNumbers()
     @Test
@@ -124,15 +147,23 @@ class AppVersionCheckingTest {
     //region isMinimalVersionValid
     @Test
     fun isMinimalVersionValid_correct() {
-        val minimalVersionNumbers = defaultAppVersion.minimalAcceptedVersion.toVersionNumbers()
-        Assert.assertTrue(defaultAppVersion.isMinimalVersionValid(minimalVersionNumbers))
-        Assert.assertTrue(invalidMinimalAppVersion.isMinimalVersionValid(negativeVersion.toVersionNumbers()))
+        val minimalAcceptedVersion = defaultAppVersion.minimalAcceptedVersion
+        Assert.assertNotNull(minimalAcceptedVersion)
+        if (minimalAcceptedVersion != null) {
+            val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
+            Assert.assertTrue(defaultAppVersion.isMinimalVersionValid(minimalVersionNumbers))
+            Assert.assertTrue(invalidMinimalAppVersion.isMinimalVersionValid(negativeVersion.toVersionNumbers()))
+        }
     }
 
     @Test
     fun isMinimalVersionValid_wrongMinimalVersion() {
-        val minimalVersionNumbers = invalidMinimalAppVersion.minimalAcceptedVersion.toVersionNumbers()
-        Assert.assertFalse(invalidMinimalAppVersion.isMinimalVersionValid(minimalVersionNumbers))
+        val minimalAcceptedVersion = invalidMinimalAppVersion.minimalAcceptedVersion
+        Assert.assertNotNull(minimalAcceptedVersion)
+        if (minimalAcceptedVersion != null) {
+            val minimalVersionNumbers = minimalAcceptedVersion.toVersionNumbers()
+            Assert.assertFalse(invalidMinimalAppVersion.isMinimalVersionValid(minimalVersionNumbers))
+        }
     }
 
     @Test
