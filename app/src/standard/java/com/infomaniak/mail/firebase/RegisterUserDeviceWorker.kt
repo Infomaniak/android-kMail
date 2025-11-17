@@ -61,17 +61,11 @@ fun notificationTopicsForUser(
     mailboxController.getMailboxesAsync(userId = userId).flatMapLatest { mailboxes ->
         val notificationChannelIds = mailboxes.map { it.channelId }
         notificationManager.areChannelsEnabledFlow(notificationChannelIds).map { channelEnabledStates ->
-            buildList(capacity = mailboxes.size + 1) {
-                mailboxes.forEach { mailbox ->
-                    if (channelEnabledStates[mailbox.channelId] == true) add(mailbox.notificationTopic())
-                }
-
-                when (channelEnabledStates[TwoFactorAuthNotifications.CHANNEL_ID]) {
-                    true -> add(TwoFactorAuthNotifications.TOPIC)
-                    false -> Unit
-                    null -> SentryLog.wtf(TAG, errorMessageNull2faChannel)
-                }
-            }
+            buildNotificationTopicsList(
+                mailboxes = mailboxes,
+                shouldAddMailboxNotificationTopic = { mailbox -> channelEnabledStates[mailbox.channelId] == true },
+                canShow2faNotifications = channelEnabledStates[TwoFactorAuthNotifications.CHANNEL_ID]
+            )
         }
     }.distinctUntilChanged()
 } else {
@@ -79,16 +73,30 @@ fun notificationTopicsForUser(
         mailboxController.getMailboxesAsync(userId = userId),
         notificationManager.isChannelEnabledFlow(TwoFactorAuthNotifications.CHANNEL_ID)
     ) { mailboxes, canShow2faNotifications ->
-        buildList(mailboxes.size + 1) {
-            mailboxes.forEach { mailbox -> add(mailbox.notificationTopic()) }
-
-            when (canShow2faNotifications) {
-                true -> add(TwoFactorAuthNotifications.TOPIC)
-                false -> Unit
-                null -> SentryLog.wtf(TAG, errorMessageNull2faChannel)
-            }
-        }
+        buildNotificationTopicsList(
+            mailboxes = mailboxes,
+            shouldAddMailboxNotificationTopic = {
+                true // We don't filter on API 27 because getting notification enabled status reliably requires tricky polling.
+            },
+            canShow2faNotifications = canShow2faNotifications // Still allow the user to disable 2FA notifications on this app.
+            // Even on API 27, ensure the app won't be selected over another one that has notifications enabled.
+        )
     }.distinctUntilChanged()
+}
+
+private inline fun buildNotificationTopicsList(
+    mailboxes: List<Mailbox>,
+    shouldAddMailboxNotificationTopic: (Mailbox) -> Boolean,
+    canShow2faNotifications: Boolean?
+): List<String> {
+    return buildList(capacity = mailboxes.size + 1) {
+        mailboxes.forEach { mailbox -> if (shouldAddMailboxNotificationTopic(mailbox)) add(mailbox.notificationTopic()) }
+        when (canShow2faNotifications) {
+            true -> add(TwoFactorAuthNotifications.TOPIC)
+            false -> Unit
+            null -> SentryLog.wtf(TAG, errorMessageNull2faChannel)
+        }
+    }
 }
 
 private fun Mailbox.notificationTopic() = "mailbox-$mailboxId"
