@@ -1,0 +1,2 @@
+- Fix two factor authentication's notification still being displayed if user disabled the notifs
+- Small fixes and improvements

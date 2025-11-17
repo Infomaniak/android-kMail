@@ -1,0 +1,2 @@
+- Correction de l'affichage de la notification d'authentification à deux facteurs lorsque l'utilisateur avait désactivé les notifications
+- Petites corrections et améliorations
