@@ -167,6 +167,8 @@ dependencies {
     implementation(project(":Core:CrossAppLogin:Back"))
     implementation(project(":Core:CrossAppLogin:Front"))
     implementation(project(":Core:FragmentNavigation"))
+    implementation(project(":Core:InAppReview"))
+    implementation(project(":Core:InAppUpdate"))
     implementation(project(":Core:KSuite"))
     implementation(project(":Core:KSuite:KSuitePro"))
     implementation(project(":Core:KSuite:MyKSuite"))
@@ -174,7 +176,8 @@ dependencies {
     implementation(project(":Core:Legacy:AppLock"))
     implementation(project(":Core:Legacy:BugTracker"))
     implementation(project(":Core:Legacy:Confetti"))
-    implementation(project(":Core:Legacy:Stores"))
+    // TODO: remove
+    //implementation(project(":Core:Legacy:Stores"))
     implementation(project(":Core:Matomo"))
     implementation(project(":Core:Network"))
     implementation(project(":Core:Sentry"))
@@ -199,6 +202,8 @@ dependencies {
     "standardImplementation"(project(":Core:Notifications:Registration"))
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
+
+    implementation(core.androidx.datastore.preferences)
 
     implementation(core.lottie)
     implementation(libs.dragdropswipe.recyclerview)

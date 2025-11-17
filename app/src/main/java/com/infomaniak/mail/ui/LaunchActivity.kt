@@ -23,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.core.legacy.extensions.setDefaultLocaleIfNeeded
-import com.infomaniak.core.legacy.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
@@ -73,12 +72,13 @@ class LaunchActivity : AppCompatActivity() {
 
         handleNotificationDestinationIntent()
 
-        checkUpdateIsRequired(
-            BuildConfig.APPLICATION_ID,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE,
-            localSettings.accentColor.theme,
-        )
+        // TODO: Use inAppUpdateManager.isUpdateRequired ?
+        // checkUpdateIsRequired(
+        //     BuildConfig.APPLICATION_ID,
+        //     BuildConfig.VERSION_NAME,
+        //     BuildConfig.VERSION_CODE,
+        //     localSettings.accentColor.theme,
+        // )
 
         lifecycleScope.launch(ioDispatcher) {
             val user = AccountUtils.requestCurrentUser()

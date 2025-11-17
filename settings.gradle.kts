@@ -31,6 +31,8 @@ include(
     ":Core:CrossAppLogin:Back",
     ":Core:CrossAppLogin:Front",
     ":Core:FragmentNavigation",
+    ":Core:InAppReview",
+    ":Core:InAppUpdate",
     ":Core:KSuite",
     ":Core:KSuite:KSuitePro",
     ":Core:KSuite:MyKSuite",
@@ -38,7 +40,8 @@ include(
     ":Core:Legacy:AppLock",
     ":Core:Legacy:BugTracker",
     ":Core:Legacy:Confetti",
-    ":Core:Legacy:Stores",
+    //TODO: remove
+    //":Core:Legacy:Stores",
     ":Core:Matomo",
     ":Core:Network",
     ":Core:Network:Ktor",
@@ -57,6 +60,7 @@ include(
     ":Core:Ui:Compose:MaterialThemeFromXml",
     ":Core:Ui:Compose:Preview",
     ":Core:Ui:View",
+    ":Core:WebView",
     ":EmojiComponents",
     ":HtmlCleaner",
 )

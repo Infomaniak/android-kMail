@@ -88,4 +88,9 @@
             app:lottie_rawRes="@raw/easter_egg_halloween" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.infomaniak.mail.ui.components.views.UpdateAvailableBottomSheet
+        android:id="@+id/updateAvailableBottomSheet"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
