@@ -186,6 +186,8 @@ dependencies {
     implementation(project(":Core:Sentry"))
     implementation(project(":Core:TwoFactorAuth:Front"))
     implementation(project(":Core:TwoFactorAuth:Back:WithUserDb"))
+    implementation(project(":Core:Ui"))
+    implementation(project(":Core:Ui:View"))
     implementation(project(":EmojiComponents"))
     implementation(project(":HtmlCleaner"))
 

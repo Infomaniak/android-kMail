@@ -55,6 +55,8 @@ include(
     ":Core:TwoFactorAuth:Front",
     ":Core:TwoFactorAuth:Back",
     ":Core:TwoFactorAuth:Back:WithUserDb",
+    ":Core:Ui",
+    ":Core:Ui:View",
     ":EmojiComponents",
     ":HtmlCleaner",
 )
