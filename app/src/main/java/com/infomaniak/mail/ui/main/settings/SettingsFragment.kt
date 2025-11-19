@@ -33,7 +33,7 @@ import com.infomaniak.core.legacy.applock.LockActivity
 import com.infomaniak.core.legacy.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.core.legacy.utils.openAppNotificationSettings
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.core.legacy.utils.showToast
+import com.infomaniak.core.ui.showToast
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.toFloat

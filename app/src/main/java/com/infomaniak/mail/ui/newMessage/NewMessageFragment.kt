@@ -55,7 +55,7 @@ import com.infomaniak.core.legacy.utils.FilePicker
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.utils.setMargins
-import com.infomaniak.core.legacy.utils.showToast
+import com.infomaniak.core.ui.showToast
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
 import com.infomaniak.lib.richhtmleditor.StatusCommand.CREATE_LINK
 import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
