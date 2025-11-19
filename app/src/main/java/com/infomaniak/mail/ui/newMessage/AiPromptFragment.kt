@@ -33,7 +33,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.core.legacy.utils.showKeyboard
-import com.infomaniak.core.legacy.utils.toPx
+import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding

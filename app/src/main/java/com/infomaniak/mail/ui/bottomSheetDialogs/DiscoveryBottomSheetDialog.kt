@@ -27,7 +27,7 @@ import androidx.annotation.RawRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import com.infomaniak.core.legacy.utils.toPx
+import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.mail.MatomoMail.MatomoName
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {

@@ -41,8 +41,8 @@ import com.google.android.material.card.MaterialCardView
 import com.infomaniak.core.legacy.utils.capitalizeFirstChar
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.setMarginsRelative
-import com.infomaniak.core.legacy.utils.toPx
 import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.core.utils.format
 import com.infomaniak.core.utils.isInTheFuture
 import com.infomaniak.core.utils.isThisMonth

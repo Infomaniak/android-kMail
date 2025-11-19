@@ -21,7 +21,7 @@ import android.graphics.Rect
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.core.legacy.utils.toPx
+import com.infomaniak.core.ui.view.toPx
 
 class DateSeparatorItemDecoration : RecyclerView.ItemDecoration() {
 

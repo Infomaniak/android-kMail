@@ -37,8 +37,8 @@ import com.google.android.material.chip.Chip
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.showKeyboard
-import com.infomaniak.core.legacy.utils.toPx
 import com.infomaniak.core.legacy.views.DividerItemDecorator
+import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
