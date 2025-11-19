@@ -29,7 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import com.infomaniak.core.compose.margin.Margin
+import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.EmojiReactionDetails
 import com.infomaniak.emojicomponents.data.ReactionDetail

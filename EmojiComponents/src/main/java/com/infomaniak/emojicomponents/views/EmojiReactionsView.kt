@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.vectorResource
-import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
+import com.infomaniak.core.ui.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.AddReactionChipDefaults
 import com.infomaniak.emojicomponents.components.EmojiReactions

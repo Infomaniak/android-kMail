@@ -64,10 +64,10 @@ import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.avatar.models.AvatarUrlData
 import com.infomaniak.core.coil.ImageLoaderProvider
-import com.infomaniak.core.compose.basics.Dimens
-import com.infomaniak.core.compose.basics.Typography
-import com.infomaniak.core.compose.margin.Margin
-import com.infomaniak.core.compose.preview.PreviewAllWindows
+import com.infomaniak.core.ui.compose.basics.Dimens
+import com.infomaniak.core.ui.compose.basics.Typography
+import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.core.ui.compose.preview.PreviewAllWindows
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi

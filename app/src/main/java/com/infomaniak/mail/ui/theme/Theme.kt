@@ -21,10 +21,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import com.infomaniak.core.compose.basics.Typography
-import com.infomaniak.core.compose.basics.bottomsheet.BottomSheetThemeDefaults
-import com.infomaniak.core.compose.basics.bottomsheet.ProvideBottomSheetTheme
-import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
+import com.infomaniak.core.ui.compose.basics.Typography
+import com.infomaniak.core.ui.compose.basics.bottomsheet.BottomSheetThemeDefaults
+import com.infomaniak.core.ui.compose.basics.bottomsheet.ProvideBottomSheetTheme
+import com.infomaniak.core.ui.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.mail.R
 
 @Composable

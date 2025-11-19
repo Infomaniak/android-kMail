@@ -49,11 +49,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.infomaniak.core.compose.basics.Typography
-import com.infomaniak.core.compose.bottomstickybuttonscaffolds.BottomStickyButtonScaffold
-import com.infomaniak.core.compose.margin.Margin
-import com.infomaniak.core.compose.preview.PreviewLargeWindow
-import com.infomaniak.core.compose.preview.PreviewSmallWindow
+import com.infomaniak.core.ui.compose.basics.Typography
+import com.infomaniak.core.ui.compose.bottomstickybuttonscaffolds.BottomStickyButtonScaffold
+import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.core.ui.compose.preview.PreviewLargeWindow
+import com.infomaniak.core.ui.compose.preview.PreviewSmallWindow
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton

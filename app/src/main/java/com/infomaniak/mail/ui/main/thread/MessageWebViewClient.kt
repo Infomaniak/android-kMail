@@ -25,7 +25,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.core.uiview.toDp
+import com.infomaniak.core.ui.view.toDp
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
