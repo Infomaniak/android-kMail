@@ -133,7 +133,8 @@
 
         <activity
             android:name="com.infomaniak.core.inappupdate.updaterequired.ui.UpdateRequiredActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/AppThemeUpdateRequired"/>
 
         <activity
             android:name=".ui.login.NoMailboxActivity"
