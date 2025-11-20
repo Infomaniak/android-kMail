@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.core.compose.margin.Margin
+import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.icons.FaceSmileRoundPlus
 import com.infomaniak.emojicomponents.icons.Icons

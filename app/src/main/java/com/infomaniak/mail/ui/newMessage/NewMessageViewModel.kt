@@ -41,9 +41,9 @@ import com.infomaniak.core.legacy.utils.getFileNameAndSize
 import com.infomaniak.core.legacy.utils.guessMimeType
 import com.infomaniak.core.legacy.utils.parcelableArrayListExtra
 import com.infomaniak.core.legacy.utils.parcelableExtra
-import com.infomaniak.core.legacy.utils.showToast
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.ui.showToast
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.mail.MatomoMail.MatomoName

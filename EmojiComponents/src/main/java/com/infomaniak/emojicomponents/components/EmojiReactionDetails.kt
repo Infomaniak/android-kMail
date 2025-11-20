@@ -63,7 +63,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
-import com.infomaniak.core.compose.margin.Margin
+import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.data.ReactionDetail
 import kotlinx.coroutines.launch

@@ -22,7 +22,7 @@ import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
-import com.infomaniak.core.legacy.utils.showToast
+import com.infomaniak.core.ui.showToast
 import com.infomaniak.mail.utils.PlayServicesUtils
 import javax.inject.Inject
 import javax.inject.Singleton

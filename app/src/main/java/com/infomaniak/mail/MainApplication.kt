@@ -45,11 +45,11 @@ import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpda
 import com.infomaniak.core.legacy.stores.AppUpdateScheduler
 import com.infomaniak.core.legacy.utils.clearStack
 import com.infomaniak.core.legacy.utils.hasPermissions
-import com.infomaniak.core.legacy.utils.showToast
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.network.networking.HttpClientConfig
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import com.infomaniak.core.twofactorauth.back.TwoFactorAuthManager
+import com.infomaniak.core.ui.showToast
 import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController

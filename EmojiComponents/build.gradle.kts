@@ -39,8 +39,8 @@ android {
 
 dependencies {
     implementation(project(":Core:Avatar"))
-    implementation(project(":Core:Compose:Margin"))
-    implementation(project(":Core:Compose:MaterialThemeFromXml"))
+    implementation(project(":Core:Ui:Compose:Margin"))
+    implementation(project(":Core:Ui:Compose:MaterialThemeFromXml"))
 
     implementation(libs.compose.ui.android)
 

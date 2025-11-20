@@ -33,7 +33,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.core.legacy.utils.showKeyboard
-import com.infomaniak.core.legacy.utils.toPx
+import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
@@ -56,8 +56,6 @@ class AiPromptFragment : Fragment() {
     private val aiViewModel: AiViewModel by activityViewModels()
 
     private val newMessageFragment by lazy { parentFragment as NewMessageFragment }
-
-    private val m3BottomSheetMaxWidthPx by lazy { resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
 
     private val promptTextWatcher by lazy {
         object : TextWatcher {
@@ -105,6 +103,9 @@ class AiPromptFragment : Fragment() {
     }
 
     private fun setCorrectSheetMargins() = with(binding.root) {
+        val m3BottomSheetMaxWidthPx = resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width)
+        val m3BottomSheetHorizontalMarginPx = 56.toPx(this)
+
         val screenWidth = resources.displayMetrics.widthPixels
         val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
         val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
@@ -153,7 +154,6 @@ class AiPromptFragment : Fragment() {
     companion object {
         private const val NO_MARGIN = 0
 
-        private val m3BottomSheetHorizontalMarginPx = 56.toPx()
         private val promptExamples = listOf(
             R.string.aiPromptExample1,
             R.string.aiPromptExample2,

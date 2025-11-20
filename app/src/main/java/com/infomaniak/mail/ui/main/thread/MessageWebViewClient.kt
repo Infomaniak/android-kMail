@@ -24,8 +24,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.infomaniak.core.legacy.utils.showToast
-import com.infomaniak.core.legacy.utils.toDp
+import com.infomaniak.core.ui.showToast
+import com.infomaniak.core.ui.view.toDp
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
@@ -105,7 +105,7 @@ class MessageWebViewClient(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         runCatchingRealm {
-            val widthInDp = webView.width.toDp()
+            val widthInDp = webView.width.toDp(webView)
             if (widthInDp <= 0) {
                 val versionData = getWebViewVersionData(context)
 

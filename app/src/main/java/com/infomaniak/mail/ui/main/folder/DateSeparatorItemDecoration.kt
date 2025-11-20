@@ -21,13 +21,13 @@ import android.graphics.Rect
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.core.legacy.utils.toPx
+import com.infomaniak.core.ui.view.toPx
 
 class DateSeparatorItemDecoration : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         if (view is TextView && parent.getChildAdapterPosition(view) != 0) {
-            outRect.set(0, 16.toPx(), 0, 8.toPx())
+            outRect.set(0, 16.toPx(view), 0, 8.toPx(view))
         } else {
             super.getItemOffsets(outRect, view, parent, state)
         }

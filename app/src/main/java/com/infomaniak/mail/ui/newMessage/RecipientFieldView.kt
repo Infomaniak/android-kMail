@@ -37,8 +37,8 @@ import com.google.android.material.chip.Chip
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.showKeyboard
-import com.infomaniak.core.legacy.utils.toPx
 import com.infomaniak.core.legacy.views.DividerItemDecorator
+import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
@@ -558,7 +558,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
         fun applyTo(chip: Chip) = chip.apply {
             val (color, width) = strokeColor?.let {
-                ColorStateList.valueOf(context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
+                ColorStateList.valueOf(context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx(chip).toFloat()
             } ?: (null to NO_STROKE)
 
             chipStrokeWidth = width
