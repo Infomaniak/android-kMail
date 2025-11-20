@@ -74,7 +74,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
                 isVisible = true
                 infoIllustration.isGone = true
 
-                updateLayoutParams { height = illustration.heightDp.toPx() }
+                updateLayoutParams { height = illustration.heightDp.toPx(root) }
                 infoAnimation.setAnimation(illustration.resId)
             }
         }

@@ -42,6 +42,7 @@ import com.infomaniak.core.legacy.utils.capitalizeFirstChar
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.core.ui.view.toDp
 import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.core.utils.format
 import com.infomaniak.core.utils.isInTheFuture
@@ -651,7 +652,8 @@ class ThreadListAdapter @Inject constructor(
         }
 
         val cardView = root as MaterialCardView
-        cardView.cardElevation = cappedLinearInterpolator(CARD_ELEVATION, progress)
+        val cardElevation = 6.toPx(cardView).toFloat()
+        cardView.cardElevation = cappedLinearInterpolator(cardElevation, progress)
         cardView.radius = cappedLinearInterpolator(cardCornerRadius, progress)
     }
 
@@ -803,7 +805,6 @@ class ThreadListAdapter @Inject constructor(
 
     companion object {
         private const val SWIPE_ANIMATION_THRESHOLD = 0.15f
-        private val CARD_ELEVATION = 6.toPx().toFloat()
 
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"

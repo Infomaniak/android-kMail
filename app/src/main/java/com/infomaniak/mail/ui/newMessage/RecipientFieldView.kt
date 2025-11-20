@@ -558,7 +558,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
         fun applyTo(chip: Chip) = chip.apply {
             val (color, width) = strokeColor?.let {
-                ColorStateList.valueOf(context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
+                ColorStateList.valueOf(context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx(chip).toFloat()
             } ?: (null to NO_STROKE)
 
             chipStrokeWidth = width

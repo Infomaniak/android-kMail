@@ -105,7 +105,7 @@ class MessageWebViewClient(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         runCatchingRealm {
-            val widthInDp = webView.width.toDp()
+            val widthInDp = webView.width.toDp(webView)
             if (widthInDp <= 0) {
                 val versionData = getWebViewVersionData(context)
 
