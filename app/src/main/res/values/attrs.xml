@@ -17,8 +17,6 @@
   -->
 <resources>
 
-    <attr name="customGradientColor" format="color" />
-
     <declare-styleable name="CommonAttributes">
         <attr name="description" format="string" />
         <attr name="icon" format="reference" />
