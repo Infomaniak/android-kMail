@@ -35,7 +35,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
@@ -43,6 +42,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager.Companion.APP_UPDATE_TAG
+import com.infomaniak.core.inappupdate.updaterequired.ui.UpdateRequiredActivity.Companion.startUpdateRequiredActivity
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.Utils.toEnumOrThrow
@@ -56,7 +56,6 @@ import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -211,16 +210,16 @@ class MainActivity : BaseActivity() {
         lifecycleScope.launch {
             inAppUpdateManager.isUpdateRequired.collect { isUpdateRequired ->
                 initAppUpdateManager(isUpdateRequired)
+                if (isUpdateRequired) {
+                    startUpdateRequiredActivity(
+                        this@MainActivity,
+                        BuildConfig.APPLICATION_ID,
+                        BuildConfig.VERSION_CODE,
+                        localSettings.accentColor.theme
+                    )
+                }
             }
         }
-
-        // TODO: remove
-        // checkUpdateIsRequired(
-        //     BuildConfig.APPLICATION_ID,
-        //     BuildConfig.VERSION_NAME,
-        //     BuildConfig.VERSION_CODE,
-        //     localSettings.accentColor.theme,
-        // )
 
         observeDeletedMessages()
         observeActivityDialogLoaderReset()
@@ -569,7 +568,6 @@ class MainActivity : BaseActivity() {
                 }
             },
             onFDroidResult = { updateIsAvailable ->
-                //if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
                 if (updateIsAvailable) binding.updateAvailableBottomSheet.showBottomSheet()
             },
             isUpdateRequired = isUpdateRequired
@@ -614,10 +612,9 @@ class MainActivity : BaseActivity() {
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
-        binding.updateAvailableBottomSheet.showBottomSheet()
-        // val intent = Intent(this, NewMessageActivity::class.java)
-        // args?.let(intent::putExtras)
-        // newMessageActivityResultLauncher.launch(intent)
+        val intent = Intent(this, NewMessageActivity::class.java)
+        args?.let(intent::putExtras)
+        newMessageActivityResultLauncher.launch(intent)
     }
 
     fun navigateToSyncAutoConfigActivity() {
