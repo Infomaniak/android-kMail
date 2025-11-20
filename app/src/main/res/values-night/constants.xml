@@ -16,12 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-
-    <bool name="isPhone">true</bool>
-    <bool name="isTabletInPortrait">false</bool>
-    <bool name="isTabletInLandscape">false</bool>
-
-    <string name="pinkDotLottieThemeName" translatable="false">@null</string>
-    <string name="blueDotLottieThemeName" translatable="false">Blue-Light</string>
-
+    <string name="pinkDotLottieThemeName" translatable="false">Pink-Dark</string>
+    <string name="blueDotLottieThemeName" translatable="false">Blue-Dark</string>
 </resources>

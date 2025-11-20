@@ -299,6 +299,12 @@
     <color name="commonColor10">#F8F8F8</color>
     <color name="commonColor11">#D9D9D9</color>
 
+    <!-- Onboarding DotLottie theme colors -->
+    <color name="onboardingDotLottieAccent">@color/material_dynamic_primary40</color>
+    <color name="onboardingDotLottieBackground">@color/white</color>
+    <color name="onboardingDotLottieShape">@color/rabbit</color>
+    <color name="onboardingDotLottieStroke">@color/shark</color>
+
     <!-- Theme colors -->
     <color name="customMaterialDynamicPrimaryContainer">@color/material_dynamic_primary90</color>
 
