@@ -19,26 +19,19 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.activity.result.ActivityResult
-import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.core.auth.TokenAuthenticator.Companion.changeAccessToken
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.legacy.R
-import com.infomaniak.core.network.api.ApiController.toApiError
-import com.infomaniak.core.network.api.InternalTranslatedErrorCode
+import com.infomaniak.core.login.LoginUtils
+import com.infomaniak.core.login.models.UserLoginResult
 import com.infomaniak.core.network.models.ApiResponse
-import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.core.network.networking.HttpClient
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.core.network.utils.ErrorCodeTranslated
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
-import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
-import com.infomaniak.lib.login.InfomaniakLogin.TokenResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -48,7 +41,6 @@ import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -72,68 +64,21 @@ class LoginUtils @Inject constructor(
         infomaniakLogin: InfomaniakLogin,
         resetLoginButtons: () -> Unit,
     ) {
-        run {
-            val authCodeResult = result.toAuthCodeResult(context)
-            when (authCodeResult) {
-                is AuthCodeResult.Error -> {
-                    showError(authCodeResult.message)
-                    return@run
-                }
-                is AuthCodeResult.Canceled -> return@run
-                is AuthCodeResult.Success -> Unit
-            }
+        val userResult = LoginUtils.getLoginResultAfterWebView(
+            result = result,
+            context = context,
+            infomaniakLogin = infomaniakLogin,
+            credentialManager = AccountUtils,
+        )
 
-            val tokenResult = infomaniakLogin.getToken(okHttpClient = HttpClient.okHttpClient, code = authCodeResult.code)
-            when (tokenResult) {
-                is TokenResult.Error -> {
-                    context.showUserAuthenticationError(tokenResult.errorStatus)
-                    return@run
-                }
-                is TokenResult.Success -> Unit
-            }
-
-            val userResult = authenticateUsers(listOf(tokenResult.apiToken)).single()
-            when (userResult) {
-                is UserResult.Failure -> {
-                    context.apiError(userResult.apiResponse)
-                    return@run
-                }
-                is UserResult.Success -> Unit
-            }
-
-            val loginOutcome = fetchMailboxes(listOf(userResult.user)).single()
-            loginOutcome.handle(context, infomaniakLogin)
+        when (userResult) {
+            is UserLoginResult.Success -> fetchMailboxes(listOf(userResult.user)).single().handle(context, infomaniakLogin)
+            is UserLoginResult.Failure -> showError(userResult.errorMessage)
+            null -> Unit // User closed the webview without going through
         }
 
         // TODO: Don't reset when user is successfully logged in
         resetLoginButtons()
-    }
-
-    suspend fun authenticateUsers(apiTokens: List<ApiToken>): List<UserResult> = apiTokens.map { apiToken ->
-        runCatching { authenticateUser(apiToken) }.getOrDefault(UserResult.Failure.Unknown)
-    }
-
-    private suspend fun authenticateUser(apiToken: ApiToken): UserResult {
-        if (AccountUtils.getUserById(apiToken.userId) != null) return UserResult.Failure(
-            getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
-        )
-
-        val okhttpClient = HttpClient.okHttpClient.newBuilder().addInterceptor { chain ->
-            val newRequest = changeAccessToken(chain.request(), apiToken)
-            chain.proceed(newRequest)
-        }.build()
-
-        val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(okhttpClient) }
-
-        if (userProfileResponse.result == ApiResponseStatus.ERROR) return UserResult.Failure(userProfileResponse)
-        if (userProfileResponse.data == null) return UserResult.Failure.Unknown
-
-        val user = userProfileResponse.data!!.apply {
-            this.apiToken = apiToken
-            this.organizations = arrayListOf()
-        }
-
-        return UserResult.Success(user)
     }
 
     suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
@@ -142,23 +87,6 @@ class LoginUtils @Inject constructor(
         }.getOrDefault(LoginOutcome.Failure.Other(user.apiToken))
 
         computeLoginOutcome(user.apiToken, mailboxFetchResult)
-    }
-
-    private fun getErrorResponse(error: ErrorCodeTranslated): ApiResponse<Any> {
-        return ApiResponse(result = ApiResponseStatus.ERROR, error = error.toApiError())
-    }
-
-    private fun ActivityResult.toAuthCodeResult(context: Context): AuthCodeResult {
-        if (resultCode != AppCompatActivity.RESULT_OK) return AuthCodeResult.Canceled
-
-        val authCode = data?.getStringExtra(InfomaniakLogin.CODE_TAG)
-        val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
-
-        return when {
-            translatedError?.isNotBlank() == true -> AuthCodeResult.Error(translatedError)
-            authCode?.isNotBlank() == true -> AuthCodeResult.Success(authCode)
-            else -> AuthCodeResult.Error(context.getString(R.string.anErrorHasOccurred))
-        }
     }
 
     private fun computeLoginOutcome(apiToken: ApiToken, mailboxFetchResult: Any): LoginOutcome {
@@ -218,21 +146,6 @@ class LoginUtils @Inject constructor(
             SentryLog.e("DeleteTokenError", "Failure on deleteToken")
         }
     }
-
-    private fun Context.showUserAuthenticationError(errorStatus: ErrorStatus) {
-        val errorResId = when (errorStatus) {
-            ErrorStatus.SERVER -> R.string.serverError
-            ErrorStatus.CONNECTION -> R.string.connectionError
-            else -> R.string.anErrorHasOccurred
-        }
-        showError(getString(errorResId))
-    }
-}
-
-private sealed interface AuthCodeResult {
-    data class Success(val code: String) : AuthCodeResult
-    data class Error(val message: String) : AuthCodeResult
-    data object Canceled : AuthCodeResult
 }
 
 sealed class LoginOutcome(val initiatesNavigation: Boolean) {
@@ -252,17 +165,5 @@ sealed class LoginOutcome(val initiatesNavigation: Boolean) {
         ) : Failure(initiatesNavigation = false)
 
         data class Other(override val apiToken: ApiToken) : Failure(initiatesNavigation = false)
-    }
-}
-
-sealed interface UserResult {
-    data class Success(val user: User) : UserResult
-    open class Failure(val apiResponse: ApiResponse<*>) : UserResult {
-        data object Unknown : Failure(
-            ApiResponse<Unit>(
-                result = ApiResponseStatus.ERROR,
-                error = InternalTranslatedErrorCode.UnknownError.toApiError()
-            )
-        )
     }
 }
