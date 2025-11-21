@@ -41,9 +41,9 @@ object Utils {
     /** The MIME type for data whose type is otherwise unknown. */
     const val MIMETYPE_UNKNOWN = "application/octet-stream"
 
-    const val NUMBER_OF_OLD_UIDS_TO_FETCH = 50_000 // Total number of Messages we will ever fetch in a Folder history
-    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 50_000 // Number of Messages we want to fetch when 1st opening a Folder
-    const val PAGE_SIZE = 200 // Beware: the API refuses a PAGE_SIZE bigger than 200
+    const val NUMBER_OF_OLD_UIDS_TO_FETCH = 10_000 // Total number of Messages we will ever fetch in a Folder history
+    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500 // Number of Messages we want to fetch when 1st opening a Folder
+    const val PAGE_SIZE = 50 // Beware: the API refuses a PAGE_SIZE bigger than 200
     const val MIN_THREADS_TO_GET_ENOUGH_THREADS = PAGE_SIZE / 2 // We want to get at least 25 Threads when we fetch 1 old page
     const val MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_THREADS = 5 // We don't want to spam the API, so we just get a few pages
 
