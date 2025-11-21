@@ -31,6 +31,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.crossapplogin.login.getLoginResultsAfterCrossApp
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.launchInOnLifecycle
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -42,6 +43,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.showProgressCatching
 import com.infomaniak.core.legacy.utils.updateTextColor
+import com.infomaniak.core.login.models.UserLoginResult
 import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.awaitOneClick
@@ -53,9 +55,9 @@ import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.CrossLoginBottomSheetDialog.Companion.ON_ANOTHER_ACCOUNT_CLICKED_KEY
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
-import com.infomaniak.mail.utils.UserResult
 import com.infomaniak.mail.utils.colorStateList
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -76,6 +78,7 @@ import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 import com.infomaniak.core.crossapplogin.front.R as RCrossLogin
 import com.infomaniak.core.legacy.R as RCore
+import com.infomaniak.core.login.LoginUtils as CoreLoginUtils
 
 @OptIn(ExperimentalSerializationApi::class)
 @AndroidEntryPoint
@@ -247,12 +250,12 @@ class LoginFragment : Fragment() {
             } else {
                 val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
                 with(loginUtils) {
-                    val userResults = authenticateUsers(loginResult.tokens)
+                    val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
                     val users = buildList {
-                        userResults.forEach { result ->
+                        results.forEach { result ->
                             when (result) {
-                                is UserResult.Success -> add(result.user)
-                                is UserResult.Failure -> requireContext().apiError(result.apiResponse)
+                                is UserLoginResult.Success -> add(result.user)
+                                is UserLoginResult.Failure -> showError(result.errorMessage)
                             }
                         }
                     }

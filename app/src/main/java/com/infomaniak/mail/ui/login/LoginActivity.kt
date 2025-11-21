@@ -35,7 +35,6 @@ import com.infomaniak.core.network.networking.HttpClient
 import com.infomaniak.core.network.utils.ErrorCodeTranslated
 import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
-import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
@@ -115,42 +114,6 @@ class LoginActivity : AppCompatActivity() {
                 val newRequest = changeAccessToken(chain.request(), user.apiToken)
                 chain.proceed(newRequest)
             }.build()
-
-            val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(okhttpClient) }
-
-            return when {
-                !apiResponse.isSuccess() -> apiResponse
-                apiResponse.data?.isEmpty() == true -> MailboxErrorCode.NO_MAILBOX
-                else -> {
-                    apiResponse.data?.let { mailboxes ->
-                        trackUserInfo(MatomoName.NbMailboxes, mailboxes.count())
-                        AccountUtils.addUser(user)
-                        mailboxController.updateMailboxes(mailboxes)
-                        return@let if (mailboxes.none { it.isAvailable }) MailboxErrorCode.NO_VALID_MAILBOX else user
-                    } ?: run {
-                        getErrorResponse(InternalTranslatedErrorCode.UnknownError)
-                    }
-                }
-            }
-        }
-
-        suspend fun authenticateUser(apiToken: ApiToken, mailboxController: MailboxController): Any {
-            if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
-
-            val okhttpClient = HttpClient.okHttpClient.newBuilder().addInterceptor { chain ->
-                val newRequest = changeAccessToken(chain.request(), apiToken)
-                chain.proceed(newRequest)
-            }.build()
-
-            val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(okhttpClient) }
-
-            if (userProfileResponse.result == ApiResponseStatus.ERROR) return userProfileResponse
-            if (userProfileResponse.data == null) return getErrorResponse(InternalTranslatedErrorCode.UnknownError)
-
-            val user = userProfileResponse.data!!.apply {
-                this.apiToken = apiToken
-                this.organizations = arrayListOf()
-            }
 
             val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(okhttpClient) }
 
