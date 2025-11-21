@@ -109,10 +109,10 @@ class LoginUtils @Inject constructor(
     }
 
     suspend fun authenticateUsers(apiTokens: List<ApiToken>): List<UserResult> = apiTokens.map { apiToken ->
-        runCatching { authenticateUserShared(apiToken) }.getOrDefault(UserResult.Failure.Unknown)
+        runCatching { authenticateUser(apiToken) }.getOrDefault(UserResult.Failure.Unknown)
     }
 
-    private suspend fun authenticateUserShared(apiToken: ApiToken): UserResult {
+    private suspend fun authenticateUser(apiToken: ApiToken): UserResult {
         if (AccountUtils.getUserById(apiToken.userId) != null) return UserResult.Failure(
             getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
         )
