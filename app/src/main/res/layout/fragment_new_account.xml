@@ -27,6 +27,7 @@
         android:layout_height="match_parent"
         android:paddingHorizontal="@dimen/marginStandard">
 
+        <!-- 290dp represents the size stored inside the file. Without it the view doesn't use this stored size -->
         <com.infomaniak.core.dotlottie.DotLottieView
             android:id="@+id/illustration"
             android:layout_width="290dp"
