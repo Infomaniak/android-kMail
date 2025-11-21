@@ -72,6 +72,9 @@
         <!--Created for the stroke color of participation chips so it can be overridden later on-->
         <item name="calendarChipSelectedStrokeColor">#00ff00</item>
 
+        <!-- So dotLottie theme id can adapt automatically based on the context with resources using qualifiers -->
+        <item name="dotLottieThemeId">@null</item>
+
         <!-- Primary color palette -->
         <item name="primary0">@color/material_dynamic_primary0</item>
         <item name="primary10">@color/material_dynamic_primary10</item>
@@ -102,6 +105,9 @@
 
         <item name="colorControlNormal">@color/pinkMail</item>
 
+        <!-- So dotLottie theme id can adapt automatically based on the context with resources using qualifiers -->
+        <item name="dotLottieThemeId">@string/pinkDotLottieThemeName</item>
+
         <!-- Primary color palette -->
         <item name="primary0">@color/pink0</item>
         <item name="primary10">@color/pink10</item>
@@ -129,6 +135,9 @@
         <item name="colorAccent">@color/blueMail</item>
 
         <item name="colorControlNormal">@color/blueMail</item>
+
+        <!-- So dotLottie theme id can adapt automatically based on the context with resources using qualifiers -->
+        <item name="dotLottieThemeId">@string/blueDotLottieThemeName</item>
 
         <!-- Primary color palette -->
         <item name="primary0">@color/blue0</item>

@@ -17,8 +17,6 @@
   -->
 <resources>
 
-    <attr name="customGradientColor" format="color" />
-
     <declare-styleable name="CommonAttributes">
         <attr name="description" format="string" />
         <attr name="icon" format="reference" />
@@ -32,6 +30,7 @@
 
     <declare-styleable name="ThemeAttributes">
         <attr name="calendarChipSelectedStrokeColor" format="color" />
+        <attr name="dotLottieThemeId" format="string" />
     </declare-styleable>
 
     <declare-styleable name="DecoratedItemView">
