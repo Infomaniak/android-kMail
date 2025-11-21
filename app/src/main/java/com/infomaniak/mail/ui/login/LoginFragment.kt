@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
@@ -31,6 +32,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.crossapplogin.login.LoginResult
+import com.infomaniak.core.crossapplogin.login.LoginUtils.handleWebViewLoginResult
+import com.infomaniak.core.crossapplogin.login.LoginUtils.logUserInAfterCrossAppLogin
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.launchInOnLifecycle
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -247,12 +251,12 @@ class LoginFragment : Fragment() {
             } else {
                 val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
                 with(loginUtils) {
-                    val userResults = authenticateUsers(loginResult.tokens)
+                    val loginResults = logUserInAfterCrossAppLogin(loginResult.tokens, requireContext())
                     val users = buildList {
-                        userResults.forEach { result ->
+                        loginResults.forEach { result ->
                             when (result) {
-                                is UserResult.Success -> add(result.user)
-                                is UserResult.Failure -> requireContext().apiError(result.apiResponse)
+                                is LoginResult.Success -> add(result.user)
+                                is LoginResult.Failure -> showError(result.errorMessage)
                             }
                         }
                     }
