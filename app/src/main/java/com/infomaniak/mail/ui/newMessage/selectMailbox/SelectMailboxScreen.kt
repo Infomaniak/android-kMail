@@ -61,7 +61,10 @@ import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.SelectedMailboxUi
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState
-import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState.*
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState.DefaultScreen
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState.Error
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState.Loading
+import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UiState.SelectionScreen
 import com.infomaniak.mail.ui.newMessage.selectMailbox.SelectMailboxViewModel.UserMailboxesUi
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.AccountMailboxesDropdown
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.SelectedMailboxIndicator
@@ -224,16 +227,15 @@ private fun SelectedMailboxBottom(selectedMailbox: SelectedMailboxUi?) {
 private fun ContinueButton(
     modifier: Modifier,
     uiState: () -> UiState,
-    onContinueWithMailbox: (SelectedMailboxUi) -> Unit
+    onContinueWithMailbox: (SelectedMailboxUi) -> Unit,
 ) {
-    val uiState = uiState()
-    val selectedMailbox by remember { derivedStateOf { (uiState as? SelectMailboxViewModel.SelectedMailboxState)?.mailboxUi } }
+    val selectedMailbox by remember { derivedStateOf { (uiState() as? SelectMailboxViewModel.SelectedMailboxState)?.mailboxUi } }
 
     LargeButton(
         modifier = modifier,
         title = stringResource(R.string.buttonContinue),
         onClick = { selectedMailbox?.let { selectedMailboxUi -> onContinueWithMailbox(selectedMailboxUi) } },
-        enabled = { uiState is SelectMailboxViewModel.SelectedMailboxState },
+        enabled = { uiState() is SelectMailboxViewModel.SelectedMailboxState },
     )
 }
 
