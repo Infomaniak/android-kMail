@@ -240,8 +240,6 @@ class MainActivity : BaseActivity() {
         syncDiscoveryManager.init(::showSyncDiscovery)
 
         observeNotificationToRefresh()
-
-        mainViewModel.benchmarkGetMessagesUidsRanges()
     }
 
     private fun handleMenuDrawerEdgeToEdge() {
