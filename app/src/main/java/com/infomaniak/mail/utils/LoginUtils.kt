@@ -135,7 +135,7 @@ class LoginUtils @Inject constructor(
         return UserResult.Success(user)
     }
 
-    private suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
+    suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
         val mailboxFetchResult = runCatching {
             LoginActivity.fetchMailbox(user, mailboxController)
         }.getOrDefault(LoginOutcome.Failure.Other(user.apiToken))
@@ -145,10 +145,6 @@ class LoginUtils @Inject constructor(
 
     private fun getErrorResponse(error: ErrorCodeTranslated): ApiResponse<Any> {
         return ApiResponse(result = ApiResponseStatus.ERROR, error = error.toApiError())
-    }
-
-    suspend fun handleApiTokens(tokens: List<ApiToken>): List<LoginOutcome> = tokens.map { token ->
-        authenticateUser(token)
     }
 
     private fun ActivityResult.toAuthCodeResult(context: Context): AuthCodeResult {
@@ -162,14 +158,6 @@ class LoginUtils @Inject constructor(
             authCode?.isNotBlank() == true -> AuthCodeResult.Success(authCode)
             else -> AuthCodeResult.Error(context.getString(R.string.anErrorHasOccurred))
         }
-    }
-
-    private suspend fun authenticateUser(token: ApiToken): LoginOutcome {
-        return runCatching {
-            computeLoginOutcome(token, LoginActivity.authenticateUser(token, this.mailboxController))
-        }.cancellable().onFailure { exception ->
-            SentryLog.e("authenticateUser", "Failure on getToken", exception)
-        }.getOrElse { LoginOutcome.Failure.Other(token) }
     }
 
     private fun computeLoginOutcome(apiToken: ApiToken, mailboxFetchResult: Any): LoginOutcome {
@@ -207,7 +195,7 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    private suspend fun Context.apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
+    suspend fun Context.apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
         showError(getString(apiResponse.translateError()))
     }
 
