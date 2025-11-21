@@ -55,6 +55,7 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.CrossLoginBottomSheetDialog.Companion.ON_ANOTHER_ACCOUNT_CLICKED_KEY
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.UserResult
 import com.infomaniak.mail.utils.colorStateList
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -105,7 +106,7 @@ class LoginFragment : Fragment() {
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         lifecycleScope.launch {
-            loginUtils.handleWebViewLoginResult(context = requireContext(), result, loginActivity.infomaniakLogin, ::resetLoginButtons)
+            loginUtils.handleWebViewLoginResult(requireContext(), result, loginActivity.infomaniakLogin, ::resetLoginButtons)
         }
     }
 
@@ -246,10 +247,23 @@ class LoginFragment : Fragment() {
             } else {
                 val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
                 with(loginUtils) {
-                    val loginOutcomes = handleApiTokens(loginResult.tokens)
+                    val userResults = authenticateUsers(loginResult.tokens)
+                    val users = buildList {
+                        userResults.forEach { result ->
+                            when (result) {
+                                is UserResult.Success -> add(result.user)
+                                is UserResult.Failure -> requireContext().apiError(result.apiResponse)
+                            }
+                        }
+                    }
+
+                    val loginOutcomes = fetchMailboxes(users)
                     loginOutcomes.forEachIndexed { index, outcome ->
                         val preventNavigation = index != loginOutcomes.lastIndex
-                        if (preventNavigation && outcome.initiatesNavigation) outcome.handle(requireContext(), loginActivity.infomaniakLogin)
+                        if (preventNavigation && outcome.initiatesNavigation) outcome.handle(
+                            requireContext(),
+                            loginActivity.infomaniakLogin,
+                        )
                     }
                 }
                 loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
