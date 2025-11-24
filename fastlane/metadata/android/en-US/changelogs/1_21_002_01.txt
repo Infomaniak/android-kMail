@@ -1,0 +1,2 @@
+- Fix Cross app login being displayed in fDroid versions
+- Fix the mailbox selection when writing a mailTo not working

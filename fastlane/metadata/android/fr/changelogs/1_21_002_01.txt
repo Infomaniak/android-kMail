@@ -1,0 +1,2 @@
+- Correction de l'affichage de la connexion inter app dans les versions fDroid
+- Correction du problème de sélection de la boîte mail qui ne fonctionnait pas lors de la rédaction d'un mailTo
