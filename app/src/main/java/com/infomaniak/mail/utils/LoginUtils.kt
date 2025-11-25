@@ -105,6 +105,7 @@ class LoginUtils @Inject constructor(
             loginOutcome.handle(context, infomaniakLogin)
         }
 
+        // TODO: Don't reset when user is successfully logged in
         resetLoginButtons()
     }
 
