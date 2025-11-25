@@ -19,28 +19,35 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.activity.result.ActivityResult
+import com.infomaniak.core.auth.TokenAuthenticator.Companion.changeAccessToken
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.legacy.R
 import com.infomaniak.core.login.LoginUtils
 import com.infomaniak.core.login.models.UserLoginResult
+import com.infomaniak.core.network.api.ApiController.toApiError
+import com.infomaniak.core.network.api.InternalTranslatedErrorCode
 import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.core.network.networking.HttpClient
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.network.utils.ErrorCodeTranslated
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.MatomoMail.trackUserInfo
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -83,10 +90,38 @@ class LoginUtils @Inject constructor(
 
     suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
         val mailboxFetchResult = runCatching {
-            LoginActivity.fetchMailbox(user, mailboxController)
+            fetchMailbox(user, mailboxController)
         }.getOrDefault(LoginOutcome.Failure.Other(user.apiToken))
 
         computeLoginOutcome(user.apiToken, mailboxFetchResult)
+    }
+
+    suspend fun fetchMailbox(user: User, mailboxController: MailboxController): Any {
+        val okhttpClient = HttpClient.okHttpClient.newBuilder().addInterceptor { chain ->
+            val newRequest = changeAccessToken(chain.request(), user.apiToken)
+            chain.proceed(newRequest)
+        }.build()
+
+        val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(okhttpClient) }
+
+        return when {
+            !apiResponse.isSuccess() -> apiResponse
+            apiResponse.data?.isEmpty() == true -> MailboxErrorCode.NO_MAILBOX
+            else -> {
+                apiResponse.data?.let { mailboxes ->
+                    trackUserInfo(MatomoName.NbMailboxes, mailboxes.count())
+                    AccountUtils.addUser(user)
+                    mailboxController.updateMailboxes(mailboxes)
+                    return@let if (mailboxes.none { it.isAvailable }) MailboxErrorCode.NO_VALID_MAILBOX else user
+                } ?: run {
+                    getErrorResponse(InternalTranslatedErrorCode.UnknownError)
+                }
+            }
+        }
+    }
+
+    private fun getErrorResponse(error: ErrorCodeTranslated): ApiResponse<Any> {
+        return ApiResponse(result = ApiResponseStatus.ERROR, error = error.toApiError())
     }
 
     private fun computeLoginOutcome(apiToken: ApiToken, mailboxFetchResult: Any): LoginOutcome {
