@@ -182,10 +182,10 @@ class LoginUtils @Inject constructor(
     }
 }
 
-sealed class LoginOutcome(val initiatesNavigation: Boolean) {
+sealed class LoginOutcome(val needsNavigation: Boolean) {
     abstract val apiToken: ApiToken
 
-    data class Success(val user: User, override val apiToken: ApiToken) : LoginOutcome(initiatesNavigation = true)
+    data class Success(val user: User, override val apiToken: ApiToken) : LoginOutcome(needsNavigation = true)
 
     sealed class Failure(initiatesNavigation: Boolean) : LoginOutcome(initiatesNavigation) {
         data class NoMailbox(
