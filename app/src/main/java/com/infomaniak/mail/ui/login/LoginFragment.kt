@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.auth.models.UserLoginResult
+import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.launchInOnLifecycle
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -248,29 +249,33 @@ class LoginFragment : Fragment() {
                 openLoginWebView()
             } else {
                 val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
-                with(loginUtils) {
-                    val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
-                    val users = buildList {
-                        results.forEach { result ->
-                            when (result) {
-                                is UserLoginResult.Success -> add(result.user)
-                                is UserLoginResult.Failure -> showError(result.errorMessage)
-                            }
-                        }
-                    }
-
-                    val loginOutcomes = fetchMailboxes(users)
-                    loginOutcomes.forEachIndexed { index, outcome ->
-                        val preventNavigation = index != loginOutcomes.lastIndex
-                        if (preventNavigation && outcome.initiatesNavigation) outcome.handle(
-                            requireContext(),
-                            loginActivity.infomaniakLogin,
-                        )
-                    }
-                }
+                loginUsers(loginResult)
                 loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
 
                 delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
+            }
+        }
+    }
+
+    private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) {
+        with(loginUtils) {
+            val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
+            val users = buildList {
+                results.forEach { result ->
+                    when (result) {
+                        is UserLoginResult.Success -> add(result.user)
+                        is UserLoginResult.Failure -> showError(result.errorMessage)
+                    }
+                }
+            }
+
+            val loginOutcomes = fetchMailboxes(users)
+            loginOutcomes.forEachIndexed { index, outcome ->
+                val preventNavigation = index != loginOutcomes.lastIndex
+                if (preventNavigation && outcome.initiatesNavigation) outcome.handle(
+                    requireContext(),
+                    loginActivity.infomaniakLogin,
+                )
             }
         }
     }
