@@ -272,7 +272,7 @@ class LoginFragment : Fragment() {
             val loginOutcomes = fetchMailboxes(users)
             loginOutcomes.forEachIndexed { index, outcome ->
                 val preventNavigation = index != loginOutcomes.lastIndex
-                if (preventNavigation && outcome.initiatesNavigation) outcome.handle(
+                if (preventNavigation && outcome.needsNavigation) outcome.handle(
                     requireContext(),
                     loginActivity.infomaniakLogin,
                 )
