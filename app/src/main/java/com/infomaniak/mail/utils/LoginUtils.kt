@@ -78,7 +78,11 @@ class LoginUtils @Inject constructor(
         )
 
         when (userResult) {
-            is UserLoginResult.Success -> fetchMailboxes(listOf(userResult.user)).single().handle(context, infomaniakLogin)
+            is UserLoginResult.Success -> {
+                val loginOutcome = fetchMailboxes(listOf(userResult.user)).single()
+                loginOutcome.handleErrors(context, infomaniakLogin)
+                loginOutcome.handleNavigation(context)
+            }
             is UserLoginResult.Failure -> showError(userResult.errorMessage)
             null -> Unit // User closed the webview without going through
         }
@@ -132,15 +136,22 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    suspend fun LoginOutcome.handle(context: Context, infomaniakLogin: InfomaniakLogin) {
+    suspend fun LoginOutcome.handleErrors(context: Context, infomaniakLogin: InfomaniakLogin) {
         when (this) {
-            is LoginOutcome.Success -> return loginSuccess(user)
-            is LoginOutcome.Failure.NoMailbox -> context.mailboxError(errorCode)
+            is LoginOutcome.Success, is LoginOutcome.Failure.NoMailbox -> Unit
             is LoginOutcome.Failure.ApiError -> context.apiError(apiResponse)
             is LoginOutcome.Failure.Other -> context.otherError()
         }
 
-        logout(infomaniakLogin, apiToken)
+        if (this is LoginOutcome.Failure) logout(infomaniakLogin, apiToken)
+    }
+
+    suspend fun LoginOutcome.handleNavigation(context: Context) {
+        when (this) {
+            is LoginOutcome.Success -> return loginSuccess(user)
+            is LoginOutcome.Failure.NoMailbox -> context.mailboxError(errorCode)
+            is LoginOutcome.Failure.ApiError, is LoginOutcome.Failure.Other -> Unit
+        }
     }
 
     private suspend fun loginSuccess(user: User) {
@@ -182,22 +193,14 @@ class LoginUtils @Inject constructor(
     }
 }
 
-sealed class LoginOutcome(val needsNavigation: Boolean) {
-    abstract val apiToken: ApiToken
+sealed interface LoginOutcome {
+    val apiToken: ApiToken
 
-    data class Success(val user: User, override val apiToken: ApiToken) : LoginOutcome(needsNavigation = true)
+    data class Success(val user: User, override val apiToken: ApiToken) : LoginOutcome
 
-    sealed class Failure(initiatesNavigation: Boolean) : LoginOutcome(initiatesNavigation) {
-        data class NoMailbox(
-            val errorCode: MailboxErrorCode,
-            override val apiToken: ApiToken,
-        ) : Failure(initiatesNavigation = true)
-
-        data class ApiError(
-            val apiResponse: ApiResponse<*>,
-            override val apiToken: ApiToken,
-        ) : Failure(initiatesNavigation = false)
-
-        data class Other(override val apiToken: ApiToken) : Failure(initiatesNavigation = false)
+    sealed interface Failure : LoginOutcome {
+        data class NoMailbox(val errorCode: MailboxErrorCode, override val apiToken: ApiToken) : Failure
+        data class ApiError(val apiResponse: ApiResponse<*>, override val apiToken: ApiToken) : Failure
+        data class Other(override val apiToken: ApiToken) : Failure
     }
 }
