@@ -20,11 +20,11 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.activity.result.ActivityResult
 import com.infomaniak.core.auth.TokenAuthenticator.Companion.changeAccessToken
+import com.infomaniak.core.auth.models.UserLoginResult
 import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.auth.utils.LoginUtils
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.legacy.R
-import com.infomaniak.core.login.LoginUtils
-import com.infomaniak.core.login.models.UserLoginResult
 import com.infomaniak.core.network.api.ApiController.toApiError
 import com.infomaniak.core.network.api.InternalTranslatedErrorCode
 import com.infomaniak.core.network.models.ApiResponse

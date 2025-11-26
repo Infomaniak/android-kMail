@@ -31,7 +31,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.crossapplogin.login.getLoginResultsAfterCrossApp
+import com.infomaniak.core.auth.models.UserLoginResult
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.launchInOnLifecycle
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -43,7 +43,6 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.showProgressCatching
 import com.infomaniak.core.legacy.utils.updateTextColor
-import com.infomaniak.core.login.models.UserLoginResult
 import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.awaitOneClick
@@ -76,9 +75,9 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import splitties.coroutines.repeatWhileActive
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
+import com.infomaniak.core.auth.utils.LoginUtils as CoreLoginUtils
 import com.infomaniak.core.crossapplogin.front.R as RCrossLogin
 import com.infomaniak.core.legacy.R as RCore
-import com.infomaniak.core.login.LoginUtils as CoreLoginUtils
 
 @OptIn(ExperimentalSerializationApi::class)
 @AndroidEntryPoint
