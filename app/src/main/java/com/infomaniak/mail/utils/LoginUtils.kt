@@ -47,7 +47,6 @@ import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -102,7 +101,7 @@ class LoginUtils @Inject constructor(
             chain.proceed(newRequest)
         }.build()
 
-        val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(okhttpClient) }
+        val apiResponse = ApiRepository.getMailboxes(okhttpClient)
 
         return when {
             !apiResponse.isSuccess() -> apiResponse
