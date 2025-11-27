@@ -109,7 +109,7 @@ class LoginFragment : Fragment() {
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         lifecycleScope.launch {
-            loginUtils.handleWebViewLoginResult(requireContext(), result, loginActivity.infomaniakLogin, ::resetLoginButtons)
+            loginUtils.handleWebViewLoginResult(result, loginActivity.infomaniakLogin, ::resetLoginButtons)
         }
     }
 
@@ -269,10 +269,9 @@ class LoginFragment : Fragment() {
                 }
             }
 
-            val context = requireContext()
             fetchMailboxes(users).forEachIndexed { index, outcome ->
-                outcome.handleErrors(context, loginActivity.infomaniakLogin)
-                if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation(context)
+                outcome.handleErrors(loginActivity.infomaniakLogin)
+                if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
             }
         }
     }

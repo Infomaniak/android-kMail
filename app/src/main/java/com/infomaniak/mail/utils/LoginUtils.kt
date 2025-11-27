@@ -45,6 +45,7 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.invoke
@@ -54,6 +55,7 @@ import javax.inject.Inject
 @ActivityScoped
 class LoginUtils @Inject constructor(
     private val mailboxController: MailboxController,
+    @ApplicationContext private val appContext: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) {
@@ -65,14 +67,13 @@ class LoginUtils @Inject constructor(
     }
 
     suspend fun handleWebViewLoginResult(
-        context: Context,
         result: ActivityResult,
         infomaniakLogin: InfomaniakLogin,
         resetLoginButtons: () -> Unit,
     ) {
         val userResult = LoginUtils.getLoginResultAfterWebView(
             result = result,
-            context = context,
+            context = appContext,
             infomaniakLogin = infomaniakLogin,
             credentialManager = AccountUtils,
         )
@@ -80,8 +81,8 @@ class LoginUtils @Inject constructor(
         when (userResult) {
             is UserLoginResult.Success -> {
                 val loginOutcome = fetchMailboxes(listOf(userResult.user)).single()
-                loginOutcome.handleErrors(context, infomaniakLogin)
-                loginOutcome.handleNavigation(context)
+                loginOutcome.handleErrors(infomaniakLogin)
+                loginOutcome.handleNavigation()
             }
             is UserLoginResult.Failure -> showError(userResult.errorMessage)
             null -> Unit // User closed the webview without going through
@@ -136,20 +137,20 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    suspend fun LoginOutcome.handleErrors(context: Context, infomaniakLogin: InfomaniakLogin) {
+    suspend fun LoginOutcome.handleErrors(infomaniakLogin: InfomaniakLogin) {
         when (this) {
             is LoginOutcome.Success, is LoginOutcome.Failure.NoMailbox -> Unit
-            is LoginOutcome.Failure.ApiError -> context.apiError(apiResponse)
-            is LoginOutcome.Failure.Other -> context.otherError()
+            is LoginOutcome.Failure.ApiError -> apiError(apiResponse)
+            is LoginOutcome.Failure.Other -> otherError()
         }
 
         if (this is LoginOutcome.Failure) logout(infomaniakLogin, apiToken)
     }
 
-    suspend fun LoginOutcome.handleNavigation(context: Context) {
+    suspend fun LoginOutcome.handleNavigation() {
         when (this) {
             is LoginOutcome.Success -> return loginSuccess(user)
-            is LoginOutcome.Failure.NoMailbox -> context.mailboxError(errorCode)
+            is LoginOutcome.Failure.NoMailbox -> mailboxError(errorCode)
             is LoginOutcome.Failure.ApiError, is LoginOutcome.Failure.Other -> Unit
         }
     }
@@ -162,19 +163,19 @@ class LoginUtils @Inject constructor(
         AccountUtils.reloadApp?.invoke()
     }
 
-    private fun Context.mailboxError(errorCode: MailboxErrorCode) {
+    private fun mailboxError(errorCode: MailboxErrorCode) {
         when (errorCode) {
-            MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
-            MailboxErrorCode.NO_VALID_MAILBOX -> launchNoValidMailboxesActivity()
+            MailboxErrorCode.NO_MAILBOX -> appContext.launchNoMailboxActivity()
+            MailboxErrorCode.NO_VALID_MAILBOX -> appContext.launchNoValidMailboxesActivity()
         }
     }
 
-    suspend fun Context.apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
-        showError(getString(apiResponse.translateError()))
+    suspend fun apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
+        showError(appContext.getString(apiResponse.translateError()))
     }
 
-    private suspend fun Context.otherError() = withContext(mainDispatcher) {
-        showError(getString(R.string.anErrorHasOccurred))
+    private suspend fun otherError() = withContext(mainDispatcher) {
+        showError(appContext.getString(R.string.anErrorHasOccurred))
     }
 
     private suspend fun logout(infomaniakLogin: InfomaniakLogin, apiToken: ApiToken) {
