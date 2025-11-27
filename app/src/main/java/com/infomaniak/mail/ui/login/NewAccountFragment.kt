@@ -72,7 +72,7 @@ class NewAccountFragment : Fragment() {
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         lifecycleScope.launch {
-            loginUtils.handleWebViewLoginResult(context = requireContext(), result, loginActivity.infomaniakLogin, ::onFailedLogin)
+            loginUtils.handleWebViewLoginResult(result, loginActivity.infomaniakLogin, ::onFailedLogin)
         }
     }
 
