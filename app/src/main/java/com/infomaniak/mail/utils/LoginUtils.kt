@@ -131,7 +131,7 @@ class LoginUtils @Inject constructor(
     private fun computeLoginOutcome(apiToken: ApiToken, mailboxFetchResult: Any): LoginOutcome {
         return when (mailboxFetchResult) {
             is User -> LoginOutcome.Success(mailboxFetchResult, apiToken)
-            is MailboxErrorCode -> LoginOutcome.Failure.NoMailbox(mailboxFetchResult, apiToken)
+            is MailboxErrorCode -> LoginOutcome.Failure.Mailbox(mailboxFetchResult, apiToken)
             is ApiResponse<*> -> LoginOutcome.Failure.ApiError(mailboxFetchResult, apiToken)
             else -> LoginOutcome.Failure.Other(apiToken)
         }
@@ -139,7 +139,7 @@ class LoginUtils @Inject constructor(
 
     suspend fun LoginOutcome.handleErrors(infomaniakLogin: InfomaniakLogin) {
         when (this) {
-            is LoginOutcome.Success, is LoginOutcome.Failure.NoMailbox -> Unit
+            is LoginOutcome.Success, is LoginOutcome.Failure.Mailbox -> Unit
             is LoginOutcome.Failure.ApiError -> apiError(apiResponse)
             is LoginOutcome.Failure.Other -> otherError()
         }
@@ -150,7 +150,7 @@ class LoginUtils @Inject constructor(
     suspend fun LoginOutcome.handleNavigation() {
         when (this) {
             is LoginOutcome.Success -> return loginSuccess(user)
-            is LoginOutcome.Failure.NoMailbox -> mailboxError(errorCode)
+            is LoginOutcome.Failure.Mailbox -> mailboxError(errorCode)
             is LoginOutcome.Failure.ApiError, is LoginOutcome.Failure.Other -> Unit
         }
     }
@@ -200,7 +200,7 @@ sealed interface LoginOutcome {
     data class Success(val user: User, override val apiToken: ApiToken) : LoginOutcome
 
     sealed interface Failure : LoginOutcome {
-        data class NoMailbox(val errorCode: MailboxErrorCode, override val apiToken: ApiToken) : Failure
+        data class Mailbox(val errorCode: MailboxErrorCode, override val apiToken: ApiToken) : Failure
         data class ApiError(val apiResponse: ApiResponse<*>, override val apiToken: ApiToken) : Failure
         data class Other(override val apiToken: ApiToken) : Failure
     }
