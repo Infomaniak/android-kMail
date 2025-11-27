@@ -30,12 +30,15 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.utils.DownloadManagerUtils
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.networking.HttpUtils
+import com.infomaniak.core.network.networking.ManualAuthorizationRequired
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.ui.showToast
+import com.infomaniak.core.utils.DownloadManagerUtils
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -1672,10 +1675,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    @OptIn(ManualAuthorizationRequired::class)
     fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
         val snackbarTitleRes = if (ApiRepository.ping().isSuccess()) {
             val userBearerToken = AccountUtils.currentUser?.apiToken?.accessToken
-            DownloadManagerUtils.scheduleDownload(appContext, downloadUrl, filename, userBearerToken)
+            DownloadManagerUtils.scheduleDownload(
+                context = appContext,
+                url = downloadUrl,
+                name = filename,
+                userBearerToken = userBearerToken,
+                extraHeaders = HttpUtils.getHeaders(),
+                onError = { resourceStringId ->
+                    appContext.showToast(resourceStringId)
+                }
+            )
             R.string.snackbarDownloadInProgress
         } else {
             RCore.string.errorDownload
