@@ -95,7 +95,7 @@ class LoginUtils @Inject constructor(
     suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
         val mailboxFetchResult = runCatching {
             fetchMailbox(user, mailboxController)
-        }.getOrDefault(LoginOutcome.Failure.Other(user.apiToken))
+        }.cancellable().getOrDefault(LoginOutcome.Failure.Other(user.apiToken))
 
         computeLoginOutcome(user.apiToken, mailboxFetchResult)
     }
