@@ -1680,11 +1680,11 @@ class MainViewModel @Inject constructor(
         val snackbarTitleRes = if (ApiRepository.ping().isSuccess()) {
             val userBearerToken = AccountUtils.currentUser?.apiToken?.accessToken
             DownloadManagerUtils.scheduleDownload(
-                appContext,
-                downloadUrl,
-                filename,
-                userBearerToken,
-                HttpUtils.getHeaders(),
+                context = appContext,
+                url = downloadUrl,
+                name = filename,
+                userBearerToken = userBearerToken,
+                extraHeaders = HttpUtils.getHeaders(),
                 onError = { resourceStringId ->
                     appContext.showToast(resourceStringId)
                 }
