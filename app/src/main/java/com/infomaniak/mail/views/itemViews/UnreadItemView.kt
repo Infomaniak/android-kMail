@@ -46,12 +46,14 @@ abstract class UnreadItemView @JvmOverloads constructor(
                 text = UiUtils.formatUnreadCount(unreadCount)
                 isVisible = !isPastilleDisplayed && unreadCount > 0
             }
+            binding.endIconLayout.isVisible = isPastilleDisplayed || unreadCount > 0
         }
 
     var isPastilleDisplayed = false
         set(isDisplayed) {
             field = isDisplayed
             setEndIcon(if (isDisplayed) pastille else null, R.string.contentDescriptionUnreadPastille)
+            binding.endIconLayout.isVisible = isPastilleDisplayed || unreadCount > 0
         }
 
     init {
