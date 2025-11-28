@@ -36,12 +36,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.auth.models.UserLoginResult
+import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel.Companion.filterSelectedAccounts
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.extensions.capitalizeFirstChar
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
@@ -56,6 +57,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.components.OnboardingScreen
 import com.infomaniak.mail.ui.theme.MailTheme
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LoginUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -64,6 +66,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
+import com.infomaniak.core.auth.utils.LoginUtils as CoreLoginUtils
 import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -76,10 +79,6 @@ class LoginFragment : Fragment() {
     private val crossAppLoginViewModel: CrossAppLoginViewModel by activityViewModels()
 
     private val loginActivity by lazy { requireActivity() as LoginActivity }
-
-    private val connectButtonProgressTimer by lazy {
-        Utils.createRefreshTimer(milliseconds = 100, onTimerFinish = ::startProgress)
-    }
 
     @Inject
     @IoDispatcher
@@ -152,62 +151,15 @@ class LoginFragment : Fragment() {
 
         loginUtils.initShowError(::showError)
 
-        // val introPagerAdapter = IntroPagerAdapter(
-        //     manager = childFragmentManager,
-        //     lifecycle = viewLifecycleOwner.lifecycle,
-        //     isFirstAccount = navigationArgs.isFirstAccount,
-        // )
-        //
-        // introViewpager.apply {
-        //     adapter = introPagerAdapter
-        //     selectedPagePosition().mapLatest { position ->
-        //         val isLoginPage = position == introPagerAdapter.itemCount - 1
-        //
-        //         nextButton.isGone = isLoginPage
-        //         connectButton.isVisible = isLoginPage
-        //         crossAppLoginViewModel.availableAccounts.collectLatest { accounts ->
-        //             val hasAccounts = accounts.isNotEmpty()
-        //             signUpButton.isVisible = isLoginPage
-        //             crossLoginSelection.isVisible = isLoginPage && hasAccounts
-        //         }
-        //     }.launchInOnLifecycle(viewLifecycleOwner)
-        //
-        //     removeOverScrollForApiBelow31()
-        // }
-        //
-        // dotsIndicator.apply {
-        //     attachTo(introViewpager)
-        //     isVisible = navigationArgs.isFirstAccount
-        // }
-        //
-        // nextButton.setOnClickListener { introViewpager.currentItem += 1 }
-        //
-        // signUpButton.setOnClickListener {
-        //     safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
-        // }
-
         observeCrossLoginAccounts()
-        setCrossLoginClickListener()
         initCrossLogin()
     }
 
     private suspend fun connectSelectedAccounts(accounts: List<ExternalAccount>, skippedIds: Set<Long>) {
-        val selectedAccounts = accounts.filterSelectedAccounts(skippedIds)
-        val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts)
-
-        with(loginResult) {
-            tokens.forEachIndexed { index, token ->
-                // TODO: Check why it's not like drive
-                // authenticateUser(token, loginActivity.infomaniakLogin, withRedirection = index == tokens.lastIndex)
-            }
-
-            errorMessageIds.forEach { errorId -> showError(getString(errorId)) }
-        }
-    }
-
-    override fun onDestroyView() {
-        connectButtonProgressTimer.cancel()
-        super.onDestroyView()
+        val accountsToLogin = accounts.filterSelectedAccounts(skippedIds)
+        val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
+        loginUsers(loginResult)
+        loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
     }
 
     private fun observeCrossLoginAccounts() {
@@ -216,76 +168,29 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun setCrossLoginClickListener() {
-
-        // // Open CrossLogin bottomSheet
-        // binding.crossLoginSelection.setOnClickListener {
-        //     safelyNavigate(LoginFragmentDirections.actionLoginFragmentToCrossLoginBottomSheetDialog())
-        // }
-        //
-        // // Open Login webView when coming back from CrossLogin bottomSheet
-        // parentFragmentManager.setFragmentResultListener(
-        //     /* requestKey = */ ON_ANOTHER_ACCOUNT_CLICKED_KEY,
-        //     /* lifecycleOwner = */viewLifecycleOwner,
-        // ) { _, bundle ->
-        //     bundle.getString(ON_ANOTHER_ACCOUNT_CLICKED_KEY)?.let { openLoginWebView() }
-        // }
-    }
-
     @OptIn(ExperimentalSplittiesApi::class, ExperimentalCoroutinesApi::class)
     private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
         launch { crossAppLoginViewModel.activateUpdates(requireActivity()) }
-        // launch { crossAppLoginViewModel.skippedAccountIds.collect(binding.crossLoginSelection::setSkippedIds) }
-        //
-        // binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
-        // repeatWhileActive {
-        //     val accountsToLogin = crossAppLoginViewModel.selectedAccounts.mapLatest { accounts ->
-        //         val selectedCount = accounts.count()
-        //         SentryLog.i(TAG, "User selected $selectedCount accounts")
-        //         connectButtonText = when {
-        //             accounts.isEmpty() -> resources.getString(RCore.string.connect)
-        //             else -> resources.getQuantityString(
-        //                 RCrossLogin.plurals.buttonContinueWithAccounts,
-        //                 selectedCount,
-        //                 selectedCount,
-        //             )
-        //         }
-        //         binding.connectButton.text = connectButtonText
-        //         binding.connectButton.awaitOneClick()
-        //         accounts
-        //     }.first()
-        //     connectButtonProgressTimer.start()
-        //     if (accountsToLogin.isEmpty()) {
-        //         binding.connectButton.updateTextColor(getCurrentOnPrimary())
-        //         binding.signUpButton.isEnabled = false
-        //         openLoginWebView()
-        //     } else {
-        //         val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
-        //         loginUsers(loginResult)
-        //         loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
-        //
-        //         delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
-        //     }
     }
 
-    // private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) {
-    //     with(loginUtils) {
-    //         val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
-    //         val users = buildList {
-    //             results.forEach { result ->
-    //                 when (result) {
-    //                     is UserLoginResult.Success -> add(result.user)
-    //                     is UserLoginResult.Failure -> showError(result.errorMessage)
-    //                 }
-    //             }
-    //         }
-    // 
-    //         fetchMailboxes(users).forEachIndexed { index, outcome ->
-    //             outcome.handleErrors(loginActivity.infomaniakLogin)
-    //             if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
-    //         }
-    //     }
-    // }
+    private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) {
+        with(loginUtils) {
+            val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
+            val users = buildList {
+                results.forEach { result ->
+                    when (result) {
+                        is UserLoginResult.Success -> add(result.user)
+                        is UserLoginResult.Failure -> showError(result.errorMessage)
+                    }
+                }
+            }
+
+            fetchMailboxes(users).forEachIndexed { index, outcome ->
+                outcome.handleErrors(loginActivity.infomaniakLogin)
+                if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
+            }
+        }
+    }
 
     @VisibleForTesting
     fun openLoginWebView() {
@@ -299,17 +204,12 @@ class LoginFragment : Fragment() {
 
     private fun showError(error: String) {
         showSnackbar(error)
-        // resetLoginButtons()
+        resetLoginButtons()
     }
 
     private fun resetLoginButtons() = with(binding) {
-        connectButtonProgressTimer.cancel()
         // connectButton.hideProgressCatching(connectButtonText)
         // signUpButton.isEnabled = true
-    }
-
-    private fun startProgress() {
-        // binding.connectButton.showProgressCatching(getCurrentOnPrimary())
     }
 
     companion object {
