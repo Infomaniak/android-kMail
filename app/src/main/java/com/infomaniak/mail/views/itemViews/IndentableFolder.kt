@@ -29,30 +29,18 @@ interface IndentableFolder {
     val binding: ViewDecoratedTextItemBinding
 
     fun setIndent(indent: Int, hasCollapsibleFolder: Boolean = false, canBeCollapsed: Boolean = false) {
-        updateConstraintLayoutMarginStart(hasCollapsibleFolder)
-        updateItemNameMarginStart(indent, hasCollapsibleFolder, canBeCollapsed)
+        updateConstraintLayoutMarginStart()
+        updateItemNameMarginStart(indent, canBeCollapsed)
     }
 
-    private fun updateConstraintLayoutMarginStart(hasCollapsibleFolder: Boolean) = with(binding) {
-        val marginStart = if (hasCollapsibleFolder) {
-            0
-        } else {
-            context.resources.getDimension(R.dimen.decoratedItemConstraintMarginStart).toInt()
-        }
+    private fun updateConstraintLayoutMarginStart() = with(binding) {
+        val marginStart = context.resources.getDimension(R.dimen.decoratedItemConstraintMarginStart).toInt()
         constraintLayout.setMarginsRelative(start = marginStart)
     }
 
-    private fun updateItemNameMarginStart(indent: Int, hasCollapsibleFolder: Boolean, canBeCollapsed: Boolean) {
-        val totalMarginStart = computeMarginStart(hasCollapsibleFolder, canBeCollapsed) + computeIndent(indent)
+    private fun updateItemNameMarginStart(indent: Int, canBeCollapsed: Boolean) {
+        val totalMarginStart = binding.context.resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt() + computeIndent(indent)
         binding.itemName.apply { setMarginsRelative(start = totalMarginStart, end = marginEnd) }
-    }
-
-    private fun computeMarginStart(hasCollapsibleFolder: Boolean, canBeCollapsed: Boolean): Int = with(binding.context) {
-        return when {
-            hasCollapsibleFolder && !canBeCollapsed -> resources.getDimension(R.dimen.folderChevronSize).toInt()
-            hasCollapsibleFolder -> 0
-            else -> resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt()
-        }
     }
 
     private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandardMedium).toInt() * indent

@@ -117,6 +117,7 @@ class FolderViewHolder(
         )
 
         setCollapsingButtonContentDescription(folderName)
+        adaptMarginAfterCollapsingButton()
 
         if (folder.role == null) {
             setOnLongClickListener {
