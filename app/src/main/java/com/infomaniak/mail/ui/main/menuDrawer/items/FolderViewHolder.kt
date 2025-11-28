@@ -110,11 +110,7 @@ class FolderViewHolder(
         isCollapsed = folder.isCollapsed
         canBeCollapsed = folderUi.canBeCollapsed
 
-        setIndent(
-            indent = folderIndent,
-            hasCollapsibleFolder = hasCollapsibleFolder,
-            canBeCollapsed = canBeCollapsed,
-        )
+        setIndent(indent = folderIndent)
 
         setCollapsingButtonContentDescription(folderName)
         adaptMarginAfterCollapsingButton()
