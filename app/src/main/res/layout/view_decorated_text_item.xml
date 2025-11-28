@@ -28,20 +28,6 @@
         android:layout_marginEnd="@dimen/marginStandardMedium"
         android:gravity="center_vertical">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/collapseCustomFolderButton"
-            style="@style/IconButton"
-            android:layout_width="@dimen/folderChevronSize"
-            android:layout_height="@dimen/folderChevronSize"
-            android:visibility="gone"
-            app:icon="@drawable/ic_chevron_down"
-            app:iconSize="@dimen/chevronSize"
-            app:iconTint="@color/iconColor"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible" />
-
         <TextView
             android:id="@+id/itemName"
             style="@style/BodyMedium"
@@ -56,22 +42,25 @@
             app:drawableStartCompat="@drawable/ic_folder"
             app:drawableTint="?android:attr/colorPrimary"
             app:layout_constraintEnd_toStartOf="@id/endIconLayout"
-            app:layout_constraintStart_toEndOf="@id/collapseCustomFolderButton"
+            app:layout_constraintStart_toStartOf="parent"
             tools:text="Folder (Default/Custom)" />
 
         <FrameLayout
             android:id="@+id/endIconLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintEnd_toStartOf="@id/collapseCustomFolderButton"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
 
             <TextView
                 android:id="@+id/unreadCountChip"
                 style="@style/BodySmallMedium.Accent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:visibility="gone"
                 tools:text="42" />
 
@@ -79,10 +68,25 @@
                 android:id="@+id/endIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:visibility="gone"
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_pastille"
                 tools:visibility="visible" />
         </FrameLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/collapseCustomFolderButton"
+            style="@style/IconButton"
+            android:layout_width="@dimen/folderChevronSize"
+            android:layout_height="@dimen/folderChevronSize"
+            android:visibility="gone"
+            app:icon="@drawable/ic_chevron_down"
+            app:iconSize="@dimen/chevronSize"
+            app:iconTint="@color/iconColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
