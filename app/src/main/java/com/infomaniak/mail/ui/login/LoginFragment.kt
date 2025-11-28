@@ -58,6 +58,7 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.components.OnboardingScreen
 import com.infomaniak.mail.ui.theme.MailTheme
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.LoginOutcome
 import com.infomaniak.mail.utils.LoginUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -156,6 +157,7 @@ class LoginFragment : Fragment() {
     }
 
     private suspend fun connectSelectedAccounts(accounts: List<ExternalAccount>, skippedIds: Set<Long>) {
+        startLoadingLoginButtons()
         val accountsToLogin = accounts.filterSelectedAccounts(skippedIds)
         val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
         loginUsers(loginResult)
@@ -187,13 +189,17 @@ class LoginFragment : Fragment() {
 
             fetchMailboxes(users).forEachIndexed { index, outcome ->
                 outcome.handleErrors(loginActivity.infomaniakLogin)
-                if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
+                if (index == fetchMailboxes(users).lastIndex) {
+                    outcome.handleNavigation()
+                    if (outcome !is LoginOutcome.Success) resetLoginButtons()
+                }
             }
         }
     }
 
     @VisibleForTesting
     fun openLoginWebView() {
+        startLoadingLoginButtons()
         trackAccountEvent(MatomoName.OpenLoginWebview)
         loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
     }
@@ -204,12 +210,16 @@ class LoginFragment : Fragment() {
 
     private fun showError(error: String) {
         showSnackbar(error)
-        resetLoginButtons()
     }
 
-    private fun resetLoginButtons() = with(binding) {
-        // connectButton.hideProgressCatching(connectButtonText)
-        // signUpButton.isEnabled = true
+    private fun startLoadingLoginButtons() {
+        isLoginButtonLoading = true
+        isSignUpButtonLoading = true
+    }
+
+    private fun resetLoginButtons() {
+        isLoginButtonLoading = false
+        isSignUpButtonLoading = false
     }
 
     companion object {
