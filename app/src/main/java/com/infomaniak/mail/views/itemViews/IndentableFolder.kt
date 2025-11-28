@@ -55,5 +55,5 @@ interface IndentableFolder {
         }
     }
 
-    private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent
+    private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandardMedium).toInt() * indent
 }

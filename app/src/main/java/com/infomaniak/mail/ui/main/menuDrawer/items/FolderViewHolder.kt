@@ -138,6 +138,6 @@ class FolderViewHolder(
     )
 
     companion object {
-        const val MAX_SUB_FOLDERS_INDENT = 2
+        const val MAX_SUB_FOLDERS_INDENT = 4
     }
 }
