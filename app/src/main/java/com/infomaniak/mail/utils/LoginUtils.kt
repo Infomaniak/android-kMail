@@ -45,7 +45,7 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.invoke
@@ -55,7 +55,7 @@ import javax.inject.Inject
 @ActivityScoped
 class LoginUtils @Inject constructor(
     private val mailboxController: MailboxController,
-    @ApplicationContext private val appContext: Context,
+    @ActivityContext private val activityContext: Context, // Needs to be activity context in order to call startActivity
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) {
@@ -73,7 +73,7 @@ class LoginUtils @Inject constructor(
     ) {
         val userResult = LoginUtils.getLoginResultAfterWebView(
             result = result,
-            context = appContext,
+            context = activityContext,
             infomaniakLogin = infomaniakLogin,
             credentialManager = AccountUtils,
         )
@@ -165,17 +165,17 @@ class LoginUtils @Inject constructor(
 
     private fun mailboxError(errorCode: MailboxErrorCode) {
         when (errorCode) {
-            MailboxErrorCode.NO_MAILBOX -> appContext.launchNoMailboxActivity()
-            MailboxErrorCode.NO_VALID_MAILBOX -> appContext.launchNoValidMailboxesActivity()
+            MailboxErrorCode.NO_MAILBOX -> activityContext.launchNoMailboxActivity()
+            MailboxErrorCode.NO_VALID_MAILBOX -> activityContext.launchNoValidMailboxesActivity()
         }
     }
 
     suspend fun apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
-        showError(appContext.getString(apiResponse.translateError()))
+        showError(activityContext.getString(apiResponse.translateError()))
     }
 
     private suspend fun otherError() = withContext(mainDispatcher) {
-        showError(appContext.getString(R.string.anErrorHasOccurred))
+        showError(activityContext.getString(R.string.anErrorHasOccurred))
     }
 
     private suspend fun logout(infomaniakLogin: InfomaniakLogin, apiToken: ApiToken) {
