@@ -28,9 +28,9 @@ interface IndentableFolder {
 
     val binding: ViewDecoratedTextItemBinding
 
-    fun setIndent(indent: Int, hasCollapsibleFolder: Boolean = false, canBeCollapsed: Boolean = false) {
+    fun setIndent(indent: Int) {
         updateConstraintLayoutMarginStart()
-        updateItemNameMarginStart(indent, canBeCollapsed)
+        updateItemNameMarginStart(indent)
     }
 
     private fun updateConstraintLayoutMarginStart() = with(binding) {
@@ -38,7 +38,7 @@ interface IndentableFolder {
         constraintLayout.setMarginsRelative(start = marginStart)
     }
 
-    private fun updateItemNameMarginStart(indent: Int, canBeCollapsed: Boolean) {
+    private fun updateItemNameMarginStart(indent: Int) {
         val totalMarginStart = binding.context.resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt() + computeIndent(indent)
         binding.itemName.apply { setMarginsRelative(start = totalMarginStart, end = marginEnd) }
     }
