@@ -80,6 +80,8 @@ import com.infomaniak.mail.ui.login.components.Page.Companion.toOnboardingPage
 import com.infomaniak.mail.ui.theme.MailTheme
 import com.infomaniak.mail.utils.extensions.repeatFrame
 
+private val colorAnimationSpec = tween<Color>(600)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingScreen(
@@ -101,11 +103,11 @@ fun OnboardingScreen(
     val onboardingColor = accentColor()
 
     val context = LocalContext.current
-    val animatedPrimaryColor by animateColorAsState(Color(onboardingColor.getPrimary(context)), tween(600))
-    val animatedOnPrimaryColor by animateColorAsState(Color(onboardingColor.getOnPrimary(context)), tween(600))
+    val animatedPrimaryColor by animateColorAsState(Color(onboardingColor.getPrimary(context)), colorAnimationSpec)
+    val animatedOnPrimaryColor by animateColorAsState(Color(onboardingColor.getOnPrimary(context)), colorAnimationSpec)
     val animatedOnboardingSecondaryBackground by animateColorAsState(
         targetValue = Color(onboardingColor.getOnboardingSecondaryBackground(context)),
-        animationSpec = tween(600),
+        animationSpec = colorAnimationSpec,
     )
 
     MaterialTheme(
