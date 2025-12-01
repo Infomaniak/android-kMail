@@ -1,0 +1,1 @@
+- Réduction de l'indentation des dossiers pour afficher davantage d'imbrications
