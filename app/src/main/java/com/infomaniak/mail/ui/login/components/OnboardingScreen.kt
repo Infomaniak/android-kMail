@@ -147,7 +147,7 @@ fun OnboardingScreen(
                         isLoginButtonLoading = isLoginButtonLoading,
                         isSignUpButtonLoading = isSignUpButtonLoading,
                     ),
-                    nextButtonShape = buttonShape, // TODO: Compare with old design
+                    nextButtonShape = buttonShape,
                     customization = CrossLoginDefaults.customize(
                         colors = CrossLoginDefaults.colors(
                             titleColor = colorResource(R.color.primaryTextColor),
