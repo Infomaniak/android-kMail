@@ -51,7 +51,6 @@ import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -120,10 +119,10 @@ class LoginFragment : Fragment() {
             val accounts by crossAppLoginViewModel.accountsCheckingState.collectAsStateWithLifecycle()
             val skippedIds by crossAppLoginViewModel.skippedAccountIds.collectAsStateWithLifecycle()
 
-            var accentColor by rememberSaveable { mutableStateOf(AccentColor.PINK) }
+            var accentColor by rememberSaveable { mutableStateOf(localSettings.accentColor) }
 
             LaunchedEffect(accentColor) {
-                localSettings.accentColor = accentColor // TODO: Check if logic stores accent color correctly
+                localSettings.accentColor = accentColor
             }
 
             MailTheme {

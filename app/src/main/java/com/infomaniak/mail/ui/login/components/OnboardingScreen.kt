@@ -170,6 +170,7 @@ private sealed interface Page {
     val backgroundRes: Int
     @get:RawRes
     val illustrationRes: Int
+    val illustrationId: Int
     val repeatFrameStart: Int
     val repeatFrameEnd: Int
     @get:StringRes
@@ -202,6 +203,7 @@ private sealed interface Page {
     sealed class SimplePage(
         @DrawableRes override val backgroundRes: Int,
         @RawRes override val illustrationRes: Int,
+        override val illustrationId: Int,
         override val repeatFrameStart: Int,
         override val repeatFrameEnd: Int,
         @StringRes override val titleRes: Int,
@@ -221,6 +223,7 @@ private sealed interface Page {
     sealed class ThemePage(
         @DrawableRes override val backgroundRes: Int,
         @RawRes override val illustrationRes: Int,
+        override val illustrationId: Int,
         override val repeatFrameStart: Int,
         override val repeatFrameEnd: Int,
         @StringRes override val titleRes: Int,
@@ -247,6 +250,7 @@ private sealed interface Page {
     data object ThemeChoice : ThemePage(
         backgroundRes = R.drawable.ic_back_wave_1,
         illustrationRes = R.raw.illustration_onboarding_1,
+        illustrationId = 0,
         repeatFrameStart = 54,
         repeatFrameEnd = 138,
         titleRes = R.string.onBoardingTitle1,
@@ -255,6 +259,7 @@ private sealed interface Page {
     data object SwipeActions : SimplePage(
         backgroundRes = R.drawable.ic_back_wave_2,
         illustrationRes = R.raw.illustration_onboarding_2,
+        illustrationId = 1,
         repeatFrameStart = 108,
         repeatFrameEnd = 253,
         titleRes = R.string.onBoardingTitle2,
@@ -264,6 +269,7 @@ private sealed interface Page {
     data object MultiSelect : SimplePage(
         backgroundRes = R.drawable.ic_back_wave_3,
         illustrationRes = R.raw.illustration_onboarding_3,
+        illustrationId = 2,
         repeatFrameStart = 111,
         repeatFrameEnd = 187,
         titleRes = R.string.onBoardingTitle3,
@@ -273,6 +279,7 @@ private sealed interface Page {
     data object GetStarted : SimplePage(
         backgroundRes = R.drawable.ic_back_wave_4,
         illustrationRes = R.raw.illustration_onboarding_4,
+        illustrationId = 3,
         repeatFrameStart = 127,
         repeatFrameEnd = 236,
         titleRes = R.string.onBoardingTitle4,
@@ -314,7 +321,7 @@ private fun Page.CustomRepeatableLottieIllustration(pagerState: PagerState, inde
                 it.playAnimation()
                 isReadyToStart = false
             }
-            it.changeIllustrationColors(index, theme())
+            it.changeIllustrationColors(illustrationId, theme())
         }
     )
 }
