@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -43,6 +44,7 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,7 +71,9 @@ class NewAccountFragment : Fragment() {
     }
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
+        lifecycleScope.launch {
+            loginUtils.handleWebViewLoginResult(result, loginActivity.infomaniakLogin, ::onFailedLogin)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
