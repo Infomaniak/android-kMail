@@ -75,7 +75,7 @@ class LoginUtils @Inject constructor(
             result = result,
             context = activityContext,
             infomaniakLogin = infomaniakLogin,
-            credentialManager = AccountUtils,
+            userExistenceChecker = AccountUtils,
         )
 
         when (userResult) {
