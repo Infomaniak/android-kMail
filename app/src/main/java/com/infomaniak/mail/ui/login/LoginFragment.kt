@@ -257,22 +257,20 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) {
-        with(loginUtils) {
-            val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
-            val users = buildList {
-                results.forEach { result ->
-                    when (result) {
-                        is UserLoginResult.Success -> add(result.user)
-                        is UserLoginResult.Failure -> showError(result.errorMessage)
-                    }
+    private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) = with(loginUtils) {
+        val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
+        val users = buildList {
+            results.forEach { result ->
+                when (result) {
+                    is UserLoginResult.Success -> add(result.user)
+                    is UserLoginResult.Failure -> showError(result.errorMessage)
                 }
             }
+        }
 
-            fetchMailboxes(users).forEachIndexed { index, outcome ->
-                outcome.handleErrors(loginActivity.infomaniakLogin)
-                if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
-            }
+        fetchMailboxes(users).forEachIndexed { index, outcome ->
+            outcome.handleErrors(loginActivity.infomaniakLogin)
+            if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
         }
     }
 
