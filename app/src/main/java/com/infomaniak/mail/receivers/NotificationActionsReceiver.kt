@@ -54,8 +54,10 @@ import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -187,7 +189,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
                     dismissNotification(context, mailbox, notificationId)
                     updateFolders(folders = listOf(message.folder, destinationFolder), mailbox, realm)
                 } else {
-                    executeUndoAction(payload)
+                    Dispatchers.Main { executeUndoAction(payload) }
                     Sentry.captureException(first().getApiException()) { scope ->
                         scope.setTag("reason", "Notif action fail because of API call")
                         scope.setExtra("destination folder role", folderRole.name)
