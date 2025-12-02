@@ -48,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.ui.theme.MailTheme
@@ -122,7 +123,7 @@ private fun getTextColor(isSelected: Boolean): Color = if (isSelected) {
 private fun Preview() {
     MailTheme {
         Surface {
-            Box(Modifier.padding(16.dp)) {
+            Box(Modifier.padding(Margin.Medium)) {
                 var accentColor by remember { mutableStateOf(AccentColor.PINK) }
                 val context = LocalContext.current
                 MaterialTheme(
