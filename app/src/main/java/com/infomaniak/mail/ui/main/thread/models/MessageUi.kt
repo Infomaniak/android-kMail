@@ -24,6 +24,7 @@ data class MessageUi(
     val message: Message,
     val emojiReactionsState: Map<String, EmojiReactionStateUi>,
     val isReactionsFeatureAvailable: Boolean,
+    val hasUnsubscribeButton: Boolean
 ) {
     fun hasEmojis(): Boolean = emojiReactionsState.isNotEmpty()
     fun canBeReactedTo(): Boolean = message.isValidReactionTarget && emojiReactionsState.hasAvailableReactionSlot()

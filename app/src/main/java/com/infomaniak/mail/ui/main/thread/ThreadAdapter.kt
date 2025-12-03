@@ -177,6 +177,7 @@ class ThreadAdapter(
                 NotifyType.FailedMessage -> handleFailedMessagePayload(item.message.uid)
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
+                NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
                 is NotifyType.MessagesCollapseStateChanged -> {
                     holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
                 }
@@ -253,7 +254,7 @@ class ThreadAdapter(
         initMapForNewMessage(messageUi.message, position)
 
         bindHeader(messageUi.message)
-        bindAlerts(messageUi.message)
+        bindAlerts(messageUi)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
         bindContent(messageUi.message)
@@ -496,7 +497,8 @@ class ThreadAdapter(
         detailedMessageDate.text = context.fullDateWithYear(messageDate)
     }
 
-    private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
+    private fun MessageViewHolder.bindAlerts(messageUi: MessageUi) = with(binding) {
+        val message = messageUi.message
         if (message.isEncrypted) {
             bindEncryption(message)
         } else {
@@ -522,6 +524,7 @@ class ThreadAdapter(
             hideAlertGroupIfNoneDisplayed()
         }
 
+        bindUnsubscribe(messageUi)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -579,6 +582,17 @@ class ThreadAdapter(
         scheduleAlert.onAction2 {
             trackScheduleSendEvent(MatomoName.CancelSnooze)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
+        }
+    }
+
+    private fun ItemMessageBinding.bindUnsubscribe(messageUi: MessageUi) {
+        if (messageUi.hasUnsubscribeButton) {
+            unsubscribeAlert.isVisible = true
+            unsubscribeAlert.setDescription(context.resources.getString(R.string.messageComesFromDiscussionList))
+            unsubscribeAlert.setAction1Text(context.resources.getString(R.string.unsubscribeButtonTitle))
+            unsubscribeAlert.onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
+        } else {
+            unsubscribeAlert.isVisible = false
         }
     }
 
@@ -917,6 +931,7 @@ class ThreadAdapter(
         data object FailedMessage : NotifyType
         data object OnlyRebindCalendarAttendance : NotifyType
         data object OnlyRebindEmojiReactions : NotifyType
+        data object UnsubscribeRebind : NotifyType
         @JvmInline
         value class MessagesCollapseStateChanged(val isCollapsible: Boolean) : NotifyType
     }
@@ -943,6 +958,7 @@ class ThreadAdapter(
                     newItem is MessageUi &&
                             MessageDiffAspect.AnythingElse.areTheSame(oldItem.message, newItem.message) &&
                             MessageDiffAspect.EmojiReactions.areTheSame(oldItem, newItem) &&
+                            MessageDiffAspect.Unsubscribe.areTheSame(oldItem, newItem) &&
                             MessageDiffAspect.Calendar.areTheSame(oldItem.message, newItem.message)
                 }
                 is SuperCollapsedBlock -> {
@@ -962,6 +978,7 @@ class ThreadAdapter(
                 // null means "bind the whole item again"
                 MessageDiffAspect.AnythingElse.areDifferent(oldItem.message, newItem.message) -> null
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
+                MessageDiffAspect.Unsubscribe.areDifferent(oldItem, newItem) -> NotifyType.UnsubscribeRebind
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
@@ -1025,6 +1042,8 @@ class ThreadAdapter(
                             splitBody == oldMessage.splitBody &&
                             shouldHideDivider == oldMessage.shouldHideDivider
                 })
+
+                data object Unsubscribe : DiffAspect<MessageUi>({ hasUnsubscribeButton == it.hasUnsubscribeButton })
             }
         }
     }
@@ -1044,6 +1063,7 @@ class ThreadAdapter(
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
+        var unsubscribeClicked: ((Message) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
         var activateSpamFilter: (() -> Unit)? = null,
         var unblockMail: ((String) -> Unit)? = null,
