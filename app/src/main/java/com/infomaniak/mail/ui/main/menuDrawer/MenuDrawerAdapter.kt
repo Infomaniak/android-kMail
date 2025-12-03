@@ -244,7 +244,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 is FolderViewHolder -> holder.displayFolder(
                     folderUi = item as FolderUi,
                     currentFolderId = currentFolderId,
-                    hasCollapsibleFolder = if (item.isInDefaultFolderSection) hasCollapsibleDefaultFolder else hasCollapsibleCustomFolder,
                     onFolderClicked = callbacks.onFolderClicked,
                     onFolderLongClicked = callbacks.onFolderLongClicked,
                     onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,

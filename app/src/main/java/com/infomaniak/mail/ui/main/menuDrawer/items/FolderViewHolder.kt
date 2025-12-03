@@ -44,7 +44,6 @@ class FolderViewHolder(
     fun displayFolder(
         folderUi: FolderUi,
         currentFolderId: String?,
-        hasCollapsibleFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
@@ -79,7 +78,6 @@ class FolderViewHolder(
             folderIndent,
             unread,
             currentFolderId,
-            hasCollapsibleFolder,
             onFolderClicked,
             onFolderLongClicked,
             onCollapseChildrenClicked,
@@ -92,7 +90,6 @@ class FolderViewHolder(
         folderIndent: Int,
         unread: UnreadDisplay?,
         currentFolderId: String?,
-        hasCollapsibleFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
