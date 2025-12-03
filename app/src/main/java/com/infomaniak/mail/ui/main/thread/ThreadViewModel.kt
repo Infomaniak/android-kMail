@@ -698,13 +698,6 @@ class ThreadViewModel @Inject constructor(
     }
     //endregion
 
-    data class CombineMessageToBuildMessageUi(
-        val mode: ThreadOpeningMode,
-        val featureFlags: Mailbox.FeatureFlagSet,
-        val fakeReactions: Map<String, Set<String>>,
-        val messageUidUnsubscribed: List<String>
-    )
-
     data class SubjectDataResult(
         val thread: Thread?,
         val mergedContacts: MergedContactDictionary?,
@@ -715,6 +708,13 @@ class ThreadViewModel @Inject constructor(
         val threadUid: String,
         val message: Message,
         val menuId: Int,
+    )
+
+    private data class CombineMessageToBuildMessageUi(
+        val mode: ThreadOpeningMode,
+        val featureFlags: Mailbox.FeatureFlagSet,
+        val fakeReactions: Map<String, Set<String>>,
+        val messageUidUnsubscribed: List<String>
     )
 
     private enum class MessageBehavior {
