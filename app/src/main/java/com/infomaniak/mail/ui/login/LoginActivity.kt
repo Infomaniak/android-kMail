@@ -31,6 +31,7 @@ import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.twoFactorAuthManager
 import com.infomaniak.mail.utils.SentryDebug
@@ -51,8 +52,11 @@ class LoginActivity : AppCompatActivity() {
 
     private val navigationArgs: LoginActivityArgs? by lazy { intent?.extras?.let { LoginActivityArgs.fromBundle(it) } }
 
+    private val localSettings by lazy { LocalSettings.getInstance(context = this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         lockOrientationForSmallScreens()
+        setTheme(localSettings.accentColor.theme)
 
         super.onCreate(savedInstanceState)
 

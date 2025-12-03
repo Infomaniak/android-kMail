@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,15 +60,15 @@ object IlluColors {
         96.0,
     )
 
-    fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: AccentColor) {
-        updateAccentColorIndependentColors(position)
-        updateAccentColorDependentColors(accentColor, position)
+    fun LottieAnimationView.changeIllustrationColors(illustrationId: Int, accentColor: AccentColor) {
+        updateAccentColorIndependentColors(illustrationId)
+        updateAccentColorDependentColors(accentColor, illustrationId)
     }
 
     //region Accent color independent part
-    private fun LottieAnimationView.updateAccentColorIndependentColors(position: Int) {
+    private fun LottieAnimationView.updateAccentColorIndependentColors(illustrationId: Int) {
         val pathsToColor = context.getAccentIndependentPathsToColor()
-        colorPaths(pathsToColor, position)
+        colorPaths(pathsToColor, illustrationId)
     }
 
     private fun computeIlluOnBoardingColors(commonColor1: Int, commonColor2: Int, commonColor3: Int, commonColor4: Int) = listOf(
@@ -227,10 +227,10 @@ object IlluColors {
     //endregion
 
     //region Accent color dependent part
-    private fun LottieAnimationView.updateAccentColorDependentColors(accentColor: AccentColor, position: Int) {
+    private fun LottieAnimationView.updateAccentColorDependentColors(accentColor: AccentColor, illustrationId: Int) {
         val palette = context.getPaletteFor(accentColor)
         val pathsToColor = getPathsToColorFromPalette(palette)
-        colorPaths(pathsToColor, position)
+        colorPaths(pathsToColor, illustrationId)
     }
 
     @SuppressLint("RestrictedApi")
@@ -349,14 +349,14 @@ object IlluColors {
     //endregion
 
     //region Common
-    private fun LottieAnimationView.colorPaths(pathToColor: IlluOnBoardingColors, position: Int) = with(pathToColor) {
+    private fun LottieAnimationView.colorPaths(pathToColor: IlluOnBoardingColors, illustrationId: Int) = with(pathToColor) {
         illuAll.forEach(::changePathColor)
 
-        when (position) {
+        when (illustrationId) {
             1, 2, 3 -> illu234.forEach(::changePathColor)
         }
 
-        when (position) {
+        when (illustrationId) {
             0 -> illu1.forEach(::changePathColor)
             1 -> illu2.forEach(::changePathColor)
             2 -> illu3.forEach(::changePathColor)

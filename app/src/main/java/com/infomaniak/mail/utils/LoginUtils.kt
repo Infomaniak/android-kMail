@@ -83,13 +83,14 @@ class LoginUtils @Inject constructor(
                 val loginOutcome = fetchMailboxes(listOf(userResult.user)).single()
                 loginOutcome.handleErrors(infomaniakLogin)
                 loginOutcome.handleNavigation()
+
+                if (loginOutcome is LoginOutcome.Failure) resetLoginButtons()
             }
             is UserLoginResult.Failure -> showError(userResult.errorMessage)
             null -> Unit // User closed the webview without going through
         }
 
-        // TODO: Don't reset when user is successfully logged in
-        resetLoginButtons()
+        if (userResult !is UserLoginResult.Success) resetLoginButtons()
     }
 
     suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->
