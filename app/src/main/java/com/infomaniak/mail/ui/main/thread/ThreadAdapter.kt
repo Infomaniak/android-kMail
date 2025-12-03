@@ -955,11 +955,7 @@ class ThreadAdapter(
         override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
             return when (oldItem) {
                 is MessageUi -> {
-                    newItem is MessageUi &&
-                            MessageDiffAspect.AnythingElse.areTheSame(oldItem.message, newItem.message) &&
-                            MessageDiffAspect.EmojiReactions.areTheSame(oldItem, newItem) &&
-                            MessageDiffAspect.Unsubscribe.areTheSame(oldItem, newItem) &&
-                            MessageDiffAspect.Calendar.areTheSame(oldItem.message, newItem.message)
+                    newItem is MessageUi && MessageDiffAspect.entries.all { it.areTheSame(oldItem, newItem) }
                 }
                 is SuperCollapsedBlock -> {
                     newItem is SuperCollapsedBlock &&
@@ -976,7 +972,7 @@ class ThreadAdapter(
             // TODO: Handle the case where there are multiple aspects that changed at once
             return when {
                 // null means "bind the whole item again"
-                MessageDiffAspect.AnythingElse.areDifferent(oldItem.message, newItem.message) -> null
+                MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
                 MessageDiffAspect.Unsubscribe.areDifferent(oldItem, newItem) -> NotifyType.UnsubscribeRebind
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
@@ -1015,14 +1011,14 @@ class ThreadAdapter(
                 fun areDifferent(message: T, other: T) = areTheSame(message, other).not()
             }
 
-            object MessageDiffAspect {
+            interface MessageDiffAspect {
                 data object EmojiReactions : DiffAspect<MessageUi>({
                     emojiReactionsState.containsTheSameEmojiValuesAs(it.emojiReactionsState)
                 })
 
-                data object Calendar : DiffAspect<Message>({
-                    val calendarEventResponse = latestCalendarEventResponse
-                    val otherCalendarEventResponse = it.latestCalendarEventResponse
+                data object Calendar : DiffAspect<MessageUi>({
+                    val calendarEventResponse = message.latestCalendarEventResponse
+                    val otherCalendarEventResponse = it.message.latestCalendarEventResponse
 
                     when {
                         calendarEventResponse == null && otherCalendarEventResponse == null -> true
@@ -1035,15 +1031,19 @@ class ThreadAdapter(
                     data object AnythingElse : DiffAspect<CalendarEventResponse>({ everythingButAttendeesIsTheSame(it) })
                 }
 
-                data object AnythingElse : DiffAspect<Message>({ oldMessage ->
+                data object AnythingElse : DiffAspect<MessageUi>({ oldMessage ->
                     // Checks for any aspect of the message that could change and trigger a whole bind of the item again. Here we
                     // check for anything that doesn't need to handle bind with precision using a custom payload
-                    body?.value == oldMessage.body?.value &&
-                            splitBody == oldMessage.splitBody &&
-                            shouldHideDivider == oldMessage.shouldHideDivider
+                    message.body?.value == oldMessage.message.body?.value &&
+                            message.splitBody == oldMessage.message.splitBody &&
+                            message.shouldHideDivider == oldMessage.message.shouldHideDivider
                 })
 
                 data object Unsubscribe : DiffAspect<MessageUi>({ hasUnsubscribeButton == it.hasUnsubscribeButton })
+
+                companion object {
+                    val entries: List<DiffAspect<MessageUi>> get() = listOf(EmojiReactions, Calendar, AnythingElse, Unsubscribe)
+                }
             }
         }
     }
