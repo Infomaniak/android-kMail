@@ -32,8 +32,6 @@ import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 import com.infomaniak.core.legacy.R as RCore
-import androidx.core.view.isVisible
-import com.infomaniak.core.legacy.R as RLegacy
 
 sealed class DecoratedItemView @JvmOverloads constructor(
     context: Context,
@@ -117,16 +115,6 @@ sealed class DecoratedItemView @JvmOverloads constructor(
             setImageDrawable(icon)
             contentDescription = contentDescriptionRes?.let(context::getString)
         }
-    }
-
-    // If the item view has a collapse button, remove end margin. The margin is already present inside the button
-    fun adaptMarginAfterCollapsingButton() {
-        val endMargin = if (binding.collapseCustomFolderButton.isVisible) {
-            0
-        } else {
-            context.resources.getDimensionPixelSize(RLegacy.dimen.marginStandardMedium)
-        }
-        binding.constraintLayout.setMarginsRelative(end = endMargin)
     }
 
     enum class SelectionStyle {

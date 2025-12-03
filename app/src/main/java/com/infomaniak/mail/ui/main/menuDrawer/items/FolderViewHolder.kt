@@ -113,7 +113,6 @@ class FolderViewHolder(
         setIndent(indent = folderIndent)
 
         setCollapsingButtonContentDescription(folderName)
-        adaptMarginAfterCollapsingButton()
 
         if (folder.role == null) {
             setOnLongClickListener {

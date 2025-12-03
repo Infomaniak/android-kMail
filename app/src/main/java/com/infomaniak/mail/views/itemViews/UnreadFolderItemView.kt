@@ -20,9 +20,11 @@ package com.infomaniak.mail.views.itemViews
 import android.content.Context
 import android.util.AttributeSet
 import androidx.core.view.isVisible
+import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.toggleChevron
 import com.infomaniak.mail.views.CollapsibleItem
+import com.infomaniak.core.legacy.R as RLegacy
 
 class UnreadFolderItemView @JvmOverloads constructor(
     context: Context,
@@ -44,6 +46,14 @@ class UnreadFolderItemView @JvmOverloads constructor(
             binding.collapseCustomFolderButton.apply {
                 isVisible = value
                 setOnCollapsibleItemClickListener(if (canBeCollapsed) onCollapsedFolderClicked else null)
+
+                // If the item view has a collapse button, remove end margin. The margin is already present inside the button
+                val endMargin = if (canBeCollapsed) {
+                    0
+                } else {
+                    context.resources.getDimensionPixelSize(RLegacy.dimen.marginStandardMedium)
+                }
+                binding.constraintLayout.setMarginsRelative(end = endMargin)
             }
         }
 
