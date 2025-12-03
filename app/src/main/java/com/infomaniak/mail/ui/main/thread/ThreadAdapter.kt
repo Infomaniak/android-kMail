@@ -588,8 +588,6 @@ class ThreadAdapter(
     private fun ItemMessageBinding.bindUnsubscribe(messageUi: MessageUi) {
         if (messageUi.hasUnsubscribeButton) {
             unsubscribeAlert.isVisible = true
-            unsubscribeAlert.setDescription(context.resources.getString(R.string.messageComesFromDiscussionList))
-            unsubscribeAlert.setAction1Text(context.resources.getString(R.string.unsubscribeButtonTitle))
             unsubscribeAlert.onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
         } else {
             unsubscribeAlert.isVisible = false
@@ -1011,7 +1009,9 @@ class ThreadAdapter(
                 fun areDifferent(message: T, other: T) = areTheSame(message, other).not()
             }
 
-            interface MessageDiffAspect {
+            object MessageDiffAspect {
+                val entries: List<DiffAspect<MessageUi>> get() = listOf(EmojiReactions, Calendar, AnythingElse, Unsubscribe)
+
                 data object EmojiReactions : DiffAspect<MessageUi>({
                     emojiReactionsState.containsTheSameEmojiValuesAs(it.emojiReactionsState)
                 })
@@ -1031,6 +1031,8 @@ class ThreadAdapter(
                     data object AnythingElse : DiffAspect<CalendarEventResponse>({ everythingButAttendeesIsTheSame(it) })
                 }
 
+                data object Unsubscribe : DiffAspect<MessageUi>({ hasUnsubscribeButton == it.hasUnsubscribeButton })
+
                 data object AnythingElse : DiffAspect<MessageUi>({ oldMessage ->
                     // Checks for any aspect of the message that could change and trigger a whole bind of the item again. Here we
                     // check for anything that doesn't need to handle bind with precision using a custom payload
@@ -1038,12 +1040,6 @@ class ThreadAdapter(
                             message.splitBody == oldMessage.message.splitBody &&
                             message.shouldHideDivider == oldMessage.message.shouldHideDivider
                 })
-
-                data object Unsubscribe : DiffAspect<MessageUi>({ hasUnsubscribeButton == it.hasUnsubscribeButton })
-
-                companion object {
-                    val entries: List<DiffAspect<MessageUi>> get() = listOf(EmojiReactions, Calendar, AnythingElse, Unsubscribe)
-                }
             }
         }
     }
