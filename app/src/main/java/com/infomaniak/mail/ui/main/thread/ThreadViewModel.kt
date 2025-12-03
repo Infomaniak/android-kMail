@@ -172,8 +172,8 @@ class ThreadViewModel @Inject constructor(
     // instantly apply clicked emojis without having to wait for the API call to return.
     private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
 
-    // Each time a message is unsubscribed, it is added to the list and the list is resent to update the MessageUi flow.
-    // This unsubscribed message flow is listened in the combine to avoid losing the status of the unsubscribed message
+    // Each time a message is unsubscribed from, it is added to the list and the list is sent again to update the MessageUi flow.
+    // This unsubscribed message flow is collected in the combine to avoid losing the status of the unsubscribed message
     // if something else changes and rebuilds the MessageUi list.
     private val messageUidUnsubscribed = MutableStateFlow<List<String>>(emptyList())
 
