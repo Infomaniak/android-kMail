@@ -23,7 +23,6 @@ data class FolderUi(
     val depth: Int,
     var canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
     var isHidden: Boolean,
-    val isInDefaultFolderSection: Boolean // Whether the folder is part of the default folder section or the custom folder section
 ) : TreeStructure<FolderUi> {
     val isRoot get() = depth == 0
 }

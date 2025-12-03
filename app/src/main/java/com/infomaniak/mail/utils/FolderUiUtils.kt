@@ -46,7 +46,6 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
             canBeCollapsed = false, // will compute below
             children = emptyList(), // will compute below
             isHidden = false, // will compute below
-            isInDefaultFolderSection = isInDefaultFolderSection,
         )
         folderToFolderUi[folder to depth] = folderUi
     }

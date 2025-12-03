@@ -52,8 +52,6 @@ import javax.inject.Inject
 class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
 
     private var currentFolderId: String? = null
-    private var hasCollapsibleDefaultFolder = false
-    private var hasCollapsibleCustomFolder = false
 
     private lateinit var callbacks: MenuDrawerAdapterCallbacks
 
@@ -78,10 +76,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             addMailboxes(mailboxes, areMailboxesExpanded)
 
             add(ItemType.DIVIDER)
-            hasCollapsibleDefaultFolder = addDefaultFolders(displayedFolders.default)
+            addDefaultFolders(displayedFolders.default)
 
             add(ItemType.DIVIDER)
-            hasCollapsibleCustomFolder = addCustomFolders(displayedFolders.custom, areCustomFoldersExpanded)
+            addCustomFolders(displayedFolders.custom, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
@@ -101,40 +99,23 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         if (areMailboxesExpanded) addAll(otherMailboxes)
     }
 
-    private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>): Boolean {
-        var atLeastOneFolderIsIndented = false
-
+    private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<FolderUi>) {
         defaultFolders.forEachNestedItem { defaultFolderUi, _ ->
-            if (!defaultFolderUi.isHidden) {
-                if (defaultFolderUi.canBeCollapsed) atLeastOneFolderIsIndented = true
-                add(defaultFolderUi)
-            }
+            if (!defaultFolderUi.isHidden) add(defaultFolderUi)
         }
-
-        return atLeastOneFolderIsIndented
     }
 
-    private fun MutableList<Any>.addCustomFolders(
-        customFolders: List<FolderUi>,
-        areCustomFoldersExpanded: Boolean,
-    ): Boolean {
-        var atLeastOneFolderIsIndented = false
-
+    private fun MutableList<Any>.addCustomFolders(customFolders: List<FolderUi>, areCustomFoldersExpanded: Boolean) {
         add(ItemType.FOLDERS_HEADER)
-        if (!areCustomFoldersExpanded) return false
+        if (!areCustomFoldersExpanded) return
 
         if (customFolders.isEmpty()) {
             add(ItemType.EMPTY_FOLDERS)
         } else {
             customFolders.forEachNestedItem { customFolderUi, _ ->
-                if (!customFolderUi.isHidden) {
-                    if (customFolderUi.canBeCollapsed) atLeastOneFolderIsIndented = true
-                    add(customFolderUi)
-                }
+                if (!customFolderUi.isHidden) add(customFolderUi)
             }
         }
-
-        return atLeastOneFolderIsIndented
     }
 
     private fun MutableList<Any>.addAdvancedActions(areActionsExpanded: Boolean, permissions: MailboxPermissions?) {
@@ -244,7 +225,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 is FolderViewHolder -> holder.displayFolder(
                     folderUi = item as FolderUi,
                     currentFolderId = currentFolderId,
-                    hasCollapsibleFolder = if (item.isInDefaultFolderSection) hasCollapsibleDefaultFolder else hasCollapsibleCustomFolder,
                     onFolderClicked = callbacks.onFolderClicked,
                     onFolderLongClicked = callbacks.onFolderLongClicked,
                     onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
@@ -316,8 +296,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.folder.unreadCountDisplay == oldItem.folder.unreadCountDisplay &&
                         newItem.folder.threads.count() == oldItem.folder.threads.count() &&
                         newItem.canBeCollapsed == oldItem.canBeCollapsed &&
-                        newItem.depth == oldItem.depth &&
-                        newItem.isInDefaultFolderSection == oldItem.isInDefaultFolderSection
+                        newItem.depth == oldItem.depth
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
                 ItemType.DIVIDER,
                 ItemType.FOLDERS_HEADER,
