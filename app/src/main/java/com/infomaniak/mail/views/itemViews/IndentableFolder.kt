@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.views.itemViews
 
-import androidx.core.view.marginEnd
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.mail.R
@@ -29,18 +28,12 @@ interface IndentableFolder {
     val binding: ViewDecoratedTextItemBinding
 
     fun setIndent(indent: Int) {
-        updateConstraintLayoutMarginStart()
         updateItemNameMarginStart(indent)
-    }
-
-    private fun updateConstraintLayoutMarginStart() = with(binding) {
-        val marginStart = context.resources.getDimension(R.dimen.decoratedItemConstraintMarginStart).toInt()
-        constraintLayout.setMarginsRelative(start = marginStart)
     }
 
     private fun updateItemNameMarginStart(indent: Int) {
         val totalMarginStart = binding.context.resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt() + computeIndent(indent)
-        binding.itemName.apply { setMarginsRelative(start = totalMarginStart, end = marginEnd) }
+        binding.itemName.apply { setMarginsRelative(start = totalMarginStart) }
     }
 
     private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandardMedium).toInt() * indent
