@@ -46,15 +46,14 @@ class UnreadFolderItemView @JvmOverloads constructor(
             binding.collapseCustomFolderButton.apply {
                 isVisible = value
                 setOnCollapsibleItemClickListener(if (canBeCollapsed) onCollapsedFolderClicked else null)
-
-                // If the item view has a collapse button, remove end margin. The margin is already present inside the button
-                val endMargin = if (canBeCollapsed) {
-                    0
-                } else {
-                    context.resources.getDimensionPixelSize(RLegacy.dimen.marginStandardMedium)
-                }
-                binding.constraintLayout.setMarginsRelative(end = endMargin)
             }
+            // If the item view has a collapse button, remove end margin. The margin is already present inside the button
+            val endMargin = if (canBeCollapsed) {
+                0
+            } else {
+                context.resources.getDimensionPixelSize(RLegacy.dimen.marginStandardMedium)
+            }
+            binding.constraintLayout.setMarginsRelative(end = endMargin)
         }
 
     fun setCollapsingButtonContentDescription(folderName: String) {
