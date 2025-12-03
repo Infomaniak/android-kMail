@@ -383,6 +383,7 @@
     <string name="manageSignatures">Gérer mes signatures</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
+    <string name="messageComesFromDiscussionList">Ce message provient d’une liste de discussion.</string>
     <string name="messageDetailsDateAt">%1$s à %2$s</string>
     <string name="messageDetailsYesterday">Hier</string>
     <string name="messageForwardHeader">Message transféré</string>
@@ -613,6 +614,8 @@
         <item quantity="other">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
         <item quantity="many">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
     </plurals>
+    <string name="snackbarUnsubscribeFailure">Désinscription impossible</string>
+    <string name="snackbarUnsubscribeSuccess">Désinscription effectuée</string>
     <string name="snoozeAlertTitle">En attente jusqu’au : %s</string>
     <plurals name="snoozeArchiveConfirmAlertDescription">
         <item quantity="one">Cette conversation ne sera plus en attente et sera archivée</item>
@@ -679,6 +682,7 @@
     <string name="trashFolder">Corbeille</string>
     <string name="unblockButton">Débloquer</string>
     <string name="unknownRecipientTitle">(inconnu)</string>
+    <string name="unsubscribeButtonTitle">Se désabonner</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>

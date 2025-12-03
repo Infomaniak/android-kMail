@@ -53,6 +53,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.DefaultDispatcher
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
@@ -122,6 +123,7 @@ class ThreadViewModel @Inject constructor(
     private val messageController: MessageController,
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
+    private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
     private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -170,6 +172,11 @@ class ThreadViewModel @Inject constructor(
     // instantly apply clicked emojis without having to wait for the API call to return.
     private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
 
+    // Each time a message is unsubscribed, it is added to the list and the list is resent to update the MessageUi flow.
+    // This unsubscribed message flow is listened in the combine to avoid losing the status of the unsubscribed message
+    // if something else changes and rebuilds the MessageUi list.
+    private val messageUidUnsubscribed = MutableStateFlow<List<String>>(emptyList())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val messagesFlow: Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
         /**
@@ -184,13 +191,14 @@ class ThreadViewModel @Inject constructor(
             threadState.hasSuperCollapsedBlockBeenClicked,
             featureFlagsFlow,
             fakeReactions,
-            transform = { mode, _, featureFlags, fakeReactions ->
-                Triple(mode, featureFlags, fakeReactions)
+            messageUidUnsubscribed,
+            transform = { mode, _, featureFlags, fakeReactions, messageUidUnsubscribed ->
+                CombineMessageToBuildMessageUi(mode, featureFlags, fakeReactions, messageUidUnsubscribed)
             },
-        ).flatMapLatest { (mode, featureFlags, fakeReactions) ->
+        ).flatMapLatest { (mode, featureFlags, fakeReactions, messageUidUnsubscribed) ->
             val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
             mode.getMessages(featureFlags).mapLatest { (items, messagesToFetch) ->
-                items.toUiMessages(fakeReactions, isReactionsAvailable) to messagesToFetch
+                items.toUiMessages(fakeReactions, isReactionsAvailable, messageUidUnsubscribed) to messagesToFetch
             }
         }
 
@@ -621,11 +629,17 @@ class ThreadViewModel @Inject constructor(
     private suspend fun <E : Any> List<E>.toUiMessages(
         fakeReactions: Map<String, Set<String>>,
         isReactionsAvailable: Boolean,
+        messageUidUnsubscribed: List<String>,
     ): List<Any> = map { item ->
         if (item is Message) {
             val localReactions = fakeReactions[item.messageId] ?: emptySet()
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
-            MessageUi(item, reactions, isReactionsAvailable)
+            MessageUi(
+                message = item,
+                emojiReactionsState = reactions,
+                isReactionsFeatureAvailable = isReactionsAvailable,
+                hasUnsubscribeButton = item.hasUnsubscribeLink == true && messageUidUnsubscribed.none { it == item.uid }
+            )
         } else {
             item
         }
@@ -668,6 +682,28 @@ class ThreadViewModel @Inject constructor(
 
         return fakedReaction
     }
+
+    //region Unsubscribe list diffusion
+    fun unsubscribeMessage(message: Message) {
+        viewModelScope.launch {
+            with(ApiRepository.unsubscribe(message.resource)) {
+                if (isSuccess()) {
+                    snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeSuccess))
+                    messageUidUnsubscribed.value += message.uid
+                } else {
+                    snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeFailure))
+                }
+            }
+        }
+    }
+    //endregion
+
+    data class CombineMessageToBuildMessageUi(
+        val mode: ThreadOpeningMode,
+        val featureFlags: Mailbox.FeatureFlagSet,
+        val fakeReactions: Map<String, Set<String>>,
+        val messageUidUnsubscribed: List<String>
+    )
 
     data class SubjectDataResult(
         val thread: Thread?,

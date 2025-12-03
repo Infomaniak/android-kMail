@@ -184,6 +184,12 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
     }
 
+    //region Unsubscribe list diffusion
+    suspend fun unsubscribe(messageResource: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.unsubscribe(messageResource), POST)
+    }
+    //endregion
+
     //region Spam
     suspend fun setSpamFilter(mailboxHostingId: Int, mailboxName: String, activateSpamFilter: Boolean): ApiResponse<Unit> {
         return callApi(ApiRoutes.mailboxInfo(mailboxHostingId, mailboxName), PATCH, mapOf("has_move_spam" to activateSpamFilter))

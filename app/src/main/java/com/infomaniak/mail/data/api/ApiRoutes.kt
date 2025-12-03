@@ -307,6 +307,12 @@ object ApiRoutes {
     }
     //endregion
 
+    //region Unsubscribe list diffusion
+    fun unsubscribe(messageResource: String): String {
+        return "${resource(messageResource)}/unsubscribeFromList"
+    }
+    //endregion
+
     private fun mailboxUuidParameter(mailboxUuid: String): String {
         return "?mailbox_uuid=$mailboxUuid"
     }
