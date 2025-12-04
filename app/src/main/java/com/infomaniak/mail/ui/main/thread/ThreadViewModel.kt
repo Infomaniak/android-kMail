@@ -641,11 +641,12 @@ class ThreadViewModel @Inject constructor(
         if (item is Message) {
             val localReactions = fakeReactions[item.messageId] ?: emptySet()
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
+            val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) MessageUi.UnsubscribeState.CanUnsubscribe else null
             MessageUi(
                 message = item,
                 emojiReactionsState = reactions,
                 isReactionsFeatureAvailable = isReactionsAvailable,
-                unsubscribeState = unsubscribeStateByMessageUid[item.uid] ?: if (item.hasUnsubscribeLink == true) MessageUi.UnsubscribeState.CanUnsubscribe else null
+                unsubscribeState = unsubscribeStateByMessageUid[item.uid] ?: canUnsubscribeOrNull
             )
         } else {
             item
