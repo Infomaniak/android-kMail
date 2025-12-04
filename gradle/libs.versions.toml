@@ -1,6 +1,6 @@
 [versions]
 androidGradlePlugin = "8.13.1"
-compose = "1.9.5"
+compose = "1.10.0"
 desugarJDK = "2.1.5"
 dotsindicator = "5.1.0"
 dragDropSwipeRecyclerView = "1.0.0"
