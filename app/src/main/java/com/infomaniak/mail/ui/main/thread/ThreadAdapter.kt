@@ -586,11 +586,16 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.bindUnsubscribe(messageUi: MessageUi) {
-        if (messageUi.hasUnsubscribeButton) {
-            unsubscribeAlert.isVisible = true
-            unsubscribeAlert.onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
-        } else {
-            unsubscribeAlert.isVisible = false
+        when (messageUi.unsubscribeState) {
+            is MessageUi.UnsubscribeState.CanUnsubscribe -> {
+                unsubscribeAlert.isVisible = true
+                unsubscribeAlert.hideAction1Progress(R.string.unsubscribeButtonTitle)
+                unsubscribeAlert.onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
+            }
+            is MessageUi.UnsubscribeState.InProgress -> unsubscribeAlert.showAction1Progress()
+            is MessageUi.UnsubscribeState.Completed, null -> {
+                unsubscribeAlert.isVisible = false
+            }
         }
     }
 
@@ -1031,7 +1036,7 @@ class ThreadAdapter(
                     data object AnythingElse : DiffAspect<CalendarEventResponse>({ everythingButAttendeesIsTheSame(it) })
                 }
 
-                data object Unsubscribe : DiffAspect<MessageUi>({ hasUnsubscribeButton == it.hasUnsubscribeButton })
+                data object Unsubscribe : DiffAspect<MessageUi>({ unsubscribeState == it.unsubscribeState })
 
                 data object AnythingElse : DiffAspect<MessageUi>({ oldMessage ->
                     // Checks for any aspect of the message that could change and trigger a whole bind of the item again. Here we
