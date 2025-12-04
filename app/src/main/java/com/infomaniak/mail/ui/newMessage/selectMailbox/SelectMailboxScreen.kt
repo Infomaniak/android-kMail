@@ -170,8 +170,7 @@ private fun ScrollableContent(
 ) {
     val scope = rememberCoroutineScope()
     val uiState = uiState()
-
-    val context = LocalContext.current
+    val snackbarMessage = stringResource(RCore.string.anErrorHasOccurred)
 
     LazyColumn(
         modifier = modifier,
@@ -182,9 +181,7 @@ private fun ScrollableContent(
 
         when (uiState) {
             is Loading -> Unit
-            is Error -> scope.launch {
-                snackbarHostState.showSnackbar(message = context.getString(RCore.string.anErrorHasOccurred))
-            }
+            is Error -> scope.launch { snackbarHostState.showSnackbar(message = snackbarMessage) }
             is DefaultScreen -> {
                 item { SelectedMailboxIndicator(modifier = Modifier.animateItem(), selectedMailbox = uiState.mailboxUi) }
             }

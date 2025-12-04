@@ -92,7 +92,7 @@ private fun RowScope.SelectedMailboxIndicatorContent(
             initials = selectedMailbox.initials,
             colors = AvatarColors(
                 containerColor = Color(context.getBackgroundColorResBasedOnId(selectedMailbox.userId)),
-                contentColor = Color(context.getColor(R.color.onColorfulBackground))
+                contentColor = colorResource(R.color.onColorfulBackground)
             )
         )
     )

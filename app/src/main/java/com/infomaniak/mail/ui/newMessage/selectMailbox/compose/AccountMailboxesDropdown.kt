@@ -120,7 +120,7 @@ private fun RowScope.AccountDropdownSelector(
             initials = userWithMailboxes.initials,
             colors = AvatarColors(
                 containerColor = Color(context.getBackgroundColorResBasedOnId(userWithMailboxes.userId)),
-                contentColor = Color(context.getColor(R.color.onColorfulBackground))
+                contentColor = colorResource(R.color.onColorfulBackground)
             )
         )
     )
