@@ -174,5 +174,5 @@ private fun Message.toMessageUi(): MessageUi = MessageUi(
     message = this,
     emojiReactionsState = emptyMap(),
     isReactionsFeatureAvailable = false,
-    hasUnsubscribeButton = false
+    unsubscribeState = null
 )
