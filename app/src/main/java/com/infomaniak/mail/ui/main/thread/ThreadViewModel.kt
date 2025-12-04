@@ -58,6 +58,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
+import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState.CanUnsubscribe
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
@@ -641,7 +642,7 @@ class ThreadViewModel @Inject constructor(
         if (item is Message) {
             val localReactions = fakeReactions[item.messageId] ?: emptySet()
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
-            val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) MessageUi.UnsubscribeState.CanUnsubscribe else null
+            val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) CanUnsubscribe else null
             MessageUi(
                 message = item,
                 emojiReactionsState = reactions,
@@ -692,23 +693,21 @@ class ThreadViewModel @Inject constructor(
     }
 
     //region Unsubscribe list diffusion
-    fun unsubscribeMessage(message: Message) {
-        viewModelScope.launch {
+    fun unsubscribeMessage(message: Message) = viewModelScope.launch {
+        unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
+            set(message.uid, MessageUi.UnsubscribeState.InProgress)
+        }
+
+        val apiResponse = ApiRepository.unsubscribe(message.resource)
+        if (apiResponse.isSuccess()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeSuccess))
             unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-                set(message.uid, MessageUi.UnsubscribeState.InProgress)
+                set(message.uid, MessageUi.UnsubscribeState.Completed)
             }
-            with(ApiRepository.unsubscribe(message.resource)) {
-                if (isSuccess()) {
-                    snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeSuccess))
-                    unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-                        set(message.uid, MessageUi.UnsubscribeState.Completed)
-                    }
-                } else {
-                    snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeFailure))
-                    unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-                        set(message.uid, MessageUi.UnsubscribeState.CanUnsubscribe)
-                    }
-                }
+        } else {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeFailure))
+            unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
+                set(message.uid, CanUnsubscribe)
             }
         }
     }

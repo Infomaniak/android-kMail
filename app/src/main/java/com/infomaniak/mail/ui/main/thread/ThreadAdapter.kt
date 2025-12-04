@@ -66,6 +66,9 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
+import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState.CanUnsubscribe
+import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState.Completed
+import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState.InProgress
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -587,15 +590,15 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.bindUnsubscribe(messageUi: MessageUi) {
         when (messageUi.unsubscribeState) {
-            is MessageUi.UnsubscribeState.CanUnsubscribe -> {
-                unsubscribeAlert.isVisible = true
-                unsubscribeAlert.hideAction1Progress(R.string.unsubscribeButtonTitle)
-                unsubscribeAlert.onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
+            is CanUnsubscribe -> {
+                unsubscribeAlert.apply {
+                    isVisible = true
+                    hideAction1Progress(R.string.unsubscribeButtonTitle)
+                    onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
+                }
             }
-            is MessageUi.UnsubscribeState.InProgress -> unsubscribeAlert.showAction1Progress()
-            is MessageUi.UnsubscribeState.Completed, null -> {
-                unsubscribeAlert.isVisible = false
-            }
+            is InProgress -> unsubscribeAlert.showAction1Progress()
+            is Completed, null -> unsubscribeAlert.isVisible = false
         }
     }
 
@@ -611,13 +614,15 @@ class ThreadAdapter(
         val spamAction = getSpamBannerAction(message, firstExpeditor)
         val spamData = context.getSpamBannerData(spamAction = spamAction, emailToUnblock = firstExpeditor?.email)
 
-        if (spamData.spamAction == SpamAction.None) {
-            spamAlert.isVisible = false
-        } else {
-            spamAlert.isVisible = true
-            spamAlert.setDescription(spamData.description)
-            spamAlert.setAction1Text(spamData.action)
-            spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor!!) }
+        spamAlert.apply {
+            if (spamData.spamAction == SpamAction.None) {
+                isVisible = false
+            } else {
+                isVisible = true
+                setDescription(spamData.description)
+                setAction1Text(spamData.action)
+                onAction1 { spamActionButton(spamData, message, firstExpeditor!!) }
+            }
         }
     }
 
