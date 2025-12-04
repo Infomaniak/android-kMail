@@ -66,9 +66,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
-import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState.CanUnsubscribe
-import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState.Completed
-import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState.InProgress
+import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -590,15 +588,15 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.bindUnsubscribe(messageUi: MessageUi) {
         when (messageUi.unsubscribeState) {
-            is CanUnsubscribe -> {
+            is UnsubscribeState.CanUnsubscribe -> {
                 unsubscribeAlert.apply {
                     isVisible = true
                     hideAction1Progress(R.string.unsubscribeButtonTitle)
                     onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
                 }
             }
-            is InProgress -> unsubscribeAlert.showAction1Progress()
-            is Completed, null -> unsubscribeAlert.isVisible = false
+            is UnsubscribeState.InProgress -> unsubscribeAlert.showAction1Progress()
+            is UnsubscribeState.Completed, null -> unsubscribeAlert.isVisible = false
         }
     }
 
