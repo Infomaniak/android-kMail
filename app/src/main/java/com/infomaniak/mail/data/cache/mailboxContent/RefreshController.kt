@@ -59,6 +59,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.query.Sort
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -335,8 +336,16 @@ class RefreshController @Inject constructor(
     private suspend fun RefreshScope.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String): Boolean {
 
         val activities = when (folder.role) {
-            FolderRole.SNOOZED -> getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
-            else -> getMessagesUidsDelta<DefaultMessageFlags>(folder.id, previousCursor)
+            FolderRole.SNOOZED -> {
+                getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
+            }
+            else -> {
+                getMessagesUidsDelta<DefaultMessageFlags>(
+                    folderId = folder.id,
+                    previousCursor = previousCursor,
+                    uids = realmReadOnly.getMessagesUidsRanges(folder.id),
+                )
+            }
         } ?: return false
         scope.ensureActive()
 
@@ -373,6 +382,31 @@ class RefreshController @Inject constructor(
         sendOrphanMessages(folder, previousCursor)
 
         return false
+    }
+
+    private fun Realm.getMessagesUidsRanges(folderId: String): String? {
+        val messages = MessageController.getMessagesByFolderIdBlocking(folderId, realm = this, Sort.ASCENDING)
+        if (messages.isEmpty()) return null
+
+        var uids = ""
+        var prevUid = -1
+        var wasInRange = false
+        messages.forEachIndexed { index, message ->
+            val currentUid = message.shortUid
+            if (index == 0) {
+                uids += currentUid
+                prevUid = currentUid
+            } else {
+                val isInRange = currentUid == prevUid + 1
+                if (!isInRange) {
+                    uids += if (wasInRange) ":${prevUid},${currentUid}" else ",${currentUid}"
+                }
+                prevUid = currentUid
+                wasInRange = isInRange
+            }
+        }
+        if (wasInRange) uids += ":${prevUid}"
+        return uids
     }
 
     private fun hasTooManyActivities(activities: ActivitiesResult<out MessageFlags>): Boolean = with(activities) {
@@ -682,8 +716,9 @@ class RefreshController @Inject constructor(
     private suspend inline fun <reified T : MessageFlags> RefreshScope.getMessagesUidsDelta(
         folderId: String,
         previousCursor: String,
+        uids: String? = null,
     ): ActivitiesResult<T>? {
-        return with(ApiRepository.getMessagesUidsDelta<T>(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
+        return with(ApiRepository.getMessagesUidsDelta<T>(mailbox.uuid, folderId, previousCursor, uids, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }
