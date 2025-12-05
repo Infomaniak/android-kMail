@@ -25,6 +25,7 @@ playServices = "18.9.0"
 realmKotlin = "3.2.8-2"
 richHtmlEditor = "0.2.0"
 uiautomator = "2.3.0"
+uiTestJunit4 = "1.10.0"
 webkit = "1.14.0"
 
 [libraries]
@@ -52,13 +53,14 @@ rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", 
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 # Unit tests
+espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espressoContrib" }
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 espresso-web = { module = "androidx.test.espresso:espresso-web", version.ref = "espresso" }
 fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "fragmentTesting" }
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
-espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espressoContrib" }
+ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiTestJunit4" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

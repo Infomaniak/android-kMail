@@ -17,13 +17,14 @@
  */
 package com.infomaniak.mail.ui.login
 
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
@@ -46,7 +47,7 @@ import kotlin.time.Duration.Companion.seconds
 class LoginActivityTest {
 
     @get:Rule
-    var activityScenarioRule = activityScenarioRule<LaunchActivity>()
+    val composeTestRule = createAndroidComposeRule<LaunchActivity>()
 
     private lateinit var device: UiDevice
 
@@ -59,10 +60,10 @@ class LoginActivityTest {
     @Test
     fun login() {
         // Going through the onboarding
-        onView(withId(R.id.nextButton)).perform(click())
-        onView(withId(R.id.nextButton)).perform(click())
-        onView(withId(R.id.nextButton)).perform(click())
-        onView(withId(R.id.connectButton)).perform(click())
+        composeTestRule.onNodeWithTag("button_next_onboarding").performClick()
+        composeTestRule.onNodeWithTag("button_next_onboarding").performClick()
+        composeTestRule.onNodeWithTag("button_next_onboarding").performClick()
+        composeTestRule.onNodeWithTag("button_login_onboarding").performClick()
 
         Scenarios.login(Env.UI_TEST_ACCOUNT_EMAIL, Env.UI_TEST_ACCOUNT_PASSWORD)
 
