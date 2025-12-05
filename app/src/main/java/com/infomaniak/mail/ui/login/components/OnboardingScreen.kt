@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.login.components
 
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
@@ -58,6 +59,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel.AccountsCheckingState
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
