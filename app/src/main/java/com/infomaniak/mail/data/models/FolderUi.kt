@@ -22,9 +22,9 @@ data class FolderUi(
     override var children: List<FolderUi>,
     val depth: Int,
     var canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
-    var isHidden: Boolean,
     var isCollapsed: Boolean,
-    var parent: FolderUi? = null
+    var isParentCollapsed: Boolean,
 ) : TreeStructure<FolderUi> {
     val isRoot get() = depth == 0
+    val isHidden get() = isParentCollapsed
 }

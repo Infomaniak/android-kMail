@@ -45,9 +45,8 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
             depth = depth,
             canBeCollapsed = false, // will compute below
             children = emptyList(), // will compute below
-            isHidden = false, // will compute below
             isCollapsed = false,
-            parent = null
+            isParentCollapsed = false,
         )
         folderToFolderUi[folder to depth] = folderUi
     }
@@ -58,57 +57,25 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
         val (folder, parentDepth) = key
 
         val validChildren = folder.children
-            .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
+            .filter { !(it.shouldBeExcluded(true)) }
             .mapNotNull { folderToFolderUi[it to parentDepth + 1] } // children are stored at the parent's depth +1
 
-        // Link parent to children
+        val isCurrentFolderCollapsed = folder.isCollapsed
         for (child in validChildren) {
-            child.parent = folderUi
+            child.isParentCollapsed = isCurrentFolderCollapsed || folderUi.isParentCollapsed
         }
-
-        // Compute isHidden: true if any parent is collapsed
-        var isCurrentParentCollapsed = false
-        var current: FolderUi? = folderUi.parent
-        while (current != null) {
-            if (current.isCollapsed) {
-                isCurrentParentCollapsed = true
-                break
-            }
-            current = current.parent
-        }
-
-        // val shouldHide = if (folderUi.isRoot) {
-        //     isCurrentParentCollapsed = folder.isCollapsed
-        //     false
-        // } else {
-        //     isCurrentParentCollapsed
-        // }
 
         folderUi.apply {
             canBeCollapsed = validChildren.isNotEmpty()
             children = validChildren
-            isHidden = isCurrentParentCollapsed
-            isCollapsed = folder.isCollapsed
+            isCollapsed = isCurrentFolderCollapsed
         }
 
         if (folderUi.isRoot) resultRoots.add(folderUi)
     }
 
-    // resultRoots.forEach { root ->
-    //     propagateHiddenState(root, false)
-    // }
-
     // Step 3: Only return root folders needed for traversal
     return resultRoots
-}
-
-fun propagateHiddenState(folderUi: FolderUi, parentIsCollapsed: Boolean = false) {
-    val isCurrentCollapsed = folderUi.isCollapsed
-    folderUi.isHidden = parentIsCollapsed
-
-    folderUi.children.forEach { child ->
-        propagateHiddenState(child, parentIsCollapsed || isCurrentCollapsed)
-    }
 }
 
 private fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
