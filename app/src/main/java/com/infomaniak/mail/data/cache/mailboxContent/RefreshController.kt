@@ -392,16 +392,16 @@ class RefreshController @Inject constructor(
         var prevUid = -1
         var wasInRange = false
         messages.forEachIndexed { index, message ->
-            val nextUid = message.shortUid
+            val currentUid = message.shortUid
             if (index == 0) {
-                uids += nextUid
-                prevUid = nextUid
+                uids += currentUid
+                prevUid = currentUid
             } else {
-                val isInRange = nextUid == prevUid + 1
+                val isInRange = currentUid == prevUid + 1
                 if (!isInRange) {
-                    uids += if (wasInRange) ":${prevUid},${nextUid}" else ",${nextUid}"
+                    uids += if (wasInRange) ":${prevUid},${currentUid}" else ",${currentUid}"
                 }
-                prevUid = nextUid
+                prevUid = currentUid
                 wasInRange = isInRange
             }
         }
