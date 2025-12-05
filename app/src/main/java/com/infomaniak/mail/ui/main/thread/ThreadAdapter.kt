@@ -592,7 +592,7 @@ class ThreadAdapter(
                 unsubscribeAlert.apply {
                     isVisible = true
                     hideAction1Progress(R.string.unsubscribeButtonTitle)
-                    onAction1 { threadAdapterCallbacks?.unsubscribeClicked?.invoke(messageUi.message) }
+                    onAction1 { threadAdapterCallbacks?.onUnsubscribeClicked?.invoke(messageUi.message) }
                 }
             }
             is UnsubscribeState.InProgress -> unsubscribeAlert.showAction1Progress()
@@ -1067,7 +1067,7 @@ class ThreadAdapter(
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
-        var unsubscribeClicked: ((Message) -> Unit)? = null,
+        var onUnsubscribeClicked: ((Message) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
         var activateSpamFilter: (() -> Unit)? = null,
         var unblockMail: ((String) -> Unit)? = null,
