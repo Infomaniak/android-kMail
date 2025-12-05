@@ -318,6 +318,9 @@ private fun Page.CustomRepeatableLottieIllustration(pagerState: PagerState, inde
         update = {
             // Avoid restarting the animation when there's a recomposition by taking isReadyToStart into account
             if (pagerState.currentPage == index && isReadyToStart) {
+                // Requesting layout here solves a bug where ~1/10 of the time, when you scroll to the 4th page quickly, the 4th
+                // animation is not displayed because it has a width of 0dp
+                it.requestLayout()
                 it.playAnimation()
                 isReadyToStart = false
             }
