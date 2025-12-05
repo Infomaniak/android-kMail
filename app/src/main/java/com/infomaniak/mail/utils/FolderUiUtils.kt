@@ -32,7 +32,7 @@ import com.infomaniak.mail.utils.extensions.IK_FOLDER
  * drawer to not display role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
 fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderUi> {
-    val folderToFolderUi = mutableMapOf<Pair<Folder, Int>, FolderUi>()
+    val folderToFolderUi = mutableMapOf<Folder, FolderUi>()
     val excludeRoleFolder = isInDefaultFolderSection.not()
 
     // Step 1: Instantiate all FolderUi instances and compute visibility
@@ -45,32 +45,28 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
             depth = depth,
             canBeCollapsed = false, // will compute below
             children = emptyList(), // will compute below
-            isHidden = false, // will compute below
+            isCollapsed = false,
+            isParentCollapsed = false,
         )
-        folderToFolderUi[folder to depth] = folderUi
+        folderToFolderUi[folder] = folderUi
     }
 
     // Step 2: Link children of FolderUi to existing instances + compute collapsibility + identify root folders
     val resultRoots = mutableListOf<FolderUi>()
-    var isCurrentParentCollapsed = false
-    folderToFolderUi.forEach { (key, folderUi) ->
-        val (folder, parentDepth) = key
-
+    folderToFolderUi.forEach { (folder, folderUi) ->
         val validChildren = folder.children
-            .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
-            .mapNotNull { folderToFolderUi[it to parentDepth + 1] } // children are stored at the parent's depth +1
+            .filter { !(it.shouldBeExcluded(true)) }
+            .mapNotNull { folderToFolderUi[it] }
 
-        val shouldHide = if (folderUi.isRoot) {
-            isCurrentParentCollapsed = folder.isCollapsed
-            false
-        } else {
-            isCurrentParentCollapsed
+        val isCurrentFolderCollapsed = folder.isCollapsed
+        for (child in validChildren) {
+            child.isParentCollapsed = isCurrentFolderCollapsed || folderUi.isParentCollapsed
         }
 
         folderUi.apply {
-            canBeCollapsed = folderUi.isRoot && validChildren.isNotEmpty()
+            canBeCollapsed = validChildren.isNotEmpty()
             children = validChildren
-            isHidden = shouldHide
+            isCollapsed = isCurrentFolderCollapsed
         }
 
         if (folderUi.isRoot) resultRoots.add(folderUi)
