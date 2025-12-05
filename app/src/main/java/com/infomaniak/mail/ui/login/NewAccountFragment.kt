@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -35,9 +34,7 @@ import com.infomaniak.mail.CREATE_ACCOUNT_SUCCESS_HOST
 import com.infomaniak.mail.CREATE_ACCOUNT_URL
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentNewAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -107,14 +104,7 @@ class NewAccountFragment : Fragment() {
     }
 
     private fun selectIllustrationAccordingToTheme() {
-        val drawableRes = when (localSettings.accentColor) {
-            AccentColor.PINK -> R.drawable.new_account_illustration_pink
-            AccentColor.BLUE -> R.drawable.new_account_illustration_blue
-            AccentColor.SYSTEM -> R.drawable.new_account_illustration_material
-        }
-
-        val drawable = ResourcesCompat.getDrawable(resources, drawableRes, null)
-        binding.illustration.setImageDrawable(drawable)
+        binding.illustration.theme = localSettings.accentColor.getDotLottieTheme(requireContext())
     }
 
     private fun ActivityResult.handleCreateAccountActivityResult() {

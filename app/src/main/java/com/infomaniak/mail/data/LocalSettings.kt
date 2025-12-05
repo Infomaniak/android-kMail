@@ -22,11 +22,15 @@ package com.infomaniak.mail.data
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.view.ContextThemeWrapper
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.graphics.Color
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.core.auth.AccessTokenUsageInterceptor.ApiCallRecord
+import com.infomaniak.core.dotlottie.model.DotLottieTheme
 import com.infomaniak.core.legacy.utils.SharedValues
 import com.infomaniak.core.legacy.utils.sharedValue
 import com.infomaniak.core.legacy.utils.transaction
@@ -133,6 +137,26 @@ class LocalSettings private constructor(context: Context) : SharedValues {
             val baseThemeContext = ContextThemeWrapper(context, theme)
             return MaterialColors.getColor(baseThemeContext, RAndroid.attr.colorControlHighlight, 0)
         }
+
+        fun getDotLottieTheme(context: Context): DotLottieTheme = when (this) {
+            PINK, BLUE -> DotLottieTheme.Embedded(context.getAttributeString(R.attr.dotLottieThemeId))
+            SYSTEM -> DotLottieTheme.Custom(context.getThemeColorMap())
+        }
+
+        private fun Context.getAttributeString(@AttrRes attribute: Int): String? {
+            return theme.obtainStyledAttributes(intArrayOf(attribute)).use {
+                it.getString(0)
+            }
+        }
+
+        private fun Context.getThemeColorMap(): Map<String, Color> = buildMap {
+            set("AccentPrimary", colorOf(R.color.onboardingDotLottieAccent))
+            set("Fond1", colorOf(R.color.onboardingDotLottieBackground))
+            set("Shape1", colorOf(R.color.onboardingDotLottieShape))
+            set("Stroke", colorOf(R.color.onboardingDotLottieStroke))
+        }
+
+        private fun Context.colorOf(@ColorRes res: Int): Color = Color(getColor(res))
 
         override fun toString() = name.lowercase()
     }
