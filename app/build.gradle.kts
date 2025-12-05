@@ -248,6 +248,7 @@ dependencies {
     androidTestImplementation(libs.espresso.web)
     androidTestImplementation(libs.hamcrest)
     androidTestImplementation(libs.junit.ktx)
+    androidTestImplementation(libs.ui.test.junit4)
     androidTestImplementation(libs.uiautomator)
 
     androidTestUtil(libs.orchestrator)
