@@ -370,7 +370,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
                     navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
                 },
-                unsubscribeClicked = threadViewModel::unsubscribeMessage,
+                onUnsubscribeClicked = threadViewModel::unsubscribeMessage,
                 moveMessageToSpam = { messageUid ->
                     twoPaneViewModel.currentThreadUid.value?.let { mainViewModel.moveToSpamFolder(it, messageUid) }
                 },
