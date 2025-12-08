@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
@@ -31,6 +32,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,6 +43,11 @@ class SwitchUserViewModel @Inject constructor(
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
+
+    val currentMailbox = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).mapNotNull { it.obj }.asLiveData()
 
     val accounts = SingleLiveEvent<List<User>>()
 

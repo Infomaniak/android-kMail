@@ -33,6 +33,7 @@ import com.infomaniak.mail.databinding.BottomSheetAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.easterEgg.EasterEgg
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter
 import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.utils.AccountUtils
@@ -46,7 +47,6 @@ import io.sentry.Sentry.captureMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -130,12 +130,8 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
     }
 
     private fun showEasterEggHalloween() {
-
-        val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        val isHalloween = (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
-        if (!isHalloween) return
+        val currentMailbox = switchUserViewModel.currentMailbox.value ?: return
+        if (EasterEgg.Halloween(currentMailbox.kSuite).shouldTrigger().not()) return
 
         val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return
         if (halloween.isAnimating) return
