@@ -237,6 +237,7 @@ class MainViewModel @Inject constructor(
         folderController
             .getMenuDrawerCustomFoldersAsync()
             .map { it.list }
+            .keepTopLevelFolders()
             .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
     }.catch {}
 
@@ -1754,4 +1755,8 @@ private val HIDDEN_ROLES_WHEN_EMPTY = setOf(FolderRole.SCHEDULED_DRAFTS, FolderR
 
 private fun Flow<List<Folder>>.removeRolesThatHideWhenEmpty(): Flow<List<Folder>> = map {
     it.filterNot { folder -> folder.role in HIDDEN_ROLES_WHEN_EMPTY && folder.threads.isEmpty() }
+}
+
+private fun Flow<List<Folder>>.keepTopLevelFolders(): Flow<List<Folder>> = map {
+    it.filter { folder -> folder.parent == null }
 }

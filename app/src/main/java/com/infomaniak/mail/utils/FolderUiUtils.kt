@@ -52,25 +52,20 @@ fun List<Folder>.toFolderUiTree(isInDefaultFolderSection: Boolean): List<FolderU
 
     // Step 2: Link children of FolderUi to existing instances + compute collapsibility + identify root folders
     val resultRoots = mutableListOf<FolderUi>()
-    var isCurrentParentCollapsed = false
     folderToFolderUi.forEach { (key, folderUi) ->
         val (folder, parentDepth) = key
 
         val validChildren = folder.children
-            .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
+            .filter { !it.shouldBeExcluded(excludeRoleFolder = true) }
             .mapNotNull { folderToFolderUi[it to parentDepth + 1] } // children are stored at the parent's depth +1
 
-        val shouldHide = if (folderUi.isRoot) {
-            isCurrentParentCollapsed = folder.isCollapsed
-            false
-        } else {
-            isCurrentParentCollapsed
+        for (child in validChildren) {
+            child.isHidden = folder.isCollapsed || folderUi.isHidden
         }
 
         folderUi.apply {
-            canBeCollapsed = folderUi.isRoot && validChildren.isNotEmpty()
+            canBeCollapsed = validChildren.isNotEmpty()
             children = validChildren
-            isHidden = shouldHide
         }
 
         if (folderUi.isRoot) resultRoots.add(folderUi)

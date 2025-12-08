@@ -50,11 +50,10 @@ class FolderController @Inject constructor(
     }
 
     fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
-        val rootsQuery = " AND $isRootFolder"
         val typeQuery = " AND ${Folder.rolePropertyName} == nil"
         val visibilityQuery = " AND $isVisible"
         return mailboxContentRealm()
-            .query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}")
+            .query<Folder>("${isNotSearch}${typeQuery}${visibilityQuery}")
             .sortFolders()
             .asFlow()
     }
