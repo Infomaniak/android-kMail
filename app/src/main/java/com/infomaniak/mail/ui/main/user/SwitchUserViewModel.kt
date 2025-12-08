@@ -31,6 +31,9 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,6 +44,11 @@ class SwitchUserViewModel @Inject constructor(
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
+
+    val currentMailbox = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).mapNotNull { it.obj }.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     val accounts = SingleLiveEvent<List<User>>()
 
@@ -54,7 +62,8 @@ class SwitchUserViewModel @Inject constructor(
             RealmDatabase.backupPreviousRealms()
             myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user
-            AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: -5 // AppSettings.DEFAULT_ID
+            AccountUtils.currentMailboxId =
+                mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: -5 // AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()
         }
     }

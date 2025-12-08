@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.utils.year
@@ -33,6 +34,7 @@ import com.infomaniak.mail.databinding.BottomSheetAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter
 import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.utils.AccountUtils
@@ -45,8 +47,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry.captureMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -129,16 +131,12 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         getAccountsInDB()
     }
 
-    private fun showEasterEggHalloween() {
+    private fun showEasterEggHalloween() = lifecycleScope.launch {
+        val currentMailbox = switchUserViewModel.currentMailbox.first()
+        if (EventsEasterEgg.Halloween(currentMailbox.kSuite).shouldTrigger().not()) return@launch
 
-        val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        val isHalloween = (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
-        if (!isHalloween) return
-
-        val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return
-        if (halloween.isAnimating) return
+        val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return@launch
+        if (halloween.isAnimating) return@launch
 
         halloween.playAnimation()
         captureMessage("Easter egg Halloween has been triggered! Woohoo!")

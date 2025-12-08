@@ -69,6 +69,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.FirebaseNotificationReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
@@ -98,7 +99,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -578,19 +578,15 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showEasterXMas() {
+        val currentMailbox = mainViewModel.currentMailbox.value ?: return
+        if (EventsEasterEgg.Christmas(currentMailbox.kSuite).shouldTrigger().not()) return
 
-        val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        if (month == Calendar.DECEMBER && day <= 25) {
-            binding.easterEggXMas.apply {
-                isVisible = true
-                playAnimation()
-            }
-            Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
-            trackEasterEggEvent("${MatomoName.Xmas.value}${Date().year()}")
+        binding.easterEggXMas.apply {
+            isVisible = true
+            playAnimation()
         }
+        Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
+        trackEasterEggEvent("${MatomoName.Xmas.value}${Date().year()}")
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
