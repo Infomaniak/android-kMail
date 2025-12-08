@@ -1758,5 +1758,5 @@ private fun Flow<List<Folder>>.removeRolesThatHideWhenEmpty(): Flow<List<Folder>
 }
 
 private fun Flow<List<Folder>>.keepTopLevelFolders(): Flow<List<Folder>> = map {
-    it.filter { folder -> folder.parent == null && folder.role == null }
+    it.filter { folder -> folder.parent == null }
 }
