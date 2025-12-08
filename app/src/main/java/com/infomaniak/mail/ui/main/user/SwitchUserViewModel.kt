@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
@@ -32,7 +31,9 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,7 +48,7 @@ class SwitchUserViewModel @Inject constructor(
     val currentMailbox = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
-    ).mapNotNull { it.obj }.asLiveData()
+    ).mapNotNull { it.obj }.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     val accounts = SingleLiveEvent<List<User>>()
 
@@ -61,7 +62,8 @@ class SwitchUserViewModel @Inject constructor(
             RealmDatabase.backupPreviousRealms()
             myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user
-            AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: -5 // AppSettings.DEFAULT_ID
+            AccountUtils.currentMailboxId =
+                mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: -5 // AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()
         }
     }

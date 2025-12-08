@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.easterEgg
 
+import androidx.annotation.CallSuper
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.utils.AccountUtils
 import java.util.Calendar
@@ -26,8 +27,9 @@ sealed interface EventsEasterEgg {
 
     val pack: KSuite?
     val isCorrectPeriod: Boolean
-    val isStaff: Boolean get() = AccountUtils.currentUser?.isStaff ?: false
+    private val isStaff: Boolean get() = AccountUtils.currentUser?.isStaff ?: false
 
+    @CallSuper
     fun shouldTrigger(): Boolean {
         val isAllowed = pack !is KSuite.Pro || isStaff // We only display for individual users not the business ones
         return isCorrectPeriod && isAllowed

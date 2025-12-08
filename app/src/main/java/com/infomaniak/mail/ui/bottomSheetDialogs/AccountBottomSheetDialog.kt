@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.utils.year
@@ -46,6 +47,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry.captureMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -129,12 +131,12 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         getAccountsInDB()
     }
 
-    private fun showEasterEggHalloween() {
-        val currentMailbox = switchUserViewModel.currentMailbox.value ?: return
-        if (EventsEasterEgg.Halloween(currentMailbox.kSuite).shouldTrigger().not()) return
+    private fun showEasterEggHalloween() = lifecycleScope.launch {
+        val currentMailbox = switchUserViewModel.currentMailbox.first()
+        if (EventsEasterEgg.Halloween(currentMailbox.kSuite).shouldTrigger().not()) return@launch
 
-        val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return
-        if (halloween.isAnimating) return
+        val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return@launch
+        if (halloween.isAnimating) return@launch
 
         halloween.playAnimation()
         captureMessage("Easter egg Halloween has been triggered! Woohoo!")
