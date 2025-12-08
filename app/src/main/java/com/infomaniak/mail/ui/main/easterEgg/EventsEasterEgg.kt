@@ -22,7 +22,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import java.util.Calendar
 import kotlin.random.Random
 
-sealed interface EasterEgg {
+sealed interface EventsEasterEgg {
 
     val pack: KSuite?
     val isCorrectPeriod: Boolean
@@ -33,7 +33,7 @@ sealed interface EasterEgg {
         return isCorrectPeriod && isAllowed
     }
 
-    data class Christmas(override val pack: KSuite?) : EasterEgg {
+    data class Christmas(override val pack: KSuite?) : EventsEasterEgg {
 
         private val calendar by lazy { Calendar.getInstance() }
 
@@ -51,7 +51,7 @@ sealed interface EasterEgg {
         }
     }
 
-    data class Halloween(override val pack: KSuite?) : EasterEgg {
+    data class Halloween(override val pack: KSuite?) : EventsEasterEgg {
 
         private val calendar by lazy { Calendar.getInstance() }
 

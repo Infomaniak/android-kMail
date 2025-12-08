@@ -33,7 +33,7 @@ import com.infomaniak.mail.databinding.BottomSheetAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.easterEgg.EasterEgg
+import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter
 import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.utils.AccountUtils
@@ -131,7 +131,7 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private fun showEasterEggHalloween() {
         val currentMailbox = switchUserViewModel.currentMailbox.value ?: return
-        if (EasterEgg.Halloween(currentMailbox.kSuite).shouldTrigger().not()) return
+        if (EventsEasterEgg.Halloween(currentMailbox.kSuite).shouldTrigger().not()) return
 
         val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return
         if (halloween.isAnimating) return

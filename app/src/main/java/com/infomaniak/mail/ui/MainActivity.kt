@@ -69,7 +69,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.FirebaseNotificationReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.easterEgg.EasterEgg
+import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
@@ -579,7 +579,7 @@ class MainActivity : BaseActivity() {
 
     private fun showEasterXMas() {
         val currentMailbox = mainViewModel.currentMailbox.value ?: return
-        if (EasterEgg.Christmas(currentMailbox.kSuite).shouldTrigger().not()) return
+        if (EventsEasterEgg.Christmas(currentMailbox.kSuite).shouldTrigger().not()) return
 
         binding.easterEggXMas.apply {
             isVisible = true
