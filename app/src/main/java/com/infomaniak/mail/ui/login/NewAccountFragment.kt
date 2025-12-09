@@ -21,14 +21,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.auth.utils.AccountCreationResult
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.CREATE_ACCOUNT_CANCEL_HOST
 import com.infomaniak.mail.CREATE_ACCOUNT_SUCCESS_HOST
 import com.infomaniak.mail.CREATE_ACCOUNT_URL
@@ -43,6 +41,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.core.auth.utils.LoginUtils as CoreLoginUtils
 
 @AndroidEntryPoint
 class NewAccountFragment : Fragment() {
@@ -66,7 +65,12 @@ class NewAccountFragment : Fragment() {
     lateinit var loginUtils: LoginUtils
 
     private val createAccountResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        result.handleCreateAccountActivityResult()
+        val result = CoreLoginUtils.getAccountCreationResult(result, loginActivity.infomaniakLogin, webViewLoginResultLauncher)
+        when (result) {
+            AccountCreationResult.Canceled, AccountCreationResult.Success -> Unit
+            is AccountCreationResult.Failure -> showError(result.errorMessage)
+        }
+        onFailedLogin()
     }
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -105,20 +109,6 @@ class NewAccountFragment : Fragment() {
 
     private fun selectIllustrationAccordingToTheme() {
         binding.illustration.theme = localSettings.accentColor.getDotLottieTheme(requireContext())
-    }
-
-    private fun ActivityResult.handleCreateAccountActivityResult() {
-        if (resultCode == AppCompatActivity.RESULT_OK) {
-            val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
-            when {
-                translatedError.isNullOrBlank() -> loginActivity.infomaniakLogin.startWebViewLogin(
-                    resultLauncher = webViewLoginResultLauncher,
-                    removeCookies = false,
-                )
-                else -> showError(translatedError)
-            }
-        }
-        onFailedLogin()
     }
 
     private fun showError(error: String) {
