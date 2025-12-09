@@ -65,4 +65,17 @@ sealed interface EventsEasterEgg {
                 return (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
             }
     }
+
+    data class NewYear(override val pack: KSuite?) : EventsEasterEgg {
+
+        private val calendar by lazy { Calendar.getInstance() }
+
+        override val isCorrectPeriod: Boolean
+            get() {
+                val month = calendar.get(Calendar.MONTH)
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+                return (month == Calendar.DECEMBER && day >= 31) || (month == Calendar.JANUARY && day <= 1)
+            }
+    }
 }

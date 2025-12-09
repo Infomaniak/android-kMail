@@ -606,6 +606,7 @@ class MainActivity : BaseActivity() {
     fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
 
     fun getHalloweenLayout(): LottieAnimationView = binding.easterEggHalloween
+    fun getNewYearLayout(): LottieAnimationView = binding.easterEggNewYear
 
     private fun handleShortcuts() {
         navigationArgs?.shortcutId?.let { shortcutId ->

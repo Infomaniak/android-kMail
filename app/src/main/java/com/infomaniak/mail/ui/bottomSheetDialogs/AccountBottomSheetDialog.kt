@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
@@ -112,6 +113,7 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         bindAlertToViewLifecycle(descriptionDialog)
 
         showEasterEggHalloween()
+        showEasterEggNewYear()
     }
 
     private fun logoutCurrentUser() = appScope.launch(ioDispatcher) {
@@ -140,6 +142,24 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
         halloween.playAnimation()
         captureMessage("Easter egg Halloween has been triggered! Woohoo!")
+        trackEasterEggEvent("${MatomoName.Halloween.value}${Date().year()}")
+    }
+
+    private fun showEasterEggNewYear() = lifecycleScope.launch {
+        switchUserViewModel.currentMailbox.first()
+        // if (EventsEasterEgg.NewYear(currentMailbox.kSuite).shouldTrigger().not()) return@launch
+
+        val newYear = (activity as? MainActivity)?.getNewYearLayout() ?: return@launch
+        if (newYear.isAnimating) return@launch
+
+        val animationRes = if (Random.nextFloat() < 0.5f) {
+            R.raw.easter_egg_new_year_confetti
+        } else {
+            R.raw.easter_egg_new_year_fireworks
+        }
+        newYear.setAnimation(animationRes)
+        newYear.playAnimation()
+        captureMessage("Easter egg New Year has been triggered! Woohoo!")
         trackEasterEggEvent("${MatomoName.Halloween.value}${Date().year()}")
     }
 }
