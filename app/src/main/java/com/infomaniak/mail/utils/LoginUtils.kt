@@ -78,19 +78,27 @@ class LoginUtils @Inject constructor(
             userExistenceChecker = AccountUtils,
         )
 
-        when (userResult) {
+        handleUserLoginResult(userResult, infomaniakLogin, resetLoginButtons)
+    }
+
+    suspend fun handleUserLoginResult(
+        userLoginResult: UserLoginResult?,
+        infomaniakLogin: InfomaniakLogin,
+        resetLoginButtons: () -> Unit,
+    ) {
+        when (userLoginResult) {
             is UserLoginResult.Success -> {
-                val loginOutcome = fetchMailboxes(listOf(userResult.user)).single()
+                val loginOutcome = fetchMailboxes(listOf(userLoginResult.user)).single()
                 loginOutcome.handleErrors(infomaniakLogin)
                 loginOutcome.handleNavigation()
 
                 if (loginOutcome is LoginOutcome.Failure) resetLoginButtons()
             }
-            is UserLoginResult.Failure -> showError(userResult.errorMessage)
+            is UserLoginResult.Failure -> showError(userLoginResult.errorMessage)
             null -> Unit // User closed the webview without going through
         }
 
-        if (userResult !is UserLoginResult.Success) resetLoginButtons()
+        if (userLoginResult !is UserLoginResult.Success) resetLoginButtons()
     }
 
     suspend fun fetchMailboxes(users: List<User>): List<LoginOutcome> = users.map { user ->

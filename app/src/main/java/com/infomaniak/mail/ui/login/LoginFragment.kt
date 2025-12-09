@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.VisibleForTesting
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +36,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.auth.models.UserLoginResult
+import com.infomaniak.core.auth.utils.LoginFlowController
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel.Companion.filterSelectedAccounts
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
@@ -94,12 +94,6 @@ class LoginFragment : Fragment() {
     @Inject
     lateinit var loginUtils: LoginUtils
 
-    private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        lifecycleScope.launch {
-            loginUtils.handleWebViewLoginResult(result, loginActivity.infomaniakLogin, ::resetLoginButtons)
-        }
-    }
-
     private lateinit var connectButtonText: String
 
     private var isLoginButtonLoading by mutableStateOf(false)
@@ -125,6 +119,19 @@ class LoginFragment : Fragment() {
                 localSettings.accentColor = accentColor
             }
 
+            val loginFlowController = CoreLoginUtils.rememberLoginFlowController(
+                loginActivity.infomaniakLogin,
+                AccountUtils,
+            ) { userLoginResult ->
+                scope.launch {
+                    loginUtils.handleUserLoginResult(
+                        userLoginResult = userLoginResult,
+                        infomaniakLogin = loginActivity.infomaniakLogin,
+                        resetLoginButtons = { resetLoginButtons() }
+                    )
+                }
+            }
+
             MailTheme {
                 // The color can't be overridden at the theme level because it's used elsewhere inside the app like the threadlist
                 Surface(color = colorResource(R.color.backgroundColor)) {
@@ -133,10 +140,10 @@ class LoginFragment : Fragment() {
                         skippedIds = { skippedIds },
                         isLoginButtonLoading = { isLoginButtonLoading },
                         isSignUpButtonLoading = { isSignUpButtonLoading },
-                        onLogin = { openLoginWebView() },
+                        onLogin = { openLoginWebView(loginFlowController) },
                         onContinueWithSelectedAccounts = { scope.launch { connectSelectedAccounts(it, skippedIds) } },
                         onCreateAccount = { openAccountCreation() },
-                        onUseAnotherAccountClicked = { openLoginWebView() },
+                        onUseAnotherAccountClicked = { openLoginWebView(loginFlowController) },
                         onSaveSkippedAccounts = { crossAppLoginViewModel.skippedAccountIds.value = it },
                         accentColor = { accentColor },
                         onSelectAccentColor = {
@@ -197,10 +204,10 @@ class LoginFragment : Fragment() {
     }
 
     @VisibleForTesting
-    fun openLoginWebView() {
+    fun openLoginWebView(loginFlowController: LoginFlowController) {
         startLoadingLoginButtons()
         trackAccountEvent(MatomoName.OpenLoginWebview)
-        loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
+        loginFlowController.login()
     }
 
     private fun openAccountCreation() {

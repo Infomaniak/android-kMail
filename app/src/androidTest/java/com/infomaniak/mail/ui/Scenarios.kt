@@ -61,7 +61,7 @@ object Scenarios {
     fun FragmentActivity.startLoginWebviewActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.loginHostFragment) as NavHostFragment
         val loginFragment = navHostFragment.childFragmentManager.fragments.first() as LoginFragment
-        loginFragment.openLoginWebView()
+        loginFragment.openLoginWebView(loginFlowController)
     }
 
     fun waitFor(delay: Duration): ViewAction = object : ViewAction {
