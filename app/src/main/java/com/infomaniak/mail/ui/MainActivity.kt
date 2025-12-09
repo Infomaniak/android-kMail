@@ -579,16 +579,17 @@ class MainActivity : BaseActivity() {
         val currentKSuite = mainViewModel.currentMailbox.value?.kSuite
 
         EventsEasterEgg.Christmas(currentKSuite).show {
-            binding.easterEggXMas.apply {
+            binding.easterEggs.apply {
                 if (isAnimating) return@show
 
                 isVisible = true
+                setAnimation(R.raw.easter_egg_xmas)
                 playAnimation()
             }
         }
 
         EventsEasterEgg.NewYear(currentKSuite).show {
-            binding.easterEggNewYear.apply {
+            binding.easterEggs.apply {
                 if (isAnimating) return@show
 
                 val randomNumber = Random.nextFloat()

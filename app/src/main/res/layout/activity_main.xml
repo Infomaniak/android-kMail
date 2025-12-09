@@ -66,7 +66,7 @@
             app:layout_constraintGuide_percent="0.9" />
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/easterEggXMas"
+            android:id="@+id/easterEggs"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:importantForAccessibility="no"
@@ -74,7 +74,7 @@
             app:layout_constraintBottom_toTopOf="@id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:lottie_rawRes="@raw/easter_egg_xmas" />
+            tools:lottie_rawRes="@raw/easter_egg_xmas" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/easterEggHalloween"
@@ -86,17 +86,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="false"
             app:lottie_rawRes="@raw/easter_egg_halloween" />
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/easterEggNewYear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:importantForAccessibility="no"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:lottie_autoPlay="false"
-            tools:lottie_rawRes="@raw/easter_egg_new_year_fireworks" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
