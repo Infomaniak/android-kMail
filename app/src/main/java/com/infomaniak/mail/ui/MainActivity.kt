@@ -33,13 +33,17 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.inappreview.BaseInAppReviewManager
 import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
+import com.infomaniak.core.inappreview.view.ReviewAlertDialog.Companion.showAppReviewDialog
+import com.infomaniak.core.inappreview.view.ReviewAlertDialogData
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager.Companion.APP_UPDATE_TAG
 import com.infomaniak.core.inappupdate.updaterequired.ui.UpdateRequiredActivity.Companion.startUpdateRequiredActivity
@@ -56,6 +60,7 @@ import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -207,19 +212,8 @@ class MainActivity : BaseActivity() {
         handleMenuDrawerEdgeToEdge()
         registerMainPermissions()
 
-        lifecycleScope.launch {
-            inAppUpdateManager.isUpdateRequired.collect { isUpdateRequired ->
-                initAppUpdateManager(isUpdateRequired)
-                if (isUpdateRequired) {
-                    startUpdateRequiredActivity(
-                        this@MainActivity,
-                        BuildConfig.APPLICATION_ID,
-                        BuildConfig.VERSION_CODE,
-                        localSettings.accentColor.theme
-                    )
-                }
-            }
-        }
+        initAppUpdateManager()
+        initAppReviewManager()
 
         observeDeletedMessages()
         observeActivityDialogLoaderReset()
@@ -239,9 +233,6 @@ class MainActivity : BaseActivity() {
 
         handleShortcuts()
 
-        //initAppUpdateManager()
-        //TODO: initAppReviewManager
-        //initAppReviewManager()
         syncDiscoveryManager.init(::showSyncDiscovery)
 
         observeNotificationToRefresh()
@@ -269,15 +260,6 @@ class MainActivity : BaseActivity() {
         binding.drawerLayout.isFocusable = false // Set here because not working in XML
         setupMenuDrawerCallbacks()
     }
-
-    // TODO: Init inAppReviewManager
-    // private fun initAppReviewManager() {
-    //     inAppReviewManager.init(
-    //         onDialogShown = { trackInAppReviewEvent(MatomoName.PresentAlert) },
-    //         onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
-    //         onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
-    //     )
-    // }
 
     private fun observeDeletedMessages() = with(mainViewModel) {
         deletedMessages.observe(owner = this@MainActivity) {
@@ -554,7 +536,22 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun initAppUpdateManager(isUpdateRequired: Boolean) {
+    private fun initAppUpdateManager() {
+        lifecycleScope.launch {
+            inAppUpdateManager.isUpdateRequired
+                .flowWithLifecycle(lifecycle, State.STARTED)
+                .collect { isUpdateRequired ->
+                    if (isUpdateRequired) {
+                        startUpdateRequiredActivity(
+                            this@MainActivity,
+                            BuildConfig.APPLICATION_ID,
+                            BuildConfig.VERSION_CODE,
+                            localSettings.accentColor.theme
+                        )
+                    }
+                }
+        }
+
         inAppUpdateManager.init(
             onUserChoice = { isWantingUpdate ->
                 trackInAppUpdateEvent(if (isWantingUpdate) MatomoName.DiscoverNow else MatomoName.DiscoverLater)
@@ -570,7 +567,42 @@ class MainActivity : BaseActivity() {
             onFDroidResult = { updateIsAvailable ->
                 if (updateIsAvailable) binding.updateAvailableBottomSheet.showBottomSheet()
             },
-            isUpdateRequired = isUpdateRequired
+        )
+    }
+
+    private fun initAppReviewManager() {
+        lifecycleScope.launch {
+            inAppReviewManager.shouldDisplayReviewDialog
+                .flowWithLifecycle(lifecycle, State.STARTED)
+                .collect { shouldDisplayReviewDialog ->
+                    if (shouldDisplayReviewDialog) {
+                        trackInAppReviewEvent(MatomoName.PresentAlert)
+                        inAppReviewManager.onUserWantsToDismiss()
+                        showAppReviewDialog(
+                            activity = this@MainActivity,
+                            reviewDialogTheme = R.style.DialogStyle,
+                            reviewDialogTitleStyle = R.style.DialogReviewStyleTextAppearance,
+                            reviewAlertDialogData = ReviewAlertDialogData(
+                                title = getString(R.string.reviewAlertTitle),
+                                positiveText = getString(RCore.string.buttonYes),
+                                negativeText = getString(RCore.string.buttonNo),
+                                onPositiveButtonClicked = inAppReviewManager::onUserWantsToReview,
+                                onNegativeButtonClicked = {
+                                    inAppReviewManager.onUserWantsToGiveFeedback(getString(R.string.urlUserReportAndroid))
+                                },
+                                onDismiss = inAppReviewManager::onUserWantsToDismiss
+                            )
+                        )
+                    }
+                }
+        }
+
+        inAppReviewManager.init(
+            countdownBehavior = BaseInAppReviewManager.Behavior.LifecycleBased,
+            appReviewThreshold = DEFAULT_APP_REVIEW_LAUNCHES,
+            maxAppReviewThreshold = MAX_APP_REVIEW_LAUNCHES,
+            onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
+            onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
         )
     }
 
@@ -651,5 +683,8 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
+
+        private const val DEFAULT_APP_REVIEW_LAUNCHES = 50
+        private const val MAX_APP_REVIEW_LAUNCHES = 500
     }
 }
