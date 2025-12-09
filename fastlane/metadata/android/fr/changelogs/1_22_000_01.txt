@@ -1,0 +1,6 @@
+- Ajout de la réduction des sous-dossiers
+- Amélioration du chargement des mises à jour des e-mails pour les boîtes de réception volumineuses
+- Remplacement des illustrations statiques de l'onboarding par des animations
+- Déplacement du chevron des dossiers vers la droite et réduction des marges
+- Correction de la disparition de la quatrième animation du onboarding lors d'un balayage trop rapide
+- Masquage des easter eggs pour les utilisateurs professionnels

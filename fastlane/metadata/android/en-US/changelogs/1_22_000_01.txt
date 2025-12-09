@@ -1,0 +1,6 @@
+- Add collapse children folders feature
+- Improve email update loading for heavy mailboxes
+- Replace onboarding static illustrations with animations
+- Move folder's chevron to the right and adapt margins
+- Fix fourth onboarding animation sometime disappearing when swiping too quickly
+- Hide easter eggs for business users
