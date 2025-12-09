@@ -103,6 +103,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.random.Random
 import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
@@ -131,7 +132,10 @@ class MainActivity : BaseActivity() {
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
 
-        if (draftAction == DraftAction.SEND) showEasterXMas()
+        if (draftAction == DraftAction.SEND) {
+            showEasterXMas()
+            showEasterEggNewYear()
+        }
         if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE) showSendingSnackbarTimer.start()
     }
 
@@ -585,8 +589,31 @@ class MainActivity : BaseActivity() {
             isVisible = true
             playAnimation()
         }
+
         Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
         trackEasterEggEvent("${MatomoName.Xmas.value}${Date().year()}")
+    }
+
+    private fun showEasterEggNewYear() {
+        val currentMailbox = mainViewModel.currentMailbox.value ?: return
+        if (EventsEasterEgg.NewYear(currentMailbox.kSuite).shouldTrigger().not()) return
+
+        binding.easterEggNewYear.apply {
+            val randomNumber = Random.nextFloat()
+            val animationRes = when {
+                randomNumber < 0.33f -> R.raw.easter_egg_new_year_confetti
+                randomNumber < 0.67f -> R.raw.easter_egg_new_year_fireworks
+                else -> {
+                    speed = 1.50f
+                    R.raw.easter_egg_new_year_fireworks_2
+                }
+            }
+            setAnimation(animationRes)
+            playAnimation()
+        }
+
+        Sentry.captureMessage("Easter egg New Year has been triggered! Woohoo!")
+        trackEasterEggEvent("${MatomoName.Halloween.value}${Date().year()}")
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
@@ -606,7 +633,6 @@ class MainActivity : BaseActivity() {
     fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
 
     fun getHalloweenLayout(): LottieAnimationView = binding.easterEggHalloween
-    fun getNewYearLayout(): LottieAnimationView = binding.easterEggNewYear
 
     private fun handleShortcuts() {
         navigationArgs?.shortcutId?.let { shortcutId ->
