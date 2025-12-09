@@ -596,11 +596,9 @@ class MainViewModel @Inject constructor(
 
     private fun List<FolderUi>.updateCollapsedState(realm: MutableRealm) {
         forEachNestedItem { folderUi, _ ->
-            if (folderUi.isRoot) {
-                // If we detect that a folder doesn't have any children anymore, if it was collapsed, automatically expand it
-                val collapseStateNeedsReset = folderUi.children.isEmpty()
-                if (collapseStateNeedsReset) FolderController.expand(folderUi.folder.id, realm)
-            }
+            // If we detect that a folder doesn't have any children anymore, if it was collapsed, automatically expand it
+            val collapseStateNeedsReset = folderUi.children.isEmpty()
+            if (collapseStateNeedsReset) FolderController.expand(folderUi.folder.id, realm)
         }
     }
 
