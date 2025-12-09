@@ -42,11 +42,24 @@ sealed interface EventsEasterEgg {
     }
 
     fun show(displayUi: () -> Unit) {
-        if (shouldTrigger().not()) return
-
+        if (!shouldTrigger()) return
         displayUi()
-        Sentry.captureMessage("Easter egg $matomoName has been triggered! Woohoo!")
+        Sentry.captureMessage("Easter egg ${matomoName.value} has been triggered! Woohoo!")
         trackEasterEggEvent("${matomoName.value}${Date().year()}")
+    }
+
+    data class Halloween(override val pack: KSuite?) : EventsEasterEgg {
+
+        private val calendar by lazy { Calendar.getInstance() }
+
+        override val matomoName = MatomoMail.MatomoName.Halloween
+        override val isCorrectPeriod: Boolean
+            get() {
+                val month = calendar.get(Calendar.MONTH)
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+                return (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
+            }
     }
 
     data class Christmas(override val pack: KSuite?) : EventsEasterEgg {
@@ -68,20 +81,6 @@ sealed interface EventsEasterEgg {
         }
     }
 
-    data class Halloween(override val pack: KSuite?) : EventsEasterEgg {
-
-        private val calendar by lazy { Calendar.getInstance() }
-
-        override val matomoName = MatomoMail.MatomoName.Halloween
-        override val isCorrectPeriod: Boolean
-            get() {
-                val month = calendar.get(Calendar.MONTH)
-                val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-                return (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
-            }
-    }
-
     data class NewYear(override val pack: KSuite?) : EventsEasterEgg {
 
         private val calendar by lazy { Calendar.getInstance() }
@@ -94,16 +93,5 @@ sealed interface EventsEasterEgg {
 
                 return (month == Calendar.DECEMBER && day >= 31) || (month == Calendar.JANUARY && day <= 1)
             }
-    }
-
-    companion object {
-
-        fun showEasterEgg(easterEgg: EventsEasterEgg, displayUi: () -> Unit) {
-            if (easterEgg.shouldTrigger().not()) return
-
-            displayUi()
-            Sentry.captureMessage("Easter egg ${easterEgg.matomoName} has been triggered! Woohoo!")
-            trackEasterEggEvent("${easterEgg.matomoName.value}${Date().year()}")
-        }
     }
 }
