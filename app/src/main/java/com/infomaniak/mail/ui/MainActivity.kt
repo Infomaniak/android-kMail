@@ -578,18 +578,18 @@ class MainActivity : BaseActivity() {
     private fun showEasterEggs() {
         val currentKSuite = mainViewModel.currentMailbox.value?.kSuite
 
-        EventsEasterEgg.showEasterEgg(EventsEasterEgg.Christmas(currentKSuite)) {
+        EventsEasterEgg.Christmas(currentKSuite).show {
             binding.easterEggXMas.apply {
-                if (isAnimating) return@showEasterEgg
+                if (isAnimating) return@show
 
                 isVisible = true
                 playAnimation()
             }
         }
 
-        EventsEasterEgg.showEasterEgg(EventsEasterEgg.NewYear(currentKSuite)) {
+        EventsEasterEgg.NewYear(currentKSuite).show {
             binding.easterEggNewYear.apply {
-                if (isAnimating) return@showEasterEgg
+                if (isAnimating) return@show
 
                 val randomNumber = Random.nextFloat()
                 val animationRes = when {
