@@ -578,7 +578,7 @@ class MainViewModel @Inject constructor(
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
             if (!mailboxContentRealm().isClosed()) {
                 folderController.update(mailbox, folders, mailboxContentRealm())
-                expandRootFoldersWithoutChildren()
+                expandFoldersWithoutChildren()
             }
         }
     }
@@ -586,7 +586,7 @@ class MainViewModel @Inject constructor(
     /**
      *  Recomputes the [Folder.isCollapsed] state so a parent which has no more children is correctly expanded.
      */
-    private suspend fun expandRootFoldersWithoutChildren() {
+    private suspend fun expandFoldersWithoutChildren() {
         val folders = displayedFoldersFlow.first()
         mailboxContentRealm().write {
             folders.custom.updateCollapsedState(realm = this)
@@ -597,7 +597,7 @@ class MainViewModel @Inject constructor(
     private fun List<FolderUi>.updateCollapsedState(realm: MutableRealm) {
         forEachNestedItem { folderUi, _ ->
             // If we detect that a folder doesn't have any children anymore, if it was collapsed, automatically expand it
-            val collapseStateNeedsReset = folderUi.children.isEmpty()
+            val collapseStateNeedsReset = folderUi.children.isEmpty() && folderUi.folder.isCollapsed
             if (collapseStateNeedsReset) FolderController.expand(folderUi.folder.id, realm)
         }
     }
