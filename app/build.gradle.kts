@@ -10,7 +10,7 @@ plugins {
     alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.serialization)
     alias(core.plugins.ksp)
-    alias(libs.plugins.navigation.safeargs)
+    alias(core.plugins.navigation.safeargs)
     alias(libs.plugins.realm.kotlin)
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.parcelize)

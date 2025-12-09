@@ -60,5 +60,4 @@ ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", versi
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 google-services = { id = "com.google.gms.google-services" }
-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
 realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }
