@@ -41,6 +41,14 @@ sealed interface EventsEasterEgg {
         return isCorrectPeriod && isAllowed
     }
 
+    fun show(displayUi: () -> Unit) {
+        if (shouldTrigger().not()) return
+
+        displayUi()
+        Sentry.captureMessage("Easter egg $matomoName has been triggered! Woohoo!")
+        trackEasterEggEvent("${matomoName.value}${Date().year()}")
+    }
+
     data class Christmas(override val pack: KSuite?) : EventsEasterEgg {
 
         private val calendar by lazy { Calendar.getInstance() }

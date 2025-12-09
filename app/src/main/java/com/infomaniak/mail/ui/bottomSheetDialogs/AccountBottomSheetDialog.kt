@@ -129,9 +129,9 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private fun showEasterEggHalloween() = lifecycleScope.launch {
         val currentMailbox = switchUserViewModel.currentMailbox.first()
-        EventsEasterEgg.showEasterEgg(EventsEasterEgg.Halloween(currentMailbox.kSuite)) {
-            val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return@showEasterEgg
-            if (halloween.isAnimating) return@showEasterEgg
+        EventsEasterEgg.Halloween(currentMailbox.kSuite).show {
+            val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return@show
+            if (halloween.isAnimating) return@show
 
             halloween.playAnimation()
         }
