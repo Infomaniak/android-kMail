@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.login
 
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
@@ -26,36 +25,19 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
-import androidx.test.uiautomator.UiDevice
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.Scenarios
-import com.infomaniak.mail.ui.Scenarios.toggleAnimations
 import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.utils.Env
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class LoginActivityTest {
-
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<LaunchActivity>()
-
-    private lateinit var device: UiDevice
-
-    @Before
-    fun setUp() {
-        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.toggleAnimations(activate = false)
-    }
+class LoginActivityTest : BaseActivityTest(startingActivity = LaunchActivity::class, loginDirectly = false) {
 
     @Test
     fun login() {
@@ -70,11 +52,6 @@ class LoginActivityTest {
         onView(isRoot()).perform(waitFor(3.seconds))
 
         // Contacts synchronization is displayed so login worked
-        onView(withId(R.id.continueButton)).check(matches(isDisplayed()))
-    }
-
-    @After
-    fun cleanUp() {
-        device.toggleAnimations(activate = true)
+        onView(withId(R.id.newMessageFab)).check(matches(isDisplayed()))
     }
 }

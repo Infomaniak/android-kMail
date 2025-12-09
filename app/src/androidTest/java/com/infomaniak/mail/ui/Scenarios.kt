@@ -18,8 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.view.View
-import androidx.fragment.app.FragmentActivity
-import androidx.navigation.fragment.NavHostFragment
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
@@ -30,8 +28,6 @@ import androidx.test.espresso.web.webdriver.DriverAtoms.webClick
 import androidx.test.espresso.web.webdriver.DriverAtoms.webKeys
 import androidx.test.espresso.web.webdriver.Locator
 import androidx.test.uiautomator.UiDevice
-import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.login.LoginFragment
 import org.hamcrest.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -56,12 +52,6 @@ object Scenarios {
             .perform(webClick())
 
         onView(isRoot()).perform(waitFor(3.seconds))
-    }
-
-    fun FragmentActivity.startLoginWebviewActivity() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.loginHostFragment) as NavHostFragment
-        val loginFragment = navHostFragment.childFragmentManager.fragments.first() as LoginFragment
-        loginFragment.openLoginWebView()
     }
 
     fun waitFor(delay: Duration): ViewAction = object : ViewAction {
