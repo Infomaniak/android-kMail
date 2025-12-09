@@ -613,7 +613,7 @@ class MainActivity : BaseActivity() {
         }
 
         Sentry.captureMessage("Easter egg New Year has been triggered! Woohoo!")
-        trackEasterEggEvent("${MatomoName.Halloween.value}${Date().year()}")
+        trackEasterEggEvent("${MatomoName.NewYear.value}${Date().year()}")
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {

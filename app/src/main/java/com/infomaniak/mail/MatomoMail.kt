@@ -219,6 +219,7 @@ object MatomoMail : Matomo {
         NaturalThread("naturalThread"),
         NbMailboxes("nbMailboxes"),
         NbMessagesInThread("nbMessagesInThread"),
+        NewYear("newYear"),
         NextMonday("nextMonday"),
         NextMondayAfternoon("nextMondayAfternoon"),
         NextMondayMorning("nextMondayMorning"),
