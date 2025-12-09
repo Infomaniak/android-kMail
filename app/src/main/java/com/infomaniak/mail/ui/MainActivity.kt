@@ -51,12 +51,10 @@ import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
-import com.infomaniak.core.utils.year
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
-import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
@@ -94,7 +92,6 @@ import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -132,10 +129,7 @@ class MainActivity : BaseActivity() {
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
 
-        if (draftAction == DraftAction.SEND) {
-            showEasterXMas()
-            showEasterEggNewYear()
-        }
+        if (draftAction == DraftAction.SEND) showEasterEggs()
         if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE) showSendingSnackbarTimer.start()
     }
 
@@ -581,39 +575,35 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun showEasterXMas() {
-        val currentMailbox = mainViewModel.currentMailbox.value ?: return
-        if (EventsEasterEgg.Christmas(currentMailbox.kSuite).shouldTrigger().not()) return
+    private fun showEasterEggs() {
+        val currentKSuite = mainViewModel.currentMailbox.value?.kSuite
 
-        binding.easterEggXMas.apply {
-            isVisible = true
-            playAnimation()
-        }
+        EventsEasterEgg.showEasterEgg(EventsEasterEgg.Christmas(currentKSuite)) {
+            binding.easterEggXMas.apply {
+                if (isAnimating) return@showEasterEgg
 
-        Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
-        trackEasterEggEvent("${MatomoName.Xmas.value}${Date().year()}")
-    }
-
-    private fun showEasterEggNewYear() {
-        val currentMailbox = mainViewModel.currentMailbox.value ?: return
-        if (EventsEasterEgg.NewYear(currentMailbox.kSuite).shouldTrigger().not()) return
-
-        binding.easterEggNewYear.apply {
-            val randomNumber = Random.nextFloat()
-            val animationRes = when {
-                randomNumber < 0.33f -> R.raw.easter_egg_new_year_confetti
-                randomNumber < 0.67f -> R.raw.easter_egg_new_year_fireworks
-                else -> {
-                    speed = 1.50f
-                    R.raw.easter_egg_new_year_fireworks_2
-                }
+                isVisible = true
+                playAnimation()
             }
-            setAnimation(animationRes)
-            playAnimation()
         }
 
-        Sentry.captureMessage("Easter egg New Year has been triggered! Woohoo!")
-        trackEasterEggEvent("${MatomoName.NewYear.value}${Date().year()}")
+        EventsEasterEgg.showEasterEgg(EventsEasterEgg.NewYear(currentKSuite)) {
+            binding.easterEggNewYear.apply {
+                if (isAnimating) return@showEasterEgg
+
+                val randomNumber = Random.nextFloat()
+                val animationRes = when {
+                    randomNumber < 0.33f -> R.raw.easter_egg_new_year_confetti
+                    randomNumber < 0.67f -> R.raw.easter_egg_new_year_fireworks
+                    else -> {
+                        speed = 1.50f
+                        R.raw.easter_egg_new_year_fireworks_2
+                    }
+                }
+                setAnimation(animationRes)
+                playAnimation()
+            }
+        }
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
