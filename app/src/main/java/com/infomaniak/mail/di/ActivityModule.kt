@@ -37,14 +37,4 @@ object ActivityModule {
     @ActivityScoped
     @Provides
     fun provideInAppReviewManager(activity: FragmentActivity) = InAppReviewManager(activity = activity)
-
-    // TODO: Remove if work
-    // @ActivityScoped
-    // @Provides
-    // fun provideInAppReviewManager(activity: FragmentActivity) = InAppReviewManager(
-    //     activity = activity,
-    //     reviewDialogTheme = R.style.DialogStyle,
-    //     reviewDialogTitleResId = R.string.reviewAlertTitle,
-    //     feedbackUrlResId = R.string.urlUserReportAndroid,
-    // )
 }
