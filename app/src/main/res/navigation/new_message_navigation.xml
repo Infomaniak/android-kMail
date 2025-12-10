@@ -50,13 +50,13 @@
 
         <argument
             android:name="userId"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:argType="integer" />
 
         <argument
             android:name="mailboxId"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
 
     <fragment
@@ -155,4 +155,10 @@
             android:name="isAdmin"
             app:argType="boolean" />
     </dialog>
+
+    <dialog
+        android:id="@+id/mailPremiumBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.MailPremiumBottomSheetDialog"
+        android:label="KSuiteProBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_k_suite_pro" />
 </navigation>

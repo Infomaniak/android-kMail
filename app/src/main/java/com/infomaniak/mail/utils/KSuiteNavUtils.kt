@@ -84,12 +84,18 @@ fun Activity.openKSuiteProBottomSheet(navController: NavController, kSuite: KSui
 }
 
 fun Fragment.openMailPremiumBottomSheet(matomoTrackerName: String, substituteClassName: String? = null) {
-    if (isAtInitialDestination(substituteClassName)) {
-        requireActivity().openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
-    }
+    requireActivity().openMailPremiumBottomSheet(findNavController(), matomoTrackerName, substituteClassName)
 }
 
-fun Activity.openMailPremiumBottomSheet(navController: NavController, matomoTrackerName: String) {
+fun Activity.openMailPremiumBottomSheet(
+    navController: NavController,
+    matomoTrackerName: String,
+    substituteClassName: String? = null,
+) {
     trackMailPremiumBottomSheetEvent(matomoTrackerName)
-    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
+    safelyNavigate(
+        navController = navController,
+        resId = R.id.mailPremiumBottomSheetDialog,
+        substituteClassName = substituteClassName,
+    )
 }

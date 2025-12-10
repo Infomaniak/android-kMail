@@ -705,4 +705,10 @@
             app:argType="boolean" />
     </dialog>
 
+    <dialog
+        android:id="@+id/mailPremiumBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.MailPremiumBottomSheetDialog"
+        android:label="MailPremiumBottomSheetDialog"
+        tools:layout="@layout/mail" />
+
 </navigation>

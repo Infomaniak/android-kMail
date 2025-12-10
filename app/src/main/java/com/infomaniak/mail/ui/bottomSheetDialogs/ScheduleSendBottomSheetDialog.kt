@@ -61,7 +61,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
         when (kSuite) {
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
-            KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
+            KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName, substituteClassName = javaClass.name)
             else -> {
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
                 setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)
