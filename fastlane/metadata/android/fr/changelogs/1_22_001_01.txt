@@ -1,0 +1,2 @@
+- Correction d'un crash après le login sur les téléphone Android 11 ou plus ancien
+- Expansion automatique d'un dossier replié lorsque son dernier enfant est supprimé

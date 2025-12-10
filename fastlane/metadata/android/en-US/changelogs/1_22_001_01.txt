@@ -1,0 +1,2 @@
+- Fix crash after login for devices on Android 11 or older
+- Automatically expand collapsed folders when their last child is removed
