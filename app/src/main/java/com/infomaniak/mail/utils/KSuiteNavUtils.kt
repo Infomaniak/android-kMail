@@ -32,6 +32,7 @@ import com.infomaniak.core.ksuite.myksuite.ui.screens.MyKSuiteDashboardScreenDat
 import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils
 import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.MatomoMail.trackKSuiteProBottomSheetEvent
+import com.infomaniak.mail.MatomoMail.trackMailPremiumBottomSheetEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.bottomSheetDialogs.KSuiteProBottomSheetDialogArgs
@@ -80,4 +81,15 @@ fun Activity.openKSuiteProBottomSheet(navController: NavController, kSuite: KSui
         resId = R.id.kSuiteProBottomSheetDialog,
         args = KSuiteProBottomSheetDialogArgs(kSuite, isAdmin).toBundle(),
     )
+}
+
+fun Fragment.openMailPremiumBottomSheet(matomoTrackerName: String, substituteClassName: String? = null) {
+    if (isAtInitialDestination(substituteClassName)) {
+        requireActivity().openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
+    }
+}
+
+fun Activity.openMailPremiumBottomSheet(navController: NavController, matomoTrackerName: String) {
+    trackMailPremiumBottomSheetEvent(matomoTrackerName)
+    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
 }

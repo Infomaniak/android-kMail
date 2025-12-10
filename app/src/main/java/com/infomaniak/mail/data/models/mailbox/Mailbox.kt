@@ -72,6 +72,8 @@ class Mailbox : RealmObject {
     var isKSuitePro: Boolean = false // Means it's any [KSuite.Pro.*] tier
     @SerialName("is_ksuite_essential")
     var isKSuiteProFree: Boolean = false // Means it's a [KSuite.Pro.Free]
+    @SerialName("is_part_of_starter_pack")
+    var isPartOfStarterPack: Boolean = false // Means it's a legacy offer, bound to KSuite.Pro.Free's functionalities
     @SerialName("owner_or_admin")
     var isAdmin: Boolean = false
     @Serializable(with = ZeroAsNullLongSerializer::class)
@@ -122,6 +124,7 @@ class Mailbox : RealmObject {
             isKSuitePro && !isKSuiteProFree -> KSuite.Pro.Standard
             isKSuitePerso && isLimited -> KSuite.Perso.Free
             isKSuitePerso && !isLimited -> KSuite.Perso.Plus
+            isPartOfStarterPack -> KSuite.StarterPack
             else -> null // It's an older offer, but it checks out.
         }
 
