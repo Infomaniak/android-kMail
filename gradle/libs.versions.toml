@@ -17,7 +17,6 @@ junitKtx = "1.3.0"
 leakcanaryAndroid = "2.14"
 lifecycleProcess = "2.10.0"
 mockk = "1.14.6"
-navigation = "2.9.6"
 orchestrator = "1.6.1"
 playServices = "18.9.0"
 realmKotlin = "3.2.8-2"
@@ -39,7 +38,6 @@ hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
-navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
 realm-kotlin-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realmKotlin" }
