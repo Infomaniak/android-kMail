@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.Manifest
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
@@ -30,25 +29,16 @@ import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
-import androidx.test.uiautomator.UiDevice
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.Scenarios.grantPermissions
-import com.infomaniak.mail.ui.Scenarios.login
-import com.infomaniak.mail.ui.Scenarios.startLoginWebviewActivity
-import com.infomaniak.mail.ui.Scenarios.toggleAnimations
 import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.ui.Utils.onViewWithTimeout
 import com.infomaniak.mail.ui.login.LoginActivity
+import com.infomaniak.mail.ui.login.BaseActivityTest
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.Env
 import org.hamcrest.core.AllOf.allOf
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
@@ -57,33 +47,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class NewMessageActivityTest {
-
-    private lateinit var device: UiDevice
-    private val packageName: String = InstrumentationRegistry.getInstrumentation().targetContext.packageName
-
-    @get:Rule
-    var loginActivityScenarioRule = activityScenarioRule<LoginActivity>()
-
-    @Before
-    fun setUp() {
-        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.toggleAnimations(activate = false)
-
-        val permissions = listOf(
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.POST_NOTIFICATIONS,
-        )
-
-        grantPermissions(device, permissions, packageName)
-
-        loginActivityScenarioRule.scenario.onActivity { activity ->
-            activity.startLoginWebviewActivity()
-        }
-
-        login(Env.UI_TEST_ACCOUNT_EMAIL, Env.UI_TEST_ACCOUNT_PASSWORD)
-        loginActivityScenarioRule.scenario.close()
-    }
+class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity::class) {
 
     @Test
     fun sendEmail() {
@@ -121,11 +85,6 @@ class NewMessageActivityTest {
             matcher = withId(R.id.threadsList),
             assertion = matches(hasDescendant(withText(subject))),
         )
-    }
-
-    @After
-    fun cleanUp() {
-        device.toggleAnimations(activate = true)
     }
 
     private fun enterEmailToField(fieldResId: Int, suggestionListResId: Int) {
