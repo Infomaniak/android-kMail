@@ -126,7 +126,6 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -405,7 +404,11 @@ class NewMessageFragment : Fragment() {
 
     private fun initMailbox() {
         val userId = if (newMessageFragmentArgs.userId == -1) AccountUtils.currentUserId else newMessageFragmentArgs.userId
-        val mailboxId = if (newMessageFragmentArgs.mailboxId == -1) AccountUtils.currentMailboxId else newMessageFragmentArgs.mailboxId
+        val mailboxId = if (newMessageFragmentArgs.mailboxId == -1) {
+            AccountUtils.currentMailboxId
+        } else {
+            newMessageFragmentArgs.mailboxId
+        }
         newMessageViewModel.loadMailbox(userId, mailboxId)
     }
 

@@ -21,7 +21,6 @@ import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
@@ -30,7 +29,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.shape.MaterialShapeDrawable
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.safeNavigate
@@ -47,7 +45,6 @@ import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
@@ -185,10 +182,6 @@ class NewMessageAiManager @Inject constructor(
             addUpdateListener { animator ->
 
                 val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
-                val toolbarColor = (binding.toolbar.background as? ColorDrawable?)?.color
-                    ?: (binding.toolbar.background as? MaterialShapeDrawable?)?.fillColor?.defaultColor
-                    ?: context.getColor(R.color.backgroundColor)
-
                 scrim.alpha = alpha
             }
             start()
