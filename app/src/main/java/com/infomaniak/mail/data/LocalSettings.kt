@@ -28,6 +28,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.res.use
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.core.auth.AccessTokenUsageInterceptor.ApiCallRecord
 import com.infomaniak.core.dotlottie.model.DotLottieTheme
