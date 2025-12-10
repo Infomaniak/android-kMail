@@ -417,6 +417,16 @@
                 tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/unsubscribeAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/unsubscribeButtonTitle"
+                app:description="@string/messageComesFromDiscussionList"
+                app:icon="@drawable/ic_user_double_filled"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/encryptionAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

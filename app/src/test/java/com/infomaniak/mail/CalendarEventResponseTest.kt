@@ -170,4 +170,9 @@ class CalendarEventResponseTest {
     }
 }
 
-private fun Message.toMessageUi(): MessageUi = MessageUi(this, emptyMap(), false)
+private fun Message.toMessageUi(): MessageUi = MessageUi(
+    message = this,
+    emojiReactionsState = emptyMap(),
+    isReactionsFeatureAvailable = false,
+    unsubscribeState = null
+)

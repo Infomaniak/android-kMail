@@ -383,6 +383,7 @@
     <string name="manageSignatures">Manage my signatures</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
+    <string name="messageComesFromDiscussionList">This message comes from a discussion list.</string>
     <string name="messageDetailsDateAt">%1$s at %2$s</string>
     <string name="messageDetailsYesterday">Yesterday</string>
     <string name="messageForwardHeader">Forwarded message</string>
@@ -606,6 +607,8 @@
         <item quantity="one">Reminder canceled. Your message is back in your inbox</item>
         <item quantity="other">Reminders canceled. Your messages are back in your inbox</item>
     </plurals>
+    <string name="snackbarUnsubscribeFailure">Unsubscribe impossible</string>
+    <string name="snackbarUnsubscribeSuccess">Unsubscription completed</string>
     <string name="snoozeAlertTitle">Snoozed until: %s</string>
     <plurals name="snoozeArchiveConfirmAlertDescription">
         <item quantity="one">This conversation will no longer be snoozed and will be archived</item>
@@ -666,6 +669,7 @@
     <string name="trashFolder">Trash</string>
     <string name="unblockButton">Unblock</string>
     <string name="unknownRecipientTitle">(unknown)</string>
+    <string name="unsubscribeButtonTitle">Unsubscribe</string>
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>
