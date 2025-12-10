@@ -48,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.google.android.material.color.DynamicColors
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
@@ -86,11 +87,13 @@ fun AccentColorSelector(
             selectedTabIndex = selectedTabIndex,
             onClick = { onSelectAccentColor(AccentColor.BLUE) },
         )
-        AccentColorTab(
-            accentColor = AccentColor.SYSTEM,
-            selectedTabIndex = selectedTabIndex,
-            onClick = { onSelectAccentColor(AccentColor.SYSTEM) },
-        )
+        if (DynamicColors.isDynamicColorAvailable()) {
+            AccentColorTab(
+                accentColor = AccentColor.SYSTEM,
+                selectedTabIndex = selectedTabIndex,
+                onClick = { onSelectAccentColor(AccentColor.SYSTEM) },
+            )
+        }
     }
 }
 
