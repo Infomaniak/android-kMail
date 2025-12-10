@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
@@ -233,6 +234,7 @@ class NewMessageAiManager @Inject constructor(
         when (kSuite) {
             KSuite.Perso.Free -> fragment.openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> fragment.openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
+            KSuite.StarterPack -> fragment.openMailPremiumBottomSheet(matomoName)
             else -> aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
         }
     }

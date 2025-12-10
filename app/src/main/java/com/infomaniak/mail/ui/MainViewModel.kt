@@ -256,7 +256,12 @@ class MainViewModel @Inject constructor(
         when {
             quotas == null -> null
             quotas.isFull -> {
-                if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Full.Perso else StorageLevel.Full.Pro
+                when (currentMailbox.value?.kSuite) {
+                    is KSuite.Perso -> StorageLevel.Full.Perso
+                    KSuite.StarterPack -> StorageLevel.Full.StarterPack
+                    is KSuite.Pro -> StorageLevel.Full.Pro
+                    else -> StorageLevel.Full.Pro // Should not happened but Fallback
+                }
             }
             progress != null && progress > StorageLevel.WARNING_THRESHOLD -> {
                 if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 10 == 0) {

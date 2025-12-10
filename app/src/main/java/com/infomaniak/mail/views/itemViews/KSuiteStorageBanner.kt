@@ -98,6 +98,12 @@ class KSuiteStorageBanner @JvmOverloads constructor(
                 titleRes = R.string.kSuiteProQuotasAlertFullTitle,
                 descriptionRes = R.string.kSuiteProQuotasAlertFullDescription,
             )
+
+            data object StarterPack : StorageLevelData(
+                iconColorRes = R.color.redDestructiveAction,
+                titleRes = R.string.mailPremiumUpgradeTitle,
+                descriptionRes = R.string.mailPremiumUpgradeDescription
+            )
         }
 
         companion object {

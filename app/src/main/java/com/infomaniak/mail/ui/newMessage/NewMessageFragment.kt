@@ -118,6 +118,7 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -892,6 +893,7 @@ class NewMessageFragment : Fragment() {
             val onActionClicked: (() -> Unit)? = when (kSuite) {
                 KSuite.Perso.Free -> fun() = openMyKSuiteUpgradeBottomSheet(matomoName)
                 KSuite.Pro.Free -> fun() = openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
+                KSuite.StarterPack -> fun() = openMailPremiumBottomSheet(matomoName)
                 else -> null
             }
 
