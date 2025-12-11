@@ -12,8 +12,6 @@ flexbox = "3.0.0"
 fragmentTesting = "1.8.9"
 googleServices = "4.4.4"
 hamcrest = "3.0"
-hiltAndroid = "2.57.2"
-hiltAndroidx = "1.3.0"
 jsoup = "1.21.2"
 junitKtx = "1.3.0"
 leakcanaryAndroid = "2.14"
@@ -38,10 +36,6 @@ firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx"
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
-hilt-compiler-androidx = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltAndroidx" }
-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltAndroidx" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
@@ -65,7 +59,6 @@ ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", versi
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 google-services = { id = "com.google.gms.google-services" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
 realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }
