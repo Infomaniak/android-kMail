@@ -5,7 +5,7 @@ import java.util.Properties
  */
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.dagger.hilt)
+    alias(core.plugins.dagger.hilt)
     alias(libs.plugins.google.services)
     alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.serialization)
@@ -212,10 +212,10 @@ dependencies {
     implementation(core.androidx.concurrent.futures.ktx)
     implementation(core.androidx.work.runtime)
 
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.work)
-    ksp(libs.hilt.compiler)
-    ksp(libs.hilt.compiler.androidx)
+    implementation(core.hilt.android)
+    implementation(core.hilt.work)
+    ksp(core.hilt.compiler)
+    ksp(core.hilt.androidx.compiler)
 
     implementation(core.sentry.android.fragment)
 
