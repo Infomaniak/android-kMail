@@ -25,10 +25,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.core.utils.year
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
-import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -44,12 +42,10 @@ import com.infomaniak.mail.utils.LogoutUser
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry.captureMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -133,13 +129,11 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private fun showEasterEggHalloween() = lifecycleScope.launch {
         val currentMailbox = switchUserViewModel.currentMailbox.first()
-        if (EventsEasterEgg.Halloween(currentMailbox.kSuite).shouldTrigger().not()) return@launch
+        EventsEasterEgg.Halloween(currentMailbox.kSuite).show {
+            val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return@show
+            if (halloween.isAnimating) return@show
 
-        val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return@launch
-        if (halloween.isAnimating) return@launch
-
-        halloween.playAnimation()
-        captureMessage("Easter egg Halloween has been triggered! Woohoo!")
-        trackEasterEggEvent("${MatomoName.Halloween.value}${Date().year()}")
+            halloween.playAnimation()
+        }
     }
 }

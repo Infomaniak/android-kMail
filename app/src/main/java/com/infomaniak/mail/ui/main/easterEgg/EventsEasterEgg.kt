@@ -19,14 +19,20 @@ package com.infomaniak.mail.ui.main.easterEgg
 
 import androidx.annotation.CallSuper
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.utils.year
+import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.utils.AccountUtils
+import io.sentry.Sentry
 import java.util.Calendar
+import java.util.Date
 import kotlin.random.Random
 
 sealed interface EventsEasterEgg {
 
     val pack: KSuite?
     val isCorrectPeriod: Boolean
+    val matomoName: MatomoMail.MatomoName
     private val isStaff: Boolean get() = AccountUtils.currentUser?.isStaff ?: false
 
     @CallSuper
@@ -35,10 +41,32 @@ sealed interface EventsEasterEgg {
         return isCorrectPeriod && isAllowed
     }
 
+    fun show(displayUi: () -> Unit) {
+        if (!shouldTrigger()) return
+        displayUi()
+        Sentry.captureMessage("Easter egg ${matomoName.value} has been triggered! Woohoo!")
+        trackEasterEggEvent("${matomoName.value}${Date().year()}")
+    }
+
+    data class Halloween(override val pack: KSuite?) : EventsEasterEgg {
+
+        private val calendar by lazy { Calendar.getInstance() }
+
+        override val matomoName = MatomoMail.MatomoName.Halloween
+        override val isCorrectPeriod: Boolean
+            get() {
+                val month = calendar.get(Calendar.MONTH)
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+                return (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
+            }
+    }
+
     data class Christmas(override val pack: KSuite?) : EventsEasterEgg {
 
         private val calendar by lazy { Calendar.getInstance() }
 
+        override val matomoName = MatomoMail.MatomoName.Xmas
         override val isCorrectPeriod: Boolean
             get() {
                 val month = calendar.get(Calendar.MONTH)
@@ -53,16 +81,17 @@ sealed interface EventsEasterEgg {
         }
     }
 
-    data class Halloween(override val pack: KSuite?) : EventsEasterEgg {
+    data class NewYear(override val pack: KSuite?) : EventsEasterEgg {
 
         private val calendar by lazy { Calendar.getInstance() }
 
+        override val matomoName = MatomoMail.MatomoName.NewYear
         override val isCorrectPeriod: Boolean
             get() {
                 val month = calendar.get(Calendar.MONTH)
                 val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-                return (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
+                return (month == Calendar.DECEMBER && day >= 31) || (month == Calendar.JANUARY && day <= 1)
             }
     }
 }
