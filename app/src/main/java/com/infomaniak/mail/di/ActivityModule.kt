@@ -22,6 +22,7 @@ import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.scopes.ActivityScoped
@@ -37,4 +38,10 @@ object ActivityModule {
     @ActivityScoped
     @Provides
     fun provideInAppReviewManager(activity: FragmentActivity) = InAppReviewManager(activity = activity)
+
+    @EntryPoint
+    @InstallIn(ActivityComponent::class)
+    interface ActivityEntrypointInterface {
+        fun inAppUpdateManager(): InAppUpdateManager
+    }
 }

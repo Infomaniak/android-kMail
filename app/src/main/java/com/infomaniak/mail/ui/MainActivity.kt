@@ -537,21 +537,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initAppUpdateManager() {
-        lifecycleScope.launch {
-            inAppUpdateManager.isUpdateRequired
-                .flowWithLifecycle(lifecycle, State.STARTED)
-                .collect { isUpdateRequired ->
-                    if (isUpdateRequired) {
-                        startUpdateRequiredActivity(
-                            this@MainActivity,
-                            BuildConfig.APPLICATION_ID,
-                            BuildConfig.VERSION_CODE,
-                            localSettings.accentColor.theme
-                        )
-                    }
-                }
-        }
-
         inAppUpdateManager.init(
             onUserChoice = { isWantingUpdate ->
                 trackInAppUpdateEvent(if (isWantingUpdate) MatomoName.DiscoverNow else MatomoName.DiscoverLater)
