@@ -21,10 +21,7 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.inappupdate.updaterequired.ui.UpdateRequiredActivity.Companion.startUpdateRequiredActivity
+import com.infomaniak.core.inappupdate.BaseInAppUpdateManager.Companion.checkUpdateIsRequired
 import com.infomaniak.core.legacy.applock.LockActivity
 import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
@@ -36,9 +33,7 @@ import com.infomaniak.mail.twoFactorAuthManager
 import com.infomaniak.mail.utils.AccountUtils
 import dagger.hilt.android.EntryPointAccessors
 import io.sentry.Sentry
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlin.jvm.java
 
 open class BaseActivity : AppCompatActivity() {
     private val hiltEntryPoint by lazy { EntryPointAccessors.fromActivity(this, ActivityModule.ActivityEntrypointInterface::class.java) }
@@ -80,7 +75,12 @@ open class BaseActivity : AppCompatActivity() {
         }
 
         super.onCreate(savedInstanceState)
-        checkUpdateIsRequired()
+        checkUpdateIsRequired(
+            manager = hiltEntryPoint.inAppUpdateManager(),
+            applicationId = BuildConfig.APPLICATION_ID,
+            applicationVersionCode = BuildConfig.VERSION_CODE,
+            theme = this@BaseActivity.localSettings.accentColor.theme
+        )
         trackScreen()
 
         LockActivity.scheduleLockIfNeeded(
@@ -94,22 +94,4 @@ open class BaseActivity : AppCompatActivity() {
         .findFragmentById(fragmentContainerViewId)
         ?.childFragmentManager
         ?.primaryNavigationFragment
-
-    private fun checkUpdateIsRequired() {
-        lifecycleScope.launch {
-            hiltEntryPoint.inAppUpdateManager().isUpdateRequired
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { isUpdateRequired ->
-                    if (isUpdateRequired) {
-                        startUpdateRequiredActivity(
-                            this@BaseActivity,
-                            BuildConfig.APPLICATION_ID,
-                            BuildConfig.VERSION_CODE,
-                            localSettings.accentColor.theme
-                        )
-                    }
-                }
-        }
-    }
-
 }
