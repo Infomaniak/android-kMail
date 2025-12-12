@@ -94,7 +94,6 @@ class LogoutUser @Inject constructor(
     private suspend fun resetSettings() {
         AppSettingsController.removeAppSettings()
         localSettings.removeSettings()
-        //TODO: check clear for inappupdate and inappreview
         updateSettingsRepository.clear()
         reviewSettingsRepository.clear()
         with(WorkManager.getInstance(appContext)) {
