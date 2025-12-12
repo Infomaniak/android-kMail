@@ -41,8 +41,6 @@ include(
     ":Core:Legacy:AppLock",
     ":Core:Legacy:BugTracker",
     ":Core:Legacy:Confetti",
-    //TODO: remove
-    //":Core:Legacy:Stores",
     ":Core:Matomo",
     ":Core:Network",
     ":Core:Network:Ktor",

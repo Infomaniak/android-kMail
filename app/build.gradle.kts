@@ -177,8 +177,6 @@ dependencies {
     implementation(project(":Core:Legacy:AppLock"))
     implementation(project(":Core:Legacy:BugTracker"))
     implementation(project(":Core:Legacy:Confetti"))
-    // TODO: remove
-    //implementation(project(":Core:Legacy:Stores"))
     implementation(project(":Core:Matomo"))
     implementation(project(":Core:Network"))
     implementation(project(":Core:Sentry"))

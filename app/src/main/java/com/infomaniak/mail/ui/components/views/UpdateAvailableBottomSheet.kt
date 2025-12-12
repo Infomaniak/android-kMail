@@ -29,7 +29,7 @@ import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.inappupdate.updaterequired.ui.composable.UpdateAvailableBottomSheetContent
 import com.infomaniak.core.ui.compose.basics.Typography
 import com.infomaniak.mail.MatomoMail.MatomoName
-import com.infomaniak.mail.MatomoMail.trackAppUpdateEvent
+import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton
@@ -72,7 +72,7 @@ class UpdateAvailableBottomSheet @JvmOverloads constructor(
                     modifier = it,
                     style = ButtonType.Tertiary,
                     onClick = {
-                        trackAppUpdateEvent(MatomoName.DiscoverLater)
+                        trackInAppUpdateEvent(MatomoName.DiscoverLater)
                         inAppUpdateManager.set(AppUpdateSettingsRepository.IS_USER_WANTING_UPDATES_KEY, false)
                         hideBottomSheet()
                     }
