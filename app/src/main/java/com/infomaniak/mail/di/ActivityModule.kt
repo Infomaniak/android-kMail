@@ -18,12 +18,11 @@
 package com.infomaniak.mail.di
 
 import androidx.fragment.app.FragmentActivity
-import com.infomaniak.core.legacy.stores.reviewmanagers.InAppReviewManager
-import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
-import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.R
+import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
+import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.scopes.ActivityScoped
@@ -34,18 +33,15 @@ object ActivityModule {
 
     @ActivityScoped
     @Provides
-    fun provideInAppUpdateManager(activity: FragmentActivity) = InAppUpdateManager(
-        activity = activity,
-        appId = BuildConfig.APPLICATION_ID,
-        versionCode = BuildConfig.VERSION_CODE,
-    )
+    fun provideInAppUpdateManager(activity: FragmentActivity) = InAppUpdateManager(activity = activity)
 
     @ActivityScoped
     @Provides
-    fun provideInAppReviewManager(activity: FragmentActivity) = InAppReviewManager(
-        activity = activity,
-        reviewDialogTheme = R.style.DialogStyle,
-        reviewDialogTitleResId = R.string.reviewAlertTitle,
-        feedbackUrlResId = R.string.urlUserReportAndroid,
-    )
+    fun provideInAppReviewManager(activity: FragmentActivity) = InAppReviewManager(activity = activity)
+
+    @EntryPoint
+    @InstallIn(ActivityComponent::class)
+    interface ActivityEntrypointInterface {
+        fun inAppUpdateManager(): InAppUpdateManager
+    }
 }

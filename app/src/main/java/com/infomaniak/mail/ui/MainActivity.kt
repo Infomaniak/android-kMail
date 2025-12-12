@@ -33,17 +33,20 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.inappreview.BaseInAppReviewManager
+import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
+import com.infomaniak.core.inappreview.view.ReviewAlertDialog.Companion.showAppReviewDialog
+import com.infomaniak.core.inappreview.view.ReviewAlertDialogData
+import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
+import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager.Companion.APP_UPDATE_TAG
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.stores.StoreUtils
-import com.infomaniak.core.legacy.stores.StoreUtils.checkUpdateIsRequired
-import com.infomaniak.core.legacy.stores.reviewmanagers.InAppReviewManager
-import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.Utils.toEnumOrThrow
 import com.infomaniak.core.legacy.utils.hasPermissions
@@ -210,12 +213,8 @@ class MainActivity : BaseActivity() {
         handleMenuDrawerEdgeToEdge()
         registerMainPermissions()
 
-        checkUpdateIsRequired(
-            BuildConfig.APPLICATION_ID,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE,
-            localSettings.accentColor.theme,
-        )
+        initAppUpdateManager()
+        initAppReviewManager()
 
         observeDeletedMessages()
         observeActivityDialogLoaderReset()
@@ -235,8 +234,6 @@ class MainActivity : BaseActivity() {
 
         handleShortcuts()
 
-        initAppUpdateManager()
-        initAppReviewManager()
         syncDiscoveryManager.init(::showSyncDiscovery)
 
         observeNotificationToRefresh()
@@ -263,14 +260,6 @@ class MainActivity : BaseActivity() {
     private fun setupMenuDrawer() {
         binding.drawerLayout.isFocusable = false // Set here because not working in XML
         setupMenuDrawerCallbacks()
-    }
-
-    private fun initAppReviewManager() {
-        inAppReviewManager.init(
-            onDialogShown = { trackInAppReviewEvent(MatomoName.PresentAlert) },
-            onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
-            onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
-        )
     }
 
     private fun observeDeletedMessages() = with(mainViewModel) {
@@ -556,12 +545,50 @@ class MainActivity : BaseActivity() {
             onInstallStart = { trackInAppUpdateEvent(MatomoName.InstallUpdate) },
             onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
-                SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
-                mainViewModel.canInstallUpdate.value = isUpdateDownloaded
+                SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
+                lifecycleScope.launch {
+                    mainViewModel.canInstallUpdate.value = isUpdateDownloaded
+                }
             },
             onFDroidResult = { updateIsAvailable ->
-                if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+                if (updateIsAvailable) binding.updateAvailableBottomSheet.showBottomSheet()
             },
+        )
+    }
+
+    private fun initAppReviewManager() {
+        lifecycleScope.launch {
+            inAppReviewManager.shouldDisplayReviewDialog
+                .flowWithLifecycle(lifecycle, State.STARTED)
+                .collect { shouldDisplayReviewDialog ->
+                    if (shouldDisplayReviewDialog) {
+                        trackInAppReviewEvent(MatomoName.PresentAlert)
+                        inAppReviewManager.onUserWantsToDismiss()
+                        showAppReviewDialog(
+                            activity = this@MainActivity,
+                            reviewDialogTheme = R.style.DialogStyle,
+                            reviewDialogTitleStyle = R.style.DialogReviewStyleTextAppearance,
+                            reviewAlertDialogData = ReviewAlertDialogData(
+                                title = getString(R.string.reviewAlertTitle),
+                                positiveText = getString(RCore.string.buttonYes),
+                                negativeText = getString(RCore.string.buttonNo),
+                                onPositiveButtonClicked = inAppReviewManager::onUserWantsToReview,
+                                onNegativeButtonClicked = {
+                                    inAppReviewManager.onUserWantsToGiveFeedback(getString(R.string.urlUserReportAndroid))
+                                },
+                                onDismiss = inAppReviewManager::onUserWantsToDismiss
+                            )
+                        )
+                    }
+                }
+        }
+
+        inAppReviewManager.init(
+            countdownBehavior = BaseInAppReviewManager.Behavior.LifecycleBased,
+            appReviewThreshold = DEFAULT_APP_REVIEW_LAUNCHES,
+            maxAppReviewThreshold = MAX_APP_REVIEW_LAUNCHES,
+            onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
+            onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
         )
     }
 
@@ -629,5 +656,8 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
+
+        private const val DEFAULT_APP_REVIEW_LAUNCHES = 50
+        private const val MAX_APP_REVIEW_LAUNCHES = 500
     }
 }

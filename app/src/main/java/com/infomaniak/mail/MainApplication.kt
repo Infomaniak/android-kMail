@@ -42,7 +42,7 @@ import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.networking.HttpClient
 import com.infomaniak.core.coil.ImageLoaderProvider
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
-import com.infomaniak.core.legacy.stores.AppUpdateScheduler
+import com.infomaniak.core.inappupdate.AppUpdateScheduler
 import com.infomaniak.core.legacy.utils.clearStack
 import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.network.NetworkConfiguration
