@@ -46,7 +46,6 @@ import com.infomaniak.core.inappreview.view.ReviewAlertDialog.Companion.showAppR
 import com.infomaniak.core.inappreview.view.ReviewAlertDialogData
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager.Companion.APP_UPDATE_TAG
-import com.infomaniak.core.inappupdate.updaterequired.ui.UpdateRequiredActivity.Companion.startUpdateRequiredActivity
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.Utils.toEnumOrThrow
