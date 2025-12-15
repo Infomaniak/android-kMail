@@ -209,6 +209,7 @@ class LoginFragment : Fragment() {
 
     private fun showError(error: String) {
         showSnackbar(error)
+        resetLoginButtons()
     }
 
     private fun startLoadingLoginButtons() {
