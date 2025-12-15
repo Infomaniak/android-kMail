@@ -1,0 +1,1 @@
+- Désactivation du login inter app lorsqu'une erreur est rencontrée
