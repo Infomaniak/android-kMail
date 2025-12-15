@@ -51,12 +51,10 @@ import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
-import com.infomaniak.core.utils.year
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
-import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
@@ -70,6 +68,7 @@ import com.infomaniak.mail.firebase.FirebaseNotificationReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg
+import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg.NewYear.Animation
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
@@ -94,7 +93,6 @@ import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -131,7 +129,7 @@ class MainActivity : BaseActivity() {
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
 
-        if (draftAction == DraftAction.SEND) showEasterXMas()
+        if (draftAction == DraftAction.SEND) showEasterEggs()
         if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE) showSendingSnackbarTimer.start()
     }
 
@@ -577,16 +575,29 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun showEasterXMas() {
-        val currentMailbox = mainViewModel.currentMailbox.value ?: return
-        if (EventsEasterEgg.Christmas(currentMailbox.kSuite).shouldTrigger().not()) return
+    private fun showEasterEggs() {
+        val currentKSuite = mainViewModel.currentMailbox.value?.kSuite
 
-        binding.easterEggXMas.apply {
-            isVisible = true
-            playAnimation()
+        EventsEasterEgg.Christmas(currentKSuite).show {
+            binding.easterEggs.apply {
+                if (isAnimating) return@show
+
+                isVisible = true
+                setAnimation(R.raw.easter_egg_xmas)
+                playAnimation()
+            }
         }
-        Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
-        trackEasterEggEvent("${MatomoName.Xmas.value}${Date().year()}")
+
+        EventsEasterEgg.NewYear(currentKSuite).show {
+            binding.easterEggs.apply {
+                if (isAnimating) return@show
+
+                val easterEgg = Animation.entries.random()
+                speed = easterEgg.speed
+                setAnimation(easterEgg.animationRes)
+                playAnimation()
+            }
+        }
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {

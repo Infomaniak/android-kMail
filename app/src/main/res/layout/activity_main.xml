@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@
             app:layout_constraintGuide_percent="0.9" />
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/easterEggXMas"
+            android:id="@+id/easterEggs"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:importantForAccessibility="no"
@@ -74,7 +74,7 @@
             app:layout_constraintBottom_toTopOf="@id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:lottie_rawRes="@raw/easter_egg_xmas" />
+            tools:lottie_rawRes="@raw/easter_egg_xmas" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/easterEggHalloween"
