@@ -18,10 +18,12 @@
 package com.infomaniak.mail.ui.main.easterEgg
 
 import androidx.annotation.CallSuper
+import androidx.annotation.RawRes
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.utils.year
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import io.sentry.Sentry
 import java.util.Calendar
@@ -93,5 +95,11 @@ sealed interface EventsEasterEgg {
 
                 return (month == Calendar.DECEMBER && day >= 31) || (month == Calendar.JANUARY && day <= 1)
             }
+
+        enum class Animation(@RawRes val animationRes: Int, val speed: Float = 1f) {
+            Confetti(R.raw.easter_egg_new_year_confetti),
+            Fireworks(R.raw.easter_egg_new_year_fireworks),
+            Fireworks2(R.raw.easter_egg_new_year_fireworks_2, speed = 1.5f),
+        }
     }
 }

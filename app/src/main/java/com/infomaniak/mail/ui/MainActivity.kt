@@ -68,6 +68,7 @@ import com.infomaniak.mail.firebase.FirebaseNotificationReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg
+import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg.NewYear.Animation
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
@@ -100,7 +101,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.random.Random
 import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
@@ -592,16 +592,9 @@ class MainActivity : BaseActivity() {
             binding.easterEggs.apply {
                 if (isAnimating) return@show
 
-                val randomNumber = Random.nextFloat()
-                val animationRes = when {
-                    randomNumber < 0.33f -> R.raw.easter_egg_new_year_confetti
-                    randomNumber < 0.67f -> R.raw.easter_egg_new_year_fireworks
-                    else -> {
-                        speed = 1.50f
-                        R.raw.easter_egg_new_year_fireworks_2
-                    }
-                }
-                setAnimation(animationRes)
+                val easterEgg = Animation.entries.random()
+                speed = easterEgg.speed
+                setAnimation(easterEgg.animationRes)
                 playAnimation()
             }
         }
