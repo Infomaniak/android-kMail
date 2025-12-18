@@ -49,6 +49,7 @@ import com.infomaniak.core.utils.formatWithLocal
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackMessageBannerEvent
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
@@ -514,6 +515,7 @@ class ThreadAdapter(
         }
 
         distantImagesAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.DisplayContent)
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
 
@@ -548,7 +550,10 @@ class ThreadAdapter(
             setDescription(description)
             actionRes?.let {
                 setAction1Text(context.getString(it))
-                onAction1 { threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(recipientsNeedingPassword) }
+                onAction1 {
+                    trackMessageBannerEvent(MatomoName.Encryption)
+                    threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(recipientsNeedingPassword)
+                }
             } ?: setActionsVisibility(isVisible = false)
         }
     }
@@ -592,7 +597,10 @@ class ThreadAdapter(
                 unsubscribeAlert.apply {
                     isVisible = true
                     hideAction1Progress(R.string.unsubscribeButtonTitle)
-                    onAction1 { threadAdapterCallbacks?.onUnsubscribeClicked?.invoke(messageUi.message) }
+                    onAction1 {
+                        trackMessageBannerEvent(MatomoName.UnsubscribeLink)
+                        threadAdapterCallbacks?.onUnsubscribeClicked?.invoke(messageUi.message)
+                    }
                 }
             }
             is UnsubscribeState.InProgress -> unsubscribeAlert.showAction1Progress()
@@ -619,7 +627,10 @@ class ThreadAdapter(
                 isVisible = true
                 setDescription(spamData.description)
                 setAction1Text(spamData.action)
-                onAction1 { spamActionButton(spamData, message, firstExpeditor!!) }
+                onAction1 {
+                    trackMessageBannerEvent(MatomoName.Spam)
+                    spamActionButton(spamData, message, firstExpeditor!!)
+                }
             }
         }
     }

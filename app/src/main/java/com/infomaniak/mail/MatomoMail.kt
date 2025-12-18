@@ -58,6 +58,7 @@ object MatomoMail : Matomo {
         MenuDrawer("menuDrawer"),
         Message("message"),
         MessageActions("messageActions"),
+        MessageBanner("messageBanner"),
         MoveSearch("moveSearch"),
         MultiSelection("multiSelection"),
         NewMessage("newMessage"),
@@ -72,8 +73,8 @@ object MatomoMail : Matomo {
         SettingsAutoAdvance("settingsAutoAdvance"),
         SettingsDataManagement("settingsDataManagement"),
         SettingsDensity("settingsDensity"),
-        SettingsDisplayExternalContent("settingsDisplayExternalContent"),
         SettingsForwardMode("settingsForwardMode"),
+        SettingsDisplayExternalContent("settingsDisplayExternalContent"),
         SettingsGeneral("settingsGeneral"),
         SettingsNotifications("settingsNotifications"),
         SettingsSend("settingsSend"),
@@ -90,6 +91,7 @@ object MatomoMail : Matomo {
     }
 
     enum class MatomoName(val value: String) {
+        Acknowledge("acknowledge"),
         Acknowledgement("acknowledgement"),
         Add("add"),
         AddLink("addLink"),
@@ -160,6 +162,7 @@ object MatomoMail : Matomo {
         DismissError("dismissError"),
         DismissPromptWithoutGenerating("dismissPromptWithoutGenerating"),
         DismissProposition("dismissProposition"),
+        DisplayContent("displayContent"),
         Download("download"),
         DownloadAll("downloadAll"),
         DraftFolder("draftFolder"),
@@ -171,6 +174,7 @@ object MatomoMail : Matomo {
         EmptySpam("emptySpam"),
         EmptyTrash("emptyTrash"),
         Enable("enable"),
+        Encryption("encryption"),
         EncryptionActivation("encryptionActivation"),
         ExecuteSearch("executeSearch"),
         Expand("expand"),
@@ -212,6 +216,7 @@ object MatomoMail : Matomo {
         Mailboxes("mailboxes"),
         MarkAsSeen("markAsSeen"),
         Message("message"),
+        ModifySchedule("modifySchedule"),
         ModifySnooze("modifySnooze"),
         Move("move"),
         MoveSwipe("moveSwipe"),
@@ -230,6 +235,7 @@ object MatomoMail : Matomo {
         NumberOfTo("numberOfTo"),
         OneMessagesInThread("oneMessagesInThread"),
         Open("open"),
+        OpenAppStore("openPlayStore"),
         OpenBottomSheet("openBottomSheet"),
         OpenByButton("openByButton"),
         OpenByGesture("openByGesture"),
@@ -248,7 +254,6 @@ object MatomoMail : Matomo {
         OpenLoginWebview("openLoginWebview"),
         OpenMessage("openMessage"),
         OpenNotificationSettings("openNotificationSettings"),
-        OpenAppStore("openPlayStore"),
         OpenRecipientsFields("openRecipientsFields"),
         OpenSwissTransfer("openSwissTransfer"),
         OpenSyncApp("openSyncApp"),
@@ -339,6 +344,7 @@ object MatomoMail : Matomo {
         Undo("undo"),
         UnorderedList("unorderedList"),
         UnreadFilter("unreadFilter"),
+        UnsubscribeLink("unsubscribeLink"),
         ValidateSearch("validateSearch"),
         WriteEmail("writeEmail"),
         Xmas("xmas"),
@@ -425,6 +431,10 @@ object MatomoMail : Matomo {
 
     fun trackMessageActionsEvent(name: MatomoName) {
         trackEvent(MatomoCategory.MessageActions, name)
+    }
+
+    fun trackMessageBannerEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.MessageBanner, name)
     }
 
     fun trackBlockUserAction(name: MatomoName) {
