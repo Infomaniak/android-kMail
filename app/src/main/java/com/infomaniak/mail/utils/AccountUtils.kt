@@ -18,7 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.core.auth.CredentialManager
+import com.infomaniak.core.auth.RoomCredentialManager
 import com.infomaniak.core.auth.TokenAuthenticator
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.networking.HttpClient
@@ -39,7 +39,7 @@ import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import io.sentry.protocol.User as SentryUser
 
-object AccountUtils : CredentialManager() {
+object AccountUtils : RoomCredentialManager() {
 
     const val NO_MAILBOX_USER_ID_KEY = "noMailboxUserId"
 
