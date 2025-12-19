@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import com.infomaniak.core.extensions.goToAppStore
 import com.infomaniak.core.inappupdate.AppUpdateSettingsRepository
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
-import com.infomaniak.core.inappupdate.updaterequired.ui.composable.UpdateAvailableBottomSheetContent
+import com.infomaniak.core.inappupdate.ui.composable.UpdateAvailableBottomSheetContent
 import com.infomaniak.core.ui.compose.basics.Typography
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent

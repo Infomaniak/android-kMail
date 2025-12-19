@@ -132,7 +132,7 @@
             android:theme="@style/AppThemeLock" />
 
         <activity
-            android:name="com.infomaniak.core.inappupdate.updaterequired.ui.UpdateRequiredActivity"
+            android:name="com.infomaniak.core.inappupdate.ui.UpdateRequiredActivity"
             android:exported="false"
             android:theme="@style/AppThemeUpdateRequired"/>
 
