@@ -38,6 +38,8 @@ import kotlinx.coroutines.runBlocking
 open class BaseActivity : AppCompatActivity() {
     private val hiltEntryPoint by lazy { EntryPointAccessors.fromActivity(this, ActivityModule.ActivityEntrypointInterface::class.java) }
 
+    protected val inAppUpdateManager by lazy { hiltEntryPoint.inAppUpdateManager() }
+
     // TODO: Try to replace this with a dependency injection.
     //  Currently, it crashes because the lateinit value isn't initialized when the `MainActivity.onCreate()` calls its super.
     protected val localSettings by lazy { LocalSettings.getInstance(context = this) }

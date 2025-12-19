@@ -44,7 +44,6 @@ import com.infomaniak.core.inappreview.BaseInAppReviewManager
 import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
 import com.infomaniak.core.inappreview.view.ReviewAlertDialog
 import com.infomaniak.core.inappreview.view.ReviewAlertDialogData
-import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager.Companion.APP_UPDATE_TAG
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.Utils
@@ -163,9 +162,6 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
-
-    @Inject
-    lateinit var inAppUpdateManager: InAppUpdateManager
 
     @Inject
     lateinit var inAppReviewManager: InAppReviewManager
