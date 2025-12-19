@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui
 
+import android.R.attr.targetActivity
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
@@ -78,7 +79,7 @@ open class BaseActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         checkUpdateIsRequired(
-            manager = hiltEntryPoint.inAppUpdateManager(),
+            manager = inAppUpdateManager,
             applicationId = BuildConfig.APPLICATION_ID,
             applicationVersionCode = BuildConfig.VERSION_CODE,
             theme = this@BaseActivity.localSettings.accentColor.theme
