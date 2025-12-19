@@ -57,6 +57,7 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     protected open val containerColor: Color? = null
     protected open val title: String? = null
     protected open val bottomPadding: Dp = Margin.Medium
+    protected open val skipPartiallyExpanded: Boolean = false
 
     @Composable
     abstract fun BottomSheetContent()
@@ -87,7 +88,7 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun ComposeViewContent() {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(startHidingAnimation) {

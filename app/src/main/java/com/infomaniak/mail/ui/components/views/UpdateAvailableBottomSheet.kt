@@ -44,8 +44,11 @@ class UpdateAvailableBottomSheet @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : MailBottomSheetScaffoldComposeView(context, attrs, defStyleAttr) {
+
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
+
+    override val skipPartiallyExpanded: Boolean = true
 
     @Composable
     override fun BottomSheetContent() {

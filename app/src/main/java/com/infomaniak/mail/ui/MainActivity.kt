@@ -542,9 +542,7 @@ class MainActivity : BaseActivity() {
             onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
                 SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
-                lifecycleScope.launch {
-                    mainViewModel.canInstallUpdate.value = isUpdateDownloaded
-                }
+                mainViewModel.canInstallUpdate.value = isUpdateDownloaded
             },
             onFDroidResult = { updateIsAvailable ->
                 if (updateIsAvailable) binding.updateAvailableBottomSheet.showBottomSheet()
