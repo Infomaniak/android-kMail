@@ -42,7 +42,7 @@ import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
 import com.infomaniak.core.inappreview.BaseInAppReviewManager
 import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
-import com.infomaniak.core.inappreview.view.ReviewAlertDialog.Companion.showAppReviewDialog
+import com.infomaniak.core.inappreview.view.ReviewAlertDialog
 import com.infomaniak.core.inappreview.view.ReviewAlertDialogData
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager.Companion.APP_UPDATE_TAG
@@ -99,11 +99,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.coroutines.resume
 import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
@@ -561,22 +563,13 @@ class MainActivity : BaseActivity() {
                 .collect { shouldDisplayReviewDialog ->
                     if (shouldDisplayReviewDialog) {
                         trackInAppReviewEvent(MatomoName.PresentAlert)
-                        inAppReviewManager.onUserWantsToDismiss()
-                        showAppReviewDialog(
-                            activity = this@MainActivity,
-                            reviewDialogTheme = R.style.DialogStyle,
-                            reviewDialogTitleStyle = R.style.DialogReviewStyleTextAppearance,
-                            reviewAlertDialogData = ReviewAlertDialogData(
-                                title = getString(R.string.reviewAlertTitle),
-                                positiveText = getString(RCore.string.buttonYes),
-                                negativeText = getString(RCore.string.buttonNo),
-                                onPositiveButtonClicked = inAppReviewManager::onUserWantsToReview,
-                                onNegativeButtonClicked = {
-                                    inAppReviewManager.onUserWantsToGiveFeedback(getString(R.string.urlUserReportAndroid))
-                                },
-                                onDismiss = inAppReviewManager::onUserWantsToDismiss
-                            )
-                        )
+                        when (askForAppReview()) {
+                            ReviewAlertDialog.DialogAction.Positive -> inAppReviewManager.onUserWantsToReview()
+                            ReviewAlertDialog.DialogAction.Negative -> {
+                                inAppReviewManager.onUserWantsToGiveFeedback(getString(R.string.urlUserReportAndroid))
+                            }
+                            ReviewAlertDialog.DialogAction.Dismiss -> inAppReviewManager.onUserWantsToDismiss()
+                        }
                     }
                 }
         }
@@ -588,6 +581,25 @@ class MainActivity : BaseActivity() {
             onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
             onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
         )
+    }
+
+    private suspend fun askForAppReview(): ReviewAlertDialog.DialogAction = suspendCancellableCoroutine { continuation ->
+        var userChoice = ReviewAlertDialog.DialogAction.Dismiss
+        val dialog = ReviewAlertDialog(
+            activityContext = this@MainActivity,
+            reviewDialogTheme = R.style.DialogStyle,
+            reviewDialogTitleStyle = R.style.DialogReviewStyleTextAppearance,
+            reviewAlertDialogData = ReviewAlertDialogData(
+                title = getString(R.string.reviewAlertTitle),
+                positiveText = getString(RCore.string.buttonYes),
+                negativeText = getString(RCore.string.buttonNo),
+                onPositiveButtonClicked = { userChoice = ReviewAlertDialog.DialogAction.Positive },
+                onNegativeButtonClicked = { userChoice = ReviewAlertDialog.DialogAction.Negative },
+                onDismiss = { continuation.resume(userChoice) }
+            )
+        )
+        dialog.show()
+        continuation.invokeOnCancellation { dialog.dismiss() }
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
