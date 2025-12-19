@@ -21,18 +21,24 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
+import com.infomaniak.core.inappupdate.BaseInAppUpdateManager.Companion.checkUpdateIsRequired
 import com.infomaniak.core.legacy.applock.LockActivity
 import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.di.ActivityModule
 import com.infomaniak.mail.twoFactorAuthManager
 import com.infomaniak.mail.utils.AccountUtils
+import dagger.hilt.android.EntryPointAccessors
 import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
+    private val hiltEntryPoint by lazy { EntryPointAccessors.fromActivity(this, ActivityModule.ActivityEntrypointInterface::class.java) }
 
+    protected val inAppUpdateManager by lazy { hiltEntryPoint.inAppUpdateManager() }
 
     // TODO: Try to replace this with a dependency injection.
     //  Currently, it crashes because the lateinit value isn't initialized when the `MainActivity.onCreate()` calls its super.
@@ -71,6 +77,12 @@ open class BaseActivity : AppCompatActivity() {
         }
 
         super.onCreate(savedInstanceState)
+        checkUpdateIsRequired(
+            manager = inAppUpdateManager,
+            applicationId = BuildConfig.APPLICATION_ID,
+            applicationVersionCode = BuildConfig.VERSION_CODE,
+            theme = this@BaseActivity.localSettings.accentColor.theme
+        )
         trackScreen()
 
         LockActivity.scheduleLockIfNeeded(

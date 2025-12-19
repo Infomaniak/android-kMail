@@ -22,7 +22,8 @@ import android.content.Context
 import androidx.work.WorkManager
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
-import com.infomaniak.core.legacy.stores.StoresSettingsRepository
+import com.infomaniak.core.inappreview.AppReviewSettingsRepository
+import com.infomaniak.core.inappupdate.AppUpdateSettingsRepository
 import com.infomaniak.core.network.networking.HttpClient
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.LocalSettings
@@ -45,7 +46,8 @@ class LogoutUser @Inject constructor(
     private val mailboxController: MailboxController,
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
     private val playServicesUtils: PlayServicesUtils,
-    private val storesSettingsRepository: StoresSettingsRepository,
+    private val updateSettingsRepository: AppUpdateSettingsRepository,
+    private val reviewSettingsRepository: AppReviewSettingsRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -92,7 +94,8 @@ class LogoutUser @Inject constructor(
     private suspend fun resetSettings() {
         AppSettingsController.removeAppSettings()
         localSettings.removeSettings()
-        storesSettingsRepository.clear()
+        updateSettingsRepository.clear()
+        reviewSettingsRepository.clear()
         with(WorkManager.getInstance(appContext)) {
             cancelAllWork()
             pruneWork()

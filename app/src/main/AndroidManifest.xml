@@ -132,9 +132,9 @@
             android:theme="@style/AppThemeLock" />
 
         <activity
-            android:name="com.infomaniak.core.legacy.stores.updaterequired.UpdateRequiredActivity"
+            android:name="com.infomaniak.core.inappupdate.ui.UpdateRequiredActivity"
             android:exported="false"
-            android:theme="@style/AppThemeUpdateRequired" />
+            android:theme="@style/AppThemeUpdateRequired"/>
 
         <activity
             android:name=".ui.login.NoMailboxActivity"
@@ -156,7 +156,7 @@
             android:name=".ui.MainActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"/>
 
         <activity
             android:name=".ui.newMessage.NewMessageActivity"
