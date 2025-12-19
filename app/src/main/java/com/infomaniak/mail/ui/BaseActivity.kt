@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui
 
-import android.R.attr.targetActivity
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
