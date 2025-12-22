@@ -22,6 +22,7 @@ import com.infomaniak.core.appversionchecker.data.models.AppPublishedVersion
 import com.infomaniak.core.appversionchecker.data.models.AppVersion
 import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.compareVersionTo
 import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.toVersionNumbers
+import com.infomaniak.core.appversionchecker.utils.AndroidSdkVersionProvider
 import com.infomaniak.core.sentry.SentryLog
 import io.mockk.every
 import io.mockk.mockk
@@ -48,17 +49,37 @@ class AppVersionCheckingTest {
     private val invalidParseVersion = "invalid_parse_version"
     private val invalidEmptyVersion = ""
 
+    private val defaultVersionChannel = AppVersion.VersionChannel.Production
+
     private val defaultAppVersion = AppVersion(
         minimalAcceptedVersion = mediumVersion,
-        publishedVersions = listOf(AppPublishedVersion(tag = greatVersion))
+        publishedVersions = listOf(
+            AppPublishedVersion(
+                tag = greatVersion,
+                type = defaultVersionChannel.value,
+                buildMinOsVersion = "27"
+            )
+        )
     )
     private val invalidMinimalAppVersion = AppVersion(
         minimalAcceptedVersion = mediumVersion,
-        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+        publishedVersions = listOf(
+            AppPublishedVersion(
+                tag = basicVersion,
+                type = defaultVersionChannel.value,
+                buildMinOsVersion = "27"
+            )
+        )
     )
     private val invalidFormatAppVersion = AppVersion(
         minimalAcceptedVersion = invalidCommaVersion,
-        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+        publishedVersions = listOf(
+            AppPublishedVersion(
+                tag = basicVersion,
+                type = defaultVersionChannel.value,
+                buildMinOsVersion = "27"
+            )
+        )
     )
 
     val sentryLog = mockk<SentryLog>(relaxed = true)
@@ -67,6 +88,8 @@ class AppVersionCheckingTest {
     fun setup() {
         mockkObject(SentryLog)
         every { SentryLog.e(any(), any(), any(), any()) } returns sentryLog.e("", "")
+        mockkObject(AndroidSdkVersionProvider)
+        every { AndroidSdkVersionProvider.sdkInt } returns 30
     }
 
     //region toVersionNumbers()
@@ -181,32 +204,32 @@ class AppVersionCheckingTest {
     //region mustRequireUpdate
     @Test
     fun mustRequireUpdate_newerVersion() {
-        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(greatVersion))
+        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(greatVersion, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_sameVersion() {
-        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersion))
-        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersionShortFormat))
+        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersion, defaultVersionChannel))
+        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersionShortFormat, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_olderVersion() {
-        Assert.assertTrue(defaultAppVersion.mustRequireUpdate(basicVersion))
+        Assert.assertTrue(defaultAppVersion.mustRequireUpdate(basicVersion, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_invalidMinimal() {
-        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(greaterVersion))
-        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(mediumVersion))
-        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(smallVersion))
+        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(greaterVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(mediumVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(smallVersion, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_invalidFormat() {
-        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(greaterVersion))
-        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(mediumVersion))
-        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(smallVersion))
+        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(greaterVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(mediumVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(smallVersion, defaultVersionChannel))
     }
     //endregion
 }
