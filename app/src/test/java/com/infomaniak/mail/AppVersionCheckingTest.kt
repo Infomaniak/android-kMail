@@ -48,6 +48,8 @@ class AppVersionCheckingTest {
     private val invalidParseVersion = "invalid_parse_version"
     private val invalidEmptyVersion = ""
 
+    private val defaultVersionChannel = AppVersion.VersionChannel.Production
+
     private val defaultAppVersion = AppVersion(
         minimalAcceptedVersion = mediumVersion,
         publishedVersions = listOf(AppPublishedVersion(tag = greatVersion))
@@ -181,32 +183,32 @@ class AppVersionCheckingTest {
     //region mustRequireUpdate
     @Test
     fun mustRequireUpdate_newerVersion() {
-        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(greatVersion))
+        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(greatVersion, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_sameVersion() {
-        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersion))
-        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersionShortFormat))
+        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersion, defaultVersionChannel))
+        Assert.assertFalse(defaultAppVersion.mustRequireUpdate(mediumVersionShortFormat, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_olderVersion() {
-        Assert.assertTrue(defaultAppVersion.mustRequireUpdate(basicVersion))
+        Assert.assertTrue(defaultAppVersion.mustRequireUpdate(basicVersion, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_invalidMinimal() {
-        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(greaterVersion))
-        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(mediumVersion))
-        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(smallVersion))
+        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(greaterVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(mediumVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidMinimalAppVersion.mustRequireUpdate(smallVersion, defaultVersionChannel))
     }
 
     @Test
     fun mustRequireUpdate_invalidFormat() {
-        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(greaterVersion))
-        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(mediumVersion))
-        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(smallVersion))
+        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(greaterVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(mediumVersion, defaultVersionChannel))
+        Assert.assertFalse(invalidFormatAppVersion.mustRequireUpdate(smallVersion, defaultVersionChannel))
     }
     //endregion
 }
