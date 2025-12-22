@@ -49,6 +49,7 @@ import com.infomaniak.core.utils.formatWithLocal
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackMessageBannerEvent
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
@@ -66,6 +67,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
+import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -177,6 +179,7 @@ class ThreadAdapter(
                 NotifyType.FailedMessage -> handleFailedMessagePayload(item.message.uid)
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
+                NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
                 is NotifyType.MessagesCollapseStateChanged -> {
                     holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
                 }
@@ -253,7 +256,7 @@ class ThreadAdapter(
         initMapForNewMessage(messageUi.message, position)
 
         bindHeader(messageUi.message)
-        bindAlerts(messageUi.message)
+        bindAlerts(messageUi)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
         bindContent(messageUi.message)
@@ -496,7 +499,8 @@ class ThreadAdapter(
         detailedMessageDate.text = context.fullDateWithYear(messageDate)
     }
 
-    private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
+    private fun MessageViewHolder.bindAlerts(messageUi: MessageUi) = with(binding) {
+        val message = messageUi.message
         if (message.isEncrypted) {
             bindEncryption(message)
         } else {
@@ -511,6 +515,7 @@ class ThreadAdapter(
         }
 
         distantImagesAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.DisplayContent)
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
 
@@ -522,6 +527,7 @@ class ThreadAdapter(
             hideAlertGroupIfNoneDisplayed()
         }
 
+        bindUnsubscribe(messageUi)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -544,7 +550,10 @@ class ThreadAdapter(
             setDescription(description)
             actionRes?.let {
                 setAction1Text(context.getString(it))
-                onAction1 { threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(recipientsNeedingPassword) }
+                onAction1 {
+                    trackMessageBannerEvent(MatomoName.Encryption)
+                    threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(recipientsNeedingPassword)
+                }
             } ?: setActionsVisibility(isVisible = false)
         }
     }
@@ -568,7 +577,7 @@ class ThreadAdapter(
 
         message.draftResource?.let { draftResource ->
             scheduleAlert.onAction1 {
-                trackScheduleSendEvent(MatomoName.ModifySnooze)
+                trackMessageBannerEvent(MatomoName.ReprogramSchedule)
                 threadAdapterCallbacks?.onRescheduleClicked?.invoke(
                     draftResource,
                     message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
@@ -577,8 +586,25 @@ class ThreadAdapter(
         }
 
         scheduleAlert.onAction2 {
-            trackScheduleSendEvent(MatomoName.CancelSnooze)
+            trackMessageBannerEvent(MatomoName.ModifySchedule)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
+        }
+    }
+
+    private fun ItemMessageBinding.bindUnsubscribe(messageUi: MessageUi) {
+        when (messageUi.unsubscribeState) {
+            is UnsubscribeState.CanUnsubscribe -> {
+                unsubscribeAlert.apply {
+                    isVisible = true
+                    hideAction1Progress(R.string.unsubscribeButtonTitle)
+                    onAction1 {
+                        trackMessageBannerEvent(MatomoName.UnsubscribeLink)
+                        threadAdapterCallbacks?.onUnsubscribeClicked?.invoke(messageUi.message)
+                    }
+                }
+            }
+            is UnsubscribeState.InProgress -> unsubscribeAlert.showAction1Progress()
+            is UnsubscribeState.Completed, null -> unsubscribeAlert.isVisible = false
         }
     }
 
@@ -594,13 +620,18 @@ class ThreadAdapter(
         val spamAction = getSpamBannerAction(message, firstExpeditor)
         val spamData = context.getSpamBannerData(spamAction = spamAction, emailToUnblock = firstExpeditor?.email)
 
-        if (spamData.spamAction == SpamAction.None) {
-            spamAlert.isVisible = false
-        } else {
-            spamAlert.isVisible = true
-            spamAlert.setDescription(spamData.description)
-            spamAlert.setAction1Text(spamData.action)
-            spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor!!) }
+        spamAlert.apply {
+            if (spamData.spamAction == SpamAction.None) {
+                isVisible = false
+            } else {
+                isVisible = true
+                setDescription(spamData.description)
+                setAction1Text(spamData.action)
+                onAction1 {
+                    trackMessageBannerEvent(MatomoName.Spam)
+                    spamActionButton(spamData, message, firstExpeditor!!)
+                }
+            }
         }
     }
 
@@ -917,6 +948,7 @@ class ThreadAdapter(
         data object FailedMessage : NotifyType
         data object OnlyRebindCalendarAttendance : NotifyType
         data object OnlyRebindEmojiReactions : NotifyType
+        data object UnsubscribeRebind : NotifyType
         @JvmInline
         value class MessagesCollapseStateChanged(val isCollapsible: Boolean) : NotifyType
     }
@@ -940,10 +972,7 @@ class ThreadAdapter(
         override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
             return when (oldItem) {
                 is MessageUi -> {
-                    newItem is MessageUi &&
-                            MessageDiffAspect.AnythingElse.areTheSame(oldItem.message, newItem.message) &&
-                            MessageDiffAspect.EmojiReactions.areTheSame(oldItem, newItem) &&
-                            MessageDiffAspect.Calendar.areTheSame(oldItem.message, newItem.message)
+                    newItem is MessageUi && MessageDiffAspect.entries.all { it.areTheSame(oldItem, newItem) }
                 }
                 is SuperCollapsedBlock -> {
                     newItem is SuperCollapsedBlock &&
@@ -960,8 +989,9 @@ class ThreadAdapter(
             // TODO: Handle the case where there are multiple aspects that changed at once
             return when {
                 // null means "bind the whole item again"
-                MessageDiffAspect.AnythingElse.areDifferent(oldItem.message, newItem.message) -> null
+                MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
+                MessageDiffAspect.Unsubscribe.areDifferent(oldItem, newItem) -> NotifyType.UnsubscribeRebind
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
@@ -999,13 +1029,15 @@ class ThreadAdapter(
             }
 
             object MessageDiffAspect {
+                val entries: List<DiffAspect<MessageUi>> get() = listOf(EmojiReactions, Calendar, AnythingElse, Unsubscribe)
+
                 data object EmojiReactions : DiffAspect<MessageUi>({
                     emojiReactionsState.containsTheSameEmojiValuesAs(it.emojiReactionsState)
                 })
 
-                data object Calendar : DiffAspect<Message>({
-                    val calendarEventResponse = latestCalendarEventResponse
-                    val otherCalendarEventResponse = it.latestCalendarEventResponse
+                data object Calendar : DiffAspect<MessageUi>({
+                    val calendarEventResponse = message.latestCalendarEventResponse
+                    val otherCalendarEventResponse = it.message.latestCalendarEventResponse
 
                     when {
                         calendarEventResponse == null && otherCalendarEventResponse == null -> true
@@ -1018,12 +1050,14 @@ class ThreadAdapter(
                     data object AnythingElse : DiffAspect<CalendarEventResponse>({ everythingButAttendeesIsTheSame(it) })
                 }
 
-                data object AnythingElse : DiffAspect<Message>({ oldMessage ->
+                data object Unsubscribe : DiffAspect<MessageUi>({ unsubscribeState == it.unsubscribeState })
+
+                data object AnythingElse : DiffAspect<MessageUi>({ oldMessage ->
                     // Checks for any aspect of the message that could change and trigger a whole bind of the item again. Here we
                     // check for anything that doesn't need to handle bind with precision using a custom payload
-                    body?.value == oldMessage.body?.value &&
-                            splitBody == oldMessage.splitBody &&
-                            shouldHideDivider == oldMessage.shouldHideDivider
+                    message.body?.value == oldMessage.message.body?.value &&
+                            message.splitBody == oldMessage.message.splitBody &&
+                            message.shouldHideDivider == oldMessage.message.shouldHideDivider
                 })
             }
         }
@@ -1044,6 +1078,7 @@ class ThreadAdapter(
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
+        var onUnsubscribeClicked: ((Message) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
         var activateSpamFilter: (() -> Unit)? = null,
         var unblockMail: ((String) -> Unit)? = null,
