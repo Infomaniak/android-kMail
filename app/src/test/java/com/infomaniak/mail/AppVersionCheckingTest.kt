@@ -22,6 +22,7 @@ import com.infomaniak.core.appversionchecker.data.models.AppPublishedVersion
 import com.infomaniak.core.appversionchecker.data.models.AppVersion
 import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.compareVersionTo
 import com.infomaniak.core.appversionchecker.data.models.AppVersion.Companion.toVersionNumbers
+import com.infomaniak.core.appversionchecker.utils.AndroidSdkVersionProvider
 import com.infomaniak.core.sentry.SentryLog
 import io.mockk.every
 import io.mockk.mockk
@@ -52,15 +53,33 @@ class AppVersionCheckingTest {
 
     private val defaultAppVersion = AppVersion(
         minimalAcceptedVersion = mediumVersion,
-        publishedVersions = listOf(AppPublishedVersion(tag = greatVersion))
+        publishedVersions = listOf(
+            AppPublishedVersion(
+                tag = greatVersion,
+                type = defaultVersionChannel.value,
+                buildMinOsVersion = "27"
+            )
+        )
     )
     private val invalidMinimalAppVersion = AppVersion(
         minimalAcceptedVersion = mediumVersion,
-        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+        publishedVersions = listOf(
+            AppPublishedVersion(
+                tag = basicVersion,
+                type = defaultVersionChannel.value,
+                buildMinOsVersion = "27"
+            )
+        )
     )
     private val invalidFormatAppVersion = AppVersion(
         minimalAcceptedVersion = invalidCommaVersion,
-        publishedVersions = listOf(AppPublishedVersion(tag = basicVersion))
+        publishedVersions = listOf(
+            AppPublishedVersion(
+                tag = basicVersion,
+                type = defaultVersionChannel.value,
+                buildMinOsVersion = "27"
+            )
+        )
     )
 
     val sentryLog = mockk<SentryLog>(relaxed = true)
@@ -69,6 +88,8 @@ class AppVersionCheckingTest {
     fun setup() {
         mockkObject(SentryLog)
         every { SentryLog.e(any(), any(), any(), any()) } returns sentryLog.e("", "")
+        mockkObject(AndroidSdkVersionProvider)
+        every { AndroidSdkVersionProvider.sdkInt } returns 30
     }
 
     //region toVersionNumbers()
