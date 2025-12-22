@@ -694,21 +694,24 @@ class ThreadViewModel @Inject constructor(
 
     //region Unsubscribe list diffusion
     fun unsubscribeMessage(message: Message) = viewModelScope.launch {
-        unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-            set(message.uid, UnsubscribeState.InProgress)
-        }
+        setUnsubscribeState(message, UnsubscribeState.InProgress)
 
         val apiResponse = ApiRepository.unsubscribe(message.resource)
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeSuccess))
+            setUnsubscribeState(message, UnsubscribeState.Completed)
             unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
                 set(message.uid, UnsubscribeState.Completed)
             }
         } else {
             snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeFailure))
-            unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-                set(message.uid, UnsubscribeState.CanUnsubscribe)
-            }
+            setUnsubscribeState(message, UnsubscribeState.CanUnsubscribe)
+        }
+    }
+
+    private fun setUnsubscribeState(message: Message, state: UnsubscribeState) {
+        unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
+            set(message.uid, state)
         }
     }
     //endregion
