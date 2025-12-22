@@ -283,6 +283,7 @@ object MatomoMail : Matomo {
         ReplyNo("replyNo"),
         ReplyYes("replyYes"),
         ReportJunk("reportJunk"),
+        ReprogramSchedule("reprogramSchedule"),
         RequestPassword("requestPassword"),
         Restore("restore"),
         RestoreEmails("restoreEmails"),

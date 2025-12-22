@@ -577,7 +577,7 @@ class ThreadAdapter(
 
         message.draftResource?.let { draftResource ->
             scheduleAlert.onAction1 {
-                trackScheduleSendEvent(MatomoName.ModifySnooze)
+                trackMessageBannerEvent(MatomoName.ReprogramSchedule)
                 threadAdapterCallbacks?.onRescheduleClicked?.invoke(
                     draftResource,
                     message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
@@ -586,7 +586,7 @@ class ThreadAdapter(
         }
 
         scheduleAlert.onAction2 {
-            trackScheduleSendEvent(MatomoName.CancelSnooze)
+            trackMessageBannerEvent(MatomoName.ModifySchedule)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
         }
     }
