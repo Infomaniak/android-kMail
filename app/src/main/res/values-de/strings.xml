@@ -453,7 +453,10 @@
     <string name="renameFolder">Benennen Sie den Ordner um</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>
     <string name="reportDisplayProblemTitle">Ein Anzeigeproblem melden</string>
-    <string name="reportPhishingDescription">Wenn diese Nachricht versucht, vertrauliche Informationen (Passwort, Bankdaten usw.) zu stehlen und/oder sich als eine anerkannte Identität ausgibt, handelt es sich um Phishing.\n\nIndem Sie uns diese Nachricht melden, können Sie die Erkennung gefährlicher Nachrichten für alle unsere Nutzer beschleunigen.\n\nDie Meldung wird an unser Sicherheitsteam weitergeleitet, das sie analysiert und Massnahmen ergreift. Die E-Mail wird ausserdem automatisch in Ihren Spam-Ordner verschoben.</string>
+    <plurals name="reportPhishingDescription">
+        <item quantity="one">Wenn diese Nachricht versucht, vertrauliche Informationen (Passwort, Bankdaten usw.) zu stehlen und/oder sich als eine anerkannte Identität ausgibt, handelt es sich um Phishing.\n\nIndem Sie uns diese Nachricht melden, können Sie die Erkennung gefährlicher Nachrichten für alle unsere Nutzer beschleunigen.\n\nDie Meldung wird an unser Sicherheitsteam weitergeleitet, das sie analysiert und Massnahmen ergreift. Die E-Mail wird ausserdem automatisch in Ihren Spam-Ordner verschoben.</item>
+        <item quantity="other">Wenn diese Nachrichten versuchen, vertrauliche Informationen (Passwörter, Bankdaten usw.) zu stehlen und/oder sich als anerkannte Identitäten ausgeben, handeln es sich um Phishing.\n\nIndem Sie uns diese Nachrichten melden, können Sie die Erkennung gefährlicher Nachrichten für alle unsere Nutzer beschleunigen.\n\nDie Meldungen werden an unser Sicherheitsteam weitergeleitet, das sie analysiert und Massnahmen ergreift. Die E-Mails werden ausserdem automatisch in Ihre Spam-Ordner verschoben.</item>
+    </plurals>
     <string name="reportPhishingTitle">Einen Phishing-Versuch melden</string>
     <string name="restoreEmailsBackupDate">Datum der Sicherung</string>
     <string name="restoreEmailsNoBackup">Kein Backup gefunden</string>

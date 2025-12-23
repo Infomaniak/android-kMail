@@ -459,7 +459,10 @@
     <string name="renameFolder">Rename the folder</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
     <string name="reportDisplayProblemTitle">Report a display problem</string>
-    <string name="reportPhishingDescription">If this message attempts to steal sensitive information (password, bank details, etc.) and/or impersonates a recognised identity then it is phishing.\n\nBy reporting it to us, you speed up the detection of dangerous messages for all our users.\n\nThe report will be sent to our security team for analysis and action. The email will also be automatically moved to your spam folder.</string>
+    <plurals name="reportPhishingDescription">
+        <item quantity="one">If this message attempts to steal sensitive information (password, bank details, etc.) and/or impersonates a recognised identity then it is phishing.\n\nBy reporting it to us, you speed up the detection of dangerous messages for all our users.\n\nThe report will be sent to our security team for analysis and action. The email will also be automatically moved to your spam folder.</item>
+        <item quantity="other">If these messages attempt to steal sensitive information (passwords, bank details, etc.) and/or impersonate recognized identities, then they are phishing.\n\nBy reporting them to us, you speed up the detection of dangerous messages for all our users.\n\nThe reports will be sent to our security team for analysis and action. The emails will also be automatically moved to your spam folder.</item>
+    </plurals>
     <string name="reportPhishingTitle">Report a phishing attempt</string>
     <string name="restoreEmailsBackupDate">Backup date</string>
     <string name="restoreEmailsNoBackup">No backup found</string>
