@@ -31,8 +31,8 @@ android {
         applicationId = "com.infomaniak.mail"
         minSdk = appMinSdk
         targetSdk = appCompileSdk
-        versionCode = 1_22_002_02
-        versionName = "1.22.2"
+        versionCode = 1_23_000_01
+        versionName = "1.23.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
         testInstrumentationRunnerArguments["useTestStorageService"] = "true"
