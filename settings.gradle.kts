@@ -4,6 +4,7 @@ pluginManagement {
         google()
         mavenCentral()
     }
+    includeBuild("Core/build-logic")
 }
 
 dependencyResolutionManagement {
@@ -20,46 +21,17 @@ dependencyResolutionManagement {
     }
 }
 
+plugins {
+    id("com.infomaniak.core.composite")
+}
+
 rootProject.name = "Infomaniak Mail"
 include(
     ":app",
-    ":Core:AppIntegrity",
-    ":Core:AppVersionChecker",
-    ":Core:Auth",
-    ":Core:Avatar",
-    ":Core:Coil",
-    ":Core:CrossAppLogin:Back",
-    ":Core:CrossAppLogin:Front",
-    ":Core:DotLottie",
-    ":Core:FragmentNavigation",
-    ":Core:InAppReview",
-    ":Core:InAppUpdate",
-    ":Core:KSuite",
-    ":Core:KSuite:KSuitePro",
-    ":Core:KSuite:MyKSuite",
     ":Core:Legacy",
     ":Core:Legacy:AppLock",
     ":Core:Legacy:BugTracker",
     ":Core:Legacy:Confetti",
-    ":Core:Matomo",
-    ":Core:Network",
-    ":Core:Network:Ktor",
-    ":Core:Network:Models",
-    ":Core:Notifications:Registration",
-    ":Core:Onboarding",
-    ":Core:Sentry",
-    ":Core:TwoFactorAuth:Front",
-    ":Core:TwoFactorAuth:Back",
-    ":Core:TwoFactorAuth:Back:WithUserDb",
-    ":Core:Ui",
-    ":Core:Ui:Compose:BasicButton",
-    ":Core:Ui:Compose:Basics",
-    ":Core:Ui:Compose:Margin",
-    ":Core:Ui:Compose:BottomStickyButtonScaffolds",
-    ":Core:Ui:Compose:MaterialThemeFromXml",
-    ":Core:Ui:Compose:Preview",
-    ":Core:Ui:View",
-    ":Core:WebView",
     ":EmojiComponents",
     ":HtmlCleaner",
 )
