@@ -164,7 +164,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         return@runCatchingRealm when (val item = currentList[position]) {
             ItemType.DIVIDER -> ItemType.DIVIDER.ordinal
             is MailboxesHeader -> ItemType.MAILBOXES_HEADER.ordinal
-            is Mailbox -> if (item.isAvailable) ItemType.MAILBOX.ordinal else ItemType.INVALID_MAILBOX.ordinal
+            is Mailbox -> if (item.isLocked) ItemType.INVALID_MAILBOX.ordinal else ItemType.MAILBOX.ordinal
             ItemType.FOLDERS_HEADER -> ItemType.FOLDERS_HEADER.ordinal
             is FolderUi -> ItemType.FOLDER.ordinal
             ItemType.EMPTY_FOLDERS -> ItemType.EMPTY_FOLDERS.ordinal

@@ -104,10 +104,6 @@
     <string name="bccTitle">CCO:</string>
     <string name="blockAnExpeditorTitle">Bloquear un remitente</string>
     <string name="blockExpeditorTitle">Bloquear %s</string>
-    <plurals name="blockedPasswordTitle">
-        <item quantity="one">Contraseña bloqueada</item>
-        <item quantity="other">Contraseñas bloqueadas</item>
-    </plurals>
     <string name="buttonAccept">Acepte</string>
     <string name="buttonAccountDelete">Eliminar cuenta</string>
     <string name="buttonAccountLogOut">Cerrar sesión</string>

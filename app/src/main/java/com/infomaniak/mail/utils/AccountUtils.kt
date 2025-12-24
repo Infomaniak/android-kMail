@@ -92,7 +92,7 @@ object AccountUtils : CredentialManager() {
                 Dispatchers.Main { context.launchNoMailboxActivity(currentUserId, shouldStartLoginActivity = true) }
                 true
             }
-            mailboxes.none { it.isAvailable } -> {
+            mailboxes.all { it.isLocked } -> {
                 Dispatchers.Main { context.launchNoValidMailboxesActivity() }
                 true
             }
