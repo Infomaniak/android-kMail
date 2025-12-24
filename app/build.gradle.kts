@@ -4,7 +4,7 @@ import java.util.Properties
  * Don't change the order in this `plugins` block, it will mess things up.
  */
 plugins {
-    alias(libs.plugins.android.application)
+    alias(core.plugins.android.application)
     alias(core.plugins.dagger.hilt)
     alias(libs.plugins.google.services)
     alias(core.plugins.kotlin.android)
