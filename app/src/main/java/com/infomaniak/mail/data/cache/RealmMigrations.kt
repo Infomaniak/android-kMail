@@ -41,6 +41,7 @@ val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.keepDefaultValuesAfterSixthMigration()
     migrationContext.renameKSuiteRelatedBooleans()
     migrationContext.revertKSuiteRelatedBooleanRenaming()
+    migrationContext.keepDefaultValuesAfterTwelveMigration()
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
@@ -296,6 +297,20 @@ private fun MigrationContext.initMessagesWithContentToTheOldMessagesListAfterThi
                 // Initialize messagesWithContent by copying the existing messages
                 val messages = newThread.getObjectList(propertyName = "messages")
                 newThread.set(propertyName = "messagesWithContent", value = messages)
+            }
+        }
+    }
+}
+//endregion
+
+// Migrate from version #13
+private fun MigrationContext.keepDefaultValuesAfterTwelveMigration() {
+
+    if (oldRealm.schemaVersion() <= 13L) {
+        enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Rename property without losing its previous value
+                set(propertyName = "isLocked", value = oldObject.getValue<Boolean>(fieldName = "_isLocked"))
             }
         }
     }

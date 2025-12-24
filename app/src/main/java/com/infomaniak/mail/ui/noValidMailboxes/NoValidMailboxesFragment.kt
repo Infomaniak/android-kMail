@@ -42,9 +42,6 @@ class NoValidMailboxesFragment : Fragment() {
 
     private val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as InvalidMailboxesAdapter
 
-    private val invalidPasswordMailboxesAdapter
-        inline get() = binding.invalidPasswordMailboxesRecyclerView.adapter as InvalidMailboxesAdapter
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -59,7 +56,6 @@ class NoValidMailboxesFragment : Fragment() {
     }
 
     private fun setupAdapters() = with(binding) {
-        invalidPasswordMailboxesRecyclerView.adapter = InvalidMailboxesAdapter()
         lockedMailboxesRecyclerView.adapter = InvalidMailboxesAdapter()
     }
 
@@ -76,13 +72,6 @@ class NoValidMailboxesFragment : Fragment() {
     }
 
     private fun observeMailboxesLive() = with(binding) {
-        noValidMailboxesViewModel.invalidPasswordMailboxesLive.observe(viewLifecycleOwner) { invalidPasswordMailboxes ->
-            invalidPasswordMailboxesAdapter.setMailboxes(invalidPasswordMailboxes)
-            invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
-            invalidPasswordTitle.text =
-                resources.getQuantityString(R.plurals.blockedPasswordTitle, invalidPasswordMailboxes.count())
-        }
-
         noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
             mailboxesAdapter.setMailboxes(lockedMailboxes)
             lockedMailboxesGroup.isVisible = lockedMailboxes.isNotEmpty()
