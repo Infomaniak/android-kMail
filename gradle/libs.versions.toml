@@ -27,14 +27,41 @@ webkit = "1.14.0"
 
 [libraries]
 compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "compose" }
-dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 desugar-jdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJDK" }
+dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 dragdropswipe-recyclerview = { module = "com.github.infomaniak:DragDropSwipeRecyclerview", version.ref = "dragDropSwipeRecyclerView" }
 emoji2-emojipicker = { module = "androidx.emoji2:emoji2-emojipicker", version.ref = "emoji2" }
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
+infomaniak-core = { module = "com.infomaniak.core:Core" }
+infomaniak-core-appversionchecker = { module = "com.infomaniak.core:AppVersionChecker" }
+infomaniak-core-auth = { module = "com.infomaniak.core:Auth" }
+infomaniak-core-avatar = { module = "com.infomaniak.core:Avatar" }
+infomaniak-core-coil = { module = "com.infomaniak.core:Coil" }
+infomaniak-core-crossapplogin-front = { module = "com.infomaniak.core:CrossAppLogin.Front" }
+infomaniak-core-dotlottie = { module = "com.infomaniak.core:DotLottie" }
+infomaniak-core-fragmentnavigation = { module = "com.infomaniak.core:FragmentNavigation" }
+infomaniak-core-inappreview = { module = "com.infomaniak.core:InAppReview" }
+infomaniak-core-inappupdate = { module = "com.infomaniak.core:InAppUpdate" }
+infomaniak-core-ksuite = { module = "com.infomaniak.core:KSuite" }
+infomaniak-core-ksuite-ksuitepro = { module = "com.infomaniak.core:KSuite.KSuitePro" }
+infomaniak-core-ksuite-myksuite = { module = "com.infomaniak.core:KSuite.MyKSuite" }
+infomaniak-core-matomo = { module = "com.infomaniak.core:Matomo" }
+infomaniak-core-network = { module = "com.infomaniak.core:Network" }
+infomaniak-core-notifications-registration = { module = "com.infomaniak.core:Notifications.Registration" }
+infomaniak-core-sentry = { module = "com.infomaniak.core:Sentry" }
+infomaniak-core-twofactorauth-back-withuserdb = { module = "com.infomaniak.core:TwoFactorAuth.Back.WithUserDb" }
+infomaniak-core-twofactorauth-front = { module = "com.infomaniak.core:TwoFactorAuth.Front" }
+infomaniak-core-ui = { module = "com.infomaniak.core:Ui" }
+infomaniak-core-ui-compose-basicbutton = { module = "com.infomaniak.core:Ui.Compose.BasicButton" }
+infomaniak-core-ui-compose-basics = { module = "com.infomaniak.core:Ui.Compose.Basics" }
+infomaniak-core-ui-compose-bottomstickybuttonscaffolds = { module = "com.infomaniak.core:Ui.Compose.BottomStickyButtonScaffolds" }
+infomaniak-core-ui-compose-margin = { module = "com.infomaniak.core:Ui.Compose.Margin" }
+infomaniak-core-ui-compose-materialthemefromxml = { module = "com.infomaniak.core:Ui.Compose.MaterialThemeFromXml" }
+infomaniak-core-ui-compose-preview = { module = "com.infomaniak.core:Ui.Compose.Preview" }
+infomaniak-core-ui-view = { module = "com.infomaniak.core:Ui.View" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
@@ -55,7 +82,5 @@ mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiTestJunit4" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 google-services = { id = "com.google.gms.google-services" }
 realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }
