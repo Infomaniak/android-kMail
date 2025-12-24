@@ -41,7 +41,7 @@ class SettingsMailboxesAdapter(
         setTitle(mailbox.email)
 
         setOnClickListener { onMailboxSelected(mailbox) }
-        toggleMailboxBlockedState(!mailbox.isAvailable)
+        toggleMailboxBlockedState(mailbox.isLocked)
     }
 
     override fun getItemCount(): Int = mailboxes.count()

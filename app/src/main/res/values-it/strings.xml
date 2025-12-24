@@ -104,10 +104,6 @@
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Blocca un mittente</string>
     <string name="blockExpeditorTitle">Blocca %s</string>
-    <plurals name="blockedPasswordTitle">
-        <item quantity="one">Password bloccata</item>
-        <item quantity="other">Password bloccate</item>
-    </plurals>
     <string name="buttonAccept">Accetta</string>
     <string name="buttonAccountDelete">Cancella l’account</string>
     <string name="buttonAccountLogOut">Disconnettersi</string>

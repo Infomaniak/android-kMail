@@ -157,10 +157,10 @@ class SettingsFragment : Fragment() {
     private fun setupMailboxesAdapter() {
         val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
             with(selectedMailbox) {
-                if (isAvailable) {
-                    animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
-                } else {
+                if (isLocked) {
                     context?.showToast(R.string.errorMailboxLocked)
+                } else {
+                    animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
                 }
             }
         }
