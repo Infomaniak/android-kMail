@@ -124,7 +124,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             trackBottomSheetThreadActionsEvent(MatomoName.SignalPhishing)
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
-                description = getString(R.string.reportPhishingDescription),
+                description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
             )
         }
