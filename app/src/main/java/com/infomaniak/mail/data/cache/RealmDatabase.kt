@@ -19,6 +19,9 @@ package com.infomaniak.mail.data.cache
 
 import android.content.Context
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.data.cache.migrations.MAILBOX_CONTENT_MIGRATION
+import com.infomaniak.mail.data.cache.migrations.MAILBOX_INFO_MIGRATION
+import com.infomaniak.mail.data.cache.migrations.USER_INFO_MIGRATION
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
