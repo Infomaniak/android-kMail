@@ -163,6 +163,7 @@ dependencies {
     implementation(libs.infomaniak.core.appversionchecker)
     implementation(libs.infomaniak.core.auth)
     implementation(libs.infomaniak.core.avatar)
+    implementation(libs.infomaniak.core.bugtracker)
     implementation(libs.infomaniak.core.coil)
     implementation(libs.infomaniak.core.crossapplogin.front)
     implementation(libs.infomaniak.core.dotlottie)
@@ -188,7 +189,6 @@ dependencies {
 
     implementation(project(":Core:Legacy"))
     implementation(project(":Core:Legacy:AppLock"))
-    implementation(project(":Core:Legacy:BugTracker"))
     implementation(project(":Core:Legacy:Confetti"))
     implementation(project(":EmojiComponents"))
     implementation(project(":HtmlCleaner"))
