@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.auth.room.UserDatabase
+import com.infomaniak.core.crossapplogin.back.CrossAppLogin
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
@@ -53,7 +56,9 @@ import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResul
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.getDashboardData
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.uuid.ExperimentalUuidApi
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
@@ -172,6 +177,18 @@ class SettingsFragment : Fragment() {
             settingsThreadMode.setSubtitle(threadMode.localisedNameRes)
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
             settingsAutomaticAdvance.setSubtitle(autoAdvanceMode.localisedNameRes)
+            lifecycleScope.launch {
+                val currentUser = AccountUtils.currentUser ?: UserDatabase().userDao().findById(AccountUtils.currentUserId)
+                val isStaff = currentUser?.isStaff == true
+                if (isStaff) {
+                    settingsCrossAppDeviceId.isVisible = true
+                    val crossAppLogin = CrossAppLogin.forContext(requireContext(), this)
+                    @OptIn(ExperimentalUuidApi::class)
+                    crossAppLogin.sharedDeviceIdFlow.collect { crossAppDeviceId ->
+                        settingsCrossAppDeviceId.setSubtitle(crossAppDeviceId.toHexDashString())
+                    }
+                }
+            }
         }
     }
 
