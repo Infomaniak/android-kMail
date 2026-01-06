@@ -89,10 +89,6 @@ class MailboxController @Inject constructor(
         return getMailboxQuery(userId, mailboxId, mailboxInfoRealm).asFlow()
     }
 
-    fun getInvalidPasswordMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
-        return getInvalidPasswordMailboxesQuery(userId, mailboxInfoRealm).toMailboxesFlow()
-    }
-
     fun getLockedMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
         return getLockedMailboxesQuery(userId, mailboxInfoRealm).toMailboxesFlow()
     }
@@ -167,9 +163,7 @@ class MailboxController @Inject constructor(
         //region Queries
         private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
-        private val isValidInLdap = "${Mailbox.isValidInLdapPropertyName} == true"
         private val isLocked = "${Mailbox.isLockedPropertyName} == true"
-        private val hasValidPassword = "${Mailbox::hasValidPassword.name} == true"
         private val isKSuitePerso = "${Mailbox::isKSuitePerso.name} == true"
 
         private fun getMailboxesQuery(
@@ -196,7 +190,7 @@ class MailboxController @Inject constructor(
         }
 
         private fun getValidMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-            return realm.query("${checkHasUserId(userId)} AND $isValidInLdap AND NOT $isLocked AND $hasValidPassword")
+            return realm.query("${checkHasUserId(userId)} AND NOT $isLocked")
         }
 
         private fun getMailboxesCountQuery(userId: Int, realm: TypedRealm): RealmScalarQuery<Long> {
@@ -212,12 +206,8 @@ class MailboxController @Inject constructor(
             return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId", mailboxId).first()
         }
 
-        private fun getInvalidPasswordMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-            return realm.query("${checkHasUserId(userId)} AND NOT $hasValidPassword AND NOT $isLocked AND $isValidInLdap")
-        }
-
         private fun getLockedMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-            return realm.query("${checkHasUserId(userId)} AND ($isLocked OR NOT $isValidInLdap)")
+            return realm.query("${checkHasUserId(userId)} AND $isLocked")
         }
 
         private fun getMyKSuiteMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {

@@ -117,7 +117,7 @@ class LoginUtils @Inject constructor(
                     trackUserInfo(MatomoName.NbMailboxes, mailboxes.count())
                     AccountUtils.addUser(user)
                     mailboxController.updateMailboxes(mailboxes)
-                    return@let if (mailboxes.none { it.isAvailable }) MailboxErrorCode.NO_VALID_MAILBOX else user
+                    return@let if (mailboxes.all { it.isLocked }) MailboxErrorCode.NO_VALID_MAILBOX else user
                 } ?: run {
                     getErrorResponse(InternalTranslatedErrorCode.UnknownError)
                 }
