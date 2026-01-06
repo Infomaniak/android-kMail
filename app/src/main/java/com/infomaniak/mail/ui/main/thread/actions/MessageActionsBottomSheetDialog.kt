@@ -170,7 +170,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
             }
 
-            override fun onReportJunk() = Unit
+            override fun onSpam() = Unit
+            override fun onPhishing() = Unit
+            override fun onBlockSender() = Unit
 
             override fun onPrint() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Print)

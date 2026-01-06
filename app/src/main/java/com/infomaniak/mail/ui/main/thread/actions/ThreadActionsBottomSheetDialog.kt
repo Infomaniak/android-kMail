@@ -19,11 +19,13 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.core.observe
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -32,10 +34,13 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
@@ -57,7 +62,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
-
+    private val junkMessagesViewModel: JunkMessagesViewModel by viewModels()
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
 
@@ -94,7 +99,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setReactionUi(canBeReactedTo = messageUidToReactTo != null)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
+                junkMessagesViewModel.threadsUids = listOf(thread.uid)
             }
+
+        junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
+            setBlockUserUi(potentialUsersToBlock)
+        }
+
+        observeReportPhishingResult()
+
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
@@ -105,17 +118,32 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         cancelSnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
     }
 
-    private fun setJunkUi() = binding.reportJunk.apply {
+    private fun setJunkUi() = with(binding) {
+        spam.apply {
+            val (text, icon) = if (isFromSpam) {
+                R.string.actionNonSpam to R.drawable.ic_non_spam
+            } else {
+                R.string.actionSpam to R.drawable.ic_report_junk
+            }
 
-        val (text, icon) = if (isFromSpam) {
-            R.string.actionNonSpam to R.drawable.ic_non_spam
-        } else {
-            R.string.actionReportJunk to R.drawable.ic_report_junk
+            setTitle(text)
+            setIconResource(icon)
+            isVisible = true
         }
 
-        setTitle(text)
-        setIconResource(icon)
-        isVisible = true
+        phishing.isVisible = !isFromSpam
+        blockSender.isVisible = !isFromSpam
+    }
+
+    private fun observeReportPhishingResult() {
+        mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
+            descriptionDialog.resetLoadingAndDismiss()
+            findNavController().popBackStack()
+        }
+    }
+
+    private fun setBlockUserUi(potentialUsersToBlock: Map<Recipient, Message>) {
+        if (potentialUsersToBlock.count() == 0) binding.blockSender.isGone = true
     }
 
     private fun onActionClick(
@@ -214,16 +242,46 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid)
         }
 
-        override fun onReportJunk() {
+        override fun onSpam() {
             if (isFromSpam) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
                 mainViewModel.toggleThreadSpamStatus(listOf(navigationArgs.threadUid))
             } else {
-                findNavController().navigate(
-                    resId = R.id.junkBottomSheetDialog,
-                    args = JunkBottomSheetDialogArgs(arrayOf(thread.uid)).toBundle(),
+                // Check the first message, because it is not possible to select messages from multiple folders,
+                // so you won't have both SPAM and non-SPAM messages.
+                trackBottomSheetThreadActionsEvent(
+                    MatomoName.Spam,
+                    value = thread.messages.firstOrNull()?.folder?.role == FolderRole.SPAM
                 )
+                mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
+
             }
+        }
+
+        override fun onPhishing() {
+            trackBottomSheetThreadActionsEvent(MatomoName.SignalPhishing)
+            descriptionDialog.show(
+                title = getString(R.string.reportPhishingTitle),
+                description = resources.getQuantityString(R.plurals.reportPhishingDescription, thread.messages.count()),
+                onPositiveButtonClicked = { mainViewModel.reportPhishing(listOf(thread.uid), thread.messages) },
+            )
+        }
+
+        override fun onBlockSender() {
+            trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
+            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value ?: return
+
+            if (potentialUsersToBlock.count() > 1) {
+                safelyNavigate(
+                    resId = R.id.userToBlockBottomSheetDialog,
+                    substituteClassName = ThreadListFragment::class.java.name,
+                )
+            } else {
+                potentialUsersToBlock.values.firstOrNull()?.let { message ->
+                    junkMessagesViewModel.messageOfUserToBlock.value = message
+                }
+            }
+            mainViewModel.isMultiSelectOn = false
         }
 
         override fun onPrint() {

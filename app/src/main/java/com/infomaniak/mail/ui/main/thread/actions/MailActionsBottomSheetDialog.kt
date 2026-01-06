@@ -63,7 +63,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onModifySnooze() = Unit
         override fun onCancelSnooze() = Unit
         override fun onFavorite() = Unit
-        override fun onReportJunk() = Unit
+        override fun onSpam() = Unit
+        override fun onPhishing() = Unit
+        override fun onBlockSender() = Unit
         override fun onPrint() = Unit
         override fun onShare() = Unit
         override fun onSaveToKDrive() = Unit
@@ -91,7 +93,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
         favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }
-        reportJunk.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportJunk() }
+        spam.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSpam() }
+        phishing.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPhishing() }
+        blockSender.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onBlockSender() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
         share.setClosingOnClickListener(shouldCloseMultiSelection) {
             if (mainViewModel.currentMailbox.value?.kSuite is KSuite.Perso.Free) {
@@ -177,7 +181,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onModifySnooze()
         fun onCancelSnooze()
         fun onFavorite()
-        fun onReportJunk()
+        fun onSpam() = Unit
+        fun onPhishing() = Unit
+        fun onBlockSender() = Unit
         fun onPrint()
         fun onShare()
         fun onSaveToKDrive()
