@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2025 Infomaniak Network SA
+  ~ Copyright (C) 2022-2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -195,6 +195,15 @@
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
                 app:title="@string/settingsAccountManagementTitle" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsCrossAppDeviceId"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="none"
+                app:subtitle="-"
+                app:title="Cross app device ID" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
