@@ -56,6 +56,8 @@ import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResul
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.getDashboardData
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.uuid.ExperimentalUuidApi
@@ -178,9 +180,8 @@ class SettingsFragment : Fragment() {
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
             settingsAutomaticAdvance.setSubtitle(autoAdvanceMode.localisedNameRes)
             lifecycleScope.launch {
-                val currentUser = AccountUtils.currentUser ?: UserDatabase().userDao().findById(AccountUtils.currentUserId)
-                val isStaff = currentUser?.isStaff == true
-                if (isStaff) {
+                UserDatabase().userDao().allUsers.map { list -> list.any { it.isStaff } }.collectLatest { hasStaffAccount ->
+                    if (!hasStaffAccount) return@collectLatest
                     settingsCrossAppDeviceId.isVisible = true
                     val crossAppLogin = CrossAppLogin.forContext(requireContext(), this)
                     @OptIn(ExperimentalUuidApi::class)
