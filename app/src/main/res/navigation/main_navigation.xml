@@ -152,16 +152,6 @@
     </fragment>
 
     <dialog
-        android:id="@+id/junkBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.thread.actions.JunkBottomSheetDialog"
-        android:label="JunkBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_junk">
-        <argument
-            android:name="threadUids"
-            app:argType="string[]" />
-    </dialog>
-
-    <dialog
         android:id="@+id/userToBlockBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.UserToBlockBottomSheetDialog"
         android:label="UserToBlockBottomSheetDialog"
