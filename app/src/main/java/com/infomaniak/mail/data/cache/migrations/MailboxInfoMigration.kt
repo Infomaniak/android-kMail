@@ -17,10 +17,21 @@
  */
 package com.infomaniak.mail.data.cache.migrations
 
+import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.DynamicRealmObject
 import io.realm.kotlin.dynamic.getValue
+import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
+
+fun mailboxInfoMigration() = AutomaticSchemaMigration { migrationContext ->
+    SentryDebug.addMigrationBreadcrumb(migrationContext)
+    migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.keepDefaultValuesAfterSixthMigration()
+    migrationContext.renameKSuiteRelatedBooleans()
+    migrationContext.revertKSuiteRelatedBooleanRenaming()
+    migrationContext.keepDefaultValuesAfterTwelveMigration()
+}
 
 //region Use default property values when adding a new column in a migration
 /**
@@ -34,7 +45,7 @@ import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
  * Documentation to handle manual migrations :
  * https://www.mongodb.com/docs/atlas/device-sdks/sdk/kotlin/realm-database/schemas/change-an-object-model/
  */
-internal fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
+private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
     if (oldRealm.schemaVersion() <= 6L) {
         enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
@@ -53,7 +64,7 @@ internal fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
 }
 
 // Migrate from version #9
-internal fun MigrationContext.renameKSuiteRelatedBooleans() {
+private fun MigrationContext.renameKSuiteRelatedBooleans() {
 
     if (oldRealm.schemaVersion() <= 9L) {
         enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -72,7 +83,7 @@ internal fun MigrationContext.renameKSuiteRelatedBooleans() {
 }
 
 // Migrate from version #11
-internal fun MigrationContext.revertKSuiteRelatedBooleanRenaming() {
+private fun MigrationContext.revertKSuiteRelatedBooleanRenaming() {
 
     if (oldRealm.schemaVersion() <= 11L) {
         enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -89,7 +100,7 @@ internal fun MigrationContext.revertKSuiteRelatedBooleanRenaming() {
 //endregion
 
 // Migrate from version #13
-internal fun MigrationContext.keepDefaultValuesAfterTwelveMigration() {
+private fun MigrationContext.keepDefaultValuesAfterTwelveMigration() {
 
     if (oldRealm.schemaVersion() <= 13L) {
         enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->

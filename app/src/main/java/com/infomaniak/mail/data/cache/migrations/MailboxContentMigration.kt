@@ -18,15 +18,28 @@
 package com.infomaniak.mail.data.cache.migrations
 
 import com.infomaniak.mail.data.models.SnoozeState
+import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.DynamicRealmObject
 import io.realm.kotlin.dynamic.getValue
+import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 import io.realm.kotlin.types.RealmInstant
 
 
+fun mailboxContentMigration() = AutomaticSchemaMigration { migrationContext ->
+    SentryDebug.addMigrationBreadcrumb(migrationContext)
+    migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.keepDefaultValuesAfterNineteenthMigration()
+    migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration()
+    migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
+    migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
+    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration()
+    migrationContext.initMessagesWithContentToTheOldMessagesListAfterThirtySecondMigration()
+}
+
 // Migrate from version #19
-internal fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
+private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
 
     if (oldRealm.schemaVersion() <= 19L) {
 
@@ -49,7 +62,7 @@ internal fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
 //endregion
 
 // Migrate from version #22
-internal fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigration() {
+private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigration() {
 
     if (oldRealm.schemaVersion() <= 22L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -76,7 +89,7 @@ internal fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigra
 //endregion
 
 // Migrate from version #24
-internal fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration() {
+private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration() {
 
     if (oldRealm.schemaVersion() <= 24L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -115,7 +128,7 @@ internal fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourt
 //endregion
 
 // Migrate from version #25
-internal fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration() {
+private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration() {
 
     if (oldRealm.schemaVersion() <= 25L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -144,12 +157,12 @@ internal fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigra
 
 private const val UUID_PATTERN = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 private val lastUuidRegex = Regex("""$UUID_PATTERN(?!.*$UUID_PATTERN)""", RegexOption.IGNORE_CASE)
-internal fun String.lastUuidOrNull() = lastUuidRegex.find(this)?.value
+private fun String.lastUuidOrNull() = lastUuidRegex.find(this)?.value
 //endregion
 
 // Migrate from version #27 or #28
 // Bumping to schema 29 required to recompute the Thread object again. If already done for schema 28, no need to do it twice
-internal fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration() {
+private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration() {
 
     if (oldRealm.schemaVersion() <= 28L) {
         enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -188,7 +201,7 @@ internal fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAnd
 //endregion
 
 // Migrate from version #32
-internal fun MigrationContext.initMessagesWithContentToTheOldMessagesListAfterThirtySecondMigration() {
+private fun MigrationContext.initMessagesWithContentToTheOldMessagesListAfterThirtySecondMigration() {
 
     if (oldRealm.schemaVersion() <= 32L) {
         enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->

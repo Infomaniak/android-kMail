@@ -33,28 +33,12 @@ val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.deleteRealmFromFirstMigration()
 }
 
-val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
-    SentryDebug.addMigrationBreadcrumb(migrationContext)
-    migrationContext.deleteRealmFromFirstMigration()
-    migrationContext.keepDefaultValuesAfterSixthMigration()
-    migrationContext.renameKSuiteRelatedBooleans()
-    migrationContext.revertKSuiteRelatedBooleanRenaming()
-    migrationContext.keepDefaultValuesAfterTwelveMigration()
-}
+val MAILBOX_INFO_MIGRATION = mailboxInfoMigration()
 
-val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
-    SentryDebug.addMigrationBreadcrumb(migrationContext)
-    migrationContext.deleteRealmFromFirstMigration()
-    migrationContext.keepDefaultValuesAfterNineteenthMigration()
-    migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration()
-    migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
-    migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
-    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration()
-    migrationContext.initMessagesWithContentToTheOldMessagesListAfterThirtySecondMigration()
-}
+val MAILBOX_CONTENT_MIGRATION = mailboxContentMigration()
 
 // Migrate to version #1
-private fun MigrationContext.deleteRealmFromFirstMigration() {
+fun MigrationContext.deleteRealmFromFirstMigration() {
     if (oldRealm.schemaVersion() < 1L) newRealm.deleteAll()
 }
 
@@ -62,7 +46,7 @@ private fun MigrationContext.deleteRealmFromFirstMigration() {
  * If the property we're trying to set doesn't exist anymore in our model at the latest schema version, instead of crashing skip
  * this property value.
  */
-internal fun DynamicMutableRealmObject.setIfPropertyExists(propertyName: String, value: Any?) {
+fun DynamicMutableRealmObject.setIfPropertyExists(propertyName: String, value: Any?) {
     runCatching {
         set(propertyName, value)
     }.onFailure {
