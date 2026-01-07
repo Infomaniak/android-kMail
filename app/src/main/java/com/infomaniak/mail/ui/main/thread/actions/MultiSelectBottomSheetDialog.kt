@@ -31,6 +31,7 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
@@ -41,6 +42,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
@@ -61,6 +63,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+import com.infomaniak.core.R as RCore
 
 @AndroidEntryPoint
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -82,6 +85,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     @Inject
     lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -174,7 +180,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.phishing.setOnClickListener {
             trackMultiSelectActionEvent(MatomoName.SignalPhishing, threadsCount, isFromBottomSheet = true)
-            val messages = junkMessagesViewModel.junkMessages.value ?: return@setOnClickListener
+            val messages = junkMessagesViewModel.junkMessages.value ?: emptyList()
+
+            if (messages.isEmpty()) {
+                //An error will be shown to the user in the reportPhishing function
+                SentryLog.e(TAG, getString(R.string.errorPhishingMessagesNull))
+            }
 
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
@@ -190,7 +201,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.blockSender.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.BlockUser, threadsCount, isFromBottomSheet = true)
-            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value ?: return@setClosingOnClickListener
+            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
+            if (potentialUsersToBlock == null) {
+                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+                SentryLog.e(TAG, getString(R.string.errorPotentialUsersToBlockNull))
+                return@setClosingOnClickListener
+            }
 
             if (potentialUsersToBlock.count() > 1) {
                 safelyNavigate(
@@ -298,6 +314,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     data class JunkThreads(val threadUids: List<String>) : Parcelable
 
     companion object {
-        const val DIALOG_SHEET_MULTI_JUNK = "dialog_sheet_multi_junk"
+        private val TAG = MultiSelectBottomSheetDialog::class.java.simpleName
     }
 }

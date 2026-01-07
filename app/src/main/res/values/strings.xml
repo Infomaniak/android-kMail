@@ -336,6 +336,8 @@
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
     <string name="errorUserAlreadySynchronized">User is already synchronized</string>
+    <string name="errorPotentialUsersToBlockNull" translatable="false">Potential users to block is null</string>
+    <string name="errorPhishingMessagesNull" translatable="false">Phishing messages report failed because the list is empty</string>
     <string name="expeditorAuthenticationDescription">The sender’s origin has been authenticated.</string>
     <string name="externalDialogConfirmButton">I understand</string>
     <plurals name="externalDialogDescriptionExpeditor">

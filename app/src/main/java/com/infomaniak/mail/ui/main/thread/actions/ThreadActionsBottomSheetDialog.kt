@@ -29,6 +29,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.core.observe
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
@@ -41,6 +42,7 @@ import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
@@ -57,6 +59,7 @@ import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.core.R as RCore
 
 @AndroidEntryPoint
 class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
@@ -82,6 +85,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     @Inject
     lateinit var threadController: ThreadController
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -271,7 +277,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onBlockSender() {
             trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
-            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value ?: return
+            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
+            if (potentialUsersToBlock == null) {
+                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+                SentryLog.e(TAG, getString(R.string.errorPotentialUsersToBlockNull))
+                return
+            }
 
             if (potentialUsersToBlock.count() > 1) {
                 safelyNavigate(
@@ -317,6 +328,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     companion object {
+        private val TAG = ThreadActionsBottomSheetDialog::class.java.simpleName
         const val OPEN_SNOOZE_BOTTOM_SHEET = "openSnoozeBottomSheet"
     }
 }
