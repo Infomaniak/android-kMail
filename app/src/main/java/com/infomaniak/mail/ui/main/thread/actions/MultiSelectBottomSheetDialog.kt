@@ -314,6 +314,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     data class JunkThreads(val threadUids: List<String>) : Parcelable
 
     companion object {
-        private val TAG = MultiSelectBottomSheetDialog::class.java.simpleName
+        const val TAG = "MultiSelectBottomSheetDialog"
     }
 }

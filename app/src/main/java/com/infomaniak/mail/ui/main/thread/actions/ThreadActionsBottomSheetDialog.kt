@@ -328,7 +328,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     companion object {
-        private val TAG = ThreadActionsBottomSheetDialog::class.java.simpleName
+        const val TAG = "ThreadActionsBottomSheetDialog"
         const val OPEN_SNOOZE_BOTTOM_SHEET = "openSnoozeBottomSheet"
     }
 }
