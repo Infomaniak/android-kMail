@@ -148,7 +148,7 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name="com.infomaniak.core.legacy.bugtracker.BugTrackerActivity"
+            android:name="com.infomaniak.core.bugtracker.BugTrackerActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false" />
 

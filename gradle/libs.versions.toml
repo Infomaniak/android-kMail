@@ -43,6 +43,7 @@ infomaniak-core-bugtracker = { module = "com.infomaniak.core:BugTracker" }
 infomaniak-core-coil = { module = "com.infomaniak.core:Coil" }
 infomaniak-core-crossapplogin-front = { module = "com.infomaniak.core:CrossAppLogin.Front" }
 infomaniak-core-dotlottie = { module = "com.infomaniak.core:DotLottie" }
+infomaniak-core-file = { module = "com.infomaniak.core:File" }
 infomaniak-core-fragmentnavigation = { module = "com.infomaniak.core:FragmentNavigation" }
 infomaniak-core-inappreview = { module = "com.infomaniak.core:InAppReview" }
 infomaniak-core-inappupdate = { module = "com.infomaniak.core:InAppUpdate" }
