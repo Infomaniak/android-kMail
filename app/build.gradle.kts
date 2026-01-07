@@ -167,6 +167,7 @@ dependencies {
     implementation(libs.infomaniak.core.coil)
     implementation(libs.infomaniak.core.crossapplogin.front)
     implementation(libs.infomaniak.core.dotlottie)
+    implementation(libs.infomaniak.core.file)
     implementation(libs.infomaniak.core.fragmentnavigation)
     implementation(libs.infomaniak.core.inappreview)
     implementation(libs.infomaniak.core.inappupdate)
