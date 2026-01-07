@@ -28,17 +28,20 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
@@ -64,6 +67,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
     override val mainViewModel: MainViewModel by activityViewModels()
+    private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }
 
@@ -79,6 +83,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     @Inject
     lateinit var localSettings: LocalSettings
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -90,9 +95,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val threads = selectedThreads.toSet()
         val threadsUids = threads.map { it.uid }
         val threadsCount = threadsUids.count()
+        junkMessagesViewModel.threadsUids = threadsUids
+
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
 
         setStateDependentUi(shouldRead, shouldFavorite, threads)
+        observeReportPhishingResult()
 
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             // This DialogFragment is already be dismissing since popBackStack was called by
@@ -158,24 +166,68 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             isMultiSelectOn = false
         }
 
-        binding.reportJunk.setOnClickListener {
-            trackMultiSelectActionEvent(MatomoName.ReportJunk, threadsCount, isFromBottomSheet = true)
-            setBackNavigationResult(DIALOG_SHEET_MULTI_JUNK, JunkThreads(threadsUids))
+        binding.spam.setClosingOnClickListener {
+            trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
+            toggleThreadSpamStatus(threadsUids)
+            isMultiSelectOn = false
         }
 
-        binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
+        binding.phishing.setOnClickListener {
+            trackMultiSelectActionEvent(MatomoName.SignalPhishing, threadsCount, isFromBottomSheet = true)
+            val messages = junkMessagesViewModel.junkMessages.value ?: return@setOnClickListener
+
+            descriptionDialog.show(
+                title = getString(R.string.reportPhishingTitle),
+                description = resources.getQuantityString(R.plurals.reportPhishingDescription, threadsCount),
+                onPositiveButtonClicked = {
+                    mainViewModel.reportPhishing(
+                        threadsUids,
+                        messages
+                    )
+                },
+            )
+        }
+
+        binding.blockSender.setClosingOnClickListener {
+            trackMultiSelectActionEvent(MatomoName.BlockUser, threadsCount, isFromBottomSheet = true)
+            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value ?: return@setClosingOnClickListener
+
+            if (potentialUsersToBlock.count() > 1) {
+                safelyNavigate(
+                    resId = R.id.userToBlockBottomSheetDialog,
+                    substituteClassName = ThreadListFragment::class.java.name,
+                )
+            } else {
+                potentialUsersToBlock.values.firstOrNull()?.let { message ->
+                    junkMessagesViewModel.messageOfUserToBlock.value = message
+                }
+            }
+            mainViewModel.isMultiSelectOn = false
+
+        }
+
+        binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true)
+        {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
             isMultiSelectOn = false
         }
 
-        binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
+        binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true)
+        {
             trackMultiSelectActionEvent(MatomoName.SaveToKDrive, threadsCount, isFromBottomSheet = true)
             navigateToDownloadMessagesProgressDialog(
                 messageUids = threads.flatMap { it.messages }.map { it.uid },
                 currentClassName = MultiSelectBottomSheetDialog::class.java.name,
             )
             isMultiSelectOn = false
+        }
+    }
+
+    private fun observeReportPhishingResult() {
+        mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
+            descriptionDialog.resetLoadingAndDismiss()
+            findNavController().popBackStack()
         }
     }
 
@@ -191,8 +243,26 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         setSnoozeUi(threads)
-
+        setJunkUi()
         hideFirstActionItemDivider()
+    }
+
+    private fun setJunkUi() = with(binding) {
+        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+        spam.apply {
+            val (text, icon) = if (isFromSpam) {
+                R.string.actionNonSpam to R.drawable.ic_non_spam
+            } else {
+                R.string.actionSpam to R.drawable.ic_report_junk
+            }
+
+            setTitle(text)
+            setIconResource(icon)
+            isVisible = true
+        }
+
+        phishing.isVisible = !isFromSpam
+        blockSender.isVisible = !isFromSpam
     }
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {

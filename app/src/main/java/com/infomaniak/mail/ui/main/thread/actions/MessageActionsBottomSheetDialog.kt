@@ -73,6 +73,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
             setFavoriteUi(message.isFavorite)
             setReactionUi(message.isValidReactionTarget)
+            setJunkMessageUi()
 
             if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {

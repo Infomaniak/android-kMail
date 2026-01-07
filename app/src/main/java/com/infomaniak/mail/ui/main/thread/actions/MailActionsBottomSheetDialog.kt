@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.core.ksuite.data.KSuite
@@ -94,7 +95,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
         favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }
         spam.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSpam() }
-        phishing.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPhishing() }
+        phishing.setOnClickListener { onClickListener.onPhishing() }
         blockSender.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onBlockSender() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
         share.setClosingOnClickListener(shouldCloseMultiSelection) {
@@ -167,12 +168,17 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
+    fun setJunkMessageUi() = with(binding) {
+        spam.isGone = true
+        phishing.isGone = true
+        blockSender.isGone = true
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
         fun onForward()
         fun onDelete()
-
         fun onArchive()
         fun onReadUnread()
         fun onMove()

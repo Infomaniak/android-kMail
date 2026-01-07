@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -62,7 +63,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
-    private val junkMessagesViewModel: JunkMessagesViewModel by viewModels()
+    private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
 
@@ -98,8 +99,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setSnoozeUi(thread.isSnoozed())
                 setReactionUi(canBeReactedTo = messageUidToReactTo != null)
 
-                initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
                 junkMessagesViewModel.threadsUids = listOf(thread.uid)
+
+                initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
 
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
@@ -245,7 +247,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         override fun onSpam() {
             if (isFromSpam) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
-                mainViewModel.toggleThreadSpamStatus(listOf(navigationArgs.threadUid))
+                mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
             } else {
                 // Check the first message, because it is not possible to select messages from multiple folders,
                 // so you won't have both SPAM and non-SPAM messages.
