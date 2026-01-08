@@ -168,7 +168,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
-    fun setJunkMessageUi() = with(binding) {
+    fun hideReportJunkButtons() = with(binding) {
         spam.isGone = true
         phishing.isGone = true
         blockSender.isGone = true
