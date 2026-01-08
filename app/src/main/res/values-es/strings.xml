@@ -153,7 +153,7 @@
     <string name="buttonShare">Compartir</string>
     <string name="buttonStart">Empezar</string>
     <string name="buttonStartSync">Iniciar sincronización</string>
-    <string name="buttonStrikeThrough">Huelga a través de</string>
+    <string name="buttonStrikeThrough">Tachar</string>
     <string name="buttonTextOptionsClose">Cerrar formato de texto</string>
     <string name="buttonTextOptionsOpen">Formato de texto abierto</string>
     <string name="buttonTry">Pruebe</string>
@@ -227,7 +227,7 @@
     <string name="contextMenuPhoneNumberSms">Escribir un SMS</string>
     <string name="createFolderName">Nombre de la carpeta</string>
     <string name="datePickerTitle">Elige una fecha y hora</string>
-    <string name="dateTitle">Date:</string>
+    <string name="dateTitle">Fecha:</string>
     <string name="deleteAccountWarning">La eliminación de su cuenta será definitiva. No podrá reactivar su cuenta.</string>
     <string name="deleteFolderDialogDescription">El contenido de la carpeta %s se borrará definitivamente sin pasar por la papelera.</string>
     <string name="deleteFolderDialogTitle">Eliminar la carpeta</string>
@@ -498,7 +498,7 @@
     <string name="settingsDensityOptionCompact">Compacto</string>
     <string name="settingsDensityOptionLarge">Grande</string>
     <string name="settingsDensityOptionNormal">Normal</string>
-    <string name="settingsDisabled">Discapacitados</string>
+    <string name="settingsDisabled">Desactivado</string>
     <string name="settingsEnabled">Activado</string>
     <string name="settingsExternalContentDescription">Mostrar contenido externo</string>
     <string name="settingsExternalContentTitle">Contenido externo</string>
@@ -544,7 +544,7 @@
     <string name="settingsSwipeRight">Deslizar a la derecha</string>
     <string name="settingsThemeDescription">Elección del tema</string>
     <string name="settingsThemeTitle">Tema</string>
-    <string name="settingsThreadListDensityTitle">Densidad de la lista de hilos</string>
+    <string name="settingsThreadListDensityTitle">Densidad de la lista de conversación</string>
     <string name="settingsThreadModeTitle">Modo de visualización de mensajes</string>
     <string name="settingsThreadModeWarningDescription">Ten en cuenta que al cambiar esta opción se descargarán de nuevo todos tus mensajes</string>
     <string name="settingsThreadModeWarningTitle">¿Cambiar al modo %s?</string>
@@ -570,7 +570,7 @@
     <string name="snackbarLinkCopiedToClipboard">Enlace copiado en el portapapeles</string>
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
-    <string name="snackbarMoveCancelled">Mudanza cancelada</string>
+    <string name="snackbarMoveCancelled">Desplazamiento cancelado</string>
     <string name="snackbarPasswordCopied">Contraseña copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado en el portapapeles</string>
     <string name="snackbarReportPhishingConfirmation">Informado con éxito</string>
@@ -639,7 +639,7 @@
     </plurals>
     <string name="threadListEmptyFolderAlertDescription">¿Estás seguro de que quieres borrar definitivamente todos los mensajes de esta carpeta?</string>
     <string name="threadListEmptySpamButton">Spam vacío</string>
-    <string name="threadListEmptyTrashButton">Vaciar la basura</string>
+    <string name="threadListEmptyTrashButton">Vaciar la papelera</string>
     <string name="threadListHeaderLastUpdate">Actualizado %s</string>
     <string name="threadListHeaderLastUpdateNow">ahora</string>
     <plurals name="threadListHeaderUnreadCount">
@@ -659,7 +659,7 @@
     <string name="toTitle">Para:</string>
     <string name="tomorrowMorning">Mañana por la mañana</string>
     <string name="tooManyRecipients">No puede añadir esta dirección porque ha alcanzado el límite de destinatarios</string>
-    <string name="trashFolder">Basura</string>
+    <string name="trashFolder">Papelera</string>
     <string name="unblockButton">Desbloquear</string>
     <string name="unknownRecipientTitle">(desconocido)</string>
     <string name="unsubscribeButtonTitle">Cancelar suscripción</string>
