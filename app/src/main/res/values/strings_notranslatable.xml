@@ -16,6 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="errorPotentialUsersToBlockNull" translatable="false">Potential users to block is null</string>
-    <string name="errorPhishingMessagesNull" translatable="false">Phishing messages report failed because the list is empty</string>
+    <string name="sentryErrorPotentialUsersToBlockNull" translatable="false">Potential users to block is null</string>
+    <string name="sentryErrorPhishingMessagesEmpty" translatable="false">Phishing messages report failed because the list is empty</string>
 </resources>

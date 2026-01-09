@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -88,6 +89,12 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         Unit
     }
 
+    private fun hideReportJunkButtons() = with(binding) {
+        spam.isGone = true
+        phishing.isGone = true
+        blockSender.isGone = true
+    }
+    
     private fun initActionClickListener(messageUid: String, message: Message, threadUid: String) {
         initOnClickListener(object : OnActionClick {
             //region Main actions

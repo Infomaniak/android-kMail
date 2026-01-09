@@ -21,13 +21,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
@@ -168,10 +168,22 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
-    fun hideReportJunkButtons() = with(binding) {
-        spam.isGone = true
-        phishing.isGone = true
-        blockSender.isGone = true
+    fun setJunkUi() = with(binding) {
+        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+        spam.apply {
+            val (text, icon) = if (isFromSpam) {
+                R.string.actionNonSpam to R.drawable.ic_non_spam
+            } else {
+                R.string.actionSpam to R.drawable.ic_spam
+            }
+
+            setTitle(text)
+            setIconResource(icon)
+            isVisible = true
+        }
+
+        phishing.isVisible = !isFromSpam
+        blockSender.isVisible = !isFromSpam
     }
 
     interface OnActionClick {
@@ -187,9 +199,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onModifySnooze()
         fun onCancelSnooze()
         fun onFavorite()
-        fun onSpam() = Unit
-        fun onPhishing() = Unit
-        fun onBlockSender() = Unit
+        fun onSpam()
+        fun onPhishing()
+        fun onBlockSender()
         fun onPrint()
         fun onShare()
         fun onSaveToKDrive()

@@ -97,21 +97,19 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 folderRole = folderRoleUtils.getActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
                 isFromSpam = folderRole == FolderRole.SPAM
-
+                junkMessagesViewModel.threadsUids = listOf(thread.uid)
                 setMarkAsReadUi(thread.isSeen)
                 setArchiveUi(isFromArchive)
                 setFavoriteUi(thread.isFavorite)
-                setJunkUi()
                 setSnoozeUi(thread.isSnoozed())
                 setReactionUi(canBeReactedTo = messageUidToReactTo != null)
-
-                junkMessagesViewModel.threadsUids = listOf(thread.uid)
+                setSpamPhishingUi(binding.spam, binding.phishing, isFromSpam)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
 
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            setBlockUserUi(potentialUsersToBlock)
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
         }
 
         observeReportPhishingResult()
@@ -126,32 +124,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         cancelSnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
     }
 
-    private fun setJunkUi() = with(binding) {
-        spam.apply {
-            val (text, icon) = if (isFromSpam) {
-                R.string.actionNonSpam to R.drawable.ic_non_spam
-            } else {
-                R.string.actionSpam to R.drawable.ic_report_junk
-            }
-
-            setTitle(text)
-            setIconResource(icon)
-            isVisible = true
-        }
-
-        phishing.isVisible = !isFromSpam
-        blockSender.isVisible = !isFromSpam
-    }
-
     private fun observeReportPhishingResult() {
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
         }
-    }
-
-    private fun setBlockUserUi(potentialUsersToBlock: Map<Recipient, Message>) {
-        if (potentialUsersToBlock.count() == 0) binding.blockSender.isGone = true
     }
 
     private fun onActionClick(
@@ -255,11 +232,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
                 mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
             } else {
-                // Check the first message, because it is not possible to select messages from multiple folders,
-                // so you won't have both SPAM and non-SPAM messages.
                 trackBottomSheetThreadActionsEvent(
                     MatomoName.Spam,
-                    value = thread.messages.firstOrNull()?.folder?.role == FolderRole.SPAM
+                    value = false
                 )
                 mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
 
@@ -280,7 +255,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
             if (potentialUsersToBlock == null) {
                 snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-                SentryLog.e(TAG, getString(R.string.errorPotentialUsersToBlockNull))
+                SentryLog.e(TAG, getString(R.string.sentryErrorPotentialUsersToBlockNull))
                 return
             }
 
@@ -330,5 +305,25 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     companion object {
         const val TAG = "ThreadActionsBottomSheetDialog"
         const val OPEN_SNOOZE_BOTTOM_SHEET = "openSnoozeBottomSheet"
+
+        fun setSpamPhishingUi(spam: ActionItemView, phishing: ActionItemView, isFromSpam: Boolean) {
+            spam.apply {
+                val (text, icon) = if (isFromSpam) {
+                    R.string.actionNonSpam to R.drawable.ic_non_spam
+                } else {
+                    R.string.actionSpam to R.drawable.ic_spam
+                }
+
+                setTitle(text)
+                setIconResource(icon)
+                isVisible = true
+            }
+
+            phishing.isVisible = !isFromSpam
+        }
+
+        fun setBlockUserUi(blockSender: ActionItemView, potentialUsersToBlock: Map<Recipient, Message>, isFromSpam: Boolean) {
+            blockSender.isGone = potentialUsersToBlock.count() == 0 || isFromSpam
+        }
     }
 }

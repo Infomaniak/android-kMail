@@ -49,6 +49,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -89,7 +90,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -107,6 +107,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setStateDependentUi(shouldRead, shouldFavorite, threads)
         observeReportPhishingResult()
+        observePotentialBlockSenders()
 
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             // This DialogFragment is already be dismissing since popBackStack was called by
@@ -184,18 +185,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
             if (messages.isEmpty()) {
                 //An error will be shown to the user in the reportPhishing function
-                SentryLog.e(TAG, getString(R.string.errorPhishingMessagesNull))
+                //This should never happen, that's why we add a SentryLog.
+                SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
             }
 
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
-                description = resources.getQuantityString(R.plurals.reportPhishingDescription, threadsCount),
-                onPositiveButtonClicked = {
-                    mainViewModel.reportPhishing(
-                        threadsUids,
-                        messages
-                    )
-                },
+                description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
+                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
             )
         }
 
@@ -204,7 +201,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
             if (potentialUsersToBlock == null) {
                 snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-                SentryLog.e(TAG, getString(R.string.errorPotentialUsersToBlockNull))
+                SentryLog.e(TAG, getString(R.string.sentryErrorPotentialUsersToBlockNull))
                 return@setClosingOnClickListener
             }
 
@@ -247,6 +244,13 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
+    private fun observePotentialBlockSenders() {
+        junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
+            val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+        }
+    }
+
     private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean, threads: Set<Thread>) {
         val (readIcon, readText) = getReadIconAndShortText(shouldRead)
         binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
@@ -259,27 +263,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         setSnoozeUi(threads)
-        setJunkUi()
+        ThreadActionsBottomSheetDialog.setSpamPhishingUi(
+            binding.spam,
+            binding.phishing,
+            mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+        )
         hideFirstActionItemDivider()
     }
 
-    private fun setJunkUi() = with(binding) {
-        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-        spam.apply {
-            val (text, icon) = if (isFromSpam) {
-                R.string.actionNonSpam to R.drawable.ic_non_spam
-            } else {
-                R.string.actionSpam to R.drawable.ic_report_junk
-            }
-
-            setTitle(text)
-            setIconResource(icon)
-            isVisible = true
-        }
-
-        phishing.isVisible = !isFromSpam
-        blockSender.isVisible = !isFromSpam
-    }
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {
         fun hasMixedSnoozeState(): Boolean {
