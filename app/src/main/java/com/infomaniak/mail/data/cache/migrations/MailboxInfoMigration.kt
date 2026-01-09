@@ -30,7 +30,7 @@ fun mailboxInfoMigration() = AutomaticSchemaMigration { migrationContext ->
     migrationContext.keepDefaultValuesAfterSixthMigration()
     migrationContext.renameKSuiteRelatedBooleans()
     migrationContext.revertKSuiteRelatedBooleanRenaming()
-    migrationContext.keepDefaultValuesAfterTwelveMigration()
+    migrationContext.keepDefaultValuesAfterTwelfthMigration()
 }
 
 //region Use default property values when adding a new column in a migration
@@ -100,9 +100,9 @@ private fun MigrationContext.revertKSuiteRelatedBooleanRenaming() {
 //endregion
 
 // Migrate from version #13
-private fun MigrationContext.keepDefaultValuesAfterTwelveMigration() {
+private fun MigrationContext.keepDefaultValuesAfterTwelfthMigration() {
 
-    if (oldRealm.schemaVersion() <= 13L) {
+    if (oldRealm.schemaVersion() <= 12L) {
         enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Rename property without losing its previous value
