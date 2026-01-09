@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,12 +35,12 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
-import com.infomaniak.core.AssociatedUserDataCleanable
 import com.infomaniak.core.auth.AccessTokenUsageInterceptor
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.networking.HttpClient
 import com.infomaniak.core.coil.ImageLoaderProvider
+import com.infomaniak.core.common.AssociatedUserDataCleanable
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
 import com.infomaniak.core.inappupdate.AppUpdateScheduler
 import com.infomaniak.core.legacy.utils.clearStack

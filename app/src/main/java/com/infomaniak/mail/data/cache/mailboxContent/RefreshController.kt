@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
-import com.infomaniak.core.cancellable
+import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.common.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.core.utils.format
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.common.observe
+import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.inappreview.BaseInAppReviewManager
 import com.infomaniak.core.inappreview.reviewmanagers.InAppReviewManager
 import com.infomaniak.core.inappreview.view.ReviewAlertDialog
@@ -50,9 +52,7 @@ import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.Utils.toEnumOrThrow
 import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName

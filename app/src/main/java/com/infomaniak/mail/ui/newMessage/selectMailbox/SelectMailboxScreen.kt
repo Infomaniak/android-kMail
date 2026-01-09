@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -72,7 +71,7 @@ import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.
 import com.infomaniak.mail.ui.newMessage.selectMailbox.compose.previewparameter.SelectMailboxScreenPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
 import kotlinx.coroutines.launch
-import com.infomaniak.core.R as RCore
+import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun SelectMailboxScreen(
@@ -115,7 +114,7 @@ private fun SelectMailboxScreen(
         topBar = {
             MailTopAppBar(
                 navigationIcon = {
-                    when(uiState()) {
+                    when (uiState()) {
                         is SelectionScreen -> TopAppBarButtons.Back(onNavigationTopbarClick)
                         is DefaultScreen, Loading, Error -> TopAppBarButtons.Close(onNavigationTopbarClick)
                     }
