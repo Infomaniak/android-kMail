@@ -21,11 +21,6 @@ import com.infomaniak.mail.utils.extensions.safeTextFormatter
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 class SafeTextFormatterTest {
     @Test
     fun zero_width_space_is_removed_isCorrect() {
