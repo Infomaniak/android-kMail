@@ -101,6 +101,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val threads = selectedThreads.toSet()
         val threadsUids = threads.map { it.uid }
         val threadsCount = threadsUids.count()
+
+        // Initialization of threadsUids to populate messages and potentialUsersToBlock
         junkMessagesViewModel.threadsUids = threadsUids
 
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
@@ -264,13 +266,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setSnoozeUi(threads)
         ThreadActionsBottomSheetDialog.setSpamPhishingUi(
-            binding.spam,
-            binding.phishing,
-            mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+            spam = binding.spam,
+            phishing = binding.phishing,
+            isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         )
         hideFirstActionItemDivider()
     }
-
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {
         fun hasMixedSnoozeState(): Boolean {

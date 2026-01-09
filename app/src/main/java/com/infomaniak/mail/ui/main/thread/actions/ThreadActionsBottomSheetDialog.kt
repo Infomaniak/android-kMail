@@ -94,10 +94,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         threadActionsViewModel.threadMessagesWithActionAndReaction
             .observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageUidToReactTo) ->
+                // Initialization of threadsUids to populate messages and potentialUsersToBlock
+                junkMessagesViewModel.threadsUids = listOf(thread.uid)
+
                 folderRole = folderRoleUtils.getActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
                 isFromSpam = folderRole == FolderRole.SPAM
-                junkMessagesViewModel.threadsUids = listOf(thread.uid)
                 setMarkAsReadUi(thread.isSeen)
                 setArchiveUi(isFromArchive)
                 setFavoriteUi(thread.isFavorite)
@@ -232,12 +234,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
                 mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
             } else {
-                trackBottomSheetThreadActionsEvent(
-                    MatomoName.Spam,
-                    value = false
-                )
+                trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = false)
                 mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
-
             }
         }
 

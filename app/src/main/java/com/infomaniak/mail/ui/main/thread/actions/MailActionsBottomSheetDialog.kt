@@ -27,7 +27,6 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
@@ -166,24 +165,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     fun setReactionUi(canBeReactedTo: Boolean) = with(binding.addReaction) {
         isVisible = canBeReactedTo
-    }
-
-    fun setJunkUi() = with(binding) {
-        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-        spam.apply {
-            val (text, icon) = if (isFromSpam) {
-                R.string.actionNonSpam to R.drawable.ic_non_spam
-            } else {
-                R.string.actionSpam to R.drawable.ic_spam
-            }
-
-            setTitle(text)
-            setIconResource(icon)
-            isVisible = true
-        }
-
-        phishing.isVisible = !isFromSpam
-        blockSender.isVisible = !isFromSpam
     }
 
     interface OnActionClick {
