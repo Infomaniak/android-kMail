@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2025 Infomaniak Network SA
+  ~ Copyright (C) 2022-2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -204,7 +204,6 @@
     <string name="contentDescriptionIconFavorite">Es favorito</string>
     <string name="contentDescriptionIconFolderSelected">Carpeta seleccionada</string>
     <string name="contentDescriptionIconForward">Reenviado</string>
-    <string name="contentDescriptionIconInvalidPassword">Desbloquear la dirección de correo electrónico</string>
     <string name="contentDescriptionIconNewMail">Nuevo</string>
     <string name="contentDescriptionIconReply">Respuesta</string>
     <string name="contentDescriptionIconStorage">Estado de almacenamiento</string>
