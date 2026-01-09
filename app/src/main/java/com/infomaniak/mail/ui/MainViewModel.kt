@@ -255,14 +255,7 @@ class MainViewModel @Inject constructor(
         val progress = quotas?.getProgress()
         when {
             quotas == null -> null
-            quotas.isFull -> {
-                when (currentMailbox.value?.kSuite) {
-                    is KSuite.Perso -> StorageLevel.Full.Perso
-                    KSuite.StarterPack -> StorageLevel.Full.StarterPack
-                    is KSuite.Pro -> StorageLevel.Full.Pro
-                    else -> StorageLevel.Full.Pro // Should not happened but Fallback
-                }
-            }
+            quotas.isFull -> StorageLevel.getFullStorageBanner(currentMailbox.value?.kSuite)
             progress != null && progress > StorageLevel.WARNING_THRESHOLD -> {
                 if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 10 == 0) {
                     localSettings.hasClosedStorageBanner = false
