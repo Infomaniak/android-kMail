@@ -203,8 +203,15 @@ fun Context.formatSubject(subject: String?): String {
     return if (subject.isNullOrBlank()) {
         getString(R.string.noSubjectTitle)
     } else {
-        subject.replace("\n+".toRegex(), " ")
+        safeTextFormatter(subject)
     }
+}
+
+fun safeTextFormatter(text: String): String {
+    //This regex replaces control (p{Cc}) and format characters (p{Cf}) for a space
+    //Bidi characters are included in format.
+    val unsafeCharacters = "[\\p{Cc}\\p{Cf}]+"
+    return text.replace(unsafeCharacters.toRegex(), " ")
 }
 
 fun Context.readRawResource(@RawRes resId: Int): String = Scanner(resources.openRawResource(resId)).useDelimiter("\\A").next()
