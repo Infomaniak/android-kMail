@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,12 @@ import android.view.ViewGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.ksuite.myksuite.ui.screens.KSuiteApp
 import com.infomaniak.core.ksuite.myksuite.ui.screens.MyKSuiteUpgradeBottomSheet
 import com.infomaniak.core.ksuite.myksuite.ui.theme.MyKSuiteXMLTheme
+import com.infomaniak.mail.R
 
 class MailPremiumBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
@@ -40,7 +42,13 @@ class MailPremiumBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
                 MyKSuiteXMLTheme {
                     MyKSuiteUpgradeBottomSheet(
                         onDismissRequest = this@MailPremiumBottomSheetDialog.findNavController()::popBackStack,
-                        app = KSuiteApp.Mail,
+                        app = KSuiteApp.Mail(
+                            titleRes = R.string.mailPremiumUpgradeTitle,
+                            descriptionRes = R.string.mailPremiumUpgradeDescription,
+                            detailsRes = R.string.mailPremiumUpgradeDetails,
+                            bannerRes = R.drawable.illu_update_required,
+                            isBannerStyle = false,
+                        ),
                     )
                 }
             }

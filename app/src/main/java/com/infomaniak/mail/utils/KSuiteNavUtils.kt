@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,13 +39,13 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.KSuiteProBottomSheetDialogArgs
 
 fun Fragment.openMyKSuiteUpgradeBottomSheet(matomoTrackerName: String, substituteClassName: String? = null) {
     if (isAtInitialDestination(substituteClassName)) {
-        requireActivity().openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
+        openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
     }
 }
 
-fun Activity.openMyKSuiteUpgradeBottomSheet(navController: NavController, matomoTrackerName: String) {
+fun openMyKSuiteUpgradeBottomSheet(navController: NavController, matomoTrackerName: String) {
     trackMyKSuiteUpgradeBottomSheetEvent(matomoTrackerName)
-    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
+    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail())
 }
 
 fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData, user: User): MyKSuiteDashboardScreenData {
