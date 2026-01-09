@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.core.network.utils.ErrorCodeTranslated
-import com.infomaniak.core.utils.ApiEnum
+import com.infomaniak.core.common.utils.ApiEnum
 import com.infomaniak.mail.R
 
 enum class EmojiReactionNotAllowedReason(

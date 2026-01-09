@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import com.infomaniak.core.FormatterFileSize.formatShortFileSize
+import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName

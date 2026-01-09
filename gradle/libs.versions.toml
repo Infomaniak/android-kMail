@@ -35,7 +35,7 @@ firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx"
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
-infomaniak-core = { module = "com.infomaniak.core:Core" }
+infomaniak-core = { module = "com.infomaniak.core:Common" }
 infomaniak-core-appversionchecker = { module = "com.infomaniak.core:AppVersionChecker" }
 infomaniak-core-auth = { module = "com.infomaniak.core:Auth" }
 infomaniak-core-avatar = { module = "com.infomaniak.core:Avatar" }

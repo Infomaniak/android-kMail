@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.core.network.INFOMANIAK_API_V1
-import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
-import com.infomaniak.core.utils.format
+import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.mail.MAIL_API
 import com.infomaniak.mail.utils.Utils
 import java.net.URLEncoder
