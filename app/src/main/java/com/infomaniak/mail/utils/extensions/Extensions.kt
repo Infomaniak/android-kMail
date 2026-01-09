@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,10 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.infomaniak.core.common.utils.endOfTheWeek
+import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
+import com.infomaniak.core.common.utils.startOfTheDay
+import com.infomaniak.core.common.utils.startOfTheWeek
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.removeAccents
@@ -73,10 +77,6 @@ import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.core.utils.endOfTheWeek
-import com.infomaniak.core.utils.isEmailRfc5321Compliant
-import com.infomaniak.core.utils.startOfTheDay
-import com.infomaniak.core.utils.startOfTheWeek
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,15 @@ import android.content.Context
 import android.text.format.DateUtils
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.infomaniak.core.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
-import com.infomaniak.core.utils.FORMAT_HOUR_MINUTES
-import com.infomaniak.core.utils.FormatData
-import com.infomaniak.core.utils.format
-import com.infomaniak.core.utils.formatWithLocal
-import com.infomaniak.core.utils.isInTheFuture
-import com.infomaniak.core.utils.isThisYear
-import com.infomaniak.core.utils.isToday
-import com.infomaniak.core.utils.isYesterday
+import com.infomaniak.core.common.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
+import com.infomaniak.core.common.utils.FORMAT_HOUR_MINUTES
+import com.infomaniak.core.common.utils.FormatData
+import com.infomaniak.core.common.utils.format
+import com.infomaniak.core.common.utils.formatWithLocal
+import com.infomaniak.core.common.utils.isInTheFuture
+import com.infomaniak.core.common.utils.isThisYear
+import com.infomaniak.core.common.utils.isToday
+import com.infomaniak.core.common.utils.isYesterday
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.Companion.FORMAT_DAY_OF_THE_WEEK

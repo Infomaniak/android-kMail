@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.infomaniak.core.extensions.goToAppStore
+import com.infomaniak.core.common.extensions.goToAppStore
 import com.infomaniak.core.inappupdate.AppUpdateSettingsRepository
-import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.inappupdate.ui.composable.UpdateAvailableBottomSheetContent
+import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ui.compose.basics.Typography
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
@@ -35,7 +35,7 @@ import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.infomaniak.core.R as RCore
+import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.inappupdate.R as RCoreInAppUpdate
 
 @AndroidEntryPoint

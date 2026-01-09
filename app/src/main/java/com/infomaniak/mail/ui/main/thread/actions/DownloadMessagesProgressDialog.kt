@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.extensions.goToAppStore
+import com.infomaniak.core.common.extensions.goToAppStore
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
