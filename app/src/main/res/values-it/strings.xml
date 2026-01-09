@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2025 Infomaniak Network SA
+  ~ Copyright (C) 2022-2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -369,6 +369,9 @@
     </plurals>
     <string name="lockedMailboxViewDescription">Per ulteriori informazioni:</string>
     <string name="lockedMailboxViewTitle">Alcuni indirizzi e-mail bloccati</string>
+    <string name="mailPremiumUpgradeDescription">Ottenete più spazio di archiviazione e nuove funzionalità con il vostro indirizzo e-mail.</string>
+    <string name="mailPremiumUpgradeDetails">Per usufruire di Premium, modificate la vostra offerta dalla vostra interfaccia web.</string>
+    <string name="mailPremiumUpgradeTitle">Passare al livello successivo con il piano Premium</string>
     <string name="manageSignatures">Gestisci le mie firme</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>

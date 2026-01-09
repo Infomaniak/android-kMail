@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,19 +32,20 @@ import com.infomaniak.core.ksuite.myksuite.ui.screens.MyKSuiteDashboardScreenDat
 import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils
 import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.MatomoMail.trackKSuiteProBottomSheetEvent
+import com.infomaniak.mail.MatomoMail.trackMailPremiumBottomSheetEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.bottomSheetDialogs.KSuiteProBottomSheetDialogArgs
 
 fun Fragment.openMyKSuiteUpgradeBottomSheet(matomoTrackerName: String, substituteClassName: String? = null) {
     if (isAtInitialDestination(substituteClassName)) {
-        requireActivity().openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
+        openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
     }
 }
 
-fun Activity.openMyKSuiteUpgradeBottomSheet(navController: NavController, matomoTrackerName: String) {
+fun openMyKSuiteUpgradeBottomSheet(navController: NavController, matomoTrackerName: String) {
     trackMyKSuiteUpgradeBottomSheetEvent(matomoTrackerName)
-    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
+    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail())
 }
 
 fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData, user: User): MyKSuiteDashboardScreenData {
@@ -80,4 +81,20 @@ fun Activity.openKSuiteProBottomSheet(navController: NavController, kSuite: KSui
         resId = R.id.kSuiteProBottomSheetDialog,
         args = KSuiteProBottomSheetDialogArgs(kSuite, isAdmin).toBundle(),
     )
+}
+
+fun Fragment.openMailPremiumBottomSheet(matomoTrackerName: String) {
+    if (isAtInitialDestination()) openMailPremiumBottomSheet(findNavController(), matomoTrackerName)
+}
+
+fun openMailPremiumBottomSheet(navController: NavController, matomoTrackerName: String) {
+    trackMailPremiumBottomSheetEvent(matomoTrackerName)
+    val mailPremium = KSuiteApp.Mail(
+        titleRes = R.string.mailPremiumUpgradeTitle,
+        descriptionRes = R.string.mailPremiumUpgradeDescription,
+        detailsRes = R.string.mailPremiumUpgradeDetails,
+        bannerRes = R.drawable.illu_update_required,
+        isBannerStyle = false,
+    )
+    navController.openMyKSuiteUpgradeBottomSheet(app = mailPremium)
 }

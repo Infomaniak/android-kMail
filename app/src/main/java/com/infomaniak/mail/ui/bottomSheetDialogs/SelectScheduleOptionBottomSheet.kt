@@ -93,7 +93,7 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
         customScheduleOption.trailingContent = when (currentKSuite) {
             KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
-            KSuite.Pro.Free -> TrailingContent.KSuiteProChip
+            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
             else -> TrailingContent.Chevron
         }
     }

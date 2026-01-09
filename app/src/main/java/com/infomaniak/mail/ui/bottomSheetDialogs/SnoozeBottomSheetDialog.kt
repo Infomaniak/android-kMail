@@ -24,6 +24,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -60,6 +61,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
         when (kSuite) {
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
+            KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
             else -> {
                 trackSnoozeEvent(MatomoName.CustomSchedule)
                 setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,11 +45,11 @@ import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -61,6 +61,7 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.Sc
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.MatomoMail.trackKSuiteProEvent
+import com.infomaniak.mail.MatomoMail.trackMailPremiumEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
@@ -171,7 +172,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
-        setupKSuiteStorageBanner()
+        setupStorageBanner()
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
@@ -527,9 +528,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         }
     }
 
-    private fun setupKSuiteStorageBanner() = with(localSettings) {
+    private fun setupStorageBanner() = with(localSettings) {
         mainViewModel.storageBannerStatus.observeNotNull(viewLifecycleOwner) { storageBannerStatus ->
-            binding.kSuiteStorageBanner.apply {
+            binding.storageBanner.apply {
                 storageLevel = storageBannerStatus
                 setupListener(
                     onCloseButtonClicked = {
@@ -538,9 +539,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                         when (kSuite) {
                             KSuite.Perso.Free -> trackMyKSuiteEvent(matomoName)
                             KSuite.Pro.Free -> trackKSuiteProEvent(matomoName)
+                            KSuite.StarterPack -> trackMailPremiumEvent(matomoName)
                             else -> Unit
                         }
-                        binding.kSuiteStorageBanner.isGone = true
+                        binding.storageBanner.isGone = true
                         resetStorageBannerAppLaunches()
                     }
                 )

@@ -577,6 +577,14 @@ object MatomoMail : Matomo {
         trackEvent(MatomoKSuite.CATEGORY_KSUITE_PRO_BOTTOM_SHEET, name)
     }
 
+    fun trackMailPremiumBottomSheetEvent(name: String) {
+        trackEvent(MatomoKSuite.CATEGORY_MAIL_PREMIUM_BOTTOM_SHEET, name)
+    }
+
+    fun trackMailPremiumEvent(name: String) {
+        trackEvent(MatomoKSuite.CATEGORY_MAIL_PREMIUM, name)
+    }
+
     fun trackEncryptionEvent(name: MatomoName) {
         trackEvent(MatomoCategory.Encryption, name)
     }
