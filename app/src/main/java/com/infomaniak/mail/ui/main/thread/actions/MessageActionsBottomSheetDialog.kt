@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -73,6 +74,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
             setFavoriteUi(message.isFavorite)
             setReactionUi(message.isValidReactionTarget)
+            hideReportJunkButtons()
 
             if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {
@@ -87,6 +89,12 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         Unit
     }
 
+    private fun hideReportJunkButtons() = with(binding) {
+        spam.isGone = true
+        phishing.isGone = true
+        blockSender.isGone = true
+    }
+    
     private fun initActionClickListener(messageUid: String, message: Message, threadUid: String) {
         initOnClickListener(object : OnActionClick {
             //region Main actions
@@ -170,7 +178,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
             }
 
-            override fun onReportJunk() = Unit
+            override fun onSpam() = Unit
+            override fun onPhishing() = Unit
+            override fun onBlockSender() = Unit
 
             override fun onPrint() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Print)

@@ -95,11 +95,8 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
-import com.infomaniak.mail.ui.main.thread.actions.JunkBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.Companion.DIALOG_SHEET_MULTI_JUNK
-import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.JunkThreads
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
@@ -764,13 +761,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
-        }
-
-        getBackNavigationResult(DIALOG_SHEET_MULTI_JUNK) { junkThreads: JunkThreads ->
-            safeNavigate(
-                resId = R.id.junkBottomSheetDialog,
-                args = JunkBottomSheetDialogArgs(junkThreads.threadUids.toTypedArray()).toBundle(),
-            )
         }
     }
 
