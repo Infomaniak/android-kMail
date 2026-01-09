@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,9 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.core.cancellable
+import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.legacy.utils.getFileNameAndSize
 import com.infomaniak.core.legacy.utils.guessMimeType
@@ -44,8 +46,6 @@ import com.infomaniak.core.legacy.utils.parcelableExtra
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
-import com.infomaniak.core.utils.format
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent

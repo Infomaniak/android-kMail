@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.showProgressCatching
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.core.utils.FORMAT_EVENT_DATE
-import com.infomaniak.core.utils.format
+import com.infomaniak.core.common.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.core.common.utils.FORMAT_EVENT_DATE
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R

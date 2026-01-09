@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,19 +39,18 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
-import com.infomaniak.core.FormatterFileSize.formatShortFileSize
-import com.infomaniak.core.extensions.isNightModeEnabled
+import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
+import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
-import com.infomaniak.core.utils.FormatData
-import com.infomaniak.core.utils.format
-import com.infomaniak.core.utils.formatWithLocal
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.common.utils.FormatData
+import com.infomaniak.core.common.utils.format
+import com.infomaniak.core.common.utils.formatWithLocal
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageBannerEvent
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
-import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment

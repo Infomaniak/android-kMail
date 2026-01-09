@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.work.WorkManager
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.cancellable
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.inappreview.AppReviewSettingsRepository
 import com.infomaniak.core.inappupdate.AppUpdateSettingsRepository
 import com.infomaniak.core.network.networking.HttpClient

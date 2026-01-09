@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
-import com.infomaniak.core.utils.apiEnum
+import com.infomaniak.core.common.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.RealmInstantSerializer
