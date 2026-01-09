@@ -37,7 +37,7 @@
     <string name="actionReply">Respuesta</string>
     <string name="actionReplyAll">Responder a todos</string>
     <string name="actionReportDisplayProblem">Informar de un problema de visualización</string>
-    <string name="actionReportJunk">Informe basura</string>
+    <string name="actionReportJunk">Informe papelera</string>
     <string name="actionShortMarkAsRead">Leer</string>
     <string name="actionShortMarkAsUnread">Sin leer</string>
     <string name="actionShortSpam">Spam</string>
