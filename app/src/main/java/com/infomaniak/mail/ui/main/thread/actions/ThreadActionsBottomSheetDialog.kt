@@ -112,7 +112,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
 
-        observePotentialBlockUsers()
+        observePotentialBlockedUsers()
         observeReportPhishingResult()
     }
 
@@ -124,7 +124,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         cancelSnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
     }
 
-    private fun observePotentialBlockUsers() {
+    private fun observePotentialBlockedUsers() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
             setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
         }
@@ -245,12 +245,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onPhishing() {
             trackBottomSheetThreadActionsEvent(MatomoName.SignalPhishing)
-            val junkMessages = junkMessagesViewModel.junkMessages.value
+            val junkMessages = junkMessagesViewModel.junkMessages.value ?: emptyList()
 
-            if (junkMessages == null) {
-                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-                SentryLog.e(TAG, getString(R.string.sentryErrorJunkMessagesNull))
-                return
+            if (junkMessages.isEmpty()) {
+                //An error will be shown to the user in the reportPhishing function
+                //This should never happen, that's why we add a SentryLog.
+                SentryLog.e(MultiSelectBottomSheetDialog.TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
             }
 
             descriptionDialog.show(

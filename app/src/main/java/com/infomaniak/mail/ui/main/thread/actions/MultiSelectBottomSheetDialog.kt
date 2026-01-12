@@ -109,7 +109,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setStateDependentUi(shouldRead, shouldFavorite, threads)
         observeReportPhishingResult()
-        observePotentialBlockSenders()
+        observePotentialBlockedSenders()
 
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             // This DialogFragment is already be dismissing since popBackStack was called by
@@ -243,7 +243,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun observePotentialBlockSenders() {
+    private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
             val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
             setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)

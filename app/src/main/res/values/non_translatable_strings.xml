@@ -18,5 +18,4 @@
 <resources>
     <string name="sentryErrorPotentialUsersToBlockNull" translatable="false">Potential users to block is null</string>
     <string name="sentryErrorPhishingMessagesEmpty" translatable="false">Phishing messages report failed because the list is empty</string>
-    <string name="sentryErrorJunkMessagesNull" translatable="false">Junk messages to report for phishing are null</string>
 </resources>
