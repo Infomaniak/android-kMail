@@ -102,7 +102,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadsUids = threads.map { it.uid }
         val threadsCount = threadsUids.count()
 
-        // Initialization of threadsUids to populate messages and potentialUsersToBlock
+        // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
         junkMessagesViewModel.threadsUids = threadsUids
 
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
@@ -218,18 +218,15 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
             }
             mainViewModel.isMultiSelectOn = false
-
         }
 
-        binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true)
-        {
+        binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
             isMultiSelectOn = false
         }
 
-        binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true)
-        {
+        binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.SaveToKDrive, threadsCount, isFromBottomSheet = true)
             navigateToDownloadMessagesProgressDialog(
                 messageUids = threads.flatMap { it.messages }.map { it.uid },
