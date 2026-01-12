@@ -250,18 +250,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             if (junkMessages.isEmpty()) {
                 //An error will be shown to the user in the reportPhishing function
                 //This should never happen, that's why we add a SentryLog.
-                SentryLog.e(MultiSelectBottomSheetDialog.TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
+                SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
             }
 
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
                 description = resources.getQuantityString(R.plurals.reportPhishingDescription, thread.messages.count()),
-                onPositiveButtonClicked = {
-                    mainViewModel.reportPhishing(
-                        junkMessagesViewModel.threadsUids,
-                        junkMessages
-                    )
-                },
+                onPositiveButtonClicked = { mainViewModel.reportPhishing(junkMessagesViewModel.threadsUids, junkMessages) },
             )
         }
 
