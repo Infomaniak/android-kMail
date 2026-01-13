@@ -92,6 +92,7 @@ import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -333,6 +334,7 @@ class MainActivity : BaseActivity() {
                     matomoTrackerName = matomoName,
                 )
             }
+            KSuite.StarterPack -> openMailPremiumBottomSheet(navController, matomoName)
         }
     }
 
