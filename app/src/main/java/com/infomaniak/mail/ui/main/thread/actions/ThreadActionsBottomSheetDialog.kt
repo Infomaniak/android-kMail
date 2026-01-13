@@ -67,6 +67,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
+
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
 
@@ -94,12 +95,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         threadActionsViewModel.threadMessagesWithActionAndReaction
             .observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageUidToReactTo) ->
-                // Initialization of threadsUids to populate messages and potentialUsersToBlock
+                // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
                 junkMessagesViewModel.threadsUids = listOf(thread.uid)
 
                 folderRole = folderRoleUtils.getActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
                 isFromSpam = folderRole == FolderRole.SPAM
+
                 setMarkAsReadUi(thread.isSeen)
                 setArchiveUi(isFromArchive)
                 setFavoriteUi(thread.isFavorite)
@@ -110,12 +112,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
 
-        junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
-        }
-
+        observePotentialBlockedUsers()
         observeReportPhishingResult()
-
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
@@ -124,6 +122,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         snooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed.not()
         modifySnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
         cancelSnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
+    }
+
+    private fun observePotentialBlockedUsers() {
+        junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+        }
     }
 
     private fun observeReportPhishingResult() {
@@ -241,10 +245,18 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onPhishing() {
             trackBottomSheetThreadActionsEvent(MatomoName.SignalPhishing)
+            val junkMessages = junkMessagesViewModel.junkMessages.value ?: emptyList()
+
+            if (junkMessages.isEmpty()) {
+                //An error will be shown to the user in the reportPhishing function
+                //This should never happen, that's why we add a SentryLog.
+                SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
+            }
+
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
                 description = resources.getQuantityString(R.plurals.reportPhishingDescription, thread.messages.count()),
-                onPositiveButtonClicked = { mainViewModel.reportPhishing(listOf(thread.uid), thread.messages) },
+                onPositiveButtonClicked = { mainViewModel.reportPhishing(junkMessagesViewModel.threadsUids, junkMessages) },
             )
         }
 
