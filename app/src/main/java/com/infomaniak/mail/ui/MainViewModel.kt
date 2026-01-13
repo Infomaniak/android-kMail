@@ -1173,7 +1173,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Spam
-    private fun toggleMessageSpamStatus(threadUid: String, message: Message) {
+    fun toggleMessageSpamStatus(threadUid: String, message: Message) {
         toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = false)
     }
 
