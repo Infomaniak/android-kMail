@@ -26,6 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBannerKsuiteStorageBinding
 
@@ -98,10 +99,23 @@ class KSuiteStorageBanner @JvmOverloads constructor(
                 titleRes = R.string.kSuiteProQuotasAlertFullTitle,
                 descriptionRes = R.string.kSuiteProQuotasAlertFullDescription,
             )
+
+            data object StarterPack : StorageLevelData(
+                iconColorRes = R.color.redDestructiveAction,
+                titleRes = R.string.mailPremiumUpgradeTitle,
+                descriptionRes = R.string.mailPremiumUpgradeDescription
+            )
         }
 
         companion object {
             const val WARNING_THRESHOLD = 85
+
+            fun getFullStorageBanner(kSuite: KSuite?): StorageLevelData = when (kSuite) {
+                is KSuite.Perso -> Full.Perso
+                KSuite.StarterPack -> Full.StarterPack
+                is KSuite.Pro -> Full.Pro
+                else -> Full.Pro // Should not happened but Fallback
+            }
         }
     }
 }

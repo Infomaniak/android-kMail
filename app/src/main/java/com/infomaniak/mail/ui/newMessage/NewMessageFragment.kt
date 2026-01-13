@@ -118,6 +118,7 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -125,7 +126,6 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -404,7 +404,11 @@ class NewMessageFragment : Fragment() {
 
     private fun initMailbox() {
         val userId = if (newMessageFragmentArgs.userId == -1) AccountUtils.currentUserId else newMessageFragmentArgs.userId
-        val mailboxId = if (newMessageFragmentArgs.mailboxId == -1) AccountUtils.currentMailboxId else newMessageFragmentArgs.mailboxId
+        val mailboxId = if (newMessageFragmentArgs.mailboxId == -1) {
+            AccountUtils.currentMailboxId
+        } else {
+            newMessageFragmentArgs.mailboxId
+        }
         newMessageViewModel.loadMailbox(userId, mailboxId)
     }
 
@@ -892,6 +896,7 @@ class NewMessageFragment : Fragment() {
             val onActionClicked: (() -> Unit)? = when (kSuite) {
                 KSuite.Perso.Free -> fun() = openMyKSuiteUpgradeBottomSheet(matomoName)
                 KSuite.Pro.Free -> fun() = openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
+                KSuite.StarterPack -> fun() = openMailPremiumBottomSheet(matomoName)
                 else -> null
             }
 
