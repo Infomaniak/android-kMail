@@ -69,6 +69,33 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/folderDropDown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/marginStandardSmall"
+                        android:checkable="true"
+                        android:drawableTint="@color/chip_unread_text_color"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/suisseintl_medium"
+                        android:insetLeft="0dp"
+                        android:insetTop="@dimen/marginStandardSmall"
+                        android:insetRight="0dp"
+                        android:insetBottom="@dimen/marginStandardSmall"
+                        android:maxWidth="@dimen/maxSearchChipWidth"
+                        android:paddingStart="@dimen/alternativeMargin"
+                        android:paddingEnd="@dimen/marginStandardMedium"
+                        android:text="@string/searchFilterFolder"
+                        android:textColor="@color/chip_unread_text_color"
+                        app:backgroundTint="@color/chip_unread_background"
+                        app:closeIcon="@drawable/ic_chevron_down"
+                        app:rippleColor="?attr/colorControlHighlight"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:strokeWidth="1dp"
+                        app:toggleCheckedStateOnClick="false"
+                        tools:drawableLeft="@drawable/ic_check_sharp"
+                        tools:drawableRight="@drawable/ic_chevron_down" />
+
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/mutuallyExclusiveChipGroup"
                         android:layout_width="wrap_content"
@@ -102,32 +129,6 @@
                         android:layout_marginEnd="@dimen/marginStandardSmall"
                         android:text="@string/searchFilterAttachment"
                         tools:checked="true" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/folderDropDown"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:checkable="true"
-                        android:drawableTint="@color/chip_unread_text_color"
-                        android:ellipsize="end"
-                        android:fontFamily="@font/suisseintl_medium"
-                        android:insetLeft="0dp"
-                        android:insetTop="@dimen/marginStandardSmall"
-                        android:insetRight="0dp"
-                        android:insetBottom="@dimen/marginStandardSmall"
-                        android:maxWidth="@dimen/maxSearchChipWidth"
-                        android:paddingStart="@dimen/alternativeMargin"
-                        android:paddingEnd="@dimen/marginStandardMedium"
-                        android:text="@string/searchFilterFolder"
-                        android:textColor="@color/chip_unread_text_color"
-                        app:backgroundTint="@color/chip_unread_background"
-                        app:closeIcon="@drawable/ic_chevron_down"
-                        app:rippleColor="?attr/colorControlHighlight"
-                        app:strokeColor="?attr/colorPrimary"
-                        app:strokeWidth="1dp"
-                        app:toggleCheckedStateOnClick="false"
-                        tools:drawableLeft="@drawable/ic_check_sharp"
-                        tools:drawableRight="@drawable/ic_chevron_down" />
 
                 </LinearLayout>
             </HorizontalScrollView>

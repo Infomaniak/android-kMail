@@ -113,6 +113,8 @@ class SearchFragment : TwoPaneFragment() {
 
         handleEdgeToEdge()
 
+        selectCurrentFolder()
+
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SEARCH.id)
 
         searchViewModel.executePendingSearch()
@@ -170,6 +172,10 @@ class SearchFragment : TwoPaneFragment() {
         } else {
             _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
         }
+    }
+
+    private fun selectCurrentFolder() {
+        searchViewModel.selectFolder(mainViewModel.currentFolder.value)
     }
 
     private fun setupAdapter() {
