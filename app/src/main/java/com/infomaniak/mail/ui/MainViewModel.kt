@@ -1223,7 +1223,11 @@ class MainViewModel @Inject constructor(
                 // so you won't have both SPAM and non-SPAM messages.
                 messages.firstOrNull()?.let {
                     if (folderRoleUtils.getActionFolderRole(it) != FolderRole.SPAM) {
-                        toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
+                        if (messages.count() == 1) {
+                            toggleMessageSpamStatus(threadUids.first(), messages.first())
+                        } else {
+                            toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
+                        }
                     }
                 }
 
