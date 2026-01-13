@@ -62,7 +62,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
+
     override val shouldCloseMultiSelection: Boolean = false
+    private var isFromSpam: Boolean = false
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -82,7 +84,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             val message = mainViewModel.getMessage(messageUid)
             val folderRole = folderRoleUtils.getActionFolderRole(message)
-            val isFromSpam = folderRole == FolderRole.SPAM
+            isFromSpam = folderRole == FolderRole.SPAM
 
             setMarkAsReadUi(message.isSeen)
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
@@ -115,7 +117,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
             setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
         }
     }
@@ -204,7 +205,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onSpam() {
-                val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
                 if (isFromSpam) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = true)
                     mainViewModel.toggleMessageSpamStatus(threadUid, message)
