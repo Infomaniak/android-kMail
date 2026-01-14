@@ -22,8 +22,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.di.IoDispatcher
@@ -44,8 +42,6 @@ import javax.inject.Inject
 class MoveViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
-    private val messageController: MessageController,
-    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -53,8 +49,7 @@ class MoveViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
-    private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
+    private val sourceFolder inline get() = savedStateHandle.get<String>(MoveFragmentArgs::sourceFolder.name)
 
     private var allFolderUis = emptyList<Any>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
@@ -63,11 +58,7 @@ class MoveViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(ioCoroutineContext) {
-
-            val sourceFolderId = messageUid?.let { messageController.getMessage(it) }?.folderId
-                ?: threadController.getThread(threadsUids.first())!!.folderId
-
-            sourceFolderIdLiveData.postValue(sourceFolderId)
+            sourceFolderIdLiveData.postValue(sourceFolder)
         }
     }
 

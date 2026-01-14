@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
@@ -40,9 +41,9 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
 
     private var shouldDisplayIndent: Boolean = false
     private var selectedFolderId: String? = null
-    private lateinit var onFolderClicked: (folderId: String) -> Unit
+    private lateinit var onFolderClicked: (folder: Folder) -> Unit
 
-    operator fun invoke(onFolderClicked: (folderId: String) -> Unit): MoveAdapter {
+    operator fun invoke(onFolderClicked: (folder: Folder) -> Unit): MoveAdapter {
         this.onFolderClicked = onFolderClicked
         return this
     }
@@ -102,7 +103,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
         }
         setIndent(indent = folderIndent)
 
-        setOnClickListener { if (folder.id != selectedFolderId) onFolderClicked.invoke(folder.id) }
+        setOnClickListener { if (folder.id != selectedFolderId) onFolderClicked.invoke(folder) }
     }
 
     class MoveFolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)

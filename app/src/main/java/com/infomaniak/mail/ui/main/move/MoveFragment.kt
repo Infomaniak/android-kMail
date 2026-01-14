@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -34,9 +35,11 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
@@ -55,6 +58,7 @@ class MoveFragment : Fragment() {
     private var binding: FragmentMoveBinding by safeBinding()
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
@@ -83,7 +87,7 @@ class MoveFragment : Fragment() {
         bindAlertToViewLifecycle(createFolderDialog)
         setupRecyclerView()
         setupListeners()
-        setupCreateFolderDialog()
+        setupCreateFolder()
         setupSearchBar()
         observeSearchResults()
         observeFolderCreation()
@@ -101,7 +105,8 @@ class MoveFragment : Fragment() {
         }
     }
 
-    private fun setupCreateFolderDialog() = with(navigationArgs) {
+    private fun setupCreateFolder() = with(navigationArgs) {
+        binding.iconAddFolder.isGone = action == SEARCH
         createFolderDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
@@ -127,8 +132,11 @@ class MoveFragment : Fragment() {
         }
     }
 
-    private fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
-        mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids.toList(), messageUid)
+    private fun onFolderSelected(folder: Folder): Unit = with(navigationArgs) {
+        when (action) {
+            MOVE -> mainViewModel.moveThreadsOrMessageTo(folder.id, threadsUids.toList(), messageUid)
+            SEARCH -> searchViewModel.selectFolder(folder)
+        }
         findNavController().popBackStack()
     }
 
@@ -156,5 +164,11 @@ class MoveFragment : Fragment() {
         binding.searchTextInput.hideKeyboard()
         moveViewModel.cancelSearch()
         super.onStop()
+    }
+
+    companion object {
+        // Actions
+        const val MOVE = "move"
+        const val SEARCH = "search"
     }
 }

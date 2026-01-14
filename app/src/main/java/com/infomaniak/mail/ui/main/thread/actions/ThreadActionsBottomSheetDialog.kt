@@ -44,6 +44,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
+import com.infomaniak.mail.ui.main.move.MoveFragment
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
@@ -201,7 +202,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Move)
                 navController.animatedNavigation(
                     resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(arrayOf(navigationArgs.threadUid)).toBundle(),
+                    args = MoveFragmentArgs(
+                        arrayOf(navigationArgs.threadUid),
+                        MoveFragment.MOVE,
+                        mainViewModel.currentFolderId!!
+                    ).toBundle(),
                     currentClassName = currentClassName,
                 )
             }
