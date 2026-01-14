@@ -1221,10 +1221,10 @@ class MainViewModel @Inject constructor(
             val snackbarTitle = if (isSuccess()) {
                 // Check the first message, because it is not possible to select messages from multiple folders,
                 // so you won't have both SPAM and non-SPAM messages.
-                messages.firstOrNull()?.let {
-                    if (folderRoleUtils.getActionFolderRole(it) != FolderRole.SPAM) {
+                messages.firstOrNull()?.let { message ->
+                    if (folderRoleUtils.getActionFolderRole(message) != FolderRole.SPAM) {
                         if (messages.count() == 1) {
-                            toggleMessageSpamStatus(threadUids.first(), messages.first())
+                            toggleMessageSpamStatus(threadUids.first(), message)
                         } else {
                             toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
                         }

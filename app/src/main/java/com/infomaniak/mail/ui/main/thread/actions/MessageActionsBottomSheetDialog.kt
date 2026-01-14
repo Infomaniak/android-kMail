@@ -205,13 +205,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onSpam() {
-                if (isFromSpam) {
-                    trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = true)
-                    mainViewModel.toggleMessageSpamStatus(threadUid, message)
-                } else {
-                    trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = false)
-                    mainViewModel.toggleMessageSpamStatus(threadUid, message)
-                }
+                trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = isFromSpam)
+                mainViewModel.toggleMessageSpamStatus(threadUid, message)
             }
 
             override fun onPhishing() {
