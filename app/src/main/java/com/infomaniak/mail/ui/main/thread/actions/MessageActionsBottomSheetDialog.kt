@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.move.MoveFragment
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
@@ -182,7 +183,12 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
                     navController.animatedNavigation(
                         resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
+                        args = MoveFragmentArgs(
+                            arrayOf(threadUid),
+                            MoveFragment.MOVE,
+                            mainViewModel.currentFolderId!!,
+                            messageUid
+                        ).toBundle(),
                         currentClassName = currentClassName,
                     )
                 }

@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.ui.main.move.MoveFragment
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -124,7 +125,11 @@ object PerformSwipeActionManager {
             val navController = findNavController()
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 navController.animatedNavigation(
-                    directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)),
+                    directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
+                        arrayOf(thread.uid),
+                        action = MoveFragment.MOVE,
+                        mainViewModel.currentFolderId!!
+                    ),
                     currentClassName = javaClass.name,
                 )
             }
