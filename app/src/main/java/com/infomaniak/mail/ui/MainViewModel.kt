@@ -780,7 +780,7 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { messageController.getUnscheduledMessages(it) }
+        null -> threads.flatMap { messageController.getUnscheduledMessages(it, true) }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -1202,7 +1202,7 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { messageController.getUnscheduledMessages(it) }
+        null -> threads.flatMap { messageController.getUnscheduledMessages(it, false) }
         else -> listOf(message)
     }
     //endregion
