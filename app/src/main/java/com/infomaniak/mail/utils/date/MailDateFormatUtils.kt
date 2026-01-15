@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024-2025 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 package com.infomaniak.mail.utils.date
 
 import android.content.Context
-import com.infomaniak.core.utils.FormatData
-import com.infomaniak.core.utils.formatWithLocal
-import com.infomaniak.core.utils.isThisYear
-import com.infomaniak.core.utils.isToday
-import com.infomaniak.core.utils.isYesterday
+import com.infomaniak.core.common.utils.FormatData
+import com.infomaniak.core.common.utils.formatWithLocal
+import com.infomaniak.core.common.utils.isThisYear
+import com.infomaniak.core.common.utils.isToday
+import com.infomaniak.core.common.utils.isYesterday
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear

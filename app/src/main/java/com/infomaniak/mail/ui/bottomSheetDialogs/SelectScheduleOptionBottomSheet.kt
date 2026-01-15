@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ import androidx.core.view.isVisible
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.core.utils.getNextMonday
-import com.infomaniak.core.utils.getTimeAtHour
-import com.infomaniak.core.utils.isAtLeastXMinutesInTheFuture
-import com.infomaniak.core.utils.isWeekend
-import com.infomaniak.core.utils.tomorrow
+import com.infomaniak.core.common.utils.getNextMonday
+import com.infomaniak.core.common.utils.getTimeAtHour
+import com.infomaniak.core.common.utils.isAtLeastXMinutesInTheFuture
+import com.infomaniak.core.common.utils.isWeekend
+import com.infomaniak.core.common.utils.tomorrow
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding

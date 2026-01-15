@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,13 +43,13 @@ import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.ui.view.toPx
-import com.infomaniak.core.utils.format
-import com.infomaniak.core.utils.isInTheFuture
-import com.infomaniak.core.utils.isThisMonth
-import com.infomaniak.core.utils.isThisWeek
-import com.infomaniak.core.utils.isThisYear
-import com.infomaniak.core.utils.isToday
-import com.infomaniak.core.utils.isYesterday
+import com.infomaniak.core.common.utils.format
+import com.infomaniak.core.common.utils.isInTheFuture
+import com.infomaniak.core.common.utils.isThisMonth
+import com.infomaniak.core.common.utils.isThisWeek
+import com.infomaniak.core.common.utils.isThisYear
+import com.infomaniak.core.common.utils.isToday
+import com.infomaniak.core.common.utils.isYesterday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.mail.MainApplication

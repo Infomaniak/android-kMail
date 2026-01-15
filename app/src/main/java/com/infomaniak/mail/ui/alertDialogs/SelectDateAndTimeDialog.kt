@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,18 +27,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.utils.FORMAT_DATE_DAY_MONTH_YEAR
-import com.infomaniak.core.utils.day
-import com.infomaniak.core.utils.format
-import com.infomaniak.core.utils.hours
-import com.infomaniak.core.utils.isAtLeastXMinutesInTheFuture
-import com.infomaniak.core.utils.isInTheFuture
-import com.infomaniak.core.utils.minutes
-import com.infomaniak.core.utils.month
-import com.infomaniak.core.utils.roundUpToNextTenMinutes
-import com.infomaniak.core.utils.setHour
-import com.infomaniak.core.utils.setMinute
-import com.infomaniak.core.utils.year
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH_YEAR
+import com.infomaniak.core.common.utils.day
+import com.infomaniak.core.common.utils.format
+import com.infomaniak.core.common.utils.hours
+import com.infomaniak.core.common.utils.isAtLeastXMinutesInTheFuture
+import com.infomaniak.core.common.utils.isInTheFuture
+import com.infomaniak.core.common.utils.minutes
+import com.infomaniak.core.common.utils.month
+import com.infomaniak.core.common.utils.roundUpToNextTenMinutes
+import com.infomaniak.core.common.utils.setHour
+import com.infomaniak.core.common.utils.setMinute
+import com.infomaniak.core.common.utils.year
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
