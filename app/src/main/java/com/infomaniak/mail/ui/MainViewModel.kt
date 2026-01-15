@@ -1203,7 +1203,7 @@ class MainViewModel @Inject constructor(
 
     private suspend fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap { messageController.getUnscheduledMessages(it) }
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
+        else -> listOf(message)
     }
     //endregion
 

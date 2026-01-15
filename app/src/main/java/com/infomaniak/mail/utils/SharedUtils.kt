@@ -109,7 +109,7 @@ class SharedUtils @Inject constructor(
 
     suspend fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap { messageController.getMovableMessages(it) }
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
+        else -> listOf(message)
     }
 
     suspend fun refreshFolders(
