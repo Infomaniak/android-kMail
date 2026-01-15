@@ -1173,8 +1173,8 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Spam
-    fun toggleMessageSpamStatus(threadUid: String, message: Message) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = false)
+    fun toggleMessageSpamStatus(threadUid: String, message: Message, displaySnackbar: Boolean = true) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = displaySnackbar)
     }
 
     fun toggleThreadSpamStatus(threadUids: List<String>, displaySnackbar: Boolean = true) {
@@ -1224,7 +1224,7 @@ class MainViewModel @Inject constructor(
                 messages.firstOrNull()?.let { message ->
                     if (folderRoleUtils.getActionFolderRole(message) != FolderRole.SPAM) {
                         if (messages.count() == 1) {
-                            toggleMessageSpamStatus(threadUids.first(), message)
+                            toggleMessageSpamStatus(threadUids.first(), message, displaySnackbar = false)
                         } else {
                             toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
                         }
