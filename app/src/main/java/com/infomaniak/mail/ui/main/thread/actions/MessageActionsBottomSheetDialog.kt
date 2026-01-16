@@ -36,8 +36,8 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.move.FolderPickerFragment
-import com.infomaniak.mail.ui.main.move.FolderPickerFragmentArgs
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragment
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
