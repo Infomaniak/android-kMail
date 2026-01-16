@@ -219,7 +219,7 @@ class SearchFragment : TwoPaneFragment() {
                 directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
                     threadsUids = emptyArray(),
                     action = FolderPickerFragment.SEARCH,
-                    sourceFolder = searchViewModel.filterFolder?.id ?: mainViewModel.currentFolderId!!
+                    sourceFolderId = searchViewModel.filterFolder?.id ?: mainViewModel.currentFolderId!!
                 ),
                 currentClassName = javaClass.name,
             )

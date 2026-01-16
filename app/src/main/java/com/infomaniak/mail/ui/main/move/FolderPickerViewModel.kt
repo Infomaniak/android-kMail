@@ -49,7 +49,7 @@ class FolderPickerViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private val sourceFolder inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolder.name)
+    private val sourceFolder inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolderId.name)
 
     private var allFolderUis = emptyList<Any>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
