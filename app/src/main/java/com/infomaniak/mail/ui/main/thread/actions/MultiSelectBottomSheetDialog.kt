@@ -127,8 +127,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                             navController.animatedNavigation(
                                 directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                                     threadsUids = threadsUids.toTypedArray(),
-                                    FolderPickerFragment.MOVE,
-                                    mainViewModel.currentFolderId!!
+                                    action = FolderPickerFragment.MOVE,
+                                    sourceFolder = mainViewModel.currentFolderId!!
                                 ),
                                 currentClassName = currentClassName,
                             )

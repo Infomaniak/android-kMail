@@ -217,9 +217,9 @@ class SearchFragment : TwoPaneFragment() {
             val navController = findNavController()
             navController.animatedNavigation(
                 directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
-                    emptyArray(),
+                    threadsUids = emptyArray(),
                     action = FolderPickerFragment.SEARCH,
-                    searchViewModel.filterFolder?.id ?: mainViewModel.currentFolderId!!
+                    messageUid = searchViewModel.filterFolder?.id ?: mainViewModel.currentFolderId!!
                 ),
                 currentClassName = javaClass.name,
             )

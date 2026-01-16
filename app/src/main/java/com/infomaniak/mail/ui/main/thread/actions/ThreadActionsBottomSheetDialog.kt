@@ -203,9 +203,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 navController.animatedNavigation(
                     resId = R.id.folderPickerFragment,
                     args = FolderPickerFragmentArgs(
-                        arrayOf(navigationArgs.threadUid),
-                        FolderPickerFragment.MOVE,
-                        mainViewModel.currentFolderId!!
+                        threadsUids = arrayOf(navigationArgs.threadUid),
+                        action = FolderPickerFragment.MOVE,
+                        sourceFolder = mainViewModel.currentFolderId!!
                     ).toBundle(),
                     currentClassName = currentClassName,
                 )
