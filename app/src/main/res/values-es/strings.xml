@@ -472,7 +472,7 @@
     <string name="searchFilterFolder">Todas las carpetas</string>
     <string name="searchFilterRead">Leer</string>
     <string name="searchFilterUnread">No leídos</string>
-    <string name="searchFolderName">Buscar en</string>
+    <string name="searchFolderName">Buscar</string>
     <string name="selectDateDialogTitle">Seleccione la fecha</string>
     <string name="selectSignatureNone">Sin firma</string>
     <string name="selectTimeDialogTitle">Seleccionar la hora</string>
