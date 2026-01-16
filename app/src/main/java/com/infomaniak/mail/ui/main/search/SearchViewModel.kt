@@ -115,6 +115,10 @@ class SearchViewModel @Inject constructor(
         if (hasPendingSearch) search()
     }
 
+    fun resetFolderFilter() {
+        filterFolder = null
+    }
+
     fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
         search()
     }

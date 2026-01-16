@@ -28,7 +28,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentContainerView
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -46,7 +46,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -73,7 +72,7 @@ class SearchFragment : TwoPaneFragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
 
     override val substituteClassName: String = javaClass.name
 
@@ -108,7 +107,7 @@ class SearchFragment : TwoPaneFragment() {
 
         handleEdgeToEdge()
 
-        onFolderSelected(mainViewModel.currentFolder.value!!)
+        selectCurrentFolder()
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SEARCH.id)
 
         searchViewModel.executePendingSearch()
@@ -206,7 +205,10 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        toolbar.setNavigationOnClickListener {
+            searchViewModel.resetFolderFilter()
+            findNavController().popBackStack()
+        }
         swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
     }
 
@@ -217,21 +219,26 @@ class SearchFragment : TwoPaneFragment() {
                 directions = SearchFragmentDirections.actionSearchFragmentToMoveFragment(
                     emptyArray(),
                     action = MoveFragment.SEARCH,
-                    mainViewModel.currentFolderId!!
+                    searchViewModel.filterFolder?.id ?: mainViewModel.currentFolderId!!
                 ),
                 currentClassName = javaClass.name,
             )
         }
     }
 
-    private fun onFolderSelected(folder: Folder) {
-        searchViewModel.selectFolder(folder)
-        updateAllFoldersButtonUi(folder, requireContext().getLocalizedNameOrAllFolders(folder))
+    private fun selectCurrentFolder() {
+        if (searchViewModel.filterFolder == null) {
+            searchViewModel.selectFolder(mainViewModel.currentFolder.value)
+        }
+        updateAllFoldersButtonUi()
         trackSearchEvent(ThreadFilter.FOLDER.matomoName, true)
     }
 
-    private fun updateAllFoldersButtonUi(folder: Folder?, title: String) = with(binding) {
+    private fun updateAllFoldersButtonUi() = with(binding) {
+        val folder = searchViewModel.filterFolder
+        val title = requireContext().getLocalizedNameOrAllFolders(folder)
         val drawable = if (folder != null) R.drawable.ic_check_sharp else 0
+
         allFoldersButton.apply {
             isChecked = folder != null
             setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, 0, R.drawable.ic_chevron_down, 0)
@@ -348,6 +355,7 @@ class SearchFragment : TwoPaneFragment() {
 
         fun displaySearchResult(mode: VisibilityMode) {
             showLoadingTimer.cancel()
+            updateAllFoldersButtonUi()
             swipeRefreshLayout.apply {
                 isRefreshing = false
                 isEnabled = true
