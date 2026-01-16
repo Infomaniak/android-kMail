@@ -39,7 +39,7 @@ class Quotas : EmbeddedRealmObject {
     private var maxStorage: Long? = null
     //endregion
 
-    val size: Long get() = _size * 1_024L // Convert from KiloOctets to Octets
+    val size: Long get() = _size
 
     val isFull: Boolean
         get() {
