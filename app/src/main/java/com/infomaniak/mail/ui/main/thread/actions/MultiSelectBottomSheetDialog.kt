@@ -47,7 +47,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
-import com.infomaniak.mail.ui.main.move.MoveFragment
+import com.infomaniak.mail.ui.main.move.FolderPickerFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -125,9 +125,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         ) {
                             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
                             navController.animatedNavigation(
-                                directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
+                                directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                                     threadsUids = threadsUids.toTypedArray(),
-                                    MoveFragment.MOVE,
+                                    FolderPickerFragment.MOVE,
                                     mainViewModel.currentFolderId!!
                                 ),
                                 currentClassName = currentClassName,

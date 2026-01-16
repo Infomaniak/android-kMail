@@ -36,9 +36,9 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.move.MoveFragment
+import com.infomaniak.mail.ui.main.move.FolderPickerFragment
+import com.infomaniak.mail.ui.main.move.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -182,10 +182,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 val navController = findNavController()
                 descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
                     navController.animatedNavigation(
-                        resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(
+                        resId = R.id.folderPickerFragment,
+                        args = FolderPickerFragmentArgs(
                             arrayOf(threadUid),
-                            MoveFragment.MOVE,
+                            FolderPickerFragment.MOVE,
                             mainViewModel.currentFolderId!!,
                             messageUid
                         ).toBundle(),

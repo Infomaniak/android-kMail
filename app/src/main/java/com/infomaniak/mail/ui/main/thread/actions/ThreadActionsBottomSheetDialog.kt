@@ -44,8 +44,8 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
-import com.infomaniak.mail.ui.main.move.MoveFragment
-import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
+import com.infomaniak.mail.ui.main.move.FolderPickerFragment
+import com.infomaniak.mail.ui.main.move.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -201,10 +201,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Move)
                 navController.animatedNavigation(
-                    resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(
+                    resId = R.id.folderPickerFragment,
+                    args = FolderPickerFragmentArgs(
                         arrayOf(navigationArgs.threadUid),
-                        MoveFragment.MOVE,
+                        FolderPickerFragment.MOVE,
                         mainViewModel.currentFolderId!!
                     ).toBundle(),
                     currentClassName = currentClassName,

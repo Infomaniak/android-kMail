@@ -52,7 +52,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
-import com.infomaniak.mail.ui.main.move.MoveFragment
+import com.infomaniak.mail.ui.main.move.FolderPickerFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
@@ -216,9 +216,9 @@ class SearchFragment : TwoPaneFragment() {
         binding.allFoldersButton.setOnClickListener {
             val navController = findNavController()
             navController.animatedNavigation(
-                directions = SearchFragmentDirections.actionSearchFragmentToMoveFragment(
+                directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
                     emptyArray(),
-                    action = MoveFragment.SEARCH,
+                    action = FolderPickerFragment.SEARCH,
                     searchViewModel.filterFolder?.id ?: mainViewModel.currentFolderId!!
                 ),
                 currentClassName = javaClass.name,
