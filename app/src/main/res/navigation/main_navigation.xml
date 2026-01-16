@@ -269,7 +269,7 @@
 
     <fragment
         android:id="@+id/folderPickerFragment"
-        android:name="com.infomaniak.mail.ui.main.move.FolderPickerFragment"
+        android:name="com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragment"
         android:label="FolderPickerFragment"
         tools:layout="@layout/fragment_folder_picker">
         <argument

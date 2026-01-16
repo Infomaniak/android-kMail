@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.move
+package com.infomaniak.mail.ui.main.folderPicker
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -29,8 +29,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAdapter.MoveFolderViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder.Companion.MAX_SUB_FOLDERS_INDENT
-import com.infomaniak.mail.ui.main.move.FolderPickerAdapter.MoveFolderViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi

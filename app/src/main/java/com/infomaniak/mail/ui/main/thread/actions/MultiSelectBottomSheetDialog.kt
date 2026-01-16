@@ -47,7 +47,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
-import com.infomaniak.mail.ui.main.move.FolderPickerFragment
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi

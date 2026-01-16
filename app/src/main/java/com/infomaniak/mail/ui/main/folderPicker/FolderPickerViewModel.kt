@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.move
+package com.infomaniak.mail.ui.main.folderPicker
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
