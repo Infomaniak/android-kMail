@@ -187,7 +187,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                             threadsUids = arrayOf(threadUid),
                             action = FolderPickerFragment.MOVE,
                             messageUid = messageUid,
-                            sourceFolder = mainViewModel.currentFolderId!!
+                            sourceFolderId = mainViewModel.currentFolderId!!
                         ).toBundle(),
                         currentClassName = currentClassName,
                     )
