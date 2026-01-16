@@ -30,20 +30,20 @@ import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder.Companion.MAX_SUB_FOLDERS_INDENT
-import com.infomaniak.mail.ui.main.move.MoveAdapter.MoveFolderViewHolder
+import com.infomaniak.mail.ui.main.move.FolderPickerAdapter.MoveFolderViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import javax.inject.Inject
 import kotlin.math.min
 
-class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>(FolderDiffCallback()) {
+class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>(FolderDiffCallback()) {
 
     private var shouldDisplayIndent: Boolean = false
     private var selectedFolderId: String? = null
     private lateinit var onFolderClicked: (folder: Folder) -> Unit
 
-    operator fun invoke(onFolderClicked: (folder: Folder) -> Unit): MoveAdapter {
+    operator fun invoke(onFolderClicked: (folder: Folder) -> Unit): FolderPickerAdapter {
         this.onFolderClicked = onFolderClicked
         return this
     }

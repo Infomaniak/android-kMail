@@ -48,7 +48,7 @@
                     android:ellipsize="end"
                     android:gravity="center"
                     android:lines="1"
-                    android:text="@string/actionMove" />
+                    tools:text="@string/actionMove" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/iconAddFolder"

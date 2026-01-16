@@ -63,8 +63,8 @@
             android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
             app:destination="@id/threadActionsBottomSheetDialog" />
         <action
-            android:id="@+id/action_threadListFragment_to_moveFragment"
-            app:destination="@id/moveFragment" />
+            android:id="@+id/action_threadListFragment_to_folderPickerFragment"
+            app:destination="@id/folderPickerFragment" />
         <action
             android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
             app:destination="@id/multiSelectBottomSheetDialog" />
@@ -147,8 +147,8 @@
             android:name="dummyFolderId"
             app:argType="string" />
         <action
-            android:id="@+id/action_searchFragment_to_moveFragment"
-            app:destination="@id/moveFragment" />
+            android:id="@+id/action_searchFragment_to_folderPickerFragment"
+            app:destination="@id/folderPickerFragment" />
         <action
             android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
             app:destination="@id/detailedContactBottomSheetDialog" />
@@ -268,10 +268,10 @@
     </dialog>
 
     <fragment
-        android:id="@+id/moveFragment"
-        android:name="com.infomaniak.mail.ui.main.move.MoveFragment"
-        android:label="MoveFragment"
-        tools:layout="@layout/fragment_move">
+        android:id="@+id/folderPickerFragment"
+        android:name="com.infomaniak.mail.ui.main.move.FolderPickerFragment"
+        android:label="FolderPickerFragment"
+        tools:layout="@layout/fragment_folder_picker">
         <argument
             android:name="threadsUids"
             app:argType="string[]" />
@@ -587,8 +587,8 @@
         android:label="MultiSelectBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_multi_select">
         <action
-            android:id="@+id/action_multiSelectBottomSheetDialog_to_moveFragment"
-            app:destination="@id/moveFragment" />
+            android:id="@+id/action_multiSelectBottomSheetDialog_to_folderPickerFragment"
+            app:destination="@id/folderPickerFragment" />
     </dialog>
 
     <dialog

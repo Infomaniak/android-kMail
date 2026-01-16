@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MoveViewModel @Inject constructor(
+class FolderPickerViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -49,7 +49,7 @@ class MoveViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private val sourceFolder inline get() = savedStateHandle.get<String>(MoveFragmentArgs::sourceFolder.name)
+    private val sourceFolder inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolder.name)
 
     private var allFolderUis = emptyList<Any>()
     val sourceFolderIdLiveData = MutableLiveData<String>()

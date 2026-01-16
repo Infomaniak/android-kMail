@@ -21,7 +21,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -36,7 +37,7 @@ import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.databinding.FragmentMoveBinding
+import com.infomaniak.mail.databinding.FragmentFolderPickerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.main.search.SearchViewModel
@@ -53,11 +54,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MoveFragment : Fragment() {
+class FolderPickerFragment : Fragment() {
 
-    private var binding: FragmentMoveBinding by safeBinding()
-    private val navigationArgs: MoveFragmentArgs by navArgs()
-    private val moveViewModel: MoveViewModel by viewModels()
+    private var binding: FragmentFolderPickerBinding by safeBinding()
+    private val navigationArgs: FolderPickerFragmentArgs by navArgs()
+    private val folderPickerViewModel: FolderPickerViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
@@ -65,15 +66,15 @@ class MoveFragment : Fragment() {
     lateinit var createFolderDialog: CreateFolderDialog
 
     @Inject
-    lateinit var moveAdapter: MoveAdapter
+    lateinit var folderPickerAdapter: FolderPickerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launch { moveViewModel.initFolders(mainViewModel.displayedFoldersFlow.first()) }
+        lifecycleScope.launch { folderPickerViewModel.initFolders(mainViewModel.displayedFoldersFlow.first()) }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMoveBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentFolderPickerBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -87,14 +88,14 @@ class MoveFragment : Fragment() {
         bindAlertToViewLifecycle(createFolderDialog)
         setupRecyclerView()
         setupListeners()
-        setupCreateFolder()
+        setupToolbar()
         setupSearchBar()
         observeSearchResults()
         observeFolderCreation()
     }
 
     private fun setupRecyclerView() = with(binding.foldersRecyclerView) {
-        adapter = moveAdapter(onFolderClicked = ::onFolderSelected)
+        adapter = folderPickerAdapter(onFolderClicked = ::onFolderSelected)
     }
 
     private fun setupListeners() = with(binding) {
@@ -105,8 +106,21 @@ class MoveFragment : Fragment() {
         }
     }
 
+    private fun setupToolbar() = with(navigationArgs) {
+        when (action) {
+            SEARCH -> {
+                binding.iconAddFolder.isInvisible = true
+                binding.toolbarSubject.text = getString(R.string.searchFolderName)
+            }
+            MOVE -> {
+                binding.iconAddFolder.isVisible = true
+                binding.toolbarSubject.text = getString(R.string.actionMove)
+                setupCreateFolder()
+            }
+        }
+    }
+
     private fun setupCreateFolder() = with(navigationArgs) {
-        binding.iconAddFolder.isGone = action == SEARCH
         createFolderDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
@@ -114,10 +128,10 @@ class MoveFragment : Fragment() {
         )
     }
 
-    private fun observeSearchResults() = with(moveViewModel) {
+    private fun observeSearchResults() = with(folderPickerViewModel) {
         Utils.waitInitMediator(sourceFolderIdLiveData, filterResults).observe(viewLifecycleOwner) { (sourceFolderId, results) ->
             val (folders, shouldDisplayIndent) = results
-            moveAdapter.setFolders(sourceFolderId, shouldDisplayIndent, folders)
+            folderPickerAdapter.setFolders(sourceFolderId, shouldDisplayIndent, folders)
         }
     }
 
@@ -146,15 +160,15 @@ class MoveFragment : Fragment() {
 
         searchTextInput.apply {
             doOnTextChanged { newQuery, _, _, _ ->
-                moveViewModel.filterFolders(newQuery, shouldDebounce = true)
-                if (!moveViewModel.hasAlreadyTrackedSearch) {
+                folderPickerViewModel.filterFolders(newQuery, shouldDebounce = true)
+                if (!folderPickerViewModel.hasAlreadyTrackedSearch) {
                     trackMoveSearchEvent(MatomoName.ExecuteSearch)
-                    moveViewModel.hasAlreadyTrackedSearch = true
+                    folderPickerViewModel.hasAlreadyTrackedSearch = true
                 }
             }
 
             handleEditorSearchAction { query ->
-                moveViewModel.filterFolders(query, shouldDebounce = false)
+                folderPickerViewModel.filterFolders(query, shouldDebounce = false)
                 trackMoveSearchEvent(MatomoName.ValidateSearch)
             }
         }
@@ -162,7 +176,7 @@ class MoveFragment : Fragment() {
 
     override fun onStop() {
         binding.searchTextInput.hideKeyboard()
-        moveViewModel.cancelSearch()
+        folderPickerViewModel.cancelSearch()
         super.onStop()
     }
 
