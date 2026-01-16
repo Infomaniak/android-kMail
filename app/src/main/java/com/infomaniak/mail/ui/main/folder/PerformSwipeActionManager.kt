@@ -126,9 +126,9 @@ object PerformSwipeActionManager {
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 navController.animatedNavigation(
                     directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-                        arrayOf(thread.uid),
+                        threadsUids = arrayOf(thread.uid),
                         action = FolderPickerFragment.MOVE,
-                        mainViewModel.currentFolderId!!
+                        sourceFolder = mainViewModel.currentFolderId!!
                     ),
                     currentClassName = javaClass.name,
                 )
