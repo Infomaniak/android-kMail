@@ -134,7 +134,7 @@ object ApiRoutes {
     }
 
     fun quotas(mailboxHostingId: Int, mailboxName: String): String {
-        return "${mailbox()}/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
+        return "${mailbox()}/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId&unit=B"
     }
     //endregion
 

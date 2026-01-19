@@ -31,6 +31,7 @@ fun mailboxInfoMigration() = AutomaticSchemaMigration { migrationContext ->
     migrationContext.renameKSuiteRelatedBooleans()
     migrationContext.revertKSuiteRelatedBooleanRenaming()
     migrationContext.keepDefaultValuesAfterTwelfthMigration()
+    migrationContext.migrateQuotasSizeField()
 }
 
 //region Use default property values when adding a new column in a migration
@@ -107,6 +108,21 @@ private fun MigrationContext.keepDefaultValuesAfterTwelfthMigration() {
             newObject?.apply {
                 // Rename property without losing its previous value
                 set(propertyName = "isLocked", value = oldObject.getValue<Boolean>(fieldName = "_isLocked"))
+            }
+        }
+    }
+}
+
+// Migrate to version #15
+private fun MigrationContext.migrateQuotasSizeField() {
+
+    if (oldRealm.schemaVersion() <= 14L) {
+        enumerate(className = "Quotas") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Migrate _size field to size field
+                oldObject.getValueOrNull<Long>("_size")?.let {
+                    set(propertyName = "size", value = it)
+                }
             }
         }
     }
