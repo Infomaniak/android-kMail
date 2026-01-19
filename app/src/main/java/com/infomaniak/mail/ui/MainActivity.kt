@@ -429,7 +429,7 @@ class MainActivity : BaseActivity() {
      */
     private fun scheduleDraftActionsWorkWithDelay() = lifecycleScope.launch(Dispatchers.IO) {
         delay(1_000L)
-        draftsActionsWorkerScheduler.scheduleWork()
+        draftsActionsWorkerScheduler.scheduleWork(mailboxId = AccountUtils.currentMailboxId)
     }
 
     override fun onResume() {

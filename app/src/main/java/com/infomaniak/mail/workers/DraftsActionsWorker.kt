@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -122,16 +122,16 @@ class DraftsActionsWorker @AssistedInject constructor(
         private val workManager: WorkManager,
     ) {
 
-        suspend fun scheduleWork(draftLocalUuid: String? = null) {
+        suspend fun scheduleWork(draftLocalUuid: String? = null, mailboxId: Int) {
 
-            if (AccountUtils.currentMailboxId <= -1) return // AppSettings.DEFAULT_ID
+            if (mailboxId <= -1) return // AppSettings.DEFAULT_ID
             if (draftController.getDraftsWithActionsCount() == 0L) return
 
             SentryLog.d(TAG, "Work scheduled")
 
             val workData = workDataOf(
                 USER_ID_KEY to AccountUtils.currentUserId,
-                MAILBOX_ID_KEY to AccountUtils.currentMailboxId,
+                MAILBOX_ID_KEY to mailboxId,
                 DRAFT_LOCAL_UUID_KEY to draftLocalUuid,
             )
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
