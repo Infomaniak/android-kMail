@@ -31,15 +31,13 @@ class Quotas : EmbeddedRealmObject {
 
     //region Remote data
     @SerialName("size")
-    private var _size: Long = 0L
+    var size: Long = 0L
     //endregion
 
     //region Local data (Transient)
     @Transient
     private var maxStorage: Long? = null
     //endregion
-
-    val size: Long get() = _size
 
     val isFull: Boolean
         get() {
