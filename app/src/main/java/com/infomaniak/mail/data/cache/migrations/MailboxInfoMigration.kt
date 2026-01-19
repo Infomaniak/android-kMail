@@ -113,7 +113,7 @@ private fun MigrationContext.keepDefaultValuesAfterTwelfthMigration() {
     }
 }
 
-// Migrate from version #15
+// Migrate to version #15
 private fun MigrationContext.migrateQuotasSizeField() {
 
     if (oldRealm.schemaVersion() <= 14L) {
