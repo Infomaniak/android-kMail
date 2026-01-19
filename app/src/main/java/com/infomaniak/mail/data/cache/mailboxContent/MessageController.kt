@@ -105,22 +105,28 @@ class MessageController @Inject constructor(
     }
 
     suspend fun getFavoriteMessages(thread: Thread): List<Message> {
-        return getMessagesAndTheirDuplicates(thread, "${Message::isFavorite.name} == true")
+        return getMessagesFromThread(thread, "${Message::isFavorite.name} == true", includeDuplicates = true)
     }
 
     suspend fun getMovableMessages(thread: Thread): List<Message> {
         val byFolderId = "${Message::folderId.name} == '${thread.folderId}'"
-        return getMessagesAndTheirDuplicates(thread, "$byFolderId AND $isNotScheduledMessage")
+        return getMessagesFromThread(thread, "$byFolderId AND $isNotScheduledMessage", includeDuplicates = false)
     }
 
-    suspend fun getUnscheduledMessages(thread: Thread): List<Message> {
-        return getMessagesAndTheirDuplicates(thread, isNotScheduledMessage)
+    suspend fun getUnscheduledMessages(thread: Thread, includeDuplicates: Boolean): List<Message> {
+        return getMessagesFromThread(thread, isNotScheduledMessage, includeDuplicates)
     }
 
-    private suspend fun getMessagesAndTheirDuplicates(thread: Thread, query: String): List<Message> {
+    private suspend fun getMessagesFromThread(thread: Thread, query: String, includeDuplicates: Boolean): List<Message> {
         val messages = thread.messages.query(query).findSuspend()
-        val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).findSuspend()
-        return messages + duplicates
+        if (includeDuplicates) {
+            val duplicates = thread.duplicates.query(
+                "${Message::messageId.name} IN $0",
+                messages.map { it.messageId },
+            ).findSuspend()
+            return messages + duplicates
+        }
+        return messages
     }
 
     private suspend fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> = coroutineScope {
@@ -216,11 +222,13 @@ class MessageController @Inject constructor(
             messages: RealmList<Message>,
             extraQuery: String? = null
         ): Message? {
-            suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
+            suspend fun RealmQuery<Message>.last(): Message? {
+                return sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
+            }
 
             val appendableExtraQuery = extraQuery
                 ?.takeIf { it.isNotEmpty() }
-                ?.let { " AND $it" } 
+                ?.let { " AND $it" }
                 ?: ""
 
             val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
@@ -234,7 +242,8 @@ class MessageController @Inject constructor(
                     " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                     ").@count < 1"
 
-            return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe $appendableExtraQuery").last()
+            return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe $appendableExtraQuery")
+                .last()
                 ?: messages.query("$isNotDraft AND $isNotScheduledDraft $appendableExtraQuery").last()
                 ?: messages.query(isNotScheduledDraft + appendableExtraQuery).last()
                 ?: extraQuery
