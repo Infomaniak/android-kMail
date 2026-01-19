@@ -1173,8 +1173,8 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Spam
-    private fun toggleMessageSpamStatus(threadUid: String, message: Message) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = false)
+    fun toggleMessageSpamStatus(threadUid: String, message: Message, displaySnackbar: Boolean = true) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = displaySnackbar)
     }
 
     fun toggleThreadSpamStatus(threadUids: List<String>, displaySnackbar: Boolean = true) {
@@ -1221,9 +1221,13 @@ class MainViewModel @Inject constructor(
             val snackbarTitle = if (isSuccess()) {
                 // Check the first message, because it is not possible to select messages from multiple folders,
                 // so you won't have both SPAM and non-SPAM messages.
-                messages.firstOrNull()?.let {
-                    if (folderRoleUtils.getActionFolderRole(it) != FolderRole.SPAM) {
-                        toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
+                messages.firstOrNull()?.let { message ->
+                    if (folderRoleUtils.getActionFolderRole(message) != FolderRole.SPAM) {
+                        if (messages.count() == 1) {
+                            toggleMessageSpamStatus(threadUids.first(), message, displaySnackbar = false)
+                        } else {
+                            toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
+                        }
                     }
                 }
 
