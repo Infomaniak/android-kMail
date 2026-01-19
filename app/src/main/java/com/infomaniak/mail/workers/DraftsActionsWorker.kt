@@ -122,7 +122,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private val workManager: WorkManager,
     ) {
 
-        suspend fun scheduleWork(draftLocalUuid: String? = null, mailboxId: Int) {
+        suspend fun scheduleWork(draftLocalUuid: String? = null, mailboxId: Int, userId: Int) {
 
             if (mailboxId <= -1) return // AppSettings.DEFAULT_ID
             if (draftController.getDraftsWithActionsCount() == 0L) return
@@ -130,7 +130,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             SentryLog.d(TAG, "Work scheduled")
 
             val workData = workDataOf(
-                USER_ID_KEY to AccountUtils.currentUserId,
+                USER_ID_KEY to userId,
                 MAILBOX_ID_KEY to mailboxId,
                 DRAFT_LOCAL_UUID_KEY to draftLocalUuid,
             )

@@ -46,6 +46,7 @@ fun LargeButton(
     modifier: Modifier = Modifier,
     style: ButtonType = ButtonType.Primary,
     enabled: () -> Boolean = { true },
+    showIndeterminateProgress: () -> Boolean = { false },
 ) {
     BasicButton(
         modifier = modifier.height(
@@ -55,6 +56,7 @@ fun LargeButton(
         shape = RoundedCornerShape(dimensionResource(R.dimen.textButtonCornerRadius)),
         onClick = onClick,
         enabled = enabled,
+        showIndeterminateProgress = showIndeterminateProgress,
     ) {
         Text(text = title,  style = Typography.bodyMedium)
     }

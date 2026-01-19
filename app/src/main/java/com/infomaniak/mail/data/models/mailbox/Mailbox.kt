@@ -101,6 +101,8 @@ class Mailbox : RealmObject {
     @Transient
     var signatures = realmListOf<Signature>()
     @Transient
+    var haveSignatureNeverBeenFetched = true // TODO: Migration
+    @Transient
     var _featureFlags = realmSetOf<String>()
         private set
     @Transient

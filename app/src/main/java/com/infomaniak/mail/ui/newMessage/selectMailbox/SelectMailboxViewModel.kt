@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +38,7 @@ import javax.inject.Inject
 class SelectMailboxViewModel @Inject constructor(
     application: Application,
     private val mailboxController: MailboxController,
+    @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
     private val _usersWithMailboxes = MutableStateFlow<List<UserMailboxesUi>>(emptyList())
@@ -86,7 +90,7 @@ class SelectMailboxViewModel @Inject constructor(
                 initials = currentUser.getInitials()
             )
             defaultMailboxUi = selectedMailbox
-            _uiState.value = UiState.DefaultScreen(selectedMailbox)
+            _uiState.value = UiState.DefaultScreen.Idle(selectedMailbox)
         } else {
             _uiState.value = UiState.Error
         }
@@ -96,12 +100,17 @@ class SelectMailboxViewModel @Inject constructor(
         if (isShown) {
             _uiState.value = UiState.SelectionScreen.NoSelection
         } else {
-            defaultMailboxUi?.let { _uiState.value = UiState.DefaultScreen(it) }
+            defaultMailboxUi?.let { _uiState.value = UiState.DefaultScreen.Idle(it) }
         }
     }
 
     fun selectMailbox(selectedMailbox: SelectedMailboxUi) {
         _uiState.value = UiState.SelectionScreen.Selected(selectedMailbox)
+    }
+
+    suspend fun ensureMailboxIsFetched(userId: Int, mailboxId: Int) {
+        val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return
+        if (mailbox.haveSignatureNeverBeenFetched) SharedUtils.updateSignatures(mailbox, mailboxInfoRealm)
     }
 
     data class UserMailboxesUi(
@@ -133,7 +142,10 @@ class SelectMailboxViewModel @Inject constructor(
         data object Loading : UiState
         data object Error : UiState
 
-        data class DefaultScreen(override val mailboxUi: SelectedMailboxUi) : UiState, SelectedMailboxState
+        sealed interface DefaultScreen : UiState, SelectedMailboxState {
+            data class Idle(override val mailboxUi: SelectedMailboxUi) : DefaultScreen
+            data class FetchingNewMailbox(override val mailboxUi: SelectedMailboxUi) : DefaultScreen
+        }
 
         sealed interface SelectionScreen : UiState {
             data class Selected(override val mailboxUi: SelectedMailboxUi) : SelectionScreen, SelectedMailboxState
