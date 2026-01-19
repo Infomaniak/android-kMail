@@ -70,7 +70,12 @@ class FolderPickerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launch { folderPickerViewModel.initFolders(mainViewModel.displayedFoldersFlow.first()) }
+        lifecycleScope.launch {
+            folderPickerViewModel.initFolders(
+                mainViewModel.displayedFoldersFlow.first(),
+                SEARCH
+            )
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -146,9 +151,9 @@ class FolderPickerFragment : Fragment() {
         }
     }
 
-    private fun onFolderSelected(folder: Folder): Unit = with(navigationArgs) {
+    private fun onFolderSelected(folder: Folder?): Unit = with(navigationArgs) {
         when (action) {
-            MOVE -> mainViewModel.moveThreadsOrMessageTo(folder.id, threadsUids.toList(), messageUid)
+            MOVE -> mainViewModel.moveThreadsOrMessageTo(folder?.id!!, threadsUids.toList(), messageUid)
             SEARCH -> searchViewModel.selectFolder(folder)
         }
         findNavController().popBackStack()

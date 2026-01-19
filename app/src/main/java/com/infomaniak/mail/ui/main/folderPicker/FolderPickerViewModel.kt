@@ -62,11 +62,24 @@ class FolderPickerViewModel @Inject constructor(
         }
     }
 
-    fun initFolders(folders: MainViewModel.DisplayedFolders) {
-        allFolderUis = folders.flattenAndAddDividerBeforeFirstCustomFolder(
-            dividerType = Unit,
-            excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
-        ).also { folders -> filterResults.postValue(folders to true) }
+    fun initFolders(folders: MainViewModel.DisplayedFolders, action: String) {
+
+        allFolderUis = if (action == FolderPickerFragment.SEARCH) {
+            folders.flattenAndAddDividerBeforeFirstCustomFolder(
+                dividerType = Unit,
+                excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
+            )
+                .toMutableList()
+                .apply { add(0, FolderPickerAdapter.SearchFolderElement.ALL_FOLDERS) }
+                .apply { add(1, Unit) }
+                .toList()
+                .also { folders -> filterResults.postValue(folders to true) }
+        } else {
+            folders.flattenAndAddDividerBeforeFirstCustomFolder(
+                dividerType = Unit,
+                excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
+            ).also { folders -> filterResults.postValue(folders to true) }
+        }
     }
 
     fun filterFolders(query: CharSequence?, shouldDebounce: Boolean) {
