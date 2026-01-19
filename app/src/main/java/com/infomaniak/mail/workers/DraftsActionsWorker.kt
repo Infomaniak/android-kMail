@@ -141,7 +141,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
 
-            workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+            workManager.enqueueUniqueWork("${TAG}_${mailboxId}", ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
         fun getRunningWorkInfoLiveData(): LiveData<List<WorkInfo>> {
