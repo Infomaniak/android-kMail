@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.Companion.DUMMY_FOLDER_ID
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -73,7 +74,8 @@ class SearchViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     /** Needed to pass API request's validation, but won't be used by the API */
-    private val dummyFolderId inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)!!
+    private val dummyFolderId
+        inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name) ?: DUMMY_FOLDER_ID
 
     var filterFolder: Folder? = null
         private set
@@ -209,9 +211,7 @@ class SearchViewModel @Inject constructor(
         filters: Set<ThreadFilter>,
         query: String?,
     ): Set<ThreadFilter>? {
-
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
-
         return if (newFilters.isEmpty() && query.isNullOrBlank() && filterFolder == null) {
             searchUtils.deleteRealmSearchData()
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
@@ -228,7 +228,6 @@ class SearchViewModel @Inject constructor(
         shouldGetNextPage: Boolean,
     ) {
         visibilityMode.postValue(VisibilityMode.LOADING)
-
         val currentMailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = folder?.id ?: dummyFolderId
         val resource = if (shouldGetNextPage) resourceNext else null

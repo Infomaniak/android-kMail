@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.folderPicker
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -32,6 +33,7 @@ import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAdapter.MoveFolderViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder.Companion.MAX_SUB_FOLDERS_INDENT
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import javax.inject.Inject
@@ -41,30 +43,31 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
 
     private var shouldDisplayIndent: Boolean = false
     private var selectedFolderId: String? = null
-    private lateinit var onFolderClicked: (folder: Folder) -> Unit
+    private lateinit var onFolderClicked: (folder: Folder?) -> Unit
 
-    operator fun invoke(onFolderClicked: (folder: Folder) -> Unit): FolderPickerAdapter {
+    operator fun invoke(onFolderClicked: (folder: Folder?) -> Unit): FolderPickerAdapter {
         this.onFolderClicked = onFolderClicked
         return this
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newSelectedFolderId: String, newShouldDisplayIndent: Boolean, newFolders: List<Any>) = runCatchingRealm {
+    fun setFolders(newSelectedFolderId: String, newShouldDisplayIndent: Boolean, newFolders: List<Any>) =
+        runCatchingRealm {
 
-        selectedFolderId = newSelectedFolderId
+            selectedFolderId = newSelectedFolderId
 
-        val shouldForceNotify = newShouldDisplayIndent != shouldDisplayIndent
-        shouldDisplayIndent = newShouldDisplayIndent
-
-        submitList(newFolders)
-        if (shouldForceNotify) notifyDataSetChanged()
-    }
+            val shouldForceNotify = newShouldDisplayIndent != shouldDisplayIndent
+            shouldDisplayIndent = newShouldDisplayIndent
+            submitList(newFolders)
+            if (shouldForceNotify) notifyDataSetChanged()
+        }
 
     override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (currentList[position]) {
             is FolderUi -> DisplayType.FOLDER.layout
+            SearchFolderElement.ALL_FOLDERS -> DisplayType.FOLDER.layout
             else -> DisplayType.DIVIDER.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -82,28 +85,37 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
     override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int): Unit = with(holder.binding) {
         runCatchingRealm {
             if (getItemViewType(position) == DisplayType.FOLDER.layout) {
-                (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as FolderUi)
+                val folderUi = if (currentList[position] is FolderUi) currentList[position] as FolderUi else null
+                (this as ItemSelectableFolderBinding).root.displayFolder(folderUi)
             }
         }
     }
 
-    private fun SelectableFolderItemView.displayFolder(folderUi: FolderUi) {
-        val folder = folderUi.folder
+    private fun SelectableFolderItemView.displayFolder(folderUi: FolderUi?) {
+        if (folderUi == null) {
+            runCatchingRealm {
+                text = context.getLocalizedNameOrAllFolders(null)
+                icon = AppCompatResources.getDrawable(context, R.drawable.ic_all_folders)
+                setSelectedState(selectedFolderId == null)
+            }
+            setOnClickListener { onFolderClicked.invoke(null) }
+        } else {
+            val folder = folderUi.folder
 
-        val iconId = when {
-            folder.role != null -> folder.role!!.folderIconRes
-            folder.isFavorite -> R.drawable.ic_folder_star
-            else -> R.drawable.ic_folder
+            val iconId = when {
+                folder.role != null -> folder.role!!.folderIconRes
+                folder.isFavorite -> R.drawable.ic_folder_star
+                else -> R.drawable.ic_folder
+            }
+            setFolderUi(folder, iconId, isSelected = folder.id == selectedFolderId)
+
+            val folderIndent = when {
+                !shouldDisplayIndent -> 0
+                else -> min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
+            }
+            setIndent(indent = folderIndent)
+            setOnClickListener { if (folder.id != selectedFolderId) onFolderClicked.invoke(folder) }
         }
-        setFolderUi(folder, iconId, isSelected = folder.id == selectedFolderId)
-
-        val folderIndent = when {
-            !shouldDisplayIndent -> 0
-            else -> min(folderUi.depth, MAX_SUB_FOLDERS_INDENT)
-        }
-        setIndent(indent = folderIndent)
-
-        setOnClickListener { if (folder.id != selectedFolderId) onFolderClicked.invoke(folder) }
     }
 
     class MoveFolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
@@ -130,5 +142,9 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
                     oldFolder.folder.threads.count() == newFolder.folder.threads.count() &&
                     oldFolder.depth == newFolder.depth
         }.getOrDefault(false)
+    }
+
+    enum class SearchFolderElement(val itemId: Int) {
+        ALL_FOLDERS(0)
     }
 }

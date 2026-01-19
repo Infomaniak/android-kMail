@@ -46,6 +46,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -104,13 +105,13 @@ class SearchFragment : TwoPaneFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        selectCurrentFolder()
 
         handleEdgeToEdge()
 
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SEARCH.id)
 
         searchViewModel.executePendingSearch()
+        selectCurrentFolder()
 
         setupAdapter()
         setupListeners()
@@ -227,10 +228,14 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun selectCurrentFolder() {
-        if (searchViewModel.filterFolder == null) {
-            searchViewModel.selectFolder(mainViewModel.currentFolder.value)
-        }
         updateAllFoldersButtonUi()
+
+        if (searchViewModel.filterFolder == null) {
+            val currentFolder = mainViewModel.currentFolder.value
+            if (currentFolder?.role != Folder.FolderRole.INBOX) {
+                searchViewModel.selectFolder(currentFolder)
+            }
+        }
         trackSearchEvent(ThreadFilter.FOLDER.matomoName, true)
     }
 
