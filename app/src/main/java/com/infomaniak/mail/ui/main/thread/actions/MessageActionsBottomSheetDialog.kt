@@ -52,7 +52,7 @@ import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.infomaniak.core.R as RCore
+import com.infomaniak.core.common.R as RCore
 
 @AndroidEntryPoint
 class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
