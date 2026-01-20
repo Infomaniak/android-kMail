@@ -110,7 +110,7 @@ class SelectMailboxViewModel @Inject constructor(
 
     suspend fun ensureMailboxIsFetched(userId: Int, mailboxId: Int) {
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return
-        if (mailbox.haveSignatureNeverBeenFetched) {
+        if (!mailbox.haveSignaturesBeenFetched) {
             SharedUtils.updateSignatures(mailbox, mailboxInfoRealm, AccountUtils.getHttpClient(userId))
         }
     }

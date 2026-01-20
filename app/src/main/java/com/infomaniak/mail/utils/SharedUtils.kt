@@ -166,7 +166,7 @@ class SharedUtils @Inject constructor(
                             defaultReplySignature?.isDefaultReply = true
                         }.toRealmList()
 
-                        mailbox.haveSignatureNeverBeenFetched = false
+                        mailbox.haveSignaturesBeenFetched = true
                     }
                 }
                 null
