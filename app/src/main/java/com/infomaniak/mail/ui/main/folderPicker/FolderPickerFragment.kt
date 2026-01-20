@@ -71,10 +71,7 @@ class FolderPickerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
-            folderPickerViewModel.initFolders(
-                mainViewModel.displayedFoldersFlow.first(),
-                navigationArgs.action
-            )
+            folderPickerViewModel.initFolders(mainViewModel.displayedFoldersFlow.first(), navigationArgs.action)
         }
     }
 
