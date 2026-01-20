@@ -51,7 +51,7 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newSelectedFolderId: String, newShouldDisplayIndent: Boolean, newFolders: List<Any>) =
+    fun setFolders(newSelectedFolderId: String?, newShouldDisplayIndent: Boolean, newFolders: List<Any>) =
         runCatchingRealm {
 
             selectedFolderId = newSelectedFolderId

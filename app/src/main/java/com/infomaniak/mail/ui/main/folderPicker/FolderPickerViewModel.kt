@@ -63,22 +63,26 @@ class FolderPickerViewModel @Inject constructor(
     }
 
     fun initFolders(folders: MainViewModel.DisplayedFolders, action: String) {
-
-        allFolderUis = if (action == FolderPickerFragment.SEARCH) {
-            folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                dividerType = Unit,
-                excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
-            )
-                .toMutableList()
-                .apply { add(0, FolderPickerAdapter.SearchFolderElement.ALL_FOLDERS) }
-                .apply { add(1, Unit) }
-                .toList()
-                .also { folders -> filterResults.postValue(folders to true) }
-        } else {
-            folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                dividerType = Unit,
-                excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
-            ).also { folders -> filterResults.postValue(folders to true) }
+        allFolderUis = when (action) {
+            FolderPickerFragment.SEARCH -> {
+                folders.flattenAndAddDividerBeforeFirstCustomFolder(
+                    dividerType = Unit,
+                ).let { baseFolders ->
+                    mutableListOf<Any>().apply {
+                        add(FolderPickerAdapter.SearchFolderElement.ALL_FOLDERS) // All folders button
+                        add(Unit) // Divider
+                        addAll(baseFolders)
+                    }
+                }
+            }
+            else -> {
+                folders.flattenAndAddDividerBeforeFirstCustomFolder(
+                    dividerType = Unit,
+                    excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
+                )
+            }
+        }.also { folders ->
+            filterResults.postValue(folders to true)
         }
     }
 

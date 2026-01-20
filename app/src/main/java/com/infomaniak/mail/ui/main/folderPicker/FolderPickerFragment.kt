@@ -73,7 +73,7 @@ class FolderPickerFragment : Fragment() {
         lifecycleScope.launch {
             folderPickerViewModel.initFolders(
                 mainViewModel.displayedFoldersFlow.first(),
-                SEARCH
+                navigationArgs.action
             )
         }
     }
