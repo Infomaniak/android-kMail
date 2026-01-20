@@ -45,6 +45,12 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
     private var selectedFolderId: String? = null
     private lateinit var onFolderClicked: (folder: Folder?) -> Unit
 
+    sealed interface Item {
+        data class Folder(val folderUi: FolderUi) : Item
+        data object AllFolders : Item
+        data object Divider : Item
+    }
+
     operator fun invoke(onFolderClicked: (folder: Folder?) -> Unit): FolderPickerAdapter {
         this.onFolderClicked = onFolderClicked
         return this
@@ -66,8 +72,9 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (currentList[position]) {
-            is FolderUi -> DisplayType.FOLDER.layout
-            FolderPickerElement.ALL_FOLDERS -> DisplayType.FOLDER.layout
+            is Item.Folder -> DisplayType.FOLDER.layout
+            is Item.AllFolders -> DisplayType.FOLDER.layout
+            is Item.Divider -> DisplayType.DIVIDER.layout
             else -> DisplayType.DIVIDER.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -84,14 +91,16 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
 
     override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int): Unit = with(holder.binding) {
         runCatchingRealm {
-            if (getItemViewType(position) == DisplayType.FOLDER.layout) {
-                val folderUi = if (currentList[position] is FolderUi) currentList[position] as FolderUi else null
-                (this as ItemSelectableFolderBinding).root.displayFolder(folderUi)
+            when (val item = getItem(position)) {
+                is Item.Folder -> (this as ItemSelectableFolderBinding).root.displayFolder(item.folderUi)
+                is Item.AllFolders -> (this as ItemSelectableFolderBinding).root.displayFolder(null)
+                else -> Unit
             }
         }
     }
 
     private fun SelectableFolderItemView.displayFolder(folderUi: FolderUi?) {
+        // A null folderUi indicates the "All folders" selection button
         if (folderUi == null) {
             runCatchingRealm {
                 text = context.getLocalizedNameOrAllFolders(null)
@@ -101,7 +110,6 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
             setOnClickListener { onFolderClicked.invoke(null) }
         } else {
             val folder = folderUi.folder
-
             val iconId = when {
                 folder.role != null -> folder.role!!.folderIconRes
                 folder.isFavorite -> R.drawable.ic_folder_star
@@ -123,11 +131,6 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
     private enum class DisplayType(val layout: Int) {
         FOLDER(R.layout.item_selectable_folder),
         DIVIDER(R.layout.item_divider_horizontal),
-    }
-
-    enum class FolderPickerElement(val itemId: Int) {
-        ALL_FOLDERS(0),
-        DIVIDER(1)
     }
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {

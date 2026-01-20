@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAdapter
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.IK_FOLDER
 
@@ -89,8 +90,12 @@ fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
     excludedFolderRoles: Set<Folder.FolderRole> = emptySet(),
 ): List<Any> = buildList {
     runCatchingRealm {
-        default.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
+        default.forEachNestedItem { folder, _ ->
+            if (folder.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.Item.Folder(folder))
+        }
         add(dividerType)
-        custom.forEachNestedItem { folder, _ -> if (folder.folder.role !in excludedFolderRoles) add(folder) }
+        custom.forEachNestedItem { folder, _ ->
+            if (folder.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.Item.Folder(folder))
+        }
     }
 }
