@@ -105,13 +105,13 @@ class SearchFragment : TwoPaneFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        selectCurrentFolder()
 
         handleEdgeToEdge()
 
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SEARCH.id)
 
         searchViewModel.executePendingSearch()
-        selectCurrentFolder()
 
         setupAdapter()
         setupListeners()
@@ -220,7 +220,7 @@ class SearchFragment : TwoPaneFragment() {
                 directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
                     threadsUids = emptyArray(),
                     action = FolderPickerFragment.SEARCH,
-                    sourceFolderId = searchViewModel.filterFolder?.id ?: mainViewModel.currentFolderId!!
+                    sourceFolderId = searchViewModel.filterFolder?.id
                 ),
                 currentClassName = javaClass.name,
             )
