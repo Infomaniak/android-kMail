@@ -66,18 +66,18 @@ class FolderPickerViewModel @Inject constructor(
         allFolderUis = when (action) {
             FolderPickerFragment.SEARCH -> {
                 folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                    dividerType = Unit,
+                    dividerType = FolderPickerAdapter.FolderPickerElement.DIVIDER,
                 ).let { baseFolders ->
                     mutableListOf<Any>().apply {
-                        add(FolderPickerAdapter.SearchFolderElement.ALL_FOLDERS) // All folders button
-                        add(Unit) // Divider
+                        add(FolderPickerAdapter.FolderPickerElement.ALL_FOLDERS)
+                        add(FolderPickerAdapter.FolderPickerElement.DIVIDER)
                         addAll(baseFolders)
                     }
                 }
             }
             else -> {
                 folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                    dividerType = Unit,
+                    dividerType = FolderPickerAdapter.FolderPickerElement.DIVIDER,
                     excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
                 )
             }
