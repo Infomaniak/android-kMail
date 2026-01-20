@@ -123,8 +123,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -238,6 +240,10 @@ class NewMessageViewModel @Inject constructor(
             mailbox
         }
         .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
+
+    val currentUserIdFlow = _currentMailboxFlow
+        .map { it.userId }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     suspend fun currentMailbox() = _currentMailboxFlow.first()
 

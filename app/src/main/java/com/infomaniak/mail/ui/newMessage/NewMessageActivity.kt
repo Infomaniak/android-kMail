@@ -185,7 +185,7 @@ class NewMessageActivity : BaseActivity() {
             draftsActionsWorkerScheduler.scheduleWork(
                 draftLocalUuid = newMessageViewModel.draftLocalUuid(),
                 mailboxId = newMessageViewModel.currentMailbox().mailboxId,
-                userId = AccountUtils.currentUserId,
+                userId = newMessageViewModel.currentUserIdFlow.value ?: return@launch,
             )
         }
     }

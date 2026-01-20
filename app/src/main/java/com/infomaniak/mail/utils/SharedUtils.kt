@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
+import okhttp3.OkHttpClient
 import java.util.Date
 import javax.inject.Inject
 
@@ -150,8 +151,8 @@ class SharedUtils @Inject constructor(
 
     companion object {
 
-        suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
-            return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
+        suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm, okHttpClient: OkHttpClient? = null): Int? {
+            return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName, okHttpClient)) {
                 return@with if (isSuccess()) {
                     val signaturesResult = data!!
                     customRealm.write {

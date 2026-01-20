@@ -20,6 +20,9 @@ package com.infomaniak.mail.data.api
 import com.infomaniak.core.auth.api.ApiRepositoryCore
 import com.infomaniak.core.auth.networking.HttpClient
 import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.common.utils.FORMAT_FULL_DATE_WITH_HOUR
+import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.network.api.ApiController
 import com.infomaniak.core.network.api.ApiController.ApiMethod.DELETE
@@ -35,9 +38,6 @@ import com.infomaniak.core.network.networking.HttpUtils
 import com.infomaniak.core.network.networking.ManualAuthorizationRequired
 import com.infomaniak.core.network.utils.await
 import com.infomaniak.core.network.utils.bodyAsStringOrNull
-import com.infomaniak.core.common.utils.FORMAT_FULL_DATE_WITH_HOUR
-import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
-import com.infomaniak.core.common.utils.format
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.AttachmentsToForwardResult
@@ -122,8 +122,16 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.contact(), POST, body)
     }
 
-    suspend fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
-        return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
+    suspend fun getSignatures(
+        mailboxHostingId: Int,
+        mailboxName: String,
+        okHttpClient: OkHttpClient? = null,
+    ): ApiResponse<SignaturesResult> {
+        return callApi(
+            url = ApiRoutes.signatures(mailboxHostingId, mailboxName),
+            method = GET,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
+        )
     }
 
     suspend fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature?): ApiResponse<Boolean> {
