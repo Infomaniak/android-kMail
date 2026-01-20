@@ -67,7 +67,7 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (currentList[position]) {
             is FolderUi -> DisplayType.FOLDER.layout
-            SearchFolderElement.ALL_FOLDERS -> DisplayType.FOLDER.layout
+            FolderPickerElement.ALL_FOLDERS -> DisplayType.FOLDER.layout
             else -> DisplayType.DIVIDER.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -125,6 +125,11 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
         DIVIDER(R.layout.item_divider_horizontal),
     }
 
+    enum class FolderPickerElement(val itemId: Int) {
+        ALL_FOLDERS(0),
+        DIVIDER(1)
+    }
+
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
         override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             return when {
@@ -142,9 +147,5 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<Any, MoveFolderVie
                     oldFolder.folder.threads.count() == newFolder.folder.threads.count() &&
                     oldFolder.depth == newFolder.depth
         }.getOrDefault(false)
-    }
-
-    enum class SearchFolderElement(val itemId: Int) {
-        ALL_FOLDERS(0)
     }
 }
