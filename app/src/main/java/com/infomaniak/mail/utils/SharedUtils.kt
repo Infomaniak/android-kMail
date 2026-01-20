@@ -152,31 +152,30 @@ class SharedUtils @Inject constructor(
     companion object {
 
         suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm, okHttpClient: OkHttpClient? = null): Int? {
-            return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName, okHttpClient)) {
-                return@with if (isSuccess()) {
-                    val signaturesResult = data!!
-                    customRealm.write {
-                        MailboxController.getMailboxBlocking(mailbox.objectId, realm = this)?.let { mailbox ->
-                            mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
-                                val defaultSignature = firstOrNull { it.id == signaturesResult.defaultSignatureId }
-                                val defaultReplySignature = firstOrNull { it.id == signaturesResult.defaultReplySignatureId }
-                                    ?: defaultSignature
+            val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName, okHttpClient)
+            return if (apiResponse.isSuccess()) {
+                val signaturesResult = apiResponse.data!!
+                customRealm.write {
+                    MailboxController.getMailboxBlocking(mailbox.objectId, realm = this)?.let { mailbox ->
+                        mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
+                            val defaultSignature = firstOrNull { it.id == signaturesResult.defaultSignatureId }
+                            val defaultReplySignature = firstOrNull { it.id == signaturesResult.defaultReplySignatureId }
+                                ?: defaultSignature
 
-                                defaultSignature?.isDefault = true
-                                defaultReplySignature?.isDefaultReply = true
-                            }.toRealmList()
+                            defaultSignature?.isDefault = true
+                            defaultReplySignature?.isDefaultReply = true
+                        }.toRealmList()
 
-                            mailbox.haveSignatureNeverBeenFetched = false
-                        }
+                        mailbox.haveSignatureNeverBeenFetched = false
                     }
-                    null
-                } else {
-                    val apiException = getApiException()
-                    if (apiException !is NetworkException) {
-                        Sentry.captureException(SignatureException(apiException.message, apiException))
-                    }
-                    translateError()
                 }
+                null
+            } else {
+                val apiException = apiResponse.getApiException()
+                if (apiException !is NetworkException) {
+                    Sentry.captureException(SignatureException(apiException.message, apiException))
+                }
+                apiResponse.translateError()
             }
         }
 
