@@ -283,7 +283,6 @@
         <argument
             android:name="action"
             app:argType="string" />
-        <!--Default value is Inbox Folder ID-->
         <argument
             android:name="sourceFolderId"
             android:defaultValue="@null"
