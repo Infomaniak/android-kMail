@@ -1468,7 +1468,7 @@ class MainViewModel @Inject constructor(
 
         draftController.upsertDraft(draft)
 
-        draftsActionsWorkerScheduler.scheduleWork(draft.localUuid)
+        draftsActionsWorkerScheduler.scheduleWork(draft.localUuid, AccountUtils.currentMailboxId, AccountUtils.currentUserId)
     }
 
     private sealed interface EmojiSendStatus {

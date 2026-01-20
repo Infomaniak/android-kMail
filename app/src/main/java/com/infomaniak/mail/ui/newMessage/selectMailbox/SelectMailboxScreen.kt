@@ -81,6 +81,7 @@ fun SelectMailboxScreen(
 ) {
     val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     BackHandler(uiState is SelectionScreen) {
         viewModel.showSelectionScreen(false)
@@ -93,7 +94,12 @@ fun SelectMailboxScreen(
         onMailboxSelected = viewModel::selectMailbox,
         showSelectionScreen = viewModel::showSelectionScreen,
         onNavigationTopbarClick = onNavigationTopbarClick,
-        onContinueWithMailbox = onContinue
+        onContinueWithMailbox = {
+            scope.launch {
+                viewModel.ensureMailboxIsFetched(it.userId, it.mailboxUi.mailboxId)
+                onContinue(it)
+            }
+        }
     )
 }
 
@@ -232,6 +238,7 @@ private fun ContinueButton(
         title = stringResource(R.string.buttonContinue),
         onClick = { selectedMailbox?.let { selectedMailboxUi -> onContinueWithMailbox(selectedMailboxUi) } },
         enabled = { uiState() is SelectMailboxViewModel.SelectedMailboxState },
+        showIndeterminateProgress = { uiState() is DefaultScreen.FetchingNewMailbox },
     )
 }
 
@@ -241,14 +248,16 @@ private fun DifferentAddressButton(
     uiState: () -> UiState,
     showSelectionScreen: (Boolean) -> Unit,
 ) {
+    val uiState = uiState()
     AnimatedVisibility(
         modifier = modifier,
-        visible = uiState() is DefaultScreen
+        visible = uiState is DefaultScreen,
     ) {
         LargeButton(
             title = stringResource(R.string.buttonSendWithDifferentAddress),
             style = ButtonType.Tertiary,
             onClick = { showSelectionScreen(true) },
+            showIndeterminateProgress = { uiState is DefaultScreen.FetchingNewMailbox }
         )
     }
 }

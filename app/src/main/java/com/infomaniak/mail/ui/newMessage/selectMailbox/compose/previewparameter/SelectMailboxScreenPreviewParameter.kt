@@ -34,7 +34,7 @@ data class SelectMailboxScreenDataPreview(
 val selectMailboxScreenDataPreview = listOf(
     SelectMailboxScreenDataPreview(
         usersWithMailboxes = usersWithMailboxesPreviewData,
-        uiState = UiState.DefaultScreen(selectedMailboxPreviewData)
+        uiState = UiState.DefaultScreen.Idle(selectedMailboxPreviewData)
     ),
     SelectMailboxScreenDataPreview(
         usersWithMailboxesPreviewData,

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ fun mailboxInfoMigration() = AutomaticSchemaMigration { migrationContext ->
     migrationContext.revertKSuiteRelatedBooleanRenaming()
     migrationContext.keepDefaultValuesAfterTwelfthMigration()
     migrationContext.migrateQuotasSizeField()
+    migrationContext.computeHaveSignaturesBeenFetchedAfterFifteenthMigration()
 }
 
 //region Use default property values when adding a new column in a migration
@@ -112,6 +113,7 @@ private fun MigrationContext.keepDefaultValuesAfterTwelfthMigration() {
         }
     }
 }
+//endregion
 
 // Migrate to version #15
 private fun MigrationContext.migrateQuotasSizeField() {
@@ -123,6 +125,22 @@ private fun MigrationContext.migrateQuotasSizeField() {
                 oldObject.getValueOrNull<Long>("_size")?.let {
                     set(propertyName = "size", value = it)
                 }
+            }
+        }
+    }
+}
+//endregion
+
+// Migrate from version #15
+private fun MigrationContext.computeHaveSignaturesBeenFetchedAfterFifteenthMigration() {
+    if (oldRealm.schemaVersion() <= 15L) {
+        enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Compute value based on whether signatures are empty
+                // If signatures list exists and is not empty, then signatures have been fetched at some point
+                val signatures = oldObject.getObjectList("signatures")
+                val haveSignaturesBeenFetched = signatures.isNotEmpty()
+                set(propertyName = "haveSignaturesBeenFetched", value = haveSignaturesBeenFetched)
             }
         }
     }

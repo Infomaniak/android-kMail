@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
+import okhttp3.OkHttpClient
 import java.util.Date
 import javax.inject.Inject
 
@@ -150,30 +151,31 @@ class SharedUtils @Inject constructor(
 
     companion object {
 
-        suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
-            return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
-                return@with if (isSuccess()) {
-                    val signaturesResult = data!!
-                    customRealm.write {
-                        MailboxController.getMailboxBlocking(mailbox.objectId, realm = this)?.let { mailbox ->
-                            mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
-                                val defaultSignature = firstOrNull { it.id == signaturesResult.defaultSignatureId }
-                                val defaultReplySignature = firstOrNull { it.id == signaturesResult.defaultReplySignatureId }
-                                    ?: defaultSignature
+        suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm, okHttpClient: OkHttpClient? = null): Int? {
+            val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName, okHttpClient)
+            return if (apiResponse.isSuccess()) {
+                val signaturesResult = apiResponse.data!!
+                customRealm.write {
+                    MailboxController.getMailboxBlocking(mailbox.objectId, realm = this)?.let { mailbox ->
+                        mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
+                            val defaultSignature = firstOrNull { it.id == signaturesResult.defaultSignatureId }
+                            val defaultReplySignature = firstOrNull { it.id == signaturesResult.defaultReplySignatureId }
+                                ?: defaultSignature
 
-                                defaultSignature?.isDefault = true
-                                defaultReplySignature?.isDefaultReply = true
-                            }.toRealmList()
-                        }
+                            defaultSignature?.isDefault = true
+                            defaultReplySignature?.isDefaultReply = true
+                        }.toRealmList()
+
+                        mailbox.haveSignaturesBeenFetched = true
                     }
-                    null
-                } else {
-                    val apiException = getApiException()
-                    if (apiException !is NetworkException) {
-                        Sentry.captureException(SignatureException(apiException.message, apiException))
-                    }
-                    translateError()
                 }
+                null
+            } else {
+                val apiException = apiResponse.getApiException()
+                if (apiException !is NetworkException) {
+                    Sentry.captureException(SignatureException(apiException.message, apiException))
+                }
+                apiResponse.translateError()
             }
         }
 
