@@ -30,13 +30,14 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
+import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.setMargins
-import com.infomaniak.core.legacy.utils.setPagination
 import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -48,15 +49,23 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
+import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.MultiSelectionBinding
+import com.infomaniak.mail.ui.main.folder.MultiSelectionHost
+import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
+import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -69,19 +78,36 @@ import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class SearchFragment : TwoPaneFragment() {
+class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+
+    @Inject
+    override lateinit var folderRoleUtils: FolderRoleUtils
+    @Inject
+    override lateinit var descriptionDialog: DescriptionAlertDialog
+
+    override val multiSelectionBinding: MultiSelectionBinding
+        get() = object : MultiSelectionBinding {
+            override val quickActionBar get() = binding.quickActionBar
+            override val multiselectToolbar get() = binding.multiselectToolbar
+            override val toolbarLayout get() = binding.multiselectToolbar.toolbar
+            override val toolbar get() = binding.toolbar
+            override val threadsList get() = binding.mailRecyclerView
+            override val newMessageFab get() = null
+            override val unreadCountChip get() = null
+        }
 
     private val searchViewModel: SearchViewModel by activityViewModels()
 
     override val substituteClassName: String = javaClass.name
 
     private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
-
+    private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
     private val recentSearchAdapter by lazy {
         RecentSearchAdapter(
             searchQueries = localSettings.recentSearches.toMutableList(),
@@ -118,6 +144,15 @@ class SearchFragment : TwoPaneFragment() {
 
         setupAdapter()
         setupListeners()
+
+        threadListMultiSelection.initMultiSelection(
+            mainViewModel = mainViewModel,
+            actionsViewModel = actionsViewModel,
+            host = this,
+            activity = (requireActivity() as MainActivity),
+            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
+            localSettings = localSettings,
+        )
 
         setAllFoldersButtonListener()
         setAttachmentsUi()
@@ -217,6 +252,11 @@ class SearchFragment : TwoPaneFragment() {
                         setSelection(emailWithQuotes.length)
                     }
                 }
+            },
+            multiSelection = object : MultiSelectionListener<Thread> {
+                override var isEnabled by mainViewModel::isMultiSelectOn
+                override val selectedItems by mainViewModel::selectedThreads
+                override val publishSelectedItems = mainViewModel::publishSelectedItems
             },
         )
 
@@ -412,6 +452,42 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
+    }
+
+    override fun safeNavigation(directions: NavDirections) {
+        safeNavigate(directions)
+    }
+
+    override fun disableSwipeDirection(direction: DirectionFlag) {
+        binding.mailRecyclerView.disableSwipeDirection(direction)
+    }
+
+    override fun unlockSwipeActionsIfSet() = with(binding.mailRecyclerView) {
+        val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
+
+        val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
+        val isLeftEnabled = isLeftSet && isMultiSelectClosed
+        if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+
+        val isRightSet = localSettings.swipeRight != SwipeAction.NONE
+        val isRightEnabled = isRightSet && isMultiSelectClosed
+        if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
+    }
+
+    override fun directionToThreadActionsBottomSheetDialog(
+        threadUid: String,
+        shouldLoadDistantResources: Boolean,
+        shouldCloseMultiSelection: Boolean
+    ): NavDirections {
+        return SearchFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+            threadUid,
+            shouldLoadDistantResources,
+            shouldCloseMultiSelection
+        )
+    }
+
+    override fun directionsToMultiSelectBottomSheetDialog(): NavDirections {
+        return SearchFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
     }
 
     enum class VisibilityMode {

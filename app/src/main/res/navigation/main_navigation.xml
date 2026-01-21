@@ -60,11 +60,11 @@
             android:id="@+id/action_threadListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
-            app:destination="@id/threadActionsBottomSheetDialog" />
-        <action
             android:id="@+id/action_threadListFragment_to_folderPickerFragment"
             app:destination="@id/folderPickerFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
         <action
             android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
             app:destination="@id/multiSelectBottomSheetDialog" />
@@ -152,6 +152,13 @@
         <action
             android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
             app:destination="@id/detailedContactBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
+            app:destination="@id/multiSelectBottomSheetDialog" />
+
     </fragment>
 
     <dialog

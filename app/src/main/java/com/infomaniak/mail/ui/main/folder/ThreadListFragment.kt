@@ -41,10 +41,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+
 import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
@@ -125,7 +127,7 @@ import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
-class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
+class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectionHost {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -148,13 +150,20 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     private var isFirstTimeRefreshingThreads = true
 
     @Inject
-    lateinit var descriptionDialog: DescriptionAlertDialog
+    override lateinit var descriptionDialog: DescriptionAlertDialog
+
+    override fun safeNavigation(directions: NavDirections) {
+        safeNavigate(directions)
+    }
+
+    override fun disableSwipeDirection(direction: DirectionFlag) {
+        binding.threadsList.disableSwipeDirection(direction)
+    }
+
+    override lateinit var folderRoleUtils: FolderRoleUtils
 
     @Inject
     lateinit var downloadThreadsStatusManager: DownloadThreadsStatusManager
-
-    @Inject
-    lateinit var folderRoleUtils: FolderRoleUtils
 
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
@@ -195,7 +204,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
             actionsViewModel = actionsViewModel,
-            threadListFragment = this,
+            activity = (requireActivity() as MainActivity),
+            host = this,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
         )
@@ -234,6 +244,17 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     override fun doAfterFolderChanged() {
         navigateFromNotificationToThread()
     }
+
+    override val multiSelectionBinding: MultiSelectionBinding
+        get() = object : MultiSelectionBinding {
+            override val quickActionBar get() = binding.quickActionBar
+            override val multiselectToolbar get() = binding.multiselectToolbar
+            override val toolbarLayout get() = binding.toolbarLayout
+            override val toolbar get() = binding.toolbar
+            override val threadsList get() = binding.threadsList
+            override val newMessageFab get() = binding.newMessageFab
+            override val unreadCountChip get() = binding.unreadCountChip
+        }
 
     private fun handleEdgeToEdge() = with(binding) {
         // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
@@ -332,7 +353,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         _binding = null
     }
 
-    private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
+    override fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
         val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
 
         val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
@@ -342,6 +363,22 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         val isRightSet = localSettings.swipeRight != SwipeAction.NONE
         val isRightEnabled = isRightSet && isMultiSelectClosed
         if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
+    }
+
+    override fun directionToThreadActionsBottomSheetDialog(
+        threadUid: String,
+        shouldLoadDistantResources: Boolean,
+        shouldCloseMultiSelection: Boolean
+    ): NavDirections {
+        return ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+            threadUid,
+            shouldLoadDistantResources,
+            shouldCloseMultiSelection
+        )
+    }
+
+    override fun directionsToMultiSelectBottomSheetDialog(): NavDirections {
+        return ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
     }
 
     private fun setupDensityDependentUi() = with(binding) {
@@ -451,11 +488,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             (requireActivity() as MainActivity).openDrawerLayout()
         }
 
-        cancel.setOnClickListener {
+        multiselectToolbar.cancel.setOnClickListener {
             trackMultiSelectionEvent(MatomoName.Cancel)
             mainViewModel.isMultiSelectOn = false
         }
-        selectAll.setOnClickListener {
+        multiselectToolbar.selectAll.setOnClickListener {
             mainViewModel.selectOrUnselectAll()
             threadListAdapter.updateSelection()
         }
