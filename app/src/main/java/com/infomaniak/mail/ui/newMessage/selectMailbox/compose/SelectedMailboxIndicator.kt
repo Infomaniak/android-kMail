@@ -98,7 +98,7 @@ private fun RowScope.SelectedMailboxIndicatorContent(
     )
     Text(
         modifier = Modifier.padding(horizontal = Margin.Mini),
-        text = selectedMailbox.mailboxUi.email
+        text = selectedMailbox.mailboxUi.emailIdn
     )
     Spacer(modifier = Modifier.weight(1f))
     Icon(

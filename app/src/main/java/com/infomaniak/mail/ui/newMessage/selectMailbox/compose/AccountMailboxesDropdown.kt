@@ -175,7 +175,7 @@ private fun AccountDropdownMenu(
                         )
                         Text(
                             modifier = Modifier.padding(horizontal = Margin.Small),
-                            text = mailbox.email
+                            text = mailbox.emailIdn
                         )
                     }
                 },

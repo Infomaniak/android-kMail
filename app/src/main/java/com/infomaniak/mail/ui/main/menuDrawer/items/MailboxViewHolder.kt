@@ -39,7 +39,7 @@ class MailboxViewHolder(
     ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Mailbox (${mailbox.email})")
 
-        text = mailbox.email
+        text = mailbox.emailIdn
         unreadCount = mailbox.unreadCountDisplay.count
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
 

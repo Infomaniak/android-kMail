@@ -48,7 +48,7 @@ class MailboxesHeaderViewHolder(
             setOnClickListener { onMailboxesHeaderClicked() }
         }
 
-        mailboxSwitcherText.text = mailbox?.email
+        mailboxSwitcherText.text = mailbox?.emailIdn
         setMailboxSwitcherTextAppearance(isExpanded)
 
         mailboxExpandButton.isVisible = hasMoreThanOneMailbox

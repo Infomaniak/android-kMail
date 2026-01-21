@@ -65,7 +65,7 @@ class SelectMailboxViewModel @Inject constructor(
                 initials = user.getInitials(),
                 fullName = user.displayName ?: user.run { "$firstname $lastname" },
                 mailboxesUi = mailboxController.getMailboxes(user.id).map { mailbox ->
-                    MailboxUi(mailboxId = mailbox.mailboxId, email = mailbox.email)
+                    MailboxUi(mailboxId = mailbox.mailboxId, emailIdn = mailbox.emailIdn)
                 }
             )
         }
@@ -85,7 +85,7 @@ class SelectMailboxViewModel @Inject constructor(
         if (defaultMailbox != null) {
             val selectedMailbox = SelectedMailboxUi(
                 userId = currentUser.id,
-                mailboxUi = MailboxUi(mailboxId = defaultMailbox.mailboxId, email = defaultMailbox.email),
+                mailboxUi = MailboxUi(mailboxId = defaultMailbox.mailboxId, emailIdn = defaultMailbox.emailIdn),
                 avatarUrl = currentUser.avatar,
                 initials = currentUser.getInitials()
             )
@@ -126,7 +126,7 @@ class SelectMailboxViewModel @Inject constructor(
 
     data class MailboxUi(
         val mailboxId: Int,
-        val email: String
+        val emailIdn: String
     )
 
     data class SelectedMailboxUi(
