@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 package com.infomaniak.mail.ui.sync.discovery
 
 import android.content.Context
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.preferencesDataStore
 import com.infomaniak.core.sentry.SentryLog
 import kotlinx.coroutines.flow.first
@@ -32,7 +34,13 @@ import javax.inject.Singleton
 @Singleton
 class SyncDiscoveryRepository @Inject constructor(private val context: Context) {
 
-    private val Context.dataStore by preferencesDataStore(name = DATA_STORE_NAME)
+    private val Context.dataStore by preferencesDataStore(
+        name = DATA_STORE_NAME,
+        corruptionHandler = ReplaceFileCorruptionHandler {
+            // If a corruption occurs, the user probably had time to see the sync discovery, no need to start showing it again
+            preferencesOf(NUMBER_OF_RETRY_KEY to 0)
+        },
+    )
 
     fun <T> flowOf(key: Preferences.Key<T>) = context.dataStore.data.map { it[key] ?: (getDefaultValue(key) as T) }
 
