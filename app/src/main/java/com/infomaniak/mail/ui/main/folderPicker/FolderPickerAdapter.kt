@@ -39,8 +39,7 @@ import com.infomaniak.mail.views.itemViews.setFolderUi
 import javax.inject.Inject
 import kotlin.math.min
 
-class FolderPickerAdapter @Inject constructor() :
-    ListAdapter<FolderPickerItem, MoveFolderViewHolder>(FolderDiffCallback()) {
+class FolderPickerAdapter @Inject constructor() : ListAdapter<FolderPickerItem, MoveFolderViewHolder>(FolderDiffCallback()) {
 
     private var shouldDisplayIndent: Boolean = false
     private var selectedFolderId: String? = null

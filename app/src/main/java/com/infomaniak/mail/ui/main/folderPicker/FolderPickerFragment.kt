@@ -189,3 +189,8 @@ class FolderPickerFragment : Fragment() {
     }
 
 }
+
+enum class FolderPickerAction {
+    MOVE,
+    SEARCH
+}
