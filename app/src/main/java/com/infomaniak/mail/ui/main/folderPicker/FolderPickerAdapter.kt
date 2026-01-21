@@ -40,7 +40,7 @@ import javax.inject.Inject
 import kotlin.math.min
 
 class FolderPickerAdapter @Inject constructor() :
-    ListAdapter<FolderPickerAdapter.FolderPickerItem, MoveFolderViewHolder>(FolderDiffCallback()) {
+    ListAdapter<FolderPickerItem, MoveFolderViewHolder>(FolderDiffCallback()) {
 
     private var shouldDisplayIndent: Boolean = false
     private var selectedFolderId: String? = null
@@ -127,9 +127,9 @@ class FolderPickerAdapter @Inject constructor() :
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<FolderPickerItem>() {
         override fun areItemsTheSame(oldItem: FolderPickerItem, newItem: FolderPickerItem) = runCatchingRealm {
-            return when {
-                oldItem is FolderPickerItem.Divider && newItem is FolderPickerItem.Divider -> true // Dividers don't have any content, so always true.
-                oldItem is FolderPickerItem.Folder && newItem is FolderPickerItem.Folder && oldItem.folderUi.folder.id == newItem.folderUi.folder.id -> true
+            return when (oldItem) {
+                is FolderPickerItem.Divider if newItem is FolderPickerItem.Divider -> true // Dividers don't have any content, so always true.
+                is FolderPickerItem.Folder if newItem is FolderPickerItem.Folder && oldItem.folderUi.folder.id == newItem.folderUi.folder.id -> true
                 else -> false
             }
         }.getOrDefault(false)
@@ -142,11 +142,5 @@ class FolderPickerAdapter @Inject constructor() :
                     oldFolder.folderUi.folder.threads.count() == newFolder.folderUi.folder.threads.count() &&
                     oldFolder.folderUi.depth == newFolder.folderUi.depth
         }.getOrDefault(false)
-    }
-
-    sealed interface FolderPickerItem {
-        data class Folder(val folderUi: FolderUi) : FolderPickerItem
-        data object AllFolders : FolderPickerItem
-        data object Divider : FolderPickerItem
     }
 }
