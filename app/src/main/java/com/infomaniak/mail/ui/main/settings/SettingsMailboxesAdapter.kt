@@ -38,7 +38,7 @@ class SettingsMailboxesAdapter(
 
     override fun onBindViewHolder(holder: SettingsMailboxViewHolder, position: Int) = with(holder.binding.root) {
         val mailbox = mailboxes[position]
-        setTitle(mailbox.email)
+        setTitle(mailbox.emailIdn)
 
         setOnClickListener { onMailboxSelected(mailbox) }
         toggleMailboxBlockedState(mailbox.isLocked)

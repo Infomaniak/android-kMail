@@ -105,7 +105,7 @@ class NotificationUtils @Inject constructor(
         val groups = mutableListOf<NotificationChannelGroup>()
         val channels = mutableListOf<NotificationChannel>()
 
-        val group = NotificationChannelGroup(mailbox.channelGroupId, mailbox.email)
+        val group = NotificationChannelGroup(mailbox.channelGroupId, mailbox.emailIdn)
         groups.add(group)
 
         val channel = buildNotificationChannel(
@@ -240,7 +240,7 @@ class NotificationUtils @Inject constructor(
         }
 
         setOnlyAlertOnce(true)
-        setSubText(mailbox.email)
+        setSubText(mailbox.emailIdn)
         setContentText(payload.content)
         setColorized(true)
         setContentIntent(contentIntent)
@@ -249,7 +249,7 @@ class NotificationUtils @Inject constructor(
         setExtras(Bundle().apply { putString(EXTRA_MESSAGE_UID, payload.messageUid) })
         color = localSettings.accentColor.getPrimary(appContext)
 
-        SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
+        SentryLog.i(TAG, "Display notification | Email: ${mailbox.emailIdn} | MessageUid: ${payload.messageUid}")
 
         val notificationWithIdAndTag = NotificationWithIdAndTag(payload.notificationId, build())
         notificationsByMailboxId.getOrPut(mailbox.mailboxId) { mutableListOf() }.add(index = 0, notificationWithIdAndTag)
