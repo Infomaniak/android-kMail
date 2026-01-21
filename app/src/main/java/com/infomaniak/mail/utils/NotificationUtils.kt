@@ -249,7 +249,7 @@ class NotificationUtils @Inject constructor(
         setExtras(Bundle().apply { putString(EXTRA_MESSAGE_UID, payload.messageUid) })
         color = localSettings.accentColor.getPrimary(appContext)
 
-        SentryLog.i(TAG, "Display notification | Email: ${mailbox.emailIdn} | MessageUid: ${payload.messageUid}")
+        SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
 
         val notificationWithIdAndTag = NotificationWithIdAndTag(payload.notificationId, build())
         notificationsByMailboxId.getOrPut(mailbox.mailboxId) { mutableListOf() }.add(index = 0, notificationWithIdAndTag)
