@@ -25,7 +25,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.fragmentnavigation.animatedNavigation
+import com.infomaniak.core.fragmentnavigation.safelyAnimatedNavigation
 import com.infomaniak.core.legacy.utils.canNavigate
 import com.infomaniak.core.legacy.utils.clearStack
 import com.infomaniak.core.legacy.utils.safeNavigate
@@ -51,20 +52,36 @@ fun getAnimatedNavOptions() = NavOptions
     .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
     .build()
 
-fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) findNavController().navigate(directions, getAnimatedNavOptions())
+fun Fragment.animatedNavigation(@IdRes resId: Int, args: Bundle? = null) {
+    animatedNavigation(resId, args, getAnimatedNavOptions())
 }
 
-fun Fragment.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) findNavController().navigate(resId, args, getAnimatedNavOptions())
+fun Fragment.animatedNavigation(directions: NavDirections) {
+    animatedNavigation(directions, getAnimatedNavOptions())
 }
 
-fun NavController.animatedNavigation(directions: NavDirections, currentClassName: String) {
-    if (canNavigate(currentClassName, currentClassName)) navigate(directions, getAnimatedNavOptions())
+fun NavController.animatedNavigation(directions: NavDirections) {
+    animatedNavigation(directions, getAnimatedNavOptions())
 }
 
-fun NavController.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String) {
-    if (canNavigate(currentClassName, currentClassName)) navigate(resId, args, getAnimatedNavOptions())
+fun NavController.animatedNavigation(@IdRes resId: Int, args: Bundle) {
+    animatedNavigation(resId, args, getAnimatedNavOptions())
+}
+
+fun Fragment.safelyAnimatedNavigation(directions: NavDirections, currentClassName: String? = null) {
+    safelyAnimatedNavigation(directions, currentClassName, getAnimatedNavOptions())
+}
+
+fun Fragment.safelyAnimatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String? = null) {
+    safelyAnimatedNavigation(resId, args, currentClassName, getAnimatedNavOptions())
+}
+
+fun NavController.safelyAnimatedNavigation(directions: NavDirections, currentClassName: String) {
+    safelyAnimatedNavigation(directions, currentClassName, getAnimatedNavOptions())
+}
+
+fun NavController.safelyAnimatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String) {
+    safelyAnimatedNavigation(resId, args, currentClassName, getAnimatedNavOptions())
 }
 
 fun Fragment.safeNavigateToNewMessageActivity(

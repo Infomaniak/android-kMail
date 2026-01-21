@@ -198,17 +198,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         override fun onMove() {
-            val navController = findNavController()
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Move)
-                navController.animatedNavigation(
+                animatedNavigation(
                     resId = R.id.folderPickerFragment,
                     args = FolderPickerFragmentArgs(
                         threadsUids = arrayOf(navigationArgs.threadUid),
                         action = FolderPickerAction.MOVE,
                         sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                     ).toBundle(),
-                    currentClassName = currentClassName,
                 )
             }
         }
