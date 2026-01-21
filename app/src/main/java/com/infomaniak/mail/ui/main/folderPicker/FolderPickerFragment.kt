@@ -187,7 +187,6 @@ class FolderPickerFragment : Fragment() {
         folderPickerViewModel.cancelSearch()
         super.onStop()
     }
-
 }
 
 enum class FolderPickerAction {
