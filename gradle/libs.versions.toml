@@ -77,8 +77,6 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 espresso-web = { module = "androidx.test.espresso:espresso-web", version.ref = "espresso" }
 fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "fragmentTesting" }
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
-mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiTestJunit4" }
 
 [plugins]
