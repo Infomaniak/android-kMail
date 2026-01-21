@@ -33,6 +33,7 @@ fun mailboxInfoMigration() = AutomaticSchemaMigration { migrationContext ->
     migrationContext.keepDefaultValuesAfterTwelfthMigration()
     migrationContext.migrateQuotasSizeField()
     migrationContext.computeHaveSignaturesBeenFetchedAfterFifteenthMigration()
+    migrationContext.copyEmailToEmailIdnAfterSixteenthMigration()
 }
 
 //region Use default property values when adding a new column in a migration
@@ -141,6 +142,19 @@ private fun MigrationContext.computeHaveSignaturesBeenFetchedAfterFifteenthMigra
                 val signatures = oldObject.getObjectList("signatures")
                 val haveSignaturesBeenFetched = signatures.isNotEmpty()
                 set(propertyName = "haveSignaturesBeenFetched", value = haveSignaturesBeenFetched)
+            }
+        }
+    }
+}
+
+// Migrate from version #16
+private fun MigrationContext.copyEmailToEmailIdnAfterSixteenthMigration() {
+    if (oldRealm.schemaVersion() <= 16L) {
+        enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Copy email value to emailIdn for existing mailboxes
+                val email = oldObject.getValue<String>("email")
+                set(propertyName = "emailIdn", value = email)
             }
         }
     }
