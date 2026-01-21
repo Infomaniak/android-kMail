@@ -22,7 +22,7 @@ import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
@@ -111,7 +111,7 @@ class ThreadListMultiSelection {
                     } else {
                         ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
                     }
-                    threadListFragment.safeNavigate(direction)
+                    threadListFragment.safelyNavigate(direction)
                 }
             }
         }

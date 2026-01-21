@@ -32,7 +32,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import com.infomaniak.core.common.observe
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.setMargins
@@ -53,7 +52,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
-import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragment
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
@@ -219,7 +218,7 @@ class SearchFragment : TwoPaneFragment() {
             navController.animatedNavigation(
                 directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
                     threadsUids = emptyArray(),
-                    action = FolderPickerFragment.SEARCH,
+                    action = FolderPickerAction.SEARCH,
                     sourceFolderId = searchViewModel.filterFolder?.id
                 ),
                 currentClassName = javaClass.name,

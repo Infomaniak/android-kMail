@@ -282,7 +282,8 @@
             app:nullable="true" />
         <argument
             android:name="action"
-            app:argType="string" />
+            android:defaultValue="MOVE"
+            app:argType="com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction" />
         <argument
             android:name="sourceFolderId"
             android:defaultValue="@null"
