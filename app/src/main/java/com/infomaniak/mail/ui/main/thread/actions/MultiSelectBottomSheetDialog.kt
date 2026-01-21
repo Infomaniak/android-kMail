@@ -36,6 +36,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
@@ -128,7 +129,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                                 directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                                     threadsUids = threadsUids.toTypedArray(),
                                     action = FolderPickerFragment.MOVE,
-                                    sourceFolderId = mainViewModel.currentFolderId!!
+                                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                                 ),
                                 currentClassName = currentClassName,
                             )

@@ -24,6 +24,7 @@ import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
@@ -128,7 +129,7 @@ object PerformSwipeActionManager {
                     directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                         threadsUids = arrayOf(thread.uid),
                         action = FolderPickerFragment.MOVE,
-                        sourceFolderId = mainViewModel.currentFolderId!!
+                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                     ),
                     currentClassName = javaClass.name,
                 )

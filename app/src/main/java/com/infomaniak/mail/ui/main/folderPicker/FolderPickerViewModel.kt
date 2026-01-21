@@ -49,35 +49,34 @@ class FolderPickerViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private val sourceFolder inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolderId.name)
+    private val sourceFolderId inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolderId.name)
 
-    private var allFolderUis = emptyList<Any>()
+    private var allFolderUis = emptyList<FolderPickerAdapter.FolderPickerItem>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
-    val filterResults = MutableLiveData<Pair<List<Any>, Boolean>>()
+    val filterResults = MutableLiveData<Pair<List<FolderPickerAdapter.FolderPickerItem>, Boolean>>()
     var hasAlreadyTrackedSearch = false
 
     init {
         viewModelScope.launch(ioCoroutineContext) {
-            sourceFolderIdLiveData.postValue(sourceFolder)
+            sourceFolderIdLiveData.postValue(sourceFolderId)
         }
     }
 
     fun initFolders(folders: MainViewModel.DisplayedFolders, action: String) {
         allFolderUis = when (action) {
             FolderPickerFragment.SEARCH -> {
-                folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                    dividerType = FolderPickerAdapter.Item.Divider,
-                ).let { baseFolders ->
-                    mutableListOf<Any>().apply {
-                        add(FolderPickerAdapter.Item.AllFolders)
-                        add(FolderPickerAdapter.Item.Divider)
-                        addAll(baseFolders)
-                    }
+                val baseFolders = folders.flattenAndAddDividerBeforeFirstCustomFolder(
+                    dividerType = FolderPickerAdapter.FolderPickerItem.Divider,
+                )
+                mutableListOf<FolderPickerAdapter.FolderPickerItem>().apply {
+                    add(FolderPickerAdapter.FolderPickerItem.AllFolders)
+                    add(FolderPickerAdapter.FolderPickerItem.Divider)
+                    addAll(baseFolders)
                 }
             }
             else -> {
                 folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                    dividerType = FolderPickerAdapter.Item.Divider,
+                    dividerType = FolderPickerAdapter.FolderPickerItem.Divider,
                     excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
                 )
             }

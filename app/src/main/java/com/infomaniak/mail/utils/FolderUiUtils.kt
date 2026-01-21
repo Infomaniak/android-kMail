@@ -86,16 +86,16 @@ private fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
  * @return A list of [FolderUi] with a single divider of the provided type
  */
 fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
-    dividerType: Any,
+    dividerType: FolderPickerAdapter.FolderPickerItem.Divider,
     excludedFolderRoles: Set<Folder.FolderRole> = emptySet(),
-): List<Any> = buildList {
+): List<FolderPickerAdapter.FolderPickerItem> = buildList {
     runCatchingRealm {
-        default.forEachNestedItem { folder, _ ->
-            if (folder.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.Item.Folder(folder))
+        default.forEachNestedItem { folderUi, _ ->
+            if (folderUi.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.FolderPickerItem.Folder(folderUi))
         }
         add(dividerType)
-        custom.forEachNestedItem { folder, _ ->
-            if (folder.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.Item.Folder(folder))
+        custom.forEachNestedItem { folderUi, _ ->
+            if (folderUi.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.FolderPickerItem.Folder(folderUi))
         }
     }
 }
