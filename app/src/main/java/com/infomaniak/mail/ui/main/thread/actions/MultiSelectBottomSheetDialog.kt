@@ -233,14 +233,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun moveThreads(threadsUids: List<String>) {
-        val navController = findNavController()
-        navController.animatedNavigation(
+        animatedNavigation(
             directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                 threadsUids = threadsUids.toTypedArray(),
                 action = FolderPickerAction.MOVE,
                 sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
             ),
-            currentClassName = currentClassName,
         )
     }
 

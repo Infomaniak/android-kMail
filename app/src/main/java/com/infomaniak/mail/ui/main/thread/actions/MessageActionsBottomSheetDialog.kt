@@ -180,9 +180,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onMove() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Move)
-                val navController = findNavController()
                 descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
-                    navController.animatedNavigation(
+                    animatedNavigation(
                         resId = R.id.folderPickerFragment,
                         args = FolderPickerFragmentArgs(
                             threadsUids = arrayOf(threadUid),
@@ -190,7 +189,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                             messageUid = messageUid,
                             sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                         ).toBundle(),
-                        currentClassName = currentClassName,
                     )
                 }
             }
