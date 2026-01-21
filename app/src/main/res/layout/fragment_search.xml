@@ -49,6 +49,10 @@
 
             </com.google.android.material.appbar.MaterialToolbar>
 
+            <include
+                android:id="@+id/multiselectToolbar"
+                layout="@layout/view_multiselection_info_toolbar" />
+
             <!--
                 Don't remove this presumably useless ID.
                 By giving it an ID, the HorizontalScrollView will retain how much it has scrolled when the activity is recreated.
@@ -204,6 +208,15 @@
 
             </FrameLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <com.infomaniak.mail.views.BottomQuickActionBarView
+            android:id="@+id/quickActionBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:visibility="gone"
+            app:menu="@menu/multiselection_menu"
+            tools:visibility="visible" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.fragment.app.FragmentContainerView

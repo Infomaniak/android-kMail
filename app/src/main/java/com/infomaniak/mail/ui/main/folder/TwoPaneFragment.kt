@@ -66,7 +66,7 @@ abstract class TwoPaneFragment : Fragment() {
     lateinit var threadListAdapter: ThreadListAdapter
 
     @Inject
-    lateinit var localSettings: LocalSettings
+    open lateinit var localSettings: LocalSettings
 
     abstract val substituteClassName: String
     abstract fun getLeftPane(): View?
