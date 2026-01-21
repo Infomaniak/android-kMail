@@ -61,9 +61,9 @@ class FolderPickerViewModel @Inject constructor(
         }
     }
 
-    fun initFolders(folders: MainViewModel.DisplayedFolders, action: String) {
+    fun initFolders(folders: MainViewModel.DisplayedFolders, action: FolderPickerAction) {
         allFolderUis = when (action) {
-            FolderPickerFragment.SEARCH -> {
+            FolderPickerAction.SEARCH -> {
                 val baseFolders = folders.flattenAndAddDividerBeforeFirstCustomFolder(
                     dividerType = FolderPickerItem.Divider,
                 )

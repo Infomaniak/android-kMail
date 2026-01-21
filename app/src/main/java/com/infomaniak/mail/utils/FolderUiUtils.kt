@@ -21,7 +21,6 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAdapter
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerItem
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.IK_FOLDER

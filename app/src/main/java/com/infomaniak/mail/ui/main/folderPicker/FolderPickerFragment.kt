@@ -110,11 +110,11 @@ class FolderPickerFragment : Fragment() {
 
     private fun setupToolbar() = with(navigationArgs) {
         when (action) {
-            SEARCH -> {
+            FolderPickerAction.SEARCH -> {
                 binding.iconAddFolder.isInvisible = true
                 binding.toolbarSubject.text = getString(R.string.searchFolderName)
             }
-            MOVE -> {
+            FolderPickerAction.MOVE -> {
                 binding.iconAddFolder.isVisible = true
                 binding.toolbarSubject.text = getString(R.string.actionMove)
                 setupCreateFolderDialog()
@@ -150,8 +150,14 @@ class FolderPickerFragment : Fragment() {
 
     private fun onFolderSelected(folder: Folder?): Unit = with(navigationArgs) {
         when (action) {
-            MOVE -> folder?.id?.let { mainViewModel.moveThreadsOrMessageTo(it, threadsUids.toList(), messageUid) }
-            SEARCH -> searchViewModel.selectFolder(folder)
+            FolderPickerAction.MOVE -> folder?.id?.let {
+                mainViewModel.moveThreadsOrMessageTo(
+                    it,
+                    threadsUids.toList(),
+                    messageUid
+                )
+            }
+            FolderPickerAction.SEARCH -> searchViewModel.selectFolder(folder)
         }
         findNavController().popBackStack()
     }
@@ -182,9 +188,4 @@ class FolderPickerFragment : Fragment() {
         super.onStop()
     }
 
-    companion object {
-        // Actions
-        const val MOVE = "move"
-        const val SEARCH = "search"
-    }
 }

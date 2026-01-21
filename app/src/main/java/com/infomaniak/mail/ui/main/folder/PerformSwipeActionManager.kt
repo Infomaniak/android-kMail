@@ -30,7 +30,7 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragment
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -128,7 +128,7 @@ object PerformSwipeActionManager {
                 navController.animatedNavigation(
                     directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                         threadsUids = arrayOf(thread.uid),
-                        action = FolderPickerFragment.MOVE,
+                        action = FolderPickerAction.MOVE,
                         sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                     ),
                     currentClassName = javaClass.name,

@@ -52,9 +52,8 @@ class FolderPickerAdapter @Inject constructor() :
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newSelectedFolderId: String?, newShouldDisplayIndent: Boolean, newFolders: List<FolderPickerItem>) =
+    fun setFolders(newSelectedFolderId: String?, newShouldDisplayIndent: Boolean, newFolders: List<FolderPickerItem>) {
         runCatchingRealm {
-
             selectedFolderId = newSelectedFolderId
 
             val shouldForceNotify = newShouldDisplayIndent != shouldDisplayIndent
@@ -62,6 +61,7 @@ class FolderPickerAdapter @Inject constructor() :
             submitList(newFolders)
             if (shouldForceNotify) notifyDataSetChanged()
         }
+    }
 
     override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
 
