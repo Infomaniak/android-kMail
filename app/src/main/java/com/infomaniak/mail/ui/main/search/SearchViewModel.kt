@@ -228,6 +228,7 @@ class SearchViewModel @Inject constructor(
         shouldGetNextPage: Boolean,
     ) {
         visibilityMode.postValue(VisibilityMode.LOADING)
+
         val currentMailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = folder?.id ?: dummyFolderId
         val resource = if (shouldGetNextPage) resourceNext else null

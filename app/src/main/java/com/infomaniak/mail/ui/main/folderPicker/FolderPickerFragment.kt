@@ -117,12 +117,12 @@ class FolderPickerFragment : Fragment() {
             MOVE -> {
                 binding.iconAddFolder.isVisible = true
                 binding.toolbarSubject.text = getString(R.string.actionMove)
-                setupCreateFolder()
+                setupCreateFolderDialog()
             }
         }
     }
 
-    private fun setupCreateFolder() = with(navigationArgs) {
+    private fun setupCreateFolderDialog() = with(navigationArgs) {
         createFolderDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
@@ -150,7 +150,7 @@ class FolderPickerFragment : Fragment() {
 
     private fun onFolderSelected(folder: Folder?): Unit = with(navigationArgs) {
         when (action) {
-            MOVE -> mainViewModel.moveThreadsOrMessageTo(folder?.id!!, threadsUids.toList(), messageUid)
+            MOVE -> folder?.id?.let { mainViewModel.moveThreadsOrMessageTo(it, threadsUids.toList(), messageUid) }
             SEARCH -> searchViewModel.selectFolder(folder)
         }
         findNavController().popBackStack()

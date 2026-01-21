@@ -35,6 +35,7 @@ import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -205,7 +206,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     args = FolderPickerFragmentArgs(
                         threadsUids = arrayOf(navigationArgs.threadUid),
                         action = FolderPickerFragment.MOVE,
-                        sourceFolderId = mainViewModel.currentFolderId!!
+                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                     ).toBundle(),
                     currentClassName = currentClassName,
                 )
