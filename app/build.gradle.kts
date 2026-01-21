@@ -237,8 +237,8 @@ dependencies {
 
     // Test
     testImplementation(core.junit)
-    testImplementation(libs.mockk.agent)
-    testImplementation(libs.mockk.android)
+    testImplementation(core.mockk.agent)
+    testImplementation(core.mockk.android)
     testImplementation(core.kotlinx.coroutines.test)
 
     androidTestImplementation(core.androidx.junit)
