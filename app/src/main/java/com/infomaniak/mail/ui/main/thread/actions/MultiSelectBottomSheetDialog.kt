@@ -119,20 +119,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             globalCoroutineScope.launch(Dispatchers.Main.immediate, start = CoroutineStart.UNDISPATCHED) {
                 when (id) {
                     R.id.actionMove -> {
-                        val navController = findNavController()
                         descriptionDialog.moveWithConfirmationPopup(
                             folderRole = folderRoleUtils.getActionFolderRole(threads),
                             count = threadsCount,
                         ) {
                             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
-                            navController.animatedNavigation(
-                                directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-                                    threadsUids = threadsUids.toTypedArray(),
-                                    action = FolderPickerFragment.MOVE,
-                                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
-                                ),
-                                currentClassName = currentClassName,
-                            )
+                            moveThreads(threadsUids)
                         }
                     }
                     R.id.actionReadUnread -> {
@@ -238,6 +230,18 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             )
             isMultiSelectOn = false
         }
+    }
+
+    private fun moveThreads(threadsUids: List<String>) {
+        val navController = findNavController()
+        navController.animatedNavigation(
+            directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+                threadsUids = threadsUids.toTypedArray(),
+                action = FolderPickerFragment.MOVE,
+                sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+            ),
+            currentClassName = currentClassName,
+        )
     }
 
     private fun observeReportPhishingResult() {

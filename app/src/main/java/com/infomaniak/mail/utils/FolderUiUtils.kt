@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAdapter
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerItem
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.IK_FOLDER
 
@@ -86,16 +87,16 @@ private fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
  * @return A list of [FolderUi] with a single divider of the provided type
  */
 fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
-    dividerType: FolderPickerAdapter.FolderPickerItem.Divider,
+    dividerType: FolderPickerItem.Divider,
     excludedFolderRoles: Set<Folder.FolderRole> = emptySet(),
-): List<FolderPickerAdapter.FolderPickerItem> = buildList {
+): List<FolderPickerItem> = buildList {
     runCatchingRealm {
         default.forEachNestedItem { folderUi, _ ->
-            if (folderUi.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.FolderPickerItem.Folder(folderUi))
+            if (folderUi.folder.role !in excludedFolderRoles) add(FolderPickerItem.Folder(folderUi))
         }
         add(dividerType)
         custom.forEachNestedItem { folderUi, _ ->
-            if (folderUi.folder.role !in excludedFolderRoles) add(FolderPickerAdapter.FolderPickerItem.Folder(folderUi))
+            if (folderUi.folder.role !in excludedFolderRoles) add(FolderPickerItem.Folder(folderUi))
         }
     }
 }

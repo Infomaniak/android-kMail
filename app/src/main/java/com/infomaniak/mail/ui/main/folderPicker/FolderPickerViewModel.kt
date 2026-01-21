@@ -23,7 +23,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.coroutineContext
@@ -51,9 +50,9 @@ class FolderPickerViewModel @Inject constructor(
 
     private val sourceFolderId inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolderId.name)
 
-    private var allFolderUis = emptyList<FolderPickerAdapter.FolderPickerItem>()
+    private var allFolderUis = emptyList<FolderPickerItem>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
-    val filterResults = MutableLiveData<Pair<List<FolderPickerAdapter.FolderPickerItem>, Boolean>>()
+    val filterResults = MutableLiveData<Pair<List<FolderPickerItem>, Boolean>>()
     var hasAlreadyTrackedSearch = false
 
     init {
@@ -66,17 +65,17 @@ class FolderPickerViewModel @Inject constructor(
         allFolderUis = when (action) {
             FolderPickerFragment.SEARCH -> {
                 val baseFolders = folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                    dividerType = FolderPickerAdapter.FolderPickerItem.Divider,
+                    dividerType = FolderPickerItem.Divider,
                 )
-                mutableListOf<FolderPickerAdapter.FolderPickerItem>().apply {
-                    add(FolderPickerAdapter.FolderPickerItem.AllFolders)
-                    add(FolderPickerAdapter.FolderPickerItem.Divider)
+                mutableListOf<FolderPickerItem>().apply {
+                    add(FolderPickerItem.AllFolders)
+                    add(FolderPickerItem.Divider)
                     addAll(baseFolders)
                 }
             }
             else -> {
                 folders.flattenAndAddDividerBeforeFirstCustomFolder(
-                    dividerType = FolderPickerAdapter.FolderPickerItem.Divider,
+                    dividerType = FolderPickerItem.Divider,
                     excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
                 )
             }
@@ -108,12 +107,13 @@ class FolderPickerViewModel @Inject constructor(
             // When dealing with nested role folders, there can be multiple FolderUi for the same Folder.id, that's why we make a
             // map so there's only one FolderUi per Folder.id
             val filteredFolders = buildMap {
-                allFolderUis.forEach { folderUi ->
+                allFolderUis.forEach { folderItem ->
                     ensureActive()
-                    if (folderUi !is FolderUi) return@forEach
-                    val folderName = folderUi.folder.role?.folderNameRes?.let(appContext::getString) ?: folderUi.folder.name
+                    if (folderItem !is FolderPickerItem.Folder) return@forEach
+                    val folder = folderItem.folderUi.folder
+                    val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
                     val isFound = folderName.standardize().contains(query.standardize())
-                    if (isFound) set(folderUi.folder.id, folderUi)
+                    if (isFound) set(folder.id, folderItem)
                 }
             }
 
