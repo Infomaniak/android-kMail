@@ -121,6 +121,7 @@ class SearchViewModel @Inject constructor(
     fun resetFolderFilter() {
         filterFolder = null
         isAllFoldersSelected = false
+        unselectAllChipFilters()
     }
 
     fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
@@ -157,6 +158,12 @@ class SearchViewModel @Inject constructor(
             removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
         }
         search(filters = currentFilters)
+    }
+
+    fun unselectAllChipFilters() = viewModelScope.launch(ioCoroutineContext) {
+        currentFilters.apply {
+            removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED, ThreadFilter.ATTACHMENTS))
+        }
     }
 
     fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
