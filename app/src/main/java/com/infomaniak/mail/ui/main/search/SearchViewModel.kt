@@ -137,8 +137,11 @@ class SearchViewModel @Inject constructor(
         isAllFoldersSelected = isSelected
     }
 
-    fun selectFolder(folder: Folder?) = viewModelScope.launch(ioCoroutineContext) {
-        search(folder = folder.also { filterFolder = it })
+    fun selectFolder(folder: Folder?) {
+        filterFolder = folder
+        viewModelScope.launch(ioCoroutineContext) {
+            search(folder = folder)
+        }
     }
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
@@ -152,16 +155,12 @@ class SearchViewModel @Inject constructor(
     }
 
     fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
-        currentFilters.apply {
-            removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
-        }
+        currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
         search(filters = currentFilters)
     }
 
-    fun unselectAllChipFilters() = viewModelScope.launch(ioCoroutineContext) {
-        currentFilters.apply {
-            removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED, ThreadFilter.ATTACHMENTS))
-        }
+    fun unselectAllChipFilters() {
+        currentFilters.removeAll(ThreadFilter.entries)
     }
 
     fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
