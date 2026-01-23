@@ -239,7 +239,6 @@ class SearchFragment : TwoPaneFragment() {
         val folder = searchViewModel.filterFolder
         val title = requireContext().getLocalizedNameOrAllFolders(folder)
         val drawable = if (folder != null) R.drawable.ic_check_sharp else 0
-
         allFoldersButton.apply {
             isChecked = folder != null
             setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, 0, R.drawable.ic_chevron_down, 0)
@@ -313,8 +312,9 @@ class SearchFragment : TwoPaneFragment() {
                 if (scrollDirection == ScrollDirection.DOWN) {
                     val visibleItemCount = childCount
                     val totalItemCount = itemCount
-                    val pastVisibleItems =
-                        (this as? LinearLayoutManager)?.findFirstVisibleItemPosition()?.plus(PAGINATION_TRIGGER_OFFSET)!!
+                    val pastVisibleItems = (this as? LinearLayoutManager)
+                        ?.findFirstVisibleItemPosition()
+                        ?.plus(PAGINATION_TRIGGER_OFFSET)!!
                     val isLastElement = (visibleItemCount + pastVisibleItems) >= totalItemCount
 
                     if (isLastElement && searchViewModel.visibilityMode.value != VisibilityMode.LOADING) {
@@ -396,7 +396,10 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     enum class VisibilityMode {
-        RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS,
+        RECENT_SEARCHES,
+        LOADING,
+        NO_RESULTS,
+        RESULTS,
     }
 
     companion object {

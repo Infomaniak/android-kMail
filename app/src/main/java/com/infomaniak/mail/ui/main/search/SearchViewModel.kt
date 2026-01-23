@@ -83,6 +83,7 @@ class SearchViewModel @Inject constructor(
         private set
 
     private var currentFilters = mutableSetOf<ThreadFilter>()
+    var isAllFoldersSelected: Boolean = false
 
     private var lastExecutedFolder: Folder? = null
     private var lastExecutedSearchQuery: String = ""
@@ -90,7 +91,6 @@ class SearchViewModel @Inject constructor(
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
-    var isAllFoldersSelected: Boolean = false
 
     private var resourceNext: String? = null
     private var isFirstPage: Boolean = true
@@ -137,10 +137,8 @@ class SearchViewModel @Inject constructor(
         isAllFoldersSelected = isSelected
     }
 
-    fun selectFolder(folder: Folder?) {
-        viewModelScope.launch(ioCoroutineContext) {
-            search(folder = folder.also { filterFolder = it })
-        }
+    fun selectFolder(folder: Folder?) = viewModelScope.launch(ioCoroutineContext) {
+        search(folder = folder.also { filterFolder = it })
     }
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
@@ -226,7 +224,9 @@ class SearchViewModel @Inject constructor(
         filters: Set<ThreadFilter>,
         query: String?,
     ): Set<ThreadFilter>? {
+
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
+
         return if (newFilters.isEmpty() && query.isNullOrBlank() && filterFolder == null) {
             searchUtils.deleteRealmSearchData()
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
