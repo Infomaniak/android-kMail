@@ -62,6 +62,7 @@ class Quotas : EmbeddedRealmObject {
     }
 
     fun getProgress(): Int? = maxStorage?.let { ceil(100.0f * size.toFloat() / it.toFloat()).toInt() }
+    fun hasLimitedStorage(): Boolean = maxStorage?.takeIf { it > 0L } != null
 
     companion object
 }
