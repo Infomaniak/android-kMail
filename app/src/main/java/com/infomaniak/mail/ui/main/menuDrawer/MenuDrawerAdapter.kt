@@ -84,7 +84,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
 
-            add(MenuDrawerFooter(quotas))
+            add(MenuDrawerFooter(quotas?.takeIf { it.hasLimitedStorage() }))
         }
     }
 
