@@ -157,7 +157,10 @@ class FolderPickerFragment : Fragment() {
                     messageUid
                 )
             }
-            FolderPickerAction.SEARCH -> searchViewModel.selectFolder(folder)
+            FolderPickerAction.SEARCH -> {
+                searchViewModel.selectAllFoldersFilter(folder == null)
+                searchViewModel.selectFolder(folder)
+            }
         }
         findNavController().popBackStack()
     }

@@ -227,14 +227,11 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun selectCurrentFolder() {
-        updateAllFoldersButtonUi()
-
-        if (searchViewModel.filterFolder == null) {
-            val currentFolder = mainViewModel.currentFolder.value
-            if (currentFolder?.role != Folder.FolderRole.INBOX) {
-                searchViewModel.selectFolder(currentFolder)
-            }
+        val sourceFolder = mainViewModel.currentFolder.value
+        if (!searchViewModel.isAllFoldersSelected && searchViewModel.filterFolder == null && sourceFolder?.role != Folder.FolderRole.INBOX) {
+            searchViewModel.selectFolder(sourceFolder)
         }
+        updateAllFoldersButtonUi()
         trackSearchEvent(ThreadFilter.FOLDER.matomoName, true)
     }
 
@@ -316,9 +313,8 @@ class SearchFragment : TwoPaneFragment() {
                 if (scrollDirection == ScrollDirection.DOWN) {
                     val visibleItemCount = childCount
                     val totalItemCount = itemCount
-                    val pastVisibleItems = (this as? LinearLayoutManager)
-                        ?.findFirstVisibleItemPosition()
-                        ?.plus(PAGINATION_TRIGGER_OFFSET)!!
+                    val pastVisibleItems =
+                        (this as? LinearLayoutManager)?.findFirstVisibleItemPosition()?.plus(PAGINATION_TRIGGER_OFFSET)!!
                     val isLastElement = (visibleItemCount + pastVisibleItems) >= totalItemCount
 
                     if (isLastElement && searchViewModel.visibilityMode.value != VisibilityMode.LOADING) {
@@ -400,10 +396,7 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     enum class VisibilityMode {
-        RECENT_SEARCHES,
-        LOADING,
-        NO_RESULTS,
-        RESULTS,
+        RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS,
     }
 
     companion object {

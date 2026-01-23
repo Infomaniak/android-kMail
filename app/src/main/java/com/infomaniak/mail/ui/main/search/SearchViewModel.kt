@@ -90,6 +90,7 @@ class SearchViewModel @Inject constructor(
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
+    var isAllFoldersSelected: Boolean = false
 
     private var resourceNext: String? = null
     private var isFirstPage: Boolean = true
@@ -119,6 +120,7 @@ class SearchViewModel @Inject constructor(
 
     fun resetFolderFilter() {
         filterFolder = null
+        isAllFoldersSelected = false
     }
 
     fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
@@ -130,8 +132,14 @@ class SearchViewModel @Inject constructor(
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
 
-    fun selectFolder(folder: Folder?) = viewModelScope.launch(ioCoroutineContext) {
-        search(folder = folder.also { filterFolder = it })
+    fun selectAllFoldersFilter(isSelected: Boolean) {
+        isAllFoldersSelected = isSelected
+    }
+
+    fun selectFolder(folder: Folder?) {
+        viewModelScope.launch(ioCoroutineContext) {
+            search(folder = folder.also { filterFolder = it })
+        }
     }
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
