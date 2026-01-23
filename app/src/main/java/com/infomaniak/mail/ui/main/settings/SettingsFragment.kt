@@ -149,6 +149,7 @@ class SettingsFragment : Fragment() {
         trackMyKSuiteEvent(MatomoKSuite.OPEN_DASHBOARD_NAME)
 
         val args = MyKSuiteDashboardFragmentArgs(dashboardData = getDashboardData(myKSuiteData, user))
+
         safelyAnimatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle(), currentClassName)
     }
 
