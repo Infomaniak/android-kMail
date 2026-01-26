@@ -187,6 +187,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             mainViewModel = mainViewModel,
             activity = (requireActivity() as MainActivity),
             host = this,
+            searchViewModel = null,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
         )

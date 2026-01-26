@@ -153,10 +153,10 @@
             android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
             app:destination="@id/detailedContactBottomSheetDialog" />
         <action
-            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
+            android:id="@+id/action_searchFragment_to_threadActionsBottomSheetDialog"
             app:destination="@id/threadActionsBottomSheetDialog" />
         <action
-            android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
+            android:id="@+id/action_searchFragment_to_multiSelectBottomSheetDialog"
             app:destination="@id/multiSelectBottomSheetDialog" />
 
     </fragment>

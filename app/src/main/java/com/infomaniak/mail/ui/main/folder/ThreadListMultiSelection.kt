@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+// import com.infomaniak.mail.ui.main.folder.`<no name provided>`.computeReadFavoriteStatus
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import androidx.core.view.isGone
@@ -24,7 +25,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
-import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
@@ -71,6 +72,7 @@ class ThreadListMultiSelection {
 
     lateinit var mainViewModel: MainViewModel
     lateinit var mainActivity: MainActivity
+    lateinit var searchViewModel: SearchViewModel
     private lateinit var host: MultiSelectionHost
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
@@ -82,6 +84,7 @@ class ThreadListMultiSelection {
         mainViewModel: MainViewModel,
         activity: MainActivity,
         host: MultiSelectionHost,
+        searchViewModel: SearchViewModel?,
         unlockSwipeActionsIfSet: () -> Unit,
         localSettings: LocalSettings,
     ) {
@@ -91,9 +94,60 @@ class ThreadListMultiSelection {
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
         this.localSettings = localSettings
 
-        setupMultiSelectionActions()
+        if (searchViewModel != null) {
+            this.searchViewModel = searchViewModel
+            setupMessageMultiSelectionActions()
+        } else setupMultiSelectionActions()
 
         observerMultiSelection()
+    }
+
+    private fun setupMessageMultiSelectionActions() = with(searchViewModel) {
+        host.multiSelectionBinding.quickActionBar.setOnItemClickListener { menuId ->
+            val selectedMessagesUids = selectedMessages.map { it.uid }
+            val selectedMessagesCount = selectedMessagesUids.count()
+
+            when (menuId) {
+                R.id.quickActionUnread -> {
+                    trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedMessagesCount)
+                    mainViewModel.toggleMessageSeenStatus("", selectedMessages.toList())
+                    mainViewModel.isMultiSelectOn = false
+                }
+                // R.id.quickActionArchive -> host.lifecycleScope.launch {
+                //     trackMultiSelectActionEvent(MatomoName.Archive, selectedMessagesCount)
+                //     mainViewModel.archiveThreads(selectedMessagesUids)
+                //     isMultiSelectOn = false
+                // }
+                // R.id.quickActionFavorite -> {
+                //     trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
+                //     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
+                //     isMultiSelectOn = false
+                // }
+                // R.id.quickActionDelete -> host.lifecycleScope.launch {
+                //     host.descriptionDialog.deleteWithConfirmationPopup(
+                //         folderRole = host.folderRoleUtils.getActionFolderRole(selectedThreads),
+                //         count = selectedThreadsCount,
+                //     ) {
+                //         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
+                //         deleteThreads(selectedThreadsUids)
+                //         isMultiSelectOn = false
+                //     }
+                // }
+                // R.id.quickActionMenu -> {
+                //     trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
+                //     val direction = if (selectedThreadsCount == 1) {
+                //         host.directionToThreadActionsBottomSheetDialog(
+                //             threadUid = selectedThreadsUids.single(),
+                //             shouldLoadDistantResources = false,
+                //             shouldCloseMultiSelection = true,
+                //         )
+                //     } else {
+                //         host.directionsToMultiSelectBottomSheetDialog()
+                //     }
+                //     host.safeNavigation(direction)
+                // }
+            }
+        }
     }
 
     private fun setupMultiSelectionActions() = with(mainViewModel) {

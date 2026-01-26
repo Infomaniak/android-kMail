@@ -45,10 +45,10 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
-import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -233,13 +233,13 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun moveThreads(threadsUids: List<String>) {
-        val navController = findNavController()
-        navController.animatedNavigation(
-            directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+        animatedNavigation(
+            resId = R.id.folderPickerFragment,
+            args = FolderPickerFragmentArgs(
                 threadsUids = threadsUids.toTypedArray(),
                 action = FolderPickerAction.MOVE,
                 sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
-            ),
+            ).toBundle(),
             currentClassName = currentClassName,
         )
     }

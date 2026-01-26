@@ -22,10 +22,13 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:touchscreenBlocksFocus="false"
     android:visibility="gone"
     app:contentInsetEnd="0dp"
     app:contentInsetStart="0dp"
-    app:navigationIcon="@null">
+    app:layout_collapseMode="pin"
+    app:navigationIcon="@null"
+    tools:visibility="visible">
 
     <LinearLayout
         android:layout_width="match_parent"

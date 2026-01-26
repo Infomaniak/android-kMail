@@ -35,12 +35,14 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.DUMMY_FOLDER_ID
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
@@ -77,6 +79,12 @@ class SearchViewModel @Inject constructor(
     private val dummyFolderId
         inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name) ?: DUMMY_FOLDER_ID
 
+    val selectedMessagesLiveData = MutableLiveData(mutableSetOf<Message>())
+    inline val selectedMessages
+        get() = selectedMessagesLiveData.value!!
+
+    val isEveryMessageSelected
+        get() = runCatchingRealm { selectedMessages.count() == searchResults.value?.list?.count() }.getOrDefault(false)
     var filterFolder: Folder? = null
         private set
     var currentSearchQuery: String = ""
