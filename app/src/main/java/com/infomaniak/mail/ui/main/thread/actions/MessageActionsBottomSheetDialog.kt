@@ -32,12 +32,14 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -181,8 +183,13 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 val navController = findNavController()
                 descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
                     navController.animatedNavigation(
-                        resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
+                        resId = R.id.folderPickerFragment,
+                        args = FolderPickerFragmentArgs(
+                            threadsUids = arrayOf(threadUid),
+                            action = FolderPickerAction.MOVE,
+                            messageUid = messageUid,
+                            sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                        ).toBundle(),
                         currentClassName = currentClassName,
                     )
                 }

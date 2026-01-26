@@ -24,11 +24,13 @@ import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -124,7 +126,11 @@ object PerformSwipeActionManager {
             val navController = findNavController()
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 navController.animatedNavigation(
-                    directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)),
+                    directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+                        threadsUids = arrayOf(thread.uid),
+                        action = FolderPickerAction.MOVE,
+                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                    ),
                     currentClassName = javaClass.name,
                 )
             }

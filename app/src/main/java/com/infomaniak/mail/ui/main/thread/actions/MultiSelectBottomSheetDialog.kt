@@ -36,6 +36,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
@@ -47,6 +48,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -117,18 +119,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             globalCoroutineScope.launch(Dispatchers.Main.immediate, start = CoroutineStart.UNDISPATCHED) {
                 when (id) {
                     R.id.actionMove -> {
-                        val navController = findNavController()
                         descriptionDialog.moveWithConfirmationPopup(
                             folderRole = folderRoleUtils.getActionFolderRole(threads),
                             count = threadsCount,
                         ) {
                             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
-                            navController.animatedNavigation(
-                                directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
-                                    threadsUids = threadsUids.toTypedArray(),
-                                ),
-                                currentClassName = currentClassName,
-                            )
+                            moveThreads(threadsUids)
                         }
                     }
                     R.id.actionReadUnread -> {
@@ -234,6 +230,18 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             )
             isMultiSelectOn = false
         }
+    }
+
+    private fun moveThreads(threadsUids: List<String>) {
+        val navController = findNavController()
+        navController.animatedNavigation(
+            directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+                threadsUids = threadsUids.toTypedArray(),
+                action = FolderPickerAction.MOVE,
+                sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+            ),
+            currentClassName = currentClassName,
+        )
     }
 
     private fun observeReportPhishingResult() {

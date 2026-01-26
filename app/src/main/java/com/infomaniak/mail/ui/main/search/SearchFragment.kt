@@ -22,19 +22,16 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListPopupWindow
-import android.widget.PopupWindow
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentContainerView
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import com.infomaniak.core.common.observe
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.setMargins
@@ -49,25 +46,24 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
-import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
+import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
-import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -76,7 +72,7 @@ class SearchFragment : TwoPaneFragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
 
     override val substituteClassName: String = javaClass.name
 
@@ -102,14 +98,13 @@ class SearchFragment : TwoPaneFragment() {
         )
     }
 
-    private lateinit var searchAdapter: SearchFolderAdapter
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSearchBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        selectCurrentFolder()
 
         handleEdgeToEdge()
 
@@ -120,7 +115,7 @@ class SearchFragment : TwoPaneFragment() {
         setupAdapter()
         setupListeners()
 
-        setFoldersDropdownUi()
+        setAllFoldersButtonListener()
         setAttachmentsUi()
         setMutuallyExclusiveChipGroupUi()
         setSearchBarUi()
@@ -210,70 +205,45 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        toolbar.setNavigationOnClickListener {
+            searchViewModel.resetFolderFilter()
+            findNavController().popBackStack()
+        }
         swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
     }
 
-    private fun setFoldersDropdownUi() {
-        val popupMenu = createPopupMenu()
-        binding.folderDropDown.setOnClickListener { popupMenu.show() }
-    }
-
-    private fun createPopupMenu(): ListPopupWindow {
-        val popupMenu = ListPopupWindow(requireContext()).apply {
-            isModal = true
-            inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
-            anchorView = binding.folderDropDown
-            width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
-        }
-
-        mainViewModel.displayedFoldersFlow.observe(viewLifecycleOwner) { allFolders ->
-
-            val folders = allFolders
-                .flattenAndAddDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
-                .toMutableList()
-                .apply { add(0, SearchFolderElement.ALL_FOLDERS) }
-                .toList()
-
-            searchAdapter = SearchFolderAdapter(folders)
-
-            popupMenu.setAdapter(searchAdapter)
-
-            popupMenu.setOnItemClickListener { _, _, position, _ ->
-                if (searchAdapter.getItemViewType(position) != SearchFolderElement.DIVIDER.itemId) {
-
-                    val folderUi = folders[position] as? FolderUi
-                    val entryName = requireContext().getLocalizedNameOrAllFolders(folderUi?.folder)
-
-                    onFolderSelected(folderUi?.folder, entryName)
-                    popupMenu.dismiss()
-                }
-            }
-
-            updateFolderDropDownUi(
-                folder = searchViewModel.filterFolder,
-                title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.filterFolder),
+    private fun setAllFoldersButtonListener() {
+        binding.allFoldersButton.setOnClickListener {
+            val navController = findNavController()
+            navController.animatedNavigation(
+                directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
+                    threadsUids = emptyArray(),
+                    action = FolderPickerAction.SEARCH,
+                    sourceFolderId = searchViewModel.filterFolder?.id
+                ),
+                currentClassName = javaClass.name,
             )
         }
-
-        return popupMenu
     }
 
-    private fun onFolderSelected(folder: Folder?, title: String) {
-        updateFolderDropDownUi(folder, title)
-        searchViewModel.selectFolder(folder)
-        trackSearchEvent(ThreadFilter.FOLDER.matomoName, folder != null)
+    private fun selectCurrentFolder() {
+        val sourceFolder = mainViewModel.currentFolder.value
+        if (!searchViewModel.isAllFoldersSelected && searchViewModel.filterFolder == null && sourceFolder?.role != Folder.FolderRole.INBOX) {
+            searchViewModel.selectFolder(sourceFolder)
+        }
+        updateAllFoldersButtonUi()
+        trackSearchEvent(ThreadFilter.FOLDER.matomoName, true)
     }
 
-    private fun updateFolderDropDownUi(folder: Folder?, title: String) = with(binding) {
+    private fun updateAllFoldersButtonUi() = with(binding) {
+        val folder = searchViewModel.filterFolder
+        val title = requireContext().getLocalizedNameOrAllFolders(folder)
         val drawable = if (folder != null) R.drawable.ic_check_sharp else 0
-        folderDropDown.apply {
+        allFoldersButton.apply {
             isChecked = folder != null
             setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, 0, R.drawable.ic_chevron_down, 0)
             text = title
         }
-
-        searchAdapter.updateVisuallySelectedFolder(folder)
     }
 
     private fun setAttachmentsUi() = with(searchViewModel) {
@@ -385,6 +355,7 @@ class SearchFragment : TwoPaneFragment() {
 
         fun displaySearchResult(mode: VisibilityMode) {
             showLoadingTimer.cancel()
+            updateAllFoldersButtonUi()
             swipeRefreshLayout.apply {
                 isRefreshing = false
                 isEnabled = true
