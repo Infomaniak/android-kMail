@@ -389,7 +389,7 @@ fun Context.getInfomaniakLogin() = InfomaniakLogin(
     appUID = BuildConfig.APPLICATION_ID,
     clientID = BuildConfig.CLIENT_ID,
     accessType = null,
-    sentryCallback = { error ->
+    sentryCallback = { error, extras ->
 
         val result = Regex("""(https?:\S+)\s+([A-Z]+\s+\d+)""").find(error)
         val url = result?.groupValues[1]
@@ -402,6 +402,7 @@ fun Context.getInfomaniakLogin() = InfomaniakLogin(
                 scope.setTag("error", error)
                 scope.setTag("url", "$url")
                 scope.setTag("code", "$methodAndCode")
+                extras.forEach(scope::setExtra)
             },
         )
     }
