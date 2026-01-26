@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.DUMMY_FOLDER_ID
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -88,6 +89,12 @@ class SearchViewModel @Inject constructor(
     private val dummyFolderId
         inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name) ?: DUMMY_FOLDER_ID
 
+    val selectedMessagesLiveData = MutableLiveData(mutableSetOf<Message>())
+    inline val selectedMessages
+        get() = selectedMessagesLiveData.value!!
+
+    val isEveryMessageSelected
+        get() = runCatchingRealm { selectedMessages.count() == searchResults.value?.list?.count() }.getOrDefault(false)
     var filterFolder: Folder? = null
         private set
     var currentSearchQuery: String = ""
