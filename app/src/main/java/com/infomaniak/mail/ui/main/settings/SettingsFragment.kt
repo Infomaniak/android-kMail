@@ -125,10 +125,10 @@ class SettingsFragment : Fragment() {
 
                 if (mailbox == null) return@observe
 
-                setTitle(mailbox.email)
+                setTitle(mailbox.emailIdn)
                 setOnClickListener {
                     animatedNavigation(
-                        SettingsFragmentDirections.actionSettingsToMailboxSettings(mailbox.objectId, mailbox.email)
+                        SettingsFragmentDirections.actionSettingsToMailboxSettings(mailbox.objectId, mailbox.emailIdn)
                     )
                 }
             }

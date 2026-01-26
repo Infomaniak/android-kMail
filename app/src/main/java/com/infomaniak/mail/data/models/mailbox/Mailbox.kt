@@ -47,6 +47,8 @@ class Mailbox : RealmObject {
     //region Remote data
     var uuid: String = ""
     var email: String = ""
+    @SerialName("email_idn")
+    var emailIdn: String = ""
     @SerialName("mailbox")
     var mailboxName: String = ""
     @SerialName("mailbox_id")
