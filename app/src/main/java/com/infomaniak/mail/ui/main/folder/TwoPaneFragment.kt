@@ -45,6 +45,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.extensions.AttachmentExt
@@ -58,6 +59,7 @@ import kotlin.math.roundToInt
 abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
+    val actionsViewModel: ActionsViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     private var dragStartX = 0f
