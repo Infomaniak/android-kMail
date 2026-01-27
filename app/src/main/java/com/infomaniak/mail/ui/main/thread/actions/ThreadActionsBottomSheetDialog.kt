@@ -68,6 +68,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
@@ -239,13 +240,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         override fun onSpam() {
-            if (isFromSpam) {
-                trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
-                mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
-            } else {
-                trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = false)
-                mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
-            }
+            trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = isFromSpam)
+            actionsViewModel.toggleMessagesSpamStatus(
+                thread.messages,
+                mainViewModel.currentFolderId,
+                mainViewModel.currentMailbox.value!!
+            )
         }
 
         override fun onPhishing() {
