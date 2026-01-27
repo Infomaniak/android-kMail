@@ -73,6 +73,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
     override val mainViewModel: MainViewModel by activityViewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }
@@ -173,7 +174,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.spam.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
-            toggleThreadSpamStatus(threadsUids)
+            val threadMessages = threads.flatMap { it.messages }
+            actionsViewModel.toggleMessagesSpamStatus(
+                threadMessages,
+                mainViewModel.currentFolderId,
+                mainViewModel.currentMailbox.value!!
+            )
             isMultiSelectOn = false
         }
 
