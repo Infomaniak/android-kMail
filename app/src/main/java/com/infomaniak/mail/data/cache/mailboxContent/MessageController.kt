@@ -113,8 +113,12 @@ class MessageController @Inject constructor(
         return getMessagesFromThread(thread, "$byFolderId AND $isNotScheduledMessage", includeDuplicates = false)
     }
 
-    suspend fun getUnscheduledMessages(thread: Thread, includeDuplicates: Boolean): List<Message> {
+    suspend fun getUnscheduledMessagesFromThread(thread: Thread, includeDuplicates: Boolean): List<Message> {
         return getMessagesFromThread(thread, isNotScheduledMessage, includeDuplicates)
+    }
+
+    fun getUnscheduledMessages(messages: List<Message>): List<Message> {
+        return messages.filter { message -> !message.isScheduledMessage }
     }
 
     private suspend fun getMessagesFromThread(thread: Thread, query: String, includeDuplicates: Boolean): List<Message> {

@@ -93,6 +93,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
@@ -196,6 +197,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by viewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -369,7 +371,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 },
                 onUnsubscribeClicked = threadViewModel::unsubscribeMessage,
                 moveMessageToSpam = { messageUid ->
-                    twoPaneViewModel.currentThreadUid.value?.let { mainViewModel.moveToSpamFolder(it, messageUid) }
+                    actionsViewModel.moveToSpamFolder(
+                        listOf(messageUid),
+                        mainViewModel.currentFolderId,
+                        mainViewModel.currentMailbox.value!!
+                    )
                 },
                 activateSpamFilter = mainViewModel::activateSpamFilter,
                 unblockMail = mainViewModel::unblockMail,
