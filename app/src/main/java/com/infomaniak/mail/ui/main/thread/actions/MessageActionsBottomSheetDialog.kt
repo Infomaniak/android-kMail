@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -64,6 +65,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
 
+    private val actionsViewModel: ActionsViewModel by viewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
@@ -225,7 +227,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onSpam() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = isFromSpam)
-                mainViewModel.toggleMessageSpamStatus(threadUid, message)
+                actionsViewModel.toggleMessagesSpamStatus(
+                    listOf(message),
+                    mainViewModel.currentFolderId,
+                    mainViewModel.currentMailbox.value!!
+                )
             }
 
             override fun onPhishing() {
