@@ -124,7 +124,7 @@ class EncryptionActionsBottomSheet : ActionsBottomSheetDialog() {
 
     private fun setupListeners() {
         binding.protectWithPassword.setClosingOnClickListener {
-            MatomoMail.trackEncryptionEvent(MatomoName.SeePassword)
+            MatomoMail.trackEncryptionEvent(MatomoName.OpenPasswordView)
             safelyNavigate(
                 resId = R.id.encryptionPasswordFragment,
                 substituteClassName = NewMessageFragment::class.java.name,
