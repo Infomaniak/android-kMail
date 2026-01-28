@@ -57,12 +57,12 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
-import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
+import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -214,8 +214,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setAllFoldersButtonListener() {
         binding.allFoldersButton.setOnClickListener {
-            val navController = findNavController()
-            navController.animatedNavigation(
+            safelyAnimatedNavigation(
                 directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
                     threadsUids = emptyArray(),
                     action = FolderPickerAction.SEARCH,

@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.main.folder
 
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -80,7 +80,7 @@ object PerformSwipeActionManager {
     ) = when (swipeAction) {
         SwipeAction.TUTORIAL -> {
             localSettings.setDefaultSwipeActions()
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
+            safelyNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
             findNavController().navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
             true
         }
@@ -131,13 +131,12 @@ object PerformSwipeActionManager {
                         action = FolderPickerAction.MOVE,
                         sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                     ),
-                    currentClassName = javaClass.name,
                 )
             }
             true
         }
         SwipeAction.QUICKACTIONS_MENU -> {
-            safeNavigate(
+            safelyNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                     threadUid = thread.uid,
                     shouldLoadDistantResources = false,
