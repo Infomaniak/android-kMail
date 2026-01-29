@@ -30,5 +30,5 @@ val selectedMailboxPreviewData = SelectedMailboxUi(
     userId = 0,
     avatarUrl = "https://picsum.photos/id/110/200/200",
     initials = "CH",
-    mailboxUi = MailboxUi(mailboxId = 0, email = "chef@infomaniak.com")
+    mailboxUi = MailboxUi(mailboxId = 0, emailIdn = "chef@infomaniak.com")
 )
