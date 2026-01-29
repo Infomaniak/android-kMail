@@ -105,7 +105,7 @@ class NotificationUtils @Inject constructor(
         val groups = mutableListOf<NotificationChannelGroup>()
         val channels = mutableListOf<NotificationChannel>()
 
-        val group = NotificationChannelGroup(mailbox.channelGroupId, mailbox.email)
+        val group = NotificationChannelGroup(mailbox.channelGroupId, mailbox.emailIdn)
         groups.add(group)
 
         val channel = buildNotificationChannel(
@@ -240,7 +240,7 @@ class NotificationUtils @Inject constructor(
         }
 
         setOnlyAlertOnce(true)
-        setSubText(mailbox.email)
+        setSubText(mailbox.emailIdn)
         setContentText(payload.content)
         setColorized(true)
         setContentIntent(contentIntent)
