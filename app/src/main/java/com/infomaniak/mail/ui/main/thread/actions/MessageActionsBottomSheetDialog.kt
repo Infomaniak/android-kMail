@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.extensions.isNightModeEnabled
@@ -52,8 +53,6 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDi
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.infomaniak.core.common.R as RCore
@@ -86,8 +85,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
-        // Use a scope not tied to the DialogFragment's view lifecycle so it keeps running after the sheet is closed.
-        globalCoroutineScope.launch(Dispatchers.Main.immediate, start = CoroutineStart.UNDISPATCHED) {
+        viewLifecycleOwner.lifecycleScope.launch {
             // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
             junkMessagesViewModel.threadsUids = listOf(threadUid)
 
