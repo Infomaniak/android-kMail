@@ -373,9 +373,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onUnsubscribeClicked = threadViewModel::unsubscribeMessage,
                 moveMessageToSpam = { messageUid ->
                     actionsViewModel.moveToSpamFolder(
-                        listOf(messageUid),
-                        mainViewModel.currentFolderId,
-                        mainViewModel.currentMailbox.value!!
+                        messagesUid = listOf(messageUid),
+                        currentFolderId = mainViewModel.currentFolderId,
+                        mailbox = mainViewModel.currentMailbox.value!!
                     )
                 },
                 activateSpamFilter = { actionsViewModel.activateSpamFilter(mainViewModel.currentMailbox.value!!) },
@@ -795,10 +795,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun snoozeThreads(timestamp: Long, threadUids: List<String>) {
         lifecycleScope.launch {
             val isSuccess = actionsViewModel.snoozeThreads(
-                Date(timestamp),
-                threadUids,
-                mainViewModel.currentFolderId,
-                mainViewModel.currentMailbox.value!!
+                date = Date(timestamp),
+                threadUids = threadUids,
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mainViewModel.currentMailbox.value!!
             )
             if (isSuccess) twoPaneViewModel.closeThread()
         }
@@ -809,9 +809,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             binding.snoozeAlert.showAction1Progress()
 
             val result = actionsViewModel.rescheduleSnoozedThreads(
-                Date(timestamp),
-                threadUids,
-                mainViewModel.currentMailbox.value!!
+                date = Date(timestamp),
+                threadUids = threadUids,
+                mailbox = mainViewModel.currentMailbox.value!!
             )
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
@@ -854,8 +854,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 R.id.quickActionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Archive, isFromArchive)
+                        val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
                         actionsViewModel.archiveThreadsOrMessages(
-                            threads = listOf(threadViewModel.threadLive.value!!),
+                            threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
                             mailbox = mainViewModel.currentMailbox.value!!
                         )
@@ -864,12 +865,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 R.id.quickActionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Delete)
-                        // TODO: CHECK NULL
+                        val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
                         actionsViewModel.deleteThreadsOrMessages(
-                            threads = listOf(threadViewModel.threadLive.value!!),
+                            threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
                             mailbox = mainViewModel.currentMailbox.value!!
                         )
+
                     }
                 }
                 R.id.quickActionMenu -> {
