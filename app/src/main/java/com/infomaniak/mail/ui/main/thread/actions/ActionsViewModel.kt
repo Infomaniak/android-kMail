@@ -196,7 +196,7 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val destinationFolder = folderController.getFolder(destinationFolderId)!!
+        val destinationFolder = folderController.getFolder(destinationFolderId) ?: return@launch
         val threads: List<Thread>? = threadsUids?.let { threadController.getThreads(threadsUids).toList() }
         val messages = messagesUid?.let { messageController.getMessages(it) }
         val messagesToMove = sharedUtils.getMessagesToMove(threads, messages, currentFolderId)
@@ -285,7 +285,7 @@ class ActionsViewModel @Inject constructor(
 
     private fun showMoveSnackbar(
         threadsMoved: List<String>,
-        messages: List<Message>,
+        messagesMoved: List<Message>,
         apiResponses: List<ApiResponse<MoveResult>>,
         destinationFolder: Folder,
     ) {
@@ -294,12 +294,11 @@ class ActionsViewModel @Inject constructor(
 
         val snackbarTitle = when {
             apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
-            threadsMoved.count() > 0 -> appContext.resources.getQuantityString(
+            threadsMoved.count() > 0 || messagesMoved.count() > 1 -> appContext.resources.getQuantityString(
                 R.plurals.snackbarThreadMoved,
                 threadsMoved.count(),
                 destination
             )
-            //TODO: A MESSAGES MOVED QUANTITY STRING
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
@@ -308,7 +307,7 @@ class ActionsViewModel @Inject constructor(
             null
         } else {
             val undoDestinationId = destinationFolder.id
-            val foldersIds = messages.getFoldersIds(exception = undoDestinationId)
+            val foldersIds = messagesMoved.getFoldersIds(exception = undoDestinationId)
             foldersIds += destinationFolder.id
             UndoData(
                 resources = apiResponses.mapNotNull { it.data?.undoResource },
@@ -321,17 +320,13 @@ class ActionsViewModel @Inject constructor(
     }
     //endregion
 
-    private suspend fun moveOutThreadsLocally(
-        messages: List<Message>,
-        destinationFolder: Folder
-    ): List<String> {
-        val uidsToMove =
-            mutableListOf<String>().apply {
-                messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
-                    val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
-                    if (nbMessagesInCurrentFolder == 0) add(thread.uid)
-                }
+    private suspend fun moveOutThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
+        val uidsToMove = mutableListOf<String>().apply {
+            messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
+                val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
+                if (nbMessagesInCurrentFolder == 0) add(thread.uid)
             }
+        }
 
         if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
         return uidsToMove
@@ -343,27 +338,20 @@ class ActionsViewModel @Inject constructor(
         messages: List<Message>? = null,
         currentFolder: Folder?,
         mailbox: Mailbox
-    ) =
-        viewModelScope.launch(ioCoroutineContext) {
-            val messagesToDelete = getMessagesToDelete(threads, messages)
-            deleteMessages(messagesToDelete, currentFolder, mailbox)
-        }
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val messagesToDelete = getMessagesToDelete(threads, messages)
+        deleteMessages(messagesToDelete, currentFolder, mailbox)
+    }
 
     private fun deleteMessages(
         messages: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-
-        val shouldPermanentlyDelete =
-            isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(messages, currentFolder))
+        val shouldPermanentlyDelete = isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(messages, currentFolder))
 
         if (shouldPermanentlyDelete) {
-            permanentlyDelete(
-                messagesToDelete = messages,
-                currentFolder = currentFolder,
-                mailbox = mailbox
-            )
+            permanentlyDelete(messages, currentFolder, mailbox)
         } else {
             moveMessagesTo(
                 destinationFolder = folderController.getFolder(FolderRole.TRASH)!!,
@@ -374,11 +362,7 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun permanentlyDelete(
-        messagesToDelete: List<Message>,
-        currentFolder: Folder?,
-        mailbox: Mailbox
-    ) {
+    private suspend fun permanentlyDelete(messagesToDelete: List<Message>, currentFolder: Folder?, mailbox: Mailbox) {
         val undoResources = emptyList<String>()
         val uids = messagesToDelete.getUids()
 
@@ -393,7 +377,6 @@ class ActionsViewModel @Inject constructor(
         activityDialogLoaderResetTrigger.postValue(Unit)
 
         if (apiResponses.atLeastOneSucceeded()) {
-
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messagesToDelete.getFoldersIds(),
@@ -403,7 +386,7 @@ class ActionsViewModel @Inject constructor(
         }
 
         if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(
-            uidsToMove,
+            threadsUids = uidsToMove,
             hasBeenMovedOut = false
         )
 
@@ -415,7 +398,6 @@ class ActionsViewModel @Inject constructor(
             undoResources = undoResources,
             undoFoldersIds = undoFoldersIds,
             undoDestinationId = undoDestinationId,
-            // TODO: calculate threads?
             numberOfImpactedThreads = messagesToDelete.count(),
         )
     }
@@ -430,7 +412,6 @@ class ActionsViewModel @Inject constructor(
     ) {
         val snackbarTitle = if (apiResponses.atLeastOneSucceeded()) {
             if (messages.count() > 1) {
-                // TODO: Do a string for multiple messages deleted
                 appContext.resources.getQuantityString(
                     R.plurals.snackbarThreadDeletedPermanently,
                     numberOfImpactedThreads
@@ -475,9 +456,8 @@ class ActionsViewModel @Inject constructor(
 
         val role = folderRoleUtils.getActionFolderRole(messages, currentFolder)
         val isFromArchive = role == FolderRole.ARCHIVE
-
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
+        val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return@launch
 
         moveMessagesTo(destinationFolder, currentFolder?.id, mailbox, messages)
     }
@@ -559,7 +539,6 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox
     ): List<Message> = when {
         threads != null -> threads.flatMap { thread ->
-            //TODO: CHECK IF FEATURE FLAG IS OK LIKE THIS
             messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
         }
         messages != null -> messageController.getMessagesAndDuplicates(messages)
@@ -643,11 +622,7 @@ class ActionsViewModel @Inject constructor(
     //endregion
 
     //region Phishing
-    fun reportPhishing(
-        messages: List<Message>,
-        currentFolder: Folder?,
-        mailbox: Mailbox
-    ) {
+    fun reportPhishing(messages: List<Message>, currentFolder: Folder?, mailbox: Mailbox) {
         viewModelScope.launch(ioCoroutineContext) {
             val mailboxUuid = mailbox.uuid
             val messagesUids: List<String> = messages.map { it.uid }
@@ -662,13 +637,12 @@ class ActionsViewModel @Inject constructor(
 
                     if (folderRoleUtils.getActionFolderRole(messages, currentFolder) != FolderRole.SPAM) {
                         toggleThreadsOrMessagesSpamStatus(
-                            messages,
+                            messages = messages,
                             currentFolderId = currentFolder?.id,
                             mailbox = mailbox,
                             displaySnackbar = false
                         )
                     }
-
 
                     R.string.snackbarReportPhishingConfirmation
                 } else {
@@ -686,7 +660,6 @@ class ActionsViewModel @Inject constructor(
     fun blockUser(folderId: String, shortUid: Int, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = mailbox.uuid
         with(ApiRepository.blockUser(mailboxUuid, folderId, shortUid)) {
-
             val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
             snackbarManager.postValue(appContext.getString(snackbarTitle))
 
@@ -697,12 +670,7 @@ class ActionsViewModel @Inject constructor(
 
     //region Snooze
     // For now we only do snooze for Threads.
-    suspend fun snoozeThreads(
-        date: Date,
-        threadUids: List<String>,
-        currentFolderId: String?,
-        mailbox: Mailbox?
-    ): Boolean {
+    suspend fun snoozeThreads(date: Date, threadUids: List<String>, currentFolderId: String?, mailbox: Mailbox?): Boolean {
         var isSuccess = false
 
         viewModelScope.launch {
@@ -825,7 +793,7 @@ class ActionsViewModel @Inject constructor(
     }
     //endregion
 
-//region Emoji reaction
+    //region Emoji reaction
     /**
      * Wrapper method to send an emoji reaction to the api. This method will check if the emoji reaction is allowed before
      * initiating an api call. This is the entry point to add an emoji reaction anywhere in the app.
