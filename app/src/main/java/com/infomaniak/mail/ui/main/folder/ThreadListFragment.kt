@@ -186,6 +186,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
+            actionsViewModel = actionsViewModel,
             threadListFragment = this,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
@@ -764,7 +765,13 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             viewLifecycleOwner.lifecycleScope.launch {
                 threadListViewModel.getEmojiReactionsFor(messageUid)?.let { reactions ->
-                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions)
+                    actionsViewModel.trySendEmojiReply(
+                        emoji = emoji,
+                        messageUid = messageUid,
+                        reactions = reactions,
+                        hasNetwork = mainViewModel.hasNetwork,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 }
             }
         }
