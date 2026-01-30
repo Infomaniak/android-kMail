@@ -93,7 +93,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
         favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }
-        spam.setOnClickListener { onClickListener.onSpam() }
+        spam.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSpam() }
         phishing.setOnClickListener { onClickListener.onPhishing() }
         blockSender.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onBlockSender() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }

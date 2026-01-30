@@ -98,7 +98,7 @@ class ActionsViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
-    val spamTrigger = SingleLiveEvent<Unit>()
+    val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
 
     //region Spam
@@ -144,7 +144,6 @@ class ActionsViewModel @Inject constructor(
         val messages = messageController.getUnscheduledMessages(messages)
 
         moveMessagesTo(destinationFolder, currentFolderId, mailbox, messages, displaySnackbar)
-        spamTrigger.postValue(Unit)
     }
 
     fun activateSpamFilter(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
