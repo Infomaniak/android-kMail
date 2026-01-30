@@ -865,14 +865,14 @@ class MainViewModel @Inject constructor(
     fun moveThreadsOrMessageTo(
         destinationFolderId: String,
         threadsUids: List<String>,
-        messageUid: String? = null,
+        messagesUid: List<String>? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val destinationFolder = folderController.getFolder(destinationFolderId)!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-        val message = messageUid?.let { messageController.getMessage(it)!! }
-        val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
+        val messages = messagesUid?.let { messageController.getMessages(it) }
+        val messagesToMove = sharedUtils.getMessagesToMove(threads, messages, currentFolderId)
 
-        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messagesToMove)
+        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, null, messagesToMove)
     }
 
     private suspend fun moveThreadsOrMessageTo(
@@ -1559,7 +1559,7 @@ class MainViewModel @Inject constructor(
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,
-        messageUid: String?,
+        messageUid: List<String>?,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
         moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)

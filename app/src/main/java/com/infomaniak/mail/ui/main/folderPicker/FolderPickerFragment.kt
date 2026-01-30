@@ -127,7 +127,7 @@ class FolderPickerFragment : Fragment() {
     private fun setupCreateFolderDialog() = with(navigationArgs) {
         createFolderDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
-                mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
+                mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messagesUids?.toList())
             },
         )
     }
@@ -155,8 +155,8 @@ class FolderPickerFragment : Fragment() {
             FolderPickerAction.MOVE -> folder?.id?.let {
                 actionsViewModel.moveThreadsOrMessagesTo(
                     it,
-                    threadsUids.toList(),
-                    messageUid?.let { listOf(messageUid) },
+                    threadsUids?.let { threadsUids.toList() },
+                    messagesUids?.let { messagesUids.toList() },
                     mainViewModel.currentFolderId,
                     mainViewModel.currentMailbox.value!!
                 )

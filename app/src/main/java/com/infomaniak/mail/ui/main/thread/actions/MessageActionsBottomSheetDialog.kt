@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.extensions.isNightModeEnabled
@@ -64,7 +63,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
 
-    private val actionsViewModel: ActionsViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
@@ -104,7 +103,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
-            observeSpamTrigger()
 
             if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {
@@ -129,12 +127,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
             setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
-        }
-    }
-
-    private fun observeSpamTrigger() {
-        actionsViewModel.spamTrigger.observe(viewLifecycleOwner) {
-            findNavController().popBackStack()
         }
     }
 
@@ -212,9 +204,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     navController.animatedNavigation(
                         resId = R.id.folderPickerFragment,
                         args = FolderPickerFragmentArgs(
-                            threadsUids = arrayOf(threadUid),
                             action = FolderPickerAction.MOVE,
-                            messageUid = messageUid,
+                            threadsUids = arrayOf(threadUid),
+                            messagesUids = arrayOf(messageUid),
                             sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                         ).toBundle(),
                     )

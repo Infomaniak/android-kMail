@@ -117,7 +117,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         observePotentialBlockedUsers()
         observeReportPhishingResult()
-        observeSpamTrigger()
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
@@ -137,12 +136,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private fun observeReportPhishingResult() {
         actionsViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
-            findNavController().popBackStack()
-        }
-    }
-
-    private fun observeSpamTrigger() {
-        actionsViewModel.spamTrigger.observe(viewLifecycleOwner) {
             findNavController().popBackStack()
         }
     }
