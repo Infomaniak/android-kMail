@@ -889,10 +889,10 @@ class MainViewModel @Inject constructor(
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,
-        messageUid: List<String>?,
+        messagesUids: List<String>?,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
-        moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
+        moveThreadsOrMessageTo(newFolderId, threadsUids, messagesUids)
         isMovedToNewFolder.postValue(true)
     }
     //endregion

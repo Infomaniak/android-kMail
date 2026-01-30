@@ -77,7 +77,7 @@ class ThreadListMultiSelection {
                 R.id.quickActionUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedThreadsCount)
                     actionsViewModel.toggleThreadsOrMessagesSeenStatus(
-                        selectedThreadsUids,
+                        threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
                         currentFolderId = currentFolderId,
                         mailbox = currentMailbox.value!!
@@ -101,7 +101,7 @@ class ThreadListMultiSelection {
                 R.id.quickActionFavorite -> {
                     trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
                     actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
-                        selectedThreadsUids,
+                        threadsUids = selectedThreadsUids,
                         mailbox = currentMailbox.value!!,
                         shouldFavorite = shouldMultiselectFavorite
                     )
