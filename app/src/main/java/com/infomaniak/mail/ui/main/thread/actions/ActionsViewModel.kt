@@ -36,12 +36,14 @@ import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
@@ -88,6 +90,7 @@ class ActionsViewModel @Inject constructor(
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val mailboxController: MailboxController,
     private val messageController: MessageController,
     private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
@@ -96,17 +99,19 @@ class ActionsViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
+
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
-    val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
 
     //region Spam
-    fun moveToSpamFolder(messagesUid: List<String>, currentFolderId: String?, mailbox: Mailbox) =
+    fun moveToSpamFolder(messagesUid: List<String>, currentFolderId: String?, mailbox: Mailbox) {
         viewModelScope.launch(ioCoroutineContext) {
             val messages = messageController.getMessages(messagesUid)
             toggleMessagesSpamStatus(messages, currentFolderId, mailbox)
         }
+    }
 
     fun toggleThreadsOrMessagesSpamStatus(
         messages: List<Message>? = null,
@@ -156,6 +161,29 @@ class ActionsViewModel @Inject constructor(
 
     private suspend fun getMessagesFromThreadToSpamOrHam(threads: Set<Thread>): List<Message> {
         return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = false) }
+    }
+
+    fun unblockMail(email: String, mailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
+        if (mailbox == null) return@launch
+
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                val updatedSendersRestrictions = data!!.apply {
+                    blockedSenders.removeIf { it.email == email }
+                }
+                updateBlockedSenders(mailbox, updatedSendersRestrictions)
+            }
+        }
+    }
+
+    private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
+        with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = updatedSendersRestrictions
+                }
+            }
+        }
     }
 
     //endregion
@@ -917,6 +945,7 @@ class ActionsViewModel @Inject constructor(
     }
 
     companion object {
+        private val TAG: String = ActionsViewModel::class.java.simpleName
         private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
 }
