@@ -75,6 +75,7 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.ui.sync.discovery.SyncDiscoveryManager
@@ -113,6 +114,7 @@ class MainActivity : BaseActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by viewModels()
 
     private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let(MainActivityArgs::fromBundle) }
 
@@ -488,7 +490,7 @@ class MainActivity : BaseActivity() {
             getAnchor = ::getAnchor,
             onUndoData = {
                 trackEvent(MatomoMail.MatomoCategory.Snackbar, MatomoName.Undo)
-                mainViewModel.undoAction(it)
+                actionsViewModel.undoAction(it, mainViewModel.currentMailbox.value!!)
             },
         )
     }

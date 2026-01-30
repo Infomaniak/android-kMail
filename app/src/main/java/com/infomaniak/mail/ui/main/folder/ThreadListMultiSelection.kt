@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 class ThreadListMultiSelection {
 
     lateinit var mainViewModel: MainViewModel
+    lateinit var actionsViewModel: ActionsViewModel
     private lateinit var threadListFragment: ThreadListFragment
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
@@ -50,11 +52,13 @@ class ThreadListMultiSelection {
 
     fun initMultiSelection(
         mainViewModel: MainViewModel,
+        actionsViewModel: ActionsViewModel,
         threadListFragment: ThreadListFragment,
         unlockSwipeActionsIfSet: () -> Unit,
         localSettings: LocalSettings,
     ) {
         this.mainViewModel = mainViewModel
+        this.actionsViewModel = actionsViewModel
         this.threadListFragment = threadListFragment
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
         this.localSettings = localSettings
@@ -72,7 +76,12 @@ class ThreadListMultiSelection {
             when (menuId) {
                 R.id.quickActionUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedThreadsCount)
-                    toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
+                    actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                        selectedThreadsUids,
+                        shouldRead = shouldMultiselectRead,
+                        currentFolderId = currentFolderId,
+                        mailbox = currentMailbox.value!!
+                    )
                     isMultiSelectOn = false
                 }
                 R.id.quickActionArchive -> threadListFragment.lifecycleScope.launch {
@@ -81,13 +90,21 @@ class ThreadListMultiSelection {
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
-                        archiveThreads(selectedThreadsUids)
+                        actionsViewModel.archiveThreadsOrMessages(
+                            threads = selectedThreads.toList(),
+                            currentFolder = currentFolder.value,
+                            mailbox = currentMailbox.value!!
+                        )
                         isMultiSelectOn = false
                     }
                 }
                 R.id.quickActionFavorite -> {
                     trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
-                    toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
+                    actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                        selectedThreadsUids,
+                        mailbox = currentMailbox.value!!,
+                        shouldFavorite = shouldMultiselectFavorite
+                    )
                     isMultiSelectOn = false
                 }
                 R.id.quickActionDelete -> threadListFragment.lifecycleScope.launch {
@@ -96,7 +113,11 @@ class ThreadListMultiSelection {
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
-                        deleteThreads(selectedThreadsUids)
+                        actionsViewModel.deleteThreadsOrMessages(
+                            threads = selectedThreads.toList(),
+                            currentFolder = currentFolder.value,
+                            mailbox = currentMailbox.value!!
+                        )
                         isMultiSelectOn = false
                     }
                 }
