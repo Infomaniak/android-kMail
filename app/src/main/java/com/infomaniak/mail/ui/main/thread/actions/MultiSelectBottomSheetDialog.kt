@@ -131,7 +131,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     R.id.actionReadUnread -> {
                         trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
                         actionsViewModel.toggleThreadsOrMessagesSeenStatus(
-                            threadsUids,
+                            threadsUids = threadsUids,
                             shouldRead = shouldRead,
                             currentFolderId = currentFolderId,
                             mailbox = currentMailbox.value!!
@@ -243,7 +243,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
             actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
-                threadsUids,
+                threadsUids = threadsUids,
                 mailbox = currentMailbox.value!!,
                 shouldFavorite = shouldFavorite
             )
