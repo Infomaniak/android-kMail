@@ -41,6 +41,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -50,7 +51,6 @@ import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
@@ -176,6 +176,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
+            actionsViewModel = actionsViewModel,
             threadListFragment = this,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
@@ -703,7 +704,13 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             viewLifecycleOwner.lifecycleScope.launch {
                 threadListViewModel.getEmojiReactionsFor(messageUid)?.let { reactions ->
-                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions)
+                    actionsViewModel.trySendEmojiReply(
+                        emoji = emoji,
+                        messageUid = messageUid,
+                        reactions = reactions,
+                        hasNetwork = mainViewModel.hasNetwork,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 }
             }
         }
