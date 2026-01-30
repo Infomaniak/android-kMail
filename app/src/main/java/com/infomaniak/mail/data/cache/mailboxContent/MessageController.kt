@@ -139,6 +139,12 @@ class MessageController @Inject constructor(
         messagesAsync.await() + duplicatesAsync.await()
     }
 
+    suspend fun getMessagesAndDuplicates(messages: List<Message>): List<Message> {
+        return messages.flatMap { message ->
+            getMessageAndDuplicates(message.threads.first(), message)
+        }
+    }
+
     suspend fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
         return listOf(message) + thread.duplicates.query("${Message::messageId.name} == $0", message.messageId).findSuspend()
     }
