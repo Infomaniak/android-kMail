@@ -50,10 +50,10 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
-import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
+import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.getDashboardData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -68,6 +68,8 @@ class SettingsFragment : Fragment() {
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val myKSuiteViewModel: MykSuiteViewModel by viewModels()
+
+    private val currentClassName: String by lazy { SettingsFragment::class.java.name }
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -127,8 +129,9 @@ class SettingsFragment : Fragment() {
 
                 setTitle(mailbox.email)
                 setOnClickListener {
-                    animatedNavigation(
-                        SettingsFragmentDirections.actionSettingsToMailboxSettings(mailbox.objectId, mailbox.email)
+                    safelyAnimatedNavigation(
+                        SettingsFragmentDirections.actionSettingsToMailboxSettings(mailbox.objectId, mailbox.email),
+                        currentClassName
                     )
                 }
             }
@@ -146,7 +149,8 @@ class SettingsFragment : Fragment() {
         trackMyKSuiteEvent(MatomoKSuite.OPEN_DASHBOARD_NAME)
 
         val args = MyKSuiteDashboardFragmentArgs(dashboardData = getDashboardData(myKSuiteData, user))
-        animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
+
+        safelyAnimatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle(), currentClassName)
     }
 
     override fun onResume() {
@@ -160,7 +164,9 @@ class SettingsFragment : Fragment() {
                 if (isLocked) {
                     context?.showToast(R.string.errorMailboxLocked)
                 } else {
-                    animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
+                    safelyAnimatedNavigation(
+                        SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email), currentClassName
+                    )
                 }
             }
         }
@@ -184,8 +190,7 @@ class SettingsFragment : Fragment() {
                     if (!hasStaffAccount) return@collectLatest
                     settingsCrossAppDeviceId.isVisible = true
                     val crossAppLogin = CrossAppLogin.forContext(requireContext(), this)
-                    @OptIn(ExperimentalUuidApi::class)
-                    crossAppLogin.sharedDeviceIdFlow.collect { crossAppDeviceId ->
+                    @OptIn(ExperimentalUuidApi::class) crossAppLogin.sharedDeviceIdFlow.collect { crossAppDeviceId ->
                         settingsCrossAppDeviceId.setSubtitle(crossAppDeviceId.toHexDashString())
                     }
                 }
@@ -222,43 +227,43 @@ class SettingsFragment : Fragment() {
         }
 
         settingsSend.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToSendSettings())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToSendSettings(), currentClassName)
         }
 
         settingsExternalContent.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting(), currentClassName)
         }
 
         settingsAutomaticAdvance.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToAutoAdvanceSettings())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToAutoAdvanceSettings(), currentClassName)
         }
 
         settingsThreadListDensity.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting(), currentClassName)
         }
 
         settingsTheme.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToThemeSetting())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToThemeSetting(), currentClassName)
         }
 
         settingsAccentColor.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToAccentColorSetting())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToAccentColorSetting(), currentClassName)
         }
 
         settingsSwipeActions.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting(), currentClassName)
         }
 
         settingsThreadMode.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToThreadModeSetting())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToThreadModeSetting(), currentClassName)
         }
 
         settingsDataManagement.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettings())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettings(), currentClassName)
         }
 
         settingsAccountManagement.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToAccountManagementSettings())
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToAccountManagementSettings(), currentClassName)
         }
     }
 }
