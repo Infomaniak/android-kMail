@@ -19,12 +19,12 @@
     <string name="accentColorBlueTitle">Azul</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Color del sistema</string>
-    <string name="actionArchive">Archivo</string>
+    <string name="actionArchive">Archivar</string>
     <string name="actionBlockSender">Bloquear remitente</string>
     <string name="actionCancelSnooze">Cancelar el aplazamiento</string>
     <string name="actionDelete">Borrar</string>
     <string name="actionEditMenu">Menú Edición</string>
-    <string name="actionForward">Adelante</string>
+    <string name="actionForward">Reenviar</string>
     <string name="actionMarkAsRead">Marcar como leído</string>
     <string name="actionMarkAsUnread">Marcar como no leído</string>
     <string name="actionModifySnooze">Modificar el aplazamiento</string>
