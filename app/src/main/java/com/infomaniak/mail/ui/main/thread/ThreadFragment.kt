@@ -197,7 +197,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
-    private val actionsViewModel: ActionsViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -378,7 +378,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     )
                 },
                 activateSpamFilter = { actionsViewModel.activateSpamFilter(mainViewModel.currentMailbox.value!!) },
-                unblockMail = mainViewModel::unblockMail,
+                unblockMail = { actionsViewModel.unblockMail(it, mainViewModel.currentMailbox.value!!) },
                 replyToCalendarEvent = { attendanceState, message ->
                     replyToCalendarEvent(
                         attendanceState,
