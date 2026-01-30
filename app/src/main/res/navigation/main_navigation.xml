@@ -276,9 +276,9 @@
             android:name="threadsUids"
             app:argType="string[]" />
         <argument
-            android:name="messageUid"
+            android:name="messagesUids"
             android:defaultValue="@null"
-            app:argType="string"
+            app:argType="string[]"
             app:nullable="true" />
         <argument
             android:name="action"
