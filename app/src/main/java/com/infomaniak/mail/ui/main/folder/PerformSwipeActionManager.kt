@@ -97,7 +97,11 @@ object PerformSwipeActionManager {
                     }
                 },
             ) {
-                mainViewModel.archiveThread(thread.uid)
+                actionsViewModel.archiveThreadsOrMessages(
+                    threads = listOf(thread),
+                    currentFolder = mainViewModel.currentFolder.value,
+                    mailbox = mainViewModel.currentMailbox.value!!
+                )
             }
         }
         SwipeAction.DELETE -> {
@@ -114,12 +118,19 @@ object PerformSwipeActionManager {
                 },
                 callback = {
                     if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
-                    mainViewModel.deleteThread(thread.uid)
+                    actionsViewModel.deleteThreadsOrMessages(
+                        threads = listOf(thread),
+                        currentFolder = mainViewModel.currentFolder.value,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 },
             )
         }
         SwipeAction.FAVORITE -> {
-            mainViewModel.toggleThreadFavoriteStatus(thread.uid)
+            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                threadsUids = listOf(thread.uid),
+                mailbox = mainViewModel.currentMailbox.value!!
+            )
             true
         }
         SwipeAction.MOVE -> {
@@ -145,14 +156,18 @@ object PerformSwipeActionManager {
             true
         }
         SwipeAction.READ_UNREAD -> {
-            mainViewModel.toggleThreadSeenStatus(thread.uid)
+            actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                threadsUids = listOf(thread.uid),
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mainViewModel.currentMailbox.value!!
+            )
             mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
         }
         SwipeAction.SPAM -> {
-            actionsViewModel.toggleMessagesSpamStatus(
-                thread.messages,
-                mainViewModel.currentFolderId,
-                mainViewModel.currentMailbox.value!!
+            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                threads = setOf(thread),
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mainViewModel.currentMailbox.value!!
             )
             false
         }

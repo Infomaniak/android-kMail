@@ -56,6 +56,7 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDi
 import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.infomaniak.core.common.R as RCore
@@ -77,6 +78,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     lateinit var descriptionDialog: DescriptionAlertDialog
 
     @Inject
+    lateinit var globalCoroutineScope: CoroutineScope
+
+    @Inject
     lateinit var folderRoleUtils: FolderRoleUtils
 
     @Inject
@@ -85,6 +89,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
+
         viewLifecycleOwner.lifecycleScope.launch {
             val message = mainViewModel.getMessage(messageUid)
             if (message == null) {
@@ -105,6 +110,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
+            observeSpamTrigger()
 
             if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {
@@ -120,7 +126,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun observeReportPhishingResult() {
-        mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
+        actionsViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
         }
@@ -129,6 +135,12 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
             setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+        }
+    }
+
+    private fun observeSpamTrigger() {
+        actionsViewModel.spamTrigger.observe(viewLifecycleOwner) {
+            findNavController().popBackStack()
         }
     }
 
@@ -174,7 +186,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onDelete() {
                 descriptionDialog.deleteWithConfirmationPopup(message.folder.role, count = 1) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
-                    mainViewModel.deleteMessage(threadUid, message)
+                    actionsViewModel.deleteThreadsOrMessages(
+                        messages = listOf(message),
+                        currentFolder = mainViewModel.currentFolder.value,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 }
             }
             //endregion
@@ -183,13 +199,21 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onArchive() {
                 descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
-                    mainViewModel.archiveMessage(threadUid, message)
+                    actionsViewModel.archiveThreadsOrMessages(
+                        messages = listOf(message),
+                        currentFolder = mainViewModel.currentFolder.value,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 }
             }
 
             override fun onReadUnread() {
                 trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen, message.isSeen)
-                mainViewModel.toggleMessageSeenStatus(threadUid, message)
+                actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                    messages = listOf(message),
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = mainViewModel.currentMailbox.value!!
+                )
                 twoPaneViewModel.closeThread()
             }
 
@@ -222,15 +246,18 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onFavorite() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Favorite, message.isFavorite)
-                mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
+                actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                    messages = listOf(message),
+                    mailbox = mainViewModel.currentMailbox.value!!
+                )
             }
 
             override fun onSpam() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = isFromSpam)
-                actionsViewModel.toggleMessagesSpamStatus(
-                    listOf(message),
-                    mainViewModel.currentFolderId,
-                    mainViewModel.currentMailbox.value!!
+                actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                    messages = listOf(message),
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
 
@@ -239,7 +266,13 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 descriptionDialog.show(
                     title = getString(R.string.reportPhishingTitle),
                     description = resources.getQuantityString(R.plurals.reportPhishingDescription, 1),
-                    onPositiveButtonClicked = { mainViewModel.reportPhishing(listOf(threadUid), listOf(message)) },
+                    onPositiveButtonClicked = {
+                        actionsViewModel.reportPhishing(
+                            messages = listOf(message),
+                            currentFolder = mainViewModel.currentFolder.value,
+                            mailbox = mainViewModel.currentMailbox.value!!
+                        )
+                    },
                 )
             }
 
