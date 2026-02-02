@@ -154,11 +154,11 @@ class FolderPickerFragment : Fragment() {
         when (action) {
             FolderPickerAction.MOVE -> folder?.id?.let {
                 actionsViewModel.moveThreadsOrMessagesTo(
-                    it,
-                    threadsUids?.let { threadsUids.toList() },
-                    messagesUids?.let { messagesUids.toList() },
-                    mainViewModel.currentFolderId,
-                    mainViewModel.currentMailbox.value!!
+                    destinationFolderId = it,
+                    threadsUids = threadsUids.let { threadsUids.toList() },
+                    messagesUid = messagesUids?.let { messagesUids.toList() },
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
             FolderPickerAction.SEARCH -> {

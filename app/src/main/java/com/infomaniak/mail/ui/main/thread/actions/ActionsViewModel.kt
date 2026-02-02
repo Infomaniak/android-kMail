@@ -512,10 +512,7 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun markAsUnseen(
-        messages: List<Message>,
-        mailbox: Mailbox
-    ) {
+    private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox) {
         val messagesUids = messages.map { it.uid }
 
         sharedUtils.updateSeenStatus(messagesUids, isSeen = false)
@@ -544,11 +541,9 @@ class ActionsViewModel @Inject constructor(
         messages != null -> messageController.getMessagesAndDuplicates(messages)
         else -> emptyList() //this should never happen, we should always send a list of messages or threads.
     }
-
     //endregion
 
     //region Favorite
-
     fun toggleThreadsOrMessagesFavoriteStatus(
         threadsUids: List<String>? = null,
         messages: List<Message>? = null,
@@ -572,30 +567,27 @@ class ActionsViewModel @Inject constructor(
         toggleMessagesFavoriteStatus(messages, isFavorite, mailbox)
     }
 
-    private fun toggleMessagesFavoriteStatus(
-        messages: List<Message>,
-        isFavorite: Boolean,
-        mailbox: Mailbox
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    private fun toggleMessagesFavoriteStatus(messages: List<Message>, isFavorite: Boolean, mailbox: Mailbox) {
+        viewModelScope.launch(ioCoroutineContext) {
+            val uids = messages.getUids()
 
-        val uids = messages.getUids()
+            updateFavoriteStatus(messagesUids = uids, isFavorite = !isFavorite)
 
-        updateFavoriteStatus(messagesUids = uids, isFavorite = !isFavorite)
+            val apiResponses = if (isFavorite) {
+                ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+            } else {
+                ApiRepository.addToFavorites(mailbox.uuid, uids)
+            }
 
-        val apiResponses = if (isFavorite) {
-            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
-        } else {
-            ApiRepository.addToFavorites(mailbox.uuid, uids)
-        }
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-            )
-        } else {
-            updateFavoriteStatus(messagesUids = uids, isFavorite = isFavorite)
+            if (apiResponses.atLeastOneSucceeded()) {
+                refreshFoldersAsync(
+                    mailbox = mailbox,
+                    messagesFoldersIds = messages.getFoldersIds(),
+                    callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
+                )
+            } else {
+                updateFavoriteStatus(messagesUids = uids, isFavorite = isFavorite)
+            }
         }
     }
 
@@ -618,7 +610,6 @@ class ActionsViewModel @Inject constructor(
             MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
         }
     }
-
     //endregion
 
     //region Phishing
