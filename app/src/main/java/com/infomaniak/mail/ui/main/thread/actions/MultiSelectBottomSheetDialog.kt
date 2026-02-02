@@ -47,6 +47,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
+import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getArchiveIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
@@ -74,8 +75,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
     override val mainViewModel: MainViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
-
-    private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -108,8 +107,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         junkMessagesViewModel.threadsUids = threadsUids
 
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
-
-        setStateDependentUi(shouldRead, shouldFavorite, threads)
+        val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
+        setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
         observeReportPhishingResult()
         observePotentialBlockedSenders()
 
@@ -256,9 +255,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean, threads: Set<Thread>) {
+    private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean, isFromArchive: Boolean, threads: Set<Thread>) {
         val (readIcon, readText) = getReadIconAndShortText(shouldRead)
         binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
+
+        val (archiveIcon, archiveText) = getArchiveIconAndShortText(isFromArchive)
+        binding.mainActions.setAction(R.id.actionArchive, archiveIcon, archiveText)
 
         val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
         val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
