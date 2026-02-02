@@ -208,6 +208,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     )
                 },
             )
+            
+            isMultiSelectOn = false
         }
 
         binding.blockSender.setClosingOnClickListener {
@@ -229,7 +231,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                 }
             }
-            mainViewModel.isMultiSelectOn = false
+            isMultiSelectOn = false
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
