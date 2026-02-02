@@ -237,5 +237,21 @@ class ThreadListMultiSelection {
                 R.drawable.ic_envelope to R.string.actionShortMarkAsUnread
             }
         }
+
+        fun getArchiveIconAndShortText(isFromArchive: Boolean): Pair<Int, Int> {
+            return if (isFromArchive) {
+                R.drawable.ic_drawer_inbox to R.string.inboxFolder
+            } else {
+                R.drawable.ic_archive_folder to R.string.actionArchive
+            }
+        }
+
+        fun getFavoriteIconAndShortText(shouldFavorite: Boolean): Pair<Int, Int> {
+            return if (shouldFavorite) {
+                R.drawable.ic_star to R.string.actionStar
+            } else {
+                R.drawable.ic_unstar to R.string.actionUnstar
+            }
+        }
     }
 }
