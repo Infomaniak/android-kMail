@@ -245,5 +245,13 @@ class ThreadListMultiSelection {
                 R.drawable.ic_archive_folder to R.string.actionArchive
             }
         }
+
+        fun getFavoriteIconAndShortText(shouldFavorite: Boolean): Pair<Int, Int> {
+            return if (shouldFavorite) {
+                R.drawable.ic_star to R.string.actionStar
+            } else {
+                R.drawable.ic_unstar to R.string.actionUnstar
+            }
+        }
     }
 }

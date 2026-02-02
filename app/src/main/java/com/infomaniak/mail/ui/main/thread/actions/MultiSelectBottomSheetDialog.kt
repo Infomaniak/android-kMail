@@ -48,6 +48,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getArchiveIconAndShortText
+import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getFavoriteIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
@@ -262,8 +263,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val (archiveIcon, archiveText) = getArchiveIconAndShortText(isFromArchive)
         binding.mainActions.setAction(R.id.actionArchive, archiveIcon, archiveText)
 
-        val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
-        val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
+        val (favoriteIcon, favoriteText) = getFavoriteIconAndShortText(shouldFavorite)
         binding.favorite.apply {
             setIconResource(favoriteIcon)
             setTitle(favoriteText)
