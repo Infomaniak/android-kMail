@@ -271,7 +271,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeActivityDialogLoaderReset() {
-        mainViewModel.activityDialogLoaderResetTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
+        actionsViewModel.activityDialogLoaderResetTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {
