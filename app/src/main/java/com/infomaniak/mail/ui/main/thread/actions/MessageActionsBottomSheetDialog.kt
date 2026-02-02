@@ -52,7 +52,6 @@ import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.infomaniak.core.common.R as RCore
@@ -72,9 +71,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
-
-    @Inject
-    lateinit var globalCoroutineScope: CoroutineScope
 
     @Inject
     lateinit var folderRoleUtils: FolderRoleUtils
