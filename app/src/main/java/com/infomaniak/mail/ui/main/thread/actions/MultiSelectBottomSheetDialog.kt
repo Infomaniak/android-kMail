@@ -229,8 +229,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         threadsCount: Int,
         threadsUids: List<String>
     ) {
-        // IMPORTANT: Need to get this navController outside of the popup callback, otherwise it crashes because it's not
-        // attached to a fragment
         descriptionDialog.moveWithConfirmationPopup(
             folderRole = folderRoleUtils.getActionFolderRole(threads),
             count = threadsCount,

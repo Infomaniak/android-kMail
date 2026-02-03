@@ -77,6 +77,10 @@ private fun DescriptionAlertDialog.showDeleteSnoozeDialog(
     onCancel = onCancel,
 )
 
+/**
+ * IMPORTANT: If there is a navigation in the [onPositiveButtonClicked] lambda, it NEEDS to use the provided navController,
+ * otherwise it crashes because it's not attached to a fragment
+ */
 fun DescriptionAlertDialog.moveWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
