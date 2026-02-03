@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils.extensions
 
+import androidx.navigation.NavController
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -76,19 +77,24 @@ private fun DescriptionAlertDialog.showDeleteSnoozeDialog(
     onCancel = onCancel,
 )
 
+/**
+ * IMPORTANT: If there is a navigation in the [onPositiveButtonClicked] lambda, it NEEDS to use the provided navController,
+ * otherwise it crashes because it's not attached to a fragment
+ */
 fun DescriptionAlertDialog.moveWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
-    onPositiveButtonClicked: () -> Unit,
+    navController: NavController,
+    onPositiveButtonClicked: (navController: NavController) -> Unit,
 ) = if (folderRole == FolderRole.SNOOZED) {
     show(
         title = binding.context.getString(R.string.actionMove),
         description = binding.context.resources.getQuantityString(R.plurals.snoozeMoveConfirmAlertDescription, count),
         displayLoader = false,
-        onPositiveButtonClicked = onPositiveButtonClicked,
+        onPositiveButtonClicked = { onPositiveButtonClicked(navController) },
     )
 } else {
-    onPositiveButtonClicked()
+    onPositiveButtonClicked(navController)
 }
 
 fun DescriptionAlertDialog.archiveWithConfirmationPopup(
