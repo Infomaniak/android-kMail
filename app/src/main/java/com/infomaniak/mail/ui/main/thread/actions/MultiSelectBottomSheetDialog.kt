@@ -231,11 +231,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     ) {
         // IMPORTANT: Need to get this navController outside of the popup callback, otherwise it crashes because it's not
         // attached to a fragment
-        val navController = findNavController()
         descriptionDialog.moveWithConfirmationPopup(
             folderRole = folderRoleUtils.getActionFolderRole(threads),
             count = threadsCount,
-        ) {
+            navController = findNavController(),
+        ) { navController ->
             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
             navController.animatedNavigation(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(

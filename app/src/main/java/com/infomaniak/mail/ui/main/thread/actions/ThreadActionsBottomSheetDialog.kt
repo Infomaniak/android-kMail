@@ -198,9 +198,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         override fun onMove() {
-            descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
+            descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1, findNavController()) { navController ->
                 trackBottomSheetThreadActionsEvent(MatomoName.Move)
-                animatedNavigation(
+                navController.animatedNavigation(
                     resId = R.id.folderPickerFragment,
                     args = FolderPickerFragmentArgs(
                         threadsUids = arrayOf(navigationArgs.threadUid),
