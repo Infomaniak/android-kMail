@@ -444,7 +444,7 @@ class MailActionsManager(
 
     private suspend fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
-        updateSignatures(mailbox, mailboxContentRealm)
+        updateSignatures(mailbox, RealmDatabase.mailboxInfo)
 
         val signature = mailbox.getDefaultSignatureWithFallback()
 
