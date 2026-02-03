@@ -171,7 +171,6 @@ class NewMessageViewModel @Inject constructor(
     val ccLiveData = MutableLiveData<UiRecipients>()
     val bccLiveData = MutableLiveData<UiRecipients>()
     val attachmentsLiveData = MutableLiveData<List<Attachment>>()
-    val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
     inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
@@ -348,7 +347,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getNewDraft(signatures: List<Signature>, intent: Intent, realm: Realm): Draft? = Draft().apply {
+    private suspend fun getNewDraft(signatures: List<Signature>, intent: Intent, realm: Realm): Draft = Draft().apply {
 
         var previousMessage: Message? = null
 
@@ -548,9 +547,19 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
+        val signatureHtml = draftSignature?.takeIf { !it.isDummy }?.content
+        val wrappedSignature = signatureHtml?.let { signatureUtils.encapsulateSignatureContentWithInfomaniakClass(it) }
+
+        initialBody = BodyContentPayload(
+            content = when {
+                initialBody.content.isNotEmpty() -> initialBody.content
+                wrappedSignature != null -> wrappedSignature
+                else -> ""
+            },
+            type = BodyContentType.HTML_UNSANITIZED
+        )
         editorBodyInitializer.postValue(initialBody)
 
-        uiSignatureLiveData.postValue(initialSignature)
         uiQuoteLiveData.postValue(initialQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
@@ -839,14 +848,6 @@ class NewMessageViewModel @Inject constructor(
         if (cc.isEmpty() && bcc.isEmpty()) otherRecipientsFieldsAreEmpty.value = true
     }
 
-    fun updateBodySignature(signature: Signature) {
-        uiSignatureLiveData.value = if (signature.isDummy) {
-            null
-        } else {
-            signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
-        }
-    }
-
     fun uploadAttachmentsToServer(uiAttachments: List<Attachment>) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
         val realm = mailboxContentRealm()
@@ -964,7 +965,7 @@ class NewMessageViewModel @Inject constructor(
 
         subject = subjectValue
 
-        body = uiBodyValue + (uiSignatureLiveData.value ?: "") + (uiQuoteLiveData.value ?: "")
+        body = uiBodyValue + (uiQuoteLiveData.value ?: "")
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
