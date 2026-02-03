@@ -49,7 +49,7 @@ class InvalidMailboxesAdapter(
     }
 
     private fun ItemInvalidMailboxBinding.displayInvalidMailbox(mailbox: Mailbox) = with(root) {
-        text = mailbox.email
+        text = mailbox.emailIdn
         itemStyle = SelectionStyle.OTHER
         hasNoValidMailboxes = true
         computeEndIconVisibility()

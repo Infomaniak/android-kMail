@@ -38,12 +38,12 @@ class InvalidMailboxViewHolder(
     ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Invalid Mailbox (${mailbox.email})")
 
-        text = mailbox.email
+        text = mailbox.emailIdn
         itemStyle = DecoratedItemView.SelectionStyle.MENU_DRAWER
         hasNoValidMailboxes = false
 
         computeEndIconVisibility()
 
-        initSetOnClickListener(onInvalidMailboxClicked = { onInvalidMailboxClicked(mailbox.email) })
+        initSetOnClickListener(onInvalidMailboxClicked = { onInvalidMailboxClicked(mailbox.emailIdn) })
     }
 }
