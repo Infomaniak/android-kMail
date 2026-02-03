@@ -95,6 +95,7 @@ import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
@@ -129,6 +130,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -156,7 +159,6 @@ class NewMessageFragment : Fragment() {
     private var addressListPopupWindow: ListPopupWindow? = null
 
     private var quoteWebView: WebView? = null
-    private var signatureWebView: WebView? = null
 
     private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
@@ -232,7 +234,7 @@ class NewMessageFragment : Fragment() {
         observeAttachments()
         observeImportAttachmentsResult()
         observeBodyLoader()
-        observeUiSignature()
+        observeEditorInitialization()
         observeUiQuote()
         observeShimmering()
 
@@ -363,13 +365,9 @@ class NewMessageFragment : Fragment() {
 
     private fun setWebViewReference() {
         quoteWebView = binding.quoteWebView
-        signatureWebView = binding.signatureWebView
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        newMessageViewModel.uiSignatureLiveData.value?.let { _ ->
-            binding.signatureWebView.reload()
-        }
         newMessageViewModel.uiQuoteLiveData.value?.let { _ ->
             binding.quoteWebView.reload()
         }
@@ -385,8 +383,6 @@ class NewMessageFragment : Fragment() {
         addressListPopupWindow = null
         quoteWebView?.destroyAndClearHistory()
         quoteWebView = null
-        signatureWebView?.destroyAndClearHistory()
-        signatureWebView = null
         TransitionManager.endTransitions(binding.root)
         super.onDestroyView()
         _binding = null
@@ -418,7 +414,6 @@ class NewMessageFragment : Fragment() {
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(appBarLayout, compositionNestedScrollView)
 
-        signatureWebView.enableAlgorithmicDarkening(true)
         quoteWebView.enableAlgorithmicDarkening(true)
 
         attachmentsRecyclerView.adapter = AttachmentAdapter(
@@ -528,21 +523,6 @@ class NewMessageFragment : Fragment() {
 
     private fun configureUiWithDraftData(draft: Draft) = with(binding) {
 
-        // Signature
-        signatureWebView.apply {
-            settings.setupNewMessageWebViewSettings()
-            initWebViewClientAndBridge(
-                attachments = emptyList(),
-                messageUid = "SIGNATURE-${draft.messageUid}",
-                shouldLoadDistantResources = true,
-                navigateToNewMessageActivity = null,
-            )
-        }
-        removeSignature.setOnClickListener {
-            trackNewMessageEvent(MatomoName.DeleteSignature)
-            newMessageViewModel.uiSignatureLiveData.value = null
-        }
-
         // Quote
         quoteWebView.apply {
             settings.setupNewMessageWebViewSettings()
@@ -579,11 +559,6 @@ class NewMessageFragment : Fragment() {
                 }
             )
         }
-    }
-
-    private fun WebView.loadSignatureContent(html: String, webViewGroup: Group) {
-        val processedHtml = webViewUtils.processSignatureHtmlForDisplay(html, context.isNightModeEnabled())
-        loadProcessedContent(processedHtml, webViewGroup)
     }
 
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
@@ -629,8 +604,38 @@ class NewMessageFragment : Fragment() {
 
     private fun onSignatureClicked(signature: Signature) {
         trackNewMessageEvent(MatomoName.SwitchIdentity)
-        newMessageViewModel.fromLiveData.value = UiFrom(signature)
-        addressListPopupWindow?.dismiss()
+
+        binding.editorWebView.exportHtml { html ->
+            val oldSignature = newMessageViewModel.fromLiveData.value?.signature?.content
+
+            val bodyHtml = if (!oldSignature.isNullOrEmpty()) {
+                removeSignature(html)
+            } else {
+                html
+            }
+
+            newMessageViewModel.fromLiveData.value = UiFrom(signature)
+            addressListPopupWindow?.dismiss()
+
+            // Get the New Signature HTML
+            val newSignatureHtml = signature.content
+            val wrappedNewSignature =
+                if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(newSignatureHtml)
+
+            // Combine: New Body + New Signature
+            val finalHtml = bodyHtml + wrappedNewSignature
+
+            // Update the Editor
+            newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(finalHtml, BodyContentType.HTML_SANITIZED))
+        }
+    }
+
+    private fun removeSignature(html: String): String {
+        val doc: Document = Jsoup.parseBodyFragment(html).apply {
+            getElementById(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID)?.remove()
+        }
+
+        return doc.html()
     }
 
     private fun updateSelectedSignatureInFromField(signature: Signature) {
@@ -660,9 +665,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeFromData() = with(newMessageViewModel) {
-        fromLiveData.observe(viewLifecycleOwner) { (signature, shouldUpdateBodySignature) ->
+        fromLiveData.observe(viewLifecycleOwner) { (signature) ->
             updateSelectedSignatureInFromField(signature)
-            if (shouldUpdateBodySignature) updateBodySignature(signature)
             signatureAdapter.updateSelectedSignature(signature.id)
         }
     }
@@ -762,13 +766,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeUiSignature() = with(binding) {
-        newMessageViewModel.uiSignatureLiveData.observe(viewLifecycleOwner) { signature ->
-            if (signature == null) {
-                signatureGroup.isGone = true
-            } else {
-                signatureWebView.loadSignatureContent(signature, signatureGroup)
-            }
+    private fun observeEditorInitialization() {
+        newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { bodyPayload ->
+            if (bodyPayload.content.isEmpty()) return@observe
+
+            // This sets the combined Body + Signature
+            editorContentManager.setContent(binding.editorWebView, bodyPayload)
         }
     }
 
