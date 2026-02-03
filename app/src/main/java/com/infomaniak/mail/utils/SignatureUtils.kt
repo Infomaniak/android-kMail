@@ -19,6 +19,8 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID
 import com.infomaniak.mail.utils.extensions.loadCss
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,7 +33,7 @@ class SignatureUtils @Inject constructor(appContext: Context) {
     fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
         val verticalMarginsCss = signatureMargins
         val verticalMarginAttributes = extractAttributesFromMarginCss(verticalMarginsCss)
-        return """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}" style="$verticalMarginAttributes">$signatureContent</div>"""
+        return """<div id="$INFOMANIAK_SIGNATURE_HTML_ID" class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME" style="$verticalMarginAttributes">$signatureContent</div>"""
     }
 
     private fun extractAttributesFromMarginCss(verticalMarginsCss: String): String {
