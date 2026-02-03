@@ -118,15 +118,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             // `setClosingOnClickListener`, so we avoid using its (view) lifecycleScope.
             globalCoroutineScope.launch(Dispatchers.Main.immediate, start = CoroutineStart.UNDISPATCHED) {
                 when (id) {
-                    R.id.actionMove -> {
-                        descriptionDialog.moveWithConfirmationPopup(
-                            folderRole = folderRoleUtils.getActionFolderRole(threads),
-                            count = threadsCount,
-                        ) {
-                            trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
-                            moveThreads(threadsUids)
-                        }
-                    }
+                    R.id.actionMove -> onMoveClicked(threads, threadsCount, threadsUids)
                     R.id.actionReadUnread -> {
                         trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
                         toggleThreadsSeenStatus(threadsUids, shouldRead)
@@ -232,14 +224,27 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun moveThreads(threadsUids: List<String>) {
-        animatedNavigation(
-            directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-                threadsUids = threadsUids.toTypedArray(),
-                action = FolderPickerAction.MOVE,
-                sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
-            ),
-        )
+    private suspend fun onMoveClicked(
+        threads: Set<Thread>,
+        threadsCount: Int,
+        threadsUids: List<String>
+    ) {
+        // IMPORTANT: Need to get this navController outside of the popup callback, otherwise it crashes because it's not
+        // attached to a fragment
+        val navController = findNavController()
+        descriptionDialog.moveWithConfirmationPopup(
+            folderRole = folderRoleUtils.getActionFolderRole(threads),
+            count = threadsCount,
+        ) {
+            trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
+            navController.animatedNavigation(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+                    threadsUids = threadsUids.toTypedArray(),
+                    action = FolderPickerAction.MOVE,
+                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                ),
+            )
+        }
     }
 
     private fun observeReportPhishingResult() {
