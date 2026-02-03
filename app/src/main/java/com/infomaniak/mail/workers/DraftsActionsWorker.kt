@@ -39,11 +39,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.WorkerUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -60,6 +62,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MailboxInfoRealm private val mailboxInfoRealm: Realm,
 ) : BaseCoroutineWorker(appContext, params) {
 
     private val mailboxContentRealm by lazy { RealmDatabase.newMailboxContentInstance }
@@ -102,6 +105,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             notificationUtils = notificationUtils,
             notificationManagerCompat = notificationManagerCompat,
             isAppInBackground = { mainApplication.isAppInBackground },
+            mailboxInfoRealm = mailboxInfoRealm,
         )
 
         return@withContext mailActionsManager!!.handleDraftsActions()
@@ -109,6 +113,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     override fun onFinish() {
         mailboxContentRealm.close()
+        mailboxInfoRealm.close()
         SentryLog.d(TAG, "Work finished")
     }
 

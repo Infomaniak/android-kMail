@@ -71,6 +71,7 @@ import java.util.UUID
 
 class MailActionsManager(
     private val mailboxContentRealm: Realm = RealmDatabase.newMailboxContentInstance,
+    private val mailboxInfoRealm: Realm,
     private val userId: Int,
     private val mailboxId: Int,
     private val mailbox: Mailbox,
@@ -444,7 +445,7 @@ class MailActionsManager(
 
     private suspend fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
-        updateSignatures(mailbox, RealmDatabase.mailboxInfo)
+        updateSignatures(mailbox, mailboxInfoRealm)
 
         val signature = mailbox.getDefaultSignatureWithFallback()
 
