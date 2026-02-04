@@ -93,6 +93,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
@@ -196,6 +197,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -257,7 +259,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         junkMessagesViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) { messageOfUserToBlock ->
             setPositiveButtonCallback { message ->
                 trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                mainViewModel.blockUser(message.folderId, message.shortUid)
+                actionsViewModel.blockUser(message.folderId, message.shortUid, mainViewModel.currentMailbox.value!!)
             }
             show(messageOfUserToBlock)
         }
@@ -369,10 +371,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 },
                 onUnsubscribeClicked = threadViewModel::unsubscribeMessage,
                 moveMessageToSpam = { messageUid ->
-                    twoPaneViewModel.currentThreadUid.value?.let { mainViewModel.moveToSpamFolder(it, messageUid) }
+                    actionsViewModel.moveToSpamFolder(
+                        messagesUid = listOf(messageUid),
+                        currentFolderId = mainViewModel.currentFolderId,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 },
-                activateSpamFilter = mainViewModel::activateSpamFilter,
-                unblockMail = mainViewModel::unblockMail,
+                activateSpamFilter = { actionsViewModel.activateSpamFilter(mainViewModel.currentMailbox.value!!) },
+                unblockMail = { actionsViewModel.unblockMail(it, mainViewModel.currentMailbox.value!!) },
                 replyToCalendarEvent = { attendanceState, message ->
                     replyToCalendarEvent(
                         attendanceState,
@@ -420,9 +426,15 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         trackEmojiReactionsEvent(MatomoName.AddReactionFromChip)
                     }
 
-                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
-                        threadViewModel.fakeEmojiReply(emoji, messageUid)
-                    })
+                    actionsViewModel.trySendEmojiReply(
+                        emoji = emoji,
+                        messageUid = messageUid,
+                        reactions = reactions,
+                        hasNetwork = mainViewModel.hasNetwork,
+                        mailbox = mainViewModel.currentMailbox.value!!,
+                        onAllowed = {
+                            threadViewModel.fakeEmojiReply(emoji, messageUid)
+                        })
                 },
                 showEmojiDetails = { messageUid, emoji ->
                     trackEmojiReactionsEvent(MatomoName.ShowReactionsBottomSheet)
@@ -665,9 +677,15 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.Thread.name) { (emoji, messageUid) ->
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult
-            mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
-                threadViewModel.fakeEmojiReply(emoji, messageUid)
-            })
+            actionsViewModel.trySendEmojiReply(
+                emoji = emoji,
+                messageUid = messageUid,
+                reactions = reactions,
+                hasNetwork = mainViewModel.hasNetwork,
+                mailbox = mainViewModel.currentMailbox.value!!,
+                onAllowed = {
+                    threadViewModel.fakeEmojiReply(emoji, messageUid)
+                })
         }
     }
 
@@ -774,7 +792,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun snoozeThreads(timestamp: Long, threadUids: List<String>) {
         lifecycleScope.launch {
-            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), threadUids)
+            val isSuccess = actionsViewModel.snoozeThreads(
+                date = Date(timestamp),
+                threadUids = threadUids,
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mainViewModel.currentMailbox.value!!
+            )
             if (isSuccess) twoPaneViewModel.closeThread()
         }
     }
@@ -783,7 +806,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         lifecycleScope.launch {
             binding.snoozeAlert.showAction1Progress()
 
-            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), threadUids)
+            val result = actionsViewModel.rescheduleSnoozedThreads(
+                date = Date(timestamp),
+                threadUids = threadUids,
+                mailbox = mainViewModel.currentMailbox.value!!
+            )
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
             if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
@@ -798,7 +825,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
-            mainViewModel.toggleThreadFavoriteStatus(threadUid)
+            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                threadsUids = listOf(threadUid),
+                mailbox = mainViewModel.currentMailbox.value!!
+            )
         }
 
         val isFromArchive = folderRole == FolderRole.ARCHIVE
@@ -822,13 +852,24 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 R.id.quickActionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Archive, isFromArchive)
-                        mainViewModel.archiveThread(threadUid)
+                        val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
+                        actionsViewModel.archiveThreadsOrMessages(
+                            threads = listOf(thread),
+                            currentFolder = mainViewModel.currentFolder.value,
+                            mailbox = mainViewModel.currentMailbox.value!!
+                        )
                     }
                 }
                 R.id.quickActionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Delete)
-                        mainViewModel.deleteThread(threadUid)
+                        val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
+                        actionsViewModel.deleteThreadsOrMessages(
+                            threads = listOf(thread),
+                            currentFolder = mainViewModel.currentFolder.value,
+                            mailbox = mainViewModel.currentMailbox.value!!
+                        )
+
                     }
                 }
                 R.id.quickActionMenu -> {
@@ -996,7 +1037,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         lifecycleScope.launch {
             snoozeAlert.showAction2Progress()
 
-            val result = mainViewModel.unsnoozeThreads(listOf(thread))
+            val result = actionsViewModel.unsnoozeThreads(listOf(thread), mainViewModel.currentMailbox.value)
             snoozeAlert.hideAction2Progress(R.string.buttonCancelReminder)
 
             if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
