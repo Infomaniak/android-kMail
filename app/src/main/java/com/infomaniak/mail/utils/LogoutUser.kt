@@ -26,6 +26,7 @@ import com.infomaniak.core.inappreview.AppReviewSettingsRepository
 import com.infomaniak.core.inappupdate.AppUpdateSettingsRepository
 import com.infomaniak.core.network.networking.HttpClient
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -62,11 +63,20 @@ class LogoutUser @Inject constructor(
         if (user.id == AccountUtils.currentUserId) {
             AccountUtils.currentUser = null // Inform that there is no more current user
 
-            if (AccountUtils.getAllUsersCount() == 0) {
+            val allUsersCount = AccountUtils.getAllUsersCount()
+            if (allUsersCount == 0) {
                 resetSettings()
                 playServicesUtils.deleteFirebaseToken()
             } else {
-                updateCurrentMailboxId()
+                runCatching {
+                    updateCurrentMailboxId()
+                }.cancellable().onFailure { exception ->
+                    SentryLog.e(TAG, appContext.getString(R.string.sentryErrorLogoutNpe), exception) { scope ->
+                        scope.setExtra("Number of account in User DB", allUsersCount.toString())
+                        scope.setExtra("CurrentUserId", AccountUtils.currentUserId.toString())
+                        scope.setExtra("User", "id: ${user.id} name: ${user.displayName} email: ${user.email}")
+                    }
+                }
             }
             if (shouldReload) AccountUtils.reloadApp?.invoke()
         }
