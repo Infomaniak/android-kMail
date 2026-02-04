@@ -71,14 +71,18 @@ class LogoutUser @Inject constructor(
                 runCatching {
                     updateCurrentMailboxId()
                 }.cancellable().onFailure { exception ->
-                    SentryLog.e(TAG, appContext.getString(R.string.sentryErrorLogoutNpe), exception) { scope ->
-                        scope.setExtra("Number of account in User DB", allUsersCount.toString())
-                        scope.setExtra("CurrentUserId", AccountUtils.currentUserId.toString())
-                        scope.setExtra("User", "id: ${user.id} name: ${user.displayName} email: ${user.email}")
-                    }
+                    addSentryLogOnMailboxUpdateFailure(exception, allUsersCount, user)
                 }
             }
             if (shouldReload) AccountUtils.reloadApp?.invoke()
+        }
+    }
+
+    private fun addSentryLogOnMailboxUpdateFailure(exception: Throwable, allUsersCount: Int, user: User) {
+        SentryLog.e(TAG, appContext.getString(R.string.sentryErrorLogoutNpe), exception) { scope ->
+            scope.setExtra("Number of account in User DB", allUsersCount.toString())
+            scope.setExtra("CurrentUserId", AccountUtils.currentUserId.toString())
+            scope.setExtra("User", "id: ${user.id} name: ${user.displayName} email: ${user.email}")
         }
     }
 
