@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -501,7 +501,7 @@ class ThreadViewModel @Inject constructor(
 
     fun fetchCalendarEvents(items: List<Any>, forceFetch: Boolean = false) {
         fetchCalendarEventJob?.cancel()
-        fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
+        fetchCalendarEventJob = viewModelScope.launch(ioDispatcher) {
 
             val results = items.mapNotNull { item ->
                 fetchCalendarEvent(item, forceFetch)

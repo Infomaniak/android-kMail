@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
 import com.infomaniak.mail.utils.ErrorCode.TOO_MANY_REQUESTS
 import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
@@ -62,8 +61,6 @@ class AiViewModel @Inject constructor(
     @Inject
     lateinit var localSettings: LocalSettings
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
     var aiPrompt = ""
     private val history = mutableListOf<AiMessage>()
     private var conversationContextId: String? = null
@@ -76,7 +73,7 @@ class AiViewModel @Inject constructor(
     fun generateNewAiProposition(
         currentMailboxUuid: String,
         formattedRecipientsString: String?,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    ) = viewModelScope.launch(ioDispatcher) {
 
         fun addVars(message: AiMessage) {
             formattedRecipientsString?.let { message.vars["recipient"] = it }
@@ -145,7 +142,7 @@ class AiViewModel @Inject constructor(
         PROMPT_TOO_LONG
     }
 
-    fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioDispatcher) {
         var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxUuid)
         ensureActive()
 
@@ -158,7 +155,7 @@ class AiViewModel @Inject constructor(
         handleAiResult(apiResponse, apiResponse.data?.promptMessage, isUsingPreviousMessageAsContext = false)
     }
 
-    fun updateFeatureFlag(mailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun updateFeatureFlag(mailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioDispatcher) {
         sharedUtils.updateFeatureFlags(mailboxObjectId, mailboxUuid)
     }
 
