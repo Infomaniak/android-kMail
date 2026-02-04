@@ -1,0 +1,3 @@
+- Fix some crashes
+- Fix trying to resend the draft after an error
+- Archive button now display "Move to inbox" when multiselecting in archive folder

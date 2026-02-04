@@ -1,0 +1,3 @@
+- Correction de plantages
+- Correction de la tentative de renvoi du brouillon après une erreur
+- Le bouton Archiver affiche désormais « Déplacer vers la boîte de réception » lors d'une sélection multiple dans le dossier d'archivage
