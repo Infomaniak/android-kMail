@@ -113,7 +113,6 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     override fun onFinish() {
         mailboxContentRealm.close()
-        mailboxInfoRealm.close()
         SentryLog.d(TAG, "Work finished")
     }
 
