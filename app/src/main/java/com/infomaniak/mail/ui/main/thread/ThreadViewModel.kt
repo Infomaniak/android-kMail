@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -414,7 +414,7 @@ class ThreadViewModel @Inject constructor(
         return@withContext message
     }
 
-    private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
+    private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioDispatcher) {
         sharedUtils.markAsSeen(mailbox(), listOf(thread))
     }
 
@@ -450,7 +450,7 @@ class ThreadViewModel @Inject constructor(
 
     fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
-        fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
+        fetchMessagesJob = viewModelScope.launch(ioDispatcher) {
             val (deleted, failed) = ThreadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
             if (deleted.isNotEmpty() || failed.isNotEmpty()) {
 
@@ -472,7 +472,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioDispatcher) {
         val realm = mailboxContentRealm()
         val thread = threadLive.value ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
@@ -493,7 +493,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
+    fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioDispatcher) {
         val thread = threadLive.value ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread, featureFlagsFlow.first())
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
@@ -501,7 +501,7 @@ class ThreadViewModel @Inject constructor(
 
     fun fetchCalendarEvents(items: List<Any>, forceFetch: Boolean = false) {
         fetchCalendarEventJob?.cancel()
-        fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
+        fetchCalendarEventJob = viewModelScope.launch(ioDispatcher) {
 
             val results = items.mapNotNull { item ->
                 fetchCalendarEvent(item, forceFetch)
