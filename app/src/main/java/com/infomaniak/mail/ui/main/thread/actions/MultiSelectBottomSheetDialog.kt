@@ -204,8 +204,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         folderRole: FolderRole?
     ) {
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
-            mainViewModel.isMultiSelectOn = false
-
             when (id) {
                 R.id.actionMove -> onMoveClicked(threadsCount, threadsUids, folderRole)
                 R.id.actionReadUnread -> {
