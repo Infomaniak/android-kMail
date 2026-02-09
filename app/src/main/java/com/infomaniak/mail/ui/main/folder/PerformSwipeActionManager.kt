@@ -123,7 +123,8 @@ object PerformSwipeActionManager {
             true
         }
         SwipeAction.MOVE -> {
-            descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1, findNavController()) { navController ->
+            val navController = findNavController()
+            descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 navController.animatedNavigation(
                     directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                         threadsUids = arrayOf(thread.uid),

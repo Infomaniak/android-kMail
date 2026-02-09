@@ -63,8 +63,6 @@ import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
@@ -109,41 +107,16 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
         val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
+
+        lifecycleScope.launch {
+            val folderRole = folderRoleUtils.getActionFolderRole(threads)
+            setupMainActions(threadsCount, threadsUids, shouldRead, folderRole)
+        }
+
         setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
+
         observeReportPhishingResult()
         observePotentialBlockedSenders()
-
-        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
-            // This DialogFragment is already be dismissing since popBackStack was called by
-            // `setClosingOnClickListener`, so we avoid using its (view) lifecycleScope.
-            globalCoroutineScope.launch(Dispatchers.Main.immediate, start = CoroutineStart.UNDISPATCHED) {
-                when (id) {
-                    R.id.actionMove -> onMoveClicked(threads, threadsCount, threadsUids)
-                    R.id.actionReadUnread -> {
-                        trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
-                        toggleThreadsSeenStatus(threadsUids, shouldRead)
-                    }
-                    R.id.actionArchive -> {
-                        descriptionDialog.archiveWithConfirmationPopup(
-                            folderRole = folderRoleUtils.getActionFolderRole(threads),
-                            count = threadsCount,
-                        ) {
-                            trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
-                            archiveThreads(threadsUids)
-                        }
-                    }
-                    R.id.actionDelete -> {
-                        descriptionDialog.deleteWithConfirmationPopup(
-                            folderRole = folderRoleUtils.getActionFolderRole(threads),
-                            count = threadsCount,
-                        ) {
-                            trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
-                            deleteThreads(threadsUids)
-                        }
-                    }
-                }
-            }
-        }
 
         binding.snooze.setOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Snooze, threadsCount, isFromBottomSheet = true)
@@ -224,22 +197,57 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private suspend fun onMoveClicked(
-        threads: Set<Thread>,
+    private fun setupMainActions(
         threadsCount: Int,
-        threadsUids: List<String>
+        threadsUids: List<String>,
+        shouldRead: Boolean,
+        folderRole: FolderRole?
     ) {
+        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
+            when (id) {
+                R.id.actionMove -> onMoveClicked(threadsCount, threadsUids, folderRole)
+                R.id.actionReadUnread -> {
+                    trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
+                    mainViewModel.toggleThreadsSeenStatus(threadsUids, shouldRead)
+                }
+                R.id.actionArchive -> {
+                    descriptionDialog.archiveWithConfirmationPopup(
+                        folderRole = folderRole,
+                        count = threadsCount,
+                    ) {
+                        trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
+                        mainViewModel.archiveThreads(threadsUids)
+                    }
+                }
+                R.id.actionDelete -> {
+                    descriptionDialog.deleteWithConfirmationPopup(
+                        folderRole = folderRole,
+                        count = threadsCount,
+                    ) {
+                        trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
+                        mainViewModel.deleteThreads(threadsUids)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun onMoveClicked(
+        threadsCount: Int,
+        threadsUids: List<String>,
+        folderRole: FolderRole?
+    ) {
+        val navController = findNavController()
         descriptionDialog.moveWithConfirmationPopup(
-            folderRole = folderRoleUtils.getActionFolderRole(threads),
+            folderRole = folderRole,
             count = threadsCount,
-            navController = findNavController(),
-        ) { navController ->
+        ) {
             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
             navController.animatedNavigation(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                     threadsUids = threadsUids.toTypedArray(),
                     action = FolderPickerAction.MOVE,
-                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
                 ),
             )
         }

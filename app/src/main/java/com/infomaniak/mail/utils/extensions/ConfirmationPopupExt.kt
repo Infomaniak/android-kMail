@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils.extensions
 
-import androidx.navigation.NavController
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -60,7 +59,10 @@ private fun DescriptionAlertDialog.showDeletePermanentlyDialog(
         deletedCount,
     ),
     displayLoader = displayLoader,
-    onPositiveButtonClicked = onPositiveButtonClicked,
+    onPositiveButtonClicked = {
+        onPositiveButtonClicked()
+        resetLoadingAndDismiss()
+    },
     onCancel = onCancel,
 )
 
@@ -73,7 +75,10 @@ private fun DescriptionAlertDialog.showDeleteSnoozeDialog(
     title = binding.context.getString(R.string.actionDelete),
     description = binding.context.resources.getQuantityString(R.plurals.snoozeDeleteConfirmAlertDescription, deletedCount),
     displayLoader = displayLoader,
-    onPositiveButtonClicked = onPositiveButtonClicked,
+    onPositiveButtonClicked = {
+        onPositiveButtonClicked()
+        resetLoadingAndDismiss()
+    },
     onCancel = onCancel,
 )
 
@@ -84,17 +89,19 @@ private fun DescriptionAlertDialog.showDeleteSnoozeDialog(
 fun DescriptionAlertDialog.moveWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
-    navController: NavController,
-    onPositiveButtonClicked: (navController: NavController) -> Unit,
+    onPositiveButtonClicked: () -> Unit,
 ) = if (folderRole == FolderRole.SNOOZED) {
     show(
         title = binding.context.getString(R.string.actionMove),
         description = binding.context.resources.getQuantityString(R.plurals.snoozeMoveConfirmAlertDescription, count),
         displayLoader = false,
-        onPositiveButtonClicked = { onPositiveButtonClicked(navController) },
+        onPositiveButtonClicked = {
+            onPositiveButtonClicked()
+            resetLoadingAndDismiss()
+        },
     )
 } else {
-    onPositiveButtonClicked(navController)
+    onPositiveButtonClicked()
 }
 
 fun DescriptionAlertDialog.archiveWithConfirmationPopup(
@@ -110,7 +117,10 @@ fun DescriptionAlertDialog.archiveWithConfirmationPopup(
             title = binding.context.getString(R.string.actionArchive),
             description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
             displayLoader = displayLoader,
-            onPositiveButtonClicked = onPositiveButtonClicked,
+            onPositiveButtonClicked = {
+                onPositiveButtonClicked()
+                resetLoadingAndDismiss()
+            },
             onCancel = onCancel,
         )
     } else {

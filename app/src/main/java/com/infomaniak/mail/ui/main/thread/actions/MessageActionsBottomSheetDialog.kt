@@ -180,11 +180,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onMove() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Move)
-                descriptionDialog.moveWithConfirmationPopup(
-                    folderRole = message.folder.role,
-                    count = 1,
-                    navController = findNavController(),
-                ) { navController ->
+                val navController = findNavController()
+                descriptionDialog.moveWithConfirmationPopup(folderRole = message.folder.role, count = 1) {
                     navController.animatedNavigation(
                         resId = R.id.folderPickerFragment,
                         args = FolderPickerFragmentArgs(
