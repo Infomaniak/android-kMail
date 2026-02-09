@@ -113,30 +113,36 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         observeReportPhishingResult()
         observePotentialBlockedSenders()
 
-        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
+        binding.mainActions.setOnItemClickListener { id: Int ->
+            mainViewModel.isMultiSelectOn = false
             // This DialogFragment is already be dismissing since popBackStack was called by
             // `setClosingOnClickListener`, so we avoid using its (view) lifecycleScope.
             globalCoroutineScope.launch(Dispatchers.Main.immediate, start = CoroutineStart.UNDISPATCHED) {
                 when (id) {
                     R.id.actionMove -> onMoveClicked(threads, threadsCount, threadsUids)
                     R.id.actionReadUnread -> {
+                        findNavController().popBackStack()
                         trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
                         toggleThreadsSeenStatus(threadsUids, shouldRead)
                     }
                     R.id.actionArchive -> {
+                        val navController = findNavController()
                         descriptionDialog.archiveWithConfirmationPopup(
                             folderRole = folderRoleUtils.getActionFolderRole(threads),
                             count = threadsCount,
                         ) {
+                            navController.popBackStack()
                             trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
                             archiveThreads(threadsUids)
                         }
                     }
                     R.id.actionDelete -> {
+                        val navController = findNavController()
                         descriptionDialog.deleteWithConfirmationPopup(
                             folderRole = folderRoleUtils.getActionFolderRole(threads),
                             count = threadsCount,
                         ) {
+                            navController.popBackStack()
                             trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
                             deleteThreads(threadsUids)
                         }
@@ -229,17 +235,18 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         threadsCount: Int,
         threadsUids: List<String>
     ) {
+        val navController = findNavController()
         descriptionDialog.moveWithConfirmationPopup(
             folderRole = folderRoleUtils.getActionFolderRole(threads),
             count = threadsCount,
-            navController = findNavController(),
-        ) { navController ->
+        ) {
             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
+            navController.popBackStack()
             navController.animatedNavigation(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                     threadsUids = threadsUids.toTypedArray(),
                     action = FolderPickerAction.MOVE,
-                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
                 ),
             )
         }
