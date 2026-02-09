@@ -98,6 +98,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(mainViewModel) {
         super.onViewCreated(view, savedInstanceState)
+
         // This `.toSet()` is used to make an immutable local copy of `selectedThreads`.
         val threads = selectedThreads.toSet()
         val threadsUids = threads.map { it.uid }
@@ -105,6 +106,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
         junkMessagesViewModel.threadsUids = threadsUids
+        
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
         val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
 
