@@ -5,4 +5,15 @@ html {
 body {
     margin-top: 0px;
     margin-bottom: 1rem;
+    font-family: 'Helvetica';
+}
+
+p {
+    min-height: 2em;
+    margin: 0;
+}
+
+.placeholder{
+  color: #b3b3b3;
+
 }
