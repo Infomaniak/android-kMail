@@ -302,23 +302,6 @@
                         app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
                         tools:layout_height="100dp" />
 
-                    <TextView
-                        android:id="@+id/newMessagePlaceholder"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/marginStandardMedium"
-                        android:paddingBottom="@dimen/marginStandardMedium"
-                        android:text="@string/newMessagePlaceholderTitle"
-                        android:textColor="@color/tertiaryTextColor"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/editorWebView"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/editorWebView"
-                        tools:visibility="visible" />
-
                     <LinearLayout
                         android:id="@+id/bodyLoader"
                         android:layout_width="match_parent"
@@ -371,16 +354,16 @@
                         style="@style/IconButtonSmall"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/marginStandardSmall"
+                        android:layout_marginStart="@dimen/marginStandardSmall"
                         android:contentDescription="@string/contentDescriptionButtonDeleteQuote"
                         android:minWidth="0dp"
                         android:minHeight="0dp"
-                        app:icon="@drawable/ic_close_small"
+                        app:icon="@drawable/ic_more_horiz"
                         app:layout_constraintDimensionRatio="1"
-                        app:layout_constraintEnd_toEndOf="@id/quoteWebView"
+                        app:layout_constraintStart_toStartOf="@id/editorWebView"
                         app:layout_constraintTop_toBottomOf="@id/editorWebView" />
 
-                    <WebView
+                    <com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
                         android:id="@+id/quoteWebView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -389,14 +372,6 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/removeQuote"
-                        tools:visibility="visible" />
-
-                    <androidx.constraintlayout.widget.Group
-                        android:id="@+id/signatureGroup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:constraint_referenced_ids="signatureWebView,removeSignature"
                         tools:visibility="visible" />
 
                     <androidx.constraintlayout.widget.Group

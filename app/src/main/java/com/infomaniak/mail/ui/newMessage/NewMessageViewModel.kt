@@ -24,6 +24,7 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -130,6 +131,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
@@ -160,7 +162,8 @@ class NewMessageViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     //region Initial data
-    private var initialBody: BodyContentPayload = BodyContentPayload.emptyBody()
+    private var initialBody: BodyContentPayload =
+        BodyContentPayload.emptyBody(appContext.getString(R.string.newMessagePlaceholderTitle))
     private var initialSignature: String? = null
     private var initialQuote: String? = null
     //endregion
@@ -549,15 +552,13 @@ class NewMessageViewModel @Inject constructor(
 
         val signatureHtml = draftSignature?.takeIf { !it.isDummy }?.content
         val wrappedSignature = signatureHtml?.let { signatureUtils.encapsulateSignatureContentWithInfomaniakClass(it) }
-
+        val bodyHasSignature = bodyHasSignature(initialBody.content)
         initialBody = BodyContentPayload(
-            content = when {
-                initialBody.content.isNotEmpty() -> initialBody.content
-                wrappedSignature != null -> wrappedSignature
-                else -> ""
-            },
-            type = BodyContentType.HTML_UNSANITIZED
+            content = if (bodyHasSignature || wrappedSignature == null) initialBody.content else initialBody.content + wrappedSignature,
+            type = BodyContentType.HTML_SANITIZED
         )
+
+        Log.d("HTLM initial body", initialBody.content)
         editorBodyInitializer.postValue(initialBody)
 
         uiQuoteLiveData.postValue(initialQuote)
@@ -568,6 +569,10 @@ class NewMessageViewModel @Inject constructor(
         }
 
         isEncryptionActivated.postValue(isEncrypted)
+    }
+
+    fun bodyHasSignature(bodyHtml: String): Boolean {
+        return Jsoup.parseBodyFragment(bodyHtml).getElementById(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID) != null
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
@@ -705,7 +710,7 @@ class NewMessageViewModel @Inject constructor(
 
             val bodyContent = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT)
             val mailToPayload = bodyContent?.let { BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
-            initialBody = mailToPayload ?: BodyContentPayload.emptyBody()
+            initialBody = mailToPayload ?: BodyContentPayload.emptyBody(appContext.getString(R.string.newMessagePlaceholderTitle))
         }
     }
 

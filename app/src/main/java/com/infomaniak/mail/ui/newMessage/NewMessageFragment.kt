@@ -21,7 +21,6 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ClipDescription
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -31,13 +30,11 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.Group
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -56,6 +53,7 @@ import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
 import com.infomaniak.lib.richhtmleditor.StatusCommand.CREATE_LINK
 import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
@@ -93,13 +91,10 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.HtmlUtils.processCids
-import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -125,10 +120,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -151,6 +142,7 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
+    private var hasPlaceholder = true
 
     private val filePicker = FilePicker(fragment = this).apply {
         initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
@@ -158,7 +150,7 @@ class NewMessageFragment : Fragment() {
 
     private var addressListPopupWindow: ListPopupWindow? = null
 
-    private var quoteWebView: WebView? = null
+    private var quoteWebView: RichHtmlEditorWebView? = null
 
     private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
@@ -234,7 +226,6 @@ class NewMessageFragment : Fragment() {
         observeAttachments()
         observeImportAttachmentsResult()
         observeBodyLoader()
-        observeEditorInitialization()
         observeUiQuote()
         observeShimmering()
 
@@ -460,12 +451,16 @@ class NewMessageFragment : Fragment() {
     private fun initEditorUi() = with(binding) {
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
-        handleEditorPlaceholderVisibility()
 
         editorAiAnimation.setAnimation(R.raw.euria)
-
         setToolbarEnabledStatus(false)
-        disableButtonsWhenFocusIsLost()
+        handleFocusChanges()
+    }
+
+    fun editorHasPlaceholder() = with(binding.editorWebView) {
+        exportHtml { html ->
+            hasPlaceholder = Jsoup.parseBodyFragment(html).getElementsByClass("placeholder").first() != null
+        }
     }
 
     private fun setEditorStyle() = with(binding.editorWebView) {
@@ -477,19 +472,28 @@ class NewMessageFragment : Fragment() {
         addCss(context.loadCss(R.raw.editor_style, customColors))
     }
 
-    private fun handleEditorPlaceholderVisibility() {
-        val isPlaceholderVisible = combine(
-            binding.editorWebView.isEmptyFlow.filterNotNull(),
-            newMessageViewModel.isShimmering,
-        ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
+    private fun removePlaceholder() = with(binding.editorWebView) {
+        exportHtml { html ->
+            val doc: Document = Jsoup.parseBodyFragment(html).apply {
+                getElementsByClass("placeholder").first()?.text("")?.removeClass("placeholder")
+            }
 
-        isPlaceholderVisible
-            .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
-            .launchIn(lifecycleScope)
+            newMessageViewModel.editorBodyInitializer.postValue(
+                BodyContentPayload(
+                    doc.html(),
+                    BodyContentType.HTML_SANITIZED
+                )
+            )
+        }
     }
 
-    private fun disableButtonsWhenFocusIsLost() {
-        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner, ::setToolbarEnabledStatus)
+    private fun handleFocusChanges() {
+        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { isFocused ->
+            setToolbarEnabledStatus(isFocused)
+            if (isFocused && hasPlaceholder) {
+                removePlaceholder()
+            }
+        }
     }
 
     private fun setToolbarEnabledStatus(isEnabled: Boolean) {
@@ -534,41 +538,18 @@ class NewMessageFragment : Fragment() {
                 navigateToNewMessageActivity = null,
             )
         }
+
         removeQuote.setOnClickListener {
             trackNewMessageEvent(MatomoName.DeleteQuote)
-            removeInlineAttachmentsUsedInQuote()
-            newMessageViewModel.uiQuoteLiveData.value = null
+            quoteWebView.isVisible = !quoteWebView.isVisible
         }
     }
 
-    private fun removeInlineAttachmentsUsedInQuote() = with(newMessageViewModel) {
-        uiQuoteLiveData.value?.let { html ->
-            attachmentsLiveData.value?.filterOutHtmlCids(html)?.let { attachmentsLiveData.value = it }
-        }
-    }
-
-    private fun List<Attachment>.filterOutHtmlCids(html: String): List<Attachment> {
-        return buildList {
-            addAll(this@filterOutHtmlCids)
-
-            jsoupParseWithLog(html).processCids(
-                attachments = this@filterOutHtmlCids,
-                associateDataToCid = { it },
-                onCidImageFound = { attachment, _ ->
-                    remove(attachment)
-                }
-            )
-        }
-    }
-
-    private fun WebView.loadContent(html: String, webViewGroup: Group) {
+    private fun RichHtmlEditorWebView.loadContent(html: String) {
         val processedHtml = webViewUtils.processHtmlForDisplay(html = html, isDisplayedInDarkMode = context.isNightModeEnabled())
-        loadProcessedContent(processedHtml, webViewGroup)
-    }
-
-    private fun WebView.loadProcessedContent(processedHtml: String, webViewGroup: Group) {
-        webViewGroup.isVisible = processedHtml.isNotBlank()
-        loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+        quoteWebView?.isVisible = false
+        binding.removeQuote.isVisible = processedHtml.isNotBlank()
+        setHtml(processedHtml)
     }
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
@@ -606,12 +587,13 @@ class NewMessageFragment : Fragment() {
         trackNewMessageEvent(MatomoName.SwitchIdentity)
 
         binding.editorWebView.exportHtml { html ->
+            val body = Jsoup.parse(html).body()
             val oldSignature = newMessageViewModel.fromLiveData.value?.signature?.content
 
             val bodyHtml = if (!oldSignature.isNullOrEmpty()) {
-                removeSignature(html)
+                removeSignature(body.html())
             } else {
-                html
+                body.html()
             }
 
             newMessageViewModel.fromLiveData.value = UiFrom(signature)
@@ -623,11 +605,19 @@ class NewMessageFragment : Fragment() {
                 if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(newSignatureHtml)
 
             // Combine: New Body + New Signature
-            val finalHtml = bodyHtml + wrappedNewSignature
+            val finalHtml = addSignatureInsideBody(bodyHtml, wrappedNewSignature)
 
             // Update the Editor
             newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(finalHtml, BodyContentType.HTML_SANITIZED))
         }
+    }
+
+    private fun addSignatureInsideBody(bodyHtml: String, wrappedSignature: String): String {
+        if (wrappedSignature.isEmpty()) return bodyHtml
+
+        val doc = Jsoup.parseBodyFragment(bodyHtml)
+        doc.body().append(wrappedSignature)
+        return doc.body().html()
     }
 
     private fun removeSignature(html: String): String {
@@ -763,15 +753,7 @@ class NewMessageFragment : Fragment() {
     private fun observeBodyLoader() {
         newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
             editorContentManager.setContent(binding.editorWebView, body)
-        }
-    }
-
-    private fun observeEditorInitialization() {
-        newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { bodyPayload ->
-            if (bodyPayload.content.isEmpty()) return@observe
-
-            // This sets the combined Body + Signature
-            editorContentManager.setContent(binding.editorWebView, bodyPayload)
+            editorHasPlaceholder()
         }
     }
 
@@ -780,7 +762,7 @@ class NewMessageFragment : Fragment() {
             if (quote == null) {
                 quoteGroup.isGone = true
             } else {
-                quoteWebView.loadContent(quote, quoteGroup)
+                quoteWebView.loadContent(quote)
             }
         }
     }
