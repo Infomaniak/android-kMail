@@ -36,6 +36,7 @@ object MessageBodyUtils {
     const val INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME = "ik_mail_quote"
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
     const val INFOMANIAK_SIGNATURE_HTML_ID = "ik-signature"
+    const val INFOMANIAK_BODY_HTML_ID = "ik-body"
 
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
