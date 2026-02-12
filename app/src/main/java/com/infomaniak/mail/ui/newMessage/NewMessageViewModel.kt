@@ -24,7 +24,6 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -553,12 +552,20 @@ class NewMessageViewModel @Inject constructor(
         val signatureHtml = draftSignature?.takeIf { !it.isDummy }?.content
         val wrappedSignature = signatureHtml?.let { signatureUtils.encapsulateSignatureContentWithInfomaniakClass(it) }
         val bodyHasSignature = bodyHasSignature(initialBody.content)
+        var bodyContent = initialBody.content
+
+        if (!bodyHasSignature && wrappedSignature != null) {
+            bodyContent = initialBody.content + wrappedSignature
+        }
+        if (initialQuote != null) {
+            bodyContent += initialQuote
+        }
+
         initialBody = BodyContentPayload(
-            content = if (bodyHasSignature || wrappedSignature == null) initialBody.content else initialBody.content + wrappedSignature,
+            content = bodyContent,
             type = BodyContentType.HTML_SANITIZED
         )
 
-        Log.d("HTLM initial body", initialBody.content)
         editorBodyInitializer.postValue(initialBody)
 
         uiQuoteLiveData.postValue(initialQuote)
