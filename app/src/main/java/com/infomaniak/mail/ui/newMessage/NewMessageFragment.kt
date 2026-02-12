@@ -27,6 +27,7 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,7 +54,6 @@ import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
 import com.infomaniak.lib.richhtmleditor.StatusCommand.CREATE_LINK
 import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
@@ -93,7 +93,6 @@ import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
-import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -106,6 +105,7 @@ import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.ime
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
+import com.infomaniak.mail.utils.extensions.readRawResource
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
@@ -144,8 +144,6 @@ class NewMessageFragment : Fragment() {
     }
 
     private var addressListPopupWindow: ListPopupWindow? = null
-
-    private var quoteWebView: RichHtmlEditorWebView? = null
 
     private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
@@ -358,8 +356,6 @@ class NewMessageFragment : Fragment() {
         }
 
         addressListPopupWindow = null
-        quoteWebView?.destroyAndClearHistory()
-        quoteWebView = null
         TransitionManager.endTransitions(binding.root)
         super.onDestroyView()
         _binding = null
@@ -444,7 +440,7 @@ class NewMessageFragment : Fragment() {
 
     fun editorHasPlaceholder() = with(binding.editorWebView) {
         exportHtml { html ->
-            hasPlaceholder = Jsoup.parseBodyFragment(html).getElementsByClass("placeholder").first() != null
+            hasPlaceholder = newMessageViewModel.bodyHasPlaceholder(html)
         }
     }
 
@@ -545,6 +541,7 @@ class NewMessageFragment : Fragment() {
         trackNewMessageEvent(MatomoName.SwitchIdentity)
 
         binding.editorWebView.exportHtml { html ->
+            Log.d("HTML", html)
             val body = Jsoup.parse(html).body()
             val oldSignature = newMessageViewModel.fromLiveData.value?.signature?.content
 
@@ -710,6 +707,8 @@ class NewMessageFragment : Fragment() {
     private fun observeBodyLoader() {
         newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
             editorContentManager.setContent(binding.editorWebView, body)
+            val script = context?.readRawResource(R.raw.toggle_quote_visibility_script)
+            script?.let { binding.editorWebView.addScript(script) }
             editorHasPlaceholder()
         }
     }
