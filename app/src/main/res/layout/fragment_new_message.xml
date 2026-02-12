@@ -349,39 +349,6 @@
                             android:maxWidth="200dp" />
                     </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/removeQuote"
-                        style="@style/IconButtonSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/marginStandardSmall"
-                        android:contentDescription="@string/contentDescriptionButtonDeleteQuote"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        app:icon="@drawable/ic_more_horiz"
-                        app:layout_constraintDimensionRatio="1"
-                        app:layout_constraintStart_toStartOf="@id/editorWebView"
-                        app:layout_constraintTop_toBottomOf="@id/editorWebView" />
-
-                    <com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
-                        android:id="@+id/quoteWebView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusableInTouchMode="false"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/removeQuote"
-                        tools:visibility="visible" />
-
-                    <androidx.constraintlayout.widget.Group
-                        android:id="@+id/quoteGroup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:constraint_referenced_ids="quoteWebView,removeQuote"
-                        tools:visibility="visible" />
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.recyclerview.widget.RecyclerView

@@ -9,7 +9,8 @@ body {
 }
 
 p {
-    min-height: 2em;
+    min-height: 1.4em;
+    line-height: 1.4em;
     margin: 0;
 }
 
