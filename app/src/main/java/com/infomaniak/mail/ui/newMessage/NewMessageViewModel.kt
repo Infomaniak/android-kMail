@@ -24,6 +24,7 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -173,7 +174,6 @@ class NewMessageViewModel @Inject constructor(
     val ccLiveData = MutableLiveData<UiRecipients>()
     val bccLiveData = MutableLiveData<UiRecipients>()
     val attachmentsLiveData = MutableLiveData<List<Attachment>>()
-    val uiQuoteLiveData = MutableLiveData<String?>()
     inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
@@ -549,26 +549,30 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
+        var finalBodyContent = initialBody.content
         val signatureHtml = draftSignature?.takeIf { !it.isDummy }?.content
         val wrappedSignature = signatureHtml?.let { signatureUtils.encapsulateSignatureContentWithInfomaniakClass(it) }
-        val bodyHasSignature = bodyHasSignature(initialBody.content)
-        var bodyContent = initialBody.content
 
-        if (!bodyHasSignature && wrappedSignature != null) {
-            bodyContent = initialBody.content + wrappedSignature
-        }
-        if (initialQuote != null) {
-            bodyContent += initialQuote
+        if (isNewMessage && wrappedSignature != null) {
+            finalBodyContent += wrappedSignature
+        } else if (!initialSignature.isNullOrEmpty()) {
+            finalBodyContent += initialSignature
         }
 
-        initialBody = BodyContentPayload(
-            content = bodyContent,
-            type = BodyContentType.HTML_SANITIZED
+        if (!initialQuote.isNullOrEmpty()) {
+            finalBodyContent += buildQuoteToggleButton()
+            finalBodyContent += MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
+
+        }
+
+        Log.d("BODY", finalBodyContent)
+
+        editorBodyInitializer.postValue(
+            BodyContentPayload(
+                content = finalBodyContent,
+                type = BodyContentType.HTML_SANITIZED
+            )
         )
-
-        editorBodyInitializer.postValue(initialBody)
-
-        uiQuoteLiveData.postValue(initialQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherRecipientsFieldsAreEmpty.postValue(false)
@@ -578,8 +582,31 @@ class NewMessageViewModel @Inject constructor(
         isEncryptionActivated.postValue(isEncrypted)
     }
 
-    fun bodyHasSignature(bodyHtml: String): Boolean {
-        return Jsoup.parseBodyFragment(bodyHtml).getElementById(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID) != null
+    fun bodyHasPlaceholder(bodyHtml: String): Boolean {
+        return Jsoup.parseBodyFragment(bodyHtml).getElementsByClass("placeholder").first() != null
+    }
+
+    private fun buildQuoteToggleButton(): String {
+        return """
+        <button id="quote-toggle-btn" type="button" title="Show quoted text" style="
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="5" cy="12" r="2"/>
+        <circle cx="12" cy="12" r="2"/>
+        <circle cx="19" cy="12" r="2"/>
+    </svg>
+</button>
+    """.trimIndent()
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
@@ -976,8 +1003,7 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
-
-        body = uiBodyValue + (uiQuoteLiveData.value ?: "")
+        body = uiBodyValue
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
