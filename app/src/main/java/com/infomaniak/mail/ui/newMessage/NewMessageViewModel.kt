@@ -87,6 +87,7 @@ import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_QUOTES_HTML_ID
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
@@ -559,10 +560,13 @@ class NewMessageViewModel @Inject constructor(
             finalBodyContent += initialSignature
         }
 
+        Log.d("INITIAL QUOTE", initialQuote.toString())
         if (!initialQuote.isNullOrEmpty()) {
-            finalBodyContent += buildQuoteToggleButton()
-            finalBodyContent += MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
-
+            if (!bodyHasQuotes(initialQuote.toString())) {
+                finalBodyContent += MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
+            } else {
+                finalBodyContent += initialQuote
+            }
         }
 
         Log.d("BODY", finalBodyContent)
@@ -586,27 +590,9 @@ class NewMessageViewModel @Inject constructor(
         return Jsoup.parseBodyFragment(bodyHtml).getElementsByClass("placeholder").first() != null
     }
 
-    private fun buildQuoteToggleButton(): String {
-        return """
-        <button id="quote-toggle-btn" type="button" title="Show quoted text" style="
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #666;
-    font-size: 13px;
-    font-weight: 500;
-">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <circle cx="5" cy="12" r="2"/>
-        <circle cx="12" cy="12" r="2"/>
-        <circle cx="19" cy="12" r="2"/>
-    </svg>
-</button>
-    """.trimIndent()
+    fun bodyHasQuotes(bodyHtml: String): Boolean {
+        Log.d("SIGNATURE HTML", bodyHtml)
+        return Jsoup.parseBodyFragment(bodyHtml).getElementById(INFOMANIAK_QUOTES_HTML_ID) != null
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
@@ -1003,7 +989,7 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
-        body = uiBodyValue
+        body = sanitizeBodyBeforeSaving(uiBodyValue)
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -1023,6 +1009,14 @@ class NewMessageViewModel @Inject constructor(
             isNewMessage = false
         }
     }
+
+    private fun sanitizeBodyBeforeSaving(html: String): String {
+        val doc = jsoupParseWithLog(html)
+        // Remove the toggle button before saving
+        doc.getElementById("quote-toggle-btn")?.remove()
+        return doc.html()
+    }
+
 
     private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>, step: String) {
 
