@@ -430,9 +430,7 @@ class NewMessageFragment : Fragment() {
 
     private fun initEditorUi() = with(binding) {
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
-        editorWebView.withSpellCheck(false)
         setEditorStyle()
-
         editorAiAnimation.setAnimation(R.raw.euria)
         setToolbarEnabledStatus(false)
         handleFocusChanges()
@@ -485,7 +483,8 @@ class NewMessageFragment : Fragment() {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
-                    showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
+                    val isBodyEmpty = newMessageViewModel.bodyHasPlaceholder(draft.body)
+                    showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty(), isBodyEmpty = isBodyEmpty)
                     binding.subjectTextField.setText(draft.subject)
                 } else {
                     requireActivity().apply {
@@ -497,10 +496,10 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
+    private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean, isBodyEmpty: Boolean) = with(recipientFieldsManager) {
         when (newMessageViewModel.draftMode()) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.REPLY_ALL -> if (isBodyEmpty) focusBodyField()
             DraftMode.FORWARD -> focusToField()
             DraftMode.NEW_MAIL -> if (isToFieldEmpty) focusToField() else focusBodyField()
         }

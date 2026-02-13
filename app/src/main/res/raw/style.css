@@ -11,6 +11,29 @@ body {
     min-width: auto !important;
 }
 
+#ik-quotes, #ik-quotes > * {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+  }
+
+  #ik-quotes table {
+      width: auto !important;
+      max-width: 100% !important;
+  }
+
+ #quote-toggle-btn {
+     background: none;
+     border: none;
+     cursor: pointer;
+     padding: 8px 12px;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     color: #666;
+     font-size: 13px;
+     font-weight: 500;
+     }
+
 blockquote {
     padding: 0.2em 1.2em !important;
     margin: 0 !important;
