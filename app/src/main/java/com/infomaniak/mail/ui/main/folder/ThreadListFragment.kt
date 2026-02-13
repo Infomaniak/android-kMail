@@ -557,6 +557,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
                 TransitionManager.beginDelayedTransition(binding.root)
                 binding.noNetwork.isGone = isNetworkAvailable
+                binding.updatedAt.isGone = !isNetworkAvailable
                 if (!isNetworkAvailable) updateThreadsVisibility()
             }
         }
