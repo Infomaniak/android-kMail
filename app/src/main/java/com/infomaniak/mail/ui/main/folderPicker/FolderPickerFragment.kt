@@ -41,6 +41,7 @@ import com.infomaniak.mail.databinding.FragmentFolderPickerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.main.search.SearchViewModel
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
@@ -61,6 +62,7 @@ class FolderPickerFragment : Fragment() {
     private val folderPickerViewModel: FolderPickerViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
 
     @Inject
     lateinit var createFolderDialog: CreateFolderDialog
@@ -125,7 +127,7 @@ class FolderPickerFragment : Fragment() {
     private fun setupCreateFolderDialog() = with(navigationArgs) {
         createFolderDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
-                mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
+                mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messagesUids?.toList())
             },
         )
     }
@@ -151,10 +153,12 @@ class FolderPickerFragment : Fragment() {
     private fun onFolderSelected(folder: Folder?): Unit = with(navigationArgs) {
         when (action) {
             FolderPickerAction.MOVE -> folder?.id?.let {
-                mainViewModel.moveThreadsOrMessageTo(
-                    it,
-                    threadsUids.toList(),
-                    messageUid
+                actionsViewModel.moveThreadsOrMessagesTo(
+                    destinationFolderId = it,
+                    threadsUids = threadsUids.let { threadsUids.toList() },
+                    messagesUid = messagesUids?.let { messagesUids.toList() },
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
             FolderPickerAction.SEARCH -> {

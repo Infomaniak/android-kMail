@@ -30,9 +30,11 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
@@ -72,11 +74,7 @@ object PerformSwipeActionManager {
     }
 
     private fun ThreadListFragment.performSwipeAction(
-        swipeAction: SwipeAction,
-        folderRole: FolderRole?,
-        thread: Thread,
-        position: Int,
-        isPermanentDeleteFolder: Boolean
+        swipeAction: SwipeAction, folderRole: FolderRole?, thread: Thread, position: Int, isPermanentDeleteFolder: Boolean
     ) = when (swipeAction) {
         SwipeAction.TUTORIAL -> {
             localSettings.setDefaultSwipeActions()
@@ -97,7 +95,7 @@ object PerformSwipeActionManager {
                     }
                 },
             ) {
-                mainViewModel.archiveThread(thread.uid)
+                handleArchive(thread, actionsViewModel, mainViewModel)
             }
         }
         SwipeAction.DELETE -> {
@@ -114,12 +112,14 @@ object PerformSwipeActionManager {
                 },
                 callback = {
                     if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
-                    mainViewModel.deleteThread(thread.uid)
+                    handleDelete(thread, actionsViewModel, mainViewModel)
                 },
             )
         }
         SwipeAction.FAVORITE -> {
-            mainViewModel.toggleThreadFavoriteStatus(thread.uid)
+            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                threadsUids = listOf(thread.uid), mailbox = mainViewModel.currentMailbox.value!!
+            )
             true
         }
         SwipeAction.MOVE -> {
@@ -145,11 +145,19 @@ object PerformSwipeActionManager {
             true
         }
         SwipeAction.READ_UNREAD -> {
-            mainViewModel.toggleThreadSeenStatus(thread.uid)
+            actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                threadsUids = listOf(thread.uid),
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mainViewModel.currentMailbox.value!!
+            )
             mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
         }
         SwipeAction.SPAM -> {
-            mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
+            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                threads = setOf(thread),
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mainViewModel.currentMailbox.value!!
+            )
             false
         }
         SwipeAction.SNOOZE -> {
@@ -162,6 +170,22 @@ object PerformSwipeActionManager {
             true
         }
         SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
+    }
+
+    private fun handleArchive(thread: Thread, actionsViewModel: ActionsViewModel, mainViewModel: MainViewModel) {
+        actionsViewModel.archiveThreadsOrMessages(
+            threads = listOf(thread),
+            currentFolder = mainViewModel.currentFolder.value,
+            mailbox = mainViewModel.currentMailbox.value!!
+        )
+    }
+
+    private fun handleDelete(thread: Thread, actionsViewModel: ActionsViewModel, mainViewModel: MainViewModel) {
+        actionsViewModel.deleteThreadsOrMessages(
+            threads = listOf(thread),
+            currentFolder = mainViewModel.currentFolder.value,
+            mailbox = mainViewModel.currentMailbox.value!!
+        )
     }
 
     private fun LocalSettings.setDefaultSwipeActions() {

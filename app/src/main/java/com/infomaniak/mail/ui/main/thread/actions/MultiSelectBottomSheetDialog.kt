@@ -73,6 +73,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
     override val mainViewModel: MainViewModel by activityViewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     @Inject
@@ -110,7 +111,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         lifecycleScope.launch {
             val folderRole = folderRoleUtils.getActionFolderRole(threads)
-            setupMainActions(threadsCount, threadsUids, shouldRead, folderRole)
+            setupMainActions(threads, threadsUids, shouldRead, folderRole)
         }
 
         setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
@@ -132,13 +133,17 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.cancelSnooze.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.CancelSnooze, threadsCount, isFromBottomSheet = true)
-            lifecycleScope.launch { mainViewModel.unsnoozeThreads(threads) }
+            lifecycleScope.launch { actionsViewModel.unsnoozeThreads(threads, mainViewModel.currentMailbox.value) }
             isMultiSelectOn = false
         }
 
         binding.spam.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
-            toggleThreadSpamStatus(threadsUids)
+            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                threads = threads,
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mainViewModel.currentMailbox.value!!,
+            )
             isMultiSelectOn = false
         }
 
@@ -155,8 +160,16 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
                 description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
-                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
+                onPositiveButtonClicked = {
+                    actionsViewModel.reportPhishing(
+                        messages = messages,
+                        currentFolder = mainViewModel.currentFolder.value,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
+                },
             )
+            
+            isMultiSelectOn = false
         }
 
         binding.blockSender.setClosingOnClickListener {
@@ -178,12 +191,16 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                 }
             }
-            mainViewModel.isMultiSelectOn = false
+            isMultiSelectOn = false
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
-            toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
+            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                threadsUids = threadsUids,
+                mailbox = currentMailbox.value!!,
+                shouldFavorite = shouldFavorite
+            )
             isMultiSelectOn = false
         }
 
@@ -198,17 +215,33 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun setupMainActions(
-        threadsCount: Int,
+        threads: Set<Thread>,
         threadsUids: List<String>,
         shouldRead: Boolean,
         folderRole: FolderRole?
     ) {
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
+            val currentMailbox = mainViewModel.currentMailbox.value ?: run {
+                SentryLog.e(TAG, "Mailbox is null but shouldn't") { scope ->
+                    scope.setTag("context", "$TAG.setupMailAction")
+                }
+                return@setClosingOnClickListener
+            }
+
+            val threadsCount = threads.count()
+            val currentFolder = mainViewModel.currentFolder.value
+            val currentFolderId = mainViewModel.currentFolderId
+
             when (id) {
                 R.id.actionMove -> onMoveClicked(threadsCount, threadsUids, folderRole)
                 R.id.actionReadUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
-                    mainViewModel.toggleThreadsSeenStatus(threadsUids, shouldRead)
+                    actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                        threadsUids = threadsUids,
+                        shouldRead = shouldRead,
+                        currentFolderId = currentFolderId,
+                        mailbox = currentMailbox
+                    )
                 }
                 R.id.actionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(
@@ -216,7 +249,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
-                        mainViewModel.archiveThreads(threadsUids)
+                        actionsViewModel.archiveThreadsOrMessages(
+                            threads = threads.toList(),
+                            currentFolder = currentFolder,
+                            mailbox = currentMailbox
+                        )
                     }
                 }
                 R.id.actionDelete -> {
@@ -225,7 +262,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
-                        mainViewModel.deleteThreads(threadsUids)
+                        actionsViewModel.deleteThreadsOrMessages(
+                            threads = threads.toList(),
+                            currentFolder = currentFolder,
+                            mailbox = currentMailbox
+                        )
                     }
                 }
             }
@@ -254,7 +295,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeReportPhishingResult() {
-        mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
+        actionsViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
         }
