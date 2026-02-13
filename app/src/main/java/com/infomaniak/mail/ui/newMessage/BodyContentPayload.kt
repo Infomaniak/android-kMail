@@ -28,7 +28,7 @@ data class BodyContentPayload(val content: String, val type: BodyContentType) {
     companion object {
         fun emptyBody(placeHolderText: String) =
             BodyContentPayload(
-                content = "<div id=$INFOMANIAK_BODY_HTML_ID><p class='placeholder'>$placeHolderText</p></div>",
+                content = "<div id=$INFOMANIAK_BODY_HTML_ID><p class='placeholder'>$placeHolderText</p><br></div>",
                 type = BodyContentType.HTML_SANITIZED
             )
     }
