@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ class SearchViewModel @Inject constructor(
         searchJob?.cancel()
     }
 
-    fun executePendingSearch() = viewModelScope.launch(ioCoroutineContext) {
+    fun executePendingSearch() = viewModelScope.launch(ioDispatcher) {
         val hasPendingSearch = (lastExecutedSearchQuery != currentSearchQuery)
                 || (lastExecutedFolder != filterFolder)
                 || (lastExecutedFilters != currentFilters)
@@ -124,11 +124,11 @@ class SearchViewModel @Inject constructor(
         unselectAllChipFilters()
     }
 
-    fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
+    fun refreshSearch() = viewModelScope.launch(ioDispatcher) {
         search()
     }
 
-    fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
+    fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioDispatcher) {
         if (query.isNotBlank() && isLengthTooShort(query)) return@launch
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
@@ -139,12 +139,12 @@ class SearchViewModel @Inject constructor(
 
     fun selectFolder(folder: Folder?) {
         filterFolder = folder
-        viewModelScope.launch(ioCoroutineContext) {
+        viewModelScope.launch(ioDispatcher) {
             search(folder = folder)
         }
     }
 
-    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
+    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioDispatcher) {
         if (isEnabled && currentFilters.contains(filter)) return@launch
         if (isEnabled) {
             trackSearchEvent(filter.matomoName)
@@ -154,7 +154,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
+    fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioDispatcher) {
         currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
         search(filters = currentFilters)
     }
@@ -163,7 +163,7 @@ class SearchViewModel @Inject constructor(
         currentFilters.removeAll(ThreadFilter.entries)
     }
 
-    fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
+    fun nextPage() = viewModelScope.launch(ioDispatcher) {
         if (isLastPage) return@launch
         search(shouldGetNextPage = true)
     }
@@ -198,7 +198,7 @@ class SearchViewModel @Inject constructor(
         filters: Set<ThreadFilter> = currentFilters,
         folder: Folder? = filterFolder,
         shouldGetNextPage: Boolean = false,
-    ) = withContext(ioCoroutineContext) {
+    ) = withContext(ioDispatcher) {
         cancelSearch()
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)

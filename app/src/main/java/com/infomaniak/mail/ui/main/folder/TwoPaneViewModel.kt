@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -46,8 +45,6 @@ class TwoPaneViewModel @Inject constructor(
     private val draftController: DraftController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     val currentThreadUid: LiveData<String?> = state.getLiveData(CURRENT_THREAD_UID_KEY)
 
@@ -70,7 +67,7 @@ class TwoPaneViewModel @Inject constructor(
         state[CURRENT_THREAD_UID_KEY] = null
     }
 
-    fun openDraft(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
+    fun openDraft(thread: Thread) = viewModelScope.launch(ioDispatcher) {
         navigateToSelectedDraft(thread.messages.single())
     }
 

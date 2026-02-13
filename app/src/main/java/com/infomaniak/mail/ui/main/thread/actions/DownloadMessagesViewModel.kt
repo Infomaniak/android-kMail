@@ -35,7 +35,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils.getEmlCacheDir
-import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -52,8 +51,6 @@ class DownloadMessagesViewModel @Inject constructor(
     private val messageController: MessageController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val messageLocalUids: Array<String>?
         inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::messageUids.name]
@@ -92,7 +89,7 @@ class DownloadMessagesViewModel @Inject constructor(
 
     private fun numberOfMessagesToDownloads(): Int = messageLocalUids?.size ?: 0
 
-    fun downloadMessages(currentMailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
+    fun downloadMessages(currentMailbox: Mailbox?) = viewModelScope.launch(ioDispatcher) {
         val mailbox = currentMailbox ?: return@launch
 
         val downloadedThreadUris = runCatching {
