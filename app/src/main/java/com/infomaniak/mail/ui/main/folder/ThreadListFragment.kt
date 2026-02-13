@@ -552,13 +552,13 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun observeNetworkStatus() {
         viewLifecycleOwner.lifecycleScope.launch {
-            mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
-                if (_binding == null) return@collect
-
-                TransitionManager.beginDelayedTransition(binding.root)
-                binding.noNetwork.isGone = isNetworkAvailable
-                binding.updatedAt.isGone = !isNetworkAvailable
-                if (!isNetworkAvailable) updateThreadsVisibility()
+            repeatOnLifecycle(State.STARTED) {
+                mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
+                    TransitionManager.beginDelayedTransition(binding.root)
+                    binding.noNetwork.isGone = isNetworkAvailable
+                    binding.updatedAt.isGone = !isNetworkAvailable
+                    if (!isNetworkAvailable) updateThreadsVisibility()
+                }
             }
         }
     }
