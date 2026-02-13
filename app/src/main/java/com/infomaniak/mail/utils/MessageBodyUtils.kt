@@ -67,7 +67,19 @@ object MessageBodyUtils {
     )
 
     fun encapsulateQuotesWithInfomaniakClass(quotes: String): String {
-        return """<div id=$INFOMANIAK_QUOTES_HTML_ID>$quotes</div>"""
+        return """<div class=$INFOMANIAK_QUOTES_HTML_ID><div id=$INFOMANIAK_QUOTES_HTML_ID style="display: none;" spellcheck=false>$quotes<br></div>${toggleButton()}</div>"""
+    }
+
+    fun toggleButton(): String {
+        return """
+        <button id="quote-toggle-btn" type="button" title="Show quoted text">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="5" cy="12" r="2"/>
+                <circle cx="12" cy="12" r="2"/>
+                <circle cx="19" cy="12" r="2"/>
+            </svg>
+        </button>
+        """.trimIndent()
     }
 
     suspend fun splitContentAndQuote(body: Body): SplitBody {
