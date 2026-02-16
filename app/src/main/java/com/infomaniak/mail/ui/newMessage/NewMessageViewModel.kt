@@ -476,6 +476,24 @@ class NewMessageViewModel @Inject constructor(
         return BodyData(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
     }
 
+    fun addSignatureInsideBody(bodyHtml: String, element: String): String {
+        if (element.isEmpty()) return bodyHtml
+
+        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).apply {
+            // if the mail has quotes, add the signature before the quotes.
+            val body = body()
+            body.getElementById(INFOMANIAK_QUOTES_HTML_ID)?.before(element) ?: body.append(element)
+        }.body().html()
+    }
+
+    fun removeSignature(html: String): String {
+        val doc: Document = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html).apply {
+            getElementById(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID)?.remove()
+        }
+
+        return doc.html()
+    }
+
     private suspend fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SEND -> handleSingleSendIntent(draft, intent)
