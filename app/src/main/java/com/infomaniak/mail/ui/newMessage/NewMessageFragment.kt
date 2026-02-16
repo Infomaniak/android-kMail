@@ -22,12 +22,10 @@ package com.infomaniak.mail.ui.newMessage
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -89,6 +87,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.JsoupParserUtil
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
@@ -116,7 +115,6 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
@@ -344,11 +342,6 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        //TODO: CHECK IF WE SHOULD ADD A RELOD HERE
-        super.onConfigurationChanged(newConfig)
-    }
-
     override fun onDestroyView() {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editorWebView.exportHtml { html ->
@@ -456,7 +449,7 @@ class NewMessageFragment : Fragment() {
 
     private fun removePlaceholder() = with(binding.editorWebView) {
         exportHtml { html ->
-            val doc: Document = Jsoup.parseBodyFragment(html).apply {
+            val doc: Document = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html).apply {
                 getElementsByClass("placeholder").first()?.text("")?.removeClass("placeholder")
             }
 
@@ -543,8 +536,7 @@ class NewMessageFragment : Fragment() {
         trackNewMessageEvent(MatomoName.SwitchIdentity)
 
         binding.editorWebView.exportHtml { html ->
-            Log.d("HTML", html)
-            val body = Jsoup.parse(html).body()
+            val body = JsoupParserUtil.jsoupParseWithLog(html).body()
             val oldSignature = newMessageViewModel.fromLiveData.value?.signature?.content
 
             val bodyHtml = if (!oldSignature.isNullOrEmpty()) {
@@ -572,13 +564,13 @@ class NewMessageFragment : Fragment() {
     private fun addInsideBody(bodyHtml: String, element: String): String {
         if (element.isEmpty()) return bodyHtml
 
-        val doc = Jsoup.parseBodyFragment(bodyHtml)
+        val doc = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
         doc.body().append(element)
         return doc.body().html()
     }
 
     private fun removeSignature(html: String): String {
-        val doc: Document = Jsoup.parseBodyFragment(html).apply {
+        val doc: Document = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html).apply {
             getElementById(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID)?.remove()
         }
 
