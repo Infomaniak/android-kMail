@@ -24,7 +24,6 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -606,7 +605,6 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun bodyHasQuotes(bodyHtml: String): Boolean {
-        Log.d("SIGNATURE HTML", bodyHtml)
         return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).getElementById(INFOMANIAK_QUOTES_HTML_ID) != null
     }
 
