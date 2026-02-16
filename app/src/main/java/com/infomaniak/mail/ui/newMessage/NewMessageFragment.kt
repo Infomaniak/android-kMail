@@ -67,6 +67,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -91,6 +92,7 @@ import com.infomaniak.mail.utils.JsoupParserUtil
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
+import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -101,6 +103,7 @@ import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.ime
+import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.readRawResource
@@ -491,6 +494,19 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun configureUiWithDraftData(draft: Draft) = with(binding) {
+        editorWebView.apply {
+            settings.setupNewMessageWebViewSettings()
+            val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+            initWebViewClientAndBridge(
+                attachments = draft.attachments,
+                messageUid = "QUOTE-${draft.messageUid}",
+                shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
+                navigateToNewMessageActivity = null,
+            )
+        }
+    }
+
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
         signatureAdapter.setList(signatures)
@@ -569,7 +585,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitResult() {
-        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (_, signatures) ->
+        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
+            configureUiWithDraftData(draft)
             setupFromField(signatures)
             editorManager.setupEditorFormatActions()
             editorManager.setupEditorFormatActionsToggle()
