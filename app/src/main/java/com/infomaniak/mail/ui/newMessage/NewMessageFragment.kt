@@ -88,7 +88,6 @@ import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.JsoupParserUtil
-import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
@@ -433,9 +432,7 @@ class NewMessageFragment : Fragment() {
     }
 
     fun editorHasPlaceholder() = with(binding.editorWebView) {
-        exportHtml { html ->
-            hasPlaceholder = newMessageViewModel.bodyHasPlaceholder(html)
-        }
+        exportHtml { html -> hasPlaceholder = newMessageViewModel.bodyHasPlaceholder(html) }
     }
 
     private fun setEditorStyle() = with(binding.editorWebView) {
@@ -452,12 +449,8 @@ class NewMessageFragment : Fragment() {
             val doc: Document = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html).apply {
                 getElementsByClass("placeholder").first()?.text("")?.removeClass("placeholder")
             }
-
             newMessageViewModel.editorBodyInitializer.postValue(
-                BodyContentPayload(
-                    doc.html(),
-                    BodyContentType.HTML_SANITIZED
-                )
+                BodyContentPayload(doc.html(), BodyContentType.HTML_SANITIZED)
             )
         }
     }
@@ -540,7 +533,7 @@ class NewMessageFragment : Fragment() {
             val oldSignature = newMessageViewModel.fromLiveData.value?.signature?.content
 
             val bodyHtml = if (!oldSignature.isNullOrEmpty()) {
-                removeSignature(body.html())
+                newMessageViewModel.removeSignature(body.html())
             } else {
                 body.html()
             }
@@ -554,32 +547,11 @@ class NewMessageFragment : Fragment() {
                 if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(newSignatureHtml)
 
             // Combine: New Body + New Signature
-            val finalHtml = addSignatureInsideBody(bodyHtml, wrappedNewSignature)
+            val finalHtml = newMessageViewModel.addSignatureInsideBody(bodyHtml, wrappedNewSignature)
 
             // Update the Editor
             newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(finalHtml, BodyContentType.HTML_SANITIZED))
         }
-    }
-
-    private fun addSignatureInsideBody(bodyHtml: String, element: String): String {
-        if (element.isEmpty()) return bodyHtml
-
-        val doc = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
-        val quotesDiv = doc.body().getElementById(MessageBodyUtils.INFOMANIAK_QUOTES_HTML_ID)
-        if (quotesDiv != null) {
-            quotesDiv.before(element)
-        } else {
-            doc.body().append(element)
-        }
-        return doc.body().html()
-    }
-
-    private fun removeSignature(html: String): String {
-        val doc: Document = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html).apply {
-            getElementById(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID)?.remove()
-        }
-
-        return doc.html()
     }
 
     private fun updateSelectedSignatureInFromField(signature: Signature) {
