@@ -551,18 +551,23 @@ class NewMessageFragment : Fragment() {
                 if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(newSignatureHtml)
 
             // Combine: New Body + New Signature
-            val finalHtml = addInsideBody(bodyHtml, wrappedNewSignature)
+            val finalHtml = addSignatureInsideBody(bodyHtml, wrappedNewSignature)
 
             // Update the Editor
             newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(finalHtml, BodyContentType.HTML_SANITIZED))
         }
     }
 
-    private fun addInsideBody(bodyHtml: String, element: String): String {
+    private fun addSignatureInsideBody(bodyHtml: String, element: String): String {
         if (element.isEmpty()) return bodyHtml
 
         val doc = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
-        doc.body().append(element)
+        val quotesDiv = doc.body().getElementById(MessageBodyUtils.INFOMANIAK_QUOTES_HTML_ID)
+        if (quotesDiv != null) {
+            quotesDiv.before(element)
+        } else {
+            doc.body().append(element)
+        }
         return doc.body().html()
     }
 
