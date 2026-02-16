@@ -138,15 +138,13 @@ class WebViewUtils(context: Context) {
             @SuppressLint("SetJavaScriptEnabled")
             javaScriptEnabled = true
 
-            loadWithOverviewMode = true
-            useWideViewPort = true
-
             cacheMode = LOAD_CACHE_ELSE_NETWORK
         }
 
         fun WebSettings.setupThreadWebViewSettings() {
             setupCommonWebViewSettings()
 
+            loadWithOverviewMode = true
             setSupportZoom(true)
             builtInZoomControls = true
             displayZoomControls = false
