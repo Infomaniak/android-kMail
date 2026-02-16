@@ -84,6 +84,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldT
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.DraftInitManager
+import com.infomaniak.mail.utils.JsoupParserUtil
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -132,7 +133,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
@@ -560,16 +560,13 @@ class NewMessageViewModel @Inject constructor(
             finalBodyContent += initialSignature
         }
 
-        Log.d("INITIAL QUOTE", initialQuote.toString())
         if (!initialQuote.isNullOrEmpty()) {
-            if (!bodyHasQuotes(initialQuote.toString())) {
-                finalBodyContent += MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
+            finalBodyContent += if (!bodyHasQuotes(initialQuote.toString())) {
+                MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
             } else {
-                finalBodyContent += initialQuote
+                initialQuote
             }
         }
-
-        Log.d("BODY", finalBodyContent)
 
         editorBodyInitializer.postValue(
             BodyContentPayload(
@@ -587,12 +584,12 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun bodyHasPlaceholder(bodyHtml: String): Boolean {
-        return Jsoup.parseBodyFragment(bodyHtml).getElementsByClass("placeholder").first() != null
+        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).getElementsByClass("placeholder").first() != null
     }
 
     fun bodyHasQuotes(bodyHtml: String): Boolean {
         Log.d("SIGNATURE HTML", bodyHtml)
-        return Jsoup.parseBodyFragment(bodyHtml).getElementById(INFOMANIAK_QUOTES_HTML_ID) != null
+        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).getElementById(INFOMANIAK_QUOTES_HTML_ID) != null
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
