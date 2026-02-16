@@ -33,7 +33,11 @@ class SignatureUtils @Inject constructor(appContext: Context) {
     fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
         val verticalMarginsCss = signatureMargins
         val verticalMarginAttributes = extractAttributesFromMarginCss(verticalMarginsCss)
-        return """<div id="$INFOMANIAK_SIGNATURE_HTML_ID" class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME" spellcheck="false" style="$verticalMarginAttributes">$signatureContent</div>"""
+        return """
+            <div id="$INFOMANIAK_SIGNATURE_HTML_ID" class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME" spellcheck="false" style="$verticalMarginAttributes">
+            $signatureContent
+            </div>
+        """.trimIndent()
     }
 
     private fun extractAttributesFromMarginCss(verticalMarginsCss: String): String {

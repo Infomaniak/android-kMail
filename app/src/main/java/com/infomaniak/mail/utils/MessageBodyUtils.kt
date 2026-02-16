@@ -67,7 +67,12 @@ object MessageBodyUtils {
     )
 
     fun encapsulateQuotesWithInfomaniakClass(quotes: String): String {
-        return """<div class=$INFOMANIAK_QUOTES_HTML_ID><div id=$INFOMANIAK_QUOTES_HTML_ID style="display: none;" spellcheck=false>$quotes<br></div>${toggleButton()}</div>"""
+        return """
+        <div class=$INFOMANIAK_QUOTES_HTML_ID>
+           <div id=$INFOMANIAK_QUOTES_HTML_ID style="display: none;" spellcheck=false>$quotes<br></div>
+           ${toggleButton()}
+        </div>
+        """.trimMargin()
     }
 
     fun toggleButton(): String {
