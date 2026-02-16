@@ -20,8 +20,11 @@ package com.infomaniak.mail.utils.extensions
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
+import android.util.Base64
 import androidx.core.content.FileProvider
 import com.infomaniak.core.common.extensions.goToAppStore
 import com.infomaniak.core.legacy.utils.hasSupportedApplications
@@ -45,6 +48,8 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.S
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import kotlin.math.roundToInt
 import com.infomaniak.core.legacy.R as RCore
 
 object AttachmentExt {
@@ -110,6 +115,36 @@ object AttachmentExt {
             executeIntent(context, OPEN_WITH, navigateToDownloadProgressDialog)
         } else {
             snackbarManager.setValue(context.getString(RCore.string.errorNoSupportingAppFound))
+        }
+    }
+
+    fun Attachment.getScaledLocalBase64(context: Context, maxWidth: Int = 1024): String? {
+        val file = getUploadLocalFile() ?: getCacheFile(context)
+        if (!file.exists()) return null
+
+        return try {
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(file.absolutePath, options)
+
+            var inSampleSize = 1
+            if (options.outWidth > maxWidth) {
+                inSampleSize = (options.outWidth.toFloat() / maxWidth.toFloat()).roundToInt()
+            }
+
+            val rescaledOptions = BitmapFactory.Options().apply {
+                this.inSampleSize = inSampleSize
+            }
+
+            val bitmap = BitmapFactory.decodeFile(file.absolutePath, rescaledOptions) ?: return null
+
+            val outputStream = ByteArrayOutputStream()
+            // Compress as JPEG to 8 0% quality to reduce size
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+            val byteArray = outputStream.toByteArray()
+
+            Base64.encodeToString(byteArray, Base64.NO_WRAP)
+        } catch (e: Exception) {
+            null
         }
     }
 
