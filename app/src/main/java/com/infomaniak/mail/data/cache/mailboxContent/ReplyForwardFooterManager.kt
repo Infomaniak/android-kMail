@@ -31,6 +31,7 @@ import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatForHeader
+import com.infomaniak.mail.utils.extensions.AttachmentExt.getScaledLocalBase64
 import com.infomaniak.mail.utils.extensions.toDate
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -46,14 +47,21 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
             document.processCids(
                 attachments = message.attachments,
                 associateDataToCid = { oldAttachment ->
-                    val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
-                    newAttachment?.contentId
+                    attachmentsToForward.find {
+                        it.originalContentId == oldAttachment.contentId || it.name == oldAttachment.name
+                    }
                 },
-                onCidImageFound = { newContentId, imageElement ->
-                    imageElement.attr(SRC_ATTRIBUTE, "${CID_PROTOCOL}$newContentId")
+                onCidImageFound = { attachment, imageElement ->
+                    // get the image in base64, since the richHtmlEditorWebView doesn't work correctly with Cids.
+                    val base64 = attachment.getScaledLocalBase64(appContext)
+                    if (base64 != null) {
+                        imageElement.attr(SRC_ATTRIBUTE, "data:${attachment.mimeType};base64,$base64")
+                        imageElement.attr("style", "max-width: 100%; height: auto;")
+                    } else {
+                        imageElement.attr(SRC_ATTRIBUTE, "${CID_PROTOCOL}${attachment.contentId}")
+                    }
                 },
             )
-
             document.outerHtml()
         } ?: ""
 
