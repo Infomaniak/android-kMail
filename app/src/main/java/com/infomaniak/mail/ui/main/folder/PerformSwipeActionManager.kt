@@ -81,8 +81,7 @@ object PerformSwipeActionManager {
         position: Int,
         isPermanentDeleteFolder: Boolean
     ): Boolean {
-        val currentMailbox = mainViewModel.currentMailbox.value
-        if (currentMailbox == null) {
+        val currentMailbox = mainViewModel.currentMailbox.value ?: run {
             snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
             SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
                 scope.setTag("context", "PerformSwipeActionManager.performSwipeAction")
