@@ -104,7 +104,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadsCount = threadsUids.count()
         val currentMailbox = mainViewModel.currentMailbox.value
         if (currentMailbox == null) {
-            SentryLog.e(TAG, "Mailbox is null but shouldn't") { scope ->
+            SentryLog.e(TAG, getString(R.string.sentryErrorMailboxIsNull)) { scope ->
                 scope.setTag("context", "$TAG.onViewCreated")
             }
         }
@@ -240,7 +240,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     ) {
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             val currentMailbox = mainViewModel.currentMailbox.value ?: run {
-                SentryLog.e(TAG, "Mailbox is null but shouldn't") { scope ->
+                SentryLog.e(TAG, getString(R.string.sentryErrorMailboxIsNull)) { scope ->
                     scope.setTag("context", "$TAG.setupMailAction")
                 }
                 return@setClosingOnClickListener
