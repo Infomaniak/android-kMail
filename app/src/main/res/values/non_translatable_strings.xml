@@ -19,4 +19,5 @@
     <string name="sentryErrorLogoutNpe" translatable="false">RequestCurrentUser returned null while there are account in DB</string>
     <string name="sentryErrorPotentialUsersToBlockNull" translatable="false">Potential users to block is null</string>
     <string name="sentryErrorPhishingMessagesEmpty" translatable="false">Phishing messages report failed because the list is empty</string>
+    <string name="sentryErrorMailboxIsNull" translatable="false">Mailbox is null</string>
 </resources>
