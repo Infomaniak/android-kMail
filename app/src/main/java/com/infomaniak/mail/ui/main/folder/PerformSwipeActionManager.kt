@@ -30,16 +30,15 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
-import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAnimatedNavOptions
 import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
+import com.infomaniak.core.common.R as RCore
 
 object PerformSwipeActionManager {
 
@@ -74,117 +73,161 @@ object PerformSwipeActionManager {
     }
 
     private fun ThreadListFragment.performSwipeAction(
-        swipeAction: SwipeAction, folderRole: FolderRole?, thread: Thread, position: Int, isPermanentDeleteFolder: Boolean
-    ) = when (swipeAction) {
-        SwipeAction.TUTORIAL -> {
-            localSettings.setDefaultSwipeActions()
-            safelyNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
-            findNavController().navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
-            true
-        }
-        SwipeAction.ARCHIVE -> {
-            descriptionDialog.archiveWithConfirmationPopup(
-                folderRole = folderRole,
-                count = 1,
-                displayLoader = false,
-                onCancel = {
-                    // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
-                    // otherwise it will notify the next item in the list and make it slightly blink
-                    if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
-                        threadListAdapter.notifyItemChanged(position)
-                    }
-                },
-            ) {
-                handleArchive(thread, actionsViewModel, mainViewModel)
+        swipeAction: SwipeAction,
+        folderRole: FolderRole?,
+        thread: Thread,
+        position: Int,
+        isPermanentDeleteFolder: Boolean
+    ): Boolean {
+        return when (swipeAction) {
+            SwipeAction.TUTORIAL -> {
+                localSettings.setDefaultSwipeActions()
+                safelyNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
+                findNavController().navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
+                true
             }
-        }
-        SwipeAction.DELETE -> {
-            descriptionDialog.deleteWithConfirmationPopup(
-                folderRole = folderRole,
-                count = 1,
-                displayLoader = false,
-                onCancel = {
-                    // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
-                    // otherwise it will notify the next item in the list and make it slightly blink
-                    if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
-                        threadListAdapter.notifyItemChanged(position)
-                    }
-                },
-                callback = {
-                    if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
-                    handleDelete(thread, actionsViewModel, mainViewModel)
-                },
-            )
-        }
-        SwipeAction.FAVORITE -> {
-            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
-                threadsUids = listOf(thread.uid), mailbox = mainViewModel.currentMailbox.value!!
-            )
-            true
-        }
-        SwipeAction.MOVE -> {
-            val navController = findNavController()
-            descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
-                navController.animatedNavigation(
-                    directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-                        threadsUids = arrayOf(thread.uid),
-                        action = FolderPickerAction.MOVE,
-                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
-                    ),
+            SwipeAction.ARCHIVE -> {
+                handleArchiveSwipe(thread, position, folderRole)
+            }
+            SwipeAction.DELETE -> {
+                handleDeleteSwipe(thread, position, folderRole, isPermanentDeleteFolder)
+            }
+            SwipeAction.FAVORITE -> {
+                val currentMailbox = mainViewModel.currentMailbox.value
+                if (currentMailbox == null) {
+                    snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+                    return true
+                }
+                actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(threadsUids = listOf(thread.uid), mailbox = currentMailbox)
+                true
+            }
+            SwipeAction.MOVE -> {
+                val navController = findNavController()
+                descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
+                    navController.animatedNavigation(
+                        directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+                            threadsUids = arrayOf(thread.uid),
+                            action = FolderPickerAction.MOVE,
+                            sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                        ),
+                    )
+                }
+                true
+            }
+            SwipeAction.QUICKACTIONS_MENU -> {
+                safelyNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                        threadUid = thread.uid,
+                        shouldLoadDistantResources = false,
+                    )
                 )
+                true
             }
-            true
-        }
-        SwipeAction.QUICKACTIONS_MENU -> {
-            safelyNavigate(
-                ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                    threadUid = thread.uid,
-                    shouldLoadDistantResources = false,
+            SwipeAction.READ_UNREAD -> {
+                val currentMailbox = mainViewModel.currentMailbox.value
+                if (currentMailbox == null) {
+                    snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+                    return true
+                }
+                actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                    threadsUids = listOf(thread.uid),
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = currentMailbox
                 )
-            )
-            true
-        }
-        SwipeAction.READ_UNREAD -> {
-            actionsViewModel.toggleThreadsOrMessagesSeenStatus(
-                threadsUids = listOf(thread.uid),
-                currentFolderId = mainViewModel.currentFolderId,
-                mailbox = mainViewModel.currentMailbox.value!!
-            )
-            mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
-        }
-        SwipeAction.SPAM -> {
-            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
-                threads = setOf(thread),
-                currentFolderId = mainViewModel.currentFolderId,
-                mailbox = mainViewModel.currentMailbox.value!!
-            )
-            false
-        }
-        SwipeAction.SNOOZE -> {
-            val snoozeScheduleType = if (thread.isSnoozed()) {
-                SnoozeScheduleType.Modify(thread.uid)
-            } else {
-                SnoozeScheduleType.Snooze(thread.uid)
+                mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
+                true
             }
-            navigateToSnoozeBottomSheet(snoozeScheduleType, thread.snoozeEndDate)
-            true
+
+            SwipeAction.SPAM -> {
+                val currentMailbox = mainViewModel.currentMailbox.value
+                if (currentMailbox == null) {
+                    snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+                    return true
+                }
+                actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                    threads = setOf(thread),
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = currentMailbox
+                )
+                false
+            }
+            SwipeAction.SNOOZE -> {
+                val snoozeScheduleType = if (thread.isSnoozed()) {
+                    SnoozeScheduleType.Modify(thread.uid)
+                } else {
+                    SnoozeScheduleType.Snooze(thread.uid)
+                }
+                navigateToSnoozeBottomSheet(snoozeScheduleType, thread.snoozeEndDate)
+                true
+            }
+            SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
         }
-        SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
     }
 
-    private fun handleArchive(thread: Thread, actionsViewModel: ActionsViewModel, mainViewModel: MainViewModel) {
-        actionsViewModel.archiveThreadsOrMessages(
-            threads = listOf(thread),
-            currentFolder = mainViewModel.currentFolder.value,
-            mailbox = mainViewModel.currentMailbox.value!!
+    private fun ThreadListFragment.handleArchiveSwipe(thread: Thread, position: Int, folderRole: FolderRole?): Boolean {
+        fun onCancel() {
+            if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
+                threadListAdapter.notifyItemChanged(position)
+            }
+        }
+
+        fun onSuccess() {
+            val currentMailBox = mainViewModel.currentMailbox.value
+            if (currentMailBox == null) {
+                snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+                return
+            }
+            actionsViewModel.archiveThreadsOrMessages(
+                threads = listOf(thread),
+                currentFolder = mainViewModel.currentFolder.value,
+                mailbox = currentMailBox
+            )
+        }
+
+        return descriptionDialog.archiveWithConfirmationPopup(
+            folderRole = folderRole,
+            count = 1,
+            displayLoader = false,
+            onCancel = ::onCancel,
+            onPositiveButtonClicked = ::onSuccess
         )
     }
 
-    private fun handleDelete(thread: Thread, actionsViewModel: ActionsViewModel, mainViewModel: MainViewModel) {
-        actionsViewModel.deleteThreadsOrMessages(
-            threads = listOf(thread),
-            currentFolder = mainViewModel.currentFolder.value,
-            mailbox = mainViewModel.currentMailbox.value!!
+    private fun ThreadListFragment.handleDeleteSwipe(
+        thread: Thread,
+        position: Int,
+        folderRole: FolderRole?,
+        isPermanentDeleteFolder: Boolean
+    ): Boolean {
+        fun onCancel() {
+            // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
+            // otherwise it will notify the next item in the list and make it slightly blink
+            if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
+                threadListAdapter.notifyItemChanged(position)
+            }
+        }
+
+        fun onHandleDelete() {
+            if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
+            val currentMailBox = mainViewModel.currentMailbox.value
+            if (currentMailBox == null) {
+                snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+                return
+            }
+
+            actionsViewModel.deleteThreadsOrMessages(
+                threads = listOf(thread),
+                currentFolder = mainViewModel.currentFolder.value,
+                mailbox = currentMailBox
+            )
+        }
+
+        return descriptionDialog.deleteWithConfirmationPopup(
+            folderRole = folderRole,
+            count = 1,
+            displayLoader = false,
+            onCancel = ::onCancel,
+            callback = ::onHandleDelete,
         )
     }
 
