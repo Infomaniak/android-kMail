@@ -26,10 +26,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NetworkManager {
+class NetworkManager @Inject constructor() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /**
