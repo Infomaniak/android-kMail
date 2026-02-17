@@ -1033,7 +1033,7 @@ class MainViewModel @Inject constructor(
         val mailboxUuid = currentMailbox.value?.uuid
 
         viewModelScope.launch {
-            if (mailboxUuid == null || !networkManager.hasNetwork) {
+            if (mailboxUuid == null || !hasNetwork) {
                 _shareThreadUrlResult.emit(null)
                 return@launch
             }
