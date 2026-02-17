@@ -18,19 +18,16 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -40,7 +37,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
-import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
@@ -50,15 +46,10 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.DraftInitManager
-import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
-import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
@@ -69,7 +60,6 @@ import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -83,9 +73,6 @@ import com.infomaniak.core.legacy.R as RCore
 @HiltViewModel
 class ActionsViewModel @Inject constructor(
     application: Application,
-    private val draftController: DraftController,
-    private val draftInitManager: DraftInitManager,
-    private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
@@ -764,87 +751,6 @@ class ActionsViewModel @Inject constructor(
     }
     //endregion
 
-    //region Emoji reaction
-    /**
-     * Wrapper method to send an emoji reaction to the api. This method will check if the emoji reaction is allowed before
-     * initiating an api call. This is the entry point to add an emoji reaction anywhere in the app.
-     *
-     * If sending is allowed, the caller place can fake the emoji reaction locally thanks to [onAllowed].
-     * If sending is not allowed, it will display the error directly to the user and avoid doing the api call.
-     */
-    fun trySendEmojiReply(
-        emoji: String,
-        messageUid: String,
-        reactions: Map<String, Reaction>,
-        hasNetwork: Boolean,
-        mailbox: Mailbox,
-        onAllowed: () -> Unit = {},
-    ) {
-        viewModelScope.launch {
-            when (val status = reactions.getEmojiSendStatus(emoji, hasNetwork)) {
-                EmojiSendStatus.Allowed -> {
-                    onAllowed()
-                    sendEmojiReply(emoji, messageUid, mailbox)
-                }
-                is EmojiSendStatus.NotAllowed -> snackbarManager.postValue(appContext.getString(status.errorMessageRes))
-            }
-        }
-    }
-
-    private fun Map<String, Reaction>.getEmojiSendStatus(emoji: String, hasNetwork: Boolean): EmojiSendStatus = when {
-        this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
-        hasAvailableReactionSlot().not() -> EmojiSendStatus.NotAllowed.MaxReactionReached
-        hasNetwork.not() -> EmojiSendStatus.NotAllowed.NoInternet
-        else -> EmojiSendStatus.Allowed
-    }
-
-    /**
-     * The actual logic of sending an emoji reaction to the api. This method initializes a [Draft] instance, stores it into the
-     * database and schedules the [DraftsActionsWorker] so the draft is uploaded on the api.
-     */
-    private suspend fun sendEmojiReply(emoji: String, messageUid: String, mailbox: Mailbox) {
-        val targetMessage = messageController.getMessage(messageUid) ?: return
-        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
-        if (hasFailedFetching) return
-
-        val draftMode = Draft.DraftMode.REPLY_ALL
-        val draft = Draft().apply {
-            with(draftInitManager) {
-                setPreviousMessage(draftMode, fullMessage)
-            }
-
-            val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
-            body = EMOJI_REACTION_PLACEHOLDER + quote
-
-            with(draftInitManager) {
-                // We don't want to send the HTML code of the signature for an emoji reaction but we still need to send the
-                // identityId stored in a Signature
-                val signature = chooseSignature(mailbox.email, mailbox.signatures, draftMode, fullMessage)
-                setSignatureIdentity(signature)
-            }
-
-            mimeType = Utils.TEXT_HTML
-
-            action = Draft.DraftAction.SEND_REACTION
-            emojiReaction = emoji
-        }
-
-        draftController.upsertDraft(draft)
-
-        draftsActionsWorkerScheduler.scheduleWork(draft.localUuid, AccountUtils.currentMailboxId, AccountUtils.currentUserId)
-    }
-
-    private sealed interface EmojiSendStatus {
-        data object Allowed : EmojiSendStatus
-
-        sealed class NotAllowed(@StringRes val errorMessageRes: Int) : EmojiSendStatus {
-            data object AlreadyUsed : NotAllowed(ErrorCode.EmojiReactions.alreadyUsed.translateRes)
-            data object MaxReactionReached : NotAllowed(ErrorCode.EmojiReactions.maxReactionReached.translateRes)
-            data object NoInternet : NotAllowed(RCore.string.noConnection)
-        }
-    }
-    //endregion
-
     //region Undo action
     fun undoAction(undoData: UndoData, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
 
@@ -903,9 +809,5 @@ class ActionsViewModel @Inject constructor(
 
         if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
         return uidsToMove
-    }
-
-    companion object {
-        private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
 }
