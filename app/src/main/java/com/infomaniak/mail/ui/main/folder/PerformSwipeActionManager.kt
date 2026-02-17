@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.folder
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -28,6 +29,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
@@ -79,6 +81,15 @@ object PerformSwipeActionManager {
         position: Int,
         isPermanentDeleteFolder: Boolean
     ): Boolean {
+        val currentMailbox = mainViewModel.currentMailbox.value
+        if (currentMailbox == null) {
+            snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+            SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
+                scope.setTag("context", "PerformSwipeActionManager.performSwipeAction")
+            }
+            return true
+        }
+
         return when (swipeAction) {
             SwipeAction.TUTORIAL -> {
                 localSettings.setDefaultSwipeActions()
@@ -87,17 +98,12 @@ object PerformSwipeActionManager {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                handleArchiveSwipe(thread, position, folderRole)
+                handleArchiveSwipe(thread, position, folderRole, currentMailbox)
             }
             SwipeAction.DELETE -> {
-                handleDeleteSwipe(thread, position, folderRole, isPermanentDeleteFolder)
+                handleDeleteSwipe(thread, position, folderRole, isPermanentDeleteFolder, currentMailbox)
             }
             SwipeAction.FAVORITE -> {
-                val currentMailbox = mainViewModel.currentMailbox.value
-                if (currentMailbox == null) {
-                    snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
-                    return true
-                }
                 actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(threadsUids = listOf(thread.uid), mailbox = currentMailbox)
                 true
             }
@@ -124,11 +130,6 @@ object PerformSwipeActionManager {
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                val currentMailbox = mainViewModel.currentMailbox.value
-                if (currentMailbox == null) {
-                    snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
-                    return true
-                }
                 actionsViewModel.toggleThreadsOrMessagesSeenStatus(
                     threadsUids = listOf(thread.uid),
                     currentFolderId = mainViewModel.currentFolderId,
@@ -139,11 +140,6 @@ object PerformSwipeActionManager {
             }
 
             SwipeAction.SPAM -> {
-                val currentMailbox = mainViewModel.currentMailbox.value
-                if (currentMailbox == null) {
-                    snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
-                    return true
-                }
                 actionsViewModel.toggleThreadsOrMessagesSpamStatus(
                     threads = setOf(thread),
                     currentFolderId = mainViewModel.currentFolderId,
@@ -164,7 +160,12 @@ object PerformSwipeActionManager {
         }
     }
 
-    private fun ThreadListFragment.handleArchiveSwipe(thread: Thread, position: Int, folderRole: FolderRole?): Boolean {
+    private fun ThreadListFragment.handleArchiveSwipe(
+        thread: Thread,
+        position: Int,
+        folderRole: FolderRole?,
+        currentMailBox: Mailbox
+    ): Boolean {
         fun onCancel() {
             if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
                 threadListAdapter.notifyItemChanged(position)
@@ -172,11 +173,6 @@ object PerformSwipeActionManager {
         }
 
         fun onSuccess() {
-            val currentMailBox = mainViewModel.currentMailbox.value
-            if (currentMailBox == null) {
-                snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
-                return
-            }
             actionsViewModel.archiveThreadsOrMessages(
                 threads = listOf(thread),
                 currentFolder = mainViewModel.currentFolder.value,
@@ -197,7 +193,8 @@ object PerformSwipeActionManager {
         thread: Thread,
         position: Int,
         folderRole: FolderRole?,
-        isPermanentDeleteFolder: Boolean
+        isPermanentDeleteFolder: Boolean,
+        currentMailBox: Mailbox
     ): Boolean {
         fun onCancel() {
             // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
@@ -209,12 +206,6 @@ object PerformSwipeActionManager {
 
         fun onHandleDelete() {
             if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
-            val currentMailBox = mainViewModel.currentMailbox.value
-            if (currentMailBox == null) {
-                snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
-                return
-            }
-
             actionsViewModel.deleteThreadsOrMessages(
                 threads = listOf(thread),
                 currentFolder = mainViewModel.currentFolder.value,
