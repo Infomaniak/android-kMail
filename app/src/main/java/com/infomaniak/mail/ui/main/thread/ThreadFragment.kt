@@ -97,6 +97,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
+import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
@@ -199,6 +200,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
+    private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -427,7 +429,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         trackEmojiReactionsEvent(MatomoName.AddReactionFromChip)
                     }
 
-                    actionsViewModel.trySendEmojiReply(
+                    emojiReactionsViewModel.trySendEmojiReply(
                         emoji = emoji,
                         messageUid = messageUid,
                         reactions = reactions,
@@ -679,7 +681,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerObserverTarget.Thread.name) { (emoji, messageUid) ->
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult
-            actionsViewModel.trySendEmojiReply(
+            emojiReactionsViewModel.trySendEmojiReply(
                 emoji = emoji,
                 messageUid = messageUid,
                 reactions = reactions,
