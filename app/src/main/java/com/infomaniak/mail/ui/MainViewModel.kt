@@ -31,7 +31,6 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.utils.DownloadManagerUtils
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
-import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.networking.HttpUtils
 import com.infomaniak.core.network.networking.ManualAuthorizationRequired
@@ -76,6 +75,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
+import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
@@ -142,6 +142,7 @@ class MainViewModel @Inject constructor(
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
+    private val networkManager: NetworkManager,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
@@ -267,20 +268,10 @@ class MainViewModel @Inject constructor(
 
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
-    val isNetworkAvailable = NetworkAvailability(appContext).isNetworkAvailable
-    var hasNetwork: Boolean = true
-        private set
-
     private var currentThreadsLiveJob: Job? = null
 
-    init {
-        viewModelScope.launch {
-            isNetworkAvailable.collect {
-                SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
-                hasNetwork = it
-            }
-        }
-    }
+    val isNetworkAvailable = networkManager.isNetworkAvailable
+    val hasNetwork: Boolean get() = networkManager.hasNetwork
 
     fun reassignCurrentThreadsLive() {
         currentThreadsLiveJob?.cancel()
@@ -1042,7 +1033,7 @@ class MainViewModel @Inject constructor(
         val mailboxUuid = currentMailbox.value?.uuid
 
         viewModelScope.launch {
-            if (mailboxUuid == null || !hasNetwork) {
+            if (mailboxUuid == null || !networkManager.hasNetwork) {
                 _shareThreadUrlResult.emit(null)
                 return@launch
             }

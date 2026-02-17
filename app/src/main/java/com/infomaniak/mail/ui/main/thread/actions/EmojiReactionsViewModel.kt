@@ -31,6 +31,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
 import com.infomaniak.mail.utils.ErrorCode
+import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -46,6 +47,7 @@ class EmojiReactionsViewModel @Inject constructor(
     private val draftInitManager: DraftInitManager,
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val messageController: MessageController,
+    private val networkManager: NetworkManager,
     private val snackbarManager: SnackbarManager,
 ) : AndroidViewModel(application) {
     /**
@@ -55,16 +57,17 @@ class EmojiReactionsViewModel @Inject constructor(
      * If sending is allowed, the caller place can fake the emoji reaction locally thanks to [onAllowed].
      * If sending is not allowed, it will display the error directly to the user and avoid doing the api call.
      */
+    val hasNetwork: Boolean get() = networkManager.hasNetwork
+
     fun trySendEmojiReply(
         emoji: String,
         messageUid: String,
         reactions: Map<String, Reaction>,
-        hasNetwork: Boolean,
         mailbox: Mailbox,
         onAllowed: () -> Unit = {},
     ) {
         viewModelScope.launch {
-            when (val status = reactions.getEmojiSendStatus(emoji, hasNetwork)) {
+            when (val status = reactions.getEmojiSendStatus(emoji)) {
                 EmojiSendStatus.Allowed -> {
                     onAllowed()
                     sendEmojiReply(emoji, messageUid, mailbox)
@@ -74,7 +77,7 @@ class EmojiReactionsViewModel @Inject constructor(
         }
     }
 
-    private fun Map<String, Reaction>.getEmojiSendStatus(emoji: String, hasNetwork: Boolean): EmojiSendStatus = when {
+    private fun Map<String, Reaction>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
         this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
         hasAvailableReactionSlot().not() -> EmojiSendStatus.NotAllowed.MaxReactionReached
         hasNetwork.not() -> EmojiSendStatus.NotAllowed.NoInternet
