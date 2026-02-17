@@ -129,6 +129,32 @@ class ActionsViewModel @Inject constructor(
         toggleMessagesSpamStatus(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
     }
 
+    fun activateSpamFilter(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        ApiRepository.setSpamFilter(
+            mailboxHostingId = mailbox.hostingId,
+            mailboxName = mailbox.mailboxName,
+            activateSpamFilter = true,
+        )
+    }
+
+    fun unblockMail(email: String, mailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
+        if (mailbox == null) return@launch
+
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                val restrictions = data
+                if (restrictions == null) {
+                    snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                    return@launch
+                }
+                restrictions.apply {
+                    blockedSenders.removeIf { it.email == email }
+                }
+                updateBlockedSenders(mailbox, restrictions)
+            }
+        }
+    }
+
     private fun toggleMessagesSpamStatus(
         messages: List<Message>,
         currentFolderId: String?,
@@ -146,34 +172,13 @@ class ActionsViewModel @Inject constructor(
         }
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
-        val messages = messageController.getUnscheduledMessages(messages)
+        val unscheduleMessages = messageController.getUnscheduledMessages(messages)
 
-        moveMessagesTo(destinationFolder, currentFolderId, mailbox, messages, displaySnackbar)
-    }
-
-    fun activateSpamFilter(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        ApiRepository.setSpamFilter(
-            mailboxHostingId = mailbox.hostingId,
-            mailboxName = mailbox.mailboxName,
-            activateSpamFilter = true,
-        )
+        moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduleMessages, displaySnackbar)
     }
 
     private suspend fun getMessagesFromThreadToSpamOrHam(threads: Set<Thread>): List<Message> {
         return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = false) }
-    }
-
-    fun unblockMail(email: String, mailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
-        if (mailbox == null) return@launch
-
-        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) {
-                val updatedSendersRestrictions = data!!.apply {
-                    blockedSenders.removeIf { it.email == email }
-                }
-                updateBlockedSenders(mailbox, updatedSendersRestrictions)
-            }
-        }
     }
 
     private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
@@ -185,20 +190,19 @@ class ActionsViewModel @Inject constructor(
             }
         }
     }
-
     //endregion
 
     //region Move
     fun moveThreadsOrMessagesTo(
         destinationFolderId: String,
         threadsUids: List<String>? = null,
-        messagesUid: List<String>? = null,
+        messagesUids: List<String>? = null,
         currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return@launch
         val threads: List<Thread>? = threadsUids?.let { threadController.getThreads(threadsUids).toList() }
-        val messages = messagesUid?.let { messageController.getMessages(it) }
+        val messages = messagesUids?.let { messageController.getMessages(it) }
         val messagesToMove = sharedUtils.getMessagesToMove(threads, messages, currentFolderId)
 
         moveMessagesTo(destinationFolder, currentFolderId, mailbox, messagesToMove)
@@ -320,18 +324,6 @@ class ActionsViewModel @Inject constructor(
     }
     //endregion
 
-    private suspend fun moveOutThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
-        val uidsToMove = mutableListOf<String>().apply {
-            messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
-                val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
-                if (nbMessagesInCurrentFolder == 0) add(thread.uid)
-            }
-        }
-
-        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
-        return uidsToMove
-    }
-
     //region Delete
     fun deleteThreadsOrMessages(
         threads: List<Thread>? = null,
@@ -429,7 +421,12 @@ class ActionsViewModel @Inject constructor(
     }
 
     private suspend fun getMessagesToDelete(threads: List<Thread>?, messages: List<Message>?) = when {
-        threads != null -> threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = true) }
+        threads != null -> threads.flatMap {
+            messageController.getUnscheduledMessagesFromThread(
+                it,
+                includeDuplicates = true
+            )
+        }
         messages != null -> messageController.getMessagesAndDuplicates(messages)
         else -> emptyList()
     }
@@ -462,18 +459,7 @@ class ActionsViewModel @Inject constructor(
         moveMessagesTo(destinationFolder, currentFolder?.id, mailbox, messages)
     }
 
-    private fun refreshFoldersAsync(
-        mailbox: Mailbox,
-        messagesFoldersIds: ImpactedFolders,
-        currentFolderId: String? = null,
-        destinationFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
-    }
-
     //region Seen
-
     fun toggleThreadsOrMessagesSeenStatus(
         threadsUids: List<String>? = null,
         messages: List<Message>? = null,
@@ -725,28 +711,6 @@ class ActionsViewModel @Inject constructor(
         return rescheduleResult
     }
 
-    private suspend fun rescheduleSnoozedThreads(
-        currentMailbox: Mailbox,
-        snoozeUuids: List<String>,
-        date: Date,
-    ): BatchSnoozeResult {
-        return SharedUtils.rescheduleSnoozedThreads(
-            mailboxUuid = currentMailbox.uuid,
-            snoozeUuids = snoozeUuids,
-            newDate = date,
-            impactedFolders = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
-        )
-    }
-
-    private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {
-        val errorMessageRes = when (errorResult) {
-            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
-            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
-            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
-        }
-        return appContext.getString(errorMessageRes)
-    }
-
     suspend fun unsnoozeThreads(threads: Collection<Thread>, mailbox: Mailbox?): BatchSnoozeResult {
         var unsnoozeResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
 
@@ -771,6 +735,28 @@ class ActionsViewModel @Inject constructor(
         }.join()
 
         return unsnoozeResult
+    }
+
+    private suspend fun rescheduleSnoozedThreads(
+        currentMailbox: Mailbox,
+        snoozeUuids: List<String>,
+        date: Date,
+    ): BatchSnoozeResult {
+        return SharedUtils.rescheduleSnoozedThreads(
+            mailboxUuid = currentMailbox.uuid,
+            snoozeUuids = snoozeUuids,
+            newDate = date,
+            impactedFolders = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
+        )
+    }
+
+    private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {
+        val errorMessageRes = when (errorResult) {
+            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
+            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+        }
+        return appContext.getString(errorMessageRes)
     }
 
     private fun getUnsnoozeErrorMessage(errorResult: BatchSnoozeResult.Error): String {
@@ -826,8 +812,8 @@ class ActionsViewModel @Inject constructor(
         val targetMessage = messageController.getMessage(messageUid) ?: return
         val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
         if (hasFailedFetching) return
-        val draftMode = Draft.DraftMode.REPLY_ALL
 
+        val draftMode = Draft.DraftMode.REPLY_ALL
         val draft = Draft().apply {
             with(draftInitManager) {
                 setPreviousMessage(draftMode, fullMessage)
@@ -903,8 +889,29 @@ class ActionsViewModel @Inject constructor(
         isDownloadingChanges.postValue(false)
     }
 
+    private fun refreshFoldersAsync(
+        mailbox: Mailbox,
+        messagesFoldersIds: ImpactedFolders,
+        currentFolderId: String? = null,
+        destinationFolderId: String? = null,
+        callbacks: RefreshCallbacks? = null,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
+    }
+
+    private suspend fun moveOutThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
+        val uidsToMove = mutableListOf<String>().apply {
+            messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
+                val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
+                if (nbMessagesInCurrentFolder == 0) add(thread.uid)
+            }
+        }
+
+        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
+        return uidsToMove
+    }
+
     companion object {
-        private val TAG: String = ActionsViewModel::class.java.simpleName
         private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
 }
