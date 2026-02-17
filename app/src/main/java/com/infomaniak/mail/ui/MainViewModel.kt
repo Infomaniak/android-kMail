@@ -31,7 +31,6 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.utils.DownloadManagerUtils
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
-import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.networking.HttpUtils
 import com.infomaniak.core.network.networking.ManualAuthorizationRequired
@@ -76,6 +75,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
+import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
@@ -119,9 +119,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -144,6 +142,7 @@ class MainViewModel @Inject constructor(
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
+    private val networkManager: NetworkManager,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
@@ -269,13 +268,10 @@ class MainViewModel @Inject constructor(
 
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
-    val isNetworkAvailable = NetworkAvailability().isNetworkAvailable.onEach {
-        SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
-
-    val hasNetwork: Boolean by isNetworkAvailable::value
-
     private var currentThreadsLiveJob: Job? = null
+
+    val isNetworkAvailable = networkManager.isNetworkAvailable
+    val hasNetwork: Boolean get() = networkManager.hasNetwork
 
     fun reassignCurrentThreadsLive() {
         currentThreadsLiveJob?.cancel()
@@ -1054,7 +1050,7 @@ class MainViewModel @Inject constructor(
         val mailboxUuid = currentMailbox.value?.uuid
 
         viewModelScope.launch {
-            if (mailboxUuid == null || !hasNetwork) {
+            if (mailboxUuid == null || !networkManager.hasNetwork) {
                 _shareThreadUrlResult.emit(null)
                 return@launch
             }
