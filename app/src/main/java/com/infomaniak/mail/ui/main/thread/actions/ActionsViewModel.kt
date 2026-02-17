@@ -421,12 +421,7 @@ class ActionsViewModel @Inject constructor(
     }
 
     private suspend fun getMessagesToDelete(threads: List<Thread>?, messages: List<Message>?) = when {
-        threads != null -> threads.flatMap {
-            messageController.getUnscheduledMessagesFromThread(
-                it,
-                includeDuplicates = true
-            )
-        }
+        threads != null -> threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = true) }
         messages != null -> messageController.getMessagesAndDuplicates(messages)
         else -> emptyList()
     }

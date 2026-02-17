@@ -102,11 +102,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val threads = selectedThreads.toSet()
         val threadsUids = threads.map { it.uid }
         val threadsCount = threadsUids.count()
-        val currentMailbox = mainViewModel.currentMailbox.value
-        if (currentMailbox == null) {
+        val currentMailbox = mainViewModel.currentMailbox.value ?: run {
             SentryLog.e(TAG, getString(R.string.sentryErrorMailboxIsNull)) { scope ->
                 scope.setTag("context", "$TAG.onViewCreated")
             }
+            snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+            return@with
         }
 
         // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
@@ -145,15 +146,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.spam.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
-            if (currentMailbox == null) {
-                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-            } else {
-                actionsViewModel.toggleThreadsOrMessagesSpamStatus(
-                    threads = threads,
-                    currentFolderId = mainViewModel.currentFolderId,
-                    mailbox = currentMailbox,
-                )
-            }
+            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                threads = threads,
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = currentMailbox,
+            )
             isMultiSelectOn = false
         }
 
@@ -167,21 +164,17 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
             }
 
-            if (currentMailbox == null) {
-                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-            } else {
-                descriptionDialog.show(
-                    title = getString(R.string.reportPhishingTitle),
-                    description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
-                    onPositiveButtonClicked = {
-                        actionsViewModel.reportPhishing(
-                            messages = messages,
-                            currentFolder = mainViewModel.currentFolder.value,
-                            mailbox = currentMailbox
-                        )
-                    },
-                )
-            }
+            descriptionDialog.show(
+                title = getString(R.string.reportPhishingTitle),
+                description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
+                onPositiveButtonClicked = {
+                    actionsViewModel.reportPhishing(
+                        messages = messages,
+                        currentFolder = mainViewModel.currentFolder.value,
+                        mailbox = currentMailbox
+                    )
+                },
+            )
 
             isMultiSelectOn = false
         }
@@ -210,15 +203,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
-            if (currentMailbox == null) {
-                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-            } else {
-                actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
-                    threadsUids = threadsUids,
-                    mailbox = currentMailbox,
-                    shouldFavorite = shouldFavorite
-                )
-            }
+            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                threadsUids = threadsUids,
+                mailbox = currentMailbox,
+                shouldFavorite = shouldFavorite
+            )
+
             isMultiSelectOn = false
         }
 
