@@ -155,8 +155,8 @@ class FolderPickerFragment : Fragment() {
             FolderPickerAction.MOVE -> folder?.id?.let {
                 actionsViewModel.moveThreadsOrMessagesTo(
                     destinationFolderId = it,
-                    threadsUids = threadsUids.let { threadsUids.toList() },
-                    messagesUid = messagesUids?.let { messagesUids.toList() },
+                    threadsUids = threadsUids.toList(),
+                    messagesUids = messagesUids?.toList(),
                     currentFolderId = mainViewModel.currentFolderId,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
