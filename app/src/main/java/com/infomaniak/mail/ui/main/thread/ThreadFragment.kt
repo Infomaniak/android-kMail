@@ -866,7 +866,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Delete)
                         val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
-                        actionsViewModel.deleteThreadsOrMessages(
+                        actionsViewModel.deleteThreads(
                             threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
                             mailbox = mainViewModel.currentMailbox.value!!
