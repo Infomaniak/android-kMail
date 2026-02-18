@@ -46,7 +46,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
-import com.infomaniak.mail.utils.FeatureAvailability
+import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
@@ -55,7 +55,6 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
@@ -79,6 +78,7 @@ class ActionsViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
+    private val messagesActionsUseCase: MessagesActionsUseCase,
     private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
@@ -96,24 +96,46 @@ class ActionsViewModel @Inject constructor(
     fun moveToSpamFolder(messagesUid: List<String>, currentFolderId: String?, mailbox: Mailbox) {
         viewModelScope.launch(ioCoroutineContext) {
             val messages = messageController.getMessages(messagesUid)
-            toggleMessagesSpamStatus(messages, currentFolderId, mailbox)
+            handleToggleSpamMessages(messages, currentFolderId, mailbox, displaySnackbar = true)
         }
     }
 
-    fun toggleThreadsOrMessagesSpamStatus(
-        messages: List<Message>? = null,
-        threads: Set<Thread>? = null,
+    fun toggleThreadsSpamStatus(
+        threads: Set<Thread>,
         currentFolderId: String?,
         mailbox: Mailbox,
         displaySnackbar: Boolean = true
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMarkAsSpam = when {
-            threads != null -> getMessagesFromThreadToSpamOrHam(threads)
-            messages != null -> messageController.getUnscheduledMessages(messages)
-            else -> emptyList()
-        }
+        val messagesToMarkAsSpam = messagesActionsUseCase.getMessagesFromThreadToSpamOrHam(threads)
+        handleToggleSpamMessages(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
+    }
 
-        toggleMessagesSpamStatus(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
+    fun toggleMessagesSpamStatus(
+        messages: List<Message>,
+        currentFolderId: String?,
+        mailbox: Mailbox,
+        displaySnackbar: Boolean = true
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val messagesToMarkAsSpam = messageController.getUnscheduledMessages(messages)
+        handleToggleSpamMessages(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
+    }
+
+    private fun handleToggleSpamMessages(
+        messages: List<Message>,
+        currentFolderId: String?,
+        mailbox: Mailbox,
+        displaySnackbar: Boolean = true
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val result = messagesActionsUseCase.toggleMessagesSpamStatus(
+            messages = messages,
+            currentFolderId = currentFolderId,
+            mailbox = mailbox,
+            callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+        )
+
+        if (displaySnackbar) {
+            showMoveSnackbar(result.movedThreads, result.messages, result.apiResponses, result.destinationFolder)
+        }
     }
 
     fun activateSpamFilter(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
@@ -141,32 +163,6 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-    private fun toggleMessagesSpamStatus(
-        messages: List<Message>,
-        currentFolderId: String?,
-        mailbox: Mailbox,
-        displaySnackbar: Boolean = true,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-
-        val folder = if (currentFolderId != null) folderController.getFolder(currentFolderId) else null
-        val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
-
-        val destinationFolderRole = if (folderRole == FolderRole.SPAM) {
-            FolderRole.INBOX
-        } else {
-            FolderRole.SPAM
-        }
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
-
-        val unscheduledMessages = messageController.getUnscheduledMessages(messages)
-
-        moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduledMessages, displaySnackbar)
-    }
-
-    private suspend fun getMessagesFromThreadToSpamOrHam(threads: Set<Thread>): List<Message> {
-        return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = false) }
-    }
-
     private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
         with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
             if (isSuccess()) {
@@ -179,98 +175,47 @@ class ActionsViewModel @Inject constructor(
     //endregion
 
     //region Move
-    fun moveThreadsOrMessagesTo(
+    fun moveThreadsTo(
         destinationFolderId: String,
-        threadsUids: List<String>? = null,
-        messagesUids: List<String>? = null,
+        threadsUids: List<String>,
         currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val destinationFolder = folderController.getFolder(destinationFolderId) ?: return@launch
-        val threads: List<Thread>? = threadsUids?.let { threadController.getThreads(threadsUids).toList() }
-        val messages = messagesUids?.let { messageController.getMessages(it) }
-        val messagesToMove = sharedUtils.getMessagesToMove(threads, messages, currentFolderId)
+        val threads: List<Thread> = threadController.getThreads(threadsUids).toList()
+        val messagesToMove = sharedUtils.getMessagesFromThreadsToMove(threads)
 
-        moveMessagesTo(destinationFolder, currentFolderId, mailbox, messagesToMove)
+        handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
     }
 
-    private suspend fun moveMessagesTo(
-        destinationFolder: Folder,
+    fun moveMessagesTo(
+        destinationFolderId: String,
+        messagesUids: List<String>,
         currentFolderId: String?,
         mailbox: Mailbox,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val messages = messagesUids.let { messageController.getMessages(it) }
+        val messagesToMove = sharedUtils.getMessagesToMove(messages, currentFolderId)
+
+        handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
+    }
+
+    private fun handleMessagesMove(
+        destinationFolderId: String,
         messages: List<Message>,
-        shouldDisplaySnackbar: Boolean = true,
-    ) {
-
-        val movedThreads = moveOutThreadsLocally(messages, destinationFolder)
-        val featureFlags = mailbox.featureFlags
-
-        val apiResponses = moveMessages(
-            mailbox = mailbox,
-            messagesToMove = messages,
-            destinationFolder = destinationFolder,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings),
-        )
-
-        if (apiResponses.atLeastOneSucceeded() && currentFolderId != null) {
-
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
-                destinationFolderId = destinationFolder.id,
-                currentFolderId = currentFolderId,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(movedThreads) }),
-            )
-        }
-
-        if (apiResponses.atLeastOneFailed() && movedThreads.isNotEmpty()) {
-            threadController.updateIsLocallyMovedOutStatus(movedThreads, hasBeenMovedOut = false)
-        }
-
-        if (shouldDisplaySnackbar) showMoveSnackbar(movedThreads, messages, apiResponses, destinationFolder)
-    }
-
-    private suspend fun moveMessages(
+        currentFolderId: String?,
         mailbox: Mailbox,
-        messagesToMove: List<Message>,
-        destinationFolder: Folder,
-        alsoMoveReactionMessages: Boolean,
-    ): List<ApiResponse<MoveResult>> {
-        val apiResponses = ApiRepository.moveMessages(
-            mailboxUuid = mailbox.uuid,
-            messagesUids = messagesToMove.getUids(),
-            destinationId = destinationFolder.id,
-            alsoMoveReactionMessages = alsoMoveReactionMessages,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+
+        val destinationFolder = folderController.getFolder(destinationFolderId) ?: return@launch
+        val result = messagesActionsUseCase.moveMessagesTo(
+            destinationFolder,
+            currentFolderId,
+            mailbox,
+            messages,
+            callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
         )
 
-        // TODO: Will unsync permantly the mailbox if one message in one of the batches did succeed but some other messages in the
-        //  same batch or in other batches that are target by emoji reactions did not
-        if (alsoMoveReactionMessages && apiResponses.atLeastOneSucceeded()) deleteEmojiReactionMessagesLocally(messagesToMove)
-
-        return apiResponses
-    }
-
-    /**
-     * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
-     * that were targeting this message will display for a brief moment until we refresh their folders. This is because those
-     * messages don't have a target message anymore and emoji reactions messages with no target in their thread need to be
-     * displayed.
-     *
-     * Deleting them from the database in the first place will prevent them from being shown and the messages will be deleted by
-     * the api at the same time anyway.
-     */
-    private suspend fun deleteEmojiReactionMessagesLocally(messagesToMove: List<Message>) {
-        for (messageToMove in messagesToMove) {
-            if (messageToMove.emojiReactions.isEmpty()) continue
-
-            mailboxContentRealm().write {
-                messageToMove.emojiReactions.forEach { reaction ->
-                    reaction.authors.forEach { author ->
-                        MessageController.deleteMessageByUidBlocking(author.sourceMessageUid, this)
-                    }
-                }
-            }
-        }
+        showMoveSnackbar(result.movedThreads, result.messages, result.apiResponses, result.destinationFolder)
     }
 
     private fun showMoveSnackbar(
@@ -311,74 +256,59 @@ class ActionsViewModel @Inject constructor(
     //endregion
 
     //region Delete
-    fun deleteThreadsOrMessages(
-        threads: List<Thread>? = null,
-        messages: List<Message>? = null,
+    fun deleteThreads(
+        threads: List<Thread>,
         currentFolder: Folder?,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToDelete = getMessagesToDelete(threads, messages)
-        deleteMessages(messagesToDelete, currentFolder, mailbox)
+        val messagesToDelete = messagesActionsUseCase.getMessagesFromThreadToDelete(threads)
+        handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
     }
 
-    private fun deleteMessages(
+    fun deleteMessages(
         messages: List<Message>,
         currentFolder: Folder?,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val shouldPermanentlyDelete = isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(messages, currentFolder))
+        val messagesToDelete = messagesActionsUseCase.getMessagesToDelete(messages)
+        handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
+    }
+
+    private fun handleDeleteMessages(
+        messagesToDelete: List<Message>,
+        currentFolder: Folder?,
+        mailbox: Mailbox,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val shouldPermanentlyDelete =
+            isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(messagesToDelete, currentFolder))
 
         if (shouldPermanentlyDelete) {
-            permanentlyDelete(messages, currentFolder, mailbox)
+            val result = messagesActionsUseCase.permanentlyDelete(
+                messagesToDelete,
+                currentFolder,
+                mailbox,
+                onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) }, // UI logic stays here
+                refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+            )
+
+            showDeleteSnackbar(
+                apiResponses = result.apiResponses,
+                messages = messagesToDelete,
+                undoResources = result.undoResources,
+                undoFoldersIds = result.undoFoldersIds,
+                undoDestinationId = result.undoDestinationId,
+                numberOfImpactedThreads = messagesToDelete.count()
+            )
         } else {
             moveMessagesTo(
-                destinationFolder = folderController.getFolder(FolderRole.TRASH)!!,
-                messages = messages,
+                destinationFolderId = folderController.getFolder(FolderRole.TRASH)!!.id,
+                messagesUids = messagesToDelete.getUids(),
                 currentFolderId = currentFolder?.id,
                 mailbox = mailbox
             )
         }
     }
 
-    private suspend fun permanentlyDelete(messagesToDelete: List<Message>, currentFolder: Folder?, mailbox: Mailbox) {
-        val undoResources = emptyList<String>()
-        val uids = messagesToDelete.getUids()
-
-        val uidsToMove = moveOutThreadsLocally(messagesToDelete, folderController.getFolder(FolderRole.TRASH)!!)
-
-        val apiResponses = ApiRepository.deleteMessages(
-            mailboxUuid = mailbox.uuid,
-            messagesUids = uids,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(mailbox.featureFlags, localSettings)
-        )
-
-        activityDialogLoaderResetTrigger.postValue(Unit)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                currentFolderId = currentFolder?.id,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(uidsToMove) }),
-            )
-        }
-
-        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(
-            threadsUids = uidsToMove,
-            hasBeenMovedOut = false
-        )
-
-        val undoDestinationId = messagesToDelete.first().folderId
-        val undoFoldersIds = messagesToDelete.getFoldersIds(exception = undoDestinationId)
-        showDeleteSnackbar(
-            apiResponses = apiResponses,
-            messages = messagesToDelete,
-            undoResources = undoResources,
-            undoFoldersIds = undoFoldersIds,
-            undoDestinationId = undoDestinationId,
-            numberOfImpactedThreads = messagesToDelete.count(),
-        )
-    }
 
     private fun showDeleteSnackbar(
         apiResponses: List<ApiResponse<*>>,
@@ -404,12 +334,6 @@ class ActionsViewModel @Inject constructor(
         val undoData = if (undoResources.isEmpty()) null else UndoData(undoResources, undoFoldersIds, undoDestinationId)
 
         snackbarManager.postValue(snackbarTitle, undoData)
-    }
-
-    private suspend fun getMessagesToDelete(threads: List<Thread>?, messages: List<Message>?) = when {
-        threads != null -> threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = true) }
-        messages != null -> messageController.getMessagesAndDuplicates(messages)
-        else -> emptyList()
     }
 
     //endregion
@@ -495,6 +419,15 @@ class ActionsViewModel @Inject constructor(
         } else {
             sharedUtils.updateSeenStatus(messagesUids, isSeen = true)
         }
+    }
+
+    private fun onDownloadStart() {
+        isDownloadingChanges.postValue(true)
+    }
+
+    private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        isDownloadingChanges.postValue(false)
     }
 
     private suspend fun getMessagesToMarkAsUnseen(
@@ -594,7 +527,7 @@ class ActionsViewModel @Inject constructor(
                 val snackbarTitle = if (isSuccess()) {
 
                     if (folderRoleUtils.getActionFolderRole(messages, currentFolder) != FolderRole.SPAM) {
-                        toggleThreadsOrMessagesSpamStatus(
+                        toggleMessagesSpamStatus(
                             messages = messages,
                             currentFolderId = currentFolder?.id,
                             mailbox = mailbox,
@@ -780,14 +713,6 @@ class ActionsViewModel @Inject constructor(
     }
     //endregion
 
-    private fun onDownloadStart() {
-        isDownloadingChanges.postValue(true)
-    }
-
-    private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        isDownloadingChanges.postValue(false)
-    }
 
     private fun refreshFoldersAsync(
         mailbox: Mailbox,
