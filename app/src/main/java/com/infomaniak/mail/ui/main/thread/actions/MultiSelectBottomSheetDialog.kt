@@ -146,7 +146,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.spam.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
-            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+            actionsViewModel.toggleThreadsSpamStatus(
                 threads = threads,
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = currentMailbox,
@@ -270,7 +270,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
-                        actionsViewModel.deleteThreadsOrMessages(
+                        actionsViewModel.deleteThreads(
                             threads = threads.toList(),
                             currentFolder = currentFolder,
                             mailbox = currentMailbox
