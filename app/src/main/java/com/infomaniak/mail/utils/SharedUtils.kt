@@ -146,10 +146,14 @@ class SharedUtils @Inject constructor(
         else -> listOf(message)
     }
 
-    suspend fun getMessagesToMove(threads: List<Thread>?, messages: List<Message>?, currentFolderId: String?) = when {
-        messages != null -> messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
-        threads != null -> threads.flatMap { messageController.getMovableMessages(it) }
-        else -> emptyList() //this should never happen, we have to send a list of threads or messages.
+    suspend fun getMessagesFromThreadsToMove(threads: List<Thread>): List<Message> {
+        return threads.flatMap {
+            messageController.getMovableMessages(it)
+        }
+    }
+
+    fun getMessagesToMove(messages: List<Message>, currentFolderId: String?): List<Message> {
+        return messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
     }
 
     suspend fun refreshFolders(

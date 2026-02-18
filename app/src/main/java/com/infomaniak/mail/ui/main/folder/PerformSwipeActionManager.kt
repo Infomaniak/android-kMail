@@ -138,7 +138,7 @@ object PerformSwipeActionManager {
             }
 
             SwipeAction.SPAM -> {
-                actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                actionsViewModel.toggleThreadsSpamStatus(
                     threads = setOf(thread),
                     currentFolderId = mainViewModel.currentFolderId,
                     mailbox = currentMailbox
@@ -206,7 +206,7 @@ object PerformSwipeActionManager {
 
         fun onHandleDelete() {
             if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
-            actionsViewModel.deleteThreadsOrMessages(
+            actionsViewModel.deleteThreads(
                 threads = listOf(thread),
                 currentFolder = mainViewModel.currentFolder.value,
                 mailbox = currentMailBox

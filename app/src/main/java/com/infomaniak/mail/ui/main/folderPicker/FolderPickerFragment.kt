@@ -153,13 +153,21 @@ class FolderPickerFragment : Fragment() {
     private fun onFolderSelected(folder: Folder?): Unit = with(navigationArgs) {
         when (action) {
             FolderPickerAction.MOVE -> folder?.id?.let {
-                actionsViewModel.moveThreadsOrMessagesTo(
-                    destinationFolderId = it,
-                    threadsUids = threadsUids.toList(),
-                    messagesUids = messagesUids?.toList(),
-                    currentFolderId = mainViewModel.currentFolderId,
-                    mailbox = mainViewModel.currentMailbox.value!!
-                )
+                if (messagesUids != null) {
+                    actionsViewModel.moveMessagesTo(
+                        destinationFolderId = it,
+                        messagesUids = messagesUids.toList(),
+                        currentFolderId = mainViewModel.currentFolderId,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
+                } else {
+                    actionsViewModel.moveThreadsTo(
+                        destinationFolderId = it,
+                        threadsUids = threadsUids.toList(),
+                        currentFolderId = mainViewModel.currentFolderId,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
+                }
             }
             FolderPickerAction.SEARCH -> {
                 searchViewModel.selectAllFoldersFilter(folder == null)
