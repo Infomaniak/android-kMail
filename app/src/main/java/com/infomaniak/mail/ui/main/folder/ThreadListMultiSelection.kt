@@ -113,7 +113,7 @@ class ThreadListMultiSelection {
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
-                        actionsViewModel.deleteThreadsOrMessages(
+                        actionsViewModel.deleteThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
                             mailbox = currentMailbox.value!!

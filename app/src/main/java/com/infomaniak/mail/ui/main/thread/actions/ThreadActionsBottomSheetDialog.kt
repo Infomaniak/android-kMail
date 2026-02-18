@@ -179,7 +179,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         override fun onDelete() {
             descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
-                actionsViewModel.deleteThreadsOrMessages(
+                actionsViewModel.deleteThreads(
                     threads = listOf(thread),
                     currentFolder = mainViewModel.currentFolder.value,
                     mailbox = mainViewModel.currentMailbox.value!!
@@ -256,7 +256,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onSpam() {
             trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = isFromSpam)
-            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+            actionsViewModel.toggleThreadsSpamStatus(
                 threads = setOf(thread),
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!
