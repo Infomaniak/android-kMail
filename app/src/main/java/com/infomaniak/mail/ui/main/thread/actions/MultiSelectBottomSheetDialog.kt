@@ -140,7 +140,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.cancelSnooze.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.CancelSnooze, threadsCount, isFromBottomSheet = true)
-            lifecycleScope.launch { actionsViewModel.unsnoozeThreads(threads, mainViewModel.currentMailbox.value) }
+            lifecycleScope.launch { actionsViewModel.unsnoozeThreads(threads.toList(), mainViewModel.currentMailbox.value) }
             isMultiSelectOn = false
         }
 
