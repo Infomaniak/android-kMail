@@ -27,7 +27,6 @@ import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -75,7 +74,6 @@ class ActionsViewModel @Inject constructor(
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
@@ -139,11 +137,7 @@ class ActionsViewModel @Inject constructor(
     }
 
     fun activateSpamFilter(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        ApiRepository.setSpamFilter(
-            mailboxHostingId = mailbox.hostingId,
-            mailboxName = mailbox.mailboxName,
-            activateSpamFilter = true,
-        )
+        messagesActionsUseCase.activateSpamFilter(mailbox)
     }
 
     fun unblockMail(email: String, mailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
@@ -416,33 +410,30 @@ class ActionsViewModel @Inject constructor(
     //region Phishing
     fun reportPhishing(messages: List<Message>, currentFolder: Folder?, mailbox: Mailbox) {
         viewModelScope.launch(ioCoroutineContext) {
-            val mailboxUuid = mailbox.uuid
-            val messagesUids: List<String> = messages.map { it.uid }
-
-            if (messagesUids.isEmpty()) {
-                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-                return@launch
-            }
-
-            with(ApiRepository.reportPhishing(mailboxUuid, messagesUids)) {
-                val snackbarTitle = if (isSuccess()) {
-
-                    if (folderRoleUtils.getActionFolderRole(messages, currentFolder) != FolderRole.SPAM) {
-                        toggleMessagesSpamStatus(
-                            messages = messages,
-                            currentFolderId = currentFolder?.id,
-                            mailbox = mailbox,
-                            displaySnackbar = false
-                        )
-                    }
-
-                    R.string.snackbarReportPhishingConfirmation
-                } else {
-                    translateError()
+            val result = messagesActionsUseCase.reportPhishing(
+                messages = messages,
+                currentFolder = currentFolder,
+                mailbox = mailbox,
+                onReportSuccess = {
+                    // We keep the call to toggleMessagesSpamStatus in the VM
+                    // because it likely involves more UI triggers/refresh logic
+                    toggleMessagesSpamStatus(
+                        messages = messages,
+                        currentFolderId = currentFolder?.id,
+                        mailbox = mailbox,
+                        displaySnackbar = false
+                    )
                 }
+            )
 
-                reportPhishingTrigger.postValue(Unit)
-                snackbarManager.postValue(appContext.getString(snackbarTitle))
+            when (result) {
+                is MessagesActionsUseCase.PhishingResult.Success -> {
+                    reportPhishingTrigger.postValue(Unit)
+                    snackbarManager.postValue(appContext.getString(result.messageRes))
+                }
+                is MessagesActionsUseCase.PhishingResult.Error -> {
+                    snackbarManager.postValue(appContext.getString(result.messageRes))
+                }
             }
         }
     }
@@ -450,12 +441,16 @@ class ActionsViewModel @Inject constructor(
 
     //region BlockUser
     fun blockUser(folderId: String, shortUid: Int, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        val mailboxUuid = mailbox.uuid
-        with(ApiRepository.blockUser(mailboxUuid, folderId, shortUid)) {
-            val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
-            snackbarManager.postValue(appContext.getString(snackbarTitle))
-
-            reportPhishingTrigger.postValue(Unit)
+        val result = messagesActionsUseCase.blockUser(folderId, shortUid, mailbox)
+        when (result) {
+            is MessagesActionsUseCase.BlockUserResult.Success -> {
+                // UI Trigger stays in the ViewModel
+                reportPhishingTrigger.postValue(Unit)
+                snackbarManager.postValue(appContext.getString(result.messageRes))
+            }
+            is MessagesActionsUseCase.BlockUserResult.Error -> {
+                snackbarManager.postValue(appContext.getString(result.messageRes))
+            }
         }
     }
     //endregion

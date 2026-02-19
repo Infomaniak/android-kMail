@@ -18,6 +18,8 @@
 package com.infomaniak.mail.useCases
 
 import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -40,6 +42,7 @@ import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import javax.inject.Inject
+import com.infomaniak.core.legacy.R as RCore
 
 class MessagesActionsUseCase @Inject constructor(
     private val folderController: FolderController,
@@ -51,27 +54,7 @@ class MessagesActionsUseCase @Inject constructor(
     private val sharedUtils: SharedUtils,
 ) {
 
-    suspend fun toggleMessagesSpamStatus(
-        messages: List<Message>,
-        currentFolderId: String?,
-        mailbox: Mailbox,
-        callbacks: RefreshCallbacks? = null,
-    ): MoveMessagesResult {
-        val folder = if (currentFolderId != null) folderController.getFolder(currentFolderId) else null
-        val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
-
-        val destinationFolderRole = if (folderRole == FolderRole.SPAM) {
-            FolderRole.INBOX
-        } else {
-            FolderRole.SPAM
-        }
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
-
-        val unscheduleMessages = messageController.getUnscheduledMessages(messages)
-
-        return moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduleMessages, callbacks)
-    }
-
+    // Move Region
     suspend fun moveMessagesTo(
         destinationFolder: Folder,
         currentFolderId: String?,
@@ -91,8 +74,7 @@ class MessagesActionsUseCase @Inject constructor(
         )
 
         if (apiResponses.atLeastOneSucceeded() && currentFolderId != null) {
-
-            refreshFoldersAsync(
+            sharedUtils.refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
@@ -107,29 +89,6 @@ class MessagesActionsUseCase @Inject constructor(
 
         return MoveMessagesResult(movedThreads, messages, apiResponses, destinationFolder)
     }
-
-    private suspend fun refreshFoldersAsync(
-        mailbox: Mailbox,
-        messagesFoldersIds: ImpactedFolders,
-        currentFolderId: String? = null,
-        destinationFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-    ) {
-        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
-    }
-
-    private suspend fun moveOutThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
-        val uidsToMove = mutableListOf<String>().apply {
-            messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
-                val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
-                if (nbMessagesInCurrentFolder == 0) add(thread.uid)
-            }
-        }
-
-        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
-        return uidsToMove
-    }
-
 
     private suspend fun moveMessages(
         mailbox: Mailbox,
@@ -151,33 +110,53 @@ class MessagesActionsUseCase @Inject constructor(
         return apiResponses
     }
 
-    /**
-     * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
-     * that were targeting this message will display for a brief moment until we refresh their folders. This is because those
-     * messages don't have a target message anymore and emoji reactions messages with no target in their thread need to be
-     * displayed.
-     *
-     * Deleting them from the database in the first place will prevent them from being shown and the messages will be deleted by
-     * the api at the same time anyway.
-     */
-    suspend fun deleteEmojiReactionMessagesLocally(messagesToMove: List<Message>) {
-        for (messageToMove in messagesToMove) {
-            if (messageToMove.emojiReactions.isEmpty()) continue
-
-            mailboxContentRealm().write {
-                messageToMove.emojiReactions.forEach { reaction ->
-                    reaction.authors.forEach { author ->
-                        MessageController.deleteMessageByUidBlocking(author.sourceMessageUid, this)
-                    }
-                }
+    private suspend fun moveOutThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
+        val uidsToMove = mutableListOf<String>().apply {
+            messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
+                val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
+                if (nbMessagesInCurrentFolder == 0) add(thread.uid)
             }
         }
+
+        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
+        return uidsToMove
+    }
+    // End Region
+
+    // Spam Region
+    suspend fun toggleMessagesSpamStatus(
+        messages: List<Message>,
+        currentFolderId: String?,
+        mailbox: Mailbox,
+        callbacks: RefreshCallbacks? = null,
+    ): MoveMessagesResult {
+        val folder = if (currentFolderId != null) folderController.getFolder(currentFolderId) else null
+        val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
+
+        val destinationFolderRole = if (folderRole == FolderRole.SPAM) {
+            FolderRole.INBOX
+        } else {
+            FolderRole.SPAM
+        }
+        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
+
+        val unscheduleMessages = messageController.getUnscheduledMessages(messages)
+
+        return moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduleMessages, callbacks)
     }
 
     suspend fun getMessagesFromThreadToSpamOrHam(threads: Set<Thread>): List<Message> {
         return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = false) }
     }
 
+    suspend fun activateSpamFilter(mailbox: Mailbox) {
+        ApiRepository.setSpamFilter(
+            mailboxHostingId = mailbox.hostingId,
+            mailboxName = mailbox.mailboxName,
+            activateSpamFilter = true,
+        )
+    }
+    // End Region
 
     // Delete Region
     suspend fun permanentlyDelete(
@@ -201,7 +180,7 @@ class MessagesActionsUseCase @Inject constructor(
         onApiFinished()
 
         if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
+            sharedUtils.refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messagesToDelete.getFoldersIds(),
                 currentFolderId = currentFolder?.id,
@@ -299,7 +278,7 @@ class MessagesActionsUseCase @Inject constructor(
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
         if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
+            sharedUtils.refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 callbacks = callbacks,
@@ -308,11 +287,9 @@ class MessagesActionsUseCase @Inject constructor(
             sharedUtils.updateSeenStatus(messagesUids, isSeen = true)
         }
     }
-
     // End Region
 
     // Favorites Region
-
     suspend fun toggleThreadFavorite(
         threadsUids: List<String>,
         shouldFavorite: Boolean = true,
@@ -364,7 +341,7 @@ class MessagesActionsUseCase @Inject constructor(
         }
 
         if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
+            sharedUtils.refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 callbacks = callbacks,
@@ -398,6 +375,79 @@ class MessagesActionsUseCase @Inject constructor(
         }
     }
     // End Region
+
+    // Phishing Region
+    suspend fun reportPhishing(
+        messages: List<Message>,
+        currentFolder: Folder?,
+        mailbox: Mailbox,
+        onReportSuccess: suspend () -> Unit
+    ): PhishingResult {
+        val messagesUids = messages.map { it.uid }
+        if (messagesUids.isEmpty()) return PhishingResult.Error(RCore.string.anErrorHasOccurred)
+
+        val response = ApiRepository.reportPhishing(mailbox.uuid, messagesUids)
+
+        return if (response.isSuccess()) {
+            if (folderRoleUtils.getActionFolderRole(messages, currentFolder) != FolderRole.SPAM) {
+                onReportSuccess()
+            }
+            PhishingResult.Success(R.string.snackbarReportPhishingConfirmation)
+        } else {
+            PhishingResult.Error(response.translateError())
+        }
+    }
+
+    sealed class PhishingResult {
+        data class Success(val messageRes: Int) : PhishingResult()
+        data class Error(val messageRes: Int) : PhishingResult()
+    }
+    // End Region
+
+    // Block user Region
+    suspend fun blockUser(
+        folderId: String,
+        shortUid: Int,
+        mailbox: Mailbox
+    ): BlockUserResult {
+        val response = ApiRepository.blockUser(mailbox.uuid, folderId, shortUid)
+
+        return if (response.isSuccess()) {
+            BlockUserResult.Success(R.string.snackbarBlockUserConfirmation)
+        } else {
+            BlockUserResult.Error(response.translateError())
+        }
+    }
+
+    sealed class BlockUserResult {
+        data class Success(val messageRes: Int) : BlockUserResult()
+        data class Error(val messageRes: Int) : BlockUserResult()
+    }
+    // End Region
+
+
+    /**
+     * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
+     * that were targeting this message will display for a brief moment until we refresh their folders. This is because those
+     * messages don't have a target message anymore and emoji reactions messages with no target in their thread need to be
+     * displayed.
+     *
+     * Deleting them from the database in the first place will prevent them from being shown and the messages will be deleted by
+     * the api at the same time anyway.
+     */
+    suspend fun deleteEmojiReactionMessagesLocally(messagesToMove: List<Message>) {
+        for (messageToMove in messagesToMove) {
+            if (messageToMove.emojiReactions.isEmpty()) continue
+
+            mailboxContentRealm().write {
+                messageToMove.emojiReactions.forEach { reaction ->
+                    reaction.authors.forEach { author ->
+                        MessageController.deleteMessageByUidBlocking(author.sourceMessageUid, this)
+                    }
+                }
+            }
+        }
+    }
 
     data class MoveMessagesResult(
         val movedThreads: List<String>,
