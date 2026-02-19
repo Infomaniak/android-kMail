@@ -855,7 +855,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Archive, isFromArchive)
                         val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
-                        actionsViewModel.archiveThreadsOrMessages(
+                        actionsViewModel.archiveThreads(
                             threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
                             mailbox = mainViewModel.currentMailbox.value!!

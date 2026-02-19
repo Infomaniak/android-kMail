@@ -70,6 +70,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
+import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -141,6 +142,7 @@ class MainViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val messagesActionsUseCase: MessagesActionsUseCase,
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
     private val networkManager: NetworkManager,
     private val permissionsController: PermissionsController,
@@ -686,8 +688,13 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
         val destinationFolder = folderController.getFolder(destinationFolderId)!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-        val messages = messagesUid?.let { messageController.getMessages(it) }
-        val messagesToMove = sharedUtils.getMessagesToMove(threads, messages, currentFolderId)
+        var messagesToMove = emptyList<Message>()
+        if (messagesUid != null) {
+            val messages = messagesUid.let { messageController.getMessages(it) }
+            messagesToMove = sharedUtils.getMessagesToMove(messages, currentFolderId)
+        } else {
+            messagesToMove = sharedUtils.getMessagesFromThreadsToMove(threads)
+        }
 
         moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, null, messagesToMove)
     }
@@ -742,7 +749,9 @@ class MainViewModel @Inject constructor(
 
         // TODO: Will unsync permantly the mailbox if one message in one of the batches did succeed but some other messages in the
         //  same batch or in other batches that are target by emoji reactions did not
-        if (alsoMoveReactionMessages && apiResponses.atLeastOneSucceeded()) deleteEmojiReactionMessagesLocally(messagesToMove)
+        if (alsoMoveReactionMessages && apiResponses.atLeastOneSucceeded()) messagesActionsUseCase.deleteEmojiReactionMessagesLocally(
+            messagesToMove
+        )
 
         return apiResponses
     }
