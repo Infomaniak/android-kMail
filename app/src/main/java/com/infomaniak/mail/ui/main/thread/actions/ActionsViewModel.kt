@@ -309,7 +309,6 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-
     private fun showDeleteSnackbar(
         apiResponses: List<ApiResponse<*>>,
         messages: List<Message>,
@@ -339,18 +338,25 @@ class ActionsViewModel @Inject constructor(
     //endregion
 
     //region Archive
+    fun archiveThreads(
+        threads: List<Thread>,
+        currentFolder: Folder?,
+        mailbox: Mailbox,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val messagesToMove = sharedUtils.getMessagesFromThreadsToMove(threads)
+        handleArchiveMessage(messagesToMove, currentFolder, mailbox)
+    }
 
-    fun archiveThreadsOrMessages(
-        threads: List<Thread>? = null,
-        messages: List<Message>? = null,
+    fun archiveMessages(
+        messages: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMove = sharedUtils.getMessagesToMove(threads, messages, currentFolder?.id)
-        archiveMessages(messagesToMove, currentFolder, mailbox)
+        val messagesToMove = sharedUtils.getMessagesToMove(messages, currentFolder?.id)
+        handleArchiveMessage(messagesToMove, currentFolder, mailbox)
     }
 
-    private fun archiveMessages(
+    private fun handleArchiveMessage(
         messages: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox
@@ -361,86 +367,36 @@ class ActionsViewModel @Inject constructor(
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return@launch
 
-        moveMessagesTo(destinationFolder, currentFolder?.id, mailbox, messages)
+        moveMessagesTo(destinationFolder.id, messages.getUids(), currentFolder?.id, mailbox)
     }
 
     //region Seen
-    fun toggleThreadsOrMessagesSeenStatus(
-        threadsUids: List<String>? = null,
-        messages: List<Message>? = null,
-        shouldRead: Boolean = true,
-        currentFolderId: String?,
-        mailbox: Mailbox
-    ) {
-        toggleMessagesSeenStatus(threadsUids, messages, shouldRead = shouldRead, currentFolderId, mailbox)
-    }
-
-    private fun toggleMessagesSeenStatus(
-        threadsUids: List<String>? = null,
-        messages: List<Message>? = null,
+    fun toggleThreadsSeenStatus(
+        threadsUids: List<String>,
         shouldRead: Boolean = true,
         currentFolderId: String?,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val threads = threadsUids?.let { threadController.getThreads(threadsUids) }
-        val isSeen = when {
-            messages?.count() == 1 -> messages.single().isSeen
-            threads?.count() == 1 -> threads.single().isSeen
-            else -> !shouldRead
-        }
+        val threads = threadsUids.let { threadController.getThreads(threadsUids) }
+        val isSeen = if (threads.count() == 1) threads.single().isSeen else !shouldRead
+        val messagesToToggleSeen = messagesActionsUseCase.getMessagesFromThreadsToMarkAsUnseen(threads, mailbox)
 
-        val messagesToToggleSeen = getMessagesToMarkAsUnseen(threads, messages, mailbox)
-
-        if (isSeen) {
-            markAsUnseen(messagesToToggleSeen, mailbox)
-        } else {
-            sharedUtils.markMessagesAsSeen(
-                messages = messagesToToggleSeen,
-                currentFolderId = currentFolderId,
-                mailbox = mailbox,
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-            )
-        }
+        messagesActionsUseCase.handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox)
     }
 
-    private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox) {
-        val messagesUids = messages.map { it.uid }
-
-        sharedUtils.updateSeenStatus(messagesUids, isSeen = false)
-
-        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-            )
-        } else {
-            sharedUtils.updateSeenStatus(messagesUids, isSeen = true)
-        }
-    }
-
-    private fun onDownloadStart() {
-        isDownloadingChanges.postValue(true)
-    }
-
-    private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        isDownloadingChanges.postValue(false)
-    }
-
-    private suspend fun getMessagesToMarkAsUnseen(
-        threads: List<Thread>?,
-        messages: List<Message>?,
+    fun toggleMessagesSeenStatus(
+        messages: List<Message>,
+        shouldRead: Boolean = true,
+        currentFolderId: String?,
         mailbox: Mailbox
-    ): List<Message> = when {
-        threads != null -> threads.flatMap { thread ->
-            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
-        }
-        messages != null -> messageController.getMessagesAndDuplicates(messages)
-        else -> emptyList() //this should never happen, we should always send a list of messages or threads.
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val isSeen = if (messages.count() == 1) messages.single().isSeen else !shouldRead
+        val messagesToToggleSeen = messagesActionsUseCase.getMessagesToMarkAsUnseen(messages)
+        val refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+
+        messagesActionsUseCase.handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox, refreshCallbacks)
     }
+
     //endregion
 
     //region Favorite
@@ -724,15 +680,12 @@ class ActionsViewModel @Inject constructor(
         sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
     }
 
-    private suspend fun moveOutThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
-        val uidsToMove = mutableListOf<String>().apply {
-            messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
-                val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
-                if (nbMessagesInCurrentFolder == 0) add(thread.uid)
-            }
-        }
+    private fun onDownloadStart() {
+        isDownloadingChanges.postValue(true)
+    }
 
-        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
-        return uidsToMove
+    private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        isDownloadingChanges.postValue(false)
     }
 }

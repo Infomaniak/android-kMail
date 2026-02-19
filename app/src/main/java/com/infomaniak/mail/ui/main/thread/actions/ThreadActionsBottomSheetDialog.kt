@@ -192,7 +192,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         override fun onArchive() {
             descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
-                actionsViewModel.archiveThreadsOrMessages(
+                actionsViewModel.archiveThreads(
                     threads = listOf(thread),
                     currentFolder = mainViewModel.currentFolder.value,
                     mailbox = mainViewModel.currentMailbox.value!!
@@ -202,7 +202,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onReadUnread() {
             trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
-            actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+            actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!

@@ -129,7 +129,7 @@ object PerformSwipeActionManager {
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                actionsViewModel.toggleThreadsSeenStatus(
                     threadsUids = listOf(thread.uid),
                     currentFolderId = mainViewModel.currentFolderId,
                     mailbox = currentMailbox
@@ -173,7 +173,7 @@ object PerformSwipeActionManager {
         }
 
         fun onSuccess() {
-            actionsViewModel.archiveThreadsOrMessages(
+            actionsViewModel.archiveThreads(
                 threads = listOf(thread),
                 currentFolder = mainViewModel.currentFolder.value,
                 mailbox = currentMailBox

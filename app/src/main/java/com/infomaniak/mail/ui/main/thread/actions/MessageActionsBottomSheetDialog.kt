@@ -178,7 +178,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onArchive() {
                 descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
-                    actionsViewModel.archiveThreadsOrMessages(
+                    actionsViewModel.archiveMessages(
                         messages = listOf(message),
                         currentFolder = mainViewModel.currentFolder.value,
                         mailbox = mainViewModel.currentMailbox.value!!
@@ -188,7 +188,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onReadUnread() {
                 trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen, message.isSeen)
-                actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                actionsViewModel.toggleMessagesSeenStatus(
                     messages = listOf(message),
                     currentFolderId = mainViewModel.currentFolderId,
                     mailbox = mainViewModel.currentMailbox.value!!

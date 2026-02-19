@@ -76,7 +76,7 @@ class ThreadListMultiSelection {
             when (menuId) {
                 R.id.quickActionUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedThreadsCount)
-                    actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                    actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
                         currentFolderId = currentFolderId,
@@ -90,7 +90,7 @@ class ThreadListMultiSelection {
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
-                        actionsViewModel.archiveThreadsOrMessages(
+                        actionsViewModel.archiveThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
                             mailbox = currentMailbox.value!!
