@@ -244,7 +244,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionMove -> onMoveClicked(threadsCount, threadsUids, folderRole)
                 R.id.actionReadUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
-                    actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                    actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = threadsUids,
                         shouldRead = shouldRead,
                         currentFolderId = currentFolderId,
@@ -257,7 +257,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
-                        actionsViewModel.archiveThreadsOrMessages(
+                        actionsViewModel.archiveThreads(
                             threads = threads.toList(),
                             currentFolder = currentFolder,
                             mailbox = currentMailbox

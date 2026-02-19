@@ -233,6 +233,57 @@ class MessagesActionsUseCase @Inject constructor(
     suspend fun getMessagesToDelete(messages: List<Message>) = messageController.getMessagesAndDuplicates(messages)
 
     // End Region
+
+    // Seen Region
+    suspend fun getMessagesFromThreadsToMarkAsUnseen(threads: List<Thread>, mailbox: Mailbox): List<Message> {
+        return threads.flatMap { thread ->
+            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
+        }
+    }
+
+    suspend fun getMessagesToMarkAsUnseen(messages: List<Message>): List<Message> {
+        return messageController.getMessagesAndDuplicates(messages)
+    }
+
+    suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, callbacks: RefreshCallbacks?) {
+        val messagesUids = messages.map { it.uid }
+
+        sharedUtils.updateSeenStatus(messagesUids, isSeen = false)
+
+        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
+
+        if (apiResponses.atLeastOneSucceeded()) {
+            refreshFoldersAsync(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                callbacks = callbacks,
+            )
+        } else {
+            sharedUtils.updateSeenStatus(messagesUids, isSeen = true)
+        }
+    }
+
+    suspend fun handleToggleSeenStatus(
+        messages: List<Message>,
+        isSeen: Boolean,
+        currentFolderId: String?,
+        mailbox: Mailbox,
+        refreshCallbacks: RefreshCallbacks? = null
+    ) {
+        if (isSeen) {
+            markAsUnseen(messages, mailbox, refreshCallbacks)
+        } else {
+            sharedUtils.markMessagesAsSeen(
+                messages = messages,
+                currentFolderId = currentFolderId,
+                mailbox = mailbox,
+                callbacks = refreshCallbacks,
+            )
+        }
+    }
+
+    // End Region
+
     data class MoveMessagesResult(
         val movedThreads: List<String>,
         val messages: List<Message>,
