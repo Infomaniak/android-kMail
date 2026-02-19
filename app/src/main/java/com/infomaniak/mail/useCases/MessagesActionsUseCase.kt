@@ -235,35 +235,34 @@ class MessagesActionsUseCase @Inject constructor(
     // End Region
 
     // Seen Region
-    suspend fun getMessagesFromThreadsToMarkAsUnseen(threads: List<Thread>, mailbox: Mailbox): List<Message> {
-        return threads.flatMap { thread ->
-            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
-        }
+    suspend fun toggleThreadSeenStatus(
+        threadsUids: List<String>,
+        shouldRead: Boolean = true,
+        currentFolderId: String?,
+        mailbox: Mailbox,
+        refreshCallbacks: RefreshCallbacks? = null
+    ) {
+        val threads = threadsUids.let { threadController.getThreads(threadsUids) }
+        val isSeen = if (threads.count() == 1) threads.single().isSeen else !shouldRead
+        val messagesToToggleSeen = getMessagesFromThreadsToMarkAsUnseen(threads, mailbox)
+
+        handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox, refreshCallbacks)
     }
 
-    suspend fun getMessagesToMarkAsUnseen(messages: List<Message>): List<Message> {
-        return messageController.getMessagesAndDuplicates(messages)
+    suspend fun toggleMessagesSeenStatus(
+        messages: List<Message>,
+        shouldRead: Boolean = true,
+        currentFolderId: String?,
+        mailbox: Mailbox,
+        refreshCallbacks: RefreshCallbacks?
+    ) {
+        val isSeen = if (messages.count() == 1) messages.single().isSeen else !shouldRead
+        val messagesToToggleSeen = getMessagesToMarkAsUnseen(messages)
+
+        handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox, refreshCallbacks)
     }
 
-    suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, callbacks: RefreshCallbacks?) {
-        val messagesUids = messages.map { it.uid }
-
-        sharedUtils.updateSeenStatus(messagesUids, isSeen = false)
-
-        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                callbacks = callbacks,
-            )
-        } else {
-            sharedUtils.updateSeenStatus(messagesUids, isSeen = true)
-        }
-    }
-
-    suspend fun handleToggleSeenStatus(
+    private suspend fun handleToggleSeenStatus(
         messages: List<Message>,
         isSeen: Boolean,
         currentFolderId: String?,
@@ -282,6 +281,122 @@ class MessagesActionsUseCase @Inject constructor(
         }
     }
 
+    private suspend fun getMessagesFromThreadsToMarkAsUnseen(threads: List<Thread>, mailbox: Mailbox): List<Message> {
+        return threads.flatMap { thread ->
+            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
+        }
+    }
+
+    private suspend fun getMessagesToMarkAsUnseen(messages: List<Message>): List<Message> {
+        return messageController.getMessagesAndDuplicates(messages)
+    }
+
+    private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, callbacks: RefreshCallbacks?) {
+        val messagesUids = messages.map { it.uid }
+
+        sharedUtils.updateSeenStatus(messagesUids, isSeen = false)
+
+        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
+
+        if (apiResponses.atLeastOneSucceeded()) {
+            refreshFoldersAsync(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                callbacks = callbacks,
+            )
+        } else {
+            sharedUtils.updateSeenStatus(messagesUids, isSeen = true)
+        }
+    }
+
+    // End Region
+
+    // Favorites Region
+
+    suspend fun toggleThreadFavorite(
+        threadsUids: List<String>,
+        shouldFavorite: Boolean = true,
+        mailbox: Mailbox,
+        callbacks: RefreshCallbacks? = null
+    ) {
+        val threads = threadsUids.let { threadController.getThreads(threadsUids) }
+        val isFavorite = if (threads.count() == 1) threads.single().isFavorite else !shouldFavorite
+        val messages = if (isFavorite) {
+            getMessagesFromThreadToUnfavorite(threads)
+        } else {
+            getMessagesFromThreadToFavorite(threads, mailbox)
+        }
+
+        toggleMessagesFavoriteStatus(messages, isFavorite, mailbox, callbacks)
+    }
+
+    suspend fun toggleMessagesFavorite(
+        messages: List<Message>,
+        shouldFavorite: Boolean = true,
+        mailbox: Mailbox,
+        callbacks: RefreshCallbacks? = null
+    ) {
+        val isFavorite = if (messages.count() == 1) messages.single().isFavorite else !shouldFavorite
+
+        val messages = if (isFavorite) {
+            getMessagesToUnfavorite(messages)
+        } else {
+            getMessagesToFavorite(messages)
+        }
+
+        toggleMessagesFavoriteStatus(messages, isFavorite, mailbox, callbacks)
+    }
+
+    private suspend fun toggleMessagesFavoriteStatus(
+        messages: List<Message>,
+        isFavorite: Boolean,
+        mailbox: Mailbox,
+        callbacks: RefreshCallbacks?
+    ) {
+        val uids = messages.getUids()
+
+        updateFavoriteStatus(messagesUids = uids, isFavorite = !isFavorite)
+
+        val apiResponses = if (isFavorite) {
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+        } else {
+            ApiRepository.addToFavorites(mailbox.uuid, uids)
+        }
+
+        if (apiResponses.atLeastOneSucceeded()) {
+            refreshFoldersAsync(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                callbacks = callbacks,
+            )
+        } else {
+            updateFavoriteStatus(messagesUids = uids, isFavorite = isFavorite)
+        }
+    }
+
+    private suspend fun getMessagesToFavorite(messages: List<Message>): List<Message> {
+        return messageController.getMessagesAndDuplicates(messages)
+    }
+
+    private suspend fun getMessagesToUnfavorite(messages: List<Message>): List<Message> {
+        return messageController.getMessagesAndDuplicates(messages)
+    }
+
+    private suspend fun getMessagesFromThreadToFavorite(threads: List<Thread>, mailbox: Mailbox): List<Message> {
+        return threads.flatMap { thread ->
+            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
+        }
+    }
+
+    private suspend fun getMessagesFromThreadToUnfavorite(threads: List<Thread>): List<Message> {
+        return threads.flatMap { messageController.getFavoriteMessages(it) }
+    }
+
+    private suspend fun updateFavoriteStatus(messagesUids: List<String>, isFavorite: Boolean) {
+        mailboxContentRealm().write {
+            MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
+        }
+    }
     // End Region
 
     data class MoveMessagesResult(
