@@ -220,7 +220,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onFavorite() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Favorite, message.isFavorite)
-                actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                actionsViewModel.toggleMessagesFavoriteStatus(
                     messages = listOf(message),
                     mailbox = mainViewModel.currentMailbox.value!!
                 )

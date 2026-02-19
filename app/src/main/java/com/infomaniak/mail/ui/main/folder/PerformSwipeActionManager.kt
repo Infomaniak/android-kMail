@@ -103,7 +103,7 @@ object PerformSwipeActionManager {
                 handleDeleteSwipe(thread, position, folderRole, isPermanentDeleteFolder, currentMailbox)
             }
             SwipeAction.FAVORITE -> {
-                actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(threadsUids = listOf(thread.uid), mailbox = currentMailbox)
+                actionsViewModel.toggleThreadsFavoriteStatus(threadsUids = listOf(thread.uid), mailbox = currentMailbox)
                 true
             }
             SwipeAction.MOVE -> {

@@ -377,11 +377,8 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val threads = threadsUids.let { threadController.getThreads(threadsUids) }
-        val isSeen = if (threads.count() == 1) threads.single().isSeen else !shouldRead
-        val messagesToToggleSeen = messagesActionsUseCase.getMessagesFromThreadsToMarkAsUnseen(threads, mailbox)
-
-        messagesActionsUseCase.handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox)
+        val refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+        messagesActionsUseCase.toggleThreadSeenStatus(threadsUids, shouldRead, currentFolderId, mailbox, refreshCallbacks)
     }
 
     fun toggleMessagesSeenStatus(
@@ -390,81 +387,29 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val isSeen = if (messages.count() == 1) messages.single().isSeen else !shouldRead
-        val messagesToToggleSeen = messagesActionsUseCase.getMessagesToMarkAsUnseen(messages)
         val refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
-
-        messagesActionsUseCase.handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox, refreshCallbacks)
+        messagesActionsUseCase.toggleMessagesSeenStatus(messages, shouldRead, currentFolderId, mailbox, refreshCallbacks)
     }
 
     //endregion
 
     //region Favorite
-    fun toggleThreadsOrMessagesFavoriteStatus(
-        threadsUids: List<String>? = null,
-        messages: List<Message>? = null,
+    fun toggleThreadsFavoriteStatus(
+        threadsUids: List<String>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val threads = threadsUids?.let { threadController.getThreads(threadsUids) }
-
-        val isFavorite = when {
-            messages?.count() == 1 -> messages.single().isFavorite
-            threads?.count() == 1 -> threads.single().isFavorite
-            else -> !shouldFavorite
-        }
-
-        val messages = if (isFavorite) {
-            getMessagesToUnfavorite(threads, messages)
-        } else {
-            getMessagesToFavorite(threads, messages, mailbox)
-        }
-
-        toggleMessagesFavoriteStatus(messages, isFavorite, mailbox)
+        val callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+        messagesActionsUseCase.toggleThreadFavorite(threadsUids, shouldFavorite, mailbox, callbacks)
     }
 
-    private fun toggleMessagesFavoriteStatus(messages: List<Message>, isFavorite: Boolean, mailbox: Mailbox) {
-        viewModelScope.launch(ioCoroutineContext) {
-            val uids = messages.getUids()
-
-            updateFavoriteStatus(messagesUids = uids, isFavorite = !isFavorite)
-
-            val apiResponses = if (isFavorite) {
-                ApiRepository.removeFromFavorites(mailbox.uuid, uids)
-            } else {
-                ApiRepository.addToFavorites(mailbox.uuid, uids)
-            }
-
-            if (apiResponses.atLeastOneSucceeded()) {
-                refreshFoldersAsync(
-                    mailbox = mailbox,
-                    messagesFoldersIds = messages.getFoldersIds(),
-                    callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-                )
-            } else {
-                updateFavoriteStatus(messagesUids = uids, isFavorite = isFavorite)
-            }
-        }
-    }
-
-    private suspend fun getMessagesToFavorite(threads: List<Thread>?, messages: List<Message>?, mailbox: Mailbox) = when {
-        threads != null -> threads.flatMap { thread ->
-            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
-        }
-        messages != null -> messageController.getMessagesAndDuplicates(messages)
-        else -> emptyList() // this should never happen, we should always pass threads or messages
-    }
-
-    private suspend fun getMessagesToUnfavorite(threads: List<Thread>?, messages: List<Message>?) = when {
-        threads != null -> threads.flatMap { messageController.getFavoriteMessages(it) }
-        messages != null -> messageController.getMessagesAndDuplicates(messages)
-        else -> emptyList()
-    }
-
-    private suspend fun updateFavoriteStatus(messagesUids: List<String>, isFavorite: Boolean) {
-        mailboxContentRealm().write {
-            MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
-        }
+    fun toggleMessagesFavoriteStatus(
+        messages: List<Message>,
+        shouldFavorite: Boolean = true,
+        mailbox: Mailbox
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+        messagesActionsUseCase.toggleMessagesFavorite(messages, shouldFavorite, mailbox, callbacks)
     }
     //endregion
 
