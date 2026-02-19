@@ -827,7 +827,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
-            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+            actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!
             )
