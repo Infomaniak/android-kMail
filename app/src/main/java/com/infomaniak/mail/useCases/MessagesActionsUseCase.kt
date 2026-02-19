@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.useCases
 
+import androidx.annotation.StringRes
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.R
@@ -28,19 +29,27 @@ import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
+import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
+import kotlinx.coroutines.coroutineScope
+import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.core.legacy.R as RCore
 
@@ -49,6 +58,7 @@ class MessagesActionsUseCase @Inject constructor(
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val mailboxController: MailboxController,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     private val sharedUtils: SharedUtils,
@@ -382,9 +392,9 @@ class MessagesActionsUseCase @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
         onReportSuccess: suspend () -> Unit
-    ): PhishingResult {
+    ): ApiCallResult {
         val messagesUids = messages.map { it.uid }
-        if (messagesUids.isEmpty()) return PhishingResult.Error(RCore.string.anErrorHasOccurred)
+        if (messagesUids.isEmpty()) return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
 
         val response = ApiRepository.reportPhishing(mailbox.uuid, messagesUids)
 
@@ -392,39 +402,151 @@ class MessagesActionsUseCase @Inject constructor(
             if (folderRoleUtils.getActionFolderRole(messages, currentFolder) != FolderRole.SPAM) {
                 onReportSuccess()
             }
-            PhishingResult.Success(R.string.snackbarReportPhishingConfirmation)
+            ApiCallResult.Success(R.string.snackbarReportPhishingConfirmation)
         } else {
-            PhishingResult.Error(response.translateError())
+            ApiCallResult.Error(response.translateError())
         }
     }
 
-    sealed class PhishingResult {
-        data class Success(val messageRes: Int) : PhishingResult()
-        data class Error(val messageRes: Int) : PhishingResult()
-    }
+
     // End Region
 
-    // Block user Region
+    // Block Region
     suspend fun blockUser(
         folderId: String,
         shortUid: Int,
         mailbox: Mailbox
-    ): BlockUserResult {
+    ): ApiCallResult {
         val response = ApiRepository.blockUser(mailbox.uuid, folderId, shortUid)
 
         return if (response.isSuccess()) {
-            BlockUserResult.Success(R.string.snackbarBlockUserConfirmation)
+            ApiCallResult.Success(R.string.snackbarBlockUserConfirmation)
         } else {
-            BlockUserResult.Error(response.translateError())
+            ApiCallResult.Error(response.translateError())
         }
     }
 
-    sealed class BlockUserResult {
-        data class Success(val messageRes: Int) : BlockUserResult()
-        data class Error(val messageRes: Int) : BlockUserResult()
+    suspend fun unblockMail(email: String, mailbox: Mailbox): ApiCallResult? {
+        val response = ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)
+        return if (response.isSuccess()) {
+            val restrictions = response.data ?: return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
+            restrictions.apply {
+                blockedSenders.removeIf { it.email == email }
+            }
+            updateBlockedSenders(mailbox, restrictions)
+            null
+        } else {
+            ApiCallResult.Error(response.translateError())
+        }
+    }
+
+    private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
+        with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = updatedSendersRestrictions
+                }
+            }
+        }
     }
     // End Region
 
+    // Snooze Region
+    suspend fun snoozeThreads(
+        date: Date,
+        threadUids: List<String>,
+        currentFolderId: String?,
+        mailbox: Mailbox,
+    ): SnoozeResult {
+        val threads = threadUids.mapNotNull { threadController.getThread(it) }
+        val messageUids = threads.mapNotNull { thread ->
+            thread.getDisplayedMessages(mailbox.featureFlags, localSettings)
+                .lastOrNull { it.folderId == currentFolderId }?.uid
+        }
+
+        val responses = ApiRepository.snoozeMessages(mailbox.uuid, messageUids, date)
+
+        return if (responses.atLeastOneSucceeded()) {
+            sharedUtils.refreshFolders(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+            SnoozeResult.Success(threads.count(), date)
+        } else {
+            val errorRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
+            SnoozeResult.Error(errorRes)
+        }
+    }
+
+    suspend fun rescheduleSnoozedThreads(
+        date: Date,
+        threadUids: List<String>,
+        mailbox: Mailbox,
+    ): BatchSnoozeResult {
+        val snoozedThreadUuids = threadUids.mapNotNull { threadUid ->
+            val thread = threadController.getThread(threadUid) ?: return@mapNotNull null
+            thread.snoozeUuid.takeIf { thread.isSnoozed() }
+        }
+
+        if (snoozedThreadUuids.isEmpty()) return BatchSnoozeResult.Error.Unknown
+
+        val result = SharedUtils.rescheduleSnoozedThreads(
+            mailboxUuid = mailbox.uuid,
+            snoozeUuids = snoozedThreadUuids,
+            newDate = date,
+            impactedFolders = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
+        )
+
+        if (result is BatchSnoozeResult.Success) {
+            sharedUtils.refreshFolders(mailbox, result.impactedFolders)
+        }
+
+        return result
+    }
+
+    suspend fun unsnoozeThreads(
+        threads: Collection<Thread>,
+        mailbox: Mailbox,
+    ): BatchSnoozeResult = coroutineScope {
+
+        val result = SharedUtils.unsnoozeThreadsWithoutRefresh(
+            mailbox = mailbox,
+            threads = threads,
+            scope = this
+        )
+
+        if (result is BatchSnoozeResult.Success) {
+            sharedUtils.refreshFolders(mailbox, result.impactedFolders)
+        }
+
+        result
+    }
+
+    sealed class SnoozeResult {
+        data class Success(val threadCount: Int, val date: Date) : SnoozeResult()
+        data class Error(@StringRes val messageRes: Int) : SnoozeResult()
+    }
+    // End Region
+
+    // Undo Region
+    suspend fun undoAction(undoData: SnackbarManager.UndoData, mailbox: Mailbox): ApiCallResult {
+        val (resources, foldersIds, destinationFolderId) = undoData    // 1. Execute the API calls for each resource
+        val apiResponses = resources.map { ApiRepository.undoAction(it) }
+
+        if (apiResponses.atLeastOneSucceeded()) {
+            sharedUtils.refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = foldersIds,
+                destinationFolderId = destinationFolderId,
+            )
+        }
+
+        val failedCall = apiResponses.firstOrNull { it.data != true }
+
+        return if (failedCall == null) {
+            ApiCallResult.Success(R.string.snackbarMoveCancelled)
+        } else {
+            ApiCallResult.Error(failedCall.translateError())
+        }
+    }
+    // End Region
 
     /**
      * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
@@ -447,6 +569,11 @@ class MessagesActionsUseCase @Inject constructor(
                 }
             }
         }
+    }
+
+    sealed class ApiCallResult {
+        data class Success(val messageRes: Int) : ApiCallResult()
+        data class Error(val messageRes: Int) : ApiCallResult()
     }
 
     data class MoveMessagesResult(
