@@ -26,19 +26,15 @@ import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
-import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
@@ -48,20 +44,17 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -74,7 +67,6 @@ class ActionsViewModel @Inject constructor(
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
-    private val mailboxController: MailboxController,
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
     private val sharedUtils: SharedUtils,
@@ -142,28 +134,9 @@ class ActionsViewModel @Inject constructor(
 
     fun unblockMail(email: String, mailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
         if (mailbox == null) return@launch
-
-        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) {
-                val restrictions = data
-                if (restrictions == null) {
-                    snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-                    return@launch
-                }
-                restrictions.blockedSenders.removeIf { it.email == email }
-
-                updateBlockedSenders(mailbox, restrictions)
-            }
-        }
-    }
-
-    private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
-        with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
-            if (isSuccess()) {
-                mailboxController.updateMailbox(mailbox.objectId) {
-                    it.sendersRestrictions = updatedSendersRestrictions
-                }
-            }
+        val result = messagesActionsUseCase.unblockMail(email, mailbox)
+        if (result is MessagesActionsUseCase.ApiCallResult.Error) {
+            snackbarManager.postValue(appContext.getString(result.messageRes))
         }
     }
     //endregion
@@ -427,11 +400,11 @@ class ActionsViewModel @Inject constructor(
             )
 
             when (result) {
-                is MessagesActionsUseCase.PhishingResult.Success -> {
+                is MessagesActionsUseCase.ApiCallResult.Success -> {
                     reportPhishingTrigger.postValue(Unit)
                     snackbarManager.postValue(appContext.getString(result.messageRes))
                 }
-                is MessagesActionsUseCase.PhishingResult.Error -> {
+                is MessagesActionsUseCase.ApiCallResult.Error -> {
                     snackbarManager.postValue(appContext.getString(result.messageRes))
                 }
             }
@@ -443,12 +416,12 @@ class ActionsViewModel @Inject constructor(
     fun blockUser(folderId: String, shortUid: Int, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActionsUseCase.blockUser(folderId, shortUid, mailbox)
         when (result) {
-            is MessagesActionsUseCase.BlockUserResult.Success -> {
+            is MessagesActionsUseCase.ApiCallResult.Success -> {
                 // UI Trigger stays in the ViewModel
                 reportPhishingTrigger.postValue(Unit)
                 snackbarManager.postValue(appContext.getString(result.messageRes))
             }
-            is MessagesActionsUseCase.BlockUserResult.Error -> {
+            is MessagesActionsUseCase.ApiCallResult.Error -> {
                 snackbarManager.postValue(appContext.getString(result.messageRes))
             }
         }
@@ -458,106 +431,62 @@ class ActionsViewModel @Inject constructor(
     //region Snooze
     // For now we only do snooze for Threads.
     suspend fun snoozeThreads(date: Date, threadUids: List<String>, currentFolderId: String?, mailbox: Mailbox?): Boolean {
-        var isSuccess = false
+        if (mailbox == null) return false
 
-        viewModelScope.launch {
-            mailbox?.let { currentMailbox ->
-                val threads = threadUids.mapNotNull { threadController.getThread(it) }
+        val result = messagesActionsUseCase.snoozeThreads(
+            date = date,
+            threadUids = threadUids,
+            currentFolderId = currentFolderId,
+            mailbox = mailbox,
+        )
 
-                val messageUids = threads.mapNotNull { thread ->
-                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings)
-                        .lastOrNull { it.folderId == currentFolderId }?.uid
-                }
-
-                val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
-
-                isSuccess = responses.atLeastOneSucceeded()
-                val userFeedbackMessage = if (isSuccess) {
-                    // Snoozing threads requires to refresh the snooze folder.
-                    // It's the only folder that will update the snooze state of any message.
-                    refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
-
-                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
-                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threads.count(), formattedDate)
-                } else {
-                    val errorMessageRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
-                    appContext.getString(errorMessageRes)
-                }
-
-                snackbarManager.postValue(userFeedbackMessage)
+        val feedback = when (result) {
+            is MessagesActionsUseCase.SnoozeResult.Success -> {
+                val formattedDate = appContext.dayOfWeekDateWithoutYear(result.date)
+                appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, result.threadCount, formattedDate)
             }
-        }.join()
+            is MessagesActionsUseCase.SnoozeResult.Error -> appContext.getString(result.messageRes)
+        }
 
-        return isSuccess
+        snackbarManager.postValue(feedback)
+        return result is MessagesActionsUseCase.SnoozeResult.Success
     }
 
     suspend fun rescheduleSnoozedThreads(date: Date, threadUids: List<String>, mailbox: Mailbox): BatchSnoozeResult {
-        var rescheduleResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
-
-        viewModelScope.launch(ioCoroutineContext) {
-            val snoozedThreadUuids = threadUids.mapNotNull { threadUid ->
-                val thread = threadController.getThread(threadUid) ?: return@mapNotNull null
-                thread.snoozeUuid.takeIf { thread.isSnoozed() }
-            }
-            if (snoozedThreadUuids.isEmpty()) return@launch
-
-            val result = rescheduleSnoozedThreads(mailbox, snoozedThreadUuids, date)
-
-            val userFeedbackMessage = when (result) {
-                is BatchSnoozeResult.Success -> {
-                    refreshFoldersAsync(mailbox, result.impactedFolders)
-
-                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
-                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threadUids.count(), formattedDate)
-                }
-                is BatchSnoozeResult.Error -> getRescheduleSnoozedErrorMessage(result)
-            }
-
-            snackbarManager.postValue(userFeedbackMessage)
-
-            rescheduleResult = result
-        }.join()
-
-        return rescheduleResult
-    }
-
-    suspend fun unsnoozeThreads(threads: Collection<Thread>, mailbox: Mailbox?): BatchSnoozeResult {
-        var unsnoozeResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
-
-        viewModelScope.launch(ioCoroutineContext) {
-            unsnoozeResult = if (mailbox == null) {
-                BatchSnoozeResult.Error.Unknown
-            } else {
-                ioDispatcher { unsnoozeThreadsWithoutRefresh(scope = null, mailbox, threads) }
-            }
-
-            unsnoozeResult.let {
-                val userFeedbackMessage = when (it) {
-                    is BatchSnoozeResult.Success -> {
-                        sharedUtils.refreshFolders(mailbox = mailbox!!, messagesFoldersIds = it.impactedFolders)
-                        appContext.resources.getQuantityString(R.plurals.snackbarUnsnoozeSuccess, threads.count())
-                    }
-                    is BatchSnoozeResult.Error -> getUnsnoozeErrorMessage(it)
-                }
-
-                snackbarManager.postValue(userFeedbackMessage)
-            }
-        }.join()
-
-        return unsnoozeResult
-    }
-
-    private suspend fun rescheduleSnoozedThreads(
-        currentMailbox: Mailbox,
-        snoozeUuids: List<String>,
-        date: Date,
-    ): BatchSnoozeResult {
-        return SharedUtils.rescheduleSnoozedThreads(
-            mailboxUuid = currentMailbox.uuid,
-            snoozeUuids = snoozeUuids,
-            newDate = date,
-            impactedFolders = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
+        val result = messagesActionsUseCase.rescheduleSnoozedThreads(
+            date = date,
+            threadUids = threadUids,
+            mailbox = mailbox,
         )
+
+        val feedback = when (result) {
+            is BatchSnoozeResult.Success -> {
+                val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
+                appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threadUids.count(), formattedDate)
+            }
+            is BatchSnoozeResult.Error -> getRescheduleSnoozedErrorMessage(result)
+        }
+
+        snackbarManager.postValue(feedback)
+        return result
+    }
+
+    fun unsnoozeThreads(threads: List<Thread>, mailbox: Mailbox?) {
+        if (mailbox == null) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return
+        }
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val result = messagesActionsUseCase.unsnoozeThreads(threads, mailbox)
+            val message = when (result) {
+                is BatchSnoozeResult.Success -> appContext.resources.getQuantityString(
+                    R.plurals.snackbarUnsnoozeSuccess, threads.count()
+                )
+                is BatchSnoozeResult.Error -> getUnsnoozeErrorMessage(result)
+            }
+            snackbarManager.postValue(message)
+        }
     }
 
     private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {
@@ -582,43 +511,15 @@ class ActionsViewModel @Inject constructor(
 
     //region Undo action
     fun undoAction(undoData: UndoData, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-
-        fun List<ApiResponse<*>>.getFailedCall() = firstOrNull { it.data != true }
-
-        val (resources, foldersIds, destinationFolderId) = undoData
-
-        val apiResponses = resources.map { ApiRepository.undoAction(it) }
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-            sharedUtils.refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = foldersIds,
-                destinationFolderId = destinationFolderId,
-            )
+        val result = messagesActionsUseCase.undoAction(undoData, mailbox)
+        val message = when (result) {
+            is MessagesActionsUseCase.ApiCallResult.Success -> appContext.getString(result.messageRes)
+            is MessagesActionsUseCase.ApiCallResult.Error -> appContext.getString(result.messageRes)
         }
 
-        val failedCall = apiResponses.getFailedCall()
-
-        val snackbarTitle = when {
-            failedCall == null -> R.string.snackbarMoveCancelled
-            else -> failedCall.translateError()
-        }
-
-        snackbarManager.postValue(appContext.getString(snackbarTitle))
+        snackbarManager.postValue(message)
     }
     //endregion
-
-
-    private fun refreshFoldersAsync(
-        mailbox: Mailbox,
-        messagesFoldersIds: ImpactedFolders,
-        currentFolderId: String? = null,
-        destinationFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
-    }
 
     private fun onDownloadStart() {
         isDownloadingChanges.postValue(true)
