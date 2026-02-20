@@ -219,7 +219,7 @@ class MessagesActionsUseCase @Inject constructor(
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
             messagesUids = uids,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(mailbox.featureFlags, localSettings)
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(mailbox.featureFlags, localSettings),
         )
 
         onApiFinished()
