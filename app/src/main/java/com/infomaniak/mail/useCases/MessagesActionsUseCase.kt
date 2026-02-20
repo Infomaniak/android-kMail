@@ -73,7 +73,7 @@ class MessagesActionsUseCase @Inject constructor(
         callbacks: RefreshCallbacks? = null,
     ): MoveMessagesResult {
 
-        val movedThreads = moveOutThreadsLocally(messages, destinationFolder)
+        val movedThreads = moveOutMessagesThreadsLocally(messages, destinationFolder)
         val featureFlags = mailbox.featureFlags
 
         val apiResponses = moveMessages(
@@ -136,7 +136,7 @@ class MessagesActionsUseCase @Inject constructor(
         return apiResponses
     }
 
-    private suspend fun moveOutThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
+    private suspend fun moveOutMessagesThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
         val uidsToMove = mutableListOf<String>().apply {
             messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
                 val nbMessagesInCurrentFolder = thread.messages.count { it.folderId != destinationFolder.id }
@@ -146,6 +146,25 @@ class MessagesActionsUseCase @Inject constructor(
 
         if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
         return uidsToMove
+    }
+
+    suspend fun moveThreadsOrMessagesTo(
+        destinationFolderId: String,
+        threadsUids: List<String>,
+        messagesUid: List<String>? = null,
+        mailbox: Mailbox,
+        currentFolderId: String?,
+    ): MoveMessagesResult? {
+        if (currentFolderId == null) return null
+        val destinationFolder = folderController.getFolder(destinationFolderId)!!
+        var messagesToMove: List<Message>
+        if (messagesUid != null) {
+            messagesToMove = messagesUid.let { messageController.getMessages(it) }
+        } else {
+            val threads = threadController.getThreads(threadsUids).ifEmpty { return null }
+            messagesToMove = getMessagesFromThreadsToMove(threads)
+        }
+        return moveMessagesTo(destinationFolder, currentFolderId, mailbox, messagesToMove)
     }
     // End Region
 
@@ -195,7 +214,7 @@ class MessagesActionsUseCase @Inject constructor(
         val undoResources = emptyList<String>()
         val uids = messagesToDelete.getUids()
 
-        val uidsToMove = moveOutThreadsLocally(messagesToDelete, folderController.getFolder(FolderRole.TRASH)!!)
+        val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, folderController.getFolder(FolderRole.TRASH)!!)
 
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
