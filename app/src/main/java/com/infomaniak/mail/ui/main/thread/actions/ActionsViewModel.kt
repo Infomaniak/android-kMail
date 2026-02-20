@@ -42,13 +42,13 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.FolderRoleUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -66,6 +66,7 @@ class ActionsViewModel @Inject constructor(
     private val folderRoleUtils: FolderRoleUtils,
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
+    private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -200,20 +201,7 @@ class ActionsViewModel @Inject constructor(
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoResources = apiResponses.mapNotNull { it.data?.undoResource }
-        val undoData = if (undoResources.isEmpty()) {
-            null
-        } else {
-            val undoDestinationId = destinationFolder.id
-            val foldersIds = messagesMoved.getFoldersIds(exception = undoDestinationId)
-            foldersIds += destinationFolder.id
-            UndoData(
-                resources = apiResponses.mapNotNull { it.data?.undoResource },
-                foldersIds = foldersIds,
-                destinationFolderId = undoDestinationId,
-            )
-        }
-
+        val undoData = sharedUtils.getUndoData(messagesMoved, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
     //endregion
