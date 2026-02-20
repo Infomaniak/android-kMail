@@ -115,7 +115,7 @@ class ActionsViewModel @Inject constructor(
             messages = messages,
             currentFolderId = currentFolderId,
             mailbox = mailbox,
-            callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+            callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
         )
 
         if (displaySnackbar && result != null) {
@@ -383,7 +383,7 @@ class ActionsViewModel @Inject constructor(
                         messages = messages,
                         currentFolderId = currentFolder?.id,
                         mailbox = mailbox,
-                        displaySnackbar = false
+                        displaySnackbar = false,
                     )
                 }
             )
