@@ -39,13 +39,13 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.NotificationPayload
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import com.infomaniak.mail.utils.NotificationUtils
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getUids
@@ -92,7 +92,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     lateinit var refreshController: RefreshController
 
     @Inject
-    lateinit var sharedUtils: SharedUtils
+    lateinit var messagesActionsUseCase: MessagesActionsUseCase
 
     @Inject
     @IoDispatcher
@@ -180,7 +180,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val threads = message.threads.filter { it.folderId == message.folderId }
 
             val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
-            val messages = sharedUtils.getMessagesToMove(threads, message)
+            val messages = messagesActionsUseCase.getMessagesToMove(threads, message)
             val destinationFolder = folderController.getFolder(folderRole) ?: return@launch
             val okHttpClient = AccountUtils.getHttpClient(userId)
 
