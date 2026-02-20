@@ -487,7 +487,7 @@ class MainViewModel @Inject constructor(
 
     private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Permissions")
-        with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
+        with(ApiRepository.getPermissions(mailbox.accessId, mailbox.hostingId)) {
             if (isSuccess()) {
                 mailboxController.updateMailbox(mailbox.objectId) {
                     it.permissions = data
