@@ -100,6 +100,22 @@ class MessagesActionsUseCase @Inject constructor(
         return MoveMessagesResult(movedThreads, messages, apiResponses, destinationFolder)
     }
 
+
+    suspend fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap { messageController.getMovableMessages(it) }
+        else -> listOf(message)
+    }
+
+    suspend fun getMessagesFromThreadsToMove(threads: List<Thread>): List<Message> {
+        return threads.flatMap {
+            messageController.getMovableMessages(it)
+        }
+    }
+
+    fun getMessagesToMove(messages: List<Message>, currentFolderId: String?): List<Message> {
+        return messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
+    }
+
     private suspend fun moveMessages(
         mailbox: Mailbox,
         messagesToMove: List<Message>,
@@ -261,12 +277,94 @@ class MessagesActionsUseCase @Inject constructor(
         if (isSeen) {
             markAsUnseen(messages, mailbox, refreshCallbacks)
         } else {
-            sharedUtils.markMessagesAsSeen(
+            markMessagesAsSeen(
                 messages = messages,
                 currentFolderId = currentFolderId,
                 mailbox = mailbox,
                 callbacks = refreshCallbacks,
             )
+        }
+    }
+
+    /**
+     * Mark a Message or some Threads as read
+     * @param mailbox The Mailbox where the Threads & Messages are located
+     * @param threads The Threads to mark as read
+     * @param message The Message to mark as read
+     * @param callbacks The callbacks for when the refresh of Threads begins/ends
+     * @param shouldRefreshThreads Sometimes, we don't want to refresh Threads after doing this action. For example, when replying
+     * to a Message.
+     */
+    suspend fun markAsSeen(
+        mailbox: Mailbox,
+        threads: List<Thread>,
+        message: Message? = null,
+        currentFolderId: String? = null,
+        callbacks: RefreshCallbacks? = null,
+        shouldRefreshThreads: Boolean = true,
+    ) {
+
+        val messages = when (message) {
+            null -> threads.flatMap { messageController.getUnseenMessages(it) }
+            else -> messageController.getMessageAndDuplicates(threads.first(), message)
+        }
+
+        val threadsUids = threads.map { it.uid }
+        val messagesUids = messages.map { it.uid }
+
+        updateSeenStatus(threadsUids, messagesUids, isSeen = true)
+
+        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
+
+        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
+            sharedUtils.refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                currentFolderId = currentFolderId,
+                callbacks = callbacks,
+            )
+        }
+
+        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(threadsUids, messagesUids, isSeen = false)
+    }
+
+    suspend fun markMessagesAsSeen(
+        mailbox: Mailbox,
+        messages: List<Message>,
+        currentFolderId: String? = null,
+        callbacks: RefreshCallbacks? = null,
+        shouldRefreshThreads: Boolean = true,
+    ) {
+
+        val messagesUids = messages.map { it.uid }
+
+        updateSeenStatus(messagesUids, isSeen = true)
+
+        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
+
+        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
+            sharedUtils.refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                currentFolderId = currentFolderId,
+                callbacks = callbacks,
+            )
+        }
+
+        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(messagesUids, isSeen = false)
+    }
+
+
+    private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().write {
+            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
+            ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+        }
+    }
+
+    suspend fun updateSeenStatus(messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().write {
+            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
         }
     }
 
@@ -283,7 +381,7 @@ class MessagesActionsUseCase @Inject constructor(
     private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, callbacks: RefreshCallbacks?) {
         val messagesUids = messages.map { it.uid }
 
-        sharedUtils.updateSeenStatus(messagesUids, isSeen = false)
+        updateSeenStatus(messagesUids, isSeen = false)
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
@@ -294,7 +392,7 @@ class MessagesActionsUseCase @Inject constructor(
                 callbacks = callbacks,
             )
         } else {
-            sharedUtils.updateSeenStatus(messagesUids, isSeen = true)
+            updateSeenStatus(messagesUids, isSeen = true)
         }
     }
     // End Region
