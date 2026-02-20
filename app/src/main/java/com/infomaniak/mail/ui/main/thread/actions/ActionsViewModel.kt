@@ -25,7 +25,6 @@ import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -43,7 +42,6 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.FolderRoleUtils
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
@@ -66,10 +64,8 @@ class ActionsViewModel @Inject constructor(
     application: Application,
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
-    private val localSettings: LocalSettings,
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
-    private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -149,7 +145,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val threads: List<Thread> = threadController.getThreads(threadsUids).toList()
-        val messagesToMove = sharedUtils.getMessagesFromThreadsToMove(threads)
+        val messagesToMove = messagesActionsUseCase.getMessagesFromThreadsToMove(threads)
 
         handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
     }
@@ -161,7 +157,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messages = messagesUids.let { messageController.getMessages(it) }
-        val messagesToMove = sharedUtils.getMessagesToMove(messages, currentFolderId)
+        val messagesToMove = messagesActionsUseCase.getMessagesToMove(messages, currentFolderId)
 
         handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
     }
@@ -310,7 +306,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMove = sharedUtils.getMessagesFromThreadsToMove(threads)
+        val messagesToMove = messagesActionsUseCase.getMessagesFromThreadsToMove(threads)
         handleArchiveMessage(messagesToMove, currentFolder, mailbox)
     }
 
@@ -319,7 +315,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMove = sharedUtils.getMessagesToMove(messages, currentFolder?.id)
+        val messagesToMove = messagesActionsUseCase.getMessagesToMove(messages, currentFolder?.id)
         handleArchiveMessage(messagesToMove, currentFolder, mailbox)
     }
 

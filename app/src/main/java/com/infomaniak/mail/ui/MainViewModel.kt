@@ -691,9 +691,9 @@ class MainViewModel @Inject constructor(
         var messagesToMove = emptyList<Message>()
         if (messagesUid != null) {
             val messages = messagesUid.let { messageController.getMessages(it) }
-            messagesToMove = sharedUtils.getMessagesToMove(messages, currentFolderId)
+            messagesToMove = messagesActionsUseCase.getMessagesToMove(messages, currentFolderId)
         } else {
-            messagesToMove = sharedUtils.getMessagesFromThreadsToMove(threads)
+            messagesToMove = messagesActionsUseCase.getMessagesFromThreadsToMove(threads)
         }
 
         moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, null, messagesToMove)
