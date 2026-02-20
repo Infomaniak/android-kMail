@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Context
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.exceptions.NetworkException
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
@@ -29,9 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -39,12 +36,9 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.comp
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.extensions.getApiException
-import com.infomaniak.mail.utils.extensions.getFoldersIds
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
@@ -55,33 +49,10 @@ import java.util.Date
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     private val mailboxController: MailboxController,
 ) {
-
-    fun getUndoData(
-        messagesMoved: List<Message>,
-        apiResponses: List<ApiResponse<MoveResult>>,
-        destinationFolder: Folder,
-    ): UndoData? {
-        val undoResources = apiResponses.mapNotNull { it.data?.undoResource }
-        val undoData = if (undoResources.isEmpty()) {
-            null
-        } else {
-            val undoDestinationId = destinationFolder.id
-            val foldersIds = messagesMoved.getFoldersIds(exception = undoDestinationId)
-            foldersIds += destinationFolder.id
-            UndoData(
-                resources = apiResponses.mapNotNull { it.data?.undoResource },
-                foldersIds = foldersIds,
-                destinationFolderId = undoDestinationId,
-            )
-        }
-        return undoData
-    }
-
     suspend fun refreshFolders(
         mailbox: Mailbox,
         messagesFoldersIds: ImpactedFolders,
