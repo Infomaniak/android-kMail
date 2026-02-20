@@ -88,7 +88,13 @@ class MessagesActions @Inject constructor(
     }
 
     suspend fun getMessagesFromThreadsToMove(threads: List<Thread>): List<Message> {
-        return threads.flatMap { messageController.getMovableMessages(it) }
+        return threads.flatMap {
+            messageController.getMovableMessages(it)
+        }
+    }
+
+    fun getMessagesToMove(messages: List<Message>, currentFolderId: String?): List<Message> {
+        return messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
     }
 
     fun getMessagesToMove(messages: List<Message>, currentFolderId: String?): List<Message> {
