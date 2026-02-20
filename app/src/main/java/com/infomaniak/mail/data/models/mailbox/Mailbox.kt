@@ -55,8 +55,8 @@ class Mailbox : RealmObject {
     var mailboxId: Int = -3 // AppSettings.DEFAULT_ID
     @SerialName("hosting_id")
     var hostingId: Int = 0
-    @SerialName("link_id")
-    var linkId: Int = 0
+    @SerialName("access_id")
+    var accessId: String = ""
     @SerialName("is_primary")
     var isPrimary: Boolean = false
     @SerialName("is_locked")
