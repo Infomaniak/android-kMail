@@ -81,6 +81,7 @@ import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSaniti
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
+import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AttachmentsReminderUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
@@ -92,7 +93,6 @@ import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.coroutineContext
@@ -155,7 +155,7 @@ class NewMessageViewModel @Inject constructor(
     private val contactGroupController: ContactGroupController,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val draftInitManager: DraftInitManager,
-    private val sharedUtils: SharedUtils,
+    private val messagesActionsUseCase: MessagesActionsUseCase,
     private val signatureUtils: SignatureUtils,
     private val snackbarManager: SnackbarManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -539,7 +539,7 @@ class NewMessageViewModel @Inject constructor(
         val message = previousMessageUid?.let { MessageController.getMessage(it, realm) } ?: return
         if (message.isSeen) return
 
-        sharedUtils.markAsSeen(
+        messagesActionsUseCase.markAsSeen(
             mailbox = mailbox,
             threads = message.threads.filter { it.folderId == message.folderId },
             message = message,
