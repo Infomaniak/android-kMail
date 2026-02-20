@@ -72,6 +72,7 @@ class ThreadListMultiSelection {
         threadListFragment.binding.quickActionBar.setOnItemClickListener { menuId ->
             val selectedThreadsUids = selectedThreads.map { it.uid }
             val selectedThreadsCount = selectedThreadsUids.count()
+            val currentMailBox = currentMailbox.value ?: return@setOnItemClickListener
 
             when (menuId) {
                 R.id.quickActionUnread -> {
@@ -80,7 +81,7 @@ class ThreadListMultiSelection {
                         threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
                         currentFolderId = currentFolderId,
-                        mailbox = currentMailbox.value!!
+                        mailbox = currentMailBox
                     )
                     isMultiSelectOn = false
                 }
@@ -93,7 +94,7 @@ class ThreadListMultiSelection {
                         actionsViewModel.archiveThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
-                            mailbox = currentMailbox.value!!
+                            mailbox = currentMailBox
                         )
                         isMultiSelectOn = false
                     }
@@ -102,7 +103,7 @@ class ThreadListMultiSelection {
                     trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
                     actionsViewModel.toggleThreadsFavoriteStatus(
                         threadsUids = selectedThreadsUids,
-                        mailbox = currentMailbox.value!!,
+                        mailbox = currentMailBox,
                         shouldFavorite = shouldMultiselectFavorite
                     )
                     isMultiSelectOn = false
@@ -116,7 +117,7 @@ class ThreadListMultiSelection {
                         actionsViewModel.deleteThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
-                            mailbox = currentMailbox.value!!
+                            mailbox = currentMailBox
                         )
                         isMultiSelectOn = false
                     }

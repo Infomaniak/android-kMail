@@ -693,7 +693,7 @@ class MainViewModel @Inject constructor(
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = sharedUtils.getUndoData(messagesMoved, apiResponses, destinationFolder)
+        val undoData = messagesActionsUseCase.getUndoData(messagesMoved, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
 
@@ -772,12 +772,23 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         messagesUids: List<String>?,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val newFolderId = createNewFolderSync(name) ?: return@launch
-        val mailbox = currentMailbox.value ?: return@launch
+        val newFolderId = createNewFolderSync(name)
+        val mailbox = currentMailbox.value
+        if (newFolderId == null || mailbox == null) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
+
+        val destinationFolder = folderController.getFolder(newFolderId)
+        if (destinationFolder == null) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
+
         val result =
             messagesActionsUseCase.moveThreadsOrMessagesTo(newFolderId, threadsUids, messagesUids, mailbox, currentFolderId)
         if (result != null) {
-            showMoveSnackbar(threadsUids.count(), result.messages, result.apiResponses, folderController.getFolder(newFolderId)!!)
+            showMoveSnackbar(threadsUids.count(), result.messages, result.apiResponses, destinationFolder)
             isMovedToNewFolder.postValue(true)
         }
     }
