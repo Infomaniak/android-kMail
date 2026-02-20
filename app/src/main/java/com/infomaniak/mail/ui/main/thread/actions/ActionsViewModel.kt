@@ -42,7 +42,6 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.FolderRoleUtils
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
@@ -66,7 +65,6 @@ class ActionsViewModel @Inject constructor(
     private val folderRoleUtils: FolderRoleUtils,
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
-    private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -91,7 +89,7 @@ class ActionsViewModel @Inject constructor(
         threads: Set<Thread>,
         currentFolderId: String?,
         mailbox: Mailbox,
-        displaySnackbar: Boolean = true
+        displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToMarkAsSpam = messagesActionsUseCase.getMessagesFromThreadToSpamOrHam(threads)
         handleToggleSpamMessages(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
@@ -101,7 +99,7 @@ class ActionsViewModel @Inject constructor(
         messages: List<Message>,
         currentFolderId: String?,
         mailbox: Mailbox,
-        displaySnackbar: Boolean = true
+        displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToMarkAsSpam = messageController.getUnscheduledMessages(messages)
         handleToggleSpamMessages(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
@@ -111,7 +109,7 @@ class ActionsViewModel @Inject constructor(
         messages: List<Message>,
         currentFolderId: String?,
         mailbox: Mailbox,
-        displaySnackbar: Boolean = true
+        displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActionsUseCase.toggleMessagesSpamStatus(
             messages = messages,
@@ -120,7 +118,7 @@ class ActionsViewModel @Inject constructor(
             callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
         )
 
-        if (displaySnackbar) {
+        if (displaySnackbar && result != null) {
             showMoveSnackbar(result.movedThreads, result.messages, result.apiResponses, result.destinationFolder)
         }
     }
@@ -172,10 +170,10 @@ class ActionsViewModel @Inject constructor(
 
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return@launch
         val result = messagesActionsUseCase.moveMessagesTo(
-            destinationFolder,
-            currentFolderId,
-            mailbox,
-            messages,
+            destinationFolder = destinationFolder,
+            currentFolderId = currentFolderId,
+            mailbox = mailbox,
+            messages = messages,
             callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
         )
 
@@ -196,12 +194,12 @@ class ActionsViewModel @Inject constructor(
             threadsMoved.count() > 0 || messagesMoved.count() > 1 -> appContext.resources.getQuantityString(
                 R.plurals.snackbarThreadMoved,
                 threadsMoved.count(),
-                destination
+                destination,
             )
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = sharedUtils.getUndoData(messagesMoved, apiResponses, destinationFolder)
+        val undoData = messagesActionsUseCase.getUndoData(messagesMoved, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
     //endregion
@@ -235,27 +233,36 @@ class ActionsViewModel @Inject constructor(
 
         if (shouldPermanentlyDelete) {
             val result = messagesActionsUseCase.permanentlyDelete(
-                messagesToDelete,
-                currentFolder,
-                mailbox,
-                onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) }, // UI logic stays here
-                refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
+                messagesToDelete = messagesToDelete,
+                currentFolder = currentFolder,
+                mailbox = mailbox,
+                onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
+                refreshCallbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = ::onDownloadStop),
             )
 
-            showDeleteSnackbar(
-                apiResponses = result.apiResponses,
-                messages = messagesToDelete,
-                undoResources = result.undoResources,
-                undoFoldersIds = result.undoFoldersIds,
-                undoDestinationId = result.undoDestinationId,
-                numberOfImpactedThreads = messagesToDelete.count()
-            )
+            if (result != null) {
+                showDeleteSnackbar(
+                    apiResponses = result.apiResponses,
+                    messages = messagesToDelete,
+                    undoResources = result.undoResources,
+                    undoFoldersIds = result.undoFoldersIds,
+                    undoDestinationId = result.undoDestinationId,
+                    numberOfImpactedThreads = messagesToDelete.count(),
+                )
+            }
+
         } else {
+            val destinationFolder = folderController.getFolder(FolderRole.TRASH)
+            if (destinationFolder == null) {
+                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                return@launch
+            }
+
             moveMessagesTo(
-                destinationFolderId = folderController.getFolder(FolderRole.TRASH)!!.id,
+                destinationFolderId = destinationFolder.id,
                 messagesUids = messagesToDelete.getUids(),
                 currentFolderId = currentFolder?.id,
-                mailbox = mailbox
+                mailbox = mailbox,
             )
         }
     }
@@ -272,7 +279,7 @@ class ActionsViewModel @Inject constructor(
             if (messages.count() > 1) {
                 appContext.resources.getQuantityString(
                     R.plurals.snackbarThreadDeletedPermanently,
-                    numberOfImpactedThreads
+                    numberOfImpactedThreads,
                 )
             } else {
                 appContext.getString(R.string.snackbarMessageDeletedPermanently)
@@ -310,7 +317,7 @@ class ActionsViewModel @Inject constructor(
     private fun handleArchiveMessage(
         messages: List<Message>,
         currentFolder: Folder?,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         val role = folderRoleUtils.getActionFolderRole(messages, currentFolder)
@@ -326,7 +333,7 @@ class ActionsViewModel @Inject constructor(
         threadsUids: List<String>,
         shouldRead: Boolean = true,
         currentFolderId: String?,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
         messagesActionsUseCase.toggleThreadSeenStatus(threadsUids, shouldRead, currentFolderId, mailbox, refreshCallbacks)
@@ -336,7 +343,7 @@ class ActionsViewModel @Inject constructor(
         messages: List<Message>,
         shouldRead: Boolean = true,
         currentFolderId: String?,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
         messagesActionsUseCase.toggleMessagesSeenStatus(messages, shouldRead, currentFolderId, mailbox, refreshCallbacks)
@@ -348,7 +355,7 @@ class ActionsViewModel @Inject constructor(
     fun toggleThreadsFavoriteStatus(
         threadsUids: List<String>,
         shouldFavorite: Boolean = true,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
         messagesActionsUseCase.toggleThreadFavorite(threadsUids, shouldFavorite, mailbox, callbacks)
@@ -357,7 +364,7 @@ class ActionsViewModel @Inject constructor(
     fun toggleMessagesFavoriteStatus(
         messages: List<Message>,
         shouldFavorite: Boolean = true,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
         messagesActionsUseCase.toggleMessagesFavorite(messages, shouldFavorite, mailbox, callbacks)
@@ -372,8 +379,6 @@ class ActionsViewModel @Inject constructor(
                 currentFolder = currentFolder,
                 mailbox = mailbox,
                 onReportSuccess = {
-                    // We keep the call to toggleMessagesSpamStatus in the VM
-                    // because it likely involves more UI triggers/refresh logic
                     toggleMessagesSpamStatus(
                         messages = messages,
                         currentFolderId = currentFolder?.id,
@@ -401,7 +406,6 @@ class ActionsViewModel @Inject constructor(
         val result = messagesActionsUseCase.blockUser(folderId, shortUid, mailbox)
         when (result) {
             is MessagesActionsUseCase.ApiCallResult.Success -> {
-                // UI Trigger stays in the ViewModel
                 reportPhishingTrigger.postValue(Unit)
                 snackbarManager.postValue(appContext.getString(result.messageRes))
             }

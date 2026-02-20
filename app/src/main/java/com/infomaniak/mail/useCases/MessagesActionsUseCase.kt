@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -156,7 +157,7 @@ class MessagesActionsUseCase @Inject constructor(
         currentFolderId: String?,
     ): MoveMessagesResult? {
         if (currentFolderId == null) return null
-        val destinationFolder = folderController.getFolder(destinationFolderId)!!
+        val destinationFolder = folderController.getFolder(destinationFolderId) ?: return null
         var messagesToMove: List<Message>
         if (messagesUid != null) {
             messagesToMove = messagesUid.let { messageController.getMessages(it) }
@@ -174,7 +175,7 @@ class MessagesActionsUseCase @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
         callbacks: RefreshCallbacks? = null,
-    ): MoveMessagesResult {
+    ): MoveMessagesResult? {
         val folder = if (currentFolderId != null) folderController.getFolder(currentFolderId) else null
         val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
 
@@ -183,8 +184,7 @@ class MessagesActionsUseCase @Inject constructor(
         } else {
             FolderRole.SPAM
         }
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
-
+        val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
         val unscheduleMessages = messageController.getUnscheduledMessages(messages)
 
         return moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduleMessages, callbacks)
@@ -208,13 +208,13 @@ class MessagesActionsUseCase @Inject constructor(
         messagesToDelete: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox,
-        onApiFinished: () -> Unit, // Callback for the loader reset
-        refreshCallbacks: RefreshCallbacks?
-    ): DeleteResult {
+        onApiFinished: () -> Unit,
+        refreshCallbacks: RefreshCallbacks?,
+    ): DeleteResult? {
         val undoResources = emptyList<String>()
         val uids = messagesToDelete.getUids()
-
-        val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, folderController.getFolder(FolderRole.TRASH)!!)
+        val destinationFolder = folderController.getFolder(FolderRole.TRASH) ?: return null
+        val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, destinationFolder)
 
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
@@ -255,7 +255,6 @@ class MessagesActionsUseCase @Inject constructor(
     }
 
     suspend fun getMessagesToDelete(messages: List<Message>) = messageController.getMessagesAndDuplicates(messages)
-
     // End Region
 
     // Seen Region
@@ -264,7 +263,7 @@ class MessagesActionsUseCase @Inject constructor(
         shouldRead: Boolean = true,
         currentFolderId: String?,
         mailbox: Mailbox,
-        refreshCallbacks: RefreshCallbacks? = null
+        refreshCallbacks: RefreshCallbacks? = null,
     ) {
         val threads = threadsUids.let { threadController.getThreads(threadsUids) }
         val isSeen = if (threads.count() == 1) threads.single().isSeen else !shouldRead
@@ -278,7 +277,7 @@ class MessagesActionsUseCase @Inject constructor(
         shouldRead: Boolean = true,
         currentFolderId: String?,
         mailbox: Mailbox,
-        refreshCallbacks: RefreshCallbacks?
+        refreshCallbacks: RefreshCallbacks?,
     ) {
         val isSeen = if (messages.count() == 1) messages.single().isSeen else !shouldRead
         val messagesToToggleSeen = getMessagesToMarkAsUnseen(messages)
@@ -291,7 +290,7 @@ class MessagesActionsUseCase @Inject constructor(
         isSeen: Boolean,
         currentFolderId: String?,
         mailbox: Mailbox,
-        refreshCallbacks: RefreshCallbacks? = null
+        refreshCallbacks: RefreshCallbacks? = null,
     ) {
         if (isSeen) {
             markAsUnseen(messages, mailbox, refreshCallbacks)
@@ -373,7 +372,6 @@ class MessagesActionsUseCase @Inject constructor(
         if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(messagesUids, isSeen = false)
     }
 
-
     private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
         mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
@@ -421,7 +419,7 @@ class MessagesActionsUseCase @Inject constructor(
         threadsUids: List<String>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
-        callbacks: RefreshCallbacks? = null
+        callbacks: RefreshCallbacks? = null,
     ) {
         val threads = threadsUids.let { threadController.getThreads(threadsUids) }
         val isFavorite = if (threads.count() == 1) threads.single().isFavorite else !shouldFavorite
@@ -438,7 +436,7 @@ class MessagesActionsUseCase @Inject constructor(
         messages: List<Message>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
-        callbacks: RefreshCallbacks? = null
+        callbacks: RefreshCallbacks? = null,
     ) {
         val isFavorite = if (messages.count() == 1) messages.single().isFavorite else !shouldFavorite
 
@@ -455,7 +453,7 @@ class MessagesActionsUseCase @Inject constructor(
         messages: List<Message>,
         isFavorite: Boolean,
         mailbox: Mailbox,
-        callbacks: RefreshCallbacks?
+        callbacks: RefreshCallbacks?,
     ) {
         val uids = messages.getUids()
 
@@ -508,7 +506,7 @@ class MessagesActionsUseCase @Inject constructor(
         messages: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox,
-        onReportSuccess: suspend () -> Unit
+        onReportSuccess: suspend () -> Unit,
     ): ApiCallResult {
         val messagesUids = messages.map { it.uid }
         if (messagesUids.isEmpty()) return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
@@ -524,15 +522,13 @@ class MessagesActionsUseCase @Inject constructor(
             ApiCallResult.Error(response.translateError())
         }
     }
-
-
     // End Region
 
     // Block Region
     suspend fun blockUser(
         folderId: String,
         shortUid: Int,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ): ApiCallResult {
         val response = ApiRepository.blockUser(mailbox.uuid, folderId, shortUid)
 
@@ -644,7 +640,7 @@ class MessagesActionsUseCase @Inject constructor(
 
     // Undo Region
     suspend fun undoAction(undoData: SnackbarManager.UndoData, mailbox: Mailbox): ApiCallResult {
-        val (resources, foldersIds, destinationFolderId) = undoData    // 1. Execute the API calls for each resource
+        val (resources, foldersIds, destinationFolderId) = undoData
         val apiResponses = resources.map { ApiRepository.undoAction(it) }
 
         if (apiResponses.atLeastOneSucceeded()) {
@@ -663,6 +659,28 @@ class MessagesActionsUseCase @Inject constructor(
             ApiCallResult.Error(failedCall.translateError())
         }
     }
+
+    fun getUndoData(
+        messagesMoved: List<Message>,
+        apiResponses: List<ApiResponse<MoveResult>>,
+        destinationFolder: Folder,
+    ): UndoData? {
+        val undoResources = apiResponses.mapNotNull { it.data?.undoResource }
+        val undoData = if (undoResources.isEmpty()) {
+            null
+        } else {
+            val undoDestinationId = destinationFolder.id
+            val foldersIds = messagesMoved.getFoldersIds(exception = undoDestinationId)
+            foldersIds += destinationFolder.id
+            UndoData(
+                resources = apiResponses.mapNotNull { it.data?.undoResource },
+                foldersIds = foldersIds,
+                destinationFolderId = undoDestinationId,
+            )
+        }
+        return undoData
+    }
+
     // End Region
 
     /**
@@ -697,7 +715,7 @@ class MessagesActionsUseCase @Inject constructor(
         val movedThreads: List<String>,
         val messages: List<Message>,
         val apiResponses: List<ApiResponse<MoveResult>>,
-        val destinationFolder: Folder
+        val destinationFolder: Folder,
     )
 
     data class DeleteResult(
