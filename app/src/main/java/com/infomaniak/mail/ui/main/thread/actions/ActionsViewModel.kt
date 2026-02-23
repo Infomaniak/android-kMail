@@ -147,9 +147,8 @@ class ActionsViewModel @Inject constructor(
                     snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
                     return@launch
                 }
-                restrictions.apply {
-                    blockedSenders.removeIf { it.email == email }
-                }
+                restrictions.blockedSenders.removeIf { it.email == email }
+
                 updateBlockedSenders(mailbox, restrictions)
             }
         }
@@ -172,9 +171,9 @@ class ActionsViewModel @Inject constructor(
         }
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
-        val unscheduleMessages = messageController.getUnscheduledMessages(messages)
+        val unscheduledMessages = messageController.getUnscheduledMessages(messages)
 
-        moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduleMessages, displaySnackbar)
+        moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduledMessages, displaySnackbar)
     }
 
     private suspend fun getMessagesFromThreadToSpamOrHam(threads: Set<Thread>): List<Message> {
