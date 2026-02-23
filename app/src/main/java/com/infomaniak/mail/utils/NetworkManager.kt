@@ -21,7 +21,6 @@ import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.core.sentry.SentryLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
@@ -31,8 +30,6 @@ import javax.inject.Singleton
 
 @Singleton
 class NetworkManager @Inject constructor() {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     /**
      * A StateFlow that emits the current network availability status.
      * It starts collecting immediately and keeps the latest value in memory.
@@ -42,7 +39,7 @@ class NetworkManager @Inject constructor() {
             SentryLog.d("NetworkManager", if (available) "Online" else "Offline")
         }
         .stateIn(
-            scope = scope,
+            scope = CoroutineScope(Dispatchers.Default),
             started = SharingStarted.Eagerly,
             initialValue = true
         )
