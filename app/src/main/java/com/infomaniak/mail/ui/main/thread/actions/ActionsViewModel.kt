@@ -105,12 +105,12 @@ class ActionsViewModel @Inject constructor(
         handleToggleSpamMessages(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
     }
 
-    private fun handleToggleSpamMessages(
+    private suspend fun handleToggleSpamMessages(
         messages: List<Message>,
         currentFolderId: String?,
         mailbox: Mailbox,
         displaySnackbar: Boolean = true,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    ) {
         val result = messagesActionsUseCase.toggleMessagesSpamStatus(
             messages = messages,
             currentFolderId = currentFolderId,
@@ -161,14 +161,13 @@ class ActionsViewModel @Inject constructor(
         handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
     }
 
-    private fun handleMessagesMove(
+    private suspend fun handleMessagesMove(
         destinationFolderId: String,
         messages: List<Message>,
         currentFolderId: String?,
         mailbox: Mailbox,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-
-        val destinationFolder = folderController.getFolder(destinationFolderId) ?: return@launch
+    ) {
+        val destinationFolder = folderController.getFolder(destinationFolderId) ?: return
         val result = messagesActionsUseCase.moveMessagesTo(
             destinationFolder = destinationFolder,
             currentFolderId = currentFolderId,
@@ -223,11 +222,11 @@ class ActionsViewModel @Inject constructor(
         handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
     }
 
-    private fun handleDeleteMessages(
+    private suspend fun handleDeleteMessages(
         messagesToDelete: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    ) {
         val shouldPermanentlyDelete =
             isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(messagesToDelete, currentFolder))
 
@@ -255,7 +254,7 @@ class ActionsViewModel @Inject constructor(
             val destinationFolder = folderController.getFolder(FolderRole.TRASH)
             if (destinationFolder == null) {
                 snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-                return@launch
+                return
             }
 
             moveMessagesTo(
@@ -270,7 +269,7 @@ class ActionsViewModel @Inject constructor(
     private fun showDeleteSnackbar(
         apiResponses: List<ApiResponse<*>>,
         messages: List<Message>,
-        undoResources: List<String>,
+        undoResources: List<String>?,
         undoFoldersIds: ImpactedFolders,
         undoDestinationId: String?,
         numberOfImpactedThreads: Int,
@@ -288,7 +287,7 @@ class ActionsViewModel @Inject constructor(
             appContext.getString(apiResponses.first().translateError())
         }
 
-        val undoData = if (undoResources.isEmpty()) null else UndoData(undoResources, undoFoldersIds, undoDestinationId)
+        val undoData = if (undoResources.isNullOrEmpty()) null else UndoData(undoResources, undoFoldersIds, undoDestinationId)
 
         snackbarManager.postValue(snackbarTitle, undoData)
     }
@@ -314,16 +313,15 @@ class ActionsViewModel @Inject constructor(
         handleArchiveMessage(messagesToMove, currentFolder, mailbox)
     }
 
-    private fun handleArchiveMessage(
+    private suspend fun handleArchiveMessage(
         messages: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-
+    ) {
         val role = folderRoleUtils.getActionFolderRole(messages, currentFolder)
         val isFromArchive = role == FolderRole.ARCHIVE
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
-        val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return@launch
+        val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return
 
         moveMessagesTo(destinationFolder.id, messages.getUids(), currentFolder?.id, mailbox)
     }
@@ -492,13 +490,13 @@ class ActionsViewModel @Inject constructor(
             is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
             BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
         }
-
         return appContext.getString(errorMessageRes)
     }
     //endregion
 
     //region Undo action
-    fun undoAction(undoData: UndoData, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+    fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        if (undoData == null) return@launch
         val result = messagesActionsUseCase.undoAction(undoData, mailbox)
         val message = when (result) {
             is MessagesActionsUseCase.ApiCallResult.Success -> appContext.getString(result.messageRes)
