@@ -205,12 +205,12 @@ object PerformSwipeActionManager {
         }
 
         fun onHandleDelete() {
+            if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
             actionsViewModel.deleteThreads(
                 threads = listOf(thread),
                 currentFolder = mainViewModel.currentFolder.value,
                 mailbox = currentMailBox
             )
-            if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
         }
 
         return descriptionDialog.deleteWithConfirmationPopup(
