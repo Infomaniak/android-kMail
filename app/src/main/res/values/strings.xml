@@ -17,11 +17,9 @@
   -->
 <resources>
     <string name="appName" translatable="false">Infomaniak Mail</string>
-
     <string name="notification_channel_id_draft_service" translatable="false">draft_service_channel_id</string>
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
     <string name="notification_channel_id_sync_messages_service" translatable="false">sync_messages_service_channel_id</string>
-
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>
     <string name="accentColorSystemTitle">System colour</string>
@@ -671,7 +669,9 @@
     <string name="tooManyRecipients">You can’t add this address because you have reached the limit of recipients</string>
     <string name="trashFolder">Trash</string>
     <string name="unblockButton">Unblock</string>
+    <string name="unknownDialogTitleRecipient">Unknown recipient</string>
     <string name="unknownRecipientTitle">(unknown)</string>
+    <string name="unknownTag">Unknown</string>
     <string name="unsubscribeButtonTitle">Unsubscribe</string>
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>

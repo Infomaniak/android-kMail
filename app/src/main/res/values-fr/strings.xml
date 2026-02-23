@@ -665,7 +665,9 @@
     <string name="tooManyRecipients">Vous ne pouvez pas ajouter cette adresse car vous avez atteint la limite de destinataires</string>
     <string name="trashFolder">Corbeille</string>
     <string name="unblockButton">Débloquer</string>
+    <string name="unknownDialogTitleRecipient">Destinataire inconnu</string>
     <string name="unknownRecipientTitle">(inconnu)</string>
+    <string name="unknownTag">Inconnu</string>
     <string name="unsubscribeButtonTitle">Se désabonner</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
