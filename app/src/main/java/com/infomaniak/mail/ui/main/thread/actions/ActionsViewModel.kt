@@ -129,6 +129,7 @@ class ActionsViewModel @Inject constructor(
 
     fun unblockMail(email: String, mailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
         if (mailbox == null) return@launch
+
         val result = messagesActionsUseCase.unblockMail(email, mailbox)
         if (result is MessagesActionsUseCase.ApiCallResult.Error) {
             snackbarManager.postValue(appContext.getString(result.messageRes))
@@ -497,6 +498,7 @@ class ActionsViewModel @Inject constructor(
     //region Undo action
     fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         if (undoData == null) return@launch
+        
         val result = messagesActionsUseCase.undoAction(undoData, mailbox)
         val message = when (result) {
             is MessagesActionsUseCase.ApiCallResult.Success -> appContext.getString(result.messageRes)
