@@ -623,12 +623,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     thread = result.thread ?: return@observe,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
                     aliases = mailbox.aliases,
+                    hasOrganisation = mailbox.hasOrganisation(),
                     externalMailFlagEnabled = mailbox.externalMailFlagEnabled,
                     trustedDomains = mailbox.trustedDomains,
                 ),
-            ) { description ->
+            ) { title, description ->
                 informationDialog.show(
-                    title = R.string.externalDialogTitleExpeditor,
+                    title = title,
                     description = description,
                     confirmButtonText = R.string.externalDialogConfirmButton,
                 )
