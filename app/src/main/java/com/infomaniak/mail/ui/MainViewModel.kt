@@ -790,6 +790,8 @@ class MainViewModel @Inject constructor(
         if (result != null) {
             showMoveSnackbar(threadsUids.count(), result.messages, result.apiResponses, destinationFolder)
             isMovedToNewFolder.postValue(true)
+        } else {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
         }
     }
     //endregion
