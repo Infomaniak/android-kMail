@@ -141,7 +141,7 @@ class MessageController @Inject constructor(
 
     suspend fun getMessagesAndDuplicates(messages: List<Message>): List<Message> {
         return messages.flatMap { message ->
-            if (message.threads.isEmpty()) return listOf(message)
+            if (message.threads.isEmpty()) return@flatMap listOf(message)
             getMessageAndDuplicates(message.threads.first(), message)
         }
     }
