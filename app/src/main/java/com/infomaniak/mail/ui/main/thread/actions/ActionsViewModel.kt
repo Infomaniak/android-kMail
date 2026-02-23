@@ -156,7 +156,7 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messages = messagesUids.let { messageController.getMessages(it) }
+        val messages = messageController.getMessages(messagesUids)
         val messagesToMove = messagesActionsUseCase.getMessagesToMove(messages, currentFolderId)
 
         handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
@@ -169,6 +169,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) {
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return
+        
         val result = messagesActionsUseCase.moveMessagesTo(
             destinationFolder = destinationFolder,
             currentFolderId = currentFolderId,
@@ -498,7 +499,7 @@ class ActionsViewModel @Inject constructor(
     //region Undo action
     fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         if (undoData == null) return@launch
-        
+
         val result = messagesActionsUseCase.undoAction(undoData, mailbox)
         val message = when (result) {
             is MessagesActionsUseCase.ApiCallResult.Success -> appContext.getString(result.messageRes)

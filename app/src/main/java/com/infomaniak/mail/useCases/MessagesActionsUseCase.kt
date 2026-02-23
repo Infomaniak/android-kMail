@@ -157,7 +157,9 @@ class MessagesActionsUseCase @Inject constructor(
         currentFolderId: String?,
     ): MoveMessagesResult? {
         if (currentFolderId == null) return null
+
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return null
+
         var messagesToMove: List<Message>
         if (messagesUid != null) {
             messagesToMove = messagesUid.let { messageController.getMessages(it) }
@@ -165,6 +167,7 @@ class MessagesActionsUseCase @Inject constructor(
             val threads = threadController.getThreads(threadsUids).ifEmpty { return null }
             messagesToMove = getMessagesFromThreadsToMove(threads)
         }
+
         return moveMessagesTo(destinationFolder, currentFolderId, mailbox, messagesToMove)
     }
     // End Region
