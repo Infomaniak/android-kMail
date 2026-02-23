@@ -135,7 +135,6 @@ object PerformSwipeActionManager {
                     mailbox = currentMailbox
                 )
                 mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
-                true
             }
 
             SwipeAction.SPAM -> {
@@ -166,6 +165,8 @@ object PerformSwipeActionManager {
         currentMailBox: Mailbox
     ): Boolean {
         fun onCancel() {
+            // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
+            // otherwise it will notify the next item in the list and make it slightly blink
             if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
                 threadListAdapter.notifyItemChanged(position)
             }
