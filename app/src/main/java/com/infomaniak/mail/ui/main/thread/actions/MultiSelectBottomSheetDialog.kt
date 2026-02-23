@@ -175,7 +175,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     )
                 },
             )
-
             isMultiSelectOn = false
         }
 
