@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentFolderPickerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.utils.Utils
@@ -53,6 +54,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.core.common.R as RCore
 
 @AndroidEntryPoint
 class FolderPickerFragment : Fragment() {
@@ -69,6 +71,9 @@ class FolderPickerFragment : Fragment() {
 
     @Inject
     lateinit var folderPickerAdapter: FolderPickerAdapter
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,31 +155,40 @@ class FolderPickerFragment : Fragment() {
         }
     }
 
-    private fun onFolderSelected(folder: Folder?): Unit = with(navigationArgs) {
-        when (action) {
-            FolderPickerAction.MOVE -> folder?.id?.let {
-                if (messagesUids != null) {
-                    actionsViewModel.moveMessagesTo(
-                        destinationFolderId = it,
-                        messagesUids = messagesUids.toList(),
-                        currentFolderId = mainViewModel.currentFolderId,
-                        mailbox = mainViewModel.currentMailbox.value!!
-                    )
-                } else {
-                    actionsViewModel.moveThreadsTo(
-                        destinationFolderId = it,
-                        threadsUids = threadsUids.toList(),
-                        currentFolderId = mainViewModel.currentFolderId,
-                        mailbox = mainViewModel.currentMailbox.value!!
-                    )
-                }
-            }
+    private fun onFolderSelected(folder: Folder?) {
+        when (navigationArgs.action) {
+            FolderPickerAction.MOVE -> handleMove(folder?.id)
             FolderPickerAction.SEARCH -> {
                 searchViewModel.selectAllFoldersFilter(folder == null)
                 searchViewModel.selectFolder(folder)
             }
         }
+
         findNavController().popBackStack()
+    }
+
+    private fun handleMove(folderId: String?) = with(navigationArgs) {
+        val mailbox = mainViewModel.currentMailbox.value
+        if (folderId == null || mailbox == null) {
+            snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+            return@with
+        }
+
+        if (messagesUids != null) {
+            actionsViewModel.moveMessagesTo(
+                destinationFolderId = folderId,
+                messagesUids = messagesUids.toList(),
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mailbox
+            )
+        } else {
+            actionsViewModel.moveThreadsTo(
+                destinationFolderId = folderId,
+                threadsUids = threadsUids.toList(),
+                currentFolderId = mainViewModel.currentFolderId,
+                mailbox = mailbox
+            )
+        }
     }
 
     private fun setupSearchBar() = with(binding) {
