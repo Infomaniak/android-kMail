@@ -106,9 +106,7 @@ class MessagesActionsUseCase @Inject constructor(
     }
 
     suspend fun getMessagesFromThreadsToMove(threads: List<Thread>): List<Message> {
-        return threads.flatMap {
-            messageController.getMovableMessages(it)
-        }
+        return threads.flatMap { messageController.getMovableMessages(it) }
     }
 
     fun getMessagesToMove(messages: List<Message>, currentFolderId: String?): List<Message> {
@@ -240,7 +238,7 @@ class MessagesActionsUseCase @Inject constructor(
 
         if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(
             threadsUids = uidsToMove,
-            hasBeenMovedOut = false
+            hasBeenMovedOut = false,
         )
 
         val undoDestinationId = messagesToDelete.first().folderId
@@ -648,6 +646,7 @@ class MessagesActionsUseCase @Inject constructor(
         if (resources == null) {
             return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
         }
+
         val apiResponses = resources.map { ApiRepository.undoAction(it) }
 
         if (apiResponses.atLeastOneSucceeded()) {
