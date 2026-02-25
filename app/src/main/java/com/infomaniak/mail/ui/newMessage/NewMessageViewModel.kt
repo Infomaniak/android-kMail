@@ -88,6 +88,7 @@ import com.infomaniak.mail.utils.JsoupParserUtil
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageBodyUtils.toggleButton
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
@@ -132,7 +133,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -328,10 +328,8 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox(), realm)
 
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
-            it.saveSnapshot(initialBody.content)
             it.initLiveData(signatures)
             _isShimmering.emit(false)
-
             initResult.postValue(InitResult(it, signatures))
         }
 
@@ -344,7 +342,10 @@ class NewMessageViewModel @Inject constructor(
             if (draft.identityId.isNullOrBlank()) {
                 draft.identityId = currentMailbox().getDefaultSignatureWithFallback().id.toString()
             }
-            splitSignatureAndQuoteFromBody(draft)
+            val contentType =
+                if (draft.mimeType == Utils.TEXT_PLAIN) BodyContentType.TEXT_PLAIN_WITH_HTML else BodyContentType.HTML_SANITIZED
+            initialBody = BodyContentPayload(draft.body, contentType)
+            return draft
         }
     }
 
@@ -422,57 +423,6 @@ class NewMessageViewModel @Inject constructor(
         // If the user put the app in background before we put the fetched Draft in Realm, and the system
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
-    }
-
-    private fun splitSignatureAndQuoteFromBody(draft: Draft) {
-        val remoteBody = draft.body
-        Log.d("DRAFT BODY", remoteBody)
-        if (remoteBody.isEmpty()) return
-
-        val (body, signature, quote) = when (draft.mimeType) {
-            Utils.TEXT_PLAIN -> BodyData(
-                body = BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML),
-                signature = null,
-                quote = null
-            )
-            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody)
-            else -> error("Cannot load an email which is not of type text/plain or text/html")
-        }
-
-        initialBody = body
-        initialSignature = signature
-        initialQuote = quote
-    }
-
-    private fun splitSignatureAndQuoteFromHtml(draftBody: String): BodyData {
-
-        fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
-            return getElementsByClass(divClassName).firstOrNull()?.let {
-                it.remove()
-                val first = body().html()
-                val second = if (it.html().isBlank()) null else it.outerHtml()
-                first to second
-            } ?: (defaultValue to null)
-        }
-
-        fun String.lastIndexOfOrMax(string: String): Int {
-            val index = lastIndexOf(string)
-            return if (index == -1) Int.MAX_VALUE else index
-        }
-
-        val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
-
-        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
-
-        val replyPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
-        val (body, quote) = if (replyPosition < forwardPosition) {
-            doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
-        } else {
-            doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
-        }
-
-        return BodyData(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
     }
 
     private fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
@@ -555,21 +505,22 @@ class NewMessageViewModel @Inject constructor(
 
         if (isNewMessage && wrappedSignature != null) {
             finalBodyContent += wrappedSignature
-        } else if (!initialSignature.isNullOrEmpty()) {
-            finalBodyContent += initialSignature
         }
 
-        if (!initialQuote.isNullOrEmpty()) {
-            finalBodyContent += if (!bodyHasQuotes(initialQuote.toString())) {
-                MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
-            } else {
-                initialQuote
-            }
+        if (isNewMessage && !initialQuote.isNullOrEmpty()) {
+            finalBodyContent += MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
         }
+
+        if (bodyHasQuotes(finalBodyContent)) {
+            finalBodyContent += toggleButton()
+        }
+
+        val normalizedBody = normalizeHtml(finalBodyContent)
+        saveSnapshot(normalizedBody)
 
         editorBodyInitializer.postValue(
             BodyContentPayload(
-                content = finalBodyContent,
+                content = normalizedBody,
                 type = BodyContentType.HTML_SANITIZED
             )
         )
@@ -589,7 +540,13 @@ class NewMessageViewModel @Inject constructor(
 
     fun bodyHasQuotes(bodyHtml: String): Boolean {
         return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
-            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME) != null
+            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).count() > 0
+    }
+
+    private fun normalizeHtml(html: String): String {
+        val doc = jsoupParseWithLog(html)
+        doc.outputSettings().prettyPrint(false)
+        return doc.body().html()
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
@@ -986,7 +943,7 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
-        body = sanitizeBodyBeforeSaving(uiBodyValue)
+        body = uiBodyValue
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -1002,18 +959,18 @@ class NewMessageViewModel @Inject constructor(
 
         // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
         if (!isFinishing) {
-            copyFromRealm().saveSnapshot(uiBodyValue)
+            val normalizedBody = normalizeHtml(uiBodyValue)
+            copyFromRealm().saveSnapshot(normalizedBody)
             isNewMessage = false
         }
     }
 
-    private fun sanitizeBodyBeforeSaving(html: String): String {
+    private fun sanitizeBody(html: String): String {
         val doc = jsoupParseWithLog(html)
         // Remove the toggle button before saving
         doc.getElementById("quote-toggle-btn")?.remove()
         return doc.html()
     }
-
 
     private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>, step: String) {
 
@@ -1054,13 +1011,15 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
+        Log.d("BODY VALUE", uiBodyValue)
+        Log.d("SNAPSHOT", snapshot?.uiBody.toString())
         return snapshot?.let { draftSnapshot ->
             draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() &&
                     draftSnapshot.to == toLiveData.valueOrEmpty().toSet() &&
                     draftSnapshot.cc == ccLiveData.valueOrEmpty().toSet() &&
                     draftSnapshot.bcc == bccLiveData.valueOrEmpty().toSet() &&
                     draftSnapshot.subject == subjectValue &&
-                    draftSnapshot.uiBody == uiBodyValue &&
+                    sanitizeBody(draftSnapshot.uiBody) == sanitizeBody(uiBodyValue) &&
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
