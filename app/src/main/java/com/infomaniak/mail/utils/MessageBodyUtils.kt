@@ -35,8 +35,6 @@ object MessageBodyUtils {
     const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
     const val INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME = "ik_mail_quote"
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
-    const val INFOMANIAK_BODY_HTML_ID = "ik-body"
-    const val INFOMANIAK_SIGNATURE_HTML_ID = "ik-signature"
     const val INFOMANIAK_QUOTES_HTML_ID = "ik-quotes"
 
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
@@ -68,11 +66,11 @@ object MessageBodyUtils {
 
     fun encapsulateQuotesWithInfomaniakClass(quotes: String): String {
         return """
-        <div class=$INFOMANIAK_QUOTES_HTML_ID>
-           <div id=$INFOMANIAK_QUOTES_HTML_ID style="display: none;" spellcheck=false>$quotes<br></div>
+        <div>
+           <div class=$INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME spellcheck=false>$quotes<br></div>
            ${toggleButton()}
         </div>
-        """.trimMargin()
+        """.trimIndent()
     }
 
     fun toggleButton(): String {
