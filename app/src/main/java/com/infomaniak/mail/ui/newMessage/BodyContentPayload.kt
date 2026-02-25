@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_BODY_HTML_ID
-
 /**
  * @param content The string representation of the body in either html or plain text format.
  * @param type The type of representation of [content]. Each type will lead to different processing of the content.
@@ -26,10 +24,10 @@ import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_BODY_HTML_ID
 data class BodyContentPayload(val content: String, val type: BodyContentType) {
 
     companion object {
-        fun emptyBody(placeHolderText: String) =
+        fun emptyBody() =
             BodyContentPayload(
-                content = "<div id=$INFOMANIAK_BODY_HTML_ID><p class='placeholder'>$placeHolderText</p><br></div>",
-                type = BodyContentType.HTML_SANITIZED
+                content = "<br id=lineBreakAtBeginningOfSignature>",
+                type = BodyContentType.TEXT_PLAIN_WITHOUT_HTML
             )
     }
 }
