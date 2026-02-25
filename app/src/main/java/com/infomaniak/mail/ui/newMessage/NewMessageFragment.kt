@@ -67,7 +67,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -88,7 +87,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.JsoupParserUtil
+import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
@@ -103,7 +102,6 @@ import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.ime
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.readRawResource
@@ -117,7 +115,6 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -434,10 +431,6 @@ class NewMessageFragment : Fragment() {
         handleFocusChanges()
     }
 
-    fun editorHasPlaceholder() = with(binding.editorWebView) {
-        exportHtml { html -> hasPlaceholder = newMessageViewModel.bodyHasPlaceholder(html) }
-    }
-
     private fun setEditorStyle() = with(binding.editorWebView) {
         enableAlgorithmicDarkening(isEnabled = true)
         if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
@@ -447,15 +440,9 @@ class NewMessageFragment : Fragment() {
         addCss(context.loadCss(R.raw.editor_style, customColors))
     }
 
-    private fun removePlaceholder() = with(binding.editorWebView) {
-        exportHtml { html ->
-            val doc: Document = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html).apply {
-                getElementsByClass("placeholder").first()?.text("")?.removeClass("placeholder")
-            }
-            newMessageViewModel.editorBodyInitializer.postValue(
-                BodyContentPayload(doc.html(), BodyContentType.HTML_SANITIZED)
-            )
-        }
+    private fun removePlaceholder() {
+        binding.newMessagePlaceholder.visibility = View.GONE
+        hasPlaceholder = false
     }
 
     private fun handleFocusChanges() {
@@ -476,6 +463,7 @@ class NewMessageFragment : Fragment() {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
                     val isBodyEmpty = newMessageViewModel.bodyHasPlaceholder(draft.body)
+                    binding.newMessagePlaceholder.isVisible = isBodyEmpty
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty(), isBodyEmpty = isBodyEmpty)
                     binding.subjectTextField.setText(draft.subject)
                 } else {
@@ -497,18 +485,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun configureUiWithDraftData(draft: Draft) = with(binding) {
-        editorWebView.apply {
-            settings.setupNewMessageWebViewSettings()
-            val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
-            initWebViewClientAndBridge(
-                attachments = draft.attachments,
-                messageUid = "QUOTE-${draft.messageUid}",
-                shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
-                navigateToNewMessageActivity = null,
-            )
-        }
-    }
+    private fun configureUiWithDraftData() = binding.editorWebView.settings.setupNewMessageWebViewSettings()
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
@@ -544,29 +521,42 @@ class NewMessageFragment : Fragment() {
     private fun onSignatureClicked(signature: Signature) {
         trackNewMessageEvent(MatomoName.SwitchIdentity)
 
-        binding.editorWebView.exportHtml { html ->
-            val body = JsoupParserUtil.jsoupParseWithLog(html).body()
-            val oldSignature = newMessageViewModel.fromLiveData.value?.signature?.content
+        // Get the New Signature HTML
+        val newSignatureHtml = signature.content
+        val wrappedNewSignature =
+            if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(newSignatureHtml)
 
-            val bodyHtml = if (!oldSignature.isNullOrEmpty()) {
-                newMessageViewModel.removeSignature(body.html())
-            } else {
-                body.html()
+        val escapedSignature = wrappedNewSignature
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+
+        val replaceSignatureScript = """
+        (function() {
+            var sigElement = document.querySelector('.${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}');
+            var newSigHtml = "$escapedSignature";
+            if (sigElement) {
+                if (newSigHtml === "") {
+                    sigElement.remove();
+                } else {
+                    sigElement.outerHTML = newSigHtml;
+                }
+            } else if (newSigHtml !== "") {
+                var quotes = document.querySelector('.${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}');
+                if (quotes) {
+                    quotes.insertAdjacentHTML('beforebegin', newSigHtml);
+                } else {
+                    document.body.insertAdjacentHTML('beforeend', newSigHtml);
+                }
             }
+        })()
+    """.trimIndent()
 
-            newMessageViewModel.fromLiveData.value = UiFrom(signature)
+        binding.editorWebView.evaluateJavascript(replaceSignatureScript) {
+            newMessageViewModel.fromLiveData.value =
+                UiFrom(signature)
             addressListPopupWindow?.dismiss()
-
-            // Get the New Signature HTML
-            val newSignatureHtml = signature.content
-            val wrappedNewSignature =
-                if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(newSignatureHtml)
-
-            // Combine: New Body + New Signature
-            val finalHtml = newMessageViewModel.addSignatureInsideBody(bodyHtml, wrappedNewSignature)
-
-            // Update the Editor
-            newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(finalHtml, BodyContentType.HTML_SANITIZED))
         }
     }
 
@@ -588,8 +578,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitResult() {
-        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
-            configureUiWithDraftData(draft)
+        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (_, signatures) ->
+            configureUiWithDraftData()
             setupFromField(signatures)
             editorManager.setupEditorFormatActions()
             editorManager.setupEditorFormatActionsToggle()
@@ -697,7 +687,6 @@ class NewMessageFragment : Fragment() {
             editorContentManager.setContent(binding.editorWebView, body)
             val script = context?.readRawResource(R.raw.toggle_quote_visibility_script)
             script?.let { binding.editorWebView.addScript(script) }
-            editorHasPlaceholder()
         }
     }
 

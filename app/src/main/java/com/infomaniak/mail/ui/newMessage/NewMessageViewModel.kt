@@ -24,6 +24,7 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -87,7 +88,6 @@ import com.infomaniak.mail.utils.JsoupParserUtil
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_QUOTES_HTML_ID
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
@@ -162,8 +162,7 @@ class NewMessageViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     //region Initial data
-    private var initialBody: BodyContentPayload =
-        BodyContentPayload.emptyBody(appContext.getString(R.string.newMessagePlaceholderTitle))
+    private var initialBody: BodyContentPayload = BodyContentPayload.emptyBody()
     private var initialSignature: String? = null
     private var initialQuote: String? = null
     //endregion
@@ -427,6 +426,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun splitSignatureAndQuoteFromBody(draft: Draft) {
         val remoteBody = draft.body
+        Log.d("DRAFT BODY", remoteBody)
         if (remoteBody.isEmpty()) return
 
         val (body, signature, quote) = when (draft.mimeType) {
@@ -473,24 +473,6 @@ class NewMessageViewModel @Inject constructor(
         }
 
         return BodyData(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
-    }
-
-    fun addSignatureInsideBody(bodyHtml: String, element: String): String {
-        if (element.isEmpty()) return bodyHtml
-
-        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).apply {
-            // if the mail has quotes, add the signature before the quotes.
-            val body = body()
-            body.getElementById(INFOMANIAK_QUOTES_HTML_ID)?.before(element) ?: body.append(element)
-        }.body().html()
-    }
-
-    fun removeSignature(html: String): String {
-        val doc: Document = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html).apply {
-            getElementById(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_ID)?.remove()
-        }
-
-        return doc.html()
     }
 
     private suspend fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
@@ -601,11 +583,13 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun bodyHasPlaceholder(bodyHtml: String): Boolean {
-        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).getElementsByClass("placeholder").first() != null
+        val body = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).body()
+        return body.text() == ""
     }
 
     fun bodyHasQuotes(bodyHtml: String): Boolean {
-        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).getElementById(INFOMANIAK_QUOTES_HTML_ID) != null
+        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
+            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME) != null
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
@@ -743,7 +727,7 @@ class NewMessageViewModel @Inject constructor(
 
             val bodyContent = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT)
             val mailToPayload = bodyContent?.let { BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
-            initialBody = mailToPayload ?: BodyContentPayload.emptyBody(appContext.getString(R.string.newMessagePlaceholderTitle))
+            initialBody = mailToPayload ?: BodyContentPayload.emptyBody()
         }
     }
 
