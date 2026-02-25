@@ -6,7 +6,7 @@
 
         // Hide quotes initially and show toggle button
         const quoteElements = document.querySelectorAll('.ik_mail_quote');
-        console.log("QUOTES ELEMENTS", quotesElements)
+
         if (quoteElements.style != 'block') {
             quoteElements.forEach(el => {
                 el.style.display = 'none';
