@@ -318,6 +318,16 @@
                         app:layout_constraintTop_toTopOf="@id/editorWebView"
                         tools:visibility="visible" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/quotesToggleButton"
+                        style="@style/IconButtonSmall"
+                        android:layout_width="24dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:contentDescription="@string/buttonTextOptionsOpen"
+                        app:icon="@drawable/ic_more_horiz"
+                        app:layout_constraintStart_toStartOf="@id/editorWebView"
+                        app:layout_constraintTop_toBottomOf="@id/editorWebView" />
 
                     <LinearLayout
                         android:id="@+id/bodyLoader"

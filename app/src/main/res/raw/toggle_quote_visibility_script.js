@@ -1,7 +1,6 @@
 (function() {
     function changeQuoteVisibility() {
         const button = document.getElementById('quote-toggle-btn');
-        console.log("BUTTON", button)
         if (!button) return;
 
         // Hide quotes initially and show toggle button
@@ -14,11 +13,20 @@
             button.style.display = 'block';
         }
 
-        // Attach click handler to button
         button.onclick = function(e) {
            e.preventDefault();
            quoteElements.forEach(el => {
-              el.style.display = 'block';
+                el.style.display = 'block';
+                // Force reload images inside quotes
+                el.querySelectorAll('img').forEach(img => {
+                    if (img.src.startsWith('cid:')) {
+                    // Store original CID, then reload
+                    const cid = img.src;
+                    img.src = '';
+
+                    setTimeout(() => img.src = cid, 0);
+                    }
+                });
            });
            button.style.display = 'none';
         };
