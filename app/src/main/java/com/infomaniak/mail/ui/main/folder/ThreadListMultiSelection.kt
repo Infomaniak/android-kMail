@@ -22,7 +22,7 @@ import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
@@ -111,7 +111,7 @@ class ThreadListMultiSelection {
                     } else {
                         ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
                     }
-                    threadListFragment.safeNavigate(direction)
+                    threadListFragment.safelyNavigate(direction)
                 }
             }
         }
@@ -235,6 +235,22 @@ class ThreadListMultiSelection {
                 R.drawable.ic_envelope_open to R.string.actionShortMarkAsRead
             } else {
                 R.drawable.ic_envelope to R.string.actionShortMarkAsUnread
+            }
+        }
+
+        fun getArchiveIconAndShortText(isFromArchive: Boolean): Pair<Int, Int> {
+            return if (isFromArchive) {
+                R.drawable.ic_drawer_inbox to R.string.inboxFolder
+            } else {
+                R.drawable.ic_archive_folder to R.string.actionArchive
+            }
+        }
+
+        fun getFavoriteIconAndShortText(shouldFavorite: Boolean): Pair<Int, Int> {
+            return if (shouldFavorite) {
+                R.drawable.ic_star to R.string.actionStar
+            } else {
+                R.drawable.ic_unstar to R.string.actionUnstar
             }
         }
     }

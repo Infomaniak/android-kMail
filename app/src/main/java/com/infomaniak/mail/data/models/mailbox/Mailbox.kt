@@ -47,14 +47,16 @@ class Mailbox : RealmObject {
     //region Remote data
     var uuid: String = ""
     var email: String = ""
+    @SerialName("email_idn")
+    var emailIdn: String = ""
     @SerialName("mailbox")
     var mailboxName: String = ""
     @SerialName("mailbox_id")
     var mailboxId: Int = -3 // AppSettings.DEFAULT_ID
     @SerialName("hosting_id")
     var hostingId: Int = 0
-    @SerialName("link_id")
-    var linkId: Int = 0
+    @SerialName("access_id")
+    var accessId: String = ""
     @SerialName("is_primary")
     var isPrimary: Boolean = false
     @SerialName("is_locked")

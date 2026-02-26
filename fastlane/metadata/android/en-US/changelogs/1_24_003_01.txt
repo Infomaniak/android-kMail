@@ -1,0 +1,7 @@
+- Change folders dropdown in search to enhance user experience
+- Allow marking a single message as SPAM
+- Add `Mail Premium` offer's ad
+- Remove junk menu duplicate and put back the actions in the general actions sheet
+- Remove invisible characters from subject
+- Fix mailbox selector when sending email with another account
+- Fix spanish translations

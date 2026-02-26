@@ -294,7 +294,7 @@ object MatomoMail : Matomo {
         ScheduledCustomDate("scheduledCustomDate"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
         SeeAllAttendees("seeAllAttendees"),
-        SeePassword("seePassword"),
+        OpenPasswordView("openPasswordView"),
         SelectAvatar("selectAvatar"),
         SelectContact("selectContact"),
         SelectDate("selectDate"),

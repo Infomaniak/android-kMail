@@ -1,0 +1,2 @@
+- Mise à jour de l'animation d'Euria
+- Correction de l'indicateur de disponibilité du réseau qui affichait parfois « réseau indisponible »

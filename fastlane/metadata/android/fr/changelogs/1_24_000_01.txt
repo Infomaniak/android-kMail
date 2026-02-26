@@ -1,0 +1,7 @@
+- Modification du menu déroulant des dossiers dans la recherche pour améliorer l'expérience utilisateur
+- Possibilité de marquer un seul message comme SPAM
+- Ajout de la publicité pour l'offre « Mail Premium »
+- Suppression du menu `indésirable et réintégration des actions dans le menu général d'actions
+- Suppression des caractères invisibles dans les objets
+- Correction du sélecteur d'adresse e-mail lors de l'envoi de messages avec un autre compte
+- Correction des traductions en espagnol

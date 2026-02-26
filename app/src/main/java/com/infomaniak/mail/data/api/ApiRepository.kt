@@ -188,8 +188,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
-    suspend fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
-        return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
+    suspend fun getPermissions(mailboxAccessId: String, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
+        return callApi(ApiRoutes.permissions(mailboxAccessId, mailboxHostingId), GET)
     }
 
     //region Unsubscribe list diffusion

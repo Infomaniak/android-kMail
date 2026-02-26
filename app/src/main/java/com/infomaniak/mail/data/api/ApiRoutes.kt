@@ -129,8 +129,8 @@ object ApiRoutes {
         return "${mailbox()}?with=aliases,unseen"
     }
 
-    fun permissions(linkId: Int, mailboxHostingId: Int): String {
-        return "${mailbox()}/permissions?user_mailbox_id=$linkId&product_id=$mailboxHostingId"
+    fun permissions(accessId: String, mailboxHostingId: Int): String {
+        return "${mailbox()}/permissions?access_id=$accessId&product_id=$mailboxHostingId"
     }
 
     fun quotas(mailboxHostingId: Int, mailboxName: String): String {

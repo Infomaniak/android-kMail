@@ -59,7 +59,10 @@ private fun DescriptionAlertDialog.showDeletePermanentlyDialog(
         deletedCount,
     ),
     displayLoader = displayLoader,
-    onPositiveButtonClicked = onPositiveButtonClicked,
+    onPositiveButtonClicked = {
+        onPositiveButtonClicked()
+        resetLoadingAndDismiss()
+    },
     onCancel = onCancel,
 )
 
@@ -72,10 +75,17 @@ private fun DescriptionAlertDialog.showDeleteSnoozeDialog(
     title = binding.context.getString(R.string.actionDelete),
     description = binding.context.resources.getQuantityString(R.plurals.snoozeDeleteConfirmAlertDescription, deletedCount),
     displayLoader = displayLoader,
-    onPositiveButtonClicked = onPositiveButtonClicked,
+    onPositiveButtonClicked = {
+        onPositiveButtonClicked()
+        resetLoadingAndDismiss()
+    },
     onCancel = onCancel,
 )
 
+/**
+ * IMPORTANT: If there is a navigation in the [onPositiveButtonClicked] lambda, it NEEDS to use the provided navController,
+ * otherwise it crashes because it's not attached to a fragment
+ */
 fun DescriptionAlertDialog.moveWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
@@ -85,7 +95,10 @@ fun DescriptionAlertDialog.moveWithConfirmationPopup(
         title = binding.context.getString(R.string.actionMove),
         description = binding.context.resources.getQuantityString(R.plurals.snoozeMoveConfirmAlertDescription, count),
         displayLoader = false,
-        onPositiveButtonClicked = onPositiveButtonClicked,
+        onPositiveButtonClicked = {
+            onPositiveButtonClicked()
+            resetLoadingAndDismiss()
+        },
     )
 } else {
     onPositiveButtonClicked()
@@ -104,7 +117,10 @@ fun DescriptionAlertDialog.archiveWithConfirmationPopup(
             title = binding.context.getString(R.string.actionArchive),
             description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
             displayLoader = displayLoader,
-            onPositiveButtonClicked = onPositiveButtonClicked,
+            onPositiveButtonClicked = {
+                onPositiveButtonClicked()
+                resetLoadingAndDismiss()
+            },
             onCancel = onCancel,
         )
     } else {

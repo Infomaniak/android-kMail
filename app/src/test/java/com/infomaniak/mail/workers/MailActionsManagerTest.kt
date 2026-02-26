@@ -25,6 +25,7 @@ import com.infomaniak.core.legacy.InfomaniakCore
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
@@ -66,6 +67,7 @@ class MailActionsManagerTest {
     private val coroutineWorker = mockk<CoroutineWorker>()
 
     private var draftController = DraftController(mailboxContentRealm)
+    private val mailboxInfoRealm: Realm by lazy { RealmDatabase.mailboxInfo }
 
     @Before
     fun setup() {
@@ -118,6 +120,7 @@ class MailActionsManagerTest {
 
     @After
     fun tearDown() {
+        mailboxInfoRealm.close()
         unmockkStatic(Log::class)
         unmockkObject(ApiRepository)
         unmockkObject(LocalStorageUtils)
@@ -164,6 +167,7 @@ class MailActionsManagerTest {
     private fun getMailActionManager(mailboxContentRealm: Realm?): MailActionsManager {
         return MailActionsManager(
             mailboxContentRealm = mailboxContentRealm!!,
+            mailboxInfoRealm = mailboxInfoRealm,
             userId = 0,
             mailboxId = 0,
             mailbox = Mailbox(),

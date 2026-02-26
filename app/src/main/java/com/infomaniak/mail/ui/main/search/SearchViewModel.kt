@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.Companion.DUMMY_FOLDER_ID
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -73,7 +74,8 @@ class SearchViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     /** Needed to pass API request's validation, but won't be used by the API */
-    private val dummyFolderId inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)!!
+    private val dummyFolderId
+        inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name) ?: DUMMY_FOLDER_ID
 
     var filterFolder: Folder? = null
         private set
@@ -81,6 +83,7 @@ class SearchViewModel @Inject constructor(
         private set
 
     private var currentFilters = mutableSetOf<ThreadFilter>()
+    var isAllFoldersSelected: Boolean = false
 
     private var lastExecutedFolder: Folder? = null
     private var lastExecutedSearchQuery: String = ""
@@ -115,6 +118,12 @@ class SearchViewModel @Inject constructor(
         if (hasPendingSearch) search()
     }
 
+    fun resetFolderFilter() {
+        filterFolder = null
+        isAllFoldersSelected = false
+        unselectAllChipFilters()
+    }
+
     fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
         search()
     }
@@ -124,8 +133,15 @@ class SearchViewModel @Inject constructor(
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
 
-    fun selectFolder(folder: Folder?) = viewModelScope.launch(ioCoroutineContext) {
-        search(folder = folder.also { filterFolder = it })
+    fun selectAllFoldersFilter(isSelected: Boolean) {
+        isAllFoldersSelected = isSelected
+    }
+
+    fun selectFolder(folder: Folder?) {
+        filterFolder = folder
+        viewModelScope.launch(ioCoroutineContext) {
+            search(folder = folder)
+        }
     }
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
@@ -139,10 +155,12 @@ class SearchViewModel @Inject constructor(
     }
 
     fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
-        currentFilters.apply {
-            removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
-        }
+        currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
         search(filters = currentFilters)
+    }
+
+    fun unselectAllChipFilters() {
+        currentFilters.removeAll(ThreadFilter.entries)
     }
 
     fun nextPage() = viewModelScope.launch(ioCoroutineContext) {

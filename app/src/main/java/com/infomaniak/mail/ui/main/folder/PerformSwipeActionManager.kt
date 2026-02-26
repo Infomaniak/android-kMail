@@ -18,17 +18,19 @@
 package com.infomaniak.mail.ui.main.folder
 
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -78,7 +80,7 @@ object PerformSwipeActionManager {
     ) = when (swipeAction) {
         SwipeAction.TUTORIAL -> {
             localSettings.setDefaultSwipeActions()
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
+            safelyNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
             findNavController().navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
             true
         }
@@ -124,14 +126,17 @@ object PerformSwipeActionManager {
             val navController = findNavController()
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 navController.animatedNavigation(
-                    directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)),
-                    currentClassName = javaClass.name,
+                    directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+                        threadsUids = arrayOf(thread.uid),
+                        action = FolderPickerAction.MOVE,
+                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                    ),
                 )
             }
             true
         }
         SwipeAction.QUICKACTIONS_MENU -> {
-            safeNavigate(
+            safelyNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                     threadUid = thread.uid,
                     shouldLoadDistantResources = false,

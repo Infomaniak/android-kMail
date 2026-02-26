@@ -1,0 +1,2 @@
+- Update Euria's animation
+- Fix network's availability indicator sometimes keeping "network unavailable"

@@ -15,17 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.move
+package com.infomaniak.mail.ui.main.folderPicker
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.coroutineContext
@@ -41,11 +38,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MoveViewModel @Inject constructor(
+class FolderPickerViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
-    private val messageController: MessageController,
-    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -53,29 +48,40 @@ class MoveViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
-    private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
+    private val sourceFolderId inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolderId.name)
 
-    private var allFolderUis = emptyList<Any>()
+    private var allFolderUis = emptyList<FolderPickerItem>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
-    val filterResults = MutableLiveData<Pair<List<Any>, Boolean>>()
+    val filterResults = MutableLiveData<Pair<List<FolderPickerItem>, Boolean>>()
     var hasAlreadyTrackedSearch = false
 
     init {
         viewModelScope.launch(ioCoroutineContext) {
-
-            val sourceFolderId = messageUid?.let { messageController.getMessage(it) }?.folderId
-                ?: threadController.getThread(threadsUids.first())!!.folderId
-
             sourceFolderIdLiveData.postValue(sourceFolderId)
         }
     }
 
-    fun initFolders(folders: MainViewModel.DisplayedFolders) {
-        allFolderUis = folders.flattenAndAddDividerBeforeFirstCustomFolder(
-            dividerType = Unit,
-            excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
-        ).also { folders -> filterResults.postValue(folders to true) }
+    fun initFolders(folders: MainViewModel.DisplayedFolders, action: FolderPickerAction) {
+        allFolderUis = when (action) {
+            FolderPickerAction.SEARCH -> {
+                val baseFolders = folders.flattenAndAddDividerBeforeFirstCustomFolder(
+                    dividerType = FolderPickerItem.Divider,
+                )
+                mutableListOf<FolderPickerItem>().apply {
+                    add(FolderPickerItem.AllFolders)
+                    add(FolderPickerItem.Divider)
+                    addAll(baseFolders)
+                }
+            }
+            else -> {
+                folders.flattenAndAddDividerBeforeFirstCustomFolder(
+                    dividerType = FolderPickerItem.Divider,
+                    excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
+                )
+            }
+        }.also { folders ->
+            filterResults.postValue(folders to true)
+        }
     }
 
     fun filterFolders(query: CharSequence?, shouldDebounce: Boolean) {
@@ -101,12 +107,13 @@ class MoveViewModel @Inject constructor(
             // When dealing with nested role folders, there can be multiple FolderUi for the same Folder.id, that's why we make a
             // map so there's only one FolderUi per Folder.id
             val filteredFolders = buildMap {
-                allFolderUis.forEach { folderUi ->
+                allFolderUis.forEach { folderItem ->
                     ensureActive()
-                    if (folderUi !is FolderUi) return@forEach
-                    val folderName = folderUi.folder.role?.folderNameRes?.let(appContext::getString) ?: folderUi.folder.name
+                    if (folderItem !is FolderPickerItem.Folder) return@forEach
+                    val folder = folderItem.folderUi.folder
+                    val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
                     val isFound = folderName.standardize().contains(query.standardize())
-                    if (isFound) set(folderUi.folder.id, folderUi)
+                    if (isFound) set(folder.id, folderItem)
                 }
             }
 
