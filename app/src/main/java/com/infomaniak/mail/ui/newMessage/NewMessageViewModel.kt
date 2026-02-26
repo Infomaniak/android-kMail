@@ -563,12 +563,12 @@ class NewMessageViewModel @Inject constructor(
             finalBodyContent += MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
         }
 
-        if (bodyHasQuotes(finalBodyContent)) {
-            finalBodyContent += toggleButton()
-        }
-
-        val normalizedBody = normalizeHtml(finalBodyContent)
+        var normalizedBody = normalizeHtml(finalBodyContent)
         saveSnapshot(normalizedBody)
+
+        if (bodyHasQuotes(finalBodyContent)) {
+            normalizedBody += toggleButton()
+        }
 
         editorBodyInitializer.postValue(
             BodyContentPayload(
@@ -591,8 +591,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun bodyHasQuotes(bodyHtml: String): Boolean {
-        return JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
+        val bodyHasQuotes = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
             .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).count() > 0
+        val toggleButtonAlreadyExists = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
+            .getElementById("quote-toggle-btn") != null
+        return bodyHasQuotes && !toggleButtonAlreadyExists
     }
 
     private fun normalizeHtml(html: String): String {
@@ -995,7 +998,7 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
-        body = uiBodyValue
+        body = sanitizeBody(uiBodyValue)
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -1011,7 +1014,7 @@ class NewMessageViewModel @Inject constructor(
 
         // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
         if (!isFinishing) {
-            val normalizedBody = normalizeHtml(uiBodyValue)
+            val normalizedBody = normalizeHtml(body)
             copyFromRealm().saveSnapshot(normalizedBody)
             isNewMessage = false
         }
@@ -1019,6 +1022,13 @@ class NewMessageViewModel @Inject constructor(
 
     private fun sanitizeBody(html: String): String {
         val doc = jsoupParseWithLog(html)
+        // If the user deleted the quotes text, remove the quotes div.
+        val bodyHasEmptyQuotes = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html)
+            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).first()?.text() == ""
+        if (bodyHasEmptyQuotes) {
+            doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
+        }
+
         // Remove the toggle button before saving
         doc.getElementById("quote-toggle-btn")?.remove()
         return doc.html()

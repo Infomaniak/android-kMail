@@ -33,7 +33,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyl
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.loadCss
 import kotlin.math.abs
@@ -43,7 +42,6 @@ class WebViewUtils(context: Context) {
     private val customDarkMode by lazy { context.getCustomDarkMode() }
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
-    private val signatureVerticalMargin by lazy { context.getSignatureMarginStyle() }
     private val printMailStyle by lazy { context.getPrintMailStyle() }
 
     private val resizeScript by lazy { context.getResizeScript() }
@@ -65,15 +63,6 @@ class WebViewUtils(context: Context) {
         isDisplayedInDarkMode: Boolean,
     ): String = with(HtmlFormatter(html)) {
         addCommonDisplayContent(isDisplayedInDarkMode)
-        return@with inject()
-    }
-
-    fun processSignatureHtmlForDisplay(
-        html: String,
-        isDisplayedInDarkMode: Boolean,
-    ): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
-        registerCss(signatureVerticalMargin)
         return@with inject()
     }
 
