@@ -219,6 +219,12 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary)),
         )
 
+        fun Context.getCustomEditorStyle(): String = loadCss(
+            R.raw.editor_style,
+            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
+        )
+
+
         fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
@@ -226,6 +232,10 @@ class HtmlFormatter(private val html: String) {
         fun Context.getResizeScript(): String = loadScript(
             R.raw.munge_email,
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
+        )
+
+        fun Context.getToggleQuotesButtonVisibilityScript(): String = loadScript(
+            R.raw.toggle_quote_visibility_script
         )
 
         fun Context.getFixStyleScript(): String {

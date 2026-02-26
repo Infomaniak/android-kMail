@@ -67,6 +67,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -87,10 +88,15 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getToggleQuotesButtonVisibilityScript
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
-import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
+import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
@@ -100,11 +106,9 @@ import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
-import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.ime
-import com.infomaniak.mail.utils.extensions.loadCss
+import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
-import com.infomaniak.mail.utils.extensions.readRawResource
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
@@ -118,7 +122,6 @@ import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
-import androidx.appcompat.R as RAndroid
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -146,6 +149,7 @@ class NewMessageFragment : Fragment() {
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
+    private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
     @Inject
     lateinit var editorContentManager: EditorContentManager
@@ -182,6 +186,7 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -430,11 +435,10 @@ class NewMessageFragment : Fragment() {
 
     private fun setEditorStyle() = with(binding.editorWebView) {
         enableAlgorithmicDarkening(isEnabled = true)
-        if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
-
-        val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RAndroid.attr.colorPrimary))
-        addCss(context.loadCss(R.raw.style, customColors))
-        addCss(context.loadCss(R.raw.editor_style, customColors))
+        if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
+        addCss(context.getCustomStyle())
+        addCss(context.getCustomEditorStyle())
+        addCss(context.getSignatureMarginStyle())
     }
 
     private fun removePlaceholder() {
@@ -482,7 +486,16 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun configureUiWithDraftData() = binding.editorWebView.settings.setupNewMessageWebViewSettings()
+    private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
+        settings.setupNewMessageWebViewSettings()
+        webViewClient =
+            initWebViewClientAndBridge(
+                attachments = draft.attachments,
+                messageUid = "MESSAGE-" + draft.messageUid,
+                shouldLoadDistantResources = true,
+                navigateToNewMessageActivity = null
+            )
+    }
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
@@ -575,8 +588,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitResult() {
-        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (_, signatures) ->
-            configureUiWithDraftData()
+        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
+            configureUiWithDraftData(draft)
             setupFromField(signatures)
             editorManager.setupEditorFormatActions()
             editorManager.setupEditorFormatActionsToggle()
@@ -682,8 +695,7 @@ class NewMessageFragment : Fragment() {
     private fun observeBodyLoader() {
         newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
             editorContentManager.setContent(binding.editorWebView, body)
-            val script = context?.readRawResource(R.raw.toggle_quote_visibility_script)
-            script?.let { binding.editorWebView.addScript(script) }
+            binding.editorWebView.addScript(requireContext().getToggleQuotesButtonVisibilityScript())
         }
     }
 
