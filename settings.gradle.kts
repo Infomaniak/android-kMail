@@ -29,7 +29,6 @@ rootProject.name = "Infomaniak Mail"
 include(
     ":app",
     ":Core:Legacy",
-    ":Core:Legacy:AppLock",
     ":Core:Legacy:Confetti",
     ":EmojiComponents",
     ":HtmlCleaner",

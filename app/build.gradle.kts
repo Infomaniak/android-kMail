@@ -160,6 +160,7 @@ sentry {
 
 dependencies {
     implementation(libs.infomaniak.core)
+    implementation(core.infomaniak.core.applock)
     implementation(libs.infomaniak.core.appversionchecker)
     implementation(libs.infomaniak.core.auth)
     implementation(libs.infomaniak.core.avatar)
@@ -189,7 +190,6 @@ dependencies {
     implementation(libs.infomaniak.core.ui.view)
 
     implementation(project(":Core:Legacy"))
-    implementation(project(":Core:Legacy:AppLock"))
     implementation(project(":Core:Legacy:Confetti"))
     implementation(project(":EmojiComponents"))
     implementation(project(":HtmlCleaner"))
