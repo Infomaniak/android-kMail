@@ -38,9 +38,9 @@ android {
 }
 
 dependencies {
-    implementation(libs.infomaniak.core.avatar)
-    implementation(libs.infomaniak.core.ui.compose.margin)
-    implementation(libs.infomaniak.core.ui.compose.materialthemefromxml)
+    implementation(core.infomaniak.core.avatar)
+    implementation(core.infomaniak.core.ui.compose.margin)
+    implementation(core.infomaniak.core.ui.compose.materialthemefromxml)
 
     implementation(libs.compose.ui.android)
 
