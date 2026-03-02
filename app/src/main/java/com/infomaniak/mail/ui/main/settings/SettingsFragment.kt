@@ -27,13 +27,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.applock.LockActivity
+import com.infomaniak.core.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.core.auth.room.UserDatabase
 import com.infomaniak.core.crossapplogin.back.CrossAppLogin
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
-import com.infomaniak.core.legacy.applock.LockActivity
-import com.infomaniak.core.legacy.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.core.legacy.utils.openAppNotificationSettings
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.ui.showToast
