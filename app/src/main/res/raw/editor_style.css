@@ -13,4 +13,7 @@ p {
     margin: 0;
 }
 
-
+.ik_mail_quote, forwardContentMessage {
+    display: none;
+    overflow-x: auto !important;
+}
