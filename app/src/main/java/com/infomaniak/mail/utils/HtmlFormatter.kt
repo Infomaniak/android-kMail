@@ -27,6 +27,7 @@ import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
+import kotlinx.serialization.json.JsonPrimitive
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -210,6 +211,11 @@ class HtmlFormatter(private val html: String) {
             }
         }
 
+        fun String.escapeForJS(): String {
+            if (isNullOrEmpty()) return this
+            return JsonPrimitive(this).toString().removeSurrounding("\"")
+        }
+
         fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
@@ -224,7 +230,6 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
 
-
         fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
@@ -235,7 +240,11 @@ class HtmlFormatter(private val html: String) {
         )
 
         fun Context.getToggleQuotesButtonVisibilityScript(): String = loadScript(
-            R.raw.toggle_quote_visibility_script
+            R.raw.show_quotes_script
+        )
+
+        fun Context.getReplaceSignatureScript(): String = loadScript(
+            R.raw.replace_signature_script
         )
 
         fun Context.getFixStyleScript(): String {

@@ -24,7 +24,6 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -88,7 +87,6 @@ import com.infomaniak.mail.utils.JsoupParserUtil
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.MessageBodyUtils.toggleButton
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
@@ -222,6 +220,9 @@ class NewMessageViewModel @Inject constructor(
 
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
+
+    private val _areQuotesVisible = MutableStateFlow(false)
+    val areQuotesVisible: StateFlow<Boolean> = _areQuotesVisible
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -560,15 +561,12 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isNewMessage && !initialQuote.isNullOrEmpty()) {
+            _areQuotesVisible.emit(true)
             finalBodyContent += MessageBodyUtils.encapsulateQuotesWithInfomaniakClass(initialQuote.toString())
         }
 
-        var normalizedBody = normalizeHtml(finalBodyContent)
+        val normalizedBody = normalizeHtml(finalBodyContent)
         saveSnapshot(normalizedBody)
-
-        if (bodyHasQuotes(finalBodyContent)) {
-            normalizedBody += toggleButton()
-        }
 
         editorBodyInitializer.postValue(
             BodyContentPayload(
@@ -587,15 +585,11 @@ class NewMessageViewModel @Inject constructor(
 
     fun bodyHasPlaceholder(bodyHtml: String): Boolean {
         val body = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml).body()
-        return body.text() == ""
+        return !body.hasText()
     }
 
-    fun bodyHasQuotes(bodyHtml: String): Boolean {
-        val bodyHasQuotes = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
-            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).count() > 0
-        val toggleButtonAlreadyExists = JsoupParserUtil.jsoupParseBodyFragmentWithLog(bodyHtml)
-            .getElementById("quote-toggle-btn") != null
-        return bodyHasQuotes && !toggleButtonAlreadyExists
+    fun changeQuotesVisibility(areVisible: Boolean) {
+        _areQuotesVisible.value = areVisible
     }
 
     private fun normalizeHtml(html: String): String {
@@ -1022,15 +1016,17 @@ class NewMessageViewModel @Inject constructor(
 
     private fun sanitizeBody(html: String): String {
         val doc = jsoupParseWithLog(html)
-        // If the user deleted the quotes text, remove the quotes div.
-        val bodyHasEmptyQuotes = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html)
-            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).first()?.text() == ""
-        if (bodyHasEmptyQuotes) {
+        // If the user deleted the quotes text, remove the quotes div so the button to show quotes doesn't show.
+        val quotes = JsoupParserUtil.jsoupParseBodyFragmentWithLog(html)
+            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val hasQuotes = quotes.isNotEmpty()
+        if (hasQuotes && !quotes.hasText()) {
             doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
         }
 
-        // Remove the toggle button before saving
-        doc.getElementById("quote-toggle-btn")?.remove()
+        // Don't save the draft or send the mail with quotes style display none.
+        if (hasQuotes) quotes.attr("style", "display: block")
+
         return doc.html()
     }
 
@@ -1073,8 +1069,6 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
-        Log.d("BODY VALUE", uiBodyValue)
-        Log.d("SNAPSHOT", snapshot?.uiBody.toString())
         return snapshot?.let { draftSnapshot ->
             draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() &&
                     draftSnapshot.to == toLiveData.valueOrEmpty().toSet() &&
