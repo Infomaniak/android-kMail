@@ -17,7 +17,7 @@
  */
 
 (function() {
-  const quoteElements = document.querySelectorAll('.ik_mail_quote');
+  const quoteElements = document.querySelectorAll('.ik_mail_quote, .forwardContentMessage');
   quoteElements.forEach(el => {
        el.style.display = 'block';
 
