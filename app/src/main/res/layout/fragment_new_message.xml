@@ -320,14 +320,16 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/quotesToggleButton"
-                        style="@style/IconButtonSmall"
-                        android:layout_width="24dp"
+                        style="@style/TextButton"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:contentDescription="@string/buttonTextOptionsOpen"
-                        app:icon="@drawable/ic_more_horiz"
-                        app:layout_constraintStart_toStartOf="@id/editorWebView"
-                        app:layout_constraintTop_toBottomOf="@id/editorWebView" />
+                        android:padding="@dimen/marginStandardVerySmall"
+                        android:text="@string/messageShowQuotedText"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="@id/postFields"
+                        app:layout_constraintTop_toBottomOf="@id/editorWebView"
+                        tools:visibility="visible" />
 
                     <LinearLayout
                         android:id="@+id/bodyLoader"
