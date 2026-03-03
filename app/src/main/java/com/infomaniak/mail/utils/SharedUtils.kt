@@ -101,6 +101,33 @@ class SharedUtils @Inject constructor(
         if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(threadsUids, messagesUids, isSeen = false)
     }
 
+    suspend fun markMessagesAsSeen(
+        mailbox: Mailbox,
+        messages: List<Message>,
+        currentFolderId: String? = null,
+        callbacks: RefreshCallbacks? = null,
+        shouldRefreshThreads: Boolean = true,
+    ) {
+
+        val messagesUids = messages.map { it.uid }
+
+        updateSeenStatus(messagesUids, isSeen = true)
+
+        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
+
+        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
+            refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                currentFolderId = currentFolderId,
+                callbacks = callbacks,
+            )
+        }
+
+        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(messagesUids, isSeen = false)
+    }
+
+
     private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
         mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
@@ -108,9 +135,21 @@ class SharedUtils @Inject constructor(
         }
     }
 
+    suspend fun updateSeenStatus(messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().write {
+            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
+        }
+    }
+
     suspend fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap { messageController.getMovableMessages(it) }
         else -> listOf(message)
+    }
+
+    suspend fun getMessagesToMove(threads: List<Thread>?, messages: List<Message>?, currentFolderId: String?) = when {
+        messages != null -> messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
+        threads != null -> threads.flatMap { messageController.getMovableMessages(it) }
+        else -> emptyList() //this should never happen, we have to send a list of threads or messages.
     }
 
     suspend fun refreshFolders(

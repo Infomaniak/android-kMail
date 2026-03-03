@@ -61,6 +61,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
 
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
@@ -111,7 +112,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun observeReportPhishingResult() {
-        mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
+        actionsViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
         }
@@ -159,7 +160,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onDelete() {
                 descriptionDialog.deleteWithConfirmationPopup(message.folder.role, count = 1) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
-                    mainViewModel.deleteMessage(threadUid, message)
+                    actionsViewModel.deleteThreadsOrMessages(
+                        messages = listOf(message),
+                        currentFolder = mainViewModel.currentFolder.value,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 }
             }
             //endregion
@@ -168,13 +173,21 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onArchive() {
                 descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
-                    mainViewModel.archiveMessage(threadUid, message)
+                    actionsViewModel.archiveThreadsOrMessages(
+                        messages = listOf(message),
+                        currentFolder = mainViewModel.currentFolder.value,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 }
             }
 
             override fun onReadUnread() {
                 trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen, message.isSeen)
-                mainViewModel.toggleMessageSeenStatus(threadUid, message)
+                actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                    messages = listOf(message),
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = mainViewModel.currentMailbox.value!!
+                )
                 twoPaneViewModel.closeThread()
             }
 
@@ -185,9 +198,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     navController.animatedNavigation(
                         resId = R.id.folderPickerFragment,
                         args = FolderPickerFragmentArgs(
-                            threadsUids = arrayOf(threadUid),
                             action = FolderPickerAction.MOVE,
-                            messageUid = messageUid,
+                            threadsUids = arrayOf(threadUid),
+                            messagesUids = arrayOf(messageUid),
                             sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                         ).toBundle(),
                     )
@@ -207,12 +220,19 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onFavorite() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Favorite, message.isFavorite)
-                mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
+                actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                    messages = listOf(message),
+                    mailbox = mainViewModel.currentMailbox.value!!
+                )
             }
 
             override fun onSpam() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = isFromSpam)
-                mainViewModel.toggleMessageSpamStatus(threadUid, message)
+                actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                    messages = listOf(message),
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = mainViewModel.currentMailbox.value!!
+                )
             }
 
             override fun onPhishing() {
@@ -220,7 +240,13 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 descriptionDialog.show(
                     title = getString(R.string.reportPhishingTitle),
                     description = resources.getQuantityString(R.plurals.reportPhishingDescription, 1),
-                    onPositiveButtonClicked = { mainViewModel.reportPhishing(listOf(threadUid), listOf(message)) },
+                    onPositiveButtonClicked = {
+                        actionsViewModel.reportPhishing(
+                            messages = listOf(message),
+                            currentFolder = mainViewModel.currentFolder.value,
+                            mailbox = mainViewModel.currentMailbox.value!!
+                        )
+                    },
                 )
             }
 
