@@ -432,7 +432,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         emoji = emoji,
                         messageUid = messageUid,
                         reactions = reactions,
-                        hasNetwork = mainViewModel.hasNetwork,
                         mailbox = mainViewModel.currentMailbox.value!!,
                         onAllowed = {
                             threadViewModel.fakeEmojiReply(emoji, messageUid)
@@ -683,7 +682,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 emoji = emoji,
                 messageUid = messageUid,
                 reactions = reactions,
-                hasNetwork = mainViewModel.hasNetwork,
                 mailbox = mainViewModel.currentMailbox.value!!,
                 onAllowed = {
                     threadViewModel.fakeEmojiReply(emoji, messageUid)

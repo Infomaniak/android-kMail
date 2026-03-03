@@ -711,7 +711,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                         emoji = emoji,
                         messageUid = messageUid,
                         reactions = reactions,
-                        hasNetwork = mainViewModel.hasNetwork,
                         mailbox = mainViewModel.currentMailbox.value!!
                     )
                 }
