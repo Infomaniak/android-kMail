@@ -53,7 +53,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
                     imageElement.attr(SRC_ATTRIBUTE, "${CID_PROTOCOL}$newContentId")
                 },
             )
-            
+
             document.outerHtml()
         } ?: ""
 
