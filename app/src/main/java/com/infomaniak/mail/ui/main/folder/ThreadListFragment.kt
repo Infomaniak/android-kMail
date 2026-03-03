@@ -85,6 +85,7 @@ import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -120,6 +121,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
 
     override val substituteClassName: String = javaClass.name
 
@@ -705,7 +707,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             viewLifecycleOwner.lifecycleScope.launch {
                 threadListViewModel.getEmojiReactionsFor(messageUid)?.let { reactions ->
-                    actionsViewModel.trySendEmojiReply(
+                    emojiReactionsViewModel.trySendEmojiReply(
                         emoji = emoji,
                         messageUid = messageUid,
                         reactions = reactions,
