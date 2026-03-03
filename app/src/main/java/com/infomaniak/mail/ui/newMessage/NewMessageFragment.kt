@@ -138,7 +138,6 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
-    private var hasPlaceholder = true
 
     private val filePicker = FilePicker(fragment = this).apply {
         initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
@@ -445,13 +444,12 @@ class NewMessageFragment : Fragment() {
 
     private fun removePlaceholder() {
         binding.newMessagePlaceholder.visibility = View.GONE
-        hasPlaceholder = false
     }
 
     private fun handleFocusChanges() {
         newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { isFocused ->
             setToolbarEnabledStatus(isFocused)
-            if (isFocused && hasPlaceholder) {
+            if (isFocused && binding.newMessagePlaceholder.isVisible) {
                 removePlaceholder()
             }
         }

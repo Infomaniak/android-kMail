@@ -132,7 +132,7 @@ class WebViewUtils(context: Context) {
 
         fun WebSettings.setupThreadWebViewSettings() {
             setupCommonWebViewSettings()
-            
+
             useWideViewPort = true
             setSupportZoom(true)
             builtInZoomControls = true

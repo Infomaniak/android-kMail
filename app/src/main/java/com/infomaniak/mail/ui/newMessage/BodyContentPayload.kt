@@ -27,7 +27,7 @@ data class BodyContentPayload(val content: String, val type: BodyContentType) {
         fun emptyBody() =
             BodyContentPayload(
                 content = "<br id=lineBreakAtBeginningOfSignature>",
-                type = BodyContentType.TEXT_PLAIN_WITHOUT_HTML
+                type = BodyContentType.HTML_SANITIZED
             )
     }
 }
