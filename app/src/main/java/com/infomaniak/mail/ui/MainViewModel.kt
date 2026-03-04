@@ -1680,12 +1680,11 @@ class MainViewModel @Inject constructor(
     fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
         val snackbarTitleRes = if (ApiRepository.ping().isSuccess()) {
             val userBearerToken = AccountUtils.currentUser?.apiToken?.accessToken
-            DownloadManagerUtils.scheduleDownload(
-                context = appContext,
+            DownloadManagerUtils.launchDownload(
                 url = downloadUrl,
                 name = filename,
+                userAgent = HttpUtils.getUserAgent,
                 userBearerToken = userBearerToken,
-                extraHeaders = HttpUtils.getHeaders(),
                 onError = { resourceStringId ->
                     appContext.showToast(resourceStringId)
                 }
