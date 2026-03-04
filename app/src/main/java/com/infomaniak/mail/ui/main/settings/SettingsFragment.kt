@@ -27,8 +27,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.applock.LockActivity
-import com.infomaniak.core.applock.Utils.silentlyReverseSwitch
+import com.infomaniak.core.applock.AppLockHelper.silentlyReverseSwitch
+import com.infomaniak.core.applock.AppLockManager
 import com.infomaniak.core.auth.room.UserDatabase
 import com.infomaniak.core.crossapplogin.back.CrossAppLogin
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
@@ -204,14 +204,14 @@ class SettingsFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         settingsAppLock.apply {
-            isVisible = LockActivity.hasBiometrics()
+            isVisible = AppLockManager.hasBiometrics()
             isChecked = localSettings.isAppLocked
             setOnClickListener {
                 trackEvent(MatomoCategory.SettingsGeneral, MatomoName.Lock, value = isChecked.toFloat())
                 // Reverse switch (before official parameter changed) by silent click
                 requireActivity().silentlyReverseSwitch(toggle!!) { isChecked ->
                     localSettings.isAppLocked = isChecked
-                    if (isChecked) LockActivity.unlock()
+                    if (isChecked) AppLockManager.unlock()
                 }
             }
         }
