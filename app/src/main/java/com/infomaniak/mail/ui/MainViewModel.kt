@@ -87,7 +87,6 @@ import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
-import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
@@ -165,7 +164,6 @@ class MainViewModel @Inject constructor(
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
-    private val notificationUtils: NotificationUtils,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
@@ -193,6 +191,7 @@ class MainViewModel @Inject constructor(
     val canInstallUpdate = MutableLiveData(false)
 
     val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
+    val undoShouldCorrectDirection = SingleLiveEvent<Boolean>()
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
@@ -1499,6 +1498,7 @@ class MainViewModel @Inject constructor(
                 messagesFoldersIds = foldersIds,
                 destinationFolderId = destinationFolderId,
             )
+            undoShouldCorrectDirection.postValue(true)
         }
 
         val failedCall = apiResponses.getFailedCall()

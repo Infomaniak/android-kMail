@@ -202,6 +202,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val isNotInSpam: Boolean
         get() = runCatchingRealm { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }.getOrDefault(true)
 
+    private var shouldCorrectStartingIndex: Boolean = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
@@ -232,6 +234,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         observeThreadOpening()
         observeAutoAdvance()
+        observeShouldCorrectStartingIndex()
 
         setupBackActionHandler()
 
@@ -715,6 +718,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner, ::tryToAutoAdvance)
     }
 
+    private fun observeShouldCorrectStartingIndex() {
+        mainViewModel.undoShouldCorrectDirection.observe(viewLifecycleOwner, ::correctStartingIndex)
+    }
+
     private fun setupBackActionHandler() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
@@ -1041,6 +1048,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         twoPaneViewModel.safelyNavigate(resId, args)
     }
 
+    private fun correctStartingIndex(shouldCorrect: Boolean) {
+        shouldCorrectStartingIndex = shouldCorrect
+    }
+
     private fun tryToAutoAdvance(listThreadUids: List<String>) = with(twoPaneFragment.threadListAdapter) {
         if (!listThreadUids.contains(openedThreadUid)) return@with
 
@@ -1053,6 +1064,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 }
 
                 twoPaneFragment.navigateToThread(nextThread)
+                shouldCorrectStartingIndex = false
             } ?: run {
                 twoPaneViewModel.closeThread()
             }
@@ -1065,13 +1077,15 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         val direction = when (localSettings.autoAdvanceMode) {
             AutoAdvanceMode.PREVIOUS_THREAD -> PREVIOUS_CHRONOLOGICAL_THREAD
-            AutoAdvanceMode.FOLLOWING_THREAD -> NEXT_CHRONOLOGICAL_THREAD
+            AutoAdvanceMode.FOLLOWING_THREAD -> {
+                if (shouldCorrectStartingIndex) NEXT_CHRONOLOGICAL_THREAD + 1 else NEXT_CHRONOLOGICAL_THREAD
+            }
             AutoAdvanceMode.THREADS_LIST -> null
             AutoAdvanceMode.NATURAL_THREAD -> {
                 if (localSettings.autoAdvanceNaturalThread == AutoAdvanceMode.PREVIOUS_THREAD) {
                     PREVIOUS_CHRONOLOGICAL_THREAD
                 } else {
-                    NEXT_CHRONOLOGICAL_THREAD
+                    if (shouldCorrectStartingIndex) NEXT_CHRONOLOGICAL_THREAD + 1 else NEXT_CHRONOLOGICAL_THREAD
                 }
             }
         }
@@ -1099,7 +1113,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         private const val ARCHIVE_INDEX = 2
 
         private const val PREVIOUS_CHRONOLOGICAL_THREAD = -1
-        private const val NEXT_CHRONOLOGICAL_THREAD = 1
+        // Since the auto advance it's happening after the move, the next thread is already the current thread.
+        private const val NEXT_CHRONOLOGICAL_THREAD = 0
 
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
