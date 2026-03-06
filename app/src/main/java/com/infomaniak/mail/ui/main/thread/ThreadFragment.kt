@@ -270,6 +270,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     override fun onStop() {
+        mainViewModel.consumeAndResetUndoCorrection()
         threadViewModel.threadState.verticalScroll = binding.messagesListNestedScrollView.scrollY
         super.onStop()
     }
