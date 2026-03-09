@@ -123,7 +123,7 @@ class ThreadListAdapter @Inject constructor(
     private var callbacks: ThreadListAdapterCallbacks? = null
 
     private var previousThreadClickedPosition: Int? = null
-    
+
     var openedThreadPosition: Int? = null
         private set
     var openedThreadUid: String? = null
@@ -697,21 +697,29 @@ class ThreadListAdapter @Inject constructor(
             Dispatchers.Main {
                 // Put back "Load more" button if it was already there
                 dataSet = if (isLoadMoreDisplayed) formattedList + ThreadListItem.LoadMore else formattedList
-                checkShouldUpdateOpenedThreadPosition()
+                refreshSelectedPositionIfPossible()
             }
         }
     }
 
-    private fun checkShouldUpdateOpenedThreadPosition() {
-        val currentUid = openedThreadUid
-        if (currentUid != null) {
-            val currentPos = openedThreadPosition
-            if (currentPos != null && currentPos in dataSet.indices &&
-                (dataSet[currentPos] as? ThreadListItem.Content)?.thread?.uid != currentUid || currentPos !in dataSet.indices
-            ) {
-                val newIndex = dataSet.indexOfFirst { it is ThreadListItem.Content && it.thread.uid == currentUid }
-                if (newIndex != -1) refreshCachedSelectedPosition(currentUid, newIndex)
-            }
+    private fun checkShouldUpdateOpenedThreadPosition(currentUid: String): Boolean {
+
+        val currentPos = openedThreadPosition
+        val isCurrentPositionValid = currentPos != null && currentPos in dataSet.indices
+
+        if (!isCurrentPositionValid) return true
+
+        val currentItem = dataSet[currentPos]
+
+        return currentItem is ThreadListItem.Content && currentItem.thread.uid != currentUid
+    }
+
+    private fun refreshSelectedPositionIfPossible() {
+        val currentUid = openedThreadUid ?: return
+
+        if (checkShouldUpdateOpenedThreadPosition(currentUid)) {
+            val newIndex = dataSet.indexOfFirst { it is ThreadListItem.Content && it.thread.uid == currentUid }
+            if (newIndex != -1) refreshCachedSelectedPosition(currentUid, newIndex)
         }
     }
 

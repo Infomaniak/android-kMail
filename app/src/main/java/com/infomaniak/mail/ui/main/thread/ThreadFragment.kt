@@ -1043,6 +1043,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun tryToAutoAdvance(listThreadUids: List<String>) = with(twoPaneFragment.threadListAdapter) {
         if (!listThreadUids.contains(openedThreadUid)) return@with
+
         openedThreadPosition?.let {
             val data = getNextThreadToOpenByPosition(it)
 
@@ -1062,9 +1063,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         startingThreadIndex: Int,
     ): Pair<Thread, Int>? = with(twoPaneFragment.threadListAdapter) {
 
-        // Since the auto advance is happening after the move, the next thread is already the current thread.
         val direction = when (localSettings.autoAdvanceMode) {
             AutoAdvanceMode.PREVIOUS_THREAD -> PREVIOUS_CHRONOLOGICAL_THREAD
+            // Since the auto advance is happening after the move, the next thread is already the current thread.
             AutoAdvanceMode.FOLLOWING_THREAD -> STAY_IN_CURRENT_POSITION
             AutoAdvanceMode.THREADS_LIST -> null
             AutoAdvanceMode.NATURAL_THREAD -> {
