@@ -92,8 +92,8 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.escapeForJS
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getToggleQuotesButtonVisibilityScript
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
@@ -101,6 +101,7 @@ import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
+import com.infomaniak.mail.utils.extensions.addCssWithId
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -439,11 +440,10 @@ class NewMessageFragment : Fragment() {
         if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
-        addCss(context.getSignatureMarginStyle())
     }
 
     private fun removePlaceholder() {
-        binding.newMessagePlaceholder.visibility = View.GONE
+        binding.newMessagePlaceholder.isGone = true
     }
 
     private fun handleFocusChanges() {
@@ -479,8 +479,7 @@ class NewMessageFragment : Fragment() {
 
     private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
         when (newMessageViewModel.draftMode()) {
-            DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> focusBodyField()
             DraftMode.FORWARD -> focusToField()
             DraftMode.NEW_MAIL -> if (isToFieldEmpty) focusToField() else focusBodyField()
         }
@@ -488,11 +487,13 @@ class NewMessageFragment : Fragment() {
 
     private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
         settings.setupNewMessageWebViewSettings()
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
         webViewClient = initWebViewClientAndBridge(
             attachments = draft.attachments,
             messageUid = "MESSAGE-" + draft.messageUid,
-            shouldLoadDistantResources = true,
-            navigateToNewMessageActivity = null
+            shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
+            navigateToNewMessageActivity = null,
+            onPageFinished = { binding.editorWebView.notifyPageHasLoaded() }
         )
     }
 
@@ -539,11 +540,13 @@ class NewMessageFragment : Fragment() {
 
     private fun onSignatureClicked(signature: Signature) {
         trackNewMessageEvent(MatomoName.SwitchIdentity)
+        newMessageViewModel.fromLiveData.value = UiFrom(signature)
+        addressListPopupWindow?.dismiss()
+    }
 
-        // Get the New Signature HTML
-        val newSignatureHtml = signature.content
+    private fun updateBodySignature(signature: Signature) {
         val wrappedNewSignature =
-            if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(newSignatureHtml)
+            if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
 
         val escapedSignature = wrappedNewSignature.escapeForJS()
 
@@ -553,10 +556,7 @@ class NewMessageFragment : Fragment() {
             MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
         )
 
-        binding.editorWebView.evaluateJavascript(replaceSignatureScript) {
-            newMessageViewModel.fromLiveData.value = UiFrom(signature)
-            addressListPopupWindow?.dismiss()
-        }
+        binding.editorWebView.evaluateJavascript(replaceSignatureScript, null)
     }
 
     private fun updateSelectedSignatureInFromField(signature: Signature) {
@@ -586,8 +586,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeFromData() = with(newMessageViewModel) {
-        fromLiveData.observe(viewLifecycleOwner) { (signature) ->
+        fromLiveData.observe(viewLifecycleOwner) { (signature, shouldUpdateBodySignature) ->
             updateSelectedSignatureInFromField(signature)
+            if (shouldUpdateBodySignature) updateBodySignature(signature)
             signatureAdapter.updateSelectedSignature(signature.id)
         }
     }
@@ -681,10 +682,13 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeBodyLoader() {
-        newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
+    private fun observeBodyLoader() = with(newMessageViewModel) {
+        editorBodyInitializer.observe(viewLifecycleOwner) { body ->
             editorContentManager.setContent(binding.editorWebView, body)
-            setupToggleQuotesButton()
+            if (bodyHasQuotes(body.content)) {
+                binding.editorWebView.addCssWithId(requireContext().getHideQuotesStyle(), "quote-visibility")
+                setupToggleQuotesButton()
+            }
         }
     }
 

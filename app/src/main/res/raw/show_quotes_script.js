@@ -17,19 +17,19 @@
  */
 
 (function() {
-  const quoteElements = document.querySelectorAll('.ik_mail_quote, .forwardContentMessage');
-  quoteElements.forEach(el => {
-       el.style.display = 'block';
+    var style = document.getElementById("quote-visibility")
 
-       // Force reload images inside quotes
-       el.querySelectorAll('img').forEach(img => {
+    if (style) {
+        style.remove()
+
+        // Handle CID image reload when showing
+        document.querySelectorAll('.ik_mail_quote img, .forwardContentMessage img').forEach(img => {
          if (img.src.startsWith('cid:')) {
             // Store original CID, then reload
              const cid = img.src;
              img.src = '';
-
              setTimeout(() => img.src = cid, 0);
          }
        });
-  });
+    }
 })();
