@@ -79,6 +79,7 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
@@ -110,6 +111,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ApiErrorException
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getAddStyleWithIdScript
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.Utils
@@ -645,6 +647,16 @@ fun WebView.enableAlgorithmicDarkening(isEnabled: Boolean) {
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
         WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isEnabled)
     }
+}
+
+fun RichHtmlEditorWebView.addCssWithId(css: String, styleId: String) {
+    val escapedCss = css.replace("\\", "\\\\")
+        .replace("'", "\\'")
+        .replace("\n", "\\n")
+        .replace("\r", "")
+
+    val js = context.getAddStyleWithIdScript().format(styleId, escapedCss)
+    evaluateJavascript(js, null)
 }
 
 fun Data.getLongOrNull(key: String) = getLong(key, 0L).run { if (this == 0L) null else this }
