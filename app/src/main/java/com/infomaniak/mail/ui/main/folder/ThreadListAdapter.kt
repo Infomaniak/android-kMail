@@ -38,11 +38,6 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.card.MaterialCardView
-import com.infomaniak.core.legacy.utils.capitalizeFirstChar
-import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.legacy.utils.setMarginsRelative
-import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.common.utils.isInTheFuture
 import com.infomaniak.core.common.utils.isThisMonth
@@ -50,6 +45,11 @@ import com.infomaniak.core.common.utils.isThisWeek
 import com.infomaniak.core.common.utils.isThisYear
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.common.utils.isYesterday
+import com.infomaniak.core.legacy.utils.capitalizeFirstChar
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.mail.MainApplication
@@ -124,12 +124,10 @@ class ThreadListAdapter @Inject constructor(
 
     private var previousThreadClickedPosition: Int? = null
 
-    //region Tablet mode
     var openedThreadPosition: Int? = null
         private set
     var openedThreadUid: String? = null
         private set
-    //endregion
 
     private val isMultiselectDisabledInThisFolder: Boolean get() = folderRole == FolderRole.SCHEDULED_DRAFTS
 
@@ -249,7 +247,6 @@ class ThreadListAdapter @Inject constructor(
             return
         }
 
-        refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()
         displayAvatar(thread)
         displaySpamSpecificUi(thread)
@@ -690,7 +687,6 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun updateList(itemList: List<Thread>, lifecycleScope: LifecycleCoroutineScope) {
-
         formatListJob?.cancel()
         formatListJob = lifecycleScope.launch {
 
@@ -701,7 +697,29 @@ class ThreadListAdapter @Inject constructor(
             Dispatchers.Main {
                 // Put back "Load more" button if it was already there
                 dataSet = if (isLoadMoreDisplayed) formattedList + ThreadListItem.LoadMore else formattedList
+                refreshSelectedPositionIfPossible()
             }
+        }
+    }
+
+    private fun checkShouldUpdateOpenedThreadPosition(currentUid: String): Boolean {
+
+        val currentPos = openedThreadPosition
+        val isCurrentPositionValid = currentPos != null && currentPos in dataSet.indices
+
+        if (!isCurrentPositionValid) return true
+
+        val currentItem = dataSet[currentPos]
+
+        return currentItem is ThreadListItem.Content && currentItem.thread.uid != currentUid
+    }
+
+    private fun refreshSelectedPositionIfPossible() {
+        val currentUid = openedThreadUid ?: return
+
+        if (checkShouldUpdateOpenedThreadPosition(currentUid)) {
+            val newIndex = dataSet.indexOfFirst { it is ThreadListItem.Content && it.thread.uid == currentUid }
+            if (newIndex != -1) refreshCachedSelectedPosition(currentUid, newIndex)
         }
     }
 
