@@ -230,7 +230,7 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
 
-        fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
+        fun Context.getHideQuotesStyle(): String = loadCss(R.raw.hide_quotes_style)
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
@@ -239,13 +239,18 @@ class HtmlFormatter(private val html: String) {
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
         )
 
-        fun Context.getToggleQuotesButtonVisibilityScript(): String = loadScript(
-            R.raw.show_quotes_script
-        )
+        private var cachedToggleQuotesScript: String? = null
+        fun Context.getToggleQuotesButtonVisibilityScript(): String {
+            return cachedToggleQuotesScript ?: loadScript(R.raw.show_quotes_script).also { cachedToggleQuotesScript = it }
+        }
 
-        fun Context.getReplaceSignatureScript(): String = loadScript(
-            R.raw.replace_signature_script
-        )
+        fun Context.getAddStyleWithIdScript(): String = loadScript(R.raw.add_style_with_id_script)
+
+        private var cachedReplaceSignatureScript: String? = null
+        fun Context.getReplaceSignatureScript(): String {
+            return cachedReplaceSignatureScript
+                ?: loadScript(R.raw.replace_signature_script).also { cachedReplaceSignatureScript = it }
+        }
 
         fun Context.getFixStyleScript(): String {
             return loadScript(R.raw.fix_email_style)

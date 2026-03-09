@@ -63,8 +63,9 @@ object MessageBodyUtils {
         "[name=\"quote\"]", // GMX
     )
 
-    fun encapsulateQuotesWithInfomaniakClass(quotes: String): String {
-        return """<div class="$INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME" spellcheck="false">$quotes<br></div>""".trimIndent()
+    fun addSpaceAtTheEndOfQuotes(quotes: String): String {
+        // This will help the user to delete the quotes completely
+        return """$quotes<br>"""
     }
 
     suspend fun splitContentAndQuote(body: Body): SplitBody {

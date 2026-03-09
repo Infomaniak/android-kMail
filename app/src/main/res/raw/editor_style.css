@@ -6,14 +6,3 @@ body {
     margin-top: 0px;
     margin-bottom: 1rem;
 }
-
-p {
-    min-height: 1.4em;
-    line-height: 1.4em;
-    margin: 0;
-}
-
-.ik_mail_quote, .forwardContentMessage {
-    display: none;
-    overflow-x: auto !important;
-}
