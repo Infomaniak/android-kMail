@@ -17,7 +17,7 @@
  */
 
 (function() {
-    var style = document.getElementById("quote-visibility")
+    const style = document.getElementById("quote-visibility")
 
     if (style) {
         style.remove()

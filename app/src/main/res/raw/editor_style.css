@@ -5,4 +5,5 @@ html {
 body {
     margin-top: 0px;
     margin-bottom: 1rem;
+    overflow-x: auto !important;
 }

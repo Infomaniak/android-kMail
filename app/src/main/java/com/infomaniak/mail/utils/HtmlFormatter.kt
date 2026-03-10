@@ -27,7 +27,6 @@ import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
-import kotlinx.serialization.json.JsonPrimitive
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -211,11 +210,6 @@ class HtmlFormatter(private val html: String) {
             }
         }
 
-        fun String.escapeForJS(): String {
-            if (isNullOrEmpty()) return this
-            return JsonPrimitive(this).toString().removeSurrounding("\"")
-        }
-
         fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
@@ -230,8 +224,6 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
 
-        fun Context.getHideQuotesStyle(): String = loadCss(R.raw.hide_quotes_style)
-
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
         fun Context.getResizeScript(): String = loadScript(
@@ -239,18 +231,13 @@ class HtmlFormatter(private val html: String) {
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
         )
 
-        private var cachedToggleQuotesScript: String? = null
-        fun Context.getToggleQuotesButtonVisibilityScript(): String {
-            return cachedToggleQuotesScript ?: loadScript(R.raw.show_quotes_script).also { cachedToggleQuotesScript = it }
-        }
+        fun Context.getHideQuotesStyle(): String = loadCss(R.raw.hide_quotes_style)
+
+        fun Context.getShowQuotesScript(): String = loadScript(R.raw.show_quotes_script)
 
         fun Context.getAddStyleWithIdScript(): String = loadScript(R.raw.add_style_with_id_script)
 
-        private var cachedReplaceSignatureScript: String? = null
-        fun Context.getReplaceSignatureScript(): String {
-            return cachedReplaceSignatureScript
-                ?: loadScript(R.raw.replace_signature_script).also { cachedReplaceSignatureScript = it }
-        }
+        fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
 
         fun Context.getFixStyleScript(): String {
             return loadScript(R.raw.fix_email_style)
