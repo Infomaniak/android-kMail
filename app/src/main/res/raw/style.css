@@ -11,20 +11,6 @@ body {
     min-width: auto !important;
 }
 
-#ik-quotes, #ik-quotes > * {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-#ik-quotes table {
-    width: auto !important;
-    max-width: 100% !important;
-}
-
-img {
-    max-width: 100% !important;
-}
-
 blockquote {
     padding: 0.2em 1.2em !important;
     margin: 0 !important;

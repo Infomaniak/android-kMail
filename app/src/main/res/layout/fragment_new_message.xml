@@ -320,11 +320,9 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/quotesToggleButton"
-                        style="@style/TextButton"
+                        style="@style/ToggleQuoteTextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/marginStandardMedium"
-                        android:padding="@dimen/marginStandardVerySmall"
                         android:text="@string/messageShowQuotedText"
                         android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
