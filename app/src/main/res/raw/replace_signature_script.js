@@ -17,16 +17,16 @@
  */
 
 (function() {
-    var signatureElement = document.querySelector('.%s');
-    var newSigHtml = "%s";
+    const signatureElement = document.querySelector('.%s');
+    const newSigHtml = %s;
     if (signatureElement) {
         if (newSigHtml === "") {
             signatureElement.remove();
         } else {
-            signatureElement.outerHTML = newSigHtml;
+            signatureElement.innerHTML = newSigHtml;
         }
     } else if (newSigHtml !== "") {
-        var quotes = document.querySelector('.%s');
+        const quotes = document.querySelector('.%s');
         if (quotes) {
             quotes.insertAdjacentHTML('beforebegin', newSigHtml);
         } else {
