@@ -58,6 +58,7 @@ import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
 import com.infomaniak.lib.richhtmleditor.StatusCommand.STRIKE_THROUGH
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNDERLINE
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNORDERED_LIST
+import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -88,13 +89,12 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.escapeForJS
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getToggleQuotesButtonVisibilityScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getShowQuotesScript
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
@@ -135,6 +135,10 @@ class NewMessageFragment : Fragment() {
         // extras aren't yet initialized, so we don't use the `navArgs` here.
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
+    private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
+    private val showQuotesScript by lazy { requireContext().getShowQuotesScript() }
+    private val hideQuotesStyle by lazy { requireContext().getHideQuotesStyle() }
+
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
@@ -219,6 +223,7 @@ class NewMessageFragment : Fragment() {
         observeImportAttachmentsResult()
         observeBodyLoader()
         observeShimmering()
+        observeQuotesVisibility()
 
         setupBackActionHandler()
 
@@ -463,7 +468,7 @@ class NewMessageFragment : Fragment() {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
-                    val isBodyEmpty = newMessageViewModel.bodyHasPlaceholder(draft.body)
+                    val isBodyEmpty = newMessageViewModel.bodyIsEmpty(draft.body)
                     binding.newMessagePlaceholder.isVisible = isBodyEmpty
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
                     binding.subjectTextField.setText(draft.subject)
@@ -493,16 +498,21 @@ class NewMessageFragment : Fragment() {
             messageUid = "MESSAGE-" + draft.messageUid,
             shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
             navigateToNewMessageActivity = null,
-            onPageFinished = { binding.editorWebView.notifyPageHasLoaded() }
+            onPageFinished = { notifyPageHasLoaded() }
         )
     }
 
-    private fun setupToggleQuotesButton() {
-        binding.quotesToggleButton.isVisible = newMessageViewModel.areQuotesVisible.value
-        binding.quotesToggleButton.setOnClickListener {
-            binding.editorWebView.evaluateJavascript(requireContext().getToggleQuotesButtonVisibilityScript()) {
-                binding.quotesToggleButton.isGone = true
-                newMessageViewModel.changeQuotesVisibility(areVisible = true)
+    private fun observeQuotesVisibility() = viewLifecycleOwner.lifecycleScope.launch {
+        // Don't show button if quotes are already visible
+        newMessageViewModel.isQuotesButtonVisible.collect { isVisible ->
+            binding.quotesToggleButton.isVisible = isVisible
+        }
+    }
+
+    private fun setupToggleQuotesButton() = with(binding) {
+        quotesToggleButton.setOnClickListener {
+            editorWebView.evaluateJavascript(showQuotesScript) {
+                newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
             }
         }
     }
@@ -545,12 +555,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateBodySignature(signature: Signature) {
-        val wrappedNewSignature =
-            if (signature.isDummy) "" else signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+        val escapedSignature = if (signature.isDummy) "" else looselyEscapeAsStringLiteralForJs(signature.content)
 
-        val escapedSignature = wrappedNewSignature.escapeForJS()
-
-        val replaceSignatureScript = requireContext().getReplaceSignatureScript().format(
+        val replaceSignatureScript = replaceSignatureScript.format(
             MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
             escapedSignature,
             MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -685,10 +692,8 @@ class NewMessageFragment : Fragment() {
     private fun observeBodyLoader() = with(newMessageViewModel) {
         editorBodyInitializer.observe(viewLifecycleOwner) { body ->
             editorContentManager.setContent(binding.editorWebView, body)
-            if (bodyHasQuotes(body.content)) {
-                binding.editorWebView.addCssWithId(requireContext().getHideQuotesStyle(), "quote-visibility")
-                setupToggleQuotesButton()
-            }
+            binding.editorWebView.addCssWithId(hideQuotesStyle, "quote-visibility")
+            setupToggleQuotesButton()
         }
     }
 
