@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
-import javax.inject.Inject
-import javax.inject.Singleton
+(function() {
+    const style = document.getElementById("quote-visibility")
 
-@Singleton
-class SignatureUtils @Inject constructor() {
-    fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
-        return """
-            <div class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME" spellcheck="false">
-            $signatureContent
-            </div>
-        """.trimIndent()
+    if (style) {
+        style.remove()
+
+        // Handle CID image reload when showing
+        document.querySelectorAll('.ik_mail_quote img, .forwardContentMessage img').forEach(img => {
+         if (img.src.startsWith('cid:')) {
+            // Store original CID, then reload
+             const cid = img.src;
+             img.src = '';
+             setTimeout(() => img.src = cid, 0);
+         }
+       });
     }
-}
+})();

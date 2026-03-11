@@ -24,7 +24,12 @@ package com.infomaniak.mail.ui.newMessage
 data class BodyContentPayload(val content: String, val type: BodyContentType) {
 
     companion object {
-        fun emptyBody() = BodyContentPayload(content = "", type = BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
+        // Add some empty lines in the body so the body focus on these lines and not in the signature
+        fun emptyBody() =
+            BodyContentPayload(
+                content = "<br><br>",
+                type = BodyContentType.HTML_UNSANITIZED
+            )
     }
 }
 
