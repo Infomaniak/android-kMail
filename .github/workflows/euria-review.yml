@@ -1,0 +1,14 @@
+name: Euria Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  euria-review:
+    uses: infomaniak/.github/.github/workflows/euria-review.yml@v2
+    secrets: inherit
