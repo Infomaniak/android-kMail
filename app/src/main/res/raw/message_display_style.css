@@ -1,0 +1,7 @@
+/* The 16px must go in margin and not in padding,
+otherwise large elements will only have 16px on the left.
+You won't see the 16px on the right. */
+body {
+    margin: 16px;
+    padding: 0;
+}

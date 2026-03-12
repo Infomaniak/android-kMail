@@ -29,6 +29,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
@@ -39,6 +40,7 @@ class WebViewUtils(context: Context) {
     private val customDarkMode by lazy { context.getCustomDarkMode() }
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
+    private val messageDisplayStyle by lazy { context.getMessageDisplayStyle() }
     private val printMailStyle by lazy { context.getPrintMailStyle() }
 
     private val resizeScript by lazy { context.getResizeScript() }
@@ -67,6 +69,7 @@ class WebViewUtils(context: Context) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
+        registerCss(messageDisplayStyle)
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)

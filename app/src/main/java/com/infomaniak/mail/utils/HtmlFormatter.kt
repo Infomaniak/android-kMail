@@ -214,6 +214,8 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
+        fun Context.getMessageDisplayStyle(): String = loadCss(R.raw.message_display_style)
+
         fun Context.getCustomStyle(): String = loadCss(
             R.raw.style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary)),
@@ -234,8 +236,6 @@ class HtmlFormatter(private val html: String) {
         fun Context.getHideQuotesStyle(): String = loadCss(R.raw.hide_quotes_style)
 
         fun Context.getShowQuotesScript(): String = loadScript(R.raw.show_quotes_script)
-
-        fun Context.getAddStyleWithIdScript(): String = loadScript(R.raw.add_style_with_id_script)
 
         fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
 
