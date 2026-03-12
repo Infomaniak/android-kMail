@@ -101,7 +101,6 @@ import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
-import com.infomaniak.mail.utils.extensions.addCssWithId
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -445,6 +444,7 @@ class NewMessageFragment : Fragment() {
         if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
+        addCss(hideQuotesStyle, "quote-visibility")
     }
 
     private fun removePlaceholder() {
@@ -692,7 +692,6 @@ class NewMessageFragment : Fragment() {
     private fun observeBodyLoader() = with(newMessageViewModel) {
         editorBodyInitializer.observe(viewLifecycleOwner) { body ->
             editorContentManager.setContent(binding.editorWebView, body)
-            binding.editorWebView.addCssWithId(hideQuotesStyle, "quote-visibility")
             setupToggleQuotesButton()
         }
     }
