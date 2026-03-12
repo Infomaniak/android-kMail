@@ -102,12 +102,12 @@ import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.folder.ThreadListItem
-import com.infomaniak.mail.ui.main.thread.MessageDisplayWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
+import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ApiErrorException
