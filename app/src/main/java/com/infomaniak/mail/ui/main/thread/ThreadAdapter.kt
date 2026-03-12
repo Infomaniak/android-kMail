@@ -1126,8 +1126,8 @@ class ThreadAdapter(
             onAttachmentOptionsClicked = { onAttachmentOptionsClicked?.invoke(it) },
         )
 
-        private var _bodyWebViewClient: MessageWebViewClient? = null
-        private var _fullMessageWebViewClient: MessageWebViewClient? = null
+        private var _bodyWebViewClient: MessageDisplayWebViewClient? = null
+        private var _fullMessageWebViewClient: MessageDisplayWebViewClient? = null
         val bodyWebViewClient get() = _bodyWebViewClient!!
         val fullMessageWebViewClient get() = _fullMessageWebViewClient!!
 

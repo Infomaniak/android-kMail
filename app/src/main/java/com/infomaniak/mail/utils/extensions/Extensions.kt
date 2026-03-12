@@ -102,7 +102,7 @@ import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.folder.ThreadListItem
-import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
+import com.infomaniak.mail.ui.main.thread.MessageDisplayWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
@@ -270,7 +270,7 @@ fun WebView.initWebViewClientAndBridge(
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
     onPageFinished: (() -> Unit)? = null,
     onWebViewFinishedLoading: (() -> Unit)? = null,
-): MessageWebViewClient {
+): MessageDisplayWebViewClient {
 
     WebViewUtils.initJavascriptBridge(onWebViewFinishedLoading)
     addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
@@ -283,7 +283,7 @@ fun WebView.initWebViewClientAndBridge(
         }
     }
 
-    return MessageWebViewClient(
+    return MessageDisplayWebViewClient(
         context,
         cidDictionary,
         messageUid,

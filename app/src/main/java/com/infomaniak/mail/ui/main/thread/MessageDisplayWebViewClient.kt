@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,20 +24,68 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.annotation.CallSuper
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.core.ui.view.toDp
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 
-class MessageWebViewClient(
+class MessageDisplayWebViewClient(
+    private val context: Context,
+    cidDictionary: MutableMap<String, Attachment>,
+    private val messageUid: String,
+    private var shouldLoadDistantResources: Boolean,
+    onBlockedResourcesDetected: (() -> Unit)? = null,
+    navigateToNewMessageActivity: ((Uri) -> Unit)?,
+    onPageFinished: (() -> Unit)? = null,
+) : MessageWebViewClient(
+    context,
+    cidDictionary,
+    shouldLoadDistantResources,
+    onBlockedResourcesDetected,
+    navigateToNewMessageActivity,
+    onPageFinished,
+) {
+    override fun onPageFinished(webView: WebView, url: String?) {
+        runCatchingRealm {
+            val widthInDp = webView.width.toDp(webView)
+            if (widthInDp <= 0) {
+                val versionData = getWebViewVersionData(context)
+
+                Sentry.captureMessage("Zero width webview detected onPageFinished which prevents message width's normalization") { scope ->
+                    scope.level = SentryLevel.WARNING
+                    scope.setExtra("width", webView.width.toString())
+                    scope.setExtra("measuredWidth", webView.measuredWidth.toString())
+                    scope.setExtra("height", webView.height.toString())
+                    scope.setExtra("measuredHeight", webView.measuredHeight.toString())
+                    scope.setTag(
+                        "webview version",
+                        "${versionData?.webViewPackageName}: ${versionData?.versionName} - ${versionData?.majorVersion}"
+                    )
+                    scope.setTag("visibility", webView.visibility.toString())
+                    scope.setTag("messageUid", messageUid)
+                    scope.setTag("shouldLoadDistantResources", shouldLoadDistantResources.toString())
+                }
+            }
+
+            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, '$messageUid')")
+            super.onPageFinished(webView, url)
+        }
+    }
+}
+
+open class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: MutableMap<String, Attachment>,
-    private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
     private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
@@ -99,10 +147,9 @@ class MessageWebViewClient(
         return true
     }
 
+    @CallSuper
     override fun onPageFinished(webView: WebView, url: String?) {
-        runCatchingRealm {
-            onPageFinished?.invoke()
-        }
+        onPageFinished?.invoke()
     }
 
     fun unblockDistantResources() {
@@ -110,8 +157,6 @@ class MessageWebViewClient(
     }
 
     companion object {
-        val TAG = MessageWebViewClient::class.simpleName
-
         const val CID_SCHEME = "cid"
         const val DATA_SCHEME = "data"
 
