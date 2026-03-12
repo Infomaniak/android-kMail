@@ -108,7 +108,7 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.ime
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
+import com.infomaniak.mail.utils.extensions.initEditorWebviewClientAndBridge
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
@@ -490,9 +490,8 @@ class NewMessageFragment : Fragment() {
     private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
         settings.setupNewMessageWebViewSettings()
         val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
-        webViewClient = initWebViewClientAndBridge(
+        webViewClient = initEditorWebviewClientAndBridge(
             attachments = draft.attachments,
-            messageUid = "MESSAGE-" + draft.messageUid,
             shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
             navigateToNewMessageActivity = null,
             onPageFinished = { notifyPageHasLoaded() }

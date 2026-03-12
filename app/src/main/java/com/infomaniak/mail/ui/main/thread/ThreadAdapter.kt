@@ -41,11 +41,11 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
-import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.common.utils.FormatData
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.common.utils.formatWithLocal
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -67,6 +67,7 @@ import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
+import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -87,7 +88,7 @@ import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
+import com.infomaniak.mail.utils.extensions.initDisplayWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.toggleChevron
 import io.sentry.Sentry
@@ -1126,8 +1127,8 @@ class ThreadAdapter(
             onAttachmentOptionsClicked = { onAttachmentOptionsClicked?.invoke(it) },
         )
 
-        private var _bodyWebViewClient: MessageWebViewClient? = null
-        private var _fullMessageWebViewClient: MessageWebViewClient? = null
+        private var _bodyWebViewClient: MessageDisplayWebViewClient? = null
+        private var _fullMessageWebViewClient: MessageDisplayWebViewClient? = null
         val bodyWebViewClient get() = _bodyWebViewClient!!
         val fullMessageWebViewClient get() = _fullMessageWebViewClient!!
 
@@ -1153,7 +1154,7 @@ class ThreadAdapter(
             }
 
             if (_bodyWebViewClient == null) {
-                _bodyWebViewClient = binding.bodyWebView.initWebViewClientAndBridge(
+                _bodyWebViewClient = binding.bodyWebView.initDisplayWebViewClientAndBridge(
                     attachments = message.attachments,
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
@@ -1162,7 +1163,7 @@ class ThreadAdapter(
                     onPageFinished = onPageFinished,
                     onWebViewFinishedLoading = onWebViewFinishedLoading,
                 )
-                _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
+                _fullMessageWebViewClient = binding.fullMessageWebView.initDisplayWebViewClientAndBridge(
                     attachments = message.attachments,
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
