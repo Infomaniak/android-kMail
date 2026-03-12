@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread
+package com.infomaniak.mail.ui.main.thread.webViewClient
 
 import android.content.Context
 import android.content.Intent
@@ -34,10 +34,9 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 
-class MessageWebViewClient(
+abstract class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: MutableMap<String, Attachment>,
-    private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
     private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
