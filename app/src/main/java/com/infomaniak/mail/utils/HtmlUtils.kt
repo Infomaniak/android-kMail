@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
+import com.infomaniak.mail.ui.main.thread.webViewClient.MessageWebViewClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
