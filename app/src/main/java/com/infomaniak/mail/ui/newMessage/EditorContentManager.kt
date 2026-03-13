@@ -28,8 +28,11 @@ import javax.inject.Inject
 @FragmentScoped
 class EditorContentManager @Inject constructor() {
 
-    fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload) = with(editor) {
-        when (bodyContentPayload.type) {
+    /**
+     * Returns the html that was processed and inserted inside the editor
+     * */
+    fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload): String = with(editor) {
+        return when (bodyContentPayload.type) {
             BodyContentType.HTML_SANITIZED -> setSanitizedHtml(bodyContentPayload.content)
             BodyContentType.HTML_UNSANITIZED -> setUnsanitizedHtml(bodyContentPayload.content)
             BodyContentType.TEXT_PLAIN_WITH_HTML -> setPlainTextAndInterpretHtml(bodyContentPayload.content)
@@ -37,16 +40,19 @@ class EditorContentManager @Inject constructor() {
         }
     }
 
-    private fun RichHtmlEditorWebView.setSanitizedHtml(html: String) = setHtml(html)
+    private fun RichHtmlEditorWebView.setSanitizedHtml(html: String): String {
+        setHtml(html)
+        return html
+    }
 
     private fun RichHtmlEditorWebView.setUnsanitizedHtml(html: String) = setSanitizedHtml(html.sanitize())
 
-    private fun RichHtmlEditorWebView.setPlainTextAndInterpretHtml(text: String) {
-        setSanitizedHtml(text.replaceNewLines().sanitize())
+    private fun RichHtmlEditorWebView.setPlainTextAndInterpretHtml(text: String): String {
+        return setSanitizedHtml(text.replaceNewLines().sanitize())
     }
 
-    private fun RichHtmlEditorWebView.setPlainTextAndEscapeHtml(text: String) {
-        setSanitizedHtml(text.escapeHtmlCharacters().replaceNewLines())
+    private fun RichHtmlEditorWebView.setPlainTextAndEscapeHtml(text: String): String {
+        return setSanitizedHtml(text.escapeHtmlCharacters().replaceNewLines())
     }
 
     private fun String.escapeHtmlCharacters(): String = Html.escapeHtml(this)
