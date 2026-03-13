@@ -349,10 +349,17 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    override fun onDestroyView() {
+    override fun onDestroyView() = with(newMessageViewModel) {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editorWebView.exportHtml { html ->
-            newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(html, BodyContentType.HTML_SANITIZED))
+            newMessageViewModel.editorBodyInitializer.postValue(
+                NewMessageViewModel.EditorBodyInitialization(
+                    BodyContentPayload(
+                        html,
+                        BodyContentType.HTML_SANITIZED
+                    )
+                )
+            )
         }
 
         addressListPopupWindow = null
@@ -444,7 +451,6 @@ class NewMessageFragment : Fragment() {
         if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
-        addCss(hideQuotesStyle, "quote-visibility")
     }
 
     private fun removePlaceholder() {
@@ -689,8 +695,11 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeBodyLoader() = with(newMessageViewModel) {
-        editorBodyInitializer.observe(viewLifecycleOwner) { body ->
-            editorContentManager.setContent(binding.editorWebView, body)
+        editorBodyInitializer.observe(viewLifecycleOwner) { (body, isFirstInitialization) ->
+            val bodyContent = editorContentManager.setContent(binding.editorWebView, body)
+            if (isFirstInitialization) saveInitialSnapshot(bodyContent)
+            // We only hide the quotes if it is a new message. If it's a draft the quotes are always visible.
+            if (isNewMessage) binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
             setupToggleQuotesButton()
         }
     }
