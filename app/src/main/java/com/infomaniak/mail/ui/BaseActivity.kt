@@ -88,7 +88,7 @@ open class BaseActivity : AppCompatActivity() {
 
         AppLockManager.scheduleLockIfNeeded(
             targetActivity = this,
-            lockActivityCls = AppLockActivity::class.java,
+            lockActivityCls = AppLockActivity::class,
             isAppLockEnabled = { localSettings.isAppLocked }
         )
     }
