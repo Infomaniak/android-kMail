@@ -617,18 +617,19 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeSubjectUpdateTriggers() = with(binding) {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
-
+            val mailbox = result.mailbox ?: return@observe
             val (subjectWithoutTags, subjectWithTags) = subjectFormatter.generateSubjectContent(
                 subjectData = SubjectData(
                     thread = result.thread ?: return@observe,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
-                    aliases = result.mailbox?.aliases ?: emptyList(),
-                    externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
-                    trustedDomains = result.mailbox?.trustedDomains ?: emptyList(),
+                    aliases = mailbox.aliases,
+                    hasOrganisation = mailbox.hasOrganisation(),
+                    externalMailFlagEnabled = mailbox.externalMailFlagEnabled,
+                    trustedDomains = mailbox.trustedDomains,
                 ),
-            ) { description ->
+            ) { title, description ->
                 informationDialog.show(
-                    title = R.string.externalDialogTitleExpeditor,
+                    title = title,
                     description = description,
                     confirmButtonText = R.string.externalDialogConfirmButton,
                 )
