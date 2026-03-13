@@ -125,7 +125,7 @@
             android:theme="@style/WebViewTheme" />
 
         <activity
-            android:name="com.infomaniak.core.applock.LockActivity"
+            android:name="com.infomaniak.mail.ui.applock.AppLockActivity"
             android:exported="false"
             android:launchMode="singleTop"
             android:theme="@style/AppThemeLock" />

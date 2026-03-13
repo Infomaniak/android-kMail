@@ -21,7 +21,7 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
-import com.infomaniak.core.applock.LockActivity
+import com.infomaniak.core.applock.AppLockManager
 import com.infomaniak.core.inappupdate.BaseInAppUpdateManager.Companion.checkUpdateIsRequired
 import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
@@ -30,6 +30,7 @@ import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.ActivityModule
 import com.infomaniak.mail.twoFactorAuthManager
+import com.infomaniak.mail.ui.applock.AppLockActivity
 import com.infomaniak.mail.utils.AccountUtils
 import dagger.hilt.android.EntryPointAccessors
 import io.sentry.Sentry
@@ -85,9 +86,9 @@ open class BaseActivity : AppCompatActivity() {
         )
         trackScreen()
 
-        LockActivity.scheduleLockIfNeeded(
+        AppLockManager.scheduleLockIfNeeded(
             targetActivity = this,
-            primaryColor = localSettings.accentColor.getPrimary(this),
+            lockActivityCls = AppLockActivity::class,
             isAppLockEnabled = { localSettings.isAppLocked }
         )
     }
