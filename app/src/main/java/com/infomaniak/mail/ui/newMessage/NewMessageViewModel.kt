@@ -24,7 +24,6 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -174,7 +173,9 @@ class NewMessageViewModel @Inject constructor(
     inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
-    val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
+    data class EditorBodyInitialization(val bodyContentPayload: BodyContentPayload, val isFirstInitialization: Boolean = false)
+
+    val editorBodyInitializer = SingleLiveEvent<EditorBodyInitialization>()
 
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.
@@ -190,7 +191,7 @@ class NewMessageViewModel @Inject constructor(
     var isExternalBannerManuallyClosed = false
     var draftAction = DraftAction.SAVE
     var signaturesCount = 0
-    private var isNewMessage = false
+    var isNewMessage = false
 
     private var snapshot: DraftSnapshot? = null
 
@@ -499,6 +500,11 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
+    fun saveInitialSnapshot(body: String) = viewModelScope.launch(ioCoroutineContext) {
+        val draft: Draft? = getLatestLocalDraft(draftLocalUuid)
+        draft?.saveSnapshot(body)
+    }
+
     private suspend fun Draft.initLiveData(signatures: List<Signature>) {
         val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
 
@@ -519,7 +525,7 @@ class NewMessageViewModel @Inject constructor(
 
         saveSnapshot(initialBody.content)
 
-        editorBodyInitializer.postValue(initialBody)
+        editorBodyInitializer.postValue(EditorBodyInitialization(initialBody, isFirstInitialization = true))
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherRecipientsFieldsAreEmpty.postValue(false)
@@ -531,7 +537,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun bodyIsEmpty(bodyHtml: String): Boolean {
         val body = getBodyWithoutSignatureAndQuotes(bodyHtml)
-        return body.isEmpty()
+        return body.isBlank()
     }
 
     private fun getBodyWithoutSignatureAndQuotes(draftBody: String): String {
@@ -562,7 +568,7 @@ class NewMessageViewModel @Inject constructor(
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        return body
+        return body.htmlToText()
     }
 
     fun changeQuotesButtonVisibility(isVisible: Boolean) {
@@ -983,9 +989,11 @@ class NewMessageViewModel @Inject constructor(
     private fun removeEmptyQuotes(html: String): String {
         val doc = jsoupParseWithLog(html)
 
-        // If the user deleted the quotes text, remove the quotes div so the button to show quotes doesn't show.
+        // If the user deleted the quotes text, remove the quotes div so user doesn't write in the quotes div
+        // (the text could get hidden later with the toggle button).
         if (bodyHasEmptyQuotes(html)) {
             doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
+            doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
         }
 
         return doc.body().html()
@@ -1038,8 +1046,6 @@ class NewMessageViewModel @Inject constructor(
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
-            Log.d("DRAFT BODY", draftSnapshot.uiBody)
-            Log.d("BODY", uiBodyValue)
             draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() && draftSnapshot.to == toLiveData.valueOrEmpty()
                 .toSet() && draftSnapshot.cc == ccLiveData.valueOrEmpty()
                 .toSet() && draftSnapshot.bcc == bccLiveData.valueOrEmpty()
@@ -1131,8 +1137,6 @@ class NewMessageViewModel @Inject constructor(
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
-
-    private data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName
