@@ -63,11 +63,6 @@ object MessageBodyUtils {
         "[name=\"quote\"]", // GMX
     )
 
-    fun addSpaceAtTheEndOfQuotes(quotes: String): String {
-        // This will help the user to delete the quotes completely
-        return """$quotes<br>"""
-    }
-
     suspend fun splitContentAndQuote(body: Body): SplitBody {
 
         val bodyContent = body.value
