@@ -21,6 +21,7 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
 import com.infomaniak.core.ui.view.toDp
+import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewVersionUtils
@@ -64,8 +65,8 @@ class MessageDisplayWebViewClient(
                     scope.setTag("shouldLoadDistantResources", shouldLoadDistantResources.toString())
                 }
             }
-
-            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, '$messageUid')")
+            val escapedMessageUid = looselyEscapeAsStringLiteralForJs(messageUid)
+            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, '$escapedMessageUid')")
             super.onPageFinished(webView, url)
         }
     }

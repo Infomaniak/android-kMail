@@ -222,6 +222,7 @@ class NewMessageFragment : Fragment() {
         observeImportAttachmentsResult()
         observeBodyLoader()
         observeShimmering()
+        observePlaceholderVisibility()
         observeQuotesVisibility()
 
         setupBackActionHandler()
@@ -349,15 +350,12 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    override fun onDestroyView() = with(newMessageViewModel) {
+    override fun onDestroyView() {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editorWebView.exportHtml { html ->
             newMessageViewModel.editorBodyInitializer.postValue(
                 NewMessageViewModel.EditorBodyInitialization(
-                    BodyContentPayload(
-                        html,
-                        BodyContentType.HTML_SANITIZED
-                    )
+                    BodyContentPayload(html, BodyContentType.HTML_SANITIZED)
                 )
             )
         }
@@ -453,15 +451,11 @@ class NewMessageFragment : Fragment() {
         addCss(context.getCustomEditorStyle())
     }
 
-    private fun removePlaceholder() {
-        binding.newMessagePlaceholder.isGone = true
-    }
-
-    private fun handleFocusChanges() {
-        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { isFocused ->
+    private fun handleFocusChanges() = with(newMessageViewModel) {
+        isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { isFocused ->
             setToolbarEnabledStatus(isFocused)
-            if (isFocused && binding.newMessagePlaceholder.isVisible) {
-                removePlaceholder()
+            if (isFocused && isPlaceHolderVisible.value) {
+                changePlaceholderVisibility(isVisible = false)
             }
         }
     }
@@ -475,7 +469,7 @@ class NewMessageFragment : Fragment() {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
                     val isBodyEmpty = newMessageViewModel.bodyIsEmpty(draft.body)
-                    binding.newMessagePlaceholder.isVisible = isBodyEmpty
+                    changePlaceholderVisibility(isVisible = isBodyEmpty)
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
                     binding.subjectTextField.setText(draft.subject)
                 } else {
@@ -490,7 +484,8 @@ class NewMessageFragment : Fragment() {
 
     private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
         when (newMessageViewModel.draftMode()) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.REPLY,
+            DraftMode.REPLY_ALL -> focusBodyField()
             DraftMode.FORWARD -> focusToField()
             DraftMode.NEW_MAIL -> if (isToFieldEmpty) focusToField() else focusBodyField()
         }
@@ -508,17 +503,26 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeQuotesVisibility() = viewLifecycleOwner.lifecycleScope.launch {
-        // Don't show button if quotes are already visible
-        newMessageViewModel.isQuotesButtonVisible.collect { isVisible ->
-            binding.quotesToggleButton.isVisible = isVisible
+        newMessageViewModel.isQuotesButtonVisible.collect { isQuotesButtonVisible ->
+            binding.quotesToggleButton.isVisible = isQuotesButtonVisible
+            if (!isQuotesButtonVisible) {
+                // User toggle show quotes visibility
+                binding.editorWebView.evaluateJavascript(showQuotesScript, null)
+            } else {
+                binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
+            }
+        }
+    }
+
+    private fun observePlaceholderVisibility() = viewLifecycleOwner.lifecycleScope.launch {
+        newMessageViewModel.isPlaceHolderVisible.collect { isPlaceholderVisible ->
+            binding.newMessagePlaceholder.isVisible = isPlaceholderVisible
         }
     }
 
     private fun setupToggleQuotesButton() = with(binding) {
         quotesToggleButton.setOnClickListener {
-            editorWebView.evaluateJavascript(showQuotesScript) {
-                newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
-            }
+            newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
         }
     }
 
@@ -698,8 +702,7 @@ class NewMessageFragment : Fragment() {
         editorBodyInitializer.observe(viewLifecycleOwner) { (body, isFirstInitialization) ->
             val bodyContent = editorContentManager.setContent(binding.editorWebView, body)
             if (isFirstInitialization) saveInitialSnapshot(bodyContent)
-            // We only hide the quotes if it is a new message. If it's a draft the quotes are always visible.
-            if (isNewMessage) binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
+
             setupToggleQuotesButton()
         }
     }
