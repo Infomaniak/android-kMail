@@ -121,7 +121,6 @@
     <string name="buttonContinue">Continuar</string>
     <string name="buttonCopyPassword">Copiar contraseña</string>
     <string name="buttonCreate">Cree</string>
-    <string name="buttonCreateAccount">Crear una cuenta</string>
     <string name="buttonCreateFolder">Añadir una carpeta</string>
     <string name="buttonCustomSchedule">Horario personalizado</string>
     <string name="buttonDownload">Descargar</string>
@@ -135,7 +134,6 @@
     <string name="buttonItalic">Cursiva</string>
     <string name="buttonLoadMore">Cargar más conversaciones</string>
     <string name="buttonLogInDifferentAccount">Conectarse con otra cuenta</string>
-    <string name="buttonLogin">Inicio de sesión</string>
     <string name="buttonMaybe">Quizás</string>
     <string name="buttonModify">Modificar</string>
     <string name="buttonMore">Más</string>

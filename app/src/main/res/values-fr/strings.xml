@@ -98,7 +98,6 @@
     <plurals name="attachmentQuantity">
         <item quantity="one">%d pièce jointe</item>
         <item quantity="other">%d pièces jointes</item>
-        <item quantity="many">%d de pièces jointes</item>
     </plurals>
     <string name="attendeesListTitle">Liste des participants (%d)</string>
     <string name="bccTitle">Cci :</string>
@@ -122,7 +121,6 @@
     <string name="buttonContinue">Continuer</string>
     <string name="buttonCopyPassword">Copier le mot de passe</string>
     <string name="buttonCreate">Créer</string>
-    <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
     <string name="buttonCustomSchedule">Horaire personnalisé</string>
     <string name="buttonDownload">Télécharger</string>
@@ -136,7 +134,6 @@
     <string name="buttonItalic">Italique</string>
     <string name="buttonLoadMore">Charger plus de conversations</string>
     <string name="buttonLogInDifferentAccount">Me connecter avec un autre compte</string>
-    <string name="buttonLogin">Se connecter</string>
     <string name="buttonMaybe">Peut-être</string>
     <string name="buttonModify">Modifier</string>
     <string name="buttonMore">Plus</string>
@@ -336,12 +333,10 @@
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">L’expéditeur %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
         <item quantity="other">Certains expéditeurs ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
-        <item quantity="many">Certains expéditeurs ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
     </plurals>
     <plurals name="externalDialogDescriptionRecipient">
         <item quantity="one">Le destinataire %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
         <item quantity="other">Certains destinataires ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
-        <item quantity="many">Certains destinataires ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
     </plurals>
     <string name="externalDialogTitleExpeditor">Expéditeur externe</string>
     <string name="externalDialogTitleRecipient">Destinataire externe</string>
@@ -352,7 +347,6 @@
     <plurals name="fileQuantity">
         <item quantity="one">%d fichier envoyé via SwissTransfer</item>
         <item quantity="other">%d fichiers envoyés via SwissTransfer</item>
-        <item quantity="many">%d de fichiers envoyés via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
@@ -370,7 +364,6 @@
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Adresse mail bloquée</item>
         <item quantity="other">Adresses mail bloquées</item>
-        <item quantity="many">Adresses mail bloquées</item>
     </plurals>
     <string name="lockedMailboxViewDescription">Pour plus d’informations :</string>
     <string name="lockedMailboxViewTitle">Certaines de vos adresses mail sont bloquées</string>
@@ -398,7 +391,6 @@
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
-        <item quantity="many">%d de sélectionnés</item>
     </plurals>
     <string name="myKSuiteQuotasAlertDescription">Une fois atteinte, vous ne pourrez plus recevoir ou envoyer de messages. Libérez de l’espace ou faites évoluer votre offre vers my kSuite+.</string>
     <string name="myKSuiteQuotasAlertFullDescription">Libérer de l’espace ou faites évoluer votre offre vers my kSuite+.</string>
@@ -415,7 +407,6 @@
     <plurals name="newMessageNotificationSummary">
         <item quantity="one">%d nouveau message</item>
         <item quantity="other">%d nouveaux messages</item>
-        <item quantity="many">%d de nouveaux messages</item>
     </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="nextMonday">Lundi prochain</string>
@@ -590,29 +581,24 @@
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Expéditeur blacklisté avec succès</item>
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
-        <item quantity="many">Expéditeurs blacklistés avec succès</item>
     </plurals>
     <plurals name="snackbarSnoozeSuccess">
         <item quantity="one">Vous recevrez un rappel de ce message %s</item>
         <item quantity="other">Vous recevrez un rappel de ces messages %s</item>
-        <item quantity="many">Vous recevrez un rappel de ces messages %s</item>
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Objet copié dans le presse-papiers</string>
     <string name="snackbarSwipeActionIncompatible">Action de balayage incompatible</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
         <item quantity="other">Conversations supprimées</item>
-        <item quantity="many">Conversations supprimées</item>
     </plurals>
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversation déplacée vers %s</item>
         <item quantity="other">Conversations déplacées vers %s</item>
-        <item quantity="many">Conversations déplacées vers %s</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Rappel annulé. Votre message est revenu dans votre boîte de réception</item>
         <item quantity="other">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
-        <item quantity="many">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
     </plurals>
     <string name="snackbarUnsubscribeFailure">Désinscription impossible</string>
     <string name="snackbarUnsubscribeSuccess">Désinscription effectuée</string>
@@ -620,17 +606,14 @@
     <plurals name="snoozeArchiveConfirmAlertDescription">
         <item quantity="one">Cette conversation ne sera plus en attente et sera archivée</item>
         <item quantity="other">Ces conversations ne seront plus en attente et seront archivées</item>
-        <item quantity="many">Ces conversations ne seront plus en attente et seront archivées</item>
     </plurals>
     <plurals name="snoozeDeleteConfirmAlertDescription">
         <item quantity="one">Cette conversation ne sera plus en attente et sera supprimée</item>
         <item quantity="other">Ces conversations ne seront plus en attente et seront supprimées</item>
-        <item quantity="many">Ces conversations ne seront plus en attente et seront supprimées</item>
     </plurals>
     <plurals name="snoozeMoveConfirmAlertDescription">
         <item quantity="one">Cette conversation ne sera plus en attente et sera déplacée</item>
         <item quantity="other">Ces conversations ne seront plus en attente et seront déplacées</item>
-        <item quantity="many">Ces conversations ne seront plus en attente et seront déplacées</item>
     </plurals>
     <string name="snoozedFolder">En attente</string>
     <string name="socialNetworksFolder">Réseaux sociaux</string>
@@ -649,12 +632,10 @@
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Êtes-vous sûr de vouloir supprimer cette conversation définitivement ?</item>
         <item quantity="other">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
-        <item quantity="many">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
     </plurals>
     <plurals name="threadListDeletionConfirmationAlertTitle">
         <item quantity="one">Supprimer %d conversation</item>
         <item quantity="other">Supprimer %d conversations</item>
-        <item quantity="many">Supprimer %d de conversations</item>
     </plurals>
     <string name="threadListEmptyFolderAlertDescription">Êtes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
     <string name="threadListEmptySpamButton">Vider les spams</string>
@@ -664,7 +645,6 @@
     <plurals name="threadListHeaderUnreadCount">
         <item quantity="one">%s non lu</item>
         <item quantity="other">%s non lus</item>
-        <item quantity="many">%s non lus</item>
     </plurals>
     <string name="threadListSectionLastWeek">La semaine dernière</string>
     <string name="threadListSectionThisMonth">Ce mois-ci</string>

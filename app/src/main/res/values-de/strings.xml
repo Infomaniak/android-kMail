@@ -121,7 +121,6 @@
     <string name="buttonContinue">Weiter</string>
     <string name="buttonCopyPassword">Passwort kopieren</string>
     <string name="buttonCreate">Erstellen</string>
-    <string name="buttonCreateAccount">Ein Konto erstellen</string>
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
     <string name="buttonCustomSchedule">Benutzerdefinierter Zeitplan</string>
     <string name="buttonDownload">Herunterladen</string>
@@ -135,7 +134,6 @@
     <string name="buttonItalic">Kursiv</string>
     <string name="buttonLoadMore">Mehr Unterhaltungen laden</string>
     <string name="buttonLogInDifferentAccount">Mit einem anderen Konto anmelden</string>
-    <string name="buttonLogin">Anmeldung</string>
     <string name="buttonMaybe">Vielleicht</string>
     <string name="buttonModify">Ändern</string>
     <string name="buttonMore">Mehr</string>
@@ -500,7 +498,7 @@
     <string name="settingsDensityOptionCompact">Kompakt</string>
     <string name="settingsDensityOptionLarge">Gross</string>
     <string name="settingsDensityOptionNormal">Normal</string>
-    <string name="settingsDisabled">Behinderte</string>
+    <string name="settingsDisabled">Deaktiviert</string>
     <string name="settingsEnabled">Aktiviert</string>
     <string name="settingsExternalContentDescription">Externe Inhalte anzeigen</string>
     <string name="settingsExternalContentTitle">Externer Inhalte</string>
