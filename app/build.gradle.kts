@@ -68,7 +68,7 @@ android {
         resValue("string", "FILES_AUTHORITY", "com.infomaniak.mail.attachments;com.infomaniak.mail.eml")
 
         androidResources {
-            localeFilters += listOf("en", "de", "es", "fr", "it")
+            localeFilters += listOf("en", "de", "es", "fr", "it", "da", "el", "fi", "nb", "nl", "pl", "pt", "sv")
             generateLocaleConfig = true
         }
     }
