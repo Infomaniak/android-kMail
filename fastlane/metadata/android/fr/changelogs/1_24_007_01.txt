@@ -1,0 +1,2 @@
+- Prise en charge de 8 langues supplémentaires (danois, grec, finnois, norvégien, néerlandais, polonais, portugais et suédois)
+- Corrections diverses

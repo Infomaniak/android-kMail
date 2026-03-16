@@ -1,0 +1,2 @@
+- Support 8 more languages (Danish, Greek, Finnish, Norwegian, Dutch, Polish, Portuguese, and Swedish)
+- Diverse fixes
