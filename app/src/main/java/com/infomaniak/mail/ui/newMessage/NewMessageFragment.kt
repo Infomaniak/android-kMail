@@ -506,7 +506,7 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isQuotesButtonVisible.collect { isQuotesButtonVisible ->
             binding.quotesToggleButton.isVisible = isQuotesButtonVisible
             if (!isQuotesButtonVisible) {
-                // User toggle show quotes visibility
+                // User toggled show quotes visibility
                 binding.editorWebView.evaluateJavascript(showQuotesScript, null)
             } else {
                 binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
