@@ -7,10 +7,9 @@ html {
 body {
     margin-top: 0px;
     margin-bottom: 1rem;
-    /* overflow-x needs to be in both the html and the body for the whole email to scroll.
-    To have the spacing scroll with the mail it needs to be padding and not margin. */
+    /* overflow-x needs to be in both the html and the body for the whole email to scroll. */
+    /* To have the spacing scroll with the mail it needs to be padding and not margin. */
     overflow-x: auto !important;
     margin: 0;
     padding: 16px;
 }
-
