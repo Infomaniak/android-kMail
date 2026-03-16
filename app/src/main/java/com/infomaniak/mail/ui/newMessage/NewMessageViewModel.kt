@@ -331,10 +331,10 @@ class NewMessageViewModel @Inject constructor(
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
             _isShimmering.emit(false)
+            initResult.postValue(InitResult(it, signatures))
             if (bodyHasQuotes(draft.body) || bodyHasQuotes(initialBody.content)) {
                 changeQuotesButtonVisibility(isVisible = true)
             }
-            initResult.postValue(InitResult(it, signatures))
         }
 
         emit(draft)
