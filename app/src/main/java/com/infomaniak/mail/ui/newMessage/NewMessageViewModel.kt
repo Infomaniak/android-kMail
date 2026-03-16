@@ -366,15 +366,17 @@ class NewMessageViewModel @Inject constructor(
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
             DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
-                previousMessageUid?.let { uid -> MessageController.getMessage(uid, realm) }?.let { message ->
-                    val (fullMessage, hasFailedFetching) = DraftController.fetchHeavyDataIfNeeded(message, realm)
-                    previousMessage = fullMessage
+                previousMessageUid
+                    ?.let { uid -> MessageController.getMessage(uid, realm) }
+                    ?.let { message ->
+                        val (fullMessage, hasFailedFetching) = DraftController.fetchHeavyDataIfNeeded(message, realm)
+                        previousMessage = fullMessage
 
-                    if (hasFailedFetching) return@let
+                        if (hasFailedFetching) return@let
 
-                    initializeReplyForwardDraftValues(draft = this, fullMessage)
-                    initialQuote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
-                }
+                        initializeReplyForwardDraftValues(draft = this, fullMessage)
+                        initialQuote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
+                    }
             }
         }
 
@@ -698,11 +700,15 @@ class NewMessageViewModel @Inject constructor(
         val mailToIntent = runCatching { MailTo.parse(uri!!) }.getOrNull()
         if (mailToIntent == null && intent?.hasExtra(Intent.EXTRA_EMAIL) != true) return
 
-        val splitTo =
-            mailToIntent?.to?.splitToRecipientList() ?: intent?.getRecipientsFromIntent(Intent.EXTRA_EMAIL) ?: emptyList()
-        val splitCc = mailToIntent?.cc?.splitToRecipientList() ?: intent?.getRecipientsFromIntent(Intent.EXTRA_CC) ?: emptyList()
-        val splitBcc =
-            mailToIntent?.bcc?.splitToRecipientList() ?: intent?.getRecipientsFromIntent(Intent.EXTRA_BCC) ?: emptyList()
+        val splitTo = mailToIntent?.to?.splitToRecipientList()
+            ?: intent?.getRecipientsFromIntent(Intent.EXTRA_EMAIL)
+            ?: emptyList()
+        val splitCc = mailToIntent?.cc?.splitToRecipientList()
+            ?: intent?.getRecipientsFromIntent(Intent.EXTRA_CC)
+            ?: emptyList()
+        val splitBcc = mailToIntent?.bcc?.splitToRecipientList()
+            ?: intent?.getRecipientsFromIntent(Intent.EXTRA_BCC)
+            ?: emptyList()
 
         draft.apply {
             to.addAll(splitTo)
@@ -1001,9 +1007,10 @@ class NewMessageViewModel @Inject constructor(
         if (bodyHasEmptyQuotes(html)) {
             doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
             doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
+            return doc.html()
         }
 
-        return doc.body().html()
+        return html
     }
 
     private fun bodyHasEmptyQuotes(body: String): Boolean {
@@ -1023,8 +1030,9 @@ class NewMessageViewModel @Inject constructor(
          * - none got removed (their quantity is the same in UI and in Realm),
          * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
          */
-        val isForwardingUneditedAttachmentsList =
-            draftMode == DraftMode.FORWARD && uiAttachments.all { it.attachmentUploadStatus == AttachmentUploadStatus.UPLOADED } && uiAttachments.count() == attachments.count()
+        val isForwardingUneditedAttachmentsList = draftMode == DraftMode.FORWARD &&
+                uiAttachments.all { it.attachmentUploadStatus == AttachmentUploadStatus.UPLOADED } &&
+                uiAttachments.count() == attachments.count()
         if (isForwardingUneditedAttachmentsList) return
 
         val updatedAttachments = uiAttachments.map { uiAttachment ->
@@ -1116,7 +1124,8 @@ class NewMessageViewModel @Inject constructor(
     }
 
     enum class ImportationResult {
-        SUCCESS, ATTACHMENTS_TOO_BIG,
+        SUCCESS,
+        ATTACHMENTS_TOO_BIG,
     }
 
     data class MailboxRef(val userId: Int, val mailboxId: Int)
