@@ -191,7 +191,7 @@ class NewMessageViewModel @Inject constructor(
     var isExternalBannerManuallyClosed = false
     var draftAction = DraftAction.SAVE
     var signaturesCount = 0
-    var isNewMessage = false
+    private var isNewMessage = false
 
     private var snapshot: DraftSnapshot? = null
 
@@ -231,7 +231,8 @@ class NewMessageViewModel @Inject constructor(
     private val exitSignal: CompletableJob = Job()
 
     private val mailboxRefFlow = MutableSharedFlow<MailboxRef>(
-        replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
     fun changePlaceholderVisibility(isVisible: Boolean) {
@@ -247,7 +248,9 @@ class NewMessageViewModel @Inject constructor(
         mailbox
     }.shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
-    val currentUserIdFlow = _currentMailboxFlow.map { it.userId }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    val currentUserIdFlow = _currentMailboxFlow
+        .map { it.userId }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     suspend fun currentMailbox() = _currentMailboxFlow.first()
 
@@ -313,7 +316,9 @@ class NewMessageViewModel @Inject constructor(
 
         val draft: Draft? = runCatching {
 
-            signatures = currentMailbox().signatures.also { signaturesCount = it.count() }.toMutableList()
+            signatures = currentMailbox().signatures
+                .also { signaturesCount = it.count() }
+                .toMutableList()
                 .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox().email)) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
@@ -323,6 +328,7 @@ class NewMessageViewModel @Inject constructor(
         }.getOrNull()
 
         draft?.let {
+
             it.flagRecipientsAsAutomaticallyEntered()
 
             dismissNotification()
@@ -448,56 +454,6 @@ class NewMessageViewModel @Inject constructor(
         // If the user put the app in background before we put the fetched Draft in Realm, and the system
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
-    }
-
-    private fun splitSignatureAndQuoteFromBody(draft: Draft) {
-        val remoteBody = draft.body
-        if (remoteBody.isEmpty()) return
-
-        val (body, signature, quote) = when (draft.mimeType) {
-            Utils.TEXT_PLAIN -> BodyData(
-                body = BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML),
-                signature = null,
-                quote = null
-            )
-            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody)
-            else -> error("Cannot load an email which is not of type text/plain or text/html")
-        }
-
-        initialBody = body
-        initialSignature = signature
-        initialQuote = quote
-    }
-
-    private fun splitSignatureAndQuoteFromHtml(draftBody: String): BodyData {
-
-        fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
-            return getElementsByClass(divClassName).firstOrNull()?.let {
-                it.remove()
-                val first = body().html()
-                val second = if (it.html().isBlank()) null else it.outerHtml()
-                first to second
-            } ?: (defaultValue to null)
-        }
-
-        fun String.lastIndexOfOrMax(string: String): Int {
-            val index = lastIndexOf(string)
-            return if (index == -1) Int.MAX_VALUE else index
-        }
-
-        val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
-
-        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
-
-        val replyPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
-        val (body, quote) = if (replyPosition < forwardPosition) {
-            doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
-        } else {
-            doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
-        }
-
-        return BodyData(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
     }
 
     private suspend fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
@@ -702,11 +658,9 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
-            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
-                importAttachments(
-                    currentAttachments = draft.attachments, uris = listOf(it)
-                )
-            }?.let(draft.attachments::addAll)
+            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+                ?.let { importAttachments(currentAttachments = draft.attachments, uris = listOf(it)) }
+                ?.let(draft.attachments::addAll)
         }
     }
 
@@ -1210,6 +1164,8 @@ class NewMessageViewModel @Inject constructor(
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
+
+    data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName
