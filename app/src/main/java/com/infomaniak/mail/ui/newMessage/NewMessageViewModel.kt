@@ -223,7 +223,9 @@ class NewMessageViewModel @Inject constructor(
 
     private val _isQuotesButtonVisible = MutableStateFlow(false)
     val isQuotesButtonVisible: StateFlow<Boolean> = _isQuotesButtonVisible
-    private var hasQuotes: Boolean = false
+
+    private val _isPlaceHolderVisible = MutableStateFlow(false)
+    val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -231,6 +233,10 @@ class NewMessageViewModel @Inject constructor(
     private val mailboxRefFlow = MutableSharedFlow<MailboxRef>(
         replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+
+    fun changePlaceholderVisibility(isVisible: Boolean) {
+        _isPlaceHolderVisible.value = isVisible
+    }
 
     private val _currentMailboxFlow: Flow<Mailbox> = mailboxRefFlow.mapLatest {
         val mailbox = mailboxController.getMailbox(it.userId, it.mailboxId)
@@ -325,7 +331,7 @@ class NewMessageViewModel @Inject constructor(
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
             _isShimmering.emit(false)
-            if (hasQuotes) {
+            if (bodyHasQuotes(draft.body) || bodyHasQuotes(initialBody.content)) {
                 changeQuotesButtonVisibility(isVisible = true)
             }
             initResult.postValue(InitResult(it, signatures))
@@ -384,7 +390,6 @@ class NewMessageViewModel @Inject constructor(
         populateWithExternalMailDataIfNeeded(draft = this, intent)
 
         val finalBodyContent = getFinalBodyContent(initialSignature, initialQuote)
-
         initialBody = BodyContentPayload(finalBodyContent, BodyContentType.HTML_UNSANITIZED)
     }
 
@@ -396,7 +401,6 @@ class NewMessageViewModel @Inject constructor(
         }
         if (!initialQuote.isNullOrEmpty()) {
             finalBodyContent += initialQuote
-            hasQuotes = true
         }
 
         return finalBodyContent
@@ -523,8 +527,6 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
-        saveSnapshot(initialBody.content)
-
         editorBodyInitializer.postValue(EditorBodyInitialization(initialBody, isFirstInitialization = true))
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
@@ -533,6 +535,11 @@ class NewMessageViewModel @Inject constructor(
         }
 
         isEncryptionActivated.postValue(isEncrypted)
+    }
+
+    private fun bodyHasQuotes(body: String): Boolean {
+        return body.contains(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME) ||
+                body.contains(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
     }
 
     fun bodyIsEmpty(bodyHtml: String): Boolean {
@@ -1046,10 +1053,15 @@ class NewMessageViewModel @Inject constructor(
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
-            draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() && draftSnapshot.to == toLiveData.valueOrEmpty()
-                .toSet() && draftSnapshot.cc == ccLiveData.valueOrEmpty()
-                .toSet() && draftSnapshot.bcc == bccLiveData.valueOrEmpty()
-                .toSet() && draftSnapshot.subject == subjectValue && draftSnapshot.uiBody == uiBodyValue && draftSnapshot.isEncrypted == isEncryptionActivated.value && draftSnapshot.encryptionPassword == encryptionPassword.value && draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
+            draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() &&
+                    draftSnapshot.to == toLiveData.valueOrEmpty().toSet() &&
+                    draftSnapshot.cc == ccLiveData.valueOrEmpty().toSet() &&
+                    draftSnapshot.bcc == bccLiveData.valueOrEmpty().toSet() &&
+                    draftSnapshot.subject == subjectValue &&
+                    draftSnapshot.uiBody == uiBodyValue &&
+                    draftSnapshot.isEncrypted == isEncryptionActivated.value &&
+                    draftSnapshot.encryptionPassword == encryptionPassword.value &&
+                    draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
                 .mapTo(mutableSetOf()) { it.localUuid }
         } ?: false
     }
