@@ -502,6 +502,7 @@ class NewMessageFragment : Fragment() {
     private fun observeQuotesVisibility() = viewLifecycleOwner.lifecycleScope.launch {
         newMessageViewModel.isQuotesButtonVisible.collect { isQuotesButtonVisible ->
             binding.quotesToggleButton.isVisible = isQuotesButtonVisible
+
             // We wait until the webview finished shimmering before changing the quotes' visibility.
             if (!newMessageViewModel.isShimmering.value) {
                 if (!isQuotesButtonVisible) {
