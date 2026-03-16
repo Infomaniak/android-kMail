@@ -505,11 +505,14 @@ class NewMessageFragment : Fragment() {
     private fun observeQuotesVisibility() = viewLifecycleOwner.lifecycleScope.launch {
         newMessageViewModel.isQuotesButtonVisible.collect { isQuotesButtonVisible ->
             binding.quotesToggleButton.isVisible = isQuotesButtonVisible
-            if (!isQuotesButtonVisible) {
-                // User toggled show quotes visibility
-                binding.editorWebView.evaluateJavascript(showQuotesScript, null)
-            } else {
-                binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
+            // If it isn't shimmering, the webview is ready to evaluate js.
+            if (!newMessageViewModel.isShimmering.value) {
+                if (!isQuotesButtonVisible) {
+                    // User toggled show quotes visibility
+                    binding.editorWebView.evaluateJavascript(showQuotesScript, null)
+                } else {
+                    binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
+                }
             }
         }
     }
