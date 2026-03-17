@@ -16,5 +16,5 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  function onImagesDeletedFromQuotes(cids) {
-     window.kmail.onImagesDeletedFromQuotes(cids);
+     globalThis.kmail.onImagesDeletedFromQuotes(cids);
  }
