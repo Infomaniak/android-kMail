@@ -22,7 +22,7 @@
     <string name="actionArchive">Arquivar</string>
     <string name="actionBlockSender">Bloquear remetente</string>
     <string name="actionCancelSnooze">Cancelar lembrete</string>
-    <string name="actionDelete">Excluir</string>
+    <string name="actionDelete">Eliminar</string>
     <string name="actionEditMenu">Editar menu</string>
     <string name="actionForward">Encaminhar</string>
     <string name="actionMarkAsRead">Marcar como lido</string>
@@ -104,7 +104,7 @@
     <string name="blockAnExpeditorTitle">Bloquear um remetente</string>
     <string name="blockExpeditorTitle">Bloquear %s</string>
     <string name="buttonAccept">Aceitar</string>
-    <string name="buttonAccountDelete">Excluir conta</string>
+    <string name="buttonAccountDelete">Eliminar conta</string>
     <string name="buttonAccountLogOut">Terminar sessão</string>
     <string name="buttonAccountSwitch">Mudar de conta</string>
     <string name="buttonAddAccount">Adicionar uma conta</string>
@@ -178,8 +178,8 @@
     <string name="contentDescriptionAccountSelection">Conta selecionada</string>
     <string name="contentDescriptionActionIcon">Ícone de ação</string>
     <string name="contentDescriptionButtonBack">Voltar</string>
-    <string name="contentDescriptionButtonDelete">Excluir %s</string>
-    <string name="contentDescriptionButtonDeleteDraft">Excluir rascunho</string>
+    <string name="contentDescriptionButtonDelete">Eliminar %s</string>
+    <string name="contentDescriptionButtonDeleteDraft">Eliminar o rascunho</string>
     <string name="contentDescriptionButtonDeleteHistory">Eliminar entrada do histórico</string>
     <string name="contentDescriptionButtonDeleteQuote">Eliminar mensagens citadas</string>
     <string name="contentDescriptionButtonDeleteSignature">Eliminar assinatura</string>
@@ -571,7 +571,7 @@
     <string name="snackbarMessageDeletedPermanently">Mensagem eliminada</string>
     <string name="snackbarMessageMoved">Mensagem movida para %s</string>
     <string name="snackbarMoveCancelled">Movimento cancelado</string>
-    <string name="snackbarPasswordCopied">Senha copiada</string>
+    <string name="snackbarPasswordCopied">Palavra-passe copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado</string>
     <string name="snackbarReportPhishingConfirmation">Reporte efetuado com sucesso</string>
     <string name="snackbarRestorationLaunched">A iniciar a restauração</string>
