@@ -92,7 +92,9 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getQuotesImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getShowQuotesScript
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -108,7 +110,8 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.ime
-import com.infomaniak.mail.utils.extensions.initEditorWebviewClientAndBridge
+import com.infomaniak.mail.utils.extensions.initEditorWebviewBridge
+import com.infomaniak.mail.utils.extensions.initEditorWebviewClient
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
@@ -137,6 +140,8 @@ class NewMessageFragment : Fragment() {
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val showQuotesScript by lazy { requireContext().getShowQuotesScript() }
     private val hideQuotesStyle by lazy { requireContext().getHideQuotesStyle() }
+    private val quoteImagesObserverScript by lazy { requireContext().getQuotesImagesObserverScript() }
+    private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -437,6 +442,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() = with(binding) {
+        editorWebView.initEditorWebviewBridge(onImagesDeletedFromQuotes = { cids ->
+            newMessageViewModel.deleteInlineAttachments(cids)
+        })
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
         editorAiAnimation.setAnimation(R.raw.euria)
@@ -494,11 +502,12 @@ class NewMessageFragment : Fragment() {
     private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
         settings.setupNewMessageWebViewSettings()
         val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
-        webViewClient = initEditorWebviewClientAndBridge(
+        addScript(editorJsBridgeScript)
+        webViewClient = initEditorWebviewClient(
             attachments = draft.attachments,
             shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
             navigateToNewMessageActivity = null,
-            onPageFinished = { notifyPageHasLoaded() }
+            onPageFinished = { notifyPageHasLoaded() },
         )
     }
 
@@ -511,6 +520,7 @@ class NewMessageFragment : Fragment() {
                 if (!isQuotesButtonVisible) {
                     // User toggled show quotes visibility
                     binding.editorWebView.evaluateJavascript(showQuotesScript, null)
+                    binding.editorWebView.evaluateJavascript(quoteImagesObserverScript, null)
                 } else {
                     binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
                 }
@@ -706,7 +716,6 @@ class NewMessageFragment : Fragment() {
         editorBodyInitializer.observe(viewLifecycleOwner) { (body, isFirstInitialization) ->
             val bodyContent = editorContentManager.setContent(binding.editorWebView, body)
             if (isFirstInitialization) saveInitialSnapshot(bodyContent)
-
             setupToggleQuotesButton()
         }
     }

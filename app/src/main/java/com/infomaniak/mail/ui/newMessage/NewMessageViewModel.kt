@@ -1132,6 +1132,14 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
+    fun deleteInlineAttachments(cids: List<String>) {
+        val cidsToDelete = cids.map { it.removePrefix("cid:") }
+        val newAttachments = attachmentsLiveData.value
+            ?.filter { attachment -> !cidsToDelete.contains(attachment.contentId) }
+            ?: emptyList()
+        attachmentsLiveData.postValue(newAttachments)
+    }
+
     enum class ImportationResult {
         SUCCESS,
         ATTACHMENTS_TOO_BIG,

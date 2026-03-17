@@ -117,6 +117,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
@@ -293,18 +294,19 @@ fun WebView.initDisplayWebViewClientAndBridge(
     }
 }
 
-fun WebView.initEditorWebviewClientAndBridge(
+fun WebView.initEditorWebviewBridge(onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null) {
+    settings.setupNewMessageWebViewSettings()
+    WebViewUtils.initEditorJsBridge(onImagesDeletedFromQuotes)
+    addJavascriptInterface(WebViewUtils.editorJsBridge, "kmail")
+}
+
+fun WebView.initEditorWebviewClient(
     attachments: List<Attachment>,
     shouldLoadDistantResources: Boolean,
     onBlockedResourcesDetected: (() -> Unit)? = null,
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
     onPageFinished: (() -> Unit)? = null,
-    onWebViewFinishedLoading: (() -> Unit)? = null,
 ): EditorWebViewClient {
-
-    WebViewUtils.initJavascriptBridge(onWebViewFinishedLoading)
-    addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
-
     val cidDictionary = mutableMapOf<String, Attachment>().apply {
         attachments.forEach {
             it.contentId?.let { cid ->
