@@ -237,6 +237,8 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getShowQuotesScript(): String = loadScript(R.raw.show_quotes_script)
 
+        fun Context.getQuotesImagesObserverScript(): String = loadScript(R.raw.quotes_images_observer)
+
         fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
 
         fun Context.getFixStyleScript(): String {
@@ -245,6 +247,10 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getJsBridgeScript(): String {
             return loadScript(R.raw.javascript_bridge)
+        }
+
+        fun Context.getEditorJsBridgeScript(): String {
+            return loadScript(R.raw.editor_javascript_bridge)
         }
     }
 }
