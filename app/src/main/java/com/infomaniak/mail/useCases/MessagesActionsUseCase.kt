@@ -188,7 +188,7 @@ class MessagesActionsUseCase @Inject constructor(
         return moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduleMessages, callbacks)
     }
 
-    suspend fun getMessagesFromThreadToSpamOrHam(threads: Set<Thread>): List<Message> {
+    suspend fun getMessagesFromThreadsToSpamOrHam(threads: Set<Thread>): List<Message> {
         return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = false) }
     }
 
@@ -249,7 +249,7 @@ class MessagesActionsUseCase @Inject constructor(
         )
     }
 
-    suspend fun getMessagesFromThreadToDelete(threads: List<Thread>): List<Message> {
+    suspend fun getMessagesFromThreadsToDelete(threads: List<Thread>): List<Message> {
         return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = true) }
     }
 
@@ -257,7 +257,7 @@ class MessagesActionsUseCase @Inject constructor(
     // End Region
 
     // Seen Region
-    suspend fun toggleThreadSeenStatus(
+    suspend fun toggleThreadsSeenStatus(
         threadsUids: List<String>,
         shouldRead: Boolean = true,
         currentFolderId: String?,
@@ -414,7 +414,7 @@ class MessagesActionsUseCase @Inject constructor(
     // End Region
 
     // Favorites Region
-    suspend fun toggleThreadFavorite(
+    suspend fun toggleThreadsFavorite(
         threadsUids: List<String>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
@@ -423,9 +423,9 @@ class MessagesActionsUseCase @Inject constructor(
         val threads = threadsUids.let { threadController.getThreads(threadsUids) }
         val isFavorite = if (threads.count() == 1) threads.single().isFavorite else !shouldFavorite
         val messages = if (isFavorite) {
-            getMessagesFromThreadToUnfavorite(threads)
+            getMessagesFromThreadsToUnfavorite(threads)
         } else {
-            getMessagesFromThreadToFavorite(threads, mailbox)
+            getMessagesFromThreadsToFavorite(threads, mailbox)
         }
 
         toggleMessagesFavoriteStatus(messages, isFavorite, mailbox, callbacks)
@@ -483,13 +483,13 @@ class MessagesActionsUseCase @Inject constructor(
         return messageController.getMessagesAndDuplicates(messages)
     }
 
-    private suspend fun getMessagesFromThreadToFavorite(threads: List<Thread>, mailbox: Mailbox): List<Message> {
+    private suspend fun getMessagesFromThreadsToFavorite(threads: List<Thread>, mailbox: Mailbox): List<Message> {
         return threads.flatMap { thread ->
             messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
         }
     }
 
-    private suspend fun getMessagesFromThreadToUnfavorite(threads: List<Thread>): List<Message> {
+    private suspend fun getMessagesFromThreadsToUnfavorite(threads: List<Thread>): List<Message> {
         return threads.flatMap { messageController.getFavoriteMessages(it) }
     }
 
