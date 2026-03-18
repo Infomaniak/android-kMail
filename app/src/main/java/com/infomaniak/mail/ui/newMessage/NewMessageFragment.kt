@@ -498,8 +498,8 @@ class NewMessageFragment : Fragment() {
 
     private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
         settings.setupNewMessageWebViewSettings()
-        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
         addScript(editorJsBridgeScript)
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
         webViewClient = initEditorWebviewClient(
             attachments = draft.attachments,
             shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
