@@ -89,9 +89,11 @@ class WebViewUtils(context: Context) {
         @JavascriptInterface
         fun onImagesDeletedFromQuotes(cidJson: String) {
             runCatching {
-                val cids = JSONArray(cidJson).let { jsonArray ->
-                    (0 until jsonArray.length()).map { jsonArray.getString(it) }
-                }
+                val cids = JSONArray(cidJson)
+                    .let { jsonArray ->
+                        (0 until jsonArray.length())
+                            .map { jsonArray.getString(it) }
+                    }
                 onImagesDeletedFromQuotes?.invoke(cids)
             }.onFailure {
                 SentryLog.e(TAG, "Failed to parse CIDs")
@@ -147,17 +149,13 @@ class WebViewUtils(context: Context) {
         fun initJavascriptBridge(
             onWebViewFinishedLoading: (() -> Unit)? = null,
         ) {
-            jsBridge = JavascriptBridge(
-                onWebViewFinishedLoading = onWebViewFinishedLoading,
-            )
+            jsBridge = JavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
         }
 
         fun initEditorJsBridge(
             onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null,
         ) {
-            editorJsBridge = EditorJavascriptBridge(
-                onImagesDeletedFromQuotes = onImagesDeletedFromQuotes
-            )
+            editorJsBridge = EditorJavascriptBridge(onImagesDeletedFromQuotes = onImagesDeletedFromQuotes)
         }
 
         private fun WebSettings.setupCommonWebViewSettings() {

@@ -1008,7 +1008,7 @@ class NewMessageViewModel @Inject constructor(
     private fun removeEmptyQuotes(html: String): String {
         val doc = jsoupParseWithLog(html)
 
-        // If the user deleted the quotes text, remove the quotes div so user doesn't write in the quotes div
+        // If the user deleted the quotes' text, remove the quotes' div so user doesn't write in it
         // (the text could get hidden later with the toggle button).
         if (bodyHasEmptyQuotes(html)) {
             doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
