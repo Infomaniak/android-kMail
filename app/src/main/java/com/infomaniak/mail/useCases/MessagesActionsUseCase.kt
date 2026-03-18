@@ -180,11 +180,8 @@ class MessagesActionsUseCase @Inject constructor(
         val folder = if (currentFolderId != null) folderController.getFolder(currentFolderId) else null
         val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
 
-        val destinationFolderRole = if (folderRole == FolderRole.SPAM) {
-            FolderRole.INBOX
-        } else {
-            FolderRole.SPAM
-        }
+        val destinationFolderRole = if (folderRole == FolderRole.SPAM) FolderRole.INBOX else FolderRole.SPAM
+
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
         val unscheduleMessages = messageController.getUnscheduledMessages(messages)
 
@@ -236,20 +233,19 @@ class MessagesActionsUseCase @Inject constructor(
             )
         }
 
-        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(
-            threadsUids = uidsToMove,
-            hasBeenMovedOut = false,
-        )
-
-        val undoDestinationId = messagesToDelete.first().folderId
-        val undoFoldersIds = messagesToDelete.getFoldersIds(exception = undoDestinationId)
+        if (apiResponses.atLeastOneFailed()) {
+            threadController.updateIsLocallyMovedOutStatus(
+                threadsUids = uidsToMove,
+                hasBeenMovedOut = false,
+            )
+        }
 
         return DeleteResult(
             apiResponses = apiResponses,
             uidsToMove = uidsToMove,
             undoResources = null, // since we are permanently deleting there isn't an undo action.
-            undoFoldersIds = undoFoldersIds,
-            undoDestinationId = undoDestinationId,
+            undoFoldersIds = ImpactedFolders(),
+            undoDestinationId = "",
         )
     }
 
@@ -546,9 +542,7 @@ class MessagesActionsUseCase @Inject constructor(
         val response = ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)
         return if (response.isSuccess()) {
             val restrictions = response.data ?: return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
-            restrictions.apply {
-                blockedSenders.removeIf { it.email == email }
-            }
+            restrictions.blockedSenders.removeIf { it.email == email }
             updateBlockedSenders(mailbox, restrictions)
             ApiCallResult.Success(R.string.unblockButton) // We don't show a snackbar on success. It's just a confirmation
         } else {
