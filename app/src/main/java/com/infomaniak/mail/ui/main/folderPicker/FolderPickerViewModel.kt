@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.standardize
 import com.infomaniak.mail.utils.flattenAndAddDividerBeforeFirstCustomFolder
@@ -44,8 +43,6 @@ class FolderPickerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
     private var searchJob: Job? = null
 
     private val sourceFolderId inline get() = savedStateHandle.get<String>(FolderPickerFragmentArgs::sourceFolderId.name)
@@ -56,7 +53,7 @@ class FolderPickerViewModel @Inject constructor(
     var hasAlreadyTrackedSearch = false
 
     init {
-        viewModelScope.launch(ioCoroutineContext) {
+        viewModelScope.launch(ioDispatcher) {
             sourceFolderIdLiveData.postValue(sourceFolderId)
         }
     }
@@ -93,7 +90,7 @@ class FolderPickerViewModel @Inject constructor(
         }
     }
 
-    private fun searchFolders(query: CharSequence, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+    private fun searchFolders(query: CharSequence, shouldDebounce: Boolean) = viewModelScope.launch(ioDispatcher) {
 
         cancelSearch()
 
