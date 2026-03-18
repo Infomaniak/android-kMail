@@ -81,7 +81,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
         viewLifecycleOwner.lifecycleScope.launch {
-            val message = mainViewModel.getMessage(messageUid) ?: return@launch
+            val message = mainViewModel.getMessage(messageUid)
+            if (message == null) {
+                snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+                return@launch
+            }
 
             // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
             junkMessagesViewModel.threadsUids = listOf(threadUid)
