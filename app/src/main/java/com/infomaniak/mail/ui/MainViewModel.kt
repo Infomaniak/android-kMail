@@ -1619,7 +1619,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    suspend fun getMessage(messageUid: String): Message = messageController.getMessage(messageUid)!!
+    suspend fun getMessage(messageUid: String): Message? = messageController.getMessage(messageUid)
 
     fun selectOrUnselectAll() {
         if (isEverythingSelected) {
