@@ -47,7 +47,7 @@ internal class BodyCleaner {
                 "var",
                 "wbr",
             )
-            .addAttributes(":all", "class", "dir", "id", "style", "spellcheck")
+            .addAttributes(":all", "class", "dir", "id", "style")
             .addAttributes("a", "name")
             // Allow all URI schemes in links.
             // Removing all protocols makes the list of protocols empty, which means allow all protocols.
