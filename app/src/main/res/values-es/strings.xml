@@ -33,8 +33,8 @@
     <string name="actionNonSpam">Notificar como no spam</string>
     <string name="actionPhishing">Informar sobre phishing</string>
     <string name="actionPrint">Imprimir</string>
-    <string name="actionRename">Cambie el nombre de</string>
-    <string name="actionReply">Respuesta</string>
+    <string name="actionRename">Renombrar</string>
+    <string name="actionReply">Responder</string>
     <string name="actionReplyAll">Responder a todos</string>
     <string name="actionReportDisplayProblem">Informar de un problema de visualización</string>
     <string name="actionShortMarkAsRead">Leer</string>
