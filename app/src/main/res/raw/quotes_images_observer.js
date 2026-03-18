@@ -29,14 +29,14 @@
            var removedCids = [];
 
            mutationRecords.forEach(function (mutation) {
-             for (var i, nodeIndex = 0; i = mutation.removedNodes[nodeIndex]; ++nodeIndex) {
-                if (i.nodeType == Node.ELEMENT_NODE) {
-                   if ("img" == i.tagName.toLowerCase()) {
-                       removedCids.push(i.src);
+             for (var removedNode, nodeIndex = 0; removedNode = mutation.removedNodes[nodeIndex]; ++nodeIndex) {
+                if (removedNode.nodeType == Node.ELEMENT_NODE) {
+                   if ("img" == removedNode.tagName.toLowerCase()) {
+                       removedCids.push(removedNode.src);
                    } else {
-                       i = i.getElementsByTagName("img");
-                       for (var j = 0; j < i.length; j++) {
-                        removedCids.push(i[j].src)
+                       var childImages = removedNode.getElementsByTagName("img");
+                       for (var childIndex = 0; childIndex < childImages.length; childIndex++) {
+                        removedCids.push(childImages[childIndex].src);
                        }
                    }
                 }
@@ -59,7 +59,7 @@
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupObserver)
+        document.addEventListener('DOMContentLoaded', setupObserver);
     } else {
         setupObserver();
     }

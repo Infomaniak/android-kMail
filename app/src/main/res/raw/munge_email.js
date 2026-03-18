@@ -18,6 +18,7 @@ const scriptFirstLine = new RegExp(/:([\d]+)/).exec(Error().stack)[1] // Android
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// The line below is injected by the code.
 // MESSAGE_SELECTOR = "#kmail-message-content";
 const PREFERENCES = {
     normalizeMessageWidths: true,
