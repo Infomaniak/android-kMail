@@ -25,7 +25,7 @@ import javax.inject.Singleton
 class SignatureUtils @Inject constructor() {
     fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
         return """
-            <div class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME" spellcheck="false">
+            <div class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME">
             $signatureContent
             </div>
         """.trimIndent()
