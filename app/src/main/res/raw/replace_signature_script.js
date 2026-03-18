@@ -23,7 +23,7 @@
         if (newSigHtml === "") {
             signatureElement.remove();
         } else {
-            signatureElement.innerHTML = newSigHtml;
+            signatureElement.outerHTML = newSigHtml;
         }
     } else if (newSigHtml !== "") {
         const quotes = document.querySelector('.%s');
