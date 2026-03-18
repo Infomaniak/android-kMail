@@ -81,10 +81,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
         viewLifecycleOwner.lifecycleScope.launch {
+            val message = mainViewModel.getMessage(messageUid) ?: return@launch
+
             // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
             junkMessagesViewModel.threadsUids = listOf(threadUid)
-
-            val message = mainViewModel.getMessage(messageUid) ?: return@launch
             val folderRole = folderRoleUtils.getActionFolderRole(message)
             isFromSpam = folderRole == FolderRole.SPAM
 
