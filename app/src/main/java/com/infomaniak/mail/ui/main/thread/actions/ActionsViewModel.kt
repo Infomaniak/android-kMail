@@ -119,7 +119,9 @@ class ActionsViewModel @Inject constructor(
         )
 
         if (displaySnackbar && result != null) {
-            showMoveSnackbar(result.movedThreads, result.messages, result.apiResponses, result.destinationFolder)
+            with(result) {
+                showMoveSnackbar(movedThreads, messages, apiResponses, destinationFolder)
+            }
         }
     }
 
@@ -169,7 +171,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) {
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return
-        
+
         val result = messagesActionsUseCase.moveMessagesTo(
             destinationFolder = destinationFolder,
             currentFolderId = currentFolderId,
@@ -500,8 +502,7 @@ class ActionsViewModel @Inject constructor(
     fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         if (undoData == null) return@launch
 
-        val result = messagesActionsUseCase.undoAction(undoData, mailbox)
-        val message = when (result) {
+        val message = when (val result = messagesActionsUseCase.undoAction(undoData, mailbox)) {
             is MessagesActionsUseCase.ApiCallResult.Success -> appContext.getString(result.messageRes)
             is MessagesActionsUseCase.ApiCallResult.Error -> appContext.getString(result.messageRes)
         }
