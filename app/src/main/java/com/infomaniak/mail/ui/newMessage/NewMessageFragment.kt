@@ -575,7 +575,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateBodySignature(signature: Signature) {
-        val escapedSignature = if (signature.isDummy) "" else looselyEscapeAsStringLiteralForJs(signature.content)
+        val selectedSignature = if (signature.isDummy) "" else signature.content
+        val signatureWithClass = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(selectedSignature)
+        val escapedSignature = looselyEscapeAsStringLiteralForJs(signatureWithClass)
 
         val replaceSignatureScript = replaceSignatureScript.format(
             MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
