@@ -686,7 +686,11 @@ class MainViewModel @Inject constructor(
 
         val snackbarTitle = when {
             apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
-            threadsMovedCount > 1 -> getMoveThreadSnackbarTitle(isSpam, threadsMovedCount, destination)
+            threadsMovedCount > 0 || messagesMoved.count() > 1 -> getMoveThreadSnackbarTitle(
+                isSpam,
+                threadsMovedCount,
+                destination
+            )
             else -> getMoveMessageSnackbarTitle(isSpam, destination)
         }
 
