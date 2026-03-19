@@ -91,7 +91,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMarkAsSpam = messagesActionsUseCase.getMessagesFromThreadToSpamOrHam(threads)
+        val messagesToMarkAsSpam = messagesActionsUseCase.getMessagesFromThreadsToSpamOrHam(threads)
         handleToggleSpamMessages(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
     }
 
@@ -213,7 +213,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToDelete = messagesActionsUseCase.getMessagesFromThreadToDelete(threads)
+        val messagesToDelete = messagesActionsUseCase.getMessagesFromThreadsToDelete(threads)
         handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
     }
 
@@ -338,7 +338,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val refreshCallbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
-        messagesActionsUseCase.toggleThreadSeenStatus(threadsUids, shouldRead, currentFolderId, mailbox, refreshCallbacks)
+        messagesActionsUseCase.toggleThreadsSeenStatus(threadsUids, shouldRead, currentFolderId, mailbox, refreshCallbacks)
     }
 
     fun toggleMessagesSeenStatus(
@@ -360,7 +360,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop)
-        messagesActionsUseCase.toggleThreadFavorite(threadsUids, shouldFavorite, mailbox, callbacks)
+        messagesActionsUseCase.toggleThreadsFavorite(threadsUids, shouldFavorite, mailbox, callbacks)
     }
 
     fun toggleMessagesFavoriteStatus(
