@@ -44,7 +44,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
@@ -303,10 +302,6 @@ class MainViewModel @Inject constructor(
 
     //region Merged Contacts
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
-    //endregion
-
-    //region Scheduled Draft
-    var draftResource: String? = null
     //endregion
 
     //region Share Thread URL
@@ -595,85 +590,6 @@ class MainViewModel @Inject constructor(
         )
     }
 
-    //region Delete
-
-    fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
-
-        if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
-            val draftFolderId = folderController.getFolder(FolderRole.DRAFT)!!.id
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolderId)))
-        }
-
-        showDeletedDraftSnackbar(apiResponse)
-    }
-
-    private fun showDeletedDraftSnackbar(apiResponse: ApiResponse<Unit>) {
-        val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
-        snackbarManager.postValue(appContext.getString(titleRes))
-    }
-    //endregion
-
-    //region Scheduled Drafts
-    fun rescheduleDraft(scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
-        draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
-            with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
-                if (isSuccess()) {
-                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
-                } else {
-                    snackbarManager.postValue(title = appContext.getString(translateError()))
-                }
-            }
-        } ?: run {
-            snackbarManager.postValue(title = appContext.getString(RCore.string.anErrorHasOccurred))
-        }
-    }
-
-    fun modifyScheduledDraft(
-        unscheduleDraftUrl: String,
-        onSuccess: () -> Unit,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
-
-        if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
-            onSuccess()
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
-        }
-    }
-
-    fun unscheduleDraft(unscheduleDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
-
-        if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
-        }
-
-        showUnscheduledDraftSnackbar(apiResponse)
-    }
-
-    private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
-
-        fun openDraftFolder() = viewModelScope.launch { folderController.getFolder(FolderRole.DRAFT)?.id?.let(::openFolder) }
-
-        if (apiResponse.isSuccess()) {
-            snackbarManager.postValue(
-                title = appContext.getString(R.string.snackbarSaveInDraft),
-                buttonTitle = R.string.draftFolder,
-                customBehavior = ::openDraftFolder,
-            )
-        } else {
-            snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
-        }
-    }
-    //endregion
-
     fun showMoveSnackbar(
         threadsMovedCount: Int,
         messagesMoved: List<Message>,
@@ -798,14 +714,6 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
-    private fun refreshFoldersAsync(
-        mailbox: Mailbox,
-        messagesFoldersIds: ImpactedFolders,
-        destinationFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        messagesActionsUseCase.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
-    }
 
     private fun onDownloadStart() {
         isDownloadingChanges.postValue(true)
