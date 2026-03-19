@@ -383,7 +383,7 @@ class MainActivity : BaseActivity() {
             buttonTitle = R.string.actionDelete,
             customBehavior = {
                 trackEvent(MatomoMail.MatomoCategory.Snackbar, MatomoName.DeleteDraft)
-                mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
+                actionsViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid, mainViewModel.currentMailbox.value!!)
             },
         )
     }
@@ -403,7 +403,13 @@ class MainActivity : BaseActivity() {
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
             buttonTitle = RCore.string.buttonCancel,
-            customBehavior = { mainViewModel.unscheduleDraft(unscheduleDraftUrl) },
+            customBehavior = {
+                actionsViewModel.unscheduleDraft(
+                    unscheduleDraftUrl = unscheduleDraftUrl,
+                    mailbox = mainViewModel.currentMailbox.value!!,
+                    openFolder = mainViewModel::openFolder
+                )
+            },
         )
     }
 
