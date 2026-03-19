@@ -804,7 +804,7 @@ class MainViewModel @Inject constructor(
         destinationFolderId: String? = null,
         callbacks: RefreshCallbacks? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
+        messagesActionsUseCase.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
     }
 
     private fun onDownloadStart() {
