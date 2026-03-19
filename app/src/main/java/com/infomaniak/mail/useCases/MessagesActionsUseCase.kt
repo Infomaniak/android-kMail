@@ -27,7 +27,9 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
@@ -60,6 +62,7 @@ class MessagesActionsUseCase @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
+    private val refreshController: RefreshController,
     private val threadController: ThreadController,
     private val sharedUtils: SharedUtils,
 ) {
@@ -84,7 +87,7 @@ class MessagesActionsUseCase @Inject constructor(
         )
 
         if (apiResponses.atLeastOneSucceeded() && currentFolderId != null) {
-            sharedUtils.refreshFolders(
+            refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
@@ -225,7 +228,7 @@ class MessagesActionsUseCase @Inject constructor(
         onApiFinished()
 
         if (apiResponses.atLeastOneSucceeded()) {
-            sharedUtils.refreshFolders(
+            refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messagesToDelete.getFoldersIds(),
                 currentFolderId = currentFolder?.id,
@@ -334,7 +337,7 @@ class MessagesActionsUseCase @Inject constructor(
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
 
         if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
-            sharedUtils.refreshFolders(
+            refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
@@ -360,7 +363,7 @@ class MessagesActionsUseCase @Inject constructor(
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
 
         if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
-            sharedUtils.refreshFolders(
+            refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
@@ -402,7 +405,7 @@ class MessagesActionsUseCase @Inject constructor(
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
         if (apiResponses.atLeastOneSucceeded()) {
-            sharedUtils.refreshFolders(
+            refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 callbacks = callbacks,
@@ -465,7 +468,7 @@ class MessagesActionsUseCase @Inject constructor(
         }
 
         if (apiResponses.atLeastOneSucceeded()) {
-            sharedUtils.refreshFolders(
+            refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 callbacks = callbacks,
@@ -577,7 +580,7 @@ class MessagesActionsUseCase @Inject constructor(
         val responses = ApiRepository.snoozeMessages(mailbox.uuid, messageUids, date)
 
         return if (responses.atLeastOneSucceeded()) {
-            sharedUtils.refreshFolders(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+            refreshFolders(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
             SnoozeResult.Success(threads.count(), date)
         } else {
             val errorRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
@@ -605,7 +608,7 @@ class MessagesActionsUseCase @Inject constructor(
         )
 
         if (result is BatchSnoozeResult.Success) {
-            sharedUtils.refreshFolders(mailbox, result.impactedFolders)
+            refreshFolders(mailbox, result.impactedFolders)
         }
 
         return result
@@ -622,7 +625,7 @@ class MessagesActionsUseCase @Inject constructor(
         )
 
         if (result is BatchSnoozeResult.Success) {
-            sharedUtils.refreshFolders(mailbox, result.impactedFolders)
+            refreshFolders(mailbox, result.impactedFolders)
         }
 
         result
@@ -644,7 +647,7 @@ class MessagesActionsUseCase @Inject constructor(
         val apiResponses = resources.map { ApiRepository.undoAction(it) }
 
         if (apiResponses.atLeastOneSucceeded()) {
-            sharedUtils.refreshFolders(
+            refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = foldersIds,
                 destinationFolderId = destinationFolderId,
@@ -704,6 +707,31 @@ class MessagesActionsUseCase @Inject constructor(
             }
         }
     }
+
+    suspend fun refreshFolders(
+        mailbox: Mailbox,
+        messagesFoldersIds: ImpactedFolders,
+        destinationFolderId: String? = null,
+        currentFolderId: String? = null,
+        callbacks: RefreshCallbacks? = null,
+    ) {
+        val realm = mailboxContentRealm()
+
+        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
+        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
+        destinationFolderId?.let(foldersIds::add)
+
+        foldersIds.forEach { folderId ->
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER,
+                mailbox = mailbox,
+                folderId = folderId,
+                realm = realm,
+                callbacks = if (folderId == currentFolderId) callbacks else null,
+            )
+        }
+    }
+
 
     sealed class ApiCallResult {
         data class Success(val messageRes: Int) : ApiCallResult()
