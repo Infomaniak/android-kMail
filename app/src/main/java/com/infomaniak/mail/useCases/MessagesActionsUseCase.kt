@@ -246,9 +246,6 @@ class MessagesActionsUseCase @Inject constructor(
         return DeleteResult(
             apiResponses = apiResponses,
             uidsToMove = uidsToMove,
-            undoResources = null, // since we are permanently deleting there isn't an undo action.
-            undoFoldersIds = ImpactedFolders(),
-            undoDestinationId = "",
         )
     }
 
@@ -748,8 +745,5 @@ class MessagesActionsUseCase @Inject constructor(
     data class DeleteResult(
         val apiResponses: List<ApiResponse<*>>,
         val uidsToMove: List<String>,
-        val undoResources: List<String>?,
-        val undoFoldersIds: ImpactedFolders,
-        val undoDestinationId: String,
     )
 }

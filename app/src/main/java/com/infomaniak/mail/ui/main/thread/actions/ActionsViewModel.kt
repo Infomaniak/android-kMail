@@ -252,9 +252,6 @@ class ActionsViewModel @Inject constructor(
                 showDeleteSnackbar(
                     apiResponses = result.apiResponses,
                     messages = messagesToDelete,
-                    undoResources = result.undoResources,
-                    undoFoldersIds = result.undoFoldersIds,
-                    undoDestinationId = result.undoDestinationId,
                     numberOfImpactedThreads = messagesToDelete.count(),
                 )
             }
@@ -278,9 +275,9 @@ class ActionsViewModel @Inject constructor(
     private fun showDeleteSnackbar(
         apiResponses: List<ApiResponse<*>>,
         messages: List<Message>,
-        undoResources: List<String>?,
-        undoFoldersIds: ImpactedFolders,
-        undoDestinationId: String?,
+        undoResources: List<String>? = null,
+        undoFoldersIds: ImpactedFolders? = null,
+        undoDestinationId: String? = null,
         numberOfImpactedThreads: Int,
     ) {
         val snackbarTitle = if (apiResponses.atLeastOneSucceeded()) {
@@ -296,7 +293,8 @@ class ActionsViewModel @Inject constructor(
             appContext.getString(apiResponses.first().translateError())
         }
 
-        val undoData = if (undoResources.isNullOrEmpty()) null else UndoData(undoResources, undoFoldersIds, undoDestinationId)
+        val undoData = if (undoResources.isNullOrEmpty() || undoFoldersIds == null) null
+        else UndoData(undoResources, undoFoldersIds, undoDestinationId)
 
         snackbarManager.postValue(snackbarTitle, undoData)
     }
