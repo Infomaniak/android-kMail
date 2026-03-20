@@ -34,13 +34,13 @@ import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
-import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
@@ -88,6 +88,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.DownloadThreadsStatusManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -136,6 +137,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var downloadThreadsStatusManager: DownloadThreadsStatusManager
 
     @Inject
     lateinit var folderRoleUtils: FolderRoleUtils
@@ -333,7 +337,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun setupOnRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            if (mainViewModel.isDownloadingChanges.value == true) return@setOnRefreshListener
+            if (downloadThreadsStatusManager.isDownloading.value) return@setOnRefreshListener
             mainViewModel.forceRefreshThreads()
         }
     }
@@ -593,8 +597,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     }
 
     private fun observeDownloadState() {
-        mainViewModel.isDownloadingChanges
-            .distinctUntilChanged()
+        downloadThreadsStatusManager.isDownloading
             .observe(viewLifecycleOwner) { isDownloading ->
                 if (isDownloading) {
                     showLoadingTimer.start()

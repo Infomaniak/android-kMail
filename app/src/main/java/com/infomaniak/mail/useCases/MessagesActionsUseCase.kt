@@ -27,9 +27,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
@@ -62,18 +59,14 @@ class MessagesActionsUseCase @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
-    private val refreshController: RefreshController,
     private val threadController: ThreadController,
-    private val sharedUtils: SharedUtils,
 ) {
 
     // Move Region
     suspend fun moveMessagesTo(
         destinationFolder: Folder,
-        currentFolderId: String?,
         mailbox: Mailbox,
         messages: List<Message>,
-        callbacks: RefreshCallbacks? = null,
     ): MoveMessagesResult {
 
         val movedThreads = moveOutMessagesThreadsLocally(messages, destinationFolder)
@@ -85,20 +78,6 @@ class MessagesActionsUseCase @Inject constructor(
             destinationFolder = destinationFolder,
             alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings),
         )
-
-        if (apiResponses.atLeastOneSucceeded() && currentFolderId != null) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
-                destinationFolderId = destinationFolder.id,
-                currentFolderId = currentFolderId,
-                callbacks = callbacks,
-            )
-        }
-
-        if (apiResponses.atLeastOneFailed() && movedThreads.isNotEmpty()) {
-            threadController.updateIsLocallyMovedOutStatus(movedThreads, hasBeenMovedOut = false)
-        }
 
         return MoveMessagesResult(movedThreads, messages, apiResponses, destinationFolder)
     }
@@ -169,7 +148,7 @@ class MessagesActionsUseCase @Inject constructor(
             messagesToMove = getMessagesFromThreadsToMove(threads)
         }
 
-        return moveMessagesTo(destinationFolder, currentFolderId, mailbox, messagesToMove)
+        return moveMessagesTo(destinationFolder, mailbox, messagesToMove)
     }
     // End Region
 
@@ -178,7 +157,6 @@ class MessagesActionsUseCase @Inject constructor(
         messages: List<Message>,
         currentFolderId: String?,
         mailbox: Mailbox,
-        callbacks: RefreshCallbacks? = null,
     ): MoveMessagesResult? {
         val folder = if (currentFolderId != null) folderController.getFolder(currentFolderId) else null
         val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
@@ -188,7 +166,7 @@ class MessagesActionsUseCase @Inject constructor(
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
         val unscheduleMessages = messageController.getUnscheduledMessages(messages)
 
-        return moveMessagesTo(destinationFolder, currentFolderId, mailbox, unscheduleMessages, callbacks)
+        return moveMessagesTo(destinationFolder, mailbox, unscheduleMessages)
     }
 
     suspend fun getMessagesFromThreadsToSpamOrHam(threads: Set<Thread>): List<Message> {
@@ -207,10 +185,8 @@ class MessagesActionsUseCase @Inject constructor(
     // Delete Region
     suspend fun permanentlyDelete(
         messagesToDelete: List<Message>,
-        currentFolder: Folder?,
         mailbox: Mailbox,
         onApiFinished: () -> Unit,
-        refreshCallbacks: RefreshCallbacks?,
     ): DeleteResult? {
         if (messagesToDelete.isEmpty()) {
             return null
@@ -226,22 +202,6 @@ class MessagesActionsUseCase @Inject constructor(
         )
 
         onApiFinished()
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                currentFolderId = currentFolder?.id,
-                callbacks = refreshCallbacks,
-            )
-        }
-
-        if (apiResponses.atLeastOneFailed()) {
-            threadController.updateIsLocallyMovedOutStatus(
-                threadsUids = uidsToMove,
-                hasBeenMovedOut = false,
-            )
-        }
 
         return DeleteResult(
             apiResponses = apiResponses,
@@ -260,45 +220,43 @@ class MessagesActionsUseCase @Inject constructor(
     suspend fun toggleThreadsSeenStatus(
         threadsUids: List<String>,
         shouldRead: Boolean = true,
-        currentFolderId: String?,
         mailbox: Mailbox,
-        refreshCallbacks: RefreshCallbacks? = null,
-    ) {
+    ): ToggleResult {
         val threads = threadsUids.let { threadController.getThreads(threadsUids) }
         val isSeen = if (threads.count() == 1) threads.single().isSeen else !shouldRead
-        val messagesToToggleSeen = getMessagesFromThreadsToMarkAsUnseen(threads, mailbox)
+        val messagesToToggleSeen = threads.flatMap { thread -> messageController.getUnseenMessages(thread) }
 
-        handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox, refreshCallbacks)
+        return handleToggleSeenStatus(messagesToToggleSeen, isSeen, mailbox, threadsUids)
     }
 
     suspend fun toggleMessagesSeenStatus(
         messages: List<Message>,
         shouldRead: Boolean = true,
-        currentFolderId: String?,
         mailbox: Mailbox,
-        refreshCallbacks: RefreshCallbacks?,
-    ) {
+    ): ToggleResult {
         val isSeen = if (messages.count() == 1) messages.single().isSeen else !shouldRead
-        val messagesToToggleSeen = getMessagesToMarkAsUnseen(messages)
+        val messagesToToggleSeen = messageController.getMessagesAndDuplicates(messages)
 
-        handleToggleSeenStatus(messagesToToggleSeen, isSeen, currentFolderId, mailbox, refreshCallbacks)
+        return handleToggleSeenStatus(messagesToToggleSeen, isSeen, mailbox)
     }
 
     private suspend fun handleToggleSeenStatus(
         messages: List<Message>,
         isSeen: Boolean,
-        currentFolderId: String?,
         mailbox: Mailbox,
-        refreshCallbacks: RefreshCallbacks? = null,
-    ) {
-        if (isSeen) {
-            markAsUnseen(messages, mailbox, refreshCallbacks)
+        threadsUids: List<String>? = null
+    ): ToggleResult {
+        return if (isSeen) {
+            markAsUnseen(
+                messages = messages,
+                mailbox = mailbox,
+                threadsUids = threadsUids
+            )
         } else {
             markMessagesAsSeen(
                 messages = messages,
-                currentFolderId = currentFolderId,
                 mailbox = mailbox,
-                callbacks = refreshCallbacks,
+                threadsUids = threadsUids
             )
         }
     }
@@ -306,110 +264,45 @@ class MessagesActionsUseCase @Inject constructor(
     /**
      * Mark a Message or some Threads as read
      * @param mailbox The Mailbox where the Threads & Messages are located
-     * @param threads The Threads to mark as read
-     * @param message The Message to mark as read
-     * @param callbacks The callbacks for when the refresh of Threads begins/ends
-     * @param shouldRefreshThreads Sometimes, we don't want to refresh Threads after doing this action. For example, when replying
-     * to a Message.
+     * @param messages The Messages to mark as read
      */
-    suspend fun markAsSeen(
-        mailbox: Mailbox,
-        threads: List<Thread>,
-        message: Message? = null,
-        currentFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-        shouldRefreshThreads: Boolean = true,
-    ) {
-
-        val messages = when (message) {
-            null -> threads.flatMap { messageController.getUnseenMessages(it) }
-            else -> messageController.getMessageAndDuplicates(threads.first(), message)
-        }
-
-        val threadsUids = threads.map { it.uid }
-        val messagesUids = messages.map { it.uid }
-
-        updateSeenStatus(threadsUids, messagesUids, isSeen = true)
-
-        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
-
-        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                currentFolderId = currentFolderId,
-                callbacks = callbacks,
-            )
-        }
-
-        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(threadsUids, messagesUids, isSeen = false)
-    }
-
     suspend fun markMessagesAsSeen(
         mailbox: Mailbox,
         messages: List<Message>,
-        currentFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-        shouldRefreshThreads: Boolean = true,
-    ) {
+        threadsUids: List<String>? = null,
+    ): ToggleResult {
 
-        val messagesUids = messages.map { it.uid }
+        val messagesUids = messages.getUids()
 
-        updateSeenStatus(messagesUids, isSeen = true)
+        updateSeenStatus(messagesUids, threadsUids, isSeen = true)
 
-        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
+        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                currentFolderId = currentFolderId,
-                callbacks = callbacks,
-            )
-        }
+        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, isSeen = false)
 
-        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(messagesUids, isSeen = false)
+        return ToggleResult(messages = messages, apiResponses = apiResponses)
     }
 
-    private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
-        mailboxContentRealm().write {
-            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
-            ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
-        }
-    }
+    suspend fun updateSeenStatus(messagesUids: List<String>, threadsUids: List<String>? = null, isSeen: Boolean) {
 
-    suspend fun updateSeenStatus(messagesUids: List<String>, isSeen: Boolean) {
         mailboxContentRealm().write {
+            if (threadsUids != null) {
+                ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+            }
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
         }
     }
 
-    private suspend fun getMessagesFromThreadsToMarkAsUnseen(threads: List<Thread>, mailbox: Mailbox): List<Message> {
-        return threads.flatMap { thread ->
-            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
-        }
-    }
+    private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, threadsUids: List<String>? = null): ToggleResult {
+        val messagesUids = messages.getUids()
 
-    private suspend fun getMessagesToMarkAsUnseen(messages: List<Message>): List<Message> {
-        return messageController.getMessagesAndDuplicates(messages)
-    }
-
-    private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, callbacks: RefreshCallbacks?) {
-        val messagesUids = messages.map { it.uid }
-
-        updateSeenStatus(messagesUids, isSeen = false)
+        updateSeenStatus(messagesUids, threadsUids, isSeen = false)
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                callbacks = callbacks,
-            )
-        } else {
-            updateSeenStatus(messagesUids, isSeen = true)
-        }
+        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, isSeen = true)
+
+        return ToggleResult(messages = messages, apiResponses = apiResponses)
     }
     // End Region
 
@@ -418,25 +311,24 @@ class MessagesActionsUseCase @Inject constructor(
         threadsUids: List<String>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
-        callbacks: RefreshCallbacks? = null,
-    ) {
+    ): ToggleResult {
         val threads = threadsUids.let { threadController.getThreads(threadsUids) }
         val isFavorite = if (threads.count() == 1) threads.single().isFavorite else !shouldFavorite
         val messages = if (isFavorite) {
-            getMessagesFromThreadsToUnfavorite(threads)
+            threads.flatMap { messageController.getFavoriteMessages(it) }
         } else {
-            getMessagesFromThreadsToFavorite(threads, mailbox)
+            threads.flatMap { thread ->
+                messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
+            }
         }
-
-        toggleMessagesFavoriteStatus(messages, isFavorite, mailbox, callbacks)
+        return toggleMessagesFavoriteStatus(messages, isFavorite, mailbox)
     }
 
     suspend fun toggleMessagesFavorite(
         messages: List<Message>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
-        callbacks: RefreshCallbacks? = null,
-    ) {
+    ): ToggleResult {
         val isFavorite = if (messages.count() == 1) messages.single().isFavorite else !shouldFavorite
 
         val messages = if (isFavorite) {
@@ -445,15 +337,14 @@ class MessagesActionsUseCase @Inject constructor(
             getMessagesToFavorite(messages)
         }
 
-        toggleMessagesFavoriteStatus(messages, isFavorite, mailbox, callbacks)
+        return toggleMessagesFavoriteStatus(messages, isFavorite, mailbox)
     }
 
     private suspend fun toggleMessagesFavoriteStatus(
         messages: List<Message>,
         isFavorite: Boolean,
         mailbox: Mailbox,
-        callbacks: RefreshCallbacks?,
-    ) {
+    ): ToggleResult {
         val uids = messages.getUids()
 
         updateFavoriteStatus(messagesUids = uids, isFavorite = !isFavorite)
@@ -464,15 +355,11 @@ class MessagesActionsUseCase @Inject constructor(
             ApiRepository.addToFavorites(mailbox.uuid, uids)
         }
 
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                callbacks = callbacks,
-            )
-        } else {
+        if (apiResponses.atLeastOneFailed()) {
             updateFavoriteStatus(messagesUids = uids, isFavorite = isFavorite)
         }
+
+        return ToggleResult(messages, apiResponses)
     }
 
     private suspend fun getMessagesToFavorite(messages: List<Message>): List<Message> {
@@ -577,7 +464,6 @@ class MessagesActionsUseCase @Inject constructor(
         val responses = ApiRepository.snoozeMessages(mailbox.uuid, messageUids, date)
 
         return if (responses.atLeastOneSucceeded()) {
-            refreshFolders(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
             SnoozeResult.Success(threads.count(), date)
         } else {
             val errorRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
@@ -604,10 +490,6 @@ class MessagesActionsUseCase @Inject constructor(
             impactedFolders = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
         )
 
-        if (result is BatchSnoozeResult.Success) {
-            refreshFolders(mailbox, result.impactedFolders)
-        }
-
         return result
     }
 
@@ -615,17 +497,11 @@ class MessagesActionsUseCase @Inject constructor(
         threads: Collection<Thread>,
         mailbox: Mailbox,
     ): BatchSnoozeResult = coroutineScope {
-        val result = SharedUtils.unsnoozeThreadsWithoutRefresh(
+        SharedUtils.unsnoozeThreadsWithoutRefresh(
             mailbox = mailbox,
             threads = threads,
             scope = this
         )
-
-        if (result is BatchSnoozeResult.Success) {
-            refreshFolders(mailbox, result.impactedFolders)
-        }
-
-        result
     }
 
     sealed class SnoozeResult {
@@ -635,22 +511,9 @@ class MessagesActionsUseCase @Inject constructor(
     // End Region
 
     // Undo Region
-    suspend fun undoAction(undoData: UndoData, mailbox: Mailbox): ApiCallResult {
-        val (resources, foldersIds, destinationFolderId) = undoData
-        if (resources == null) {
-            return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
-        }
-
+    suspend fun undoAction(undoData: UndoData): ApiCallResult {
+        val resources = undoData.resources ?: return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
         val apiResponses = resources.map { ApiRepository.undoAction(it) }
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = foldersIds,
-                destinationFolderId = destinationFolderId,
-            )
-        }
-
         val failedCall = apiResponses.firstOrNull { it.data != true }
 
         return if (failedCall == null) {
@@ -705,31 +568,6 @@ class MessagesActionsUseCase @Inject constructor(
         }
     }
 
-    suspend fun refreshFolders(
-        mailbox: Mailbox,
-        messagesFoldersIds: ImpactedFolders,
-        destinationFolderId: String? = null,
-        currentFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-    ) {
-        val realm = mailboxContentRealm()
-
-        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
-        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
-        destinationFolderId?.let(foldersIds::add)
-
-        foldersIds.forEach { folderId ->
-            refreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER,
-                mailbox = mailbox,
-                folderId = folderId,
-                realm = realm,
-                callbacks = if (folderId == currentFolderId) callbacks else null,
-            )
-        }
-    }
-
-
     sealed class ApiCallResult {
         data class Success(val messageRes: Int) : ApiCallResult()
         data class Error(val messageRes: Int) : ApiCallResult()
@@ -745,5 +583,10 @@ class MessagesActionsUseCase @Inject constructor(
     data class DeleteResult(
         val apiResponses: List<ApiResponse<*>>,
         val uidsToMove: List<String>,
+    )
+
+    data class ToggleResult(
+        val messages: List<Message>,
+        val apiResponses: List<ApiResponse<*>>
     )
 }
