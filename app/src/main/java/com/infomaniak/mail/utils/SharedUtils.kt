@@ -24,11 +24,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
@@ -40,10 +36,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
-import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
-import com.infomaniak.mail.utils.extensions.getFoldersIds
-import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
@@ -56,125 +49,8 @@ import javax.inject.Inject
 class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
-    private val messageController: MessageController,
     private val mailboxController: MailboxController,
 ) {
-    /**
-     * Mark a Message or some Threads as read
-     * @param mailbox The Mailbox where the Threads & Messages are located
-     * @param threads The Threads to mark as read
-     * @param message The Message to mark as read
-     * @param callbacks The callbacks for when the refresh of Threads begins/ends
-     * @param shouldRefreshThreads Sometimes, we don't want to refresh Threads after doing this action. For example, when replying
-     * to a Message.
-     */
-    suspend fun markAsSeen(
-        mailbox: Mailbox,
-        threads: List<Thread>,
-        message: Message? = null,
-        currentFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-        shouldRefreshThreads: Boolean = true,
-    ) {
-
-        val messages = when (message) {
-            null -> threads.flatMap { messageController.getUnseenMessages(it) }
-            else -> messageController.getMessageAndDuplicates(threads.first(), message)
-        }
-
-        val threadsUids = threads.map { it.uid }
-        val messagesUids = messages.map { it.uid }
-
-        updateSeenStatus(threadsUids, messagesUids, isSeen = true)
-
-        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
-
-        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                currentFolderId = currentFolderId,
-                callbacks = callbacks,
-            )
-        }
-
-        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(threadsUids, messagesUids, isSeen = false)
-    }
-
-    suspend fun markMessagesAsSeen(
-        mailbox: Mailbox,
-        messages: List<Message>,
-        currentFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-        shouldRefreshThreads: Boolean = true,
-    ) {
-
-        val messagesUids = messages.map { it.uid }
-
-        updateSeenStatus(messagesUids, isSeen = true)
-
-        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
-
-        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
-            refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                currentFolderId = currentFolderId,
-                callbacks = callbacks,
-            )
-        }
-
-        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(messagesUids, isSeen = false)
-    }
-
-
-    private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
-        mailboxContentRealm().write {
-            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
-            ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
-        }
-    }
-
-    suspend fun updateSeenStatus(messagesUids: List<String>, isSeen: Boolean) {
-        mailboxContentRealm().write {
-            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
-        }
-    }
-
-    suspend fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { messageController.getMovableMessages(it) }
-        else -> listOf(message)
-    }
-
-    suspend fun getMessagesToMove(threads: List<Thread>?, messages: List<Message>?, currentFolderId: String?) = when {
-        messages != null -> messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
-        threads != null -> threads.flatMap { messageController.getMovableMessages(it) }
-        else -> emptyList() //this should never happen, we have to send a list of threads or messages.
-    }
-
-    suspend fun refreshFolders(
-        mailbox: Mailbox,
-        messagesFoldersIds: ImpactedFolders,
-        destinationFolderId: String? = null,
-        currentFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
-    ) {
-        val realm = mailboxContentRealm()
-
-        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
-        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
-        destinationFolderId?.let(foldersIds::add)
-
-        foldersIds.forEach { folderId ->
-            refreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER,
-                mailbox = mailbox,
-                folderId = folderId,
-                realm = realm,
-                callbacks = if (folderId == currentFolderId) callbacks else null,
-            )
-        }
-    }
 
     suspend fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
         with(ApiRepository.getFeatureFlags(mailboxUuid)) {

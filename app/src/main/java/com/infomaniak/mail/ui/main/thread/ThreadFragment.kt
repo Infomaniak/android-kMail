@@ -740,14 +740,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onDateSelected = { timestamp ->
                     trackScheduleSendEvent(MatomoName.CustomScheduleConfirm)
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
-                    mainViewModel.rescheduleDraft(Date(timestamp))
+                    actionsViewModel.rescheduleDraft(Date(timestamp), mainViewModel.currentMailbox.value!!)
                 },
                 onAbort = ::navigateToScheduleSendBottomSheet,
             )
         }
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
-            mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
+            actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mainViewModel.currentMailbox.value!!)
         }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
@@ -825,7 +825,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
-            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+            actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!
             )
@@ -853,7 +853,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Archive, isFromArchive)
                         val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
-                        actionsViewModel.archiveThreadsOrMessages(
+                        actionsViewModel.archiveThreads(
                             threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
                             mailbox = mainViewModel.currentMailbox.value!!
@@ -864,7 +864,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Delete)
                         val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
-                        actionsViewModel.deleteThreadsOrMessages(
+                        actionsViewModel.deleteThreads(
                             threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
                             mailbox = mainViewModel.currentMailbox.value!!
@@ -1011,7 +1011,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
-        mainViewModel.draftResource = draftResource
+        actionsViewModel.draftResource = draftResource
         threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
         navigateToScheduleSendBottomSheet()
     }
@@ -1053,7 +1053,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 val draftResource = message.draftResource
 
                 if (unscheduleDraftUrl != null && draftResource != null) {
-                    mainViewModel.modifyScheduledDraft(
+                    actionsViewModel.modifyScheduledDraft(
                         unscheduleDraftUrl = unscheduleDraftUrl,
                         onSuccess = {
                             trackNewMessageEvent(MatomoName.OpenFromDraft)
@@ -1063,6 +1063,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                                 messageUid = message.uid,
                             )
                         },
+                        mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
             },

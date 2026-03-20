@@ -59,6 +59,7 @@ import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
+import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
@@ -122,6 +123,7 @@ class ThreadViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
+    private val messagesActionsUseCase: MessagesActionsUseCase,
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
@@ -174,15 +176,15 @@ class ThreadViewModel @Inject constructor(
     private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
 
     /**
-    * Flow tracking the unsubscribe status of each message, keyed by its UID.
-    *
-    * Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress], [UnsubscribeState.Completed])
-    * is updated in this map, and the entire map is re-emitted to trigger a refresh of the [MessageUi].
-    *
-    * This flow is collected inside a [combine] to ensure that unsubscribe statuses are preserved
-    * even when other changes (e.g., sorting, filtering, content updates) trigger a full rebuild
-    * of the [MessageUi] list.
-    */
+     * Flow tracking the unsubscribe status of each message, keyed by its UID.
+     *
+     * Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress], [UnsubscribeState.Completed])
+     * is updated in this map, and the entire map is re-emitted to trigger a refresh of the [MessageUi].
+     *
+     * This flow is collected inside a [combine] to ensure that unsubscribe statuses are preserved
+     * even when other changes (e.g., sorting, filtering, content updates) trigger a full rebuild
+     * of the [MessageUi] list.
+     */
     private val unsubscribeStateByMessageUid = MutableStateFlow<Map<String, UnsubscribeState>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -415,7 +417,20 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.markAsSeen(mailbox(), listOf(thread))
+        val result = messagesActionsUseCase.toggleThreadsSeenStatus(
+            threadsUids = listOf(thread.uid),
+            shouldRead = true,
+            mailbox = mailbox()
+        )
+
+        if (result.apiResponses.atLeastOneSucceeded()) {
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                mailbox = mailbox(),
+                folderId = thread.folderId,
+                realm = mailboxContentRealm(),
+            )
+        }
     }
 
     private fun sendMatomoAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {
