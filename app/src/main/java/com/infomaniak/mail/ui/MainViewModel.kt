@@ -72,6 +72,7 @@ import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
+import com.infomaniak.mail.utils.DownloadThreadsStatusManager
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
@@ -129,6 +130,7 @@ class MainViewModel @Inject constructor(
     application: Application,
     avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
+    private val downloadThreadsStatusManager: DownloadThreadsStatusManager,
     private val folderController: FolderController,
     private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
@@ -151,7 +153,6 @@ class MainViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshEverythingJob: Job? = null
 
-    val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
@@ -549,7 +550,7 @@ class MainViewModel @Inject constructor(
 
     fun getOnePageOfOldMessages() = viewModelScope.launch(ioCoroutineContext) {
 
-        if (isDownloadingChanges.value == true) return@launch
+        if (downloadThreadsStatusManager.isDownloading.value) return@launch
 
         refreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
@@ -733,12 +734,12 @@ class MainViewModel @Inject constructor(
 
 
     private fun onDownloadStart() {
-        isDownloadingChanges.postValue(true)
+        downloadThreadsStatusManager.updateState(true)
     }
 
     private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        isDownloadingChanges.postValue(false)
+        downloadThreadsStatusManager.updateState(false)
     }
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {
