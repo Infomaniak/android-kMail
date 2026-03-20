@@ -370,16 +370,6 @@ class MessagesActionsUseCase @Inject constructor(
         return messageController.getMessagesAndDuplicates(messages)
     }
 
-    private suspend fun getMessagesFromThreadsToFavorite(threads: List<Thread>, mailbox: Mailbox): List<Message> {
-        return threads.flatMap { thread ->
-            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
-        }
-    }
-
-    private suspend fun getMessagesFromThreadsToUnfavorite(threads: List<Thread>): List<Message> {
-        return threads.flatMap { messageController.getFavoriteMessages(it) }
-    }
-
     private suspend fun updateFavoriteStatus(messagesUids: List<String>, isFavorite: Boolean) {
         mailboxContentRealm().write {
             MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
