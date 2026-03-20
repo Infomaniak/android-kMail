@@ -544,8 +544,9 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun bodyHasQuotes(body: String): Boolean {
-        return body.contains(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME) ||
-                body.contains(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val doc = jsoupParseWithLog(body)
+        return doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).isNotEmpty() ||
+                doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME).isNotEmpty()
     }
 
     fun bodyIsEmpty(bodyHtml: String): Boolean {
