@@ -176,10 +176,8 @@ fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Con
 
 // If height in Landscape is too small to correctly display Tablet Mode, even in landscape.
 fun Fragment.isPhone(): Boolean = requireContext().resources.getBoolean(R.bool.isPhone)
-// If screen is big enough to display Tablet Mode, but currently in portrait, so currently not big enough.
-fun Fragment.isTabletInPortrait(): Boolean = requireContext().resources.getBoolean(R.bool.isTabletInPortrait)
-// Screen is big enough, and in landscape, so we can finally display Tablet Mode! o/
-fun Fragment.isTabletInLandscape(): Boolean = requireContext().resources.getBoolean(R.bool.isTabletInLandscape)
+// Screen is big enough, so we can finally display Tablet Mode! o/
+fun Fragment.isTabletOrFoldable(): Boolean = requireContext().resources.getBoolean(R.bool.isTabletOrFoldable)
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
