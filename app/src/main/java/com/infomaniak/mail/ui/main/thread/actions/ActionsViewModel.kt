@@ -137,6 +137,7 @@ class ActionsViewModel @Inject constructor(
                             messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                             destinationFolderId = destinationFolder.id,
                             currentFolderId = currentFolderId,
+                            threadsUids = movedThreads,
                         )
                     }
 
@@ -212,6 +213,7 @@ class ActionsViewModel @Inject constructor(
                     messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                     destinationFolderId = destinationFolder.id,
                     currentFolderId = currentFolderId,
+                    threadsUids = movedThreads,
                 )
             }
 
@@ -284,22 +286,25 @@ class ActionsViewModel @Inject constructor(
             )
 
             if (result != null) {
-                if (result.apiResponses.atLeastOneSucceeded()) {
-                    refreshFoldersAsync(
-                        mailbox = mailbox,
-                        messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                        currentFolderId = currentFolder?.id,
-                    )
-                    showDeleteSnackbar(
-                        apiResponses = result.apiResponses,
-                        messages = messagesToDelete,
-                        numberOfImpactedThreads = messagesToDelete.count(),
-                    )
-                }
+                with(result) {
+                    if (apiResponses.atLeastOneSucceeded()) {
+                        refreshFoldersAsync(
+                            mailbox = mailbox,
+                            messagesFoldersIds = messagesToDelete.getFoldersIds(),
+                            currentFolderId = currentFolder?.id,
+                            threadsUids = uidsToMove
+                        )
+                        showDeleteSnackbar(
+                            apiResponses = apiResponses,
+                            messages = messagesToDelete,
+                            numberOfImpactedThreads = messagesToDelete.count(),
+                        )
+                    }
 
-                if (result.apiResponses.atLeastOneFailed()) {
-                    viewModelScope.launch(ioCoroutineContext) {
-                        threadController.updateIsLocallyMovedOutStatus(threadsUids = result.uidsToMove, hasBeenMovedOut = false)
+                    if (apiResponses.atLeastOneFailed()) {
+                        viewModelScope.launch(ioCoroutineContext) {
+                            threadController.updateIsLocallyMovedOutStatus(threadsUids = uidsToMove, hasBeenMovedOut = false)
+                        }
                     }
                 }
             }
