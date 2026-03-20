@@ -308,15 +308,26 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="@dimen/marginStandardMedium"
+                        android:layout_marginTop="@dimen/marginStandardMedium"
                         android:paddingBottom="@dimen/marginStandardMedium"
                         android:text="@string/newMessagePlaceholderTitle"
                         android:textColor="@color/tertiaryTextColor"
                         android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/editorWebView"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@id/editorWebView"
+                        tools:visibility="visible" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/quotesToggleButton"
+                        style="@style/ToggleQuoteTextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/messageShowQuotedText"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/editorWebView"
                         tools:visibility="visible" />
 
                     <LinearLayout
@@ -365,78 +376,6 @@
                             android:layout_height="wrap_content"
                             android:maxWidth="200dp" />
                     </LinearLayout>
-
-                    <!--This view is has exactly one line of text worth of negative top margin because the editor has the same
-                    amount of extra space as "bottom margin". This way the editor and the signature continue being aligned exactly
-                    how they will look like when the email is sent. The editor extra bottom margin is needed to display selection
-                    handles correctly-->
-                    <WebView
-                        android:id="@+id/signatureWebView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-16dp"
-                        android:layout_marginBottom="@dimen/marginStandardMedium"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/editorWebView"
-                        tools:layout_height="50dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/removeSignature"
-                        style="@style/IconButtonSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/marginStandardSmall"
-                        android:contentDescription="@string/contentDescriptionButtonDeleteSignature"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        app:icon="@drawable/ic_close_small"
-                        app:layout_constraintDimensionRatio="1"
-                        app:layout_constraintEnd_toEndOf="@id/signatureWebView"
-                        app:layout_constraintTop_toTopOf="@id/signatureWebView" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/removeQuote"
-                        style="@style/IconButtonSmall"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/marginStandardSmall"
-                        android:contentDescription="@string/contentDescriptionButtonDeleteQuote"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        app:icon="@drawable/ic_close_small"
-                        app:layout_constraintDimensionRatio="1"
-                        app:layout_constraintEnd_toEndOf="@id/quoteWebView"
-                        app:layout_constraintTop_toBottomOf="@id/signatureWebView" />
-
-                    <WebView
-                        android:id="@+id/quoteWebView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusableInTouchMode="false"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/removeQuote"
-                        tools:visibility="visible" />
-
-                    <androidx.constraintlayout.widget.Group
-                        android:id="@+id/signatureGroup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:constraint_referenced_ids="signatureWebView,removeSignature"
-                        tools:visibility="visible" />
-
-                    <androidx.constraintlayout.widget.Group
-                        android:id="@+id/quoteGroup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:constraint_referenced_ids="quoteWebView,removeQuote"
-                        tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

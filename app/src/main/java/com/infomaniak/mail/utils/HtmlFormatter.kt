@@ -214,12 +214,17 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
+        fun Context.getMessageDisplayStyle(): String = loadCss(R.raw.message_display_style)
+
         fun Context.getCustomStyle(): String = loadCss(
             R.raw.style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary)),
         )
 
-        fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
+        fun Context.getCustomEditorStyle(): String = loadCss(
+            R.raw.editor_style,
+            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
+        )
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
@@ -228,12 +233,24 @@ class HtmlFormatter(private val html: String) {
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
         )
 
+        fun Context.getHideQuotesStyle(): String = loadCss(R.raw.hide_quotes_style)
+
+        fun Context.getShowQuotesScript(): String = loadScript(R.raw.show_quotes_script)
+
+        fun Context.getQuotesImagesObserverScript(): String = loadScript(R.raw.quotes_images_observer)
+
+        fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
+
         fun Context.getFixStyleScript(): String {
             return loadScript(R.raw.fix_email_style)
         }
 
         fun Context.getJsBridgeScript(): String {
             return loadScript(R.raw.javascript_bridge)
+        }
+
+        fun Context.getEditorJsBridgeScript(): String {
+            return loadScript(R.raw.editor_javascript_bridge)
         }
     }
 }

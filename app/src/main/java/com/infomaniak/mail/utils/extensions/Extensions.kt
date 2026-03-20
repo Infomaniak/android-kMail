@@ -101,12 +101,13 @@ import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.folder.ThreadListItem
-import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
+import com.infomaniak.mail.ui.main.thread.webViewClient.EditorWebViewClient
+import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ApiErrorException
@@ -116,6 +117,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
@@ -260,7 +262,7 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     }
 }
 
-fun WebView.initWebViewClientAndBridge(
+fun WebView.initDisplayWebViewClientAndBridge(
     attachments: List<Attachment>,
     messageUid: String,
     shouldLoadDistantResources: Boolean,
@@ -268,7 +270,7 @@ fun WebView.initWebViewClientAndBridge(
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
     onPageFinished: (() -> Unit)? = null,
     onWebViewFinishedLoading: (() -> Unit)? = null,
-): MessageWebViewClient {
+): MessageDisplayWebViewClient {
 
     WebViewUtils.initJavascriptBridge(onWebViewFinishedLoading)
     addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
@@ -281,10 +283,43 @@ fun WebView.initWebViewClientAndBridge(
         }
     }
 
-    return MessageWebViewClient(
+    return MessageDisplayWebViewClient(
         context,
         cidDictionary,
         messageUid,
+        shouldLoadDistantResources,
+        onBlockedResourcesDetected,
+        navigateToNewMessageActivity,
+        onPageFinished,
+    ).also {
+        webViewClient = it
+    }
+}
+
+fun WebView.initEditorWebviewBridge(onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null) {
+    settings.setupNewMessageWebViewSettings()
+    WebViewUtils.initEditorJsBridge(onImagesDeletedFromQuotes)
+    addJavascriptInterface(WebViewUtils.editorJsBridge, "kmail")
+}
+
+fun WebView.initEditorWebviewClient(
+    attachments: List<Attachment>,
+    shouldLoadDistantResources: Boolean,
+    onBlockedResourcesDetected: (() -> Unit)? = null,
+    navigateToNewMessageActivity: ((Uri) -> Unit)?,
+    onPageFinished: (() -> Unit)? = null,
+): EditorWebViewClient {
+    val cidDictionary = mutableMapOf<String, Attachment>().apply {
+        attachments.forEach {
+            it.contentId?.let { cid ->
+                if (cid.isNotBlank()) this[cid] = it
+            }
+        }
+    }
+
+    return EditorWebViewClient(
+        context,
+        cidDictionary,
         shouldLoadDistantResources,
         onBlockedResourcesDetected,
         navigateToNewMessageActivity,

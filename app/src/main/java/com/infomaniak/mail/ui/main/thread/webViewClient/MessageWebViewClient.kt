@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread
+package com.infomaniak.mail.ui.main.thread.webViewClient
 
 import android.content.Context
 import android.content.Intent
@@ -25,23 +25,18 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.core.ui.view.toDp
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 
-class MessageWebViewClient(
+abstract class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: MutableMap<String, Attachment>,
-    private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
     private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
@@ -107,27 +102,6 @@ class MessageWebViewClient(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         runCatchingRealm {
-            val widthInDp = webView.width.toDp(webView)
-            if (widthInDp <= 0) {
-                val versionData = getWebViewVersionData(context)
-
-                Sentry.captureMessage("Zero width webview detected onPageFinished which prevents message width's normalization") { scope ->
-                    scope.level = SentryLevel.WARNING
-                    scope.setExtra("width", webView.width.toString())
-                    scope.setExtra("measuredWidth", webView.measuredWidth.toString())
-                    scope.setExtra("height", webView.height.toString())
-                    scope.setExtra("measuredHeight", webView.measuredHeight.toString())
-                    scope.setTag(
-                        "webview version",
-                        "${versionData?.webViewPackageName}: ${versionData?.versionName} - ${versionData?.majorVersion}"
-                    )
-                    scope.setTag("visibility", webView.visibility.toString())
-                    scope.setTag("messageUid", messageUid)
-                    scope.setTag("shouldLoadDistantResources", shouldLoadDistantResources.toString())
-                }
-            }
-
-            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, '$messageUid')")
             onPageFinished?.invoke()
         }
     }

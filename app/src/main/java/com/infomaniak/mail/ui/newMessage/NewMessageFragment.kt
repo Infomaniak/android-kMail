@@ -21,9 +21,7 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ClipDescription
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
@@ -31,13 +29,11 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.Group
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -62,13 +58,13 @@ import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
 import com.infomaniak.lib.richhtmleditor.StatusCommand.STRIKE_THROUGH
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNDERLINE
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNORDERED_LIST
+import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
@@ -93,14 +89,17 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.HtmlUtils.processCids
-import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getQuotesImagesObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getShowQuotesScript
+import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
-import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
-import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.WebViewUtils
-import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
@@ -110,10 +109,9 @@ import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
-import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.ime
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
-import com.infomaniak.mail.utils.extensions.loadCss
+import com.infomaniak.mail.utils.extensions.initEditorWebviewBridge
+import com.infomaniak.mail.utils.extensions.initEditorWebviewClient
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
@@ -124,15 +122,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
-import androidx.appcompat.R as RAndroid
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -144,6 +137,12 @@ class NewMessageFragment : Fragment() {
         // extras aren't yet initialized, so we don't use the `navArgs` here.
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
+    private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
+    private val showQuotesScript by lazy { requireContext().getShowQuotesScript() }
+    private val hideQuotesStyle by lazy { requireContext().getHideQuotesStyle() }
+    private val quoteImagesObserverScript by lazy { requireContext().getQuotesImagesObserverScript() }
+    private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
+
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
@@ -155,14 +154,10 @@ class NewMessageFragment : Fragment() {
 
     private var addressListPopupWindow: ListPopupWindow? = null
 
-    private var quoteWebView: WebView? = null
-    private var signatureWebView: WebView? = null
-
     private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
-    private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
     @Inject
     lateinit var editorContentManager: EditorContentManager
@@ -219,7 +214,6 @@ class NewMessageFragment : Fragment() {
 
         bindAlertToViewLifecycle(descriptionDialog)
 
-        setWebViewReference()
         initMailbox()
         initUi()
         initializeDraft()
@@ -232,9 +226,9 @@ class NewMessageFragment : Fragment() {
         observeAttachments()
         observeImportAttachmentsResult()
         observeBodyLoader()
-        observeUiSignature()
-        observeUiQuote()
         observeShimmering()
+        observePlaceholderVisibility()
+        observeQuotesVisibility()
 
         setupBackActionHandler()
 
@@ -361,32 +355,17 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    private fun setWebViewReference() {
-        quoteWebView = binding.quoteWebView
-        signatureWebView = binding.signatureWebView
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        newMessageViewModel.uiSignatureLiveData.value?.let { _ ->
-            binding.signatureWebView.reload()
-        }
-        newMessageViewModel.uiQuoteLiveData.value?.let { _ ->
-            binding.quoteWebView.reload()
-        }
-        super.onConfigurationChanged(newConfig)
-    }
-
     override fun onDestroyView() {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editorWebView.exportHtml { html ->
-            newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(html, BodyContentType.HTML_SANITIZED))
+            newMessageViewModel.editorBodyInitializer.postValue(
+                NewMessageViewModel.EditorBodyInitialization(
+                    BodyContentPayload(html, BodyContentType.HTML_SANITIZED)
+                )
+            )
         }
 
         addressListPopupWindow = null
-        quoteWebView?.destroyAndClearHistory()
-        quoteWebView = null
-        signatureWebView?.destroyAndClearHistory()
-        signatureWebView = null
         TransitionManager.endTransitions(binding.root)
         super.onDestroyView()
         _binding = null
@@ -417,9 +396,6 @@ class NewMessageFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(appBarLayout, compositionNestedScrollView)
-
-        signatureWebView.enableAlgorithmicDarkening(true)
-        quoteWebView.enableAlgorithmicDarkening(true)
 
         attachmentsRecyclerView.adapter = AttachmentAdapter(
             shouldDisplayCloseButton = true,
@@ -463,38 +439,30 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() = with(binding) {
+        editorWebView.initEditorWebviewBridge(onImagesDeletedFromQuotes = { cids ->
+            newMessageViewModel.deleteInlineAttachments(cids)
+        })
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
-        handleEditorPlaceholderVisibility()
-
         editorAiAnimation.setAnimation(R.raw.euria)
-
         setToolbarEnabledStatus(false)
-        disableButtonsWhenFocusIsLost()
+        handleFocusChanges()
     }
 
     private fun setEditorStyle() = with(binding.editorWebView) {
         enableAlgorithmicDarkening(isEnabled = true)
-        if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
-
-        val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RAndroid.attr.colorPrimary))
-        addCss(context.loadCss(R.raw.style, customColors))
-        addCss(context.loadCss(R.raw.editor_style, customColors))
+        if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
+        addCss(context.getCustomStyle())
+        addCss(context.getCustomEditorStyle())
     }
 
-    private fun handleEditorPlaceholderVisibility() {
-        val isPlaceholderVisible = combine(
-            binding.editorWebView.isEmptyFlow.filterNotNull(),
-            newMessageViewModel.isShimmering,
-        ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
-
-        isPlaceholderVisible
-            .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
-            .launchIn(lifecycleScope)
-    }
-
-    private fun disableButtonsWhenFocusIsLost() {
-        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner, ::setToolbarEnabledStatus)
+    private fun handleFocusChanges() = with(newMessageViewModel) {
+        isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { isFocused ->
+            setToolbarEnabledStatus(isFocused)
+            if (isFocused && isPlaceHolderVisible.value) {
+                changePlaceholderVisibility(isVisible = false)
+            }
+        }
     }
 
     private fun setToolbarEnabledStatus(isEnabled: Boolean) {
@@ -505,6 +473,8 @@ class NewMessageFragment : Fragment() {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
+                    val isBodyEmpty = newMessageViewModel.bodyIsEmpty(draft.body)
+                    changePlaceholderVisibility(isVisible = isBodyEmpty)
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
                     binding.subjectTextField.setText(draft.subject)
                 } else {
@@ -526,74 +496,45 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun configureUiWithDraftData(draft: Draft) = with(binding) {
-
-        // Signature
-        signatureWebView.apply {
-            settings.setupNewMessageWebViewSettings()
-            initWebViewClientAndBridge(
-                attachments = emptyList(),
-                messageUid = "SIGNATURE-${draft.messageUid}",
-                shouldLoadDistantResources = true,
-                navigateToNewMessageActivity = null,
-            )
-        }
-        removeSignature.setOnClickListener {
-            trackNewMessageEvent(MatomoName.DeleteSignature)
-            newMessageViewModel.uiSignatureLiveData.value = null
-        }
-
-        // Quote
-        quoteWebView.apply {
-            settings.setupNewMessageWebViewSettings()
-            val alwaysShowExternalContent = localSettings.externalContent == ExternalContent.ALWAYS
-            initWebViewClientAndBridge(
-                attachments = draft.attachments,
-                messageUid = "QUOTE-${draft.messageUid}",
-                shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
-                navigateToNewMessageActivity = null,
-            )
-        }
-        removeQuote.setOnClickListener {
-            trackNewMessageEvent(MatomoName.DeleteQuote)
-            removeInlineAttachmentsUsedInQuote()
-            newMessageViewModel.uiQuoteLiveData.value = null
-        }
+    private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
+        settings.setupNewMessageWebViewSettings()
+        addScript(editorJsBridgeScript)
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+        webViewClient = initEditorWebviewClient(
+            attachments = draft.attachments,
+            shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
+            navigateToNewMessageActivity = null,
+            onPageFinished = { notifyPageHasLoaded() },
+        )
     }
 
-    private fun removeInlineAttachmentsUsedInQuote() = with(newMessageViewModel) {
-        uiQuoteLiveData.value?.let { html ->
-            attachmentsLiveData.value?.filterOutHtmlCids(html)?.let { attachmentsLiveData.value = it }
-        }
-    }
+    private fun observeQuotesVisibility() = viewLifecycleOwner.lifecycleScope.launch {
+        newMessageViewModel.isQuotesButtonVisible.collect { isQuotesButtonVisible ->
+            binding.quotesToggleButton.isVisible = isQuotesButtonVisible
 
-    private fun List<Attachment>.filterOutHtmlCids(html: String): List<Attachment> {
-        return buildList {
-            addAll(this@filterOutHtmlCids)
-
-            jsoupParseWithLog(html).processCids(
-                attachments = this@filterOutHtmlCids,
-                associateDataToCid = { it },
-                onCidImageFound = { attachment, _ ->
-                    remove(attachment)
+            // We wait until the webview finished shimmering before changing the quotes' visibility.
+            if (!newMessageViewModel.isShimmering.value) {
+                if (!isQuotesButtonVisible) {
+                    // User toggled show quotes visibility
+                    binding.editorWebView.evaluateJavascript(showQuotesScript, null)
+                    binding.editorWebView.evaluateJavascript(quoteImagesObserverScript, null)
+                } else {
+                    binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
                 }
-            )
+            }
         }
     }
 
-    private fun WebView.loadSignatureContent(html: String, webViewGroup: Group) {
-        val processedHtml = webViewUtils.processSignatureHtmlForDisplay(html, context.isNightModeEnabled())
-        loadProcessedContent(processedHtml, webViewGroup)
+    private fun observePlaceholderVisibility() = viewLifecycleOwner.lifecycleScope.launch {
+        newMessageViewModel.isPlaceHolderVisible.collect { isPlaceholderVisible ->
+            binding.newMessagePlaceholder.isVisible = isPlaceholderVisible
+        }
     }
 
-    private fun WebView.loadContent(html: String, webViewGroup: Group) {
-        val processedHtml = webViewUtils.processHtmlForDisplay(html = html, isDisplayedInDarkMode = context.isNightModeEnabled())
-        loadProcessedContent(processedHtml, webViewGroup)
-    }
-
-    private fun WebView.loadProcessedContent(processedHtml: String, webViewGroup: Group) {
-        webViewGroup.isVisible = processedHtml.isNotBlank()
-        loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+    private fun setupToggleQuotesButton() = with(binding) {
+        quotesToggleButton.setOnClickListener {
+            newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
+        }
     }
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
@@ -631,6 +572,20 @@ class NewMessageFragment : Fragment() {
         trackNewMessageEvent(MatomoName.SwitchIdentity)
         newMessageViewModel.fromLiveData.value = UiFrom(signature)
         addressListPopupWindow?.dismiss()
+    }
+
+    private fun updateBodySignature(signature: Signature) {
+        val selectedSignature = if (signature.isDummy) "" else signature.content
+        val signatureWithClass = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(selectedSignature)
+        val escapedSignature = looselyEscapeAsStringLiteralForJs(signatureWithClass)
+
+        val replaceSignatureScript = replaceSignatureScript.format(
+            MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            escapedSignature,
+            MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+        )
+
+        binding.editorWebView.evaluateJavascript(replaceSignatureScript, null)
     }
 
     private fun updateSelectedSignatureInFromField(signature: Signature) {
@@ -756,29 +711,11 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeBodyLoader() {
-        newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
-            editorContentManager.setContent(binding.editorWebView, body)
-        }
-    }
-
-    private fun observeUiSignature() = with(binding) {
-        newMessageViewModel.uiSignatureLiveData.observe(viewLifecycleOwner) { signature ->
-            if (signature == null) {
-                signatureGroup.isGone = true
-            } else {
-                signatureWebView.loadSignatureContent(signature, signatureGroup)
-            }
-        }
-    }
-
-    private fun observeUiQuote() = with(binding) {
-        newMessageViewModel.uiQuoteLiveData.observe(viewLifecycleOwner) { quote ->
-            if (quote == null) {
-                quoteGroup.isGone = true
-            } else {
-                quoteWebView.loadContent(quote, quoteGroup)
-            }
+    private fun observeBodyLoader() = with(newMessageViewModel) {
+        editorBodyInitializer.observe(viewLifecycleOwner) { (body, isFirstInitialization) ->
+            val bodyContent = editorContentManager.setContent(binding.editorWebView, body)
+            if (isFirstInitialization) saveInitialSnapshot(bodyContent)
+            setupToggleQuotesButton()
         }
     }
 

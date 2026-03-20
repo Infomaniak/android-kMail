@@ -125,17 +125,19 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
             addAndEscapeTextLine("")
 
             addAlreadyEscapedBody(previousFullBody)
+            addAndEscapeTextLine("")
         }.outerHtml()
     }
 
     private fun assembleReplyHtmlFooter(messageReplyHeader: String, previousFullBody: String): String {
-        val replyRoot = """<div class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" />"""
+        val replyRoot = """<div class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}"/>"""
         return parseAndWrapElementInNewDocument(replyRoot).apply {
             addAndEscapeTextLine("")
             addAndEscapeTextLine(messageReplyHeader, endWithBr = false)
             addReplyBlockQuote {
                 addAlreadyEscapedBody(previousFullBody)
             }
+            addAndEscapeTextLine("")
         }.outerHtml()
     }
 

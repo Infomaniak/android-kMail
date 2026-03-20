@@ -23,24 +23,26 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.loadCss
+import org.json.JSONArray
 
 class WebViewUtils(context: Context) {
 
     private val customDarkMode by lazy { context.getCustomDarkMode() }
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
-    private val signatureVerticalMargin by lazy { context.getSignatureMarginStyle() }
+    private val messageDisplayStyle by lazy { context.getMessageDisplayStyle() }
     private val printMailStyle by lazy { context.getPrintMailStyle() }
 
     private val resizeScript by lazy { context.getResizeScript() }
@@ -65,19 +67,11 @@ class WebViewUtils(context: Context) {
         return@with inject()
     }
 
-    fun processSignatureHtmlForDisplay(
-        html: String,
-        isDisplayedInDarkMode: Boolean,
-    ): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
-        registerCss(signatureVerticalMargin)
-        return@with inject()
-    }
-
     private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
+        registerCss(messageDisplayStyle)
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
@@ -86,7 +80,27 @@ class WebViewUtils(context: Context) {
         registerBreakLongWords()
     }
 
-    class JavascriptBridge(private val onWebViewFinishedLoading: (() -> Unit)? = null) {
+    class EditorJavascriptBridge(
+        private val onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null,
+    ) {
+        @JavascriptInterface
+        fun onImagesDeletedFromQuotes(cidJson: String) {
+            runCatching {
+                val cids = JSONArray(cidJson)
+                    .let { jsonArray ->
+                        (0 until jsonArray.length())
+                            .map { jsonArray.getString(it) }
+                    }
+                onImagesDeletedFromQuotes?.invoke(cids)
+            }.onFailure {
+                SentryLog.e(TAG, "Failed to parse CIDs")
+            }
+        }
+    }
+
+    class JavascriptBridge(
+        private val onWebViewFinishedLoading: (() -> Unit)? = null,
+    ) {
 
         @JavascriptInterface
         fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
@@ -123,27 +137,35 @@ class WebViewUtils(context: Context) {
     }
 
     companion object {
+        private const val TAG = "JavascriptBridge"
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
         lateinit var jsBridge: JavascriptBridge // TODO: Avoid excessive memory consumption with injection
+        lateinit var editorJsBridge: EditorJavascriptBridge
 
-        fun initJavascriptBridge(onWebViewFinishedLoading: (() -> Unit)? = null) {
+        fun initJavascriptBridge(
+            onWebViewFinishedLoading: (() -> Unit)? = null,
+        ) {
             jsBridge = JavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
+        }
+
+        fun initEditorJsBridge(
+            onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null,
+        ) {
+            editorJsBridge = EditorJavascriptBridge(onImagesDeletedFromQuotes = onImagesDeletedFromQuotes)
         }
 
         private fun WebSettings.setupCommonWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")
             javaScriptEnabled = true
-
-            loadWithOverviewMode = true
-            useWideViewPort = true
-
             cacheMode = LOAD_CACHE_ELSE_NETWORK
         }
 
         fun WebSettings.setupThreadWebViewSettings() {
             setupCommonWebViewSettings()
 
+            useWideViewPort = true
+            loadWithOverviewMode = true
             setSupportZoom(true)
             builtInZoomControls = true
             displayZoomControls = false
