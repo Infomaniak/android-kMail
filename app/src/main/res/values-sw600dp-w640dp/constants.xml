@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~ Copyright (C) 2024-2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 <resources>
 
     <!--
-        ~ Why is this file in the `-sw600dp-w840dp` variant of `values` folder?
+        ~ Why is this file in the `-sw600dp` variant of `values` folder?
         ~ Because Google says so: https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes
+        ~ -w640dp helps to avoid tablets in portrait mode looking too cramped, whilst maintaining compatibility with foldable devices
     -->
     <bool name="isPhone">false</bool>
-    <bool name="isTabletInPortrait">false</bool>
-    <bool name="isTabletInLandscape">true</bool>
+    <bool name="isTabletOrFoldable">true</bool>
 
 </resources>

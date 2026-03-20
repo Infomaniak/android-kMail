@@ -120,7 +120,7 @@ import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.infomaniak.mail.utils.extensions.isTabletInLandscape
+import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toDate
@@ -322,7 +322,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun updateNavigationIcon() {
         binding.toolbar.apply {
-            if (isTabletInLandscape()) {
+            if (isTabletOrFoldable()) {
                 if (navigationIcon != null) navigationIcon = null
             } else {
                 if (navigationIcon == null) setNavigationIcon(R.drawable.ic_navigation_default)

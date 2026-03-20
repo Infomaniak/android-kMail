@@ -18,8 +18,7 @@
 <resources>
 
     <bool name="isPhone">true</bool>
-    <bool name="isTabletInPortrait">false</bool>
-    <bool name="isTabletInLandscape">false</bool>
+    <bool name="isTabletOrFoldable">false</bool>
 
     <string name="pinkDotLottieThemeName" translatable="false">@null</string>
     <string name="blueDotLottieThemeName" translatable="false">Blue-Light</string>
