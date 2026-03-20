@@ -508,11 +508,9 @@ class NewMessageViewModel @Inject constructor(
         val message = previousMessageUid?.let { MessageController.getMessage(it, realm) } ?: return
         if (message.isSeen) return
 
-        messagesActionsUseCase.markAsSeen(
+        messagesActionsUseCase.markMessagesAsSeen(
             mailbox = mailbox,
-            threads = message.threads.filter { it.folderId == message.folderId },
-            message = message,
-            shouldRefreshThreads = false,
+            messages = listOf(message),
         )
     }
 
