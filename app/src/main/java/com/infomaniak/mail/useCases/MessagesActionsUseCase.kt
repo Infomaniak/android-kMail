@@ -132,7 +132,7 @@ class MessagesActionsUseCase @Inject constructor(
     suspend fun moveThreadsOrMessagesTo(
         destinationFolderId: String,
         threadsUids: List<String>,
-        messagesUid: List<String>? = null,
+        messagesUids: List<String>? = null,
         mailbox: Mailbox,
         currentFolderId: String?,
     ): MoveMessagesResult? {
@@ -141,8 +141,8 @@ class MessagesActionsUseCase @Inject constructor(
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return null
 
         var messagesToMove: List<Message>
-        if (messagesUid != null) {
-            messagesToMove = messagesUid.let { messageController.getMessages(it) }
+        if (messagesUids != null) {
+            messagesToMove = messagesUids.let { messageController.getMessages(it) }
         } else {
             val threads = threadController.getThreads(threadsUids).ifEmpty { return null }
             messagesToMove = getMessagesFromThreadsToMove(threads)
@@ -224,9 +224,13 @@ class MessagesActionsUseCase @Inject constructor(
     ): ToggleResult {
         val threads = threadsUids.let { threadController.getThreads(threadsUids) }
         val isSeen = if (threads.count() == 1) threads.single().isSeen else !shouldRead
-        val messagesToToggleSeen = threads.flatMap { thread -> messageController.getUnseenMessages(thread) }
+        val messagesToToggle = if (isSeen) {
+            threads.flatMap { thread ->
+                messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
+            }
+        } else threads.flatMap { thread -> messageController.getUnseenMessages(thread) }
 
-        return handleToggleSeenStatus(messagesToToggleSeen, isSeen, mailbox, threadsUids)
+        return handleToggleSeenStatus(messagesToToggle, isSeen, mailbox, threadsUids)
     }
 
     suspend fun toggleMessagesSeenStatus(
@@ -250,13 +254,13 @@ class MessagesActionsUseCase @Inject constructor(
             markAsUnseen(
                 messages = messages,
                 mailbox = mailbox,
-                threadsUids = threadsUids
+                threadsUids = threadsUids,
             )
         } else {
             markMessagesAsSeen(
                 messages = messages,
                 mailbox = mailbox,
-                threadsUids = threadsUids
+                threadsUids = threadsUids,
             )
         }
     }
@@ -535,6 +539,20 @@ class MessagesActionsUseCase @Inject constructor(
     }
     // End Region
 
+    // Draft Region
+    suspend fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {
+        return ApiRepository.rescheduleDraft(draftResource, scheduleDate)
+    }
+
+    suspend fun unscheduleDraft(unscheduleDraftUrl: String): ApiResponse<Unit> {
+        return ApiRepository.unscheduleDraft(unscheduleDraftUrl)
+    }
+
+    suspend fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {
+        return ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
+    }
+    // End Region
+
     /**
      * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
      * that were targeting this message will display for a brief moment until we refresh their folders. This is because those
@@ -577,6 +595,6 @@ class MessagesActionsUseCase @Inject constructor(
 
     data class ToggleResult(
         val messages: List<Message>,
-        val apiResponses: List<ApiResponse<*>>
+        val apiResponses: List<ApiResponse<*>>,
     )
 }

@@ -35,11 +35,12 @@ class DownloadThreadsStatusManager @Inject constructor() {
      * It starts collecting immediately and keeps the latest value in memory.
      */
     private val _isDownloading = MutableStateFlow(false)
+    private val scope = CoroutineScope(Dispatchers.Default)
     @OptIn(FlowPreview::class)
     val isDownloading: StateFlow<Boolean> = _isDownloading
         .debounce(50)
         .stateIn(
-            scope = CoroutineScope(Dispatchers.Default),
+            scope = scope,
             started = SharingStarted.Lazily,
             initialValue = false
         )

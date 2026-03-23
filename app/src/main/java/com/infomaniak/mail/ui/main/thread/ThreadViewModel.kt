@@ -64,7 +64,6 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
@@ -125,7 +124,6 @@ class ThreadViewModel @Inject constructor(
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
     private val refreshController: RefreshController,
-    private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
     private val localSettings: LocalSettings,
@@ -417,10 +415,11 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
+
         val result = messagesActionsUseCase.toggleThreadsSeenStatus(
             threadsUids = listOf(thread.uid),
             shouldRead = true,
-            mailbox = mailbox()
+            mailbox = mailbox(),
         )
 
         if (result.apiResponses.atLeastOneSucceeded()) {

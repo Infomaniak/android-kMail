@@ -81,7 +81,7 @@ class ThreadListMultiSelection {
                         threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
                         currentFolderId = currentFolderId,
-                        mailbox = currentMailBox
+                        mailbox = currentMailBox,
                     )
                     isMultiSelectOn = false
                 }
@@ -94,7 +94,7 @@ class ThreadListMultiSelection {
                         actionsViewModel.archiveThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
-                            mailbox = currentMailBox
+                            mailbox = currentMailBox,
                         )
                         isMultiSelectOn = false
                     }
@@ -104,7 +104,7 @@ class ThreadListMultiSelection {
                     actionsViewModel.toggleThreadsFavoriteStatus(
                         threadsUids = selectedThreadsUids,
                         mailbox = currentMailBox,
-                        shouldFavorite = shouldMultiselectFavorite
+                        shouldFavorite = shouldMultiselectFavorite,
                     )
                     isMultiSelectOn = false
                 }
@@ -117,7 +117,7 @@ class ThreadListMultiSelection {
                         actionsViewModel.deleteThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
-                            mailbox = currentMailBox
+                            mailbox = currentMailBox,
                         )
                         isMultiSelectOn = false
                     }
