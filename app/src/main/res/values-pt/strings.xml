@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity,ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity">
     <string name="accentColorBlueTitle">Azul</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Cor do sistema</string>
@@ -361,7 +361,7 @@
     <string name="loadingText">A carregar…</string>
     <string name="lockedMailboxBottomSheetDescription">O acesso à sua caixa de correio está atualmente bloqueado.\nPara mais informações, consulte as FAQ.</string>
     <string name="lockedMailboxBottomSheetTitle">O endereço %s está bloqueado</string>
-    <plurals name="lockedMailboxTitle">
+    <plurals name="lockedMailboxTitle" tools:ignore="ImpliedQuantity">
         <item quantity="one">Caixa de correio bloqueada</item>
         <item quantity="other">Caixas de correio bloqueadas</item>
     </plurals>
@@ -449,7 +449,7 @@
     <string name="renameFolder">Renomear pasta</string>
     <string name="reportDisplayProblemDescription">Aceita partilhar os seus dados com os nossos programadores para que o ajudem com o seu problema?</string>
     <string name="reportDisplayProblemTitle">Reportar um problema de exibição</string>
-    <plurals name="reportPhishingDescription">
+    <plurals name="reportPhishingDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Se esta mensagem tentar roubar informações sensíveis (palavra-passe, dados bancários, etc.) e/ou usurpar uma identidade reconhecida, trata-se de phishing.\n\nAo reportá-la, acelera a deteção de mensagens perigosas para todos os nossos utilizadores.\n\nO reporte será enviado à nossa equipa de segurança para análise e ação. O e-mail também será automaticamente movido para a sua pasta de spam.</item>
         <item quantity="other">Se estas mensagens tentarem roubar informações sensíveis (palavras-passe, dados bancários, etc.) e/ou usurparem identidades reconhecidas, tratam-se de phishing.\n\nAo reportá-las, acelera a deteção de mensagens perigosas para todos os nossos utilizadores.\n\nOs reportes serão enviados à nossa equipa de segurança para análise e ação. Os e-mails também serão automaticamente movidos para a sua pasta de spam.</item>
     </plurals>
@@ -578,7 +578,7 @@
     <string name="snackbarSaveInDraft">A sua mensagem foi guardada nos rascunhos.</string>
     <string name="snackbarScheduleSaved">A mensagem será enviada em %s</string>
     <string name="snackbarScheduling">A programar a mensagem</string>
-    <plurals name="snackbarSenderBlacklisted">
+    <plurals name="snackbarSenderBlacklisted" tools:ignore="ImpliedQuantity">
         <item quantity="one">Remetente colocado na lista negra com sucesso</item>
         <item quantity="other">Remetentes colocados na lista negra com sucesso</item>
     </plurals>
@@ -588,7 +588,7 @@
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Assunto copiado</string>
     <string name="snackbarSwipeActionIncompatible">Ação de deslizar incompatível</string>
-    <plurals name="snackbarThreadDeletedPermanently">
+    <plurals name="snackbarThreadDeletedPermanently" tools:ignore="ImpliedQuantity">
         <item quantity="one">Conversa eliminada</item>
         <item quantity="other">Conversas eliminadas</item>
     </plurals>
@@ -596,22 +596,22 @@
         <item quantity="one">Conversa movida para %s</item>
         <item quantity="other">Conversas movidas para %s</item>
     </plurals>
-    <plurals name="snackbarUnsnoozeSuccess">
+    <plurals name="snackbarUnsnoozeSuccess" tools:ignore="ImpliedQuantity">
         <item quantity="one">Lembrete cancelado. A sua mensagem voltou para a caixa de entrada</item>
         <item quantity="other">Lembretes cancelados. As suas mensagens voltaram para a caixa de entrada</item>
     </plurals>
     <string name="snackbarUnsubscribeFailure">Cancelamento de subscrição impossível</string>
     <string name="snackbarUnsubscribeSuccess">Subscrição cancelada</string>
     <string name="snoozeAlertTitle">Adiado até: %s</string>
-    <plurals name="snoozeArchiveConfirmAlertDescription">
+    <plurals name="snoozeArchiveConfirmAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Esta conversa já não estará adiada e será arquivada</item>
         <item quantity="other">Estas conversas já não estarão adiadas e serão arquivadas</item>
     </plurals>
-    <plurals name="snoozeDeleteConfirmAlertDescription">
+    <plurals name="snoozeDeleteConfirmAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Esta conversa já não estará adiada e será eliminada</item>
         <item quantity="other">Estas conversas já não estarão adiadas e serão eliminadas</item>
     </plurals>
-    <plurals name="snoozeMoveConfirmAlertDescription">
+    <plurals name="snoozeMoveConfirmAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Esta conversa já não estará adiada e será movida</item>
         <item quantity="other">Estas conversas já não estarão adiadas e serão movidas</item>
     </plurals>
@@ -629,7 +629,7 @@
     <string name="syncStartDescription">Ative os calendários e livros de endereços no kSync que deseja sincronizar no seu telemóvel.</string>
     <string name="thisAfternoon">Esta tarde</string>
     <string name="thisEvening">Esta noite</string>
-    <plurals name="threadListDeletionConfirmationAlertDescription">
+    <plurals name="threadListDeletionConfirmationAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tem a certeza de que deseja eliminar esta conversa permanentemente?</item>
         <item quantity="other">Tem a certeza de que deseja eliminar estas conversas permanentemente?</item>
     </plurals>
@@ -652,7 +652,7 @@
     <string name="threadListSectionToday">Hoje</string>
     <string name="threadListSpamHint">As mensagens que estiverem na pasta spam há mais de 30 dias serão automaticamente eliminadas.</string>
     <string name="threadListTrashHint">As mensagens que estiverem no lixo há mais de 30 dias serão automaticamente eliminadas.</string>
-    <plurals name="titleMyAccount">
+    <plurals name="titleMyAccount" tools:ignore="ImpliedQuantity">
         <item quantity="one">A minha conta</item>
         <item quantity="other">As minhas contas</item>
     </plurals>

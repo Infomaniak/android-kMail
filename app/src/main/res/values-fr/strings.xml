@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity,MissingQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity">
     <string name="accentColorBlueTitle">Bleu</string>
     <string name="accentColorPinkTitle">Rose</string>
     <string name="accentColorSystemTitle">Couleur du système</string>
@@ -361,7 +361,7 @@
     <string name="loadingText">Chargement…</string>
     <string name="lockedMailboxBottomSheetDescription">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</string>
     <string name="lockedMailboxBottomSheetTitle">L’adresse %s est bloquée</string>
-    <plurals name="lockedMailboxTitle">
+    <plurals name="lockedMailboxTitle" tools:ignore="ImpliedQuantity">
         <item quantity="one">Adresse mail bloquée</item>
         <item quantity="other">Adresses mail bloquées</item>
     </plurals>
@@ -449,7 +449,7 @@
     <string name="renameFolder">Renommer le dossier</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>
     <string name="reportDisplayProblemTitle">Signaler un problème d’affichage</string>
-    <plurals name="reportPhishingDescription">
+    <plurals name="reportPhishingDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Si ce message tente de dérober des informations sensibles (mot de passe, données bancaires, etc.) et/ou s’il usurpe une identité reconnue, alors il s’agit d’hameçonnage.\n\nEn nous le signalant, vous accélérez la détection de messages dangereux pour l’ensemble de nos utilisateurs.\n\nLe signalement sera envoyé à notre équipe sécurité pour analyse afin de prendre les mesures nécessaires. L’e-mail sera également déplacé automatiquement dans vos spams.</item>
         <item quantity="other">Si ces messages tentent de dérober des informations sensibles (mots de passe, données bancaires, etc.) et/ou s’ils usurpent une identité reconnue, alors il s’agit d’hameçonnage.\n\nEn nous les signalant, vous accélérez la détection de messages dangereux pour l’ensemble de nos utilisateurs.\n\nLes signalements seront envoyés à notre équipe sécurité pour analyse afin de prendre les mesures nécessaires. Les e-mails seront également déplacés automatiquement dans vos spams.</item>
     </plurals>
@@ -578,7 +578,7 @@
     <string name="snackbarSaveInDraft">Votre message a été sauvegardé dans les brouillons.</string>
     <string name="snackbarScheduleSaved">Le message sera envoyé le %s</string>
     <string name="snackbarScheduling">Le message est en cours de planification</string>
-    <plurals name="snackbarSenderBlacklisted">
+    <plurals name="snackbarSenderBlacklisted" tools:ignore="ImpliedQuantity">
         <item quantity="one">Expéditeur blacklisté avec succès</item>
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
     </plurals>
@@ -588,7 +588,7 @@
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Objet copié dans le presse-papiers</string>
     <string name="snackbarSwipeActionIncompatible">Action de balayage incompatible</string>
-    <plurals name="snackbarThreadDeletedPermanently">
+    <plurals name="snackbarThreadDeletedPermanently" tools:ignore="ImpliedQuantity">
         <item quantity="one">Conversation supprimée</item>
         <item quantity="other">Conversations supprimées</item>
     </plurals>
@@ -596,22 +596,22 @@
         <item quantity="one">Conversation déplacée vers %s</item>
         <item quantity="other">Conversations déplacées vers %s</item>
     </plurals>
-    <plurals name="snackbarUnsnoozeSuccess">
+    <plurals name="snackbarUnsnoozeSuccess" tools:ignore="ImpliedQuantity">
         <item quantity="one">Rappel annulé. Votre message est revenu dans votre boîte de réception</item>
         <item quantity="other">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
     </plurals>
     <string name="snackbarUnsubscribeFailure">Désinscription impossible</string>
     <string name="snackbarUnsubscribeSuccess">Désinscription effectuée</string>
     <string name="snoozeAlertTitle">En attente jusqu’au : %s</string>
-    <plurals name="snoozeArchiveConfirmAlertDescription">
+    <plurals name="snoozeArchiveConfirmAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Cette conversation ne sera plus en attente et sera archivée</item>
         <item quantity="other">Ces conversations ne seront plus en attente et seront archivées</item>
     </plurals>
-    <plurals name="snoozeDeleteConfirmAlertDescription">
+    <plurals name="snoozeDeleteConfirmAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Cette conversation ne sera plus en attente et sera supprimée</item>
         <item quantity="other">Ces conversations ne seront plus en attente et seront supprimées</item>
     </plurals>
-    <plurals name="snoozeMoveConfirmAlertDescription">
+    <plurals name="snoozeMoveConfirmAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Cette conversation ne sera plus en attente et sera déplacée</item>
         <item quantity="other">Ces conversations ne seront plus en attente et seront déplacées</item>
     </plurals>
@@ -629,7 +629,7 @@
     <string name="syncStartDescription">Activez les calendriers et carnets d’adresses dans kSync, que vous souhaitez synchroniser sur votre téléphone.</string>
     <string name="thisAfternoon">Cet après-midi</string>
     <string name="thisEvening">Ce soir</string>
-    <plurals name="threadListDeletionConfirmationAlertDescription">
+    <plurals name="threadListDeletionConfirmationAlertDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one">Êtes-vous sûr de vouloir supprimer cette conversation définitivement ?</item>
         <item quantity="other">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
     </plurals>
@@ -652,7 +652,7 @@
     <string name="threadListSectionToday">Aujourd’hui</string>
     <string name="threadListSpamHint">Les messages placés dans le dossier spam pendant plus de 30 jours seront automatiquement supprimés.</string>
     <string name="threadListTrashHint">Les messages placés dans la corbeille pendant plus de 30 jours seront automatiquement supprimés.</string>
-    <plurals name="titleMyAccount">
+    <plurals name="titleMyAccount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Mon compte</item>
         <item quantity="other">Mes comptes</item>
     </plurals>
