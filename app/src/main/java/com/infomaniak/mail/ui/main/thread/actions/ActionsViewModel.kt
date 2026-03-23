@@ -237,11 +237,13 @@ class ActionsViewModel @Inject constructor(
 
         val snackbarTitle = when {
             apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
-            threadsMoved.count() > 0 || messagesMoved.count() > 1 -> appContext.resources.getQuantityString(
-                R.plurals.snackbarThreadMoved,
-                threadsMoved.count(),
-                destination,
-            )
+            threadsMoved.count() > 0 || messagesMoved.count() > 1 -> {
+                appContext.resources.getQuantityString(
+                    R.plurals.snackbarThreadMoved,
+                    threadsMoved.count(),
+                    destination,
+                )
+            }
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
