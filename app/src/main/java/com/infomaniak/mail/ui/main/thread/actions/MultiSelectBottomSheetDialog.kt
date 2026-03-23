@@ -171,7 +171,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     actionsViewModel.reportPhishing(
                         messages = messages,
                         currentFolder = mainViewModel.currentFolder.value,
-                        mailbox = currentMailbox
+                        mailbox = currentMailbox,
                     )
                 },
             )
@@ -205,7 +205,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = threadsUids,
                 mailbox = currentMailbox,
-                shouldFavorite = shouldFavorite
+                shouldFavorite = shouldFavorite,
             )
 
             isMultiSelectOn = false
@@ -247,7 +247,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         threadsUids = threadsUids,
                         shouldRead = shouldRead,
                         currentFolderId = currentFolderId,
-                        mailbox = currentMailbox
+                        mailbox = currentMailbox,
                     )
                 }
                 R.id.actionArchive -> {
@@ -259,7 +259,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         actionsViewModel.archiveThreads(
                             threads = threads.toList(),
                             currentFolder = currentFolder,
-                            mailbox = currentMailbox
+                            mailbox = currentMailbox,
                         )
                     }
                 }
@@ -272,7 +272,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         actionsViewModel.deleteThreads(
                             threads = threads.toList(),
                             currentFolder = currentFolder,
-                            mailbox = currentMailbox
+                            mailbox = currentMailbox,
                         )
                     }
                 }

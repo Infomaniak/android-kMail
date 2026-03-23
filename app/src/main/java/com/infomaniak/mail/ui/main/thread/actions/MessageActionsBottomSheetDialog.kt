@@ -168,7 +168,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     actionsViewModel.deleteMessages(
                         messages = listOf(message),
                         currentFolder = mainViewModel.currentFolder.value,
-                        mailbox = mainViewModel.currentMailbox.value!!
+                        mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
             }
@@ -181,7 +181,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     actionsViewModel.archiveMessages(
                         messages = listOf(message),
                         currentFolder = mainViewModel.currentFolder.value,
-                        mailbox = mainViewModel.currentMailbox.value!!
+                        mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
             }
@@ -191,7 +191,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 actionsViewModel.toggleMessagesSeenStatus(
                     messages = listOf(message),
                     currentFolderId = mainViewModel.currentFolderId,
-                    mailbox = mainViewModel.currentMailbox.value!!
+                    mailbox = mainViewModel.currentMailbox.value!!,
                 )
                 twoPaneViewModel.closeThread()
             }
@@ -206,7 +206,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                             action = FolderPickerAction.MOVE,
                             threadsUids = arrayOf(threadUid),
                             messagesUids = arrayOf(messageUid),
-                            sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                            sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
                         ).toBundle(),
                     )
                 }
@@ -236,7 +236,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 actionsViewModel.toggleMessagesSpamStatus(
                     messages = listOf(message),
                     currentFolderId = mainViewModel.currentFolderId,
-                    mailbox = mainViewModel.currentMailbox.value!!
+                    mailbox = mainViewModel.currentMailbox.value!!,
                 )
             }
 
@@ -249,7 +249,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         actionsViewModel.reportPhishing(
                             messages = listOf(message),
                             currentFolder = mainViewModel.currentFolder.value,
-                            mailbox = mainViewModel.currentMailbox.value!!
+                            mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     },
                 )
