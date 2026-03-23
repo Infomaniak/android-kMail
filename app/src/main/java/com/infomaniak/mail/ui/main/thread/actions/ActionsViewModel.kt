@@ -620,6 +620,7 @@ class ActionsViewModel @Inject constructor(
                 snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
                 return@launch
             }
+
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
             onSuccess()
         } else {
@@ -637,6 +638,7 @@ class ActionsViewModel @Inject constructor(
                     snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
                     return@launch
                 }
+
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolder.id)))
             }
 
@@ -673,6 +675,7 @@ class ActionsViewModel @Inject constructor(
                     snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
                     return@launch
                 }
+
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
             }
 
@@ -690,6 +693,7 @@ class ActionsViewModel @Inject constructor(
     //region Undo action
     fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         if (undoData == null) return@launch
+
         val result = messagesActionsUseCase.undoAction(undoData)
         if (result is MessagesActionsUseCase.ApiCallResult.Success) {
             with(undoData) {
@@ -712,7 +716,7 @@ class ActionsViewModel @Inject constructor(
 
     // region refresh
 
-    fun refreshFoldersAsync(
+    private fun refreshFoldersAsync(
         mailbox: Mailbox,
         messagesFoldersIds: ImpactedFolders,
         destinationFolderId: String? = null,
