@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@ package com.infomaniak.mail.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
@@ -34,6 +36,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.loadCss
+import kotlin.math.abs
 
 class WebViewUtils(context: Context) {
 
@@ -178,6 +181,60 @@ class WebViewUtils(context: Context) {
         fun WebView.destroyAndClearHistory() {
             clearHistory()
             destroy()
+        }
+
+        /**
+         * Lets the WebView take the zoom gestures and lets the WebView handle scrolls that start horizontally while letting the
+         * parent handle scrolls that start vertically. This is not perfect but the best solution is way more complex.
+         */
+        fun WebView.configureOnTouchListener() {
+            var startX = 0f
+            var startY = 0f
+            var isHorizontalGesture: Boolean? = null
+
+            val touchSlop = ViewConfiguration.get(this.context).scaledTouchSlop
+
+            setOnTouchListener { view, event ->
+                if (event.pointerCount > 1) {
+                    // In the case of a multitouch always let the webview handle the zoom
+                    view.parent.requestDisallowInterceptTouchEvent(true)
+                } else {
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> {
+                            startX = event.x
+                            startY = event.y
+                            isHorizontalGesture = null
+                            // Take control so we can decide if we need to keep it or give it up
+                            view.parent.requestDisallowInterceptTouchEvent(true)
+                        }
+                        MotionEvent.ACTION_MOVE -> {
+                            if (isHorizontalGesture == null) {
+                                val dx = abs(event.x - startX)
+                                val dy = abs(event.y - startY)
+
+                                if (dx > touchSlop || dy > touchSlop) isHorizontalGesture = dx > dy
+                            }
+
+                            if (isHorizontalGesture == true) {
+                                // Horizontal -> WebView keeps control
+                                view.parent.requestDisallowInterceptTouchEvent(true)
+                            } else if (isHorizontalGesture == false) {
+                                // Vertical -> Parent takes over
+                                view.parent.requestDisallowInterceptTouchEvent(false)
+                            }
+                        }
+                        MotionEvent.ACTION_UP,
+                        MotionEvent.ACTION_CANCEL -> {
+                            view.parent.requestDisallowInterceptTouchEvent(false)
+                            isHorizontalGesture = null
+
+                            if (event.action == MotionEvent.ACTION_UP) view.performClick()
+                        }
+                    }
+                }
+
+                false // Event not consumed. Let the webview handle the event
+            }
         }
     }
 }
