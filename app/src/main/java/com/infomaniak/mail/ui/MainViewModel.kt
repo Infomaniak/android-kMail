@@ -44,6 +44,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
@@ -85,6 +86,9 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
+import com.infomaniak.mail.utils.extensions.atLeastOneFailed
+import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
+import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import com.infomaniak.mail.utils.toFolderUiTree
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
@@ -721,17 +725,68 @@ class MainViewModel @Inject constructor(
             return@launch
         }
 
-        val result =
-            messagesActionsUseCase.moveThreadsOrMessagesTo(newFolderId, threadsUids, messagesUids, mailbox, currentFolderId)
+        val result = messagesActionsUseCase.moveThreadsOrMessagesTo(
+            destinationFolderId = newFolderId,
+            threadsUids = threadsUids,
+            messagesUids = messagesUids,
+            mailbox = mailbox,
+            currentFolderId = currentFolderId,
+        )
+
         if (result != null) {
-            showMoveSnackbar(threadsUids.count(), result.messages, result.apiResponses, destinationFolder)
-            isMovedToNewFolder.postValue(true)
+            with(result) {
+                if (apiResponses.atLeastOneSucceeded()) {
+                    refreshFoldersAsync(
+                        mailbox = currentMailbox.value!!,
+                        messagesFoldersIds = messages.getFoldersIds(),
+                        destinationFolderId = newFolderId,
+                        threadsUids = threadsUids,
+                    )
+                    showMoveSnackbar(threadsUids.count(), messages, apiResponses, destinationFolder)
+                    isMovedToNewFolder.postValue(true)
+                }
+
+                if (apiResponses.atLeastOneFailed() && movedThreads.isNotEmpty()) {
+                    threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+                }
+            }
+
         } else {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
         }
     }
     //endregion
 
+    fun refreshFoldersAsync(
+        mailbox: Mailbox,
+        messagesFoldersIds: ImpactedFolders,
+        destinationFolderId: String? = null,
+        currentFolderId: String? = null,
+        threadsUids: List<String> = emptyList(),
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val realm = mailboxContentRealm()
+
+        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
+        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
+        destinationFolderId?.let(foldersIds::add)
+
+        foldersIds.forEach { folderId ->
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER,
+                mailbox = mailbox,
+                folderId = folderId,
+                realm = realm,
+                callbacks = if (folderId == currentFolderId) {
+                    RefreshCallbacks(
+                        onStart = ::onDownloadStart,
+                        onStop = { onDownloadStop(threadsUids) },
+                    )
+                } else {
+                    null
+                },
+            )
+        }
+    }
 
     private fun onDownloadStart() {
         downloadThreadsStatusManager.updateState(true)
@@ -743,9 +798,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {
-
         with(ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient)) {
-
             val snackbarTitle = if (isSuccess()) {
                 updateUserInfo()
                 R.string.snackbarContactSaved

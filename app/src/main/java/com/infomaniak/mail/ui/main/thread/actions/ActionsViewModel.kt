@@ -24,7 +24,6 @@ import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
@@ -144,7 +143,7 @@ class ActionsViewModel @Inject constructor(
                     if (displaySnackbar) showMoveSnackbar(movedThreads, messages, apiResponses, destinationFolder)
                 }
 
-                if (apiResponses.atLeastOneFailed()) {
+                if (apiResponses.atLeastOneFailed() && movedThreads.isNotEmpty()) {
                     viewModelScope.launch(ioCoroutineContext) {
                         threadController.updateIsLocallyMovedOutStatus(threadsUids = movedThreads, hasBeenMovedOut = false)
                     }
@@ -275,8 +274,9 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) {
-        val shouldPermanentlyDelete =
-            isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(messagesToDelete, currentFolder))
+        val shouldPermanentlyDelete = isPermanentDeleteFolder(
+            role = folderRoleUtils.getActionFolderRole(messagesToDelete, currentFolder)
+        )
 
         if (shouldPermanentlyDelete) {
             val result = messagesActionsUseCase.permanentlyDelete(
@@ -292,7 +292,7 @@ class ActionsViewModel @Inject constructor(
                             mailbox = mailbox,
                             messagesFoldersIds = messagesToDelete.getFoldersIds(),
                             currentFolderId = currentFolder?.id,
-                            threadsUids = uidsToMove
+                            threadsUids = uidsToMove,
                         )
                         showDeleteSnackbar(
                             apiResponses = apiResponses,
@@ -301,7 +301,7 @@ class ActionsViewModel @Inject constructor(
                         )
                     }
 
-                    if (apiResponses.atLeastOneFailed()) {
+                    if (apiResponses.atLeastOneFailed() && uidsToMove.isNotEmpty()) {
                         viewModelScope.launch(ioCoroutineContext) {
                             threadController.updateIsLocallyMovedOutStatus(threadsUids = uidsToMove, hasBeenMovedOut = false)
                         }
@@ -595,7 +595,7 @@ class ActionsViewModel @Inject constructor(
     //region Drafts
     fun rescheduleDraft(scheduleDate: Date, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
-            with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
+            with(messagesActionsUseCase.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
                     refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
                 } else {
@@ -613,11 +613,14 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = mailbox
-        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
+        val apiResponse = messagesActionsUseCase.unscheduleDraft(unscheduleDraftUrl)
 
         if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
+            val draftFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
+                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                return@launch
+            }
+            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
             onSuccess()
         } else {
             snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
@@ -627,11 +630,14 @@ class ActionsViewModel @Inject constructor(
     fun unscheduleDraft(unscheduleDraftUrl: String, mailbox: Mailbox, openFolder: (folderId: String) -> Unit) =
         viewModelScope.launch(ioCoroutineContext) {
             val mailbox = mailbox
-            val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
+            val apiResponse = messagesActionsUseCase.unscheduleDraft(unscheduleDraftUrl)
 
             if (apiResponse.isSuccess()) {
-                val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-                refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
+                val scheduledDraftsFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
+                    snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                    return@launch
+                }
+                refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolder.id)))
             }
 
             showUnscheduledDraftSnackbar(apiResponse, openFolder)
@@ -660,11 +666,14 @@ class ActionsViewModel @Inject constructor(
     fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String, mailbox: Mailbox) =
         viewModelScope.launch(ioCoroutineContext) {
             val mailbox = mailbox
-            val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
+            val apiResponse = messagesActionsUseCase.deleteDraft(targetMailboxUuid, remoteDraftUuid)
 
             if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
-                val draftFolderId = folderController.getFolder(FolderRole.DRAFT)!!.id
-                refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolderId)))
+                val draftFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
+                    snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                    return@launch
+                }
+                refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
             }
 
             showDeletedDraftSnackbar(apiResponse)
@@ -725,7 +734,8 @@ class ActionsViewModel @Inject constructor(
                 callbacks = if (folderId == currentFolderId) {
                     RefreshCallbacks(
                         onStart = ::onDownloadStart,
-                        onStop = { onDownloadStop(threadsUids) })
+                        onStop = { onDownloadStop(threadsUids) },
+                    )
                 } else {
                     null
                 },

@@ -377,7 +377,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     actionsViewModel.moveToSpamFolder(
                         messagesUid = listOf(messageUid),
                         currentFolderId = mainViewModel.currentFolderId,
-                        mailbox = mainViewModel.currentMailbox.value!!
+                        mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 },
                 activateSpamFilter = { actionsViewModel.activateSpamFilter(mainViewModel.currentMailbox.value!!) },
@@ -436,7 +436,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         mailbox = mainViewModel.currentMailbox.value!!,
                         onAllowed = {
                             threadViewModel.fakeEmojiReply(emoji, messageUid)
-                        })
+                        },
+                    )
                 },
                 showEmojiDetails = { messageUid, emoji ->
                     trackEmojiReactionsEvent(MatomoName.ShowReactionsBottomSheet)
@@ -687,7 +688,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 mailbox = mainViewModel.currentMailbox.value!!,
                 onAllowed = {
                     threadViewModel.fakeEmojiReply(emoji, messageUid)
-                })
+                },
+            )
         }
     }
 
@@ -798,7 +800,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 date = Date(timestamp),
                 threadUids = threadUids,
                 currentFolderId = mainViewModel.currentFolderId,
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
             if (isSuccess) twoPaneViewModel.closeThread()
         }
@@ -811,7 +813,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             val result = actionsViewModel.rescheduleSnoozedThreads(
                 date = Date(timestamp),
                 threadUids = threadUids,
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
@@ -829,7 +831,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
             actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(threadUid),
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
         }
 
@@ -858,7 +860,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         actionsViewModel.archiveThreads(
                             threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
-                            mailbox = mainViewModel.currentMailbox.value!!
+                            mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     }
                 }
@@ -869,7 +871,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         actionsViewModel.deleteThreads(
                             threads = listOf(thread),
                             currentFolder = mainViewModel.currentFolder.value,
-                            mailbox = mainViewModel.currentMailbox.value!!
+                            mailbox = mainViewModel.currentMailbox.value!!,
                         )
 
                     }
