@@ -24,11 +24,9 @@ import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -68,10 +66,8 @@ class ActionsViewModel @Inject constructor(
     private val downloadThreadsStatusManager: DownloadThreadsStatusManager,
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
-    private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
@@ -125,7 +121,10 @@ class ActionsViewModel @Inject constructor(
             messages = messages,
             currentFolderId = currentFolderId,
             mailbox = mailbox,
-        ) ?: return
+        ) ?: run {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return
+        }
 
         with(result) {
             if (apiResponses.atLeastOneSucceeded()) {
@@ -283,28 +282,29 @@ class ActionsViewModel @Inject constructor(
                 messagesToDelete = messagesToDelete,
                 mailbox = mailbox,
                 onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
-            )
+            ) ?: run {
+                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                return
+            }
 
-            if (result != null) {
-                with(result) {
-                    if (apiResponses.atLeastOneSucceeded()) {
-                        refreshFoldersAsync(
-                            mailbox = mailbox,
-                            messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                            currentFolderId = currentFolder?.id,
-                            threadsUids = uidsToMove,
-                        )
-                        showDeleteSnackbar(
-                            apiResponses = apiResponses,
-                            messages = messagesToDelete,
-                            numberOfImpactedThreads = messagesToDelete.count(),
-                        )
-                    }
+            with(result) {
+                if (apiResponses.atLeastOneSucceeded()) {
+                    refreshFoldersAsync(
+                        mailbox = mailbox,
+                        messagesFoldersIds = messagesToDelete.getFoldersIds(),
+                        currentFolderId = currentFolder?.id,
+                        threadsUids = uidsToMove,
+                    )
+                    showDeleteSnackbar(
+                        apiResponses = apiResponses,
+                        messages = messagesToDelete,
+                        numberOfImpactedThreads = messagesToDelete.count(),
+                    )
+                }
 
-                    if (apiResponses.atLeastOneFailed() && uidsToMove.isNotEmpty()) {
-                        viewModelScope.launch(ioCoroutineContext) {
-                            threadController.updateIsLocallyMovedOutStatus(threadsUids = uidsToMove, hasBeenMovedOut = false)
-                        }
+                if (apiResponses.atLeastOneFailed() && uidsToMove.isNotEmpty()) {
+                    viewModelScope.launch(ioCoroutineContext) {
+                        threadController.updateIsLocallyMovedOutStatus(threadsUids = uidsToMove, hasBeenMovedOut = false)
                     }
                 }
             }
