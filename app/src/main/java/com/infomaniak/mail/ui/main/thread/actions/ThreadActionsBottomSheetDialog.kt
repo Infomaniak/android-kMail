@@ -215,7 +215,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
                 currentFolderId = mainViewModel.currentFolderId,
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
             twoPaneViewModel.closeThread()
         }
@@ -260,7 +260,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             trackBottomSheetThreadActionsEvent(MatomoName.Favorite, thread.isFavorite)
             actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
         }
 
@@ -269,7 +269,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             actionsViewModel.toggleThreadsSpamStatus(
                 threads = setOf(thread),
                 currentFolderId = mainViewModel.currentFolderId,
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
         }
 
@@ -290,7 +290,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     actionsViewModel.reportPhishing(
                         messages = junkMessages,
                         currentFolder = mainViewModel.currentFolder.value,
-                        mailbox = mainViewModel.currentMailbox.value!!
+                        mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 },
             )

@@ -409,7 +409,7 @@ class MainActivity : BaseActivity() {
                 actionsViewModel.unscheduleDraft(
                     unscheduleDraftUrl = unscheduleDraftUrl,
                     mailbox = mainViewModel.currentMailbox.value!!,
-                    openFolder = mainViewModel::openFolder
+                    openFolder = mainViewModel::openFolder,
                 )
             },
         )
