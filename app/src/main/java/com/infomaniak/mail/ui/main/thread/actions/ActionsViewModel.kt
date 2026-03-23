@@ -125,28 +125,26 @@ class ActionsViewModel @Inject constructor(
             messages = messages,
             currentFolderId = currentFolderId,
             mailbox = mailbox,
-        )
+        ) ?: return
 
-        if (result != null) {
-            with(result) {
-                if (apiResponses.atLeastOneSucceeded()) {
-                    if (currentFolderId != null) {
-                        refreshFoldersAsync(
-                            mailbox = mailbox,
-                            messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
-                            destinationFolderId = destinationFolder.id,
-                            currentFolderId = currentFolderId,
-                            threadsUids = movedThreads,
-                        )
-                    }
-
-                    if (displaySnackbar) showMoveSnackbar(movedThreads, messages, apiResponses, destinationFolder)
+        with(result) {
+            if (apiResponses.atLeastOneSucceeded()) {
+                if (currentFolderId != null) {
+                    refreshFoldersAsync(
+                        mailbox = mailbox,
+                        messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+                        destinationFolderId = destinationFolder.id,
+                        currentFolderId = currentFolderId,
+                        threadsUids = movedThreads,
+                    )
                 }
 
-                if (apiResponses.atLeastOneFailed() && movedThreads.isNotEmpty()) {
-                    viewModelScope.launch(ioCoroutineContext) {
-                        threadController.updateIsLocallyMovedOutStatus(threadsUids = movedThreads, hasBeenMovedOut = false)
-                    }
+                if (displaySnackbar) showMoveSnackbar(movedThreads, messages, apiResponses, destinationFolder)
+            }
+
+            if (apiResponses.atLeastOneFailed()) {
+                viewModelScope.launch(ioCoroutineContext) {
+                    threadController.updateIsLocallyMovedOutStatus(threadsUids = movedThreads, hasBeenMovedOut = false)
                 }
             }
         }
