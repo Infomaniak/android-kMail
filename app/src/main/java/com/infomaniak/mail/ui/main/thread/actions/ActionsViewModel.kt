@@ -29,8 +29,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -45,6 +43,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.useCases.MessagesActionsUseCase
 import com.infomaniak.mail.utils.DownloadThreadsStatusManager
 import com.infomaniak.mail.utils.FolderRoleUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
@@ -73,6 +72,7 @@ class ActionsViewModel @Inject constructor(
     private val messageController: MessageController,
     private val messagesActionsUseCase: MessagesActionsUseCase,
     private val refreshController: RefreshController,
+    private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -721,32 +721,14 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String? = null,
         threadsUids: List<String> = emptyList(),
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val realm = mailboxContentRealm()
-
-        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
-        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
-        destinationFolderId?.let(foldersIds::add)
-
-        foldersIds.forEach { folderId ->
-            refreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER,
-                mailbox = mailbox,
-                folderId = folderId,
-                realm = realm,
-                callbacks = if (folderId == currentFolderId) {
-                    RefreshCallbacks(
-                        onStart = ::onDownloadStart,
-                        onStop = { onDownloadStop(threadsUids) },
-                    )
-                } else {
-                    null
-                },
-            )
-        }
-    }
-
-    private fun onDownloadStart() {
-        downloadThreadsStatusManager.updateState(true)
+        sharedUtils.refreshFolders(
+            mailbox = mailbox,
+            messagesFoldersIds = messagesFoldersIds,
+            destinationFolderId = destinationFolderId,
+            currentFolderId = currentFolderId,
+            threadsUids = threadsUids,
+            onDownloadStop = { threadsUids -> onDownloadStop(threadsUids) }
+        )
     }
 
     private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
