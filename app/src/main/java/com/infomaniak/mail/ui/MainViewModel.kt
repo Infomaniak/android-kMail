@@ -730,31 +730,30 @@ class MainViewModel @Inject constructor(
             messagesUids = messagesUids,
             mailbox = mailbox,
             currentFolderId = currentFolderId,
-        )
+        ) ?: run {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
 
-        if (result != null) {
-            with(result) {
-                if (apiResponses.atLeastOneSucceeded()) {
-                    refreshFoldersAsync(
-                        mailbox = currentMailbox.value!!,
-                        messagesFoldersIds = messages.getFoldersIds(),
-                        destinationFolderId = newFolderId,
-                        threadsUids = threadsUids,
-                    )
-                    showMoveSnackbar(threadsUids.count(), messages, apiResponses, destinationFolder)
-                    isMovedToNewFolder.postValue(true)
-                }
-
-                if (apiResponses.atLeastOneFailed()) {
-                    threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-                }
+        with(result) {
+            if (apiResponses.atLeastOneSucceeded()) {
+                refreshFoldersAsync(
+                    mailbox = currentMailbox.value!!,
+                    messagesFoldersIds = messages.getFoldersIds(),
+                    destinationFolderId = newFolderId,
+                    threadsUids = threadsUids,
+                )
+                showMoveSnackbar(threadsUids.count(), messages, apiResponses, destinationFolder)
+                isMovedToNewFolder.postValue(true)
             }
 
-        } else {
-            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            if (apiResponses.atLeastOneFailed()) {
+                threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+            }
         }
+
     }
-    //endregion
+//endregion
 
     fun refreshFoldersAsync(
         mailbox: Mailbox,
