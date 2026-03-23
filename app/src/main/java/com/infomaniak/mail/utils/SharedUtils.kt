@@ -25,6 +25,8 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
@@ -50,7 +52,40 @@ class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     private val mailboxController: MailboxController,
+    private val downloadThreadsStatusManager: DownloadThreadsStatusManager,
 ) {
+
+    suspend fun refreshFolders(
+        mailbox: Mailbox,
+        messagesFoldersIds: ImpactedFolders,
+        destinationFolderId: String? = null,
+        currentFolderId: String? = null,
+        threadsUids: List<String> = emptyList(),
+        onDownloadStop: ((List<String>) -> Unit)? = null,
+    ) {
+        val realm = mailboxContentRealm()
+
+        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
+        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
+        destinationFolderId?.let(foldersIds::add)
+
+        foldersIds.forEach { folderId ->
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER,
+                mailbox = mailbox,
+                folderId = folderId,
+                realm = realm,
+                callbacks = if (folderId == currentFolderId && onDownloadStop != null) {
+                    RefreshCallbacks(
+                        onStart = { downloadThreadsStatusManager.updateState(true) },
+                        onStop = { onDownloadStop(threadsUids) },
+                    )
+                } else {
+                    null
+                },
+            )
+        }
+    }
 
     suspend fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
         with(ApiRepository.getFeatureFlags(mailboxUuid)) {

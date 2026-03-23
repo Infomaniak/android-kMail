@@ -764,28 +764,14 @@ class MainViewModel @Inject constructor(
         currentFolderId: String? = null,
         threadsUids: List<String> = emptyList(),
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val realm = mailboxContentRealm()
-
-        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
-        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
-        destinationFolderId?.let(foldersIds::add)
-
-        foldersIds.forEach { folderId ->
-            refreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER,
-                mailbox = mailbox,
-                folderId = folderId,
-                realm = realm,
-                callbacks = if (folderId == currentFolderId) {
-                    RefreshCallbacks(
-                        onStart = ::onDownloadStart,
-                        onStop = { onDownloadStop(threadsUids) },
-                    )
-                } else {
-                    null
-                },
-            )
-        }
+        sharedUtils.refreshFolders(
+            mailbox = mailbox,
+            messagesFoldersIds = messagesFoldersIds,
+            destinationFolderId = destinationFolderId,
+            currentFolderId = currentFolderId,
+            threadsUids = threadsUids,
+            onDownloadStop = { threadsUids -> onDownloadStop(threadsUids) }
+        )
     }
 
     private fun onDownloadStart() {
