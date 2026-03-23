@@ -145,6 +145,7 @@ class MessagesActionsUseCase @Inject constructor(
             messagesToMove = messagesUids.let { messageController.getMessages(it) }
         } else {
             val threads = threadController.getThreads(threadsUids).ifEmpty { return null }
+
             messagesToMove = getMessagesFromThreadsToMove(threads)
         }
 
@@ -164,6 +165,7 @@ class MessagesActionsUseCase @Inject constructor(
         val destinationFolderRole = if (folderRole == FolderRole.SPAM) FolderRole.INBOX else FolderRole.SPAM
 
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
+
         val unscheduleMessages = messageController.getUnscheduledMessages(messages)
 
         return moveMessagesTo(destinationFolder, mailbox, unscheduleMessages)
@@ -191,8 +193,10 @@ class MessagesActionsUseCase @Inject constructor(
         if (messagesToDelete.isEmpty()) {
             return null
         }
+
         val uids = messagesToDelete.getUids()
         val destinationFolder = folderController.getFolder(FolderRole.TRASH) ?: return null
+
         val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, destinationFolder)
 
         val apiResponses = ApiRepository.deleteMessages(
@@ -423,6 +427,7 @@ class MessagesActionsUseCase @Inject constructor(
         val response = ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)
         return if (response.isSuccess()) {
             val restrictions = response.data ?: return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
+
             restrictions.blockedSenders.removeIf { it.email == email }
             updateBlockedSenders(mailbox, restrictions)
             ApiCallResult.Success(R.string.unblockButton) // We don't show a snackbar on success. It's just a confirmation
@@ -472,6 +477,7 @@ class MessagesActionsUseCase @Inject constructor(
     ): BatchSnoozeResult {
         val snoozedThreadUuids = threadUids.mapNotNull { threadUid ->
             val thread = threadController.getThread(threadUid) ?: return@mapNotNull null
+            
             thread.snoozeUuid.takeIf { thread.isSnoozed() }
         }
 
