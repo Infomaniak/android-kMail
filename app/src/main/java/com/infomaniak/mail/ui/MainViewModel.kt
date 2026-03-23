@@ -702,8 +702,7 @@ class MainViewModel @Inject constructor(
             return@launch
         }
 
-        val destinationFolder = folderController.getFolder(newFolderId)
-        if (destinationFolder == null) {
+        val destinationFolder = folderController.getFolder(newFolderId) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return@launch
         }
@@ -729,7 +728,7 @@ class MainViewModel @Inject constructor(
                     isMovedToNewFolder.postValue(true)
                 }
 
-                if (apiResponses.atLeastOneFailed() && movedThreads.isNotEmpty()) {
+                if (apiResponses.atLeastOneFailed()) {
                     threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
                 }
             }
