@@ -418,14 +418,15 @@ class ThreadListAdapter @Inject constructor(
                 0 // Since the auto advance is happening after the move, the next thread is already the current thread.
             }
         }
+        val stepBy = when (direction) {
+            PREVIOUS_CHRONOLOGICAL_THREAD -> -1
+            NEXT_CHRONOLOGICAL_THREAD -> 1
+        }
 
         while (currentThreadIndex >= 0 && currentThreadIndex <= dataSet.lastIndex) {
             when (val item = dataSet[currentThreadIndex]) {
                 is ThreadListItem.Content -> return item.thread to currentThreadIndex
-                else -> currentThreadIndex += when (direction) {
-                    PREVIOUS_CHRONOLOGICAL_THREAD -> -1
-                    NEXT_CHRONOLOGICAL_THREAD -> 1
-                }
+                else -> currentThreadIndex += stepBy
             }
         }
 
