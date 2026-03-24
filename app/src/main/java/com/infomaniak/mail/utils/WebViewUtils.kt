@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import android.view.ViewParent
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
@@ -211,19 +212,10 @@ class WebViewUtils(context: Context) {
                     }
                     MotionEvent.ACTION_MOVE -> {
                         if (isHorizontalGesture == null) {
-                            val dx = abs(event.x - startX)
-                            val dy = abs(event.y - startY)
-
-                            if (dx > touchSlop || dy > touchSlop) isHorizontalGesture = dx > dy
+                            isHorizontalGesture = computeIsHorizontalGesture(event, startX, startY, touchSlop)
                         }
 
-                        if (isHorizontalGesture == true) {
-                            // Horizontal -> WebView keeps control
-                            view.parent.requestDisallowInterceptTouchEvent(true)
-                        } else if (isHorizontalGesture == false) {
-                            // Vertical -> Parent takes over
-                            view.parent.requestDisallowInterceptTouchEvent(false)
-                        }
+                        isHorizontalGesture?.let(view.parent::requestDisallowInterceptHorizontalTouchEvent)
                     }
                     MotionEvent.ACTION_UP,
                     MotionEvent.ACTION_CANCEL -> {
@@ -237,5 +229,22 @@ class WebViewUtils(context: Context) {
                 false // Event not consumed. Let the webview handle the event
             }
         }
+    }
+}
+
+fun computeIsHorizontalGesture(event: MotionEvent, startX: Float, startY: Float, touchSlop: Int): Boolean? {
+    val dx = abs(event.x - startX)
+    val dy = abs(event.y - startY)
+
+    return if (dx > touchSlop || dy > touchSlop) dx > dy else null
+}
+
+fun ViewParent.requestDisallowInterceptHorizontalTouchEvent(isHorizontalGesture: Boolean) {
+    if (isHorizontalGesture) {
+        // Horizontal -> WebView keeps control
+        requestDisallowInterceptTouchEvent(true)
+    } else {
+        // Vertical -> Parent takes over
+        requestDisallowInterceptTouchEvent(false)
     }
 }
