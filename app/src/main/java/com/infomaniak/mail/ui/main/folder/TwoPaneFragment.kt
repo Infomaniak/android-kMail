@@ -48,8 +48,7 @@ import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.isPhone
-import com.infomaniak.mail.utils.extensions.isTabletInLandscape
-import com.infomaniak.mail.utils.extensions.isTabletInPortrait
+import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import io.realm.kotlin.types.RealmInstant
 import javax.inject.Inject
@@ -74,9 +73,8 @@ abstract class TwoPaneFragment : Fragment() {
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
-    fun isOnlyOneShown(): Boolean = isPhone() || isTabletInPortrait()
-    fun isOnlyLeftShown(): Boolean = isOnlyOneShown() && !twoPaneViewModel.isThreadOpen
-    fun isOnlyRightShown(): Boolean = isOnlyOneShown() && twoPaneViewModel.isThreadOpen
+    fun isOnlyLeftShown(): Boolean = isPhone() && !twoPaneViewModel.isThreadOpen
+    fun isOnlyRightShown(): Boolean = isPhone() && twoPaneViewModel.isThreadOpen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -200,7 +198,7 @@ abstract class TwoPaneFragment : Fragment() {
         val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
         val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
 
-        return if (isTabletInLandscape()) {
+        return if (isTabletOrFoldable()) {
             (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
         } else {
             if (isThreadOpen) 0 to widthPixels else widthPixels to 0
