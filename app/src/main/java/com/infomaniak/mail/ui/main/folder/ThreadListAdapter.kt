@@ -70,6 +70,9 @@ import com.infomaniak.mail.databinding.ItemThreadLoadMoreButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
+import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.NextThreadTarget.NEXT_CHRONOLOGICAL_THREAD
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.NextThreadTarget.PREVIOUS_CHRONOLOGICAL_THREAD
 import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -408,13 +411,21 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    fun getNextThread(startingThreadIndex: Int, direction: Int): Pair<Thread, Int>? {
-        var currentThreadIndex = startingThreadIndex + direction
+    fun getNextThread(startingThreadIndex: Int, direction: ThreadFragment.NextThreadTarget): Pair<Thread, Int>? {
+        var currentThreadIndex = startingThreadIndex + when (direction) {
+            PREVIOUS_CHRONOLOGICAL_THREAD -> -1
+            NEXT_CHRONOLOGICAL_THREAD -> {
+                0 // Since the auto advance is happening after the move, the next thread is already the current thread.
+            }
+        }
 
         while (currentThreadIndex >= 0 && currentThreadIndex <= dataSet.lastIndex) {
             when (val item = dataSet[currentThreadIndex]) {
                 is ThreadListItem.Content -> return item.thread to currentThreadIndex
-                else -> currentThreadIndex += direction
+                else -> currentThreadIndex += when (direction) {
+                    PREVIOUS_CHRONOLOGICAL_THREAD -> -1
+                    NEXT_CHRONOLOGICAL_THREAD -> 1
+                }
             }
         }
 
