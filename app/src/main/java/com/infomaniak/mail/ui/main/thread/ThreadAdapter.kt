@@ -24,13 +24,11 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
-import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult
-import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -41,11 +39,11 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
-import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.common.utils.FormatData
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.common.utils.formatWithLocal
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -78,6 +76,7 @@ import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.configureOnTouchListener
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
@@ -382,10 +381,7 @@ class ThreadAdapter(
     }
 
     private fun WebView.setupZoomListeners() {
-        val scaleListener = MessageBodyScaleListener(recyclerView, this, this.parent as FrameLayout)
-        val scaleDetector = ScaleGestureDetector(context, scaleListener)
-        val touchListener = MessageBodyTouchListener(recyclerView, scaleDetector, scaledTouchSlop)
-        setOnTouchListener(touchListener)
+        configureOnTouchListener()
     }
 
     private fun ItemMessageBinding.toggleFrameLayoutsTheme(isThemeTheSame: Boolean) {
