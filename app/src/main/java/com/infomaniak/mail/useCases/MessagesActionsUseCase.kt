@@ -338,12 +338,7 @@ class MessagesActionsUseCase @Inject constructor(
         mailbox: Mailbox,
     ): ToggleResult {
         val isFavorite = if (messages.count() == 1) messages.single().isFavorite else !shouldFavorite
-
-        val messages = if (isFavorite) {
-            getMessagesToUnfavorite(messages)
-        } else {
-            getMessagesToFavorite(messages)
-        }
+        val messages = messageController.getMessagesAndDuplicates(messages)
 
         return toggleMessagesFavoriteStatus(messages, isFavorite, mailbox)
     }
@@ -368,14 +363,6 @@ class MessagesActionsUseCase @Inject constructor(
         }
 
         return ToggleResult(messages, apiResponses)
-    }
-
-    private suspend fun getMessagesToFavorite(messages: List<Message>): List<Message> {
-        return messageController.getMessagesAndDuplicates(messages)
-    }
-
-    private suspend fun getMessagesToUnfavorite(messages: List<Message>): List<Message> {
-        return messageController.getMessagesAndDuplicates(messages)
     }
 
     private suspend fun updateFavoriteStatus(messagesUids: List<String>, isFavorite: Boolean) {
@@ -477,7 +464,7 @@ class MessagesActionsUseCase @Inject constructor(
     ): BatchSnoozeResult {
         val snoozedThreadUuids = threadUids.mapNotNull { threadUid ->
             val thread = threadController.getThread(threadUid) ?: return@mapNotNull null
-            
+
             thread.snoozeUuid.takeIf { thread.isSnoozed() }
         }
 
