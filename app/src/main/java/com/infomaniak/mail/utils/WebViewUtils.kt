@@ -198,38 +198,39 @@ class WebViewUtils(context: Context) {
                 if (event.pointerCount > 1) {
                     // In the case of a multitouch always let the webview handle the zoom
                     view.parent.requestDisallowInterceptTouchEvent(true)
-                } else {
-                    when (event.actionMasked) {
-                        MotionEvent.ACTION_DOWN -> {
-                            startX = event.x
-                            startY = event.y
-                            isHorizontalGesture = null
-                            // Take control so we can decide if we need to keep it or give it up
+                    return@setOnTouchListener false // Event not consumed. Let the webview handle the event
+                }
+
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        startX = event.x
+                        startY = event.y
+                        isHorizontalGesture = null
+                        // Take control so we can decide if we need to keep it or give it up
+                        view.parent.requestDisallowInterceptTouchEvent(true)
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        if (isHorizontalGesture == null) {
+                            val dx = abs(event.x - startX)
+                            val dy = abs(event.y - startY)
+
+                            if (dx > touchSlop || dy > touchSlop) isHorizontalGesture = dx > dy
+                        }
+
+                        if (isHorizontalGesture == true) {
+                            // Horizontal -> WebView keeps control
                             view.parent.requestDisallowInterceptTouchEvent(true)
-                        }
-                        MotionEvent.ACTION_MOVE -> {
-                            if (isHorizontalGesture == null) {
-                                val dx = abs(event.x - startX)
-                                val dy = abs(event.y - startY)
-
-                                if (dx > touchSlop || dy > touchSlop) isHorizontalGesture = dx > dy
-                            }
-
-                            if (isHorizontalGesture == true) {
-                                // Horizontal -> WebView keeps control
-                                view.parent.requestDisallowInterceptTouchEvent(true)
-                            } else if (isHorizontalGesture == false) {
-                                // Vertical -> Parent takes over
-                                view.parent.requestDisallowInterceptTouchEvent(false)
-                            }
-                        }
-                        MotionEvent.ACTION_UP,
-                        MotionEvent.ACTION_CANCEL -> {
+                        } else if (isHorizontalGesture == false) {
+                            // Vertical -> Parent takes over
                             view.parent.requestDisallowInterceptTouchEvent(false)
-                            isHorizontalGesture = null
-
-                            if (event.action == MotionEvent.ACTION_UP) view.performClick()
                         }
+                    }
+                    MotionEvent.ACTION_UP,
+                    MotionEvent.ACTION_CANCEL -> {
+                        view.parent.requestDisallowInterceptTouchEvent(false)
+                        isHorizontalGesture = null
+
+                        if (event.action == MotionEvent.ACTION_UP) view.performClick()
                     }
                 }
 
