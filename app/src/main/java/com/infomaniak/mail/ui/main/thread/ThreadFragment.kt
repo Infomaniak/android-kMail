@@ -1064,15 +1064,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     ): Pair<Thread, Int>? = with(twoPaneFragment.threadListAdapter) {
 
         val direction = when (localSettings.autoAdvanceMode) {
-            AutoAdvanceMode.PREVIOUS_THREAD -> PREVIOUS_CHRONOLOGICAL_THREAD
-            // Since the auto advance is happening after the move, the next thread is already the current thread.
-            AutoAdvanceMode.FOLLOWING_THREAD -> STAY_IN_CURRENT_POSITION
+            AutoAdvanceMode.PREVIOUS_THREAD -> NextThreadTarget.PREVIOUS_CHRONOLOGICAL_THREAD
+            AutoAdvanceMode.FOLLOWING_THREAD -> NextThreadTarget.NEXT_CHRONOLOGICAL_THREAD
             AutoAdvanceMode.THREADS_LIST -> null
             AutoAdvanceMode.NATURAL_THREAD -> {
                 if (localSettings.autoAdvanceNaturalThread == AutoAdvanceMode.PREVIOUS_THREAD) {
-                    PREVIOUS_CHRONOLOGICAL_THREAD
+                    NextThreadTarget.PREVIOUS_CHRONOLOGICAL_THREAD
                 } else {
-                    STAY_IN_CURRENT_POSITION
+                    NextThreadTarget.NEXT_CHRONOLOGICAL_THREAD
                 }
             }
         }
@@ -1093,14 +1092,16 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         LOWERED,
     }
 
+    enum class NextThreadTarget {
+        PREVIOUS_CHRONOLOGICAL_THREAD,
+        NEXT_CHRONOLOGICAL_THREAD,
+    }
+
     companion object {
         private val TAG = ThreadFragment::class.java.simpleName
 
         private const val COLLAPSE_TITLE_THRESHOLD = 0.5
         private const val ARCHIVE_INDEX = 2
-
-        private const val PREVIOUS_CHRONOLOGICAL_THREAD = -1
-        private const val STAY_IN_CURRENT_POSITION = 0
 
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
