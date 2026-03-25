@@ -17,13 +17,13 @@
  */
 
 function reportOverScroll(clientWidth, scrollWidth, messageUid) {
-    window.kmail.reportOverScroll(clientWidth, scrollWidth, messageUid);
+    globalThis.kmail.reportOverScroll(clientWidth, scrollWidth, messageUid);
 }
 
 function reportError(error, scriptFirstLine, messageUid) {
-    window.kmail.reportError(error.name, error.message, error.stack, scriptFirstLine, messageUid);
+    globalThis.kmail.reportError(error.name, error.message, error.stack, scriptFirstLine, messageUid);
 }
 
 function webviewFinishedLoading() {
-    window.kmail.webviewFinishedLoading();
+    globalThis.kmail.webviewFinishedLoading();
 }
