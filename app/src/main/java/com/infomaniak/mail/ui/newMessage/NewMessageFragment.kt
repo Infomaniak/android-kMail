@@ -442,9 +442,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() = with(binding) {
-        editorWebView.initEditorWebviewBridge(onImagesDeletedFromQuotes = { cids ->
-            newMessageViewModel.deleteInlineAttachments(cids)
-        })
+        editorWebView.initEditorWebviewBridge(onImagesDeletedFromQuotes = newMessageViewModel::deleteInlineAttachments)
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
         editorAiAnimation.setAnimation(R.raw.euria)

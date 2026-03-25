@@ -21,12 +21,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.MotionEvent
 import android.view.ViewParent
-import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
-import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
+import com.infomaniak.mail.data.models.javascriptBridge.MessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
@@ -37,7 +37,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.loadCss
-import org.json.JSONArray
 import kotlin.math.abs
 
 class WebViewUtils(context: Context) {
@@ -83,75 +82,17 @@ class WebViewUtils(context: Context) {
         registerBreakLongWords()
     }
 
-    class EditorJavascriptBridge(
-        private val onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null,
-    ) {
-        @JavascriptInterface
-        fun onImagesDeletedFromQuotes(cidJson: String) {
-            runCatching {
-                val cids = JSONArray(cidJson)
-                    .let { jsonArray -> (0 until jsonArray.length()).map { jsonArray.getString(it) } }
-                onImagesDeletedFromQuotes?.invoke(cids)
-            }.onFailure {
-                SentryLog.e(TAG, "Failed to parse CIDs")
-            }
-        }
-    }
-
-    class JavascriptBridge(
-        private val onWebViewFinishedLoading: (() -> Unit)? = null,
-    ) {
-
-        @JavascriptInterface
-        fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
-            SentryDebug.sendOverScrolledMessage(clientWidth, scrollWidth, messageUid)
-        }
-
-        @JavascriptInterface
-        fun reportError(
-            errorName: String,
-            errorMessage: String,
-            errorStack: String,
-            scriptFirstLine: String,
-            messageUid: String,
-        ) {
-            val correctErrorStack = fixStackTraceLineNumber(errorStack, scriptFirstLine)
-            SentryDebug.sendJavaScriptError(errorName, errorMessage, correctErrorStack, messageUid)
-        }
-
-        @JavascriptInterface
-        fun webviewFinishedLoading() {
-            onWebViewFinishedLoading?.invoke()
-        }
-
-        private fun fixStackTraceLineNumber(errorStack: String, scriptFirstLine: String): String {
-            var correctErrorStack = errorStack
-            val matches = "about:blank:([0-9]+):".toRegex().findAll(correctErrorStack)
-            matches.forEach { match ->
-                val lineNumber = match.groupValues[1]
-                val newLineNumber = lineNumber.toInt() - scriptFirstLine.toInt() + 1
-                correctErrorStack = correctErrorStack.replace(match.groupValues[0], "about:blank:$newLineNumber:")
-            }
-            return correctErrorStack
-        }
-    }
-
     companion object {
-        private const val TAG = "JavascriptBridge"
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
-        lateinit var jsBridge: JavascriptBridge // TODO: Avoid excessive memory consumption with injection
+        lateinit var messageDisplayJsBridge: MessageDisplayJavascriptBridge // TODO: Avoid excessive memory consumption with injection
         lateinit var editorJsBridge: EditorJavascriptBridge
 
-        fun initJavascriptBridge(
-            onWebViewFinishedLoading: (() -> Unit)? = null,
-        ) {
-            jsBridge = JavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
+        fun initMessageDisplayJavascriptBridge(onWebViewFinishedLoading: () -> Unit) {
+            messageDisplayJsBridge = MessageDisplayJavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
         }
 
-        fun initEditorJsBridge(
-            onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null,
-        ) {
+        fun initEditorJsBridge(onImagesDeletedFromQuotes: (List<String>) -> Unit) {
             editorJsBridge = EditorJavascriptBridge(onImagesDeletedFromQuotes = onImagesDeletedFromQuotes)
         }
 
