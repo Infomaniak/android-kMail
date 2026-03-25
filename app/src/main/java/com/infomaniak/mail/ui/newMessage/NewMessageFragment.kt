@@ -476,7 +476,7 @@ class NewMessageFragment : Fragment() {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
-                    val isBodyEmpty = newMessageViewModel.bodyIsEmpty(draft.body)
+                    val isBodyEmpty = MessageBodyUtils.isBodyEmpty(draft)
                     changePlaceholderVisibility(isVisible = isBodyEmpty)
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
                     binding.subjectTextField.setText(draft.subject)

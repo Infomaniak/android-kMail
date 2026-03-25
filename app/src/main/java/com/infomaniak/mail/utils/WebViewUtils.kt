@@ -90,10 +90,7 @@ class WebViewUtils(context: Context) {
         fun onImagesDeletedFromQuotes(cidJson: String) {
             runCatching {
                 val cids = JSONArray(cidJson)
-                    .let { jsonArray ->
-                        (0 until jsonArray.length())
-                            .map { jsonArray.getString(it) }
-                    }
+                    .let { jsonArray -> (0 until jsonArray.length()).map { jsonArray.getString(it) } }
                 onImagesDeletedFromQuotes?.invoke(cids)
             }.onFailure {
                 SentryLog.e(TAG, "Failed to parse CIDs")
@@ -198,11 +195,6 @@ class WebViewUtils(context: Context) {
         private fun WebView.removeBackgroundJs() {
             val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
             evaluateJavascript(removeBackgroundStyleScript, null)
-        }
-
-        fun WebView.destroyAndClearHistory() {
-            clearHistory()
-            destroy()
         }
 
         /**
