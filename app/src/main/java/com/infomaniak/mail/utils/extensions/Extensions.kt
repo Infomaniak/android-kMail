@@ -269,11 +269,11 @@ fun WebView.initDisplayWebViewClientAndBridge(
     onBlockedResourcesDetected: (() -> Unit)? = null,
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
     onPageFinished: (() -> Unit)? = null,
-    onWebViewFinishedLoading: (() -> Unit)? = null,
+    onWebViewFinishedLoading: () -> Unit,
 ): MessageDisplayWebViewClient {
 
-    WebViewUtils.initJavascriptBridge(onWebViewFinishedLoading)
-    addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
+    WebViewUtils.initMessageDisplayJavascriptBridge(onWebViewFinishedLoading)
+    addJavascriptInterface(WebViewUtils.messageDisplayJsBridge, "kmail")
 
     val cidDictionary = mutableMapOf<String, Attachment>().apply {
         attachments.forEach {
@@ -296,7 +296,7 @@ fun WebView.initDisplayWebViewClientAndBridge(
     }
 }
 
-fun WebView.initEditorWebviewBridge(onImagesDeletedFromQuotes: ((List<String>) -> Unit)? = null) {
+fun WebView.initEditorWebviewBridge(onImagesDeletedFromQuotes: (List<String>) -> Unit) {
     settings.setupNewMessageWebViewSettings()
     WebViewUtils.initEditorJsBridge(onImagesDeletedFromQuotes)
     addJavascriptInterface(WebViewUtils.editorJsBridge, "kmail")
