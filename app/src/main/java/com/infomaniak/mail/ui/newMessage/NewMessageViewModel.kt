@@ -123,6 +123,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -131,7 +132,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -222,10 +222,10 @@ class NewMessageViewModel @Inject constructor(
     val isShimmering: StateFlow<Boolean> = _isShimmering
 
     private val _isQuotesButtonVisible = MutableStateFlow(false)
-    val isQuotesButtonVisible: StateFlow<Boolean> = _isQuotesButtonVisible
+    val isQuotesButtonVisible: StateFlow<Boolean> = _isQuotesButtonVisible.asStateFlow()
 
     private val _isPlaceHolderVisible = MutableStateFlow(false)
-    val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible
+    val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -234,10 +234,6 @@ class NewMessageViewModel @Inject constructor(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
-
-    fun changePlaceholderVisibility(isVisible: Boolean) {
-        _isPlaceHolderVisible.value = isVisible
-    }
 
     private val _currentMailboxFlow: Flow<Mailbox> = mailboxRefFlow.mapLatest {
         val mailbox = mailboxController.getMailbox(it.userId, it.mailboxId)
@@ -337,10 +333,10 @@ class NewMessageViewModel @Inject constructor(
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
             _isShimmering.emit(false)
-            initResult.postValue(InitResult(it, signatures))
-            if (bodyHasQuotes(draft.body) || bodyHasQuotes(initialBody.content)) {
+            if (initialBody.hasQuotes()) {
                 changeQuotesButtonVisibility(isVisible = true)
             }
+            initResult.postValue(InitResult(it, signatures))
         }
 
         emit(draft)
@@ -543,50 +539,20 @@ class NewMessageViewModel @Inject constructor(
         isEncryptionActivated.postValue(isEncrypted)
     }
 
-    private fun bodyHasQuotes(body: String): Boolean {
-        val doc = jsoupParseWithLog(body)
+    private fun BodyContentPayload.hasQuotes(): Boolean {
+        if (type == BodyContentType.TEXT_PLAIN_WITHOUT_HTML || type == BodyContentType.TEXT_PLAIN_WITH_HTML) return false
+
+        val doc = jsoupParseWithLog(content)
         return doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).isNotEmpty() ||
                 doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME).isNotEmpty()
     }
 
-    fun bodyIsEmpty(bodyHtml: String): Boolean {
-        val body = getBodyWithoutSignatureAndQuotes(bodyHtml)
-        return body.isBlank()
-    }
-
-    private fun getBodyWithoutSignatureAndQuotes(draftBody: String): String {
-
-        fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
-            return getElementsByClass(divClassName).firstOrNull()?.let {
-                it.remove()
-                val first = body().html()
-                val second = if (it.html().isBlank()) null else it.outerHtml()
-                first to second
-            } ?: (defaultValue to null)
-        }
-
-        fun String.lastIndexOfOrMax(string: String): Int {
-            val index = lastIndexOf(string)
-            return if (index == -1) Int.MAX_VALUE else index
-        }
-
-        val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
-
-        val (bodyWithQuote) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
-
-        val replyPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
-        val (body) = if (replyPosition < forwardPosition) {
-            doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
-        } else {
-            doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
-        }
-
-        return body.htmlToText()
-    }
-
     fun changeQuotesButtonVisibility(isVisible: Boolean) {
         _isQuotesButtonVisible.value = isVisible
+    }
+
+    fun changePlaceholderVisibility(isVisible: Boolean) {
+        _isPlaceHolderVisible.value = isVisible
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
