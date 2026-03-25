@@ -441,6 +441,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() = with(binding) {
+        editorWebView.settings.setupNewMessageWebViewSettings()
         editorWebView.initEditorWebviewBridge(onInlineImagesDeleted = newMessageViewModel::deleteInlineAttachments)
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
@@ -503,7 +504,6 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
-        settings.setupNewMessageWebViewSettings()
         val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
         webViewClient = initEditorWebviewClient(
             attachments = draft.attachments,
@@ -537,8 +537,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setupToggleQuotesButton() = with(binding) {
-        quotesToggleButton.setOnClickListener {
+    private fun setupToggleQuotesButton() {
+        binding.quotesToggleButton.setOnClickListener {
             newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
         }
     }

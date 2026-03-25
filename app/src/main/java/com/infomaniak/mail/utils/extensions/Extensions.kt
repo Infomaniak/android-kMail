@@ -117,7 +117,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
-import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
@@ -293,7 +292,6 @@ fun WebView.initDisplayWebViewClientAndBridge(
 }
 
 fun WebView.initEditorWebviewBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
-    settings.setupNewMessageWebViewSettings()
     WebViewUtils.initEditorJsBridge(onInlineImagesDeleted)
     addJavascriptInterface(WebViewUtils.editorJsBridge, "kmail")
 }
