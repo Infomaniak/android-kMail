@@ -122,6 +122,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
@@ -514,17 +516,20 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeQuotesVisibility() = viewLifecycleOwner.lifecycleScope.launch {
-        newMessageViewModel.isQuotesButtonVisible.collect { isQuotesButtonVisible ->
-            binding.quotesToggleButton.isVisible = isQuotesButtonVisible
+        combine(
+            newMessageViewModel.isQuotesButtonVisible,
+            newMessageViewModel.isShimmering.filterNot { it }
+        ) { isQuoteVisible, _ ->
+            isQuoteVisible
+        }.collect { isQuoteToggleButtonVisible ->
+            binding.quotesToggleButton.isVisible = isQuoteToggleButtonVisible
 
-            // We wait until the webview finished shimmering before changing the quotes' visibility.
-            if (!newMessageViewModel.isShimmering.value) {
-                if (!isQuotesButtonVisible) {
-                    // User toggled show quotes visibility
-                    binding.editorWebView.evaluateJavascript(showQuotesScript, null)
-                } else {
-                    binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
-                }
+            if (isQuoteToggleButtonVisible) {
+                // If the button is visible, quotes are hidden.
+                binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
+            } else {
+                // User toggled show quotes visibility
+                binding.editorWebView.evaluateJavascript(showQuotesScript, null)
             }
         }
     }
