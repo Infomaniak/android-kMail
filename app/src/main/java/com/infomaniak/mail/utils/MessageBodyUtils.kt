@@ -116,15 +116,15 @@ object MessageBodyUtils {
         return htmlDocument.outerHtml() to quotes
     }
 
-    fun isBodyEmpty(draft: Draft): Boolean {
+    fun isBodyBlank(draft: Draft): Boolean {
         val remoteBody = draft.body
-        if (remoteBody.isEmpty()) return true
+        if (remoteBody.isBlank()) return true
 
         return when (draft.mimeType) {
             Utils.TEXT_PLAIN -> remoteBody
             Utils.TEXT_HTML -> getBodyWithoutSignatureAndQuotesFromHtml(remoteBody)
             else -> error("Cannot load an email which is not of type text/plain or text/html")
-        }.isEmpty()
+        }.isBlank()
     }
 
     /**
@@ -148,14 +148,14 @@ object MessageBodyUtils {
 
         val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
 
-        val (bodyWithQuote) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
+        val (bodyWithQuote) = doc.split(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
 
-        val replyPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val replyPosition = draftBody.lastIndexOfOrMax(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = draftBody.lastIndexOfOrMax(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
         val (body) = if (replyPosition < forwardPosition) {
-            doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+            doc.split(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
-            doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+            doc.split(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
         return body.htmlToText()
