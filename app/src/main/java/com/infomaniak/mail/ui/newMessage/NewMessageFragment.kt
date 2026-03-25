@@ -361,7 +361,7 @@ class NewMessageFragment : Fragment() {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editorWebView.exportHtml { html ->
             newMessageViewModel.editorBodyInitializer.postValue(
-                NewMessageViewModel.EditorBodyInitialization(
+                EditorBodyData.Reload(
                     BodyContentPayload(html, BodyContentType.HTML_SANITIZED)
                 )
             )
@@ -721,9 +721,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeBodyLoader() = with(newMessageViewModel) {
-        editorBodyInitializer.observe(viewLifecycleOwner) { (body, isFirstInitialization) ->
-            val bodyContent = editorContentManager.setContent(binding.editorWebView, body)
-            if (isFirstInitialization) saveInitialSnapshot(bodyContent)
+        editorBodyInitializer.observe(viewLifecycleOwner) { bodyContentData ->
+            val bodyContent = editorContentManager.setContent(binding.editorWebView, bodyContentData.bodyContentPayload)
+            if (bodyContentData is EditorBodyData.Initial) saveInitialSnapshot(
+                bodyContent,
+                bodyContentData.draft
+            )
             setupToggleQuotesButton()
         }
     }
