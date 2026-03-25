@@ -37,6 +37,8 @@ object MessageBodyUtils {
     const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
     const val INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME = "ik_mail_quote"
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
+    // This ID is used for finding the signature to replace it. REMOVE before sending the email.
+    const val EDITOR_LOCAL_SIGNATURE_ID = "ikEditorLocalSignature"
 
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
