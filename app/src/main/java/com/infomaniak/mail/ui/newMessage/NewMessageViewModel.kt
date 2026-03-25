@@ -949,7 +949,6 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
-        body = removeEmptyQuotes(uiBodyValue)
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -965,23 +964,30 @@ class NewMessageViewModel @Inject constructor(
 
         // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
         if (!isFinishing) {
-            copyFromRealm().saveSnapshot(body)
+            copyFromRealm().saveSnapshot(uiBodyValue)
             isNewMessage = false
         }
+
+        body = removeUnwantedHtml(uiBodyValue)
     }
 
-    private fun removeEmptyQuotes(html: String): String {
+    /**
+     * We filter out some HTML elements that we don't want to send with the email.
+     */
+    private fun removeUnwantedHtml(html: String): String {
         val doc = jsoupParseWithLog(html)
+
+        // Remove id used for replacing signature.
+        doc.getElementById(MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID)?.removeAttr("id")
 
         // If the user deleted the quotes' text, remove the quotes' div so user doesn't write in it
         // (the text could get hidden later with the toggle button).
         if (bodyHasEmptyQuotes(html)) {
             doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
             doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
-            return doc.html()
         }
 
-        return html
+        return doc.html()
     }
 
     private fun bodyHasEmptyQuotes(body: String): Boolean {
