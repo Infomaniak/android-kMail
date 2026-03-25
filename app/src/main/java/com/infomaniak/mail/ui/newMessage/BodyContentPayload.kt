@@ -28,7 +28,7 @@ data class BodyContentPayload(val content: String, val type: BodyContentType) {
         fun emptyBody() =
             BodyContentPayload(
                 content = "<br><br>",
-                type = BodyContentType.HTML_UNSANITIZED
+                type = BodyContentType.HTML_SANITIZED
             )
     }
 }

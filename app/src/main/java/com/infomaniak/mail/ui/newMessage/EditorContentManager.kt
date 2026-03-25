@@ -29,7 +29,7 @@ import javax.inject.Inject
 class EditorContentManager @Inject constructor() {
 
     /**
-     * Returns the html that was processed and inserted inside the editor
+     * @return The html that was processed and inserted inside the editor
      * */
     fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload): String = with(editor) {
         return when (bodyContentPayload.type) {
