@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread.webViewClient
 
 import android.content.Context
-import android.net.Uri
 import android.webkit.WebView
 import com.infomaniak.mail.data.models.Attachment
 
@@ -26,19 +25,14 @@ class EditorWebViewClient(
     context: Context,
     cidDictionary: MutableMap<String, Attachment>,
     shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: (() -> Unit)? = null,
-    navigateToNewMessageActivity: ((Uri) -> Unit)?,
-    onPageFinished: (() -> Unit)? = null,
+    private val onPageFinished: () -> Unit,
 ) : MessageWebViewClient(
     context,
     cidDictionary,
     shouldLoadDistantResources,
-    onBlockedResourcesDetected,
-    navigateToNewMessageActivity,
-    onPageFinished,
 ) {
     override fun onPageFinished(webView: WebView, url: String?) {
         webView.evaluateJavascript("removeAllProperties()", null)
-        super.onPageFinished(webView, url)
+        onPageFinished()
     }
 }
