@@ -18,12 +18,14 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
 import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
+import com.infomaniak.mail.utils.extensions.htmlToText
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -63,6 +65,7 @@ object MessageBodyUtils {
         "[name=\"quote\"]", // GMX
     )
 
+    //region Split
     suspend fun splitContentAndQuote(body: Body): SplitBody {
 
         val bodyContent = body.value
@@ -113,12 +116,51 @@ object MessageBodyUtils {
         return htmlDocument.outerHtml() to quotes
     }
 
-    fun addPrintHeader(context: Context, message: Message, htmlDocument: Document) {
-        htmlDocument.body().apply {
-            attr("style", "margin: 40px")
-            insertChildren(0, createPrintHeader(context, message))
-        }
+    fun isBodyEmpty(draft: Draft): Boolean {
+        val remoteBody = draft.body
+        if (remoteBody.isEmpty()) return true
+
+        return when (draft.mimeType) {
+            Utils.TEXT_PLAIN -> remoteBody
+            Utils.TEXT_HTML -> getBodyWithoutSignatureAndQuotesFromHtml(remoteBody)
+            else -> error("Cannot load an email which is not of type text/plain or text/html")
+        }.isEmpty()
     }
+
+    /**
+     * This only takes into account infomaniak's quotes and signatures.
+     */
+    private fun getBodyWithoutSignatureAndQuotesFromHtml(draftBody: String): String {
+
+        fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
+            return getElementsByClass(divClassName).firstOrNull()?.let {
+                it.remove()
+                val first = body().html()
+                val second = if (it.html().isBlank()) null else it.outerHtml()
+                first to second
+            } ?: (defaultValue to null)
+        }
+
+        fun String.lastIndexOfOrMax(string: String): Int {
+            val index = lastIndexOf(string)
+            return if (index == -1) Int.MAX_VALUE else index
+        }
+
+        val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
+
+        val (bodyWithQuote) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
+
+        val replyPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val (body) = if (replyPosition < forwardPosition) {
+            doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        } else {
+            doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        }
+
+        return body.htmlToText()
+    }
+    //endregion
 
     fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>): String {
         return body + formatSubBodiesContent(subBodies)
@@ -135,6 +177,13 @@ object MessageBodyUtils {
         }
 
         return subBodiesContent
+    }
+
+    fun addPrintHeader(context: Context, message: Message, htmlDocument: Document) {
+        htmlDocument.body().apply {
+            attr("style", "margin: 40px")
+            insertChildren(0, createPrintHeader(context, message))
+        }
     }
 
     //region Utils
