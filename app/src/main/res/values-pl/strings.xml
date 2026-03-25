@@ -181,8 +181,6 @@
     <string name="contentDescriptionButtonDelete">Usuń %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Usuń wersję roboczą</string>
     <string name="contentDescriptionButtonDeleteHistory">Usuń wpis historii</string>
-    <string name="contentDescriptionButtonDeleteQuote">Usuń zacytowane wiadomości</string>
-    <string name="contentDescriptionButtonDeleteSignature">Usuń podpis</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Rozwiń wybór konta</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Rozwiń niestandardowe foldery</string>
     <string name="contentDescriptionButtonExpandFolder">Rozwiń folder %s</string>

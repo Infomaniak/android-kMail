@@ -179,8 +179,6 @@
     <string name="contentDescriptionButtonDelete">Slett %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Slett utkast</string>
     <string name="contentDescriptionButtonDeleteHistory">Slett historikkoppføring</string>
-    <string name="contentDescriptionButtonDeleteQuote">Slett siterte meldinger</string>
-    <string name="contentDescriptionButtonDeleteSignature">Slett signatur</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Utvid kontovalg</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Utvid egendefinerte mapper</string>
     <string name="contentDescriptionButtonExpandFolder">Utvid mappe %s</string>

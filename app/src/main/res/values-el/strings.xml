@@ -179,8 +179,6 @@
     <string name="contentDescriptionButtonDelete">Διαγραφή %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Διαγραφή προχείρου</string>
     <string name="contentDescriptionButtonDeleteHistory">Διαγραφή καταχώρησης ιστορικού</string>
-    <string name="contentDescriptionButtonDeleteQuote">Διαγραφή παρατιθέμενων μηνυμάτων</string>
-    <string name="contentDescriptionButtonDeleteSignature">Διαγραφή υπογραφής</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ανάπτυξη επιλογής λογαριασμού</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Ανάπτυξη προσαρμοσμένων φακέλων</string>
     <string name="contentDescriptionButtonExpandFolder">Ανάπτυξη φακέλου %s</string>

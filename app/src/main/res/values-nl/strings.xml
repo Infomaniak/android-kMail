@@ -179,8 +179,6 @@
     <string name="contentDescriptionButtonDelete">%s verwijderen</string>
     <string name="contentDescriptionButtonDeleteDraft">Concept verwijderen</string>
     <string name="contentDescriptionButtonDeleteHistory">Geschiedenisingang verwijderen</string>
-    <string name="contentDescriptionButtonDeleteQuote">Geciteerde berichten verwijderen</string>
-    <string name="contentDescriptionButtonDeleteSignature">Handtekening verwijderen</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Accountselectie uitklappen</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Aangepaste mappen uitklappen</string>
     <string name="contentDescriptionButtonExpandFolder">Map %s uitklappen</string>
