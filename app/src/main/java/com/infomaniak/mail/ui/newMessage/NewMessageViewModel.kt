@@ -499,11 +499,15 @@ class NewMessageViewModel @Inject constructor(
             cc = cc.toSet(),
             bcc = bcc.toSet(),
             subject = subject,
-            uiBody = uiBodyValue,
+            uiBody = uiBodyValue.normalizeCarriageReturns(),
             isEncrypted = isEncrypted,
             encryptionPassword = encryptionKey ?: "",
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
         )
+    }
+
+    private fun String.normalizeCarriageReturns(): String {
+        return replace("\r\n", "\n")
     }
 
     fun saveInitialSnapshot(body: String) = viewModelScope.launch(ioCoroutineContext) {
