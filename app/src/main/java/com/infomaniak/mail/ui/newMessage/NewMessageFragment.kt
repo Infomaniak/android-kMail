@@ -92,9 +92,9 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getQuotesImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getShowQuotesScript
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -140,7 +140,7 @@ class NewMessageFragment : Fragment() {
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val showQuotesScript by lazy { requireContext().getShowQuotesScript() }
     private val hideQuotesStyle by lazy { requireContext().getHideQuotesStyle() }
-    private val quoteImagesObserverScript by lazy { requireContext().getQuotesImagesObserverScript() }
+    private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
@@ -439,9 +439,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() = with(binding) {
-        editorWebView.initEditorWebviewBridge(onImagesDeletedFromQuotes = newMessageViewModel::deleteInlineAttachments)
+        editorWebView.initEditorWebviewBridge(onInlineImagesDeleted = newMessageViewModel::deleteInlineAttachments)
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
+        setEditorScript()
         editorAiAnimation.setAnimation(R.raw.euria)
         setToolbarEnabledStatus(false)
         handleFocusChanges()
@@ -452,6 +453,11 @@ class NewMessageFragment : Fragment() {
         if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
+    }
+
+    private fun setEditorScript() = with(binding.editorWebView) {
+        addScript(editorJsBridgeScript)
+        evaluateJavascript(deletedInlineImagesObserverScript, null)
     }
 
     private fun handleFocusChanges() = with(newMessageViewModel) {
@@ -496,12 +502,10 @@ class NewMessageFragment : Fragment() {
 
     private fun configureUiWithDraftData(draft: Draft) = with(binding.editorWebView) {
         settings.setupNewMessageWebViewSettings()
-        addScript(editorJsBridgeScript)
         val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
         webViewClient = initEditorWebviewClient(
             attachments = draft.attachments,
             shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
-            navigateToNewMessageActivity = null,
             onPageFinished = { notifyPageHasLoaded() },
         )
     }
@@ -515,7 +519,6 @@ class NewMessageFragment : Fragment() {
                 if (!isQuotesButtonVisible) {
                     // User toggled show quotes visibility
                     binding.editorWebView.evaluateJavascript(showQuotesScript, null)
-                    binding.editorWebView.evaluateJavascript(quoteImagesObserverScript, null)
                 } else {
                     binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
                 }

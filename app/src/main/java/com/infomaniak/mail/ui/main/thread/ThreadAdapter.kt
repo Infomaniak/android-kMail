@@ -802,8 +802,8 @@ class ThreadAdapter(
         quoteButtonFrameLayout.isVisible = hasQuote
 
         initWebViewClientIfNeeded(
-            message,
-            threadAdapterCallbacks?.navigateToNewMessageActivity,
+            message = message,
+            navigateToNewMessageActivity = threadAdapterCallbacks?.navigateToNewMessageActivity,
             onPageFinished = { onExpandedMessageLoaded(message.uid) },
             onWebViewFinishedLoading = { threadAdapterCallbacks?.onBodyWebViewFinishedLoading?.invoke() },
         )

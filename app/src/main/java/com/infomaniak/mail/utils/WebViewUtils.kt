@@ -89,8 +89,8 @@ class WebViewUtils(context: Context) {
             messageDisplayJsBridge = MessageDisplayJavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
         }
 
-        fun initEditorJsBridge(onImagesDeletedFromQuotes: (List<String>) -> Unit) {
-            editorJsBridge = EditorJavascriptBridge(onImagesDeletedFromQuotes = onImagesDeletedFromQuotes)
+        fun initEditorJsBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
+            editorJsBridge = EditorJavascriptBridge(onInlineImagesDeleted = onInlineImagesDeleted)
         }
 
         private fun WebSettings.setupCommonWebViewSettings() {

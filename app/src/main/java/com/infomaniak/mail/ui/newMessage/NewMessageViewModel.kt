@@ -1096,9 +1096,8 @@ class NewMessageViewModel @Inject constructor(
 
     fun deleteInlineAttachments(cids: List<String>) {
         val cidsToDelete = cids.map { it.removePrefix("cid:") }
-        val newAttachments = attachmentsLiveData.value
-            ?.filter { attachment -> !cidsToDelete.contains(attachment.contentId) }
-            ?: emptyList()
+        val attachmentsData = attachmentsLiveData.value ?: return
+        val newAttachments = attachmentsData.filter { attachment -> !cidsToDelete.contains(attachment.contentId) }
         attachmentsLiveData.postValue(newAttachments)
     }
 
