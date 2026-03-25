@@ -18,14 +18,10 @@
 package com.infomaniak.mail.ui.main.thread.webViewClient
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.infomaniak.core.ui.showToast
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
@@ -39,8 +35,6 @@ abstract class MessageWebViewClient(
     private val cidDictionary: MutableMap<String, Attachment>,
     private var shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
-    private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
-    private val onPageFinished: (() -> Unit)? = null,
 ) : WebViewClient() {
 
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
@@ -80,31 +74,6 @@ abstract class MessageWebViewClient(
             emptyResource
         }
     }.getOrDefault(super.shouldInterceptRequest(view, request))
-
-    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        request.url?.let { uri ->
-
-            if (uri.scheme == "mailto") {
-                navigateToNewMessageActivity?.invoke(uri)
-                return true
-            }
-
-            runCatching {
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-            }.onFailure {
-                context.showToast(R.string.startActivityCantHandleAction)
-            }
-        }
-        return true
-    }
-
-    override fun onPageFinished(webView: WebView, url: String?) {
-        runCatchingRealm {
-            onPageFinished?.invoke()
-        }
-    }
 
     fun unblockDistantResources() {
         shouldLoadDistantResources = true

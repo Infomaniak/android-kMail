@@ -18,12 +18,9 @@
 
 (function() {
     var mutationObserver;
-    var QUOTE_SELECTORS = '.ik_mail_quote, .forwardContentMessage';
 
     function setupObserver() {
-        // Find all quotes containers to observe
-        var quoteElements = document.querySelectorAll(QUOTE_SELECTORS);
-        if (quoteElements.length === 0) return ;
+        var rootElement = document;
 
         mutationObserver = new MutationObserver(function(mutationRecords) {
            var removedCids = [];
@@ -45,22 +42,15 @@
 
            // Notify if images were removed
            if (removedCids.length > 0) {
-               onImagesDeletedFromQuotes(JSON.stringify(removedCids));
+               onInlineImagesDeleted(JSON.stringify(removedCids));
            }
         });
 
-        // Observe quotes containers
-        quoteElements.forEach(function(quoteElement) {
-           mutationObserver.observe(quoteElement, {
-              childList: true,
-              subtree: true,
-           })
+        mutationObserver.observe(rootElement, {
+          childList: true,
+          subtree: true,
         })
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupObserver);
-    } else {
-        setupObserver();
-    }
+    setupObserver();
 })();

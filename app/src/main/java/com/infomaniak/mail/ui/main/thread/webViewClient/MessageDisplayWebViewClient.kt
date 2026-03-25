@@ -18,10 +18,14 @@
 package com.infomaniak.mail.ui.main.thread.webViewClient
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import com.infomaniak.core.ui.showToast
 import com.infomaniak.core.ui.view.toDp
 import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewVersionUtils
@@ -33,17 +37,34 @@ class MessageDisplayWebViewClient(
     cidDictionary: MutableMap<String, Attachment>,
     private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: (() -> Unit)? = null,
-    navigateToNewMessageActivity: ((Uri) -> Unit)?,
-    onPageFinished: (() -> Unit)? = null,
+    onBlockedResourcesDetected: () -> Unit,
+    private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
+    private val onPageFinished: (() -> Unit)?,
 ) : MessageWebViewClient(
     context,
     cidDictionary,
     shouldLoadDistantResources,
     onBlockedResourcesDetected,
-    navigateToNewMessageActivity,
-    onPageFinished,
 ) {
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        request.url?.let { uri ->
+
+            if (uri.scheme == "mailto") {
+                navigateToNewMessageActivity?.invoke(uri)
+                return true
+            }
+
+            runCatching {
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+            }.onFailure {
+                context.showToast(R.string.startActivityCantHandleAction)
+            }
+        }
+        return true
+    }
+
     override fun onPageFinished(webView: WebView, url: String?) {
         runCatchingRealm {
             val widthInDp = webView.width.toDp(webView)
@@ -67,7 +88,7 @@ class MessageDisplayWebViewClient(
             }
             val escapedMessageUid = looselyEscapeAsStringLiteralForJs(messageUid)
             webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, '$escapedMessageUid')")
-            super.onPageFinished(webView, url)
+            onPageFinished?.invoke()
         }
     }
 }

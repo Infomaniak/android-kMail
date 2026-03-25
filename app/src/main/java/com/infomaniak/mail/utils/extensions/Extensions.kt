@@ -259,12 +259,14 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
         SimpleColorFilter(illuColors.color)
     }
 }
+//endregion
 
+//region WebViewClient
 fun WebView.initDisplayWebViewClientAndBridge(
     attachments: List<Attachment>,
     messageUid: String,
     shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: (() -> Unit)? = null,
+    onBlockedResourcesDetected: () -> Unit,
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
     onPageFinished: (() -> Unit)? = null,
     onWebViewFinishedLoading: () -> Unit,
@@ -273,13 +275,7 @@ fun WebView.initDisplayWebViewClientAndBridge(
     WebViewUtils.initMessageDisplayJavascriptBridge(onWebViewFinishedLoading)
     addJavascriptInterface(WebViewUtils.messageDisplayJsBridge, "kmail")
 
-    val cidDictionary = mutableMapOf<String, Attachment>().apply {
-        attachments.forEach {
-            it.contentId?.let { cid ->
-                if (cid.isNotBlank()) this[cid] = it
-            }
-        }
-    }
+    val cidDictionary = attachments.toCidDictionary()
 
     return MessageDisplayWebViewClient(
         context,
@@ -294,36 +290,36 @@ fun WebView.initDisplayWebViewClientAndBridge(
     }
 }
 
-fun WebView.initEditorWebviewBridge(onImagesDeletedFromQuotes: (List<String>) -> Unit) {
+fun WebView.initEditorWebviewBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
     settings.setupNewMessageWebViewSettings()
-    WebViewUtils.initEditorJsBridge(onImagesDeletedFromQuotes)
+    WebViewUtils.initEditorJsBridge(onInlineImagesDeleted)
     addJavascriptInterface(WebViewUtils.editorJsBridge, "kmail")
 }
 
 fun WebView.initEditorWebviewClient(
     attachments: List<Attachment>,
     shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: (() -> Unit)? = null,
-    navigateToNewMessageActivity: ((Uri) -> Unit)?,
-    onPageFinished: (() -> Unit)? = null,
+    onPageFinished: () -> Unit,
 ): EditorWebViewClient {
-    val cidDictionary = mutableMapOf<String, Attachment>().apply {
-        attachments.forEach {
-            it.contentId?.let { cid ->
-                if (cid.isNotBlank()) this[cid] = it
-            }
-        }
-    }
+    val cidDictionary = attachments.toCidDictionary()
 
     return EditorWebViewClient(
         context,
         cidDictionary,
         shouldLoadDistantResources,
-        onBlockedResourcesDetected,
-        navigateToNewMessageActivity,
         onPageFinished,
     ).also {
         webViewClient = it
+    }
+}
+
+private fun List<Attachment>.toCidDictionary(): MutableMap<String, Attachment> {
+    return mutableMapOf<String, Attachment>().apply {
+        forEach<Attachment> {
+            it.contentId?.let { cid ->
+                if (cid.isNotBlank()) this[cid] = it
+            }
+        }
     }
 }
 //endregion
