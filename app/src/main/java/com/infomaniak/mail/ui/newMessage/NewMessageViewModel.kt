@@ -173,9 +173,7 @@ class NewMessageViewModel @Inject constructor(
     inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
-    data class EditorBodyInitialization(val bodyContentPayload: BodyContentPayload, val isFirstInitialization: Boolean = false)
-
-    val editorBodyInitializer = SingleLiveEvent<EditorBodyInitialization>()
+    val editorBodyInitializer = SingleLiveEvent<EditorBodyData>()
 
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.
@@ -510,9 +508,8 @@ class NewMessageViewModel @Inject constructor(
         return replace("\r\n", "\n")
     }
 
-    fun saveInitialSnapshot(body: String) = viewModelScope.launch(ioCoroutineContext) {
-        val draft: Draft? = getLatestLocalDraft(draftLocalUuid)
-        draft?.saveSnapshot(body)
+    fun saveInitialSnapshot(body: String, draft: Draft) = viewModelScope.launch(ioCoroutineContext) {
+        draft.saveSnapshot(body)
     }
 
     private suspend fun Draft.initLiveData(signatures: List<Signature>) {
@@ -533,7 +530,7 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
-        editorBodyInitializer.postValue(EditorBodyInitialization(initialBody, isFirstInitialization = true))
+        editorBodyInitializer.postValue(EditorBodyData.Initial(bodyContentPayload = initialBody, draft = this))
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherRecipientsFieldsAreEmpty.postValue(false)
