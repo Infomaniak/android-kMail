@@ -17,7 +17,7 @@
  */
 
 (function() {
-    const signatureElement = document.querySelector('.%s');
+    const signatureElement = document.getElementById('%s');
     const newSigHtml = %s;
     if (signatureElement) {
         if (newSigHtml === "") {

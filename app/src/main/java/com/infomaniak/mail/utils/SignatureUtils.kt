@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +26,7 @@ import javax.inject.Singleton
 class SignatureUtils @Inject constructor() {
     fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
         return """
-            <div class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME">
+            <div id="$EDITOR_LOCAL_SIGNATURE_ID" class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME">
             $signatureContent
             </div>
         """.trimIndent()

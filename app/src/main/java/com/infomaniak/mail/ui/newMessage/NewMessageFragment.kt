@@ -586,7 +586,7 @@ class NewMessageFragment : Fragment() {
         val escapedSignature = looselyEscapeAsStringLiteralForJs(signatureWithClass)
 
         val replaceSignatureScript = replaceSignatureScript.format(
-            MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID,
             escapedSignature,
             MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
         )
