@@ -181,8 +181,6 @@
     <string name="contentDescriptionButtonDelete">Cancella %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Cancella la bozza</string>
     <string name="contentDescriptionButtonDeleteHistory">Cancella la voce della cronologia</string>
-    <string name="contentDescriptionButtonDeleteQuote">Elimina i messaggi citati</string>
-    <string name="contentDescriptionButtonDeleteSignature">Cancella la firma</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ampliare la selezione degli account</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Espandi le cartelle personalizzate</string>
     <string name="contentDescriptionButtonExpandFolder">Espandi la cartella %s</string>

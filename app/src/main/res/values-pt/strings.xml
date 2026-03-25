@@ -181,8 +181,6 @@
     <string name="contentDescriptionButtonDelete">Eliminar %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Eliminar o rascunho</string>
     <string name="contentDescriptionButtonDeleteHistory">Eliminar entrada do histórico</string>
-    <string name="contentDescriptionButtonDeleteQuote">Eliminar mensagens citadas</string>
-    <string name="contentDescriptionButtonDeleteSignature">Eliminar assinatura</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Expandir seleção de conta</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Expandir pastas personalizadas</string>
     <string name="contentDescriptionButtonExpandFolder">Expandir pasta %s</string>

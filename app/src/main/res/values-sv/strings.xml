@@ -181,8 +181,6 @@
     <string name="contentDescriptionButtonDelete">Ta bort %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Ta bort utkast</string>
     <string name="contentDescriptionButtonDeleteHistory">Ta bort historikpost</string>
-    <string name="contentDescriptionButtonDeleteQuote">Ta bort citerade meddelanden</string>
-    <string name="contentDescriptionButtonDeleteSignature">Ta bort signatur</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Expandera kontoval</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Expandera anpassade mappar</string>
     <string name="contentDescriptionButtonExpandFolder">Expandera mapp %s</string>

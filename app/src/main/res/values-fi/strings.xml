@@ -181,8 +181,6 @@
     <string name="contentDescriptionButtonDelete">Poista %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Poista luonnos</string>
     <string name="contentDescriptionButtonDeleteHistory">Poista historiatietue</string>
-    <string name="contentDescriptionButtonDeleteQuote">Poista lainatut viestit</string>
-    <string name="contentDescriptionButtonDeleteSignature">Poista allekirjoitus</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Laajenna tilin valinta</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Laajenna mukautetut kansiot</string>
     <string name="contentDescriptionButtonExpandFolder">Laajenna kansio %s</string>
