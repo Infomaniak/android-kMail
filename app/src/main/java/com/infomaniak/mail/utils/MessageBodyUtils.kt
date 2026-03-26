@@ -18,10 +18,11 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
+import com.infomaniak.mail.ui.newMessage.BodyContentPayload
+import com.infomaniak.mail.ui.newMessage.BodyContentType
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
 import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
@@ -118,15 +119,18 @@ object MessageBodyUtils {
         return htmlDocument.outerHtml() to quotes
     }
 
-    fun isBodyBlank(draft: Draft): Boolean {
-        val remoteBody = draft.body
-        if (remoteBody.isBlank()) return true
+    fun isBodyBlank(body: BodyContentPayload): Boolean {
+        if (body.content.isBlank()) return true
 
-        return when (draft.mimeType) {
-            Utils.TEXT_PLAIN -> remoteBody
-            Utils.TEXT_HTML -> getBodyWithoutSignatureAndQuotesFromHtml(remoteBody)
-            else -> error("Cannot load an email which is not of type text/plain or text/html")
-        }.isBlank()
+        return when (body.type) {
+            BodyContentType.HTML_UNSANITIZED,
+            BodyContentType.HTML_SANITIZED -> getBodyWithoutSignatureAndQuotesFromHtml(body.content).isBlank()
+            // On these cases we should return body content, but we know it's not blank already.
+            // We don't split text plain with HTML because with this type it shouldn't have quotes or signature
+            // and it would require to transform it to HTML which is an expensive operation
+            BodyContentType.TEXT_PLAIN_WITHOUT_HTML,
+            BodyContentType.TEXT_PLAIN_WITH_HTML -> false
+        }
     }
 
     /**

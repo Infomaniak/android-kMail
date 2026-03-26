@@ -31,60 +31,66 @@ class EditorContentManager @Inject constructor() {
     /**
      * @return The html that was processed and inserted inside the editor
      * */
-    fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload): String = with(editor) {
-        return when (bodyContentPayload.type) {
-            BodyContentType.HTML_SANITIZED -> setSanitizedHtml(bodyContentPayload.content)
-            BodyContentType.HTML_UNSANITIZED -> setUnsanitizedHtml(bodyContentPayload.content)
-            BodyContentType.TEXT_PLAIN_WITH_HTML -> setPlainTextAndInterpretHtml(bodyContentPayload.content)
-            BodyContentType.TEXT_PLAIN_WITHOUT_HTML -> setPlainTextAndEscapeHtml(bodyContentPayload.content)
-        }
-    }
-
-    private fun RichHtmlEditorWebView.setSanitizedHtml(html: String): String {
-        setHtml(html)
-        return html
-    }
-
-    private fun RichHtmlEditorWebView.setUnsanitizedHtml(html: String) = setSanitizedHtml(html.sanitize())
-
-    private fun RichHtmlEditorWebView.setPlainTextAndInterpretHtml(text: String): String {
-        return setSanitizedHtml(text.replaceNewLines().sanitize())
-    }
-
-    private fun RichHtmlEditorWebView.setPlainTextAndEscapeHtml(text: String): String {
-        return setSanitizedHtml(text.escapeHtmlCharacters().replaceNewLines())
-    }
-
-    private fun String.escapeHtmlCharacters(): String = Html.escapeHtml(this)
-
-    private fun String.replaceNewLines(): String = replace(NEW_LINES_REGEX, "<br>")
-
-    private fun String.sanitize(): String = HtmlSanitizer.getInstance()
-        .sanitize(jsoupParseWithLog(this))
-        .apply { outputSettings().prettyPrint(false) }
-        .getHtmlWithoutDocumentWrapping()
-
-    // Jsoup wraps parsed html inside an <html> and <body> tag. This gives us a wrapped form of the html content. While the editor
-    // can handle this wrapped HTML without issues, it will also output the HTML in this wrapped form if given one as input.
-    // If the HTML received from the API is unwrapped, the sanitization process will wrap it, leading to failed comparisons due to
-    // this wrapping, during draft snapshot comparisons, even when the actual content hasn't changed.
-    // This method checks if the HTML is wrapped with an <html> tag containing exactly one empty <head> and one <body> tag.
-    // If this wrapping is detected, the method unwraps the HTML and returns only the content within the <body> tag.
-    private fun Document.getHtmlWithoutDocumentWrapping(): String {
-        val html = root().firstElementChild() ?: return html()
-        val nodeSize = html.childNodeSize()
-        val elements = html.children()
-
-        val canRemoveDocumentWrapping = nodeSize == 2
-                && elements.count() == 2
-                && elements[0].tagName().uppercase() == "HEAD"
-                && elements[0].childNodeSize() == 0
-                && elements[1].tagName().uppercase() == "BODY"
-
-        return if (canRemoveDocumentWrapping) body().html() else html()
+    fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload): String {
+        val sanitizedBody = bodyContentPayload.toSanitizedHtml()
+        editor.setHtml(sanitizedBody)
+        return sanitizedBody
     }
 
     companion object {
         private val NEW_LINES_REGEX = "(\\r\\n|\\n)".toRegex()
+
+        fun BodyContentPayload.toSanitizedHtml(): String {
+            return when (type) {
+                BodyContentType.HTML_SANITIZED -> getSanitizedHtml(content)
+                BodyContentType.HTML_UNSANITIZED -> getUnsanitizedHtml(content)
+                BodyContentType.TEXT_PLAIN_WITH_HTML -> getPlainTextAndInterpretHtml(content)
+                BodyContentType.TEXT_PLAIN_WITHOUT_HTML -> getPlainTextAndEscapeHtml(content)
+            }
+        }
+
+
+        private fun getSanitizedHtml(html: String): String {
+            return html
+        }
+
+        private fun getUnsanitizedHtml(html: String) = getSanitizedHtml(html.sanitize())
+
+        private fun getPlainTextAndInterpretHtml(text: String): String {
+            return getSanitizedHtml(text.replaceNewLines().sanitize())
+        }
+
+        private fun getPlainTextAndEscapeHtml(text: String): String {
+            return getSanitizedHtml(text.escapeHtmlCharacters().replaceNewLines())
+        }
+
+        private fun String.escapeHtmlCharacters(): String = Html.escapeHtml(this)
+
+        private fun String.replaceNewLines(): String = replace(NEW_LINES_REGEX, "<br>")
+
+        private fun String.sanitize(): String = HtmlSanitizer.getInstance()
+            .sanitize(jsoupParseWithLog(this))
+            .apply { outputSettings().prettyPrint(false) }
+            .getHtmlWithoutDocumentWrapping()
+
+        // Jsoup wraps parsed html inside an <html> and <body> tag. This gives us a wrapped form of the html content. While the editor
+        // can handle this wrapped HTML without issues, it will also output the HTML in this wrapped form if given one as input.
+        // If the HTML received from the API is unwrapped, the sanitization process will wrap it, leading to failed comparisons due to
+        // this wrapping, during draft snapshot comparisons, even when the actual content hasn't changed.
+        // This method checks if the HTML is wrapped with an <html> tag containing exactly one empty <head> and one <body> tag.
+        // If this wrapping is detected, the method unwraps the HTML and returns only the content within the <body> tag.
+        private fun Document.getHtmlWithoutDocumentWrapping(): String {
+            val html = root().firstElementChild() ?: return html()
+            val nodeSize = html.childNodeSize()
+            val elements = html.children()
+
+            val canRemoveDocumentWrapping = nodeSize == 2
+                    && elements.count() == 2
+                    && elements[0].tagName().uppercase() == "HEAD"
+                    && elements[0].childNodeSize() == 0
+                    && elements[1].tagName().uppercase() == "BODY"
+
+            return if (canRemoveDocumentWrapping) body().html() else html()
+        }
     }
 }
