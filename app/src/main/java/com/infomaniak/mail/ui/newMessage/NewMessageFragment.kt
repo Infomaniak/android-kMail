@@ -433,6 +433,7 @@ class NewMessageFragment : Fragment() {
         })
 
         initEditorUi()
+        setupToggleQuotesButton()
 
         viewLifecycleOwner.lifecycleScope.launch { setupSendButtons() }
         externalsManager.setupExternalBanner()
@@ -731,7 +732,6 @@ class NewMessageFragment : Fragment() {
                 bodyContent,
                 bodyContentData.draft
             )
-            setupToggleQuotesButton()
         }
     }
 
