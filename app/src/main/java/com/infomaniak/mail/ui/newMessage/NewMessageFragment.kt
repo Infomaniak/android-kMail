@@ -463,7 +463,7 @@ class NewMessageFragment : Fragment() {
 
     private fun setEditorScript() = with(binding.editorWebView) {
         addScript(editorJsBridgeScript)
-        evaluateJavascript(deletedInlineImagesObserverScript, null)
+        addScript(deletedInlineImagesObserverScript)
     }
 
     private fun handleFocusChanges() = with(newMessageViewModel) {
