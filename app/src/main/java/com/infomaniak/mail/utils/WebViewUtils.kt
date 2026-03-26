@@ -20,7 +20,6 @@ package com.infomaniak.mail.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.MotionEvent
-import android.view.ViewConfiguration
 import android.view.ViewParent
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
@@ -188,12 +187,10 @@ class WebViewUtils(context: Context) {
          * Lets the WebView take the zoom gestures and lets the WebView handle scrolls that start horizontally while letting the
          * parent handle scrolls that start vertically. This is not perfect but the best solution is way more complex.
          */
-        fun WebView.configureOnTouchListener() {
+        fun WebView.configureOnTouchListener(touchSlop: Int) {
             var startX = 0f
             var startY = 0f
             var isHorizontalGesture: Boolean? = null
-
-            val touchSlop = ViewConfiguration.get(this.context).scaledTouchSlop
 
             setOnTouchListener { view, event ->
                 if (event.pointerCount > 1) {
@@ -232,7 +229,7 @@ class WebViewUtils(context: Context) {
     }
 }
 
-fun computeIsHorizontalGesture(event: MotionEvent, startX: Float, startY: Float, touchSlop: Int): Boolean? {
+private fun computeIsHorizontalGesture(event: MotionEvent, startX: Float, startY: Float, touchSlop: Int): Boolean? {
     val dx = abs(event.x - startX)
     val dy = abs(event.y - startY)
 
