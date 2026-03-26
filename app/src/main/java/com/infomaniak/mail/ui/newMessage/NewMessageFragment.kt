@@ -97,7 +97,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getShowQuotesScript
-import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -484,8 +483,6 @@ class NewMessageFragment : Fragment() {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
-                    val isBodyEmpty = MessageBodyUtils.isBodyBlank(draft)
-                    changePlaceholderVisibility(isVisible = isBodyEmpty)
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
                     binding.subjectTextField.setText(draft.subject)
                 } else {
@@ -728,10 +725,7 @@ class NewMessageFragment : Fragment() {
     private fun observeBodyLoader() = with(newMessageViewModel) {
         editorBodyInitializer.observe(viewLifecycleOwner) { bodyContentData ->
             val bodyContent = editorContentManager.setContent(binding.editorWebView, bodyContentData.bodyContentPayload)
-            if (bodyContentData is EditorBodyData.Initial) saveInitialSnapshot(
-                bodyContent,
-                bodyContentData.draft
-            )
+            if (bodyContentData is EditorBodyData.Initial) saveInitialSnapshot(bodyContent, bodyContentData.draft)
         }
     }
 
