@@ -77,6 +77,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSanitizedHtml
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -331,13 +332,20 @@ class NewMessageViewModel @Inject constructor(
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
             _isShimmering.emit(false)
-            if (initialBody.hasQuotes()) {
-                changeQuotesButtonVisibility(isVisible = true)
-            }
+            initEditorElementsVisibility()
             initResult.postValue(InitResult(it, signatures))
         }
 
         emit(draft)
+    }
+
+    private fun initEditorElementsVisibility() {
+        val isBodyEmpty = MessageBodyUtils.isBodyBlank(initialBody)
+        changePlaceholderVisibility(isVisible = isBodyEmpty)
+
+        if (initialBody.hasQuotes()) {
+            changeQuotesButtonVisibility(isVisible = true)
+        }
     }
 
     private suspend fun getExistingDraft(localUuid: String?): Draft? {
@@ -389,21 +397,16 @@ class NewMessageViewModel @Inject constructor(
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
 
-        val finalBodyContent = getFinalBodyContent(initialSignature, initialQuote)
-        initialBody = BodyContentPayload(finalBodyContent, BodyContentType.HTML_UNSANITIZED)
+        val mergedBodyContent = initialBody.mergeWithSignatureAndQuotes(initialSignature, initialQuote)
+        initialBody = BodyContentPayload(mergedBodyContent, BodyContentType.HTML_UNSANITIZED)
     }
 
-    private fun getFinalBodyContent(initialSignature: String?, initialQuote: String?): String {
-        var finalBodyContent = initialBody.content
+    private fun BodyContentPayload.mergeWithSignatureAndQuotes(initialSignature: String?, initialQuote: String?): String {
+        var body = toSanitizedHtml()
+        if (!initialSignature.isNullOrEmpty()) body += initialSignature
+        if (!initialQuote.isNullOrEmpty()) body += initialQuote
 
-        if (!initialSignature.isNullOrEmpty()) {
-            finalBodyContent += initialSignature
-        }
-        if (!initialQuote.isNullOrEmpty()) {
-            finalBodyContent += initialQuote
-        }
-
-        return finalBodyContent
+        return body
     }
 
     /**
