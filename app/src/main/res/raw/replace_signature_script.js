@@ -30,7 +30,7 @@
         if (quotes) {
             quotes.insertAdjacentHTML('beforebegin', newSigHtml);
         } else {
-            document.body.insertAdjacentHTML('beforeend', newSigHtml);
+            getEditor().insertAdjacentHTML('beforeend', newSigHtml);
         }
     }
 })()
