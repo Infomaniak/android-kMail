@@ -98,6 +98,9 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getShowQuotesScript
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -584,14 +587,18 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateBodySignature(signature: Signature) {
-        val selectedSignature = if (signature.isDummy) "" else signature.content
-        val signatureWithClass = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(selectedSignature)
-        val escapedSignature = looselyEscapeAsStringLiteralForJs(signatureWithClass)
+        val selectedSignature = if (signature.isDummy) {
+            "''" // This will represent an empty string in js.
+        } else {
+            val signatureWithClass = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+            looselyEscapeAsStringLiteralForJs(signatureWithClass)
+        }
 
+        val quotesSelector = ".${INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME},.${INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}"
         val replaceSignatureScript = replaceSignatureScript.format(
-            MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID,
-            escapedSignature,
-            MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+            EDITOR_LOCAL_SIGNATURE_ID,
+            selectedSignature,
+            quotesSelector
         )
 
         binding.editorWebView.evaluateJavascript(replaceSignatureScript, null)
