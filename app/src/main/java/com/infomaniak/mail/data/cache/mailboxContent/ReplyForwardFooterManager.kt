@@ -125,6 +125,10 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
             addAndEscapeTextLine("")
 
             addAlreadyEscapedBody(previousFullBody)
+            // We insert an unstyled empty line immediately after the quoted block. This is necessary because deleting styled
+            // content often leaves behind empty containers with residual formatting (borders, backgrounds). This plain line acts
+            // as a "clean exit", when the user deletes the quotes up to this point, the editor drops the quotes' inline styles
+            // completely, allowing the entire block to be removed in one go.
             addAndEscapeTextLine("")
         }.outerHtml()
     }
@@ -137,6 +141,10 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
             addReplyBlockQuote {
                 addAlreadyEscapedBody(previousFullBody)
             }
+            // We insert an unstyled empty line immediately after the quoted block. This is necessary because deleting styled
+            // content often leaves behind empty containers with residual formatting (borders, backgrounds). This plain line acts
+            // as a "clean exit", when the user deletes the quotes up to this point, the editor drops the quotes' inline styles
+            // completely, allowing the entire block to be removed in one go.
             addAndEscapeTextLine("")
         }.outerHtml()
     }
