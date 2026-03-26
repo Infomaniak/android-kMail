@@ -433,6 +433,7 @@ class NewMessageFragment : Fragment() {
         })
 
         initEditorUi()
+        setupToggleQuotesButton()
 
         viewLifecycleOwner.lifecycleScope.launch {
             val mailbox = newMessageViewModel.currentMailbox()
@@ -734,7 +735,6 @@ class NewMessageFragment : Fragment() {
                 bodyContent,
                 bodyContentData.draft
             )
-            setupToggleQuotesButton()
         }
     }
 
