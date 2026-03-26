@@ -26,7 +26,7 @@
             signatureElement.outerHTML = newSigHtml;
         }
     } else if (newSigHtml !== "") {
-        const quotes = document.querySelector('.%s');
+        const quotes = document.querySelector('%s');
         if (quotes) {
             quotes.insertAdjacentHTML('beforebegin', newSigHtml);
         } else {
