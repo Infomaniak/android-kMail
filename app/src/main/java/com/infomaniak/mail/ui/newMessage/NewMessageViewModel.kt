@@ -84,7 +84,6 @@ import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldT
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.DraftInitManager
-import com.infomaniak.mail.utils.JsoupParserUtil
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -133,6 +132,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -986,20 +986,16 @@ class NewMessageViewModel @Inject constructor(
 
         // If the user deleted the quotes' text, remove the quotes' div so user doesn't write in it
         // (the text could get hidden later with the toggle button).
-        if (bodyHasEmptyQuotes(html)) {
-            doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
-            doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME).forEach { it.remove() }
-        }
+        doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
 
         return doc.html()
     }
 
-    private fun bodyHasEmptyQuotes(body: String): Boolean {
-        val replyQuotes = JsoupParserUtil.jsoupParseBodyFragmentWithLog(body)
-            .getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardQuotes = JsoupParserUtil.jsoupParseBodyFragmentWithLog(body)
-            .getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
-        return replyQuotes.isNotEmpty() && !replyQuotes.hasText() || forwardQuotes.isNotEmpty() && !forwardQuotes.hasText()
+    private fun Document.removeEmptyElements(className: String) {
+        val elements = getElementsByClass(className)
+        if (elements.isEmpty()) return
+        elements.forEach { if (it.text().isEmpty()) it.remove() }
     }
 
     private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>, step: String) {
