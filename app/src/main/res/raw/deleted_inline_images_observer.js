@@ -20,22 +20,17 @@
     var mutationObserver;
 
     function setupObserver() {
-        var rootElement = document;
+        var rootElement = document.body;
+        if (!rootElement) return;
 
         mutationObserver = new MutationObserver(function(mutationRecords) {
            var removedCids = [];
 
            mutationRecords.forEach(function (mutation) {
-             for (var removedNode, nodeIndex = 0; removedNode = mutation.removedNodes[nodeIndex]; ++nodeIndex) {
+             for (var nodeIndex = 0; nodeIndex < mutation.removedNodes.length; ++nodeIndex) {
+                var removedNode = mutation.removedNodes[nodeIndex]
                 if (removedNode.nodeType == Node.ELEMENT_NODE) {
-                   if ("img" == removedNode.tagName.toLowerCase()) {
-                       removedCids.push(removedNode.src);
-                   } else {
-                       var childImages = removedNode.getElementsByTagName("img");
-                       for (var childIndex = 0; childIndex < childImages.length; childIndex++) {
-                        removedCids.push(childImages[childIndex].src);
-                       }
-                   }
+                   addRemovedCids(removedNode, removedCids)
                 }
              }
            });
@@ -50,6 +45,17 @@
           childList: true,
           subtree: true,
         })
+    }
+
+    function addRemovedCids(removedNode, removedCids) {
+        if ("img" == removedNode.tagName.toLowerCase()) {
+            removedCids.push(removedNode.src);
+        } else {
+            var childImages = removedNode.getElementsByTagName("img");
+            for (var childIndex = 0; childIndex < childImages.length; childIndex++) {
+                removedCids.push(childImages[childIndex].src);
+            }
+        }
     }
 
     setupObserver();
