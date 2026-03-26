@@ -9,5 +9,5 @@ body {
     /* To have the spacing scroll with the mail it needs to be padding and not margin. */
     overflow-x: auto !important;
     margin: 0;
-    padding: 16px;
+    padding: 0 16px 0;
 }
