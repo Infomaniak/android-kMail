@@ -25,10 +25,6 @@ import javax.inject.Singleton
 @Singleton
 class SignatureUtils @Inject constructor() {
     fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
-        return """
-            <div id="$EDITOR_LOCAL_SIGNATURE_ID" class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME">
-            $signatureContent
-            </div>
-        """.trimIndent()
+        return """<div id="$EDITOR_LOCAL_SIGNATURE_ID" class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME">$signatureContent</div>"""
     }
 }

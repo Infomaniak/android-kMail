@@ -235,7 +235,7 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getHideQuotesStyle(): String = loadCss(R.raw.hide_quotes_style)
 
-        fun Context.getShowQuotesScript(): String = loadScript(R.raw.show_quotes_script)
+        fun Context.getShowQuotesScript(): String = loadScript(R.raw.include_quotes_script)
 
         fun Context.getDeletedInlineImagesObserverScript(): String = loadScript(R.raw.deleted_inline_images_observer)
 
