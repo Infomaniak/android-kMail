@@ -124,6 +124,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
@@ -232,7 +233,8 @@ class NewMessageFragment : Fragment() {
         observeBodyLoader()
         observeShimmering()
         observePlaceholderVisibility()
-        observeQuotesVisibility()
+        observeQuotesButtonVisibility()
+        observeQuotesInclusion()
 
         setupBackActionHandler()
 
@@ -363,9 +365,7 @@ class NewMessageFragment : Fragment() {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editorWebView.exportHtml { html ->
             newMessageViewModel.editorBodyInitializer.postValue(
-                EditorBodyData.Reload(
-                    BodyContentPayload(html, BodyContentType.HTML_SANITIZED)
-                )
+                BodyContentPayload(html, BodyContentType.HTML_SANITIZED)
             )
         }
 
@@ -513,7 +513,7 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    private fun observeQuotesVisibility() = viewLifecycleOwner.lifecycleScope.launch {
+    private fun observeQuotesButtonVisibility() = viewLifecycleOwner.lifecycleScope.launch {
         combine(
             newMessageViewModel.isQuotesButtonVisible,
             newMessageViewModel.isShimmering.filterNot { it }
@@ -521,14 +521,6 @@ class NewMessageFragment : Fragment() {
             isQuoteVisible
         }.collect { isQuoteToggleButtonVisible ->
             binding.quotesToggleButton.isVisible = isQuoteToggleButtonVisible
-
-            if (isQuoteToggleButtonVisible) {
-                // If the button is visible, quotes are hidden.
-                binding.editorWebView.addCss(hideQuotesStyle, "quote-visibility")
-            } else {
-                // User toggled show quotes visibility
-                binding.editorWebView.evaluateJavascript(showQuotesScript, null)
-            }
         }
     }
 
@@ -538,11 +530,21 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun observeQuotesInclusion() = viewLifecycleOwner.lifecycleScope.launch {
+        newMessageViewModel.quotesToIncludeChannel.consumeEach { quote ->
+            val escapedQuote = looselyEscapeAsStringLiteralForJs(quote)
+            val includeQuoteScript = showQuotesScript.format(escapedQuote)
+            binding.editorWebView.evaluateJavascript(includeQuoteScript, null)
+        }
+    }
+
     private fun setupToggleQuotesButton() {
         binding.quotesToggleButton.setOnClickListener {
             newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
+            newMessageViewModel.includeQuotes()
         }
     }
+
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
@@ -724,8 +726,7 @@ class NewMessageFragment : Fragment() {
 
     private fun observeBodyLoader() = with(newMessageViewModel) {
         editorBodyInitializer.observe(viewLifecycleOwner) { bodyContentData ->
-            val bodyContent = editorContentManager.setContent(binding.editorWebView, bodyContentData.bodyContentPayload)
-            if (bodyContentData is EditorBodyData.Initial) saveInitialSnapshot(bodyContent, bodyContentData.draft)
+            editorContentManager.setContent(binding.editorWebView, bodyContentData)
         }
     }
 

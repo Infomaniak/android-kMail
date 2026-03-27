@@ -87,6 +87,8 @@ import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageBodyUtils.splitQuoteFromBody
+import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromHtml
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
@@ -163,6 +165,7 @@ class NewMessageViewModel @Inject constructor(
 
     //region Initial data
     private var initialBody: BodyContentPayload = BodyContentPayload.emptyBody()
+    private var initialQuote: String? = null // is always sanitized and it's only set in initDraftAndViewModel
     //endregion
 
     //region UI data
@@ -174,7 +177,7 @@ class NewMessageViewModel @Inject constructor(
     inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
-    val editorBodyInitializer = SingleLiveEvent<EditorBodyData>()
+    val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
 
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.
@@ -222,6 +225,10 @@ class NewMessageViewModel @Inject constructor(
 
     private val _isQuotesButtonVisible = MutableStateFlow(false)
     val isQuotesButtonVisible: StateFlow<Boolean> = _isQuotesButtonVisible.asStateFlow()
+
+    private var areQuotesIncluded = false
+    private val _quotesToIncludeChannel: Channel<String> = Channel(capacity = CONFLATED)
+    val quotesToIncludeChannel: ReceiveChannel<String> = _quotesToIncludeChannel
 
     private val _isPlaceHolderVisible = MutableStateFlow(false)
     val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
@@ -332,8 +339,7 @@ class NewMessageViewModel @Inject constructor(
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
 
-            initEditorElementsVisibility(initialBody)
-            editorBodyInitializer.postValue(EditorBodyData.Initial(bodyContentPayload = initialBody, draft = it))
+            commonBodyProcessing(it)
 
             _isShimmering.emit(false)
             initResult.postValue(InitResult(it, signatures))
@@ -342,11 +348,25 @@ class NewMessageViewModel @Inject constructor(
         emit(draft)
     }
 
+    private fun commonBodyProcessing(draft: Draft) {
+        val sanitizedBodyHtml = initialBody.toSanitizedHtml()
+        val sanitizedBodyHtmlWithoutQuotes = if (initialQuote != null) {
+            val (body, signature) = splitSignatureAndQuoteFromHtml(sanitizedBodyHtml)
+            body + signature
+        } else {
+            sanitizedBodyHtml
+        }
+        val sanitizedBodyWithoutQuotes = BodyContentPayload(sanitizedBodyHtmlWithoutQuotes, BodyContentType.HTML_SANITIZED)
+        draft.saveSnapshot(sanitizedBodyHtml)
+        initEditorElementsVisibility(sanitizedBodyWithoutQuotes)
+        editorBodyInitializer.postValue(sanitizedBodyWithoutQuotes)
+    }
+
     private fun initEditorElementsVisibility(initialBody: BodyContentPayload) {
         val isBodyEmpty = MessageBodyUtils.isBodyBlank(initialBody)
         changePlaceholderVisibility(isVisible = isBodyEmpty)
 
-        if (initialBody.hasQuotes()) {
+        if (initialQuote != null) {
             changeQuotesButtonVisibility(isVisible = true)
         }
     }
@@ -362,6 +382,9 @@ class NewMessageViewModel @Inject constructor(
             else
                 BodyContentType.HTML_UNSANITIZED
             initialBody = BodyContentPayload(draft.body, contentType)
+            initialQuote = splitQuoteFromBody(draft)?.let {
+                BodyContentPayload(it, BodyContentType.HTML_UNSANITIZED).toSanitizedHtml()
+            }
             return draft
         }
     }
@@ -373,7 +396,6 @@ class NewMessageViewModel @Inject constructor(
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
         saveNavArgsToSavedState(localUuid)
 
-        var initialQuote: String? = null
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
             DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
@@ -386,7 +408,9 @@ class NewMessageViewModel @Inject constructor(
                         if (hasFailedFetching) return@let
 
                         initializeReplyForwardDraftValues(draft = this, fullMessage)
-                        initialQuote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
+                        initialQuote = draftInitManager.createQuote(draftMode, fullMessage, attachments)?.let {
+                            BodyContentPayload(it, BodyContentType.HTML_UNSANITIZED).toSanitizedHtml()
+                        }
                     }
             }
         }
@@ -514,10 +538,6 @@ class NewMessageViewModel @Inject constructor(
         return replace("\r\n", "\n")
     }
 
-    fun saveInitialSnapshot(body: String, draft: Draft) = viewModelScope.launch(ioCoroutineContext) {
-        draft.saveSnapshot(body)
-    }
-
     private suspend fun Draft.initLiveData(signatures: List<Signature>) {
         val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
 
@@ -544,16 +564,13 @@ class NewMessageViewModel @Inject constructor(
         isEncryptionActivated.postValue(isEncrypted)
     }
 
-    private fun BodyContentPayload.hasQuotes(): Boolean {
-        if (type == BodyContentType.TEXT_PLAIN_WITHOUT_HTML || type == BodyContentType.TEXT_PLAIN_WITH_HTML) return false
-
-        val doc = jsoupParseWithLog(content)
-        return doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME).isNotEmpty() ||
-                doc.getElementsByClass(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME).isNotEmpty()
-    }
-
     fun changeQuotesButtonVisibility(isVisible: Boolean) {
         _isQuotesButtonVisible.value = isVisible
+    }
+
+    fun includeQuotes() {
+        initialQuote?.let { _quotesToIncludeChannel.trySend(it) }
+        areQuotesIncluded = true
     }
 
     fun changePlaceholderVisibility(isVisible: Boolean) {
@@ -896,18 +913,23 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    private fun String.addMissingQuotes(): String {
+        return if (areQuotesIncluded) this else this + initialQuote
+    }
+
     private suspend fun executeDraftAction(draftSaveConfiguration: DraftSaveConfiguration) = with(draftSaveConfiguration) {
         val localUuid = draftLocalUuid ?: return@with
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        if (action == DraftAction.SAVE && isSnapshotTheSame(subject, uiBodyValue)) {
+        val bodyWithQuotes = uiBodyValue.addMissingQuotes()
+        if (action == DraftAction.SAVE && isSnapshotTheSame(subject, bodyWithQuotes)) {
             if (isFinishing && isNewMessage) removeDraftFromRealm(localUuid)
             return@with
         }
 
         val hasFailed = mailboxContentRealm().write {
             DraftController.getDraftBlocking(localUuid, realm = this)
-                ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, uiBodyValue, realm = this@write)
+                ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, bodyWithQuotes, realm = this@write)
                 ?: return@write true
             return@write false
         }
@@ -1143,6 +1165,8 @@ class NewMessageViewModel @Inject constructor(
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
+
+    data class BodyData(val body: String, val signature: String?, val quote: String?)
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName

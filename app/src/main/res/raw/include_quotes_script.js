@@ -17,19 +17,6 @@
  */
 
 (function() {
-    var style = document.getElementById("quote-visibility")
-
-    if (style) {
-        style.remove()
-
-        // Handle CID image reload when showing
-        document.querySelectorAll('.ik_mail_quote img, .forwardContentMessage img').forEach(img => {
-         if (img.src.startsWith('cid:')) {
-            // Store original CID, then reload
-             const cid = img.src;
-             img.src = '';
-             setTimeout(() => img.src = cid, 0);
-         }
-       });
-    }
+    var quotes = %s;
+    getEditor().insertAdjacentHTML('beforeend', quotes);
 })();

@@ -18,11 +18,13 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.ui.newMessage.BodyContentPayload
 import com.infomaniak.mail.ui.newMessage.BodyContentType
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.BodyData
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
 import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
@@ -124,7 +126,7 @@ object MessageBodyUtils {
 
         return when (body.type) {
             BodyContentType.HTML_UNSANITIZED,
-            BodyContentType.HTML_SANITIZED -> getBodyWithoutSignatureAndQuotesFromHtml(body.content).isBlank()
+            BodyContentType.HTML_SANITIZED -> splitSignatureAndQuoteFromHtml(body.content).body.htmlToText().isBlank()
             // On these cases we should return body content, but we know it's not blank already.
             // We don't split text plain with HTML because with this type it shouldn't have quotes or signature
             // and it would require to transform it to HTML which is an expensive operation
@@ -133,16 +135,31 @@ object MessageBodyUtils {
         }
     }
 
+    fun splitQuoteFromBody(draft: Draft): String? {
+        val remoteBody = draft.body
+        if (remoteBody.isEmpty()) return null
+
+        return when (draft.mimeType) {
+            Utils.TEXT_PLAIN -> null
+            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody).quote
+            else -> error("Cannot load an email which is not of type text/plain or text/html")
+        }
+    }
+
     /**
      * This only takes into account infomaniak's quotes and signatures.
      */
-    private fun getBodyWithoutSignatureAndQuotesFromHtml(draftBody: String): String {
+    fun splitSignatureAndQuoteFromHtml(draftBody: String): BodyData {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
-            return getElementsByClass(divClassName).firstOrNull()?.let {
+            // We need to use select and not getElementByClass because getElementByClass adds a \n after every <br>.
+            // The function remove() also adds \n after each <br> of it.
+            // So we need to use select, save the second part of the split first, and then do remove, to save the correct value
+            // for the snapshot to compare.
+            return select(".$divClassName").firstOrNull()?.let {
+                val second = if (it.html().isBlank()) null else it.outerHtml()
                 it.remove()
                 val first = body().html()
-                val second = if (it.html().isBlank()) null else it.outerHtml()
                 first to second
             } ?: (defaultValue to null)
         }
@@ -154,17 +171,17 @@ object MessageBodyUtils {
 
         val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
 
-        val (bodyWithQuote) = doc.split(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
+        val (bodyWithQuote, signature) = doc.split(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
 
         val replyPosition = draftBody.lastIndexOfOrMax(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         val forwardPosition = draftBody.lastIndexOfOrMax(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
-        val (body) = if (replyPosition < forwardPosition) {
+        val (body, quote) = if (replyPosition < forwardPosition) {
             doc.split(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
             doc.split(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        return body.htmlToText()
+        return BodyData(body, signature, quote)
     }
     //endregion
 
