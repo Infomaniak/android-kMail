@@ -38,8 +38,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.common.utils.format
+import com.infomaniak.core.file.getFileNameAndSize
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
-import com.infomaniak.core.legacy.utils.getFileNameAndSize
 import com.infomaniak.core.legacy.utils.guessMimeType
 import com.infomaniak.core.legacy.utils.parcelableArrayListExtra
 import com.infomaniak.core.legacy.utils.parcelableExtra
@@ -348,7 +348,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getNewDraft(signatures: List<Signature>, intent: Intent, realm: Realm): Draft? = Draft().apply {
+    private suspend fun getNewDraft(signatures: List<Signature>, intent: Intent, realm: Realm): Draft = Draft().apply {
 
         var previousMessage: Message? = null
 
@@ -474,7 +474,7 @@ class NewMessageViewModel @Inject constructor(
         return BodyData(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
     }
 
-    private fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
+    private suspend fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SEND -> handleSingleSendIntent(draft, intent)
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent(draft, intent)
@@ -619,7 +619,7 @@ class NewMessageViewModel @Inject constructor(
         }.ifBlank { null }
     }
 
-    private fun handleSingleSendIntent(draft: Draft, intent: Intent) = with(intent) {
+    private suspend fun handleSingleSendIntent(draft: Draft, intent: Intent) = with(intent) {
 
         if (hasExtra(Intent.EXTRA_EMAIL)) {
             handleMailTo(draft, intent.data, intent)
@@ -635,7 +635,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun handleMultipleSendIntent(draft: Draft, intent: Intent) {
+    private suspend fun handleMultipleSendIntent(draft: Draft, intent: Intent) {
         intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
             ?.filterIsInstance<Uri>()
             ?.let { importAttachments(currentAttachments = draft.attachments, uris = it) }
@@ -708,7 +708,7 @@ class NewMessageViewModel @Inject constructor(
         completion(importAttachments(currentAttachments, uris))
     }
 
-    private fun importAttachments(currentAttachments: List<Attachment>, uris: List<Uri>): List<Attachment> {
+    private suspend fun importAttachments(currentAttachments: List<Attachment>, uris: List<Uri>): List<Attachment> {
 
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = currentAttachments.sumOf { it.size }
@@ -734,9 +734,9 @@ class NewMessageViewModel @Inject constructor(
         return newAttachments
     }
 
-    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean> {
+    private suspend fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean> {
 
-        val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null to false
+        val (fileName, fileSize) = getFileNameAndSize(uri) ?: return null to false
         val attachment = Attachment()
 
         return LocalStorageUtils.saveAttachmentToUploadDir(
