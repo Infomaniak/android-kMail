@@ -331,15 +331,18 @@ class NewMessageViewModel @Inject constructor(
 
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
+
+            initEditorElementsVisibility(initialBody)
+            editorBodyInitializer.postValue(EditorBodyData.Initial(bodyContentPayload = initialBody, draft = it))
+
             _isShimmering.emit(false)
-            initEditorElementsVisibility()
             initResult.postValue(InitResult(it, signatures))
         }
 
         emit(draft)
     }
 
-    private fun initEditorElementsVisibility() {
+    private fun initEditorElementsVisibility(initialBody: BodyContentPayload) {
         val isBodyEmpty = MessageBodyUtils.isBodyBlank(initialBody)
         changePlaceholderVisibility(isVisible = isBodyEmpty)
 
@@ -532,8 +535,6 @@ class NewMessageViewModel @Inject constructor(
         bccLiveData.postValue(UiRecipients(recipients = bcc))
 
         attachmentsLiveData.postValue(attachments)
-
-        editorBodyInitializer.postValue(EditorBodyData.Initial(bodyContentPayload = initialBody, draft = this))
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherRecipientsFieldsAreEmpty.postValue(false)
