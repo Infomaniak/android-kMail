@@ -31,10 +31,8 @@ class EditorContentManager @Inject constructor() {
     /**
      * @return The html that was processed and inserted inside the editor
      * */
-    fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload): String {
-        val sanitizedBody = bodyContentPayload.toSanitizedHtml()
-        editor.setHtml(sanitizedBody)
-        return sanitizedBody
+    fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload) {
+        editor.setHtml(bodyContentPayload.toSanitizedHtml())
     }
 
     companion object {
