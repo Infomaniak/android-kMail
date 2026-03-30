@@ -124,7 +124,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
@@ -534,7 +533,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeQuotesInclusion() = viewLifecycleOwner.lifecycleScope.launch {
-        newMessageViewModel.quotesToIncludeChannel.consumeEach { quote ->
+        for (quote in newMessageViewModel.quotesToIncludeChannel) {
             val escapedQuote = looselyEscapeAsStringLiteralForJs(quote)
             val includeQuoteScript = showQuotesScript.format(escapedQuote)
             binding.editorWebView.evaluateJavascript(includeQuoteScript, null)
