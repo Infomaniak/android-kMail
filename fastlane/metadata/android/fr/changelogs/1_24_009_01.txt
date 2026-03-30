@@ -1,0 +1,3 @@
+- Amélioration UI pour les appareils pliables
+- Mise à jour de la gestion du zoom dans les e-mails pour éviter de revenir systématiquement en haut à gauche
+- Améliorations et fixes
