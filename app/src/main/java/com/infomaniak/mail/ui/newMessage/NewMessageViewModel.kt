@@ -87,6 +87,8 @@ import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.splitQuoteFromBody
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromHtml
 import com.infomaniak.mail.utils.SentryDebug
@@ -349,6 +351,14 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun commonBodyProcessing(draft: Draft) {
+        // This is only used for existing drafts, for new drafts we add the signature id during the signature encapsulation.
+        // We added this here to avoid an extra parse.
+        if (!isNewMessage) {
+            val doc = jsoupParseWithLog(initialBody.content)
+            doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
+            initialBody = BodyContentPayload(doc.body().html(), BodyContentType.HTML_UNSANITIZED)
+        }
+
         val sanitizedBodyHtml = initialBody.toSanitizedHtml()
         val sanitizedBodyHtmlWithoutQuotes = if (initialQuote != null) {
             val (body, signature) = splitSignatureAndQuoteFromHtml(sanitizedBodyHtml)
@@ -381,6 +391,7 @@ class NewMessageViewModel @Inject constructor(
                 BodyContentType.TEXT_PLAIN_WITHOUT_HTML
             else
                 BodyContentType.HTML_UNSANITIZED
+
             initialBody = BodyContentPayload(draft.body, contentType)
             initialQuote = splitQuoteFromBody(draft)?.let {
                 BodyContentPayload(it, BodyContentType.HTML_UNSANITIZED).toSanitizedHtml()
@@ -1009,7 +1020,7 @@ class NewMessageViewModel @Inject constructor(
         val doc = jsoupParseWithLog(html)
 
         // Remove id used for replacing signature.
-        doc.getElementById(MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID)?.removeAttr("id")
+        doc.getElementById(EDITOR_LOCAL_SIGNATURE_ID)?.removeAttr("id")
 
         // If the user deleted the quotes' text, remove the quotes' div so user doesn't write in it
         // (the text could get hidden later with the toggle button).
