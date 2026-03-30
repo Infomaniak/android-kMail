@@ -121,18 +121,8 @@ object MessageBodyUtils {
         return htmlDocument.outerHtml() to quotes
     }
 
-    fun isBodyBlank(body: BodyContentPayload): Boolean {
-        if (body.content.isBlank()) return true
-
-        return when (body.type) {
-            BodyContentType.HTML_UNSANITIZED,
-            BodyContentType.HTML_SANITIZED -> splitSignatureAndQuoteFromHtml(body.content).body.htmlToText().isBlank()
-            // On these cases we should return body content, but we know it's not blank already.
-            // We don't split text plain with HTML because with this type it shouldn't have quotes or signature
-            // and it would require to transform it to HTML which is an expensive operation
-            BodyContentType.TEXT_PLAIN_WITHOUT_HTML,
-            BodyContentType.TEXT_PLAIN_WITH_HTML -> false
-        }
+    fun String.isHtmlBlank(): Boolean {
+        return htmlToText().isBlank()
     }
 
     fun splitQuoteFromBody(draft: Draft): String? {
