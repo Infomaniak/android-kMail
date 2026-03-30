@@ -360,20 +360,20 @@ class NewMessageViewModel @Inject constructor(
         }
 
         val sanitizedBodyHtml = initialBody.toSanitizedHtml()
-        val sanitizedBodyHtmlWithoutQuotes = if (initialQuote != null) {
             val (body, signature) = splitSignatureAndQuoteFromHtml(sanitizedBodyHtml)
+        val sanitizedBodyHtmlWithoutQuotes = if (initialQuote != null) {
             if (signature == null) body else body + signature
         } else {
             sanitizedBodyHtml
         }
         val sanitizedBodyWithoutQuotes = BodyContentPayload(sanitizedBodyHtmlWithoutQuotes, BodyContentType.HTML_SANITIZED)
         draft.saveSnapshot(sanitizedBodyHtml)
-        initEditorElementsVisibility(sanitizedBodyWithoutQuotes)
+        initEditorElementsVisibility(body)
         editorBodyInitializer.postValue(sanitizedBodyWithoutQuotes)
     }
 
-    private fun initEditorElementsVisibility(initialBody: BodyContentPayload) {
-        val isBodyEmpty = MessageBodyUtils.isBodyBlank(initialBody)
+    private fun initEditorElementsVisibility(body: String) {
+        val isBodyEmpty = body.isHtmlBlank()
         changePlaceholderVisibility(isVisible = isBodyEmpty)
 
         if (initialQuote != null) {
