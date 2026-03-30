@@ -352,7 +352,7 @@ class NewMessageViewModel @Inject constructor(
         val sanitizedBodyHtml = initialBody.toSanitizedHtml()
         val sanitizedBodyHtmlWithoutQuotes = if (initialQuote != null) {
             val (body, signature) = splitSignatureAndQuoteFromHtml(sanitizedBodyHtml)
-            body + signature
+            if (signature == null) body else body + signature
         } else {
             sanitizedBodyHtml
         }
