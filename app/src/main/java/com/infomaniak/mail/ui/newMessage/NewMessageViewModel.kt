@@ -914,7 +914,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun String.addMissingQuotes(): String {
-        return if (areQuotesIncluded) this else this + initialQuote
+        return if (areQuotesIncluded || initialQuote == null) {
+            this
+        } else {
+            this + initialQuote
+        }
     }
 
     private suspend fun executeDraftAction(draftSaveConfiguration: DraftSaveConfiguration) = with(draftSaveConfiguration) {
