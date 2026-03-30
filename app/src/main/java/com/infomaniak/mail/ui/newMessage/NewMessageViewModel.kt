@@ -89,6 +89,7 @@ import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitQuoteFromBody
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromHtml
 import com.infomaniak.mail.utils.SentryDebug
@@ -351,16 +352,16 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun commonBodyProcessing(draft: Draft) {
+        val sanitizedBodyHtml = initialBody.toSanitizedHtml()
+        val doc = jsoupParseWithLog(sanitizedBodyHtml)
+
         // This is only used for existing drafts, for new drafts we add the signature id during the signature encapsulation.
         // We added this here to avoid an extra parse.
         if (!isNewMessage) {
-            val doc = jsoupParseWithLog(initialBody.content)
             doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
-            initialBody = BodyContentPayload(doc.body().html(), BodyContentType.HTML_UNSANITIZED)
         }
 
-        val sanitizedBodyHtml = initialBody.toSanitizedHtml()
-            val (body, signature) = splitSignatureAndQuoteFromHtml(sanitizedBodyHtml)
+        val (body, signature) = splitSignatureAndQuoteFromHtml(doc)
         val sanitizedBodyHtmlWithoutQuotes = if (initialQuote != null) {
             if (signature == null) body else body + signature
         } else {

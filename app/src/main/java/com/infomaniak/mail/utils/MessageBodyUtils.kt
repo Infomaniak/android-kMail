@@ -22,8 +22,6 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
-import com.infomaniak.mail.ui.newMessage.BodyContentPayload
-import com.infomaniak.mail.ui.newMessage.BodyContentType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.BodyData
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
@@ -34,6 +32,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 
 object MessageBodyUtils {
 
@@ -136,12 +135,17 @@ object MessageBodyUtils {
         }
     }
 
+    fun splitSignatureAndQuoteFromHtml(body: String): BodyData {
+        val doc = jsoupParseWithLog(body)
+        return splitSignatureAndQuoteFromHtml(doc)
+    }
+
     /**
      * This only takes into account infomaniak's quotes and signatures.
      */
-    fun splitSignatureAndQuoteFromHtml(draftBody: String): BodyData {
+    fun splitSignatureAndQuoteFromHtml(document: Document): BodyData {
 
-        fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
+        fun Document.split(divClassName: String, defaultValue: Element): Pair<Element, String?> {
             // We need to use select and not getElementByClass because getElementByClass adds a \n after every <br>.
             // The function remove() also adds \n after each <br> of it.
             // So we need to use select, save the second part of the split first, and then do remove, to save the correct value
@@ -149,29 +153,28 @@ object MessageBodyUtils {
             return select(".$divClassName").firstOrNull()?.let {
                 val second = if (it.html().isBlank()) null else it.outerHtml()
                 it.remove()
-                val first = body().html()
+                val first = body()
                 first to second
             } ?: (defaultValue to null)
         }
 
-        fun String.lastIndexOfOrMax(string: String): Int {
-            val index = lastIndexOf(string)
-            return if (index == -1) Int.MAX_VALUE else index
-        }
+        document.outputSettings().prettyPrint(false)
 
-        val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
+        val (bodyWithQuote, signature) = document.split(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, document)
 
-        val (bodyWithQuote, signature) = doc.split(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
-
-        val replyPosition = draftBody.lastIndexOfOrMax(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draftBody.lastIndexOfOrMax(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val replyPosition = document.getElementPositionOrMax(".$INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME")
+        val forwardPosition = document.getElementPositionOrMax(".$INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME")
         val (body, quote) = if (replyPosition < forwardPosition) {
-            doc.split(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+            document.split(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
-            doc.split(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+            document.split(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        return BodyData(body, signature, quote)
+        return BodyData(body.html(), signature, quote)
+    }
+
+    private fun Document.getElementPositionOrMax(className: String): Int {
+        return this.selectFirst(className)?.sourceRange()?.start()?.pos() ?: Int.MAX_VALUE
     }
     //endregion
 
