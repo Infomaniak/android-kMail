@@ -667,6 +667,7 @@
     <string name="unblockButton">Deblokkeren</string>
     <string name="unknownDialogTitleRecipient">Onbekende ontvanger</string>
     <string name="unknownRecipientTitle">(onbekend)</string>
+    <string name="unknownTag">Onbekend</string>
     <string name="unsubscribeButtonTitle">Afmelden</string>
     <string name="urlEntryTitle">Een hyperlink maken</string>
     <string name="urlPlaceholder">URL</string>

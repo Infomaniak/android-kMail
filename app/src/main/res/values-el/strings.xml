@@ -667,6 +667,7 @@
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
     <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>
+    <string name="unknownTag">Άγνωστο</string>
     <string name="unsubscribeButtonTitle">Κατάργηση εγγραφής</string>
     <string name="urlEntryTitle">Δημιουργία υπερσύνδεσμου</string>
     <string name="urlPlaceholder">URL</string>

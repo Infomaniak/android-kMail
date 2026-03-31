@@ -667,6 +667,7 @@
     <string name="unblockButton">Desbloquear</string>
     <string name="unknownDialogTitleRecipient">Destinatário desconhecido</string>
     <string name="unknownRecipientTitle">(desconhecido)</string>
+    <string name="unknownTag">Desconhecido</string>
     <string name="unsubscribeButtonTitle">Cancelar subscrição</string>
     <string name="urlEntryTitle">Criar uma hiperligação</string>
     <string name="urlPlaceholder">URL</string>

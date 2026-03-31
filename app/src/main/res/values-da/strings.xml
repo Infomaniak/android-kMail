@@ -667,6 +667,7 @@
     <string name="unblockButton">Fjern blokering</string>
     <string name="unknownDialogTitleRecipient">Ukendt modtager</string>
     <string name="unknownRecipientTitle">(ukendt)</string>
+    <string name="unknownTag">Ukendt</string>
     <string name="unsubscribeButtonTitle">Afmeld</string>
     <string name="urlEntryTitle">Opret et hyperlink</string>
     <string name="urlPlaceholder">URL</string>

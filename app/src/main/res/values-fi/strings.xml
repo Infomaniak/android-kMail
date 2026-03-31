@@ -667,6 +667,7 @@
     <string name="unblockButton">Poista esto</string>
     <string name="unknownDialogTitleRecipient">Tuntematon vastaanottaja</string>
     <string name="unknownRecipientTitle">(tuntematon)</string>
+    <string name="unknownTag">Tuntematon</string>
     <string name="unsubscribeButtonTitle">Peruuta tilaus</string>
     <string name="urlEntryTitle">Luo hyperlinkki</string>
     <string name="urlPlaceholder">URL</string>

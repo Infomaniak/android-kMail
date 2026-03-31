@@ -667,6 +667,7 @@
     <string name="unblockButton">Avblockera</string>
     <string name="unknownDialogTitleRecipient">Okänd mottagare</string>
     <string name="unknownRecipientTitle">(okänd)</string>
+    <string name="unknownTag">Okänd</string>
     <string name="unsubscribeButtonTitle">Avregistrera</string>
     <string name="urlEntryTitle">Skapa en hyperlänk</string>
     <string name="urlPlaceholder">URL</string>
