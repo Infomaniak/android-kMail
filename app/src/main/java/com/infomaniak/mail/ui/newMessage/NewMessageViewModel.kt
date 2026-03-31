@@ -941,7 +941,7 @@ class NewMessageViewModel @Inject constructor(
         val localUuid = draftLocalUuid ?: return@with
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        val bodyWithQuotes = uiBodyValue.addMissingQuotes()
+        val bodyWithQuotes = removeUnwantedHtml(uiBodyValue.addMissingQuotes())
         if (action == DraftAction.SAVE && isSnapshotTheSame(subject, bodyWithQuotes)) {
             if (isFinishing && isNewMessage) removeDraftFromRealm(localUuid)
             return@with
@@ -1015,7 +1015,7 @@ class NewMessageViewModel @Inject constructor(
             isNewMessage = false
         }
 
-        body = removeUnwantedHtml(uiBodyValue)
+        body = uiBodyValue
     }
 
     /**
