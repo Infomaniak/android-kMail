@@ -2,7 +2,8 @@
 
 ## 1. Project Summary
 
-**Infomaniak Mail** is an Android email client application built by Infomaniak Network SA, featuring a modern UI with Jetpack Compose, Realm database, and multi-account support with push notifications (Google Play variant).
+**Infomaniak Mail** is an Android email client application built by Infomaniak Network SA, featuring a modern UI with Jetpack
+Compose, Realm database, and multi-account support with push notifications (Google Play variant).
 
 ### High-Level Tech Stack
 
@@ -99,10 +100,10 @@ android-kMail/
 ### Code Style
 
 - **Kotlin Style**: Follow official Kotlin code style (`kotlin.code.style=official` in gradle.properties)
-- **Naming**: 
-  - Classes: PascalCase (e.g., `ThreadController`, `MainActivity`)
-  - Functions/Properties: camelCase (e.g., `getThreads()`, `isEmpty`)
-  - Packages: lowercase, single word (e.g., `com.infomaniak.mail.ui.main`)
+- **Naming**:
+    - Classes: PascalCase (e.g., `ThreadController`, `MainActivity`)
+    - Functions/Properties: camelCase (e.g., `getThreads()`, `isEmpty`)
+    - Packages: lowercase, single word (e.g., `com.infomaniak.mail.ui.main`)
 - **File Naming**: Match class name exactly (e.g., `MainActivity.kt`)
 - **Comments**: GPL license header in all source files
 
@@ -116,11 +117,11 @@ android-kMail/
 ### Testing
 
 - **Unit Tests**: Located in `app/src/test/java/`
-  - Use JUnit 4 with MockK for mocking
-  - Database tests use dummy datasets in `dataset/` package
+    - Use JUnit 4 with MockK for mocking
+    - Database tests use dummy datasets in `dataset/` package
 - **UI Tests**: Located in `app/src/androidTest/java/`
-  - Use Espresso for view interactions
-  - Test files follow pattern: `*ActivityTest.kt` or `*Test.kt`
+    - Use Espresso for view interactions
+    - Test files follow pattern: `*ActivityTest.kt` or `*Test.kt`
 - **Test Flavors**: Separate test source sets for `standard` and `fdroid` flavors
 
 ### Product Flavors
@@ -138,12 +139,48 @@ android-kMail/
 
 ### Learned Preferences
 
-- None yet - start recording here when the user corrects your assumptions.
+When writing code, follow these specific style rules:
+
+**Line Length:**
+
+- Maximum 130 characters per line for kotlin files
+- Exceptions: single-line comments, import statements, hardcoded strings
+
+**Blank Lines:**
+
+- Never use more than 1 consecutive blank line
+- Always add 1 blank line after early return statements/blocks (helps identify happy path)
+
+**Copyright Headers:**
+
+- Required in ALL files (including resources)
+- Format: `Copyright (C) YYYY` or `Copyright (C) startYear-endYear`
+- No blank line between copyright and package declaration
+
+**Kotlin Control Flow:**
+
+- Prefer one-line if/else for trivial statements under 130 chars
+- Always use braces + newlines for non-trivial statements
+
+**Jetpack Compose:**
+
+- One-line composables with single parameter (within line limit)
+
+**Resources (XML):**
+
+- Remove fillColor="#00000000" (invisible colors from Figma imports)
+- Follow Android Studio formatting on PRs if formatting is off
+
+**Enums:**
+
+- New enums: PascalCase entries (e.g., `Active`, `Inactive`)
+- DO NOT rename existing enums (stored in sharedPrefs/Realm)
 
 ## 4. Self-correction
 
 This section is for you, the future agent.
 
 1. **Stale Map**: If you encounter a file or folder not listed in the "Context Map", update the map in this file.
-2. **New Norms**: If the user corrects you (e.g., "Don't use X, use Y"), add that rule to the "Local norms" section immediately so you don't make the mistake again.
+2. **New Norms**: If the user corrects you (e.g., "Don't use X, use Y"), add that rule to the "Local norms" section immediately so
+   you don't make the mistake again.
 3. **Refinement**: If you find this file is too verbose, prune it. Keep it high-signal.
