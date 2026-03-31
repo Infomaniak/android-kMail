@@ -665,6 +665,7 @@
     <string name="tooManyRecipients">Et voi lisätä tätä osoitetta, koska olet saavuttanut vastaanottajien rajan</string>
     <string name="trashFolder">Roskakori</string>
     <string name="unblockButton">Poista esto</string>
+    <string name="unknownDialogTitleRecipient">Tuntematon vastaanottaja</string>
     <string name="unknownRecipientTitle">(tuntematon)</string>
     <string name="unsubscribeButtonTitle">Peruuta tilaus</string>
     <string name="urlEntryTitle">Luo hyperlinkki</string>

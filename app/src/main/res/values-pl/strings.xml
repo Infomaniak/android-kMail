@@ -709,6 +709,7 @@
     <string name="tooManyRecipients">Nie możesz dodać tego adresu, ponieważ osiągnąłeś/aś limit odbiorców</string>
     <string name="trashFolder">Kosz</string>
     <string name="unblockButton">Odblokuj</string>
+    <string name="unknownDialogTitleRecipient">Nieznany odbiorca</string>
     <string name="unknownRecipientTitle">(nieznany)</string>
     <string name="unsubscribeButtonTitle">Wypisz się</string>
     <string name="urlEntryTitle">Utwórz hiperłącze</string>
