@@ -22,6 +22,8 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
+import com.infomaniak.mail.ui.newMessage.BodyContentPayload
+import com.infomaniak.mail.ui.newMessage.BodyContentType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.BodyData
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
@@ -124,18 +126,7 @@ object MessageBodyUtils {
         return htmlToText().isBlank()
     }
 
-    fun splitQuoteFromBody(draft: Draft): String? {
-        val remoteBody = draft.body
-        if (remoteBody.isEmpty()) return null
-
-        return when (draft.mimeType) {
-            Utils.TEXT_PLAIN -> null
-            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody).quote
-            else -> error("Cannot load an email which is not of type text/plain or text/html")
-        }
-    }
-
-    fun splitSignatureAndQuoteFromHtml(body: String): BodyData {
+    private fun splitSignatureAndQuoteFromHtml(body: String): BodyData {
         val doc = jsoupParseWithLog(body)
         return splitSignatureAndQuoteFromHtml(doc)
     }
@@ -170,7 +161,24 @@ object MessageBodyUtils {
             document.split(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        return BodyData(body.html(), signature, quote)
+        return BodyData(BodyContentPayload(body.html(), BodyContentType.HTML_UNSANITIZED), signature, quote)
+    }
+
+    fun splitSignatureAndQuoteFromBody(draft: Draft): BodyData {
+        val remoteBody = draft.body
+        if (remoteBody.isEmpty()) return BodyData(BodyContentPayload.emptyBody(), null, null)
+
+        val (body, signature, quote) = when (draft.mimeType) {
+            Utils.TEXT_PLAIN -> BodyData(
+                body = BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML),
+                signature = null,
+                quote = null
+            )
+            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody)
+            else -> error("Cannot load an email which is not of type text/plain or text/html")
+        }
+
+        return BodyData(body, signature, quote)
     }
 
     private fun Document.getElementPositionOrMax(className: String): Int {
