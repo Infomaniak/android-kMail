@@ -353,6 +353,11 @@ class NewMessageViewModel @Inject constructor(
 
     private fun commonBodyProcessing(draft: Draft) {
         val sanitizedBodyHtml = initialBody.toSanitizedHtml()
+        // We save the initial snapshot with its quotes, because quotes are added during snapshot comparison, ensuring it works
+        // whether the user included them or not.
+        // We do not save the custom editor local signature id because we remove it before snapshot comparison.
+        draft.saveSnapshot(sanitizedBodyHtml)
+
         val doc = jsoupParseWithLog(sanitizedBodyHtml)
 
         // This is only used for existing drafts, for new drafts we add the signature id during the signature encapsulation.
@@ -363,16 +368,18 @@ class NewMessageViewModel @Inject constructor(
 
         val (body, signature) = splitSignatureAndQuoteFromHtml(doc)
         val sanitizedBodyHtmlWithoutQuotes = if (signature == null) body else body + signature
-
         val sanitizedBodyWithoutQuotes = BodyContentPayload(sanitizedBodyHtmlWithoutQuotes, BodyContentType.HTML_SANITIZED)
-        draft.saveSnapshot(sanitizedBodyHtml)
+
         initEditorElementsVisibility(body)
+        /**
+         * We load the body into the editor without its quotes to improve performances. We load them only if the user expands the
+         * quotes section. Anyhow, the quotes will always be added before executing the draft action inside [addMissingQuotes].
+         */
         editorBodyInitializer.postValue(sanitizedBodyWithoutQuotes)
     }
 
     private fun initEditorElementsVisibility(body: String) {
-        val isBodyEmpty = body.isHtmlBlank()
-        changePlaceholderVisibility(isVisible = isBodyEmpty)
+        changePlaceholderVisibility(isVisible = body.isHtmlBlank())
 
         if (initialQuote != null) {
             changeQuotesButtonVisibility(isVisible = true)
