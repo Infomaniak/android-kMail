@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,9 +48,7 @@ class EditorContentManager @Inject constructor() {
         }
 
 
-        private fun getSanitizedHtml(html: String): String {
-            return html
-        }
+        private fun getSanitizedHtml(html: String): String = html
 
         private fun getUnsanitizedHtml(html: String) = getSanitizedHtml(html.sanitize())
 

@@ -95,8 +95,8 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getShowQuotesScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -142,7 +142,7 @@ class NewMessageFragment : Fragment() {
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
-    private val showQuotesScript by lazy { requireContext().getShowQuotesScript() }
+    private val showQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val hideQuotesStyle by lazy { requireContext().getHideQuotesStyle() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
@@ -363,9 +363,7 @@ class NewMessageFragment : Fragment() {
     override fun onDestroyView() {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editorWebView.exportHtml { html ->
-            newMessageViewModel.editorBodyInitializer.postValue(
-                BodyContentPayload(html, BodyContentType.HTML_SANITIZED)
-            )
+            newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(html, BodyContentType.HTML_SANITIZED))
         }
 
         addressListPopupWindow = null
