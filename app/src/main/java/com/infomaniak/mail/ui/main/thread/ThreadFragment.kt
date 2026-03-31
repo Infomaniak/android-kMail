@@ -38,6 +38,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.work.Data
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.views.DividerItemDecorator
@@ -623,7 +624,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     thread = result.thread ?: return@observe,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
                     aliases = mailbox.aliases,
-                    hasOrganisation = mailbox.hasOrganisation(),
+                    hasOrganisation = mailbox.kSuite is KSuite.Pro,
                     externalMailFlagEnabled = mailbox.externalMailFlagEnabled,
                     trustedDomains = mailbox.trustedDomains,
                 ),

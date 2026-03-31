@@ -178,8 +178,6 @@ class Mailbox : RealmObject {
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
     }
 
-    fun hasOrganisation(): Boolean = kSuite !is KSuite.Perso
-
     class FeatureFlagSet(val featureFlagsBacking: KMutableProperty0<RealmSet<String>>) {
         fun contains(featureFlag: FeatureFlag): Boolean {
             return featureFlagsBacking.get().contains(featureFlag.apiName)
