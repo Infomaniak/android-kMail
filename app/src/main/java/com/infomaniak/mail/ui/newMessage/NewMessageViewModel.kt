@@ -90,8 +90,7 @@ import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
-import com.infomaniak.mail.utils.MessageBodyUtils.splitQuoteFromBody
-import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromHtml
+import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
@@ -168,7 +167,9 @@ class NewMessageViewModel @Inject constructor(
 
     //region Initial data
     private var initialBody: BodyContentPayload = BodyContentPayload.emptyBody()
-    private var initialQuote: String? = null // is always sanitized and it's only set in initDraftAndViewModel
+    private var initialSignature: BodyContentPayload? = null
+    // It is always sanitized to safely be inserted when the user clicks on "show quotes" and it's only set in initDraftAndViewModel
+    private var initialSanitizedQuote: String? = null
     //endregion
 
     //region UI data
@@ -352,55 +353,57 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun commonBodyProcessing(draft: Draft) {
-        val sanitizedBodyHtml = initialBody.toSanitizedHtml()
-        // We save the initial snapshot with its quotes, because quotes are added during snapshot comparison, ensuring it works
-        // whether the user included them or not.
-        // We do not save the custom editor local signature id because we remove it before snapshot comparison.
-        draft.saveSnapshot(sanitizedBodyHtml)
+        val sanitizedBody = initialBody.toSanitizedHtml()
+        initEditorElementsVisibility(sanitizedBody)
 
-        val doc = jsoupParseWithLog(sanitizedBodyHtml)
-
-        // This is only used for existing drafts, for new drafts we add the signature id during the signature encapsulation.
-        // We added this here to avoid an extra parse.
-        if (!isNewMessage) {
-            doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
-        }
-
-        val (body, signature) = splitSignatureAndQuoteFromHtml(doc)
-        val sanitizedBodyHtmlWithoutQuotes = if (signature == null) body else body + signature
-        val sanitizedBodyWithoutQuotes = BodyContentPayload(sanitizedBodyHtmlWithoutQuotes, BodyContentType.HTML_SANITIZED)
-
-        initEditorElementsVisibility(body)
+        val sanitizedSignature = initialSignature?.toSanitizedHtml()
+        val sanitizedBodyWithoutQuotes = sanitizedBody.mergeWithSignature(sanitizedSignature)
+        val sanitizedBodyContentWithoutQuotes = BodyContentPayload(sanitizedBodyWithoutQuotes, BodyContentType.HTML_SANITIZED)
         /**
          * We load the body into the editor without its quotes to improve performances. We load them only if the user expands the
          * quotes section. Anyhow, the quotes will always be added before executing the draft action inside [addMissingQuotes].
          */
-        editorBodyInitializer.postValue(sanitizedBodyWithoutQuotes)
+        editorBodyInitializer.postValue(sanitizedBodyContentWithoutQuotes)
+
+        val sanitizedBodyWithQuotes = sanitizedBodyWithoutQuotes.mergeWithQuotes(initialSanitizedQuote)
+        // We save the initial snapshot with its quotes, because quotes are added during snapshot comparison, ensuring it works
+        // whether the user included them or not.
+        draft.saveSnapshot(sanitizedBodyWithQuotes)
     }
 
     private fun initEditorElementsVisibility(body: String) {
         changePlaceholderVisibility(isVisible = body.isHtmlBlank())
 
-        if (initialQuote != null) {
+        if (initialSanitizedQuote != null) {
             changeQuotesButtonVisibility(isVisible = true)
         }
     }
 
     private suspend fun getExistingDraft(localUuid: String?): Draft? {
+
+        fun String.sanitize(): String {
+            return BodyContentPayload(this, BodyContentType.HTML_UNSANITIZED).toSanitizedHtml()
+        }
+
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
                 draft.identityId = currentMailbox().getDefaultSignatureWithFallback().id.toString()
             }
-            val contentType = if (draft.mimeType == Utils.TEXT_PLAIN)
-                BodyContentType.TEXT_PLAIN_WITHOUT_HTML
-            else
-                BodyContentType.HTML_UNSANITIZED
 
-            initialBody = BodyContentPayload(draft.body, contentType)
-            initialQuote = splitQuoteFromBody(draft)?.let {
-                BodyContentPayload(it, BodyContentType.HTML_UNSANITIZED).toSanitizedHtml()
+            val doc = jsoupParseWithLog(draft.body)
+
+            // This is only used for existing drafts, for new drafts we add the signature id during the signature encapsulation.
+            // We added this here to avoid an extra parse.
+            if (!isNewMessage) {
+                doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
             }
+
+            val (body, signature, quote) = splitSignatureAndQuoteFromBody(draft)
+            initialBody = body
+            initialSignature = signature?.let { BodyContentPayload(it, BodyContentType.HTML_UNSANITIZED) }
+            initialSanitizedQuote = quote?.sanitize()
+
             return draft
         }
     }
@@ -424,32 +427,30 @@ class NewMessageViewModel @Inject constructor(
                         if (hasFailedFetching) return@let
 
                         initializeReplyForwardDraftValues(draft = this, fullMessage)
-                        initialQuote = draftInitManager.createQuote(draftMode, fullMessage, attachments)?.let {
+                        initialSanitizedQuote = draftInitManager.createQuote(draftMode, fullMessage, attachments)?.let {
                             BodyContentPayload(it, BodyContentType.HTML_UNSANITIZED).toSanitizedHtml()
                         }
                     }
             }
         }
 
-        var initialSignature: String? = null
+        val signature: Signature
         with(draftInitManager) {
-            val signature = chooseSignature(currentMailbox().email, signatures, draftMode, previousMessage)
+            signature = chooseSignature(currentMailbox().email, signatures, draftMode, previousMessage)
             setSignatureIdentity(signature)
-            initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
         }
+        val encapsulatedSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+        initialSignature = BodyContentPayload(encapsulatedSignature, BodyContentType.HTML_UNSANITIZED)
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
-
-        val mergedBodyContent = initialBody.mergeWithSignatureAndQuotes(initialSignature, initialQuote)
-        initialBody = BodyContentPayload(mergedBodyContent, BodyContentType.HTML_UNSANITIZED)
     }
 
-    private fun BodyContentPayload.mergeWithSignatureAndQuotes(initialSignature: String?, initialQuote: String?): String {
-        var body = toSanitizedHtml()
-        if (!initialSignature.isNullOrEmpty()) body += initialSignature
-        if (!initialQuote.isNullOrEmpty()) body += initialQuote
+    private fun String.mergeWithSignature(signature: String?): String {
+        return if (signature.isNullOrEmpty()) this else this + signature
+    }
 
-        return body
+    private fun String.mergeWithQuotes(quote: String?): String {
+        return if (quote.isNullOrEmpty()) this else this + quote
     }
 
     /**
@@ -585,7 +586,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun includeQuotes() {
-        initialQuote?.let { _quotesToIncludeChannel.trySend(it) }
+        initialSanitizedQuote?.let { _quotesToIncludeChannel.trySend(it) }
         areQuotesIncluded = true
     }
 
@@ -930,10 +931,10 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun String.addMissingQuotes(): String {
-        return if (areQuotesIncluded || initialQuote == null) {
+        return if (areQuotesIncluded || initialSanitizedQuote == null) {
             this
         } else {
-            this + initialQuote
+            this + initialSanitizedQuote
         }
     }
 
@@ -941,7 +942,7 @@ class NewMessageViewModel @Inject constructor(
         val localUuid = draftLocalUuid ?: return@with
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        val bodyWithQuotes = removeUnwantedHtml(uiBodyValue.addMissingQuotes())
+        val bodyWithQuotes = uiBodyValue.addMissingQuotes()
         if (action == DraftAction.SAVE && isSnapshotTheSame(subject, bodyWithQuotes)) {
             if (isFinishing && isNewMessage) removeDraftFromRealm(localUuid)
             return@with
@@ -1015,7 +1016,7 @@ class NewMessageViewModel @Inject constructor(
             isNewMessage = false
         }
 
-        body = uiBodyValue
+        body = removeUnwantedHtml(uiBodyValue)
     }
 
     /**
@@ -1023,6 +1024,8 @@ class NewMessageViewModel @Inject constructor(
      */
     private fun removeUnwantedHtml(html: String): String {
         val doc = jsoupParseWithLog(html)
+        // This assures that jsoup doesn't add line breaks that will impact the snapshot comparison
+        doc.outputSettings().prettyPrint(false)
 
         // Remove id used for replacing signature.
         doc.getElementById(EDITOR_LOCAL_SIGNATURE_ID)?.removeAttr("id")
@@ -1031,8 +1034,7 @@ class NewMessageViewModel @Inject constructor(
         // (the text could get hidden later with the toggle button).
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
-
-        return doc.html()
+        return doc.body().html()
     }
 
     private fun Document.removeEmptyElements(className: String) {
@@ -1186,7 +1188,7 @@ class NewMessageViewModel @Inject constructor(
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
 
-    data class BodyData(val body: String, val signature: String?, val quote: String?)
+    data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName
