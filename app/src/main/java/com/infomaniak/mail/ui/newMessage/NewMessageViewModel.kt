@@ -362,11 +362,8 @@ class NewMessageViewModel @Inject constructor(
         }
 
         val (body, signature) = splitSignatureAndQuoteFromHtml(doc)
-        val sanitizedBodyHtmlWithoutQuotes = if (initialQuote != null) {
-            if (signature == null) body else body + signature
-        } else {
-            sanitizedBodyHtml
-        }
+        val sanitizedBodyHtmlWithoutQuotes = if (signature == null) body else body + signature
+
         val sanitizedBodyWithoutQuotes = BodyContentPayload(sanitizedBodyHtmlWithoutQuotes, BodyContentType.HTML_SANITIZED)
         draft.saveSnapshot(sanitizedBodyHtml)
         initEditorElementsVisibility(body)
