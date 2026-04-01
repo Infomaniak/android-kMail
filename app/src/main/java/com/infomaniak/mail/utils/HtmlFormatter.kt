@@ -245,8 +245,8 @@ class HtmlFormatter(private val html: String) {
             return loadScript(R.raw.fix_email_style)
         }
 
-        fun Context.getJsBridgeScript(): String {
-            return loadScript(R.raw.javascript_bridge)
+        fun Context.getMessageDisplayJavascriptBridge(): String {
+            return loadScript(R.raw.message_display_javascript_bridge)
         }
 
         fun Context.getEditorJsBridgeScript(): String {
