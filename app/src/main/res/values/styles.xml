@@ -146,7 +146,7 @@
         <item name="iconPadding">@dimen/marginStandardSmall</item>
     </style>
 
-    <style name="ToggleQuoteTextButton" parent="Widget.Material3.Button.TextButton">
+    <style name="ShowQuoteTextButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
         <item name="android:insetLeft">@dimen/alternativeMargin</item>
         <item name="android:insetTop">@dimen/marginStandardVerySmall</item>
