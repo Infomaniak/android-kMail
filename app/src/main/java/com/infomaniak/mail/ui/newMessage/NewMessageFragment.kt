@@ -94,7 +94,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getHideQuotesStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
@@ -143,7 +142,6 @@ class NewMessageFragment : Fragment() {
     }
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val showQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
-    private val hideQuotesStyle by lazy { requireContext().getHideQuotesStyle() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
 
