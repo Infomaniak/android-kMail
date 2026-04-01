@@ -141,7 +141,7 @@ class NewMessageFragment : Fragment() {
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
-    private val showQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
+    private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
 
@@ -528,7 +528,7 @@ class NewMessageFragment : Fragment() {
     private fun observeQuotesInclusion() = viewLifecycleOwner.lifecycleScope.launch {
         for (quote in newMessageViewModel.quotesToIncludeChannel) {
             val escapedQuote = looselyEscapeAsStringLiteralForJs(quote)
-            val includeQuoteScript = showQuotesScript.format(escapedQuote)
+            val includeQuoteScript = includeQuotesScript.format(escapedQuote)
             binding.editorWebView.evaluateJavascript(includeQuoteScript, null)
         }
     }
