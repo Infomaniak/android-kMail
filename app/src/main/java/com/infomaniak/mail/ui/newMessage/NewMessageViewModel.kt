@@ -372,8 +372,8 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun initEditorElementsVisibility(body: String) {
-        changePlaceholderVisibility(isVisible = body.isHtmlBlank())
-        if (initialSanitizedQuote != null) changeQuotesButtonVisibility(isVisible = true)
+        setPlaceholderVisibility(isVisible = body.isHtmlBlank())
+        if (initialSanitizedQuote != null) setQuotesButtonVisibility(isVisible = true)
     }
 
     private suspend fun getExistingDraft(localUuid: String?): Draft? {
@@ -390,8 +390,6 @@ class NewMessageViewModel @Inject constructor(
 
             val doc = jsoupParseWithLog(draft.body)
 
-            // This is only used for existing drafts, for new drafts we add the signature id during the signature encapsulation.
-            // We added this here to avoid an extra parse.
             if (!isNewMessage) {
                 doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
             }
@@ -578,7 +576,7 @@ class NewMessageViewModel @Inject constructor(
         isEncryptionActivated.postValue(isEncrypted)
     }
 
-    fun changeQuotesButtonVisibility(isVisible: Boolean) {
+    fun setQuotesButtonVisibility(isVisible: Boolean) {
         _isQuotesButtonVisible.value = isVisible
     }
 
@@ -587,7 +585,7 @@ class NewMessageViewModel @Inject constructor(
         areQuotesIncluded = true
     }
 
-    fun changePlaceholderVisibility(isVisible: Boolean) {
+    fun setPlaceholderVisibility(isVisible: Boolean) {
         _isPlaceHolderVisible.value = isVisible
     }
 
@@ -1036,7 +1034,6 @@ class NewMessageViewModel @Inject constructor(
 
     private fun Document.removeEmptyElements(className: String) {
         val elements = getElementsByClass(className)
-        if (elements.isEmpty()) return
         elements.forEach { if (it.text().isEmpty()) it.remove() }
     }
 
