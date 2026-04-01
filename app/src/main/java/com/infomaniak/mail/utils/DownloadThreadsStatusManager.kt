@@ -48,5 +48,4 @@ class DownloadThreadsStatusManager @Inject constructor() {
     fun updateState(isDownloading: Boolean) {
         _isDownloading.value = isDownloading
     }
-
 }
