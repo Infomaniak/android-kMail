@@ -313,8 +313,8 @@ fun WebView.initEditorWebviewClient(
     }
 }
 
-private fun List<Attachment>.toCidDictionary(): MutableMap<String, Attachment> {
-    return mutableMapOf<String, Attachment>().apply {
+private fun List<Attachment>.toCidDictionary(): Map<String, Attachment> {
+    return buildMap {
         forEach<Attachment> {
             it.contentId?.let { cid ->
                 if (cid.isNotBlank()) this[cid] = it
