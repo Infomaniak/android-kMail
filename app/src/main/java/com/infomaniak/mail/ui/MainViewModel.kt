@@ -763,7 +763,6 @@ class MainViewModel @Inject constructor(
                 threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
             }
         }
-
     }
 //endregion
 
