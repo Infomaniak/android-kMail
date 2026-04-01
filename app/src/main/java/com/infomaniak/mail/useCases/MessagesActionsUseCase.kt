@@ -232,7 +232,9 @@ class MessagesActionsUseCase @Inject constructor(
             threads.flatMap { thread ->
                 messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
             }
-        } else threads.flatMap { thread -> messageController.getUnseenMessages(thread) }
+        } else {
+            threads.flatMap { thread -> messageController.getUnseenMessages(thread) }
+        }
 
         return handleToggleSeenStatus(messagesToToggle, isSeen, mailbox, threadsUids)
     }
@@ -255,17 +257,9 @@ class MessagesActionsUseCase @Inject constructor(
         threadsUids: List<String>? = null
     ): ToggleResult {
         return if (isSeen) {
-            markAsUnseen(
-                messages = messages,
-                mailbox = mailbox,
-                threadsUids = threadsUids,
-            )
+            markAsUnseen(messages = messages, mailbox = mailbox, threadsUids = threadsUids)
         } else {
-            markMessagesAsSeen(
-                messages = messages,
-                mailbox = mailbox,
-                threadsUids = threadsUids,
-            )
+            markMessagesAsSeen(messages = messages, mailbox = mailbox, threadsUids = threadsUids)
         }
     }
 
@@ -499,7 +493,7 @@ class MessagesActionsUseCase @Inject constructor(
 
     // Undo Region
     suspend fun undoAction(undoData: UndoData): ApiCallResult {
-        val resources = undoData.resources ?: return ApiCallResult.Error(RCore.string.anErrorHasOccurred)
+        val resources = undoData.resources
         val apiResponses = resources.map { ApiRepository.undoAction(it) }
         val failedCall = apiResponses.firstOrNull { it.data != true }
 

@@ -328,9 +328,6 @@ class ActionsViewModel @Inject constructor(
     private fun showDeleteSnackbar(
         apiResponses: List<ApiResponse<*>>,
         messages: List<Message>,
-        undoResources: List<String>? = null,
-        undoFoldersIds: ImpactedFolders? = null,
-        undoDestinationId: String? = null,
         numberOfImpactedThreads: Int,
     ) {
         val snackbarTitle = if (apiResponses.atLeastOneSucceeded()) {
@@ -345,14 +342,9 @@ class ActionsViewModel @Inject constructor(
         } else {
             appContext.getString(apiResponses.first().translateError())
         }
-
-        val undoData = if (undoResources?.isNotEmpty() == true && undoFoldersIds != null) {
-            UndoData(undoResources, undoFoldersIds, undoDestinationId)
-        } else {
-            null
-        }
-
-        snackbarManager.postValue(snackbarTitle, undoData)
+        // We send a null undoData, because this snackbar is only shown in a permanently delete and it is not possible
+        // to undo this action.
+        snackbarManager.postValue(snackbarTitle, null)
     }
 
     //endregion
