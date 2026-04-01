@@ -29,7 +29,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
@@ -46,7 +46,7 @@ class WebViewUtils(context: Context) {
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
-    private val jsBridgeScript by lazy { context.getJsBridgeScript() }
+    private val messageDisplayJsBridgeScript by lazy { context.getMessageDisplayJavascriptBridge() }
 
     fun processHtmlForPrint(
         html: String,
@@ -74,7 +74,7 @@ class WebViewUtils(context: Context) {
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
-        registerScript(jsBridgeScript)
+        registerScript(messageDisplayJsBridgeScript)
         registerBodyEncapsulation()
         registerBreakLongWords()
     }
