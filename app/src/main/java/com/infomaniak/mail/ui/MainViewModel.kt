@@ -734,7 +734,6 @@ class MainViewModel @Inject constructor(
                 threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
             }
         }
-
     }
 //endregion
 
@@ -763,7 +762,6 @@ class MainViewModel @Inject constructor(
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
         downloadThreadsStatusManager.updateState(false)
     }
-
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {
 

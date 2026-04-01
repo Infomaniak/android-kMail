@@ -142,6 +142,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
 import androidx.appcompat.R as RAndroid
+import com.infomaniak.core.common.R as RCore
 
 @AndroidEntryPoint
 class ThreadFragment : Fragment(), PickerEmojiObserver {
@@ -736,20 +737,26 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun setupBackActionHandler() {
+        val mailbox = mainViewModel.currentMailbox.value
+        if (mailbox == null) {
+            snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+            return
+        }
+
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 positiveButtonResId = R.string.buttonModify,
                 onDateSelected = { timestamp ->
                     trackScheduleSendEvent(MatomoName.CustomScheduleConfirm)
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
-                    actionsViewModel.rescheduleDraft(Date(timestamp), mainViewModel.currentMailbox.value!!)
+                    actionsViewModel.rescheduleDraft(Date(timestamp), mailbox)
                 },
                 onAbort = ::navigateToScheduleSendBottomSheet,
             )
         }
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
-            actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mainViewModel.currentMailbox.value!!)
+            actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox)
         }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
