@@ -468,7 +468,7 @@ class NewMessageFragment : Fragment() {
         isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { isFocused ->
             setToolbarEnabledStatus(isFocused)
             if (isFocused && isPlaceHolderVisible.value) {
-                changePlaceholderVisibility(isVisible = false)
+                setPlaceholderVisibility(isVisible = false)
             }
         }
     }
@@ -538,11 +538,10 @@ class NewMessageFragment : Fragment() {
 
     private fun setupShowQuotesButton() {
         binding.showQuotesButton.setOnClickListener {
-            newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
+            newMessageViewModel.setQuotesButtonVisibility(isVisible = false)
             newMessageViewModel.includeQuotes()
         }
     }
-
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
@@ -722,9 +721,9 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeBodyLoader() = with(newMessageViewModel) {
-        editorBodyInitializer.observe(viewLifecycleOwner) { bodyContentData ->
-            editorContentManager.setContent(binding.editorWebView, bodyContentData)
+    private fun observeBodyLoader() {
+        newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
+            editorContentManager.setContent(binding.editorWebView, body)
         }
     }
 
