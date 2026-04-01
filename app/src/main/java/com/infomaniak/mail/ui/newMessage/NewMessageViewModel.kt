@@ -342,7 +342,10 @@ class NewMessageViewModel @Inject constructor(
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
 
-            commonBodyProcessing(it)
+            val sanitizedBodyWithQuotes = getBodyAfterCommonProcessing()
+            // We save the initial snapshot with its quotes, because quotes are added during snapshot comparison, ensuring it works
+            // whether the user included them or not.
+            draft.saveSnapshot(sanitizedBodyWithQuotes)
 
             _isShimmering.emit(false)
             initResult.postValue(InitResult(it, signatures))
@@ -351,7 +354,7 @@ class NewMessageViewModel @Inject constructor(
         emit(draft)
     }
 
-    private fun commonBodyProcessing(draft: Draft) {
+    private fun getBodyAfterCommonProcessing(): String {
         val sanitizedBody = initialBody.toSanitizedHtml()
         initEditorElementsVisibility(sanitizedBody)
 
@@ -364,18 +367,12 @@ class NewMessageViewModel @Inject constructor(
          */
         editorBodyInitializer.postValue(sanitizedBodyContentWithoutQuotes)
 
-        val sanitizedBodyWithQuotes = sanitizedBodyWithoutQuotes.mergeWithQuotes(initialSanitizedQuote)
-        // We save the initial snapshot with its quotes, because quotes are added during snapshot comparison, ensuring it works
-        // whether the user included them or not.
-        draft.saveSnapshot(sanitizedBodyWithQuotes)
+        return sanitizedBodyWithoutQuotes.mergeWithQuotes(initialSanitizedQuote)
     }
 
     private fun initEditorElementsVisibility(body: String) {
         changePlaceholderVisibility(isVisible = body.isHtmlBlank())
-
-        if (initialSanitizedQuote != null) {
-            changeQuotesButtonVisibility(isVisible = true)
-        }
+        if (initialSanitizedQuote != null) changeQuotesButtonVisibility(isVisible = true)
     }
 
     private suspend fun getExistingDraft(localUuid: String?): Draft? {
