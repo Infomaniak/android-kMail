@@ -40,24 +40,21 @@ class EditorContentManager @Inject constructor() {
 
         fun BodyContentPayload.toSanitizedHtml(): String {
             return when (type) {
-                BodyContentType.HTML_SANITIZED -> getSanitizedHtml(content)
+                BodyContentType.HTML_SANITIZED -> content
                 BodyContentType.HTML_UNSANITIZED -> getUnsanitizedHtml(content)
                 BodyContentType.TEXT_PLAIN_WITH_HTML -> getPlainTextAndInterpretHtml(content)
                 BodyContentType.TEXT_PLAIN_WITHOUT_HTML -> getPlainTextAndEscapeHtml(content)
             }
         }
 
-
-        private fun getSanitizedHtml(html: String): String = html
-
-        private fun getUnsanitizedHtml(html: String) = getSanitizedHtml(html.sanitize())
+        private fun getUnsanitizedHtml(html: String) = html.sanitize()
 
         private fun getPlainTextAndInterpretHtml(text: String): String {
-            return getSanitizedHtml(text.replaceNewLines().sanitize())
+            return text.replaceNewLines().sanitize()
         }
 
         private fun getPlainTextAndEscapeHtml(text: String): String {
-            return getSanitizedHtml(text.escapeHtmlCharacters().replaceNewLines())
+            return text.escapeHtmlCharacters().replaceNewLines()
         }
 
         private fun String.escapeHtmlCharacters(): String = Html.escapeHtml(this)
