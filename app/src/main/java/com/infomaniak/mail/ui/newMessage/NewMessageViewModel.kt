@@ -1028,7 +1028,7 @@ class NewMessageViewModel @Inject constructor(
         doc.getElementById(EDITOR_LOCAL_SIGNATURE_ID)?.removeAttr("id")
 
         // If the user deleted the quotes' text, remove the quotes' div so user doesn't write in it
-        // (the text could get hidden later with the toggle button).
+        // (the text could get hidden later with the show quotes button).
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
         return doc.body().html()
