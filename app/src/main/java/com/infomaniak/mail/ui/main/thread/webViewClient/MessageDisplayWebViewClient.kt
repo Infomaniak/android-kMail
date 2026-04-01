@@ -34,7 +34,7 @@ import io.sentry.SentryLevel
 
 class MessageDisplayWebViewClient(
     private val context: Context,
-    cidDictionary: MutableMap<String, Attachment>,
+    cidDictionary: Map<String, Attachment>,
     private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
     onBlockedResourcesDetected: () -> Unit,
