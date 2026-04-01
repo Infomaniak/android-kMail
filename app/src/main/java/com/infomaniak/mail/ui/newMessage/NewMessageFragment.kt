@@ -429,7 +429,7 @@ class NewMessageFragment : Fragment() {
         })
 
         initEditorUi()
-        setupToggleQuotesButton()
+        setupShowQuotesButton()
 
         viewLifecycleOwner.lifecycleScope.launch { setupSendButtons() }
         externalsManager.setupExternalBanner()
@@ -516,8 +516,8 @@ class NewMessageFragment : Fragment() {
             newMessageViewModel.isShimmering.filterNot { it }
         ) { isQuoteVisible, _ ->
             isQuoteVisible
-        }.collect { isQuoteToggleButtonVisible ->
-            binding.quotesToggleButton.isVisible = isQuoteToggleButtonVisible
+        }.collect { isQuoteButtonVisible ->
+            binding.showQuotesButton.isVisible = isQuoteButtonVisible
         }
     }
 
@@ -535,8 +535,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setupToggleQuotesButton() {
-        binding.quotesToggleButton.setOnClickListener {
+    private fun setupShowQuotesButton() {
+        binding.showQuotesButton.setOnClickListener {
             newMessageViewModel.changeQuotesButtonVisibility(isVisible = false)
             newMessageViewModel.includeQuotes()
         }
