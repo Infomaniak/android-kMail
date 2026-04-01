@@ -233,8 +233,6 @@ class HtmlFormatter(private val html: String) {
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
         )
 
-        fun Context.getHideQuotesStyle(): String = loadCss(R.raw.hide_quotes_style)
-
         fun Context.getIncludeQuotesScript(): String = loadScript(R.raw.include_quotes_script)
 
         fun Context.getDeletedInlineImagesObserverScript(): String = loadScript(R.raw.deleted_inline_images_observer)
