@@ -23,7 +23,7 @@ import com.infomaniak.mail.data.models.Attachment
 
 class EditorWebViewClient(
     context: Context,
-    cidDictionary: MutableMap<String, Attachment>,
+    cidDictionary: Map<String, Attachment>,
     shouldLoadDistantResources: Boolean,
     private val onPageFinished: () -> Unit,
 ) : MessageWebViewClient(

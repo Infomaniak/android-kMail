@@ -32,7 +32,7 @@ import java.io.ByteArrayInputStream
 
 abstract class MessageWebViewClient(
     private val context: Context,
-    private val cidDictionary: MutableMap<String, Attachment>,
+    private val cidDictionary: Map<String, Attachment>,
     private var shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
 ) : WebViewClient() {
