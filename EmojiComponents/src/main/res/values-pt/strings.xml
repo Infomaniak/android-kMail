@@ -17,6 +17,6 @@
   -->
 <resources>
     <string name="actionAddReaction">Adicionar reação</string>
-    <string name="reactionsAll">Todos</string>
+    <string name="reactionsAll">Todas</string>
     <string name="reactionsTitle">Reações</string>
 </resources>
