@@ -39,8 +39,8 @@ import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.auth.models.UserLoginResult
 import com.infomaniak.core.common.extensions.capitalizeFirstChar
 import com.infomaniak.core.common.observe
-import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel.Companion.filterSelectedAccounts
+import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -164,6 +164,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeCrossLoginAccounts() {
+        @OptIn(CrossAppLoginFacade.UncheckedTokens::class)
         crossAppLoginViewModel.availableAccounts.observe(viewLifecycleOwner) { accounts ->
             SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
         }
@@ -174,7 +175,7 @@ class LoginFragment : Fragment() {
         launch { crossAppLoginViewModel.activateUpdates(requireActivity()) }
     }
 
-    private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) {
+    private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult) {
         with(loginUtils) {
             val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
             val users = buildList {
