@@ -89,8 +89,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 return@launch
             }
 
-            // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
-            junkMessagesViewModel.threadsUids = listOf(threadUid)
+            // Initialization of message to populate junkMessages and potentialUsersToBlock
+            junkMessagesViewModel.messages = listOf(message)
+
             val folderRole = folderRoleUtils.getActionFolderRole(message)
             isFromSpam = folderRole == FolderRole.SPAM
 
