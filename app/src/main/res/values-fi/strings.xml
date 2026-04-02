@@ -441,6 +441,10 @@
     <string name="organizationName">Organisaatio: %s</string>
     <string name="otherOrganisation">Muu</string>
     <string name="pickerNoSelection">Ei valintaa</string>
+    <plurals name="previewMultiReaction">
+        <item quantity="one">%1$s %2$s ja %3$s henkilö on reagoinut</item>
+        <item quantity="other">%1$s %2$s ja %3$s henkilöä on reagoinut</item>
+    </plurals>
     <string name="previewReaction">%2$s %1$s reagoi</string>
     <string name="readFAQ">Lue UKK</string>
     <string name="readMore">Lue lisää</string>

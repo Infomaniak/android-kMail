@@ -441,6 +441,10 @@
     <string name="organizationName">Οργάνωση: %s</string>
     <string name="otherOrganisation">Άλλο</string>
     <string name="pickerNoSelection">Καμία επιλογή</string>
+    <plurals name="previewMultiReaction">
+        <item quantity="one">%1$s %2$s και %3$s άτομο αντέδρασαν</item>
+        <item quantity="other">%1$s %2$s και %3$s άτομα αντέδρασαν</item>
+    </plurals>
     <string name="previewReaction">%2$s αντέδρασε στο %1$s</string>
     <string name="readFAQ">Διαβάστε τις Συχνές Ερωτήσεις</string>
     <string name="readMore">Διαβάστε περισσότερα</string>

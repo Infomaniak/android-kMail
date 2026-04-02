@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -222,7 +223,36 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        val notificationBody = message.getNotificationBody() ?: message.getNotificationPreview()
+        var notificationBody = message.getNotificationBody() ?: message.getNotificationPreview()
+
+        // // Update notification body to handle plural forms when multiple people react
+        if (message.isReaction) {
+            val targetMessageIds = message.inReplyTo?.parseMessagesIds().orEmpty()
+
+            this.messages.firstOrNull { it.messageId in targetMessageIds }?.let { targetMessage ->
+                val lastReaction = targetMessage.emojiReactions.lastOrNull()
+
+                lastReaction?.let {
+                    val lastReactionEmoji = it.emoji
+
+                    val totalUnseenReactionOnLastEmoji =
+                        MessageController.getUnreadReactionCountByEmoji(uid, realm, lastReactionEmoji) ?: 0
+
+                    if (totalUnseenReactionOnLastEmoji > 1) {
+                        val lastReactorName = message.from.firstOrNull()?.name.orEmpty()
+                        val otherPeopleCount = (totalUnseenReactionOnLastEmoji - 1).toInt()
+
+                        notificationBody = appContext.resources.getQuantityString(
+                            R.plurals.previewMultiReaction,
+                            otherPeopleCount,
+                            lastReactionEmoji,
+                            lastReactorName,
+                            otherPeopleCount
+                        )
+                    }
+                }
+            }
+        }
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces

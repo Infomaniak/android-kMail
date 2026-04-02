@@ -441,6 +441,10 @@
     <string name="organizationName">Organización: %s</string>
     <string name="otherOrganisation">Otros</string>
     <string name="pickerNoSelection">Sin selección</string>
+    <plurals name="previewMultiReaction">
+        <item quantity="one">%1$s %2$s y %3$s persona reaccionaron</item>
+        <item quantity="other">%1$s %2$s y %3$s personas reaccionaron</item>
+    </plurals>
     <string name="previewReaction">%2$s %1$s reaccionó</string>
     <string name="readFAQ">Lea las preguntas frecuentes</string>
     <string name="readMore">Seguir leyendo</string>
