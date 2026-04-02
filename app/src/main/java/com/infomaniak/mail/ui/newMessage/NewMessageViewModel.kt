@@ -546,6 +546,10 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
+    /**
+     * The editor will always export code with `\n` even when we provided `\r\n` as input. To not fail snapshot comparison, we
+     * need to make sure we save the snapshots with `\n` only.
+     */
     private fun String.normalizeCarriageReturns(): String {
         return replace("\r\n", "\n")
     }
