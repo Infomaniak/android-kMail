@@ -57,6 +57,12 @@ class JunkMessagesViewModel @Inject constructor(
             getJunkMessagesAndUsersToBlock(value)
         }
 
+    var messages: List<Message> = emptyList()
+        set(value) {
+            field = value
+            getUserToBlockFromMessage(messages)
+        }
+
     private val currentMailboxFlow = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
@@ -72,6 +78,12 @@ class JunkMessagesViewModel @Inject constructor(
             threadsUids = threadUids,
             localSettings = localSettings,
         )
+        junkMessages.postValue(messages)
+        potentialBlockedUsers.postValue(potentialMessagesToBlock)
+    }
+
+    private fun getUserToBlockFromMessage(messages: List<Message>) = viewModelScope.launch(defaultDispatcher) {
+        val potentialMessagesToBlock = MessageUtils.getJunkMessagesAndMessagesToBlockUser(messages)
         junkMessages.postValue(messages)
         potentialBlockedUsers.postValue(potentialMessagesToBlock)
     }
