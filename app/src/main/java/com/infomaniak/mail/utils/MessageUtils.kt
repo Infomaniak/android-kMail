@@ -47,6 +47,20 @@ object MessageUtils {
 
         return JunkMessagesData(junkMessages = lastMessagesOfThreads, messagesFromUsersToBlock = messagesFromUsersToBlock)
     }
-}
 
-data class JunkMessagesData(val junkMessages: List<Message>, val messagesFromUsersToBlock: Map<Recipient, Message>)
+    fun getJunkMessagesAndMessagesToBlockUser(
+        messages: List<Message>,
+    ): MutableMap<Recipient, Message> {
+        val messagesFromUsersToBlock: MutableMap<Recipient, Message> = mutableMapOf()
+
+        messages.forEach { message ->
+            message.from.firstOrNull()?.let { user ->
+                if (!user.isMe() && user !in messagesFromUsersToBlock) messagesFromUsersToBlock[user] = message
+            }
+        }
+
+        return messagesFromUsersToBlock
+    }
+
+    data class JunkMessagesData(val junkMessages: List<Message>, val messagesFromUsersToBlock: Map<Recipient, Message>)
+}
