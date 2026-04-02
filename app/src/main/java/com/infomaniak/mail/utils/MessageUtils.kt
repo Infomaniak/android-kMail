@@ -23,7 +23,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 
 object MessageUtils {
 
@@ -39,7 +38,7 @@ object MessageUtils {
         val lastMessagesOfThreads = threadList.map { thread ->
             thread.getDisplayedMessages(featureFlagsLive, localSettings).forEach { message ->
                 message.from.firstOrNull()?.let { user ->
-                    if (!user.isMe() && user !in messagesFromUsersToBlock) messagesFromUsersToBlock.put(user, message)
+                    if (!user.isMe() && user !in messagesFromUsersToBlock) messagesFromUsersToBlock[user] = message
                 }
             }
 

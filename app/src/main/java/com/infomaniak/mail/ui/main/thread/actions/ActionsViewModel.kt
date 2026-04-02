@@ -183,9 +183,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messages = messageController.getMessages(messagesUids)
-        val messagesToMove = messagesActionsUseCase.getMessagesToMove(messages, currentFolderId)
-
-        handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
+        handleMessagesMove(destinationFolderId, messages, currentFolderId, mailbox)
     }
 
     private suspend fun handleMessagesMove(
@@ -364,8 +362,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMove = messagesActionsUseCase.getMessagesToMove(messages, currentFolder?.id)
-        handleArchiveMessage(messagesToMove, currentFolder, mailbox)
+        handleArchiveMessage(messages, currentFolder, mailbox)
     }
 
     private suspend fun handleArchiveMessage(
