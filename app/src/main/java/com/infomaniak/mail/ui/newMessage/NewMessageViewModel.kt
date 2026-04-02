@@ -389,10 +389,7 @@ class NewMessageViewModel @Inject constructor(
             }
 
             val doc = jsoupParseWithLog(draft.body)
-
-            if (!isNewMessage) {
-                doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
-            }
+            doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
 
             val (body, signature, quote) = splitSignatureAndQuoteFromBody(draft)
             initialBody = body
