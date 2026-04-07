@@ -278,9 +278,14 @@ class MessageController @Inject constructor(
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.findSuspend()?.lastOrNull()
         }
 
-        suspend fun getUnreadReactionCountByEmoji(threadUid: String, realm: TypedRealm, emoji: String): Long? {
-            val thread = ThreadController.getThread(threadUid, realm)
-            return thread?.messages?.query("${Message::emojiReaction.name} == $0 AND ${Message::isSeen.name} == false", emoji)?.count()?.findSuspend()
+        suspend fun getUnreadReactionCountByEmoji(threadUid: String, realm: TypedRealm, emoji: String?): Int {
+            if (emoji == null) return 0
+            val threadUidName = "${Message::threads.name}.${Thread::uid.name}"
+            return realm.query<Message>(
+                "$threadUidName=$0 AND ${Message::emojiReaction.name} == $1 AND ${Message::isSeen.name} == false",
+                threadUid,
+                emoji
+            ).count().findSuspend().toInt()
         }
 
         suspend fun doesMessageExist(uid: String, realm: TypedRealm): Boolean {

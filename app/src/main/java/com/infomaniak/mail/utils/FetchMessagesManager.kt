@@ -210,7 +210,8 @@ class FetchMessagesManager @Inject constructor(
             return@let cleanedDocument.wholeText().trim()
         }
 
-        fun Message.getNotificationPreview(): String = getFormattedPreview(appContext).content
+        fun Message.getNotificationPreview(totalUnseenReactionOnLastEmoji: Int): String =
+            getFormattedPreview(appContext, totalUnseenReactionOnLastEmoji).content
 
         ThreadController.fetchMessagesHeavyData(getDisplayedMessages(mailbox.featureFlags, localSettings), realm, okHttpClient)
 
@@ -223,36 +224,10 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        var notificationBody = message.getNotificationBody() ?: message.getNotificationPreview()
+        val totalUnseenReactionOnLastEmoji =
+            MessageController.getUnreadReactionCountByEmoji(uid, realm, message.emojiReaction)
 
-        // // Update notification body to handle plural forms when multiple people react
-        if (message.isReaction) {
-            val targetMessageIds = message.inReplyTo?.parseMessagesIds().orEmpty()
-
-            this.messages.firstOrNull { it.messageId in targetMessageIds }?.let { targetMessage ->
-                val lastReaction = targetMessage.emojiReactions.lastOrNull()
-
-                lastReaction?.let {
-                    val lastReactionEmoji = it.emoji
-
-                    val totalUnseenReactionOnLastEmoji =
-                        MessageController.getUnreadReactionCountByEmoji(uid, realm, lastReactionEmoji) ?: 0
-
-                    if (totalUnseenReactionOnLastEmoji > 1) {
-                        val lastReactorName = message.from.firstOrNull()?.name.orEmpty()
-                        val otherPeopleCount = (totalUnseenReactionOnLastEmoji - 1).toInt()
-
-                        notificationBody = appContext.resources.getQuantityString(
-                            R.plurals.previewMultiReaction,
-                            otherPeopleCount,
-                            lastReactionEmoji,
-                            lastReactorName,
-                            otherPeopleCount
-                        )
-                    }
-                }
-            }
-        }
+        val notificationBody = message.getNotificationBody() ?: message.getNotificationPreview(totalUnseenReactionOnLastEmoji)
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces
