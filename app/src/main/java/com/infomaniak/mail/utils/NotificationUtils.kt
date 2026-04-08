@@ -25,11 +25,24 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import coil3.asDrawable
+import coil3.imageLoader
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.allowHardware
+import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.coil.generateInitialsAvatarDrawable
+import com.infomaniak.core.coil.getBackgroundColorGradientDrawable
 import com.infomaniak.core.legacy.utils.NotificationUtilsCore
 import com.infomaniak.core.legacy.utils.NotificationUtilsCore.Companion.PENDING_INTENT_FLAGS
 import com.infomaniak.core.legacy.utils.clearStack
@@ -50,6 +63,7 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.EXTRA
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_ACTION
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
+import com.infomaniak.mail.utils.AvatarTypeUtils.getAvatarType
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -166,6 +180,7 @@ class NotificationUtils @Inject constructor(
         )
     }
 
+
     suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
@@ -178,7 +193,9 @@ class NotificationUtils @Inject constructor(
         val contentIntent = getContentIntent(payload = this, isUndo)
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
-        initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
+        initMessageNotificationContent(
+            mailbox, contentIntent, notificationBuilder, payload = this,
+        )
         showNotifications(scope, mailboxId, notificationManagerCompat)
         return@with true
     }
@@ -215,6 +232,28 @@ class NotificationUtils @Inject constructor(
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
+    suspend fun loadSvgAsBitmap(url: String?, size: Int = 128): Bitmap? {
+        if (url.isNullOrBlank()) return null
+
+        val imageLoader = appContext.imageLoader
+
+        val request = ImageRequest.Builder(appContext)
+            .data(url)
+            .size(size)
+            .allowHardware(false)
+            .build()
+
+
+        return when (val result = imageLoader.execute(request)) {
+            is SuccessResult -> result.image.asDrawable(appContext.resources).toBitmap()
+            is ErrorResult -> {
+                val exception = result.throwable
+                exception.printStackTrace()
+                null
+            }
+        }
+    }
+
     private fun Context.undeterminedProgressMessageNotificationBuilder(
         @StringRes channelIdRes: Int,
         @StringRes titleRes: Int,
@@ -225,7 +264,7 @@ class NotificationUtils @Inject constructor(
         .setProgress(100, 0, true)
         .setPriority(priority)
 
-    private fun initMessageNotificationContent(
+    private suspend fun initMessageNotificationContent(
         mailbox: Mailbox,
         contentIntent: PendingIntent?,
         notificationBuilder: NotificationCompat.Builder,
@@ -239,6 +278,38 @@ class NotificationUtils @Inject constructor(
             addActions(payload)
         }
 
+        val avatarType = getAvatarType(
+            correspondent = payload.from.first(),
+            bimi = payload.bimi,
+            isBimiEnabled = payload.isBimiEnabled,
+            contacts = payload.contacts,
+            context = appContext
+        )
+
+        println(payload.title)
+        println(avatarType)
+
+        val largeIconBitmap: Bitmap? = when (avatarType) {
+            is AvatarType.WithInitials.Url -> {
+                loadSvgAsBitmap(avatarType.url) ?: appContext.generateInitialsAvatarDrawable(
+                    initials = avatarType.initials,
+                    background = getBackgroundColorGradientDrawable(avatarType.colors.containerColor.toArgb()),
+                    initialsColor = avatarType.colors.contentColor.toArgb(),
+                ).toBitmap()
+            }
+            is AvatarType.WithInitials.Initials -> {
+                appContext.generateInitialsAvatarDrawable(
+                    initials = avatarType.initials,
+                    background = getBackgroundColorGradientDrawable(avatarType.colors.containerColor.toArgb()),
+                    initialsColor = avatarType.colors.contentColor.toArgb(),
+                ).toBitmap()
+            }
+            is AvatarType.DrawableResource -> {
+                ContextCompat.getDrawable(appContext, avatarType.resource)?.toBitmap()
+            }
+            else -> null
+        }
+
         setOnlyAlertOnce(true)
         setSubText(mailbox.emailIdn)
         setContentText(payload.content)
@@ -246,6 +317,7 @@ class NotificationUtils @Inject constructor(
         setContentIntent(contentIntent)
         setGroup(mailbox.notificationGroupKey)
         setGroupSummary(payload.isSummary)
+        setLargeIcon(largeIconBitmap)
         setExtras(Bundle().apply { putString(EXTRA_MESSAGE_UID, payload.messageUid) })
         color = localSettings.accentColor.getPrimary(appContext)
 

@@ -49,6 +49,7 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getUids
+import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
@@ -78,6 +79,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    @Inject
+    lateinit var avatarMergedContactData: AvatarMergedContactData
 
     @Inject
     lateinit var notificationUtils: NotificationUtils
@@ -129,6 +133,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     private fun executeUndoAction(payload: NotificationPayload) {
 
+        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
+        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
 
@@ -147,6 +154,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         matomoName: MatomoName,
         payload: NotificationPayload,
     ) = with(payload) {
+
+        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
+        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
 
         val notificationShowingJob = globalCoroutineScope.launch {
             notificationUtils.showMessageNotification(
