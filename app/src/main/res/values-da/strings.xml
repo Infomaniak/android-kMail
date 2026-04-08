@@ -480,6 +480,7 @@
     <string name="selectTimeDialogTitle">Vælg tidspunkt</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sendte beskeder</string>
+    <string name="serverUnavailable">Servere utilgængelige</string>
     <string name="settingsAccentColor">Accentfarve</string>
     <string name="settingsAccentColorDescription">Vælg accentfarven til applikationen</string>
     <string name="settingsAccountManagementTitle">Kontohåndtering</string>

@@ -22,7 +22,9 @@ import android.text.format.DateUtils
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.emojicomponents.data.Reaction
+import com.infomaniak.mail.data.api.ServerStateManager
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
@@ -34,15 +36,25 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+
+enum class AvailableService {
+    NetworkNotAvailable,
+    ServerNotAvailable,
+    AllAvailable,
+}
+
 
 @HiltViewModel
 class ThreadListViewModel @Inject constructor(
     application: Application,
     private val messageController: MessageController,
     private val searchUtils: SearchUtils,
+    private val serverStateManager: ServerStateManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -57,6 +69,15 @@ class ThreadListViewModel @Inject constructor(
 
     var currentFolderCursor: String? = null
     var currentThreadsCount: Int? = null
+
+    val availableService =
+        NetworkAvailability().isNetworkAvailable.combine(serverStateManager.isServerAvailable) { isNetworkAvailable, isServerAvailable ->
+            when {
+                !isNetworkAvailable -> AvailableService.NetworkNotAvailable
+                !isServerAvailable -> AvailableService.ServerNotAvailable
+                else -> AvailableService.AllAvailable
+            }
+        }
 
     fun startUpdatedAtJob() {
         updatedAtJob?.cancel()

@@ -480,6 +480,7 @@
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
     <string name="send">Verzenden</string>
     <string name="sentFolder">Verzonden berichten</string>
+    <string name="serverUnavailable">Servers niet beschikbaar</string>
     <string name="settingsAccentColor">Accentkleur</string>
     <string name="settingsAccentColorDescription">Kies de accentkleur voor de applicatie</string>
     <string name="settingsAccountManagementTitle">Accountbeheer</string>

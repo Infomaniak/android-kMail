@@ -480,6 +480,7 @@
     <string name="selectTimeDialogTitle">Valitse aika</string>
     <string name="send">Lähetä</string>
     <string name="sentFolder">Lähetetyt viestit</string>
+    <string name="serverUnavailable">Palvelimet eivät ole käytettävissä</string>
     <string name="settingsAccentColor">Korostusväri</string>
     <string name="settingsAccentColorDescription">Valitse sovelluksen korostusväri</string>
     <string name="settingsAccountManagementTitle">Tilin hallinta</string>

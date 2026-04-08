@@ -184,7 +184,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             localSettings = localSettings,
         )
 
-        observeNetworkStatus()
+        observeNetworkAndServerStatus()
         observeCurrentThreads()
         observeDownloadState()
         observeFilter()
@@ -553,14 +553,38 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         }
     }
 
-    private fun observeNetworkStatus() {
+    private fun observeNetworkAndServerStatus() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(State.STARTED) {
-                mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
+                threadListViewModel.availableService.collect { availableService ->
+                    val config = when (availableService) {
+                        AvailableService.NetworkNotAvailable -> {
+                            Pair(R.string.noNetwork, R.drawable.ic_no_network)
+                        }
+                        AvailableService.ServerNotAvailable -> {
+                            Pair(R.string.serverUnavailable, R.drawable.ic_cloud_slash)
+                        }
+                        else -> null
+                    }
+
                     TransitionManager.beginDelayedTransition(binding.root)
-                    binding.noNetwork.isGone = isNetworkAvailable
-                    binding.updatedAt.isGone = !isNetworkAvailable
-                    if (!isNetworkAvailable) updateThreadsVisibility()
+
+                    if (config != null) {
+                        val (textRes, drawableRes) = config
+
+                        binding.networkWarning.isGone = false
+                        binding.networkWarning.text = getString(textRes)
+
+                        getDrawable(binding.context, drawableRes)?.let { drawable ->
+                            binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+                        }
+
+                        binding.updatedAt.isGone = true
+                        updateThreadsVisibility()
+                    } else {
+                        binding.networkWarning.isGone = true
+                        binding.updatedAt.isGone = false
+                    }
                 }
             }
         }

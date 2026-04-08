@@ -480,6 +480,7 @@
     <string name="selectTimeDialogTitle">Selecionar hora</string>
     <string name="send">Enviar</string>
     <string name="sentFolder">Mensagens enviadas</string>
+    <string name="serverUnavailable">Servidores indisponíveis</string>
     <string name="settingsAccentColor">Cor de destaque</string>
     <string name="settingsAccentColorDescription">Escolha a cor de destaque da aplicação</string>
     <string name="settingsAccountManagementTitle">Gestão da conta</string>

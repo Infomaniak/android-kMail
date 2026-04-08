@@ -17,11 +17,9 @@
   -->
 <resources>
     <string name="appName" translatable="false">Infomaniak Mail</string>
-
     <string name="notification_channel_id_draft_service" translatable="false">draft_service_channel_id</string>
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
     <string name="notification_channel_id_sync_messages_service" translatable="false">sync_messages_service_channel_id</string>
-
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>
     <string name="accentColorSystemTitle">System color</string>
@@ -486,6 +484,7 @@
     <string name="selectTimeDialogTitle">Select time</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sent messages</string>
+    <string name="serverUnavailable">Servers unavailable</string>
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
     <string name="settingsAccountManagementTitle">Account management</string>

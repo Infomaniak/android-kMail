@@ -480,6 +480,7 @@
     <string name="selectTimeDialogTitle">Velg tid</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sendte meldinger</string>
+    <string name="serverUnavailable">Servere utilgjengelige</string>
     <string name="settingsAccentColor">Aksentfarge</string>
     <string name="settingsAccentColorDescription">Velg aksentfargen for applikasjonen</string>
     <string name="settingsAccountManagementTitle">Kontoadministrasjon</string>
