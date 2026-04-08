@@ -255,8 +255,8 @@ class FetchMessagesManager @Inject constructor(
                 payloadDescription = description,
                 bimi = message.bimi,
                 isBimiEnabled = isBimiEnabled,
-                contacts = mergedContacts,
             ),
+            contacts = mergedContacts,
         )
 
         // Show Group Summary notification
@@ -281,9 +281,10 @@ class FetchMessagesManager @Inject constructor(
                     from = message.from.toList(),
                     bimi = message.bimi,
                     isBimiEnabled = isBimiEnabled,
-                    contacts = mergedContacts,
                 ),
-            )
+                contacts = mergedContacts,
+
+                )
         }
 
         return hasShownNotification

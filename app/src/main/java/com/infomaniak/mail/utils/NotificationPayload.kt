@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.os.Parcelable
 import com.infomaniak.mail.data.models.Bimi
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import kotlinx.parcelize.Parcelize
@@ -40,7 +39,6 @@ data class NotificationPayload(
     var behavior: NotificationBehavior? = null,
     val bimi: Bimi? = null,
     val isBimiEnabled: Boolean = false,
-    val contacts: Map<String, Map<String, MergedContact>>,
     private val payloadTitle: String? = null,
     private val payloadContent: String? = null,
     private val payloadDescription: String? = null,

@@ -52,6 +52,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -184,7 +185,7 @@ class NotificationUtils @Inject constructor(
     suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
-        payload: NotificationPayload,
+        payload: NotificationPayload, contacts: Map<String, Map<String, MergedContact>>
     ): Boolean = with(payload) {
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
@@ -195,6 +196,7 @@ class NotificationUtils @Inject constructor(
 
         initMessageNotificationContent(
             mailbox, contentIntent, notificationBuilder, payload = this,
+            contacts = contacts,
         )
         showNotifications(scope, mailboxId, notificationManagerCompat)
         return@with true
@@ -269,6 +271,7 @@ class NotificationUtils @Inject constructor(
         contentIntent: PendingIntent?,
         notificationBuilder: NotificationCompat.Builder,
         payload: NotificationPayload,
+        contacts: Map<String, Map<String, MergedContact>>,
     ) = notificationBuilder.apply {
 
         if (payload.isSummary) {
@@ -279,15 +282,11 @@ class NotificationUtils @Inject constructor(
         }
 
         val avatarType = getAvatarType(
-            correspondent = payload.from.first(),
+            correspondent = payload.from.firstOrNull(),
             bimi = payload.bimi,
-            isBimiEnabled = payload.isBimiEnabled,
-            contacts = payload.contacts,
+            isBimiEnabled = payload.isBimiEnabled, contacts = contacts,
             context = appContext
         )
-
-        println(payload.title)
-        println(avatarType)
 
         val largeIconBitmap: Bitmap? = when (avatarType) {
             is AvatarType.WithInitials.Url -> {

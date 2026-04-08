@@ -132,17 +132,16 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     }
 
     private fun executeUndoAction(payload: NotificationPayload) {
-
-        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
-        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
-
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
+
+        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
 
         globalCoroutineScope.launch {
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
                 payload = payload.apply { behavior = null },
+                contacts = mergedContacts
             )
         }
     }
@@ -154,10 +153,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         matomoName: MatomoName,
         payload: NotificationPayload,
     ) = with(payload) {
-
-        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
         val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
-
         val notificationShowingJob = globalCoroutineScope.launch {
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
@@ -167,6 +163,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
                         behaviorTitle = context.getString(undoNotificationTitle),
                     )
                 },
+                contacts = mergedContacts,
             )
         }
 
