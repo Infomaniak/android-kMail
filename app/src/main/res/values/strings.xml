@@ -515,6 +515,7 @@
     <string name="sendConfirmationAction">Send the confirmation</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent colour</string>
+    <string name="serverUnavailable">Servers unavailable</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
     <string name="settingsAccountManagementTitle">Account management</string>
     <string name="settingsAppLock">App lock</string>
