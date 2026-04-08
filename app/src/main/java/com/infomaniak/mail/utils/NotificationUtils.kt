@@ -40,6 +40,7 @@ import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.allowHardware
+import coil3.svg.SvgDecoder
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.coil.generateInitialsAvatarDrawable
 import com.infomaniak.core.coil.getBackgroundColorGradientDrawable
@@ -234,7 +235,7 @@ class NotificationUtils @Inject constructor(
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
-    suspend fun loadSvgAsBitmap(url: String?, size: Int = 128): Bitmap? {
+    suspend fun loadAsBitmap(url: String?, size: Int = 128): Bitmap? {
         if (url.isNullOrBlank()) return null
 
         val imageLoader = appContext.imageLoader
@@ -243,14 +244,14 @@ class NotificationUtils @Inject constructor(
             .data(url)
             .size(size)
             .allowHardware(false)
+            .decoderFactory(SvgDecoder.Factory())
             .build()
 
 
         return when (val result = imageLoader.execute(request)) {
             is SuccessResult -> result.image.asDrawable(appContext.resources).toBitmap()
             is ErrorResult -> {
-                val exception = result.throwable
-                exception.printStackTrace()
+                SentryLog.e(TAG, "Failed to load SVG avatar: $url", result.throwable)
                 null
             }
         }
@@ -290,7 +291,7 @@ class NotificationUtils @Inject constructor(
 
         val largeIconBitmap: Bitmap? = when (avatarType) {
             is AvatarType.WithInitials.Url -> {
-                loadSvgAsBitmap(avatarType.url) ?: appContext.generateInitialsAvatarDrawable(
+                loadAsBitmap(avatarType.url) ?: appContext.generateInitialsAvatarDrawable(
                     initials = avatarType.initials,
                     background = getBackgroundColorGradientDrawable(avatarType.colors.containerColor.toArgb()),
                     initialsColor = avatarType.colors.contentColor.toArgb(),

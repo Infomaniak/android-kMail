@@ -44,6 +44,8 @@ import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -237,7 +239,10 @@ class FetchMessagesManager @Inject constructor(
         val description = "$subject\n$formattedBody".take(MAX_CHAR_LIMIT)
 
         val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
-        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+
+        val mergedContacts = withContext(Dispatchers.Main)  {
+            avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+        }
 
         // Show Message notification
         val hasShownNotification = notificationUtils.showMessageNotification(

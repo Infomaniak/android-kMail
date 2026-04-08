@@ -60,6 +60,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -135,9 +136,11 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
 
-        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
-
         globalCoroutineScope.launch {
+            val mergedContacts = withContext(Dispatchers.Main) {
+                avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+            }
+
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
                 payload = payload.apply { behavior = null },
