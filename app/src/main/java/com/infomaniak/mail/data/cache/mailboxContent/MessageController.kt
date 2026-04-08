@@ -282,7 +282,7 @@ class MessageController @Inject constructor(
             if (emoji == null) return 0
             val threadUidName = "${Message::threads.name}.${Thread::uid.name}"
             return realm.query<Message>(
-                "$threadUidName=$0 AND ${Message::emojiReaction.name} == $1 AND ${Message::isSeen.name} == false",
+                "$threadUidName == $0 AND ${Message::emojiReaction.name} == $1 AND ${Message::isSeen.name} == false",
                 threadUid,
                 emoji
             ).count().findSuspend().toInt()
