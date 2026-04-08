@@ -38,7 +38,7 @@ import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
-import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.ServerStateManager
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -55,6 +55,7 @@ import javax.inject.Inject
 @ActivityScoped
 class LoginUtils @Inject constructor(
     private val mailboxController: MailboxController,
+    private val serverStateManager: ServerStateManager,
     @ActivityContext private val activityContext: Context, // Needs to be activity context in order to call startActivity
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
@@ -107,7 +108,7 @@ class LoginUtils @Inject constructor(
             chain.proceed(newRequest)
         }.build()
 
-        val apiResponse = ApiRepository.getMailboxes(okhttpClient)
+        val apiResponse = serverStateManager.getMailboxes(okhttpClient)
 
         return when {
             !apiResponse.isSuccess() -> apiResponse

@@ -37,7 +37,7 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.twofactorauth.back.notifications.TwoFactorAuthNotifications
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.ServerStateManager
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -65,6 +65,7 @@ import com.infomaniak.core.legacy.R as RCore
 class NotificationUtils @Inject constructor(
     private val appContext: Context,
     private val localSettings: LocalSettings,
+    private val serverStateManager: ServerStateManager,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     private val globalCoroutineScope: CoroutineScope,
 ) {
@@ -337,7 +338,7 @@ class NotificationUtils @Inject constructor(
 
         // Refresh Mailboxes
         SentryLog.d(tag, "Refresh mailboxes from remote")
-        with(ApiRepository.getMailboxes()) {
+        with(serverStateManager.getMailboxes()) {
             if (isSuccess()) mailboxController.updateMailboxes(data!!)
         }
     }
