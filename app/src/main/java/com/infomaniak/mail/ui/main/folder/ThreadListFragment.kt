@@ -21,7 +21,9 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
 import android.transition.TransitionManager
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
@@ -32,6 +34,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -85,6 +88,7 @@ import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -109,6 +113,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+import kotlin.math.abs
 import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
@@ -122,6 +127,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     override val substituteClassName: String = javaClass.name
+
+    private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
@@ -180,6 +187,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
         )
+
+        switchUserViewModel.getAccountsInDB()
 
         observeNetworkStatus()
         observeCurrentThreads()
@@ -445,7 +454,35 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             )
         }
 
-        userAvatar.setOnClickListener { safeNavigate(resId = R.id.accountBottomSheetDialog) }
+        val gestureDetector = GestureDetector(searchButton.context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean {
+                return true
+            }
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                safeNavigate(resId = R.id.accountBottomSheetDialog)
+                return true
+            }
+
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                if (e1 == null) return false
+                val diffY = e2.y - e1.y
+                val diffX = e2.x - e1.x
+
+                if (diffX >= -100 && diffX <= 100) {
+                    if (abs(diffY) > 5 && abs(velocityY) > 50) {
+                        handleAccountSwipe(isSwipeUp = diffY > 0)
+                        return true
+                    }
+                }
+                return false
+            }
+        })
+
+        @Suppress("ClickableViewAccessibility")
+        userAvatar.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+        }
 
         newMessageFab.setOnClickListener {
             trackNewMessageEvent(MatomoName.OpenFromFab)
@@ -512,6 +549,22 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         } else {
             newMessageFab.shrink()
         }
+    }
+
+    private fun handleAccountSwipe(isSwipeUp: Boolean) {
+        val accounts = switchUserViewModel.accounts.value ?: return
+        if (accounts.isEmpty()) return
+
+        val currentIndex = accounts.indexOfFirst { it.id == AccountUtils.currentUserId }
+        if (currentIndex == -1) return
+
+        val nextIndex = if (isSwipeUp) {
+            (currentIndex - 1).mod(accounts.size)
+        } else {
+            (currentIndex + 1).mod(accounts.size)
+        }
+
+        switchUserViewModel.switchAccount(accounts[nextIndex])
     }
 
     private fun setupUserAvatar() {
