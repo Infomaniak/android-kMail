@@ -36,6 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil3.asDrawable
 import coil3.imageLoader
+import coil3.request.CachePolicy
 import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
@@ -186,7 +187,8 @@ class NotificationUtils @Inject constructor(
     suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
-        payload: NotificationPayload, contacts: Map<String, Map<String, MergedContact>>
+        payload: NotificationPayload,
+        contacts: Map<String, Map<String, MergedContact>>
     ): Boolean = with(payload) {
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
@@ -196,7 +198,9 @@ class NotificationUtils @Inject constructor(
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
         initMessageNotificationContent(
-            mailbox, contentIntent, notificationBuilder, payload = this,
+            mailbox,
+            contentIntent,
+            notificationBuilder, payload = this,
             contacts = contacts,
         )
         showNotifications(scope, mailboxId, notificationManagerCompat)
@@ -243,6 +247,7 @@ class NotificationUtils @Inject constructor(
         val request = ImageRequest.Builder(appContext)
             .data(url)
             .size(size)
+            .networkCachePolicy(policy = CachePolicy.ENABLED)
             .allowHardware(false)
             .decoderFactory(SvgDecoder.Factory())
             .build()

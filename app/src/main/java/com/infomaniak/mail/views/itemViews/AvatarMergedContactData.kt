@@ -21,6 +21,7 @@ import androidx.lifecycle.asLiveData
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils
@@ -29,9 +30,14 @@ import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,6 +50,28 @@ class AvatarMergedContactData @Inject constructor(
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) {
     private val ioCoroutineContext = globalCoroutineScope.coroutineContext(ioDispatcher)
+
+    private val _mergedContactFlow = MutableStateFlow<Map<String, Map<String, MergedContact>>>(emptyMap())
+    val mergedContactFlow: StateFlow<Map<String, Map<String, MergedContact>>> = _mergedContactFlow.asStateFlow()
+
+    init {
+        globalCoroutineScope.launch(ioCoroutineContext) {
+            mergedContactController
+                .getMergedContactsAsync()
+                .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
+                .distinctUntilChanged()
+                .collect { newContacts ->
+                    _mergedContactFlow.value = newContacts
+                }
+        }
+    }
+
+    val isBimiEnabledFlow: Flow<Boolean> =
+        mailboxController
+            .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+            .mapLatest { it.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false }
+            .filterNotNull()
+            .distinctUntilChanged()
 
     val mergedContactLiveData = mergedContactController
         .getMergedContactsAsync()

@@ -60,7 +60,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -137,9 +136,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         notificationJobsBus.unregister(payload.notificationId)
 
         globalCoroutineScope.launch {
-            val mergedContacts = withContext(Dispatchers.Main) {
-                avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
-            }
+            val mergedContacts = avatarMergedContactData.mergedContactFlow.value
 
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
@@ -156,7 +153,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         matomoName: MatomoName,
         payload: NotificationPayload,
     ) = with(payload) {
-        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+        val mergedContacts = avatarMergedContactData.mergedContactFlow.value
         val notificationShowingJob = globalCoroutineScope.launch {
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
