@@ -237,12 +237,7 @@ class FetchMessagesManager @Inject constructor(
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces
         val description = "$subject\n$formattedBody".take(MAX_CHAR_LIMIT)
 
-        val isBimiEnabled = try {
-            avatarMergedContactData.isBimiEnabledFlow.first()
-        } catch (e: Exception) {
-            SentryLog.e(TAG, "Error fetching BIMI status", e)
-            false
-        }
+        val isBimiEnabled = avatarMergedContactData.isBimiEnabledFlow.value
         val mergedContacts = avatarMergedContactData.mergedContactFlow.value
 
         // Show Message notification

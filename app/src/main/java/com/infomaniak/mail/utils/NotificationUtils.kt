@@ -239,7 +239,7 @@ class NotificationUtils @Inject constructor(
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
-    suspend fun loadAsBitmap(url: String?, size: Int = 128): Bitmap? {
+    suspend fun loadAsBitmap(url: String?, size: Int = 256): Bitmap? {
         if (url.isNullOrBlank()) return null
 
         val imageLoader = appContext.imageLoader

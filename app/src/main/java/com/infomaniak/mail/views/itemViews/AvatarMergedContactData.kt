@@ -32,11 +32,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -51,27 +53,26 @@ class AvatarMergedContactData @Inject constructor(
 ) {
     private val ioCoroutineContext = globalCoroutineScope.coroutineContext(ioDispatcher)
 
-    private val _mergedContactFlow = MutableStateFlow<Map<String, Map<String, MergedContact>>>(emptyMap())
-    val mergedContactFlow: StateFlow<Map<String, Map<String, MergedContact>>> = _mergedContactFlow.asStateFlow()
+    val mergedContactFlow: StateFlow<Map<String, Map<String, MergedContact>>> = mergedContactController
+        .getMergedContactsAsync()
+        .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
+        .distinctUntilChanged()
+        .stateIn(
+            scope = globalCoroutineScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
 
-    init {
-        globalCoroutineScope.launch(ioCoroutineContext) {
-            mergedContactController
-                .getMergedContactsAsync()
-                .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
-                .distinctUntilChanged()
-                .collect { newContacts ->
-                    _mergedContactFlow.value = newContacts
-                }
-        }
-    }
-
-    val isBimiEnabledFlow: Flow<Boolean> =
-        mailboxController
-            .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-            .mapLatest { it.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false }
-            .filterNotNull()
-            .distinctUntilChanged()
+    val isBimiEnabledFlow: StateFlow<Boolean> = mailboxController
+        .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+        .mapLatest { it.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false }
+        .filterNotNull()
+        .distinctUntilChanged()
+        .stateIn(
+            scope = globalCoroutineScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
 
     val mergedContactLiveData = mergedContactController
         .getMergedContactsAsync()
