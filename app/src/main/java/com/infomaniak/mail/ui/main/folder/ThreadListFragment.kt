@@ -469,11 +469,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
 
-                if (diffX >= -100 && diffX <= 100) {
-                    if (abs(diffY) > 5 && abs(velocityY) > 50) {
-                        handleAccountSwipe(isSwipeUp = diffY > 0)
-                        return true
-                    }
+                if (diffX >= -100 && diffX <= 100 && abs(diffY) > 5 && abs(velocityY) > 50) {
+                    handleAccountSwipe(isSwipeUp = diffY > 0)
+                    return true
                 }
                 return false
             }
