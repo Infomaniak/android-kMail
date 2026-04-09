@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.search
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -29,12 +30,15 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.ApiRoutes.contact
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.DUMMY_FOLDER_ID
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -55,6 +59,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.Normalizer
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,6 +68,7 @@ class SearchViewModel @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
+    private val mergedContactController: MergedContactController,
     private val refreshController: RefreshController,
     private val savedStateHandle: SavedStateHandle,
     private val searchUtils: SearchUtils,
@@ -82,6 +88,7 @@ class SearchViewModel @Inject constructor(
     var currentSearchQuery: String = ""
         private set
 
+    val contactsResults = MutableLiveData<List<MergedContact>>()
     private var currentFilters = mutableSetOf<ThreadFilter>()
     var isAllFoldersSelected: Boolean = false
 
@@ -203,6 +210,11 @@ class SearchViewModel @Inject constructor(
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
+            
+            val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
+                .replace("\\p{M}".toRegex(), "")
+            val contacts = mergedContactController.searchMergedContacts(queryClean)
+            contactsResults.postValue(contacts)
 
             mailboxController
                 .getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
