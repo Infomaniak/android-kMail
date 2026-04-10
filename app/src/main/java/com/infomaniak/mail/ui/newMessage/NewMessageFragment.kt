@@ -831,53 +831,76 @@ class NewMessageFragment : Fragment() {
 
         binding.editorWebView.exportHtml { html ->
             val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(html)
+            val hasBlankSubject = isSubjectBlank()
 
-            fun checkAttachmentsAndSend() {
-                if (shouldShowAttachmentReminder) {
-                    trackNewMessageEvent(MatomoName.SendWithoutAttachment)
+            var subjectValidated = !hasBlankSubject
+            var attachmentValidated = !shouldShowAttachmentReminder
 
-                    descriptionDialog.show(
-                        title = getString(R.string.attachmentsReminderTitle),
-                        description = getString(R.string.attachmentsReminderDescription),
-                        positiveButtonText = R.string.buttonContinue,
-                        displayLoader = false,
-                        onPositiveButtonClicked = {
-                            trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
-                            sendEmail()
-                        },
-                        onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-                    )
-                    return
-                }
-                sendEmail()
-            }
+            lateinit var proceedToSend: () -> Unit
 
-            fun validateAndSend() {
-                if (isSubjectBlank()) {
-                    trackNewMessageEvent(MatomoName.SendWithoutSubject)
-                    var hasClicked = false
+            fun showSubjectDialog() {
+                trackNewMessageEvent(MatomoName.SendWithoutSubject)
+                var hasClickedContinue = false
 
-                    descriptionDialog.show(
-                        title = getString(R.string.emailWithoutSubjectTitle),
-                        description = getString(R.string.emailWithoutSubjectDescription),
-                        positiveButtonText = R.string.buttonContinue,
-                        displayLoader = false,
-                        onPositiveButtonClicked = {
-                            trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
-                            hasClicked = true
-                        },
-                        onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-                        onDismiss = {
-                            Log.e("nicolas", "validateAndSend - here: ${hasClicked}")
-                            if (hasClicked) checkAttachmentsAndSend()
+                descriptionDialog.show(
+                    title = getString(R.string.emailWithoutSubjectTitle),
+                    description = getString(R.string.emailWithoutSubjectDescription),
+                    positiveButtonText = R.string.buttonContinue,
+                    displayLoader = false,
+                    onPositiveButtonClicked = {
+                        trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
+                        hasClickedContinue = true
+                        subjectValidated = true
+                    },
+                    onCancel = {
+                        if (scheduled) newMessageViewModel.resetScheduledDate()
+                    },
+                    onDismiss = {
+                        if (hasClickedContinue) {
+                            proceedToSend()
                         }
-                    )
-                    return
-                }
-                checkAttachmentsAndSend()
+                    }
+                )
             }
 
-            validateAndSend()
+            fun showAttachmentDialog() {
+                trackNewMessageEvent(MatomoName.SendWithoutAttachment)
+                var hasClickedContinue = false
+
+                descriptionDialog.show(
+                    title = getString(R.string.attachmentsReminderTitle),
+                    description = getString(R.string.attachmentsReminderDescription),
+                    positiveButtonText = R.string.buttonContinue,
+                    displayLoader = false,
+                    onPositiveButtonClicked = {
+                        trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
+                        hasClickedContinue = true
+                        attachmentValidated = true
+                    },
+                    onCancel = {
+                        if (scheduled) newMessageViewModel.resetScheduledDate()
+                    },
+                    onDismiss = {
+                        if (hasClickedContinue) {
+                            proceedToSend()
+                        }
+                    }
+                )
+            }
+
+            proceedToSend = {
+                if (subjectValidated && attachmentValidated) {
+                    sendEmail()
+                }
+
+                if (!subjectValidated) {
+                    showSubjectDialog()
+                } else {
+                    showAttachmentDialog()
+                }
+            }
+
+            proceedToSend()
         }
     }
 
