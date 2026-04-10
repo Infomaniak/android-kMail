@@ -74,7 +74,6 @@ open class DescriptionAlertDialog @Inject constructor(
         onDismiss: (() -> Unit)? = null,
         onCancel: (() -> Unit)? = null,
     ) {
-        println("Fonction show appelé")
         showDialogWithBasicInfo(title, description, displayCancelButton, positiveButtonText, negativeButtonText)
         if (displayLoader) initProgress()
         setupListeners(displayLoader, onPositiveButtonClicked, onNegativeButtonClicked, onCancel, onDismiss)

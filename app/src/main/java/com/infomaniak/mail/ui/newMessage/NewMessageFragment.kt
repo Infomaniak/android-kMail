@@ -26,7 +26,6 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -891,9 +890,7 @@ class NewMessageFragment : Fragment() {
             proceedToSend = {
                 if (subjectValidated && attachmentValidated) {
                     sendEmail()
-                }
-
-                if (!subjectValidated) {
+                }else if (!subjectValidated) {
                     showSubjectDialog()
                 } else {
                     showAttachmentDialog()
