@@ -189,6 +189,7 @@ class SearchViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        contactsResults.value = emptyList()
         cancelSearch()
         globalCoroutineScope.launch(ioDispatcher) {
             searchUtils.deleteRealmSearchData()
@@ -211,12 +212,12 @@ class SearchViewModel @Inject constructor(
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
 
-            if (query.isNotBlank() && !query.contains("\"") && !isLengthTooShort(query)){
+            if (query.isNotBlank() && !query.contains("\"") && !isLengthTooShort(query)) {
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
                 val contacts = mergedContactController.searchMergedContacts(queryClean)
                 contactsResults.postValue(contacts)
-            }else{
+            } else {
                 contactsResults.postValue(emptyList())
             }
 

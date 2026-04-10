@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +46,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes.contacts
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -113,6 +115,7 @@ class SearchFragment : TwoPaneFragment() {
 
         searchViewModel.executePendingSearch()
 
+        threadListAdapter.updateSearchContacts(emptyList())
         searchViewModel.contactsResults.observe(viewLifecycleOwner) { contacts ->
             threadListAdapter.updateSearchContacts(contacts)
             threadListAdapter.notifyDataSetChanged()
@@ -221,6 +224,7 @@ class SearchFragment : TwoPaneFragment() {
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener {
             searchViewModel.resetFolderFilter()
+            searchViewModel.contactsResults.value = emptyList()
             findNavController().popBackStack()
         }
         swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
