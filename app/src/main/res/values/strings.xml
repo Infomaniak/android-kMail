@@ -104,6 +104,8 @@
         <item quantity="one">%d attachment</item>
         <item quantity="other">%d attachments</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Missing attachment</string>
+    <string name="attachmentsReminderDescription">You mentioned an attachment, but no file has been added. Send anyway?</string>
     <string name="attendeesListTitle">List of attendees (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Block a sender</string>

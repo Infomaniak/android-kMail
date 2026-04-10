@@ -99,6 +99,8 @@
         <item quantity="one">%d liite</item>
         <item quantity="other">%d liitettä</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Liite puuttuu</string>
+    <string name="attachmentsReminderDescription">Mainitsit liitteen, mutta tiedostoa ei ole lisätty. Lähetetäänkö silti?</string>
     <string name="attendeesListTitle">Osallistujien luettelo (%d)</string>
     <string name="bccTitle">Piilokopio:</string>
     <string name="blockAnExpeditorTitle">Estä lähettäjä</string>

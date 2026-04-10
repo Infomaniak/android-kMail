@@ -99,6 +99,8 @@
         <item quantity="one">%d vedlegg</item>
         <item quantity="other">%d vedlegg</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Manglende vedlegg</string>
+    <string name="attachmentsReminderDescription">Du nevnte et vedlegg, men ingen fil ble lagt til. Sende likevel?</string>
     <string name="attendeesListTitle">Liste over deltakere (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Blokker en avsender</string>

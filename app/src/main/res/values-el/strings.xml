@@ -99,6 +99,8 @@
         <item quantity="one">%d συνημμένο</item>
         <item quantity="other">%d συνημμένα</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Λείπει συνημμένο</string>
+    <string name="attachmentsReminderDescription">Αναφέρατε συνημμένο, αλλά δεν προστέθηκε κανένα αρχείο. Να σταλεί ούτως ή άλλως;</string>
     <string name="attendeesListTitle">Λίστα συμμετεχόντων (%d)</string>
     <string name="bccTitle">Κρυφή κοινοποίηση:</string>
     <string name="blockAnExpeditorTitle">Αποκλεισμός αποστολέα</string>

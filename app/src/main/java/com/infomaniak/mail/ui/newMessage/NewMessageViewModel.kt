@@ -82,6 +82,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfigurati
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.AttachmentReminderUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
@@ -262,6 +263,13 @@ class NewMessageViewModel @Inject constructor(
 
     fun loadMailbox(userId: Int, mailboxId: Int) {
         mailboxRefFlow.tryEmit(MailboxRef(userId, mailboxId))
+    }
+
+    fun shouldShowAttachmentReminder(uiBodyValue: String): Boolean {
+        val hasAttachments = attachmentsLiveData.valueOrEmpty().isNotEmpty()
+        val plainText = jsoupParseWithLog(uiBodyValue).text()
+
+        return AttachmentReminderUtils.hasAttachmentKeyword(plainText) && !hasAttachments
     }
 
     // ------------- !IMPORTANT! -------------

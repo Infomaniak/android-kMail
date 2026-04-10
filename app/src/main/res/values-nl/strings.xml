@@ -99,6 +99,8 @@
         <item quantity="one">%d bijlage</item>
         <item quantity="other">%d bijlagen</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Ontbrekende bijlage</string>
+    <string name="attachmentsReminderDescription">U heeft een bijlage genoemd, maar er is geen bestand toegevoegd. Toch versturen?</string>
     <string name="attendeesListTitle">Lijst van deelnemers (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Een afzender blokkeren</string>

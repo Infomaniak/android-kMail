@@ -101,6 +101,8 @@
         <item quantity="many">%d załączników</item>
         <item quantity="other">%d załącznika</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Brakujący załącznik</string>
+    <string name="attachmentsReminderDescription">Wspomniałeś o załączniku, ale nie dodano żadnego pliku. Wysłać mimo to?</string>
     <string name="attendeesListTitle">Lista uczestników (%d)</string>
     <string name="bccTitle">UDW:</string>
     <string name="blockAnExpeditorTitle">Zablokuj nadawcę</string>
