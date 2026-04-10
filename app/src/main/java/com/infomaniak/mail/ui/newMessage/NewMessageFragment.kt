@@ -26,6 +26,7 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -828,21 +829,55 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (isSubjectBlank()) {
-            trackNewMessageEvent(MatomoName.SendWithoutSubject)
-            descriptionDialog.show(
-                title = getString(R.string.emailWithoutSubjectTitle),
-                description = getString(R.string.emailWithoutSubjectDescription),
-                displayLoader = false,
-                positiveButtonText = R.string.buttonContinue,
-                onPositiveButtonClicked = {
-                    trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
-                    sendEmail()
-                },
-                onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-            )
-        } else {
-            sendEmail()
+        binding.editorWebView.exportHtml { html ->
+            val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(html)
+
+            fun checkAttachmentsAndSend() {
+                if (shouldShowAttachmentReminder) {
+                    trackNewMessageEvent(MatomoName.SendWithoutAttachment)
+
+                    descriptionDialog.show(
+                        title = getString(R.string.attachmentsReminderTitle),
+                        description = getString(R.string.attachmentsReminderDescription),
+                        positiveButtonText = R.string.buttonContinue,
+                        displayLoader = false,
+                        onPositiveButtonClicked = {
+                            trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
+                            sendEmail()
+                        },
+                        onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+                    )
+                    return
+                }
+                sendEmail()
+            }
+
+            fun validateAndSend() {
+                if (isSubjectBlank()) {
+                    trackNewMessageEvent(MatomoName.SendWithoutSubject)
+                    var hasClicked = false
+
+                    descriptionDialog.show(
+                        title = getString(R.string.emailWithoutSubjectTitle),
+                        description = getString(R.string.emailWithoutSubjectDescription),
+                        positiveButtonText = R.string.buttonContinue,
+                        displayLoader = false,
+                        onPositiveButtonClicked = {
+                            trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
+                            hasClicked = true
+                        },
+                        onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+                        onDismiss = {
+                            Log.e("nicolas", "validateAndSend - here: ${hasClicked}")
+                            if (hasClicked) checkAttachmentsAndSend()
+                        }
+                    )
+                    return
+                }
+                checkAttachmentsAndSend()
+            }
+
+            validateAndSend()
         }
     }
 
@@ -881,4 +916,5 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
+
 }

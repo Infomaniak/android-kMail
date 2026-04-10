@@ -301,6 +301,8 @@ object MatomoMail : Matomo {
         SendReaction("sendReaction"),
         SendWithoutSubject("sendWithoutSubject"),
         SendWithoutSubjectConfirm("sendWithoutSubjectConfirm"),
+        SendWithoutAttachment("sendWithoutAttachment"),
+        SendWithoutAttachmentConfirm("sendWithoutAttachmentConfirm"),
         SentFolder("sentFolder"),
         SeriousWriting("seriousWriting"),
         ShareEmail("shareEmail"),
