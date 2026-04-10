@@ -22,6 +22,7 @@ import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.text.Spannable
 import android.text.TextUtils.TruncateAt
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -61,10 +62,13 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemBannerWithActionViewBinding
+import com.infomaniak.mail.databinding.ItemContactBinding
+import com.infomaniak.mail.databinding.ItemContactHeaderBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadLoadMoreButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
@@ -120,6 +124,8 @@ class ThreadListAdapter @Inject constructor(
     private var swipingIsAuthorized: Boolean = true
     private var isLoadMoreDisplayed = false
 
+    private var searchContact = emptyList<MergedContact>()
+
     private var folderRole: FolderRole? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
     private var isFolderNameVisible: Boolean = false
@@ -156,6 +162,8 @@ class ThreadListAdapter @Inject constructor(
             is ThreadListItem.Content -> DisplayType.THREAD.layout
             is ThreadListItem.DateSeparator -> DisplayType.DATE_SEPARATOR.layout
             is ThreadListItem.FlushFolderButton -> DisplayType.FLUSH_FOLDER_BUTTON.layout
+            is ThreadListItem.ContactItem -> DisplayType.CONTACT_ITEM.layout
+            is ThreadListItem.ContactHeader -> DisplayType.CONTACT_HEADER.layout
             ThreadListItem.LoadMore -> DisplayType.LOAD_MORE_BUTTON.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -173,6 +181,8 @@ class ThreadListAdapter @Inject constructor(
         return when (val item = dataSet[position]) {
             is ThreadListItem.Content -> item.thread.uid.hashCode().toLong()
             is ThreadListItem.DateSeparator -> item.title.hashCode().toLong()
+            ThreadListItem.ContactHeader -> "contact_header".hashCode().toLong()
+            is ThreadListItem.ContactItem -> item.contact.email.hashCode().toLong()
             else -> super.getItemId(position)
         }
     }.getOrDefault(super.getItemId(position))
@@ -189,6 +199,8 @@ class ThreadListAdapter @Inject constructor(
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
             R.layout.item_banner_with_action_view -> ItemBannerWithActionViewBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_contact -> ItemContactBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_contact_header -> ItemContactHeaderBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
 
@@ -228,6 +240,15 @@ class ThreadListAdapter @Inject constructor(
             }
             DisplayType.LOAD_MORE_BUTTON.layout -> {
                 (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
+            }
+            DisplayType.CONTACT_HEADER.layout -> {
+                (this as ItemContactHeaderBinding).displayContactHeader()
+            }
+            DisplayType.CONTACT_ITEM.layout -> {
+                (this as ItemContactBinding).displayContactItem(
+                    (item as ThreadListItem.ContactItem).contact,
+                    true
+                )
             }
         }
     }
@@ -594,6 +615,18 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
+    private fun ItemContactBinding.displayContactItem(contact: MergedContact, last: Boolean) {
+        contactDetails.setMergedContact(contact)
+
+        contactDetails.setOnClickListener {
+            callbacks?.onContactClicked?.invoke(contact)
+        }
+    }
+
+    private fun ItemContactHeaderBinding.displayContactHeader() {
+        contactsTitle.text = context.getString(R.string.contactsSearch) // TODO: manage plurals
+    }
+
     override fun onSwipeStarted(item: ThreadListItem, viewHolder: ThreadListViewHolder) {
         if (item is ThreadListItem.Content) item.thread.updateDynamicIcons()
     }
@@ -743,6 +776,13 @@ class ThreadListAdapter @Inject constructor(
         scope: CoroutineScope,
     ) = mutableListOf<ThreadListItem>().apply {
 
+        if (searchContact.isNotEmpty()){
+            add(ThreadListItem.ContactHeader)
+            searchContact.forEach { contact ->
+                add(ThreadListItem.ContactItem(contact))
+            }
+        }
+
         if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
             add(ThreadListItem.FlushFolderButton(folderRole))
         }
@@ -798,6 +838,10 @@ class ThreadListAdapter @Inject constructor(
         folderRole = newRole
     }
 
+    fun updateSearchContacts(contacts: List<MergedContact>){
+        searchContact = contacts
+    }
+
     fun updateSelection() {
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
     }
@@ -824,6 +868,8 @@ class ThreadListAdapter @Inject constructor(
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         FLUSH_FOLDER_BUTTON(R.layout.item_banner_with_action_view),
         LOAD_MORE_BUTTON(R.layout.item_thread_load_more_button),
+        CONTACT_HEADER(R.layout.item_contact_header),
+        CONTACT_ITEM(R.layout.item_contact),
     }
 
     enum class NotificationType {

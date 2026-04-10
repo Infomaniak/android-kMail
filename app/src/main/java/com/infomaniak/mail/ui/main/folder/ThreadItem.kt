@@ -18,11 +18,14 @@
 package com.infomaniak.mail.ui.main.folder
 
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.thread.Thread
 
 sealed interface ThreadListItem {
     data class Content(val thread: Thread) : ThreadListItem
     data class DateSeparator(val title: String) : ThreadListItem
+    data object ContactHeader : ThreadListItem
+    data class ContactItem(val contact: MergedContact) : ThreadListItem
     data class FlushFolderButton(val folderRole: Folder.FolderRole) : ThreadListItem
     data object LoadMore : ThreadListItem
 }

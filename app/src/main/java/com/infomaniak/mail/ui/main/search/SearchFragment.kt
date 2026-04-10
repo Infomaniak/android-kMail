@@ -46,6 +46,7 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -111,6 +112,11 @@ class SearchFragment : TwoPaneFragment() {
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SEARCH.id)
 
         searchViewModel.executePendingSearch()
+
+        searchViewModel.contactsResults.observe(viewLifecycleOwner) { contacts ->
+            threadListAdapter.updateSearchContacts(contacts)
+            threadListAdapter.notifyDataSetChanged()
+        }
 
         setupAdapter()
         setupListeners()
@@ -200,6 +206,12 @@ class SearchFragment : TwoPaneFragment() {
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
                 override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
+
+                override var onContactClicked: ((MergedContact) -> Unit)? = { contact ->
+                    val emailWithQuotes = "\"${contact.email}\""
+                    binding.searchBar.searchTextInput.setText(emailWithQuotes)
+                    binding.searchBar.searchTextInput.setSelection(emailWithQuotes.length)
+                }
             },
         )
 

@@ -77,6 +77,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -386,6 +387,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
                 override val getFeatureFlags: () -> FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
+
+                override var onContactClicked: ((MergedContact) -> Unit)? = null
             },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn

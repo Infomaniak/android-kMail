@@ -210,11 +210,16 @@ class SearchViewModel @Inject constructor(
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
-            
-            val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
-                .replace("\\p{M}".toRegex(), "")
-            val contacts = mergedContactController.searchMergedContacts(queryClean)
-            contactsResults.postValue(contacts)
+
+            if (query.isNotBlank() && !query.contains("\"") && !isLengthTooShort(query)){
+                val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
+                    .replace("\\p{M}".toRegex(), "")
+                val contacts = mergedContactController.searchMergedContacts(queryClean)
+                contactsResults.postValue(contacts)
+            }else{
+                contactsResults.postValue(emptyList())
+            }
+
 
             mailboxController
                 .getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
