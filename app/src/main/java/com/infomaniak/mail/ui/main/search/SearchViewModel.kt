@@ -137,6 +137,9 @@ class SearchViewModel @Inject constructor(
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
         if (query.isNotBlank() && isLengthTooShort(query)) return@launch
+        if (saveInHistory){
+            contactsResults.postValue(emptyList())
+        }
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
 
@@ -154,6 +157,7 @@ class SearchViewModel @Inject constructor(
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
         if (isEnabled && currentFilters.contains(filter)) return@launch
         if (isEnabled) {
+            contactsResults.value = emptyList()
             trackSearchEvent(filter.matomoName)
             filter.select()
         } else {
@@ -208,17 +212,19 @@ class SearchViewModel @Inject constructor(
         shouldGetNextPage: Boolean = false,
     ) = withContext(ioCoroutineContext) {
         cancelSearch()
+
+        contactsResults.postValue(emptyList())
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
+
+            contactsResults.postValue(emptyList())
 
             if (query.isNotBlank() && !query.contains("\"") && !isLengthTooShort(query)) {
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
                 val contacts = mergedContactController.searchMergedContacts(queryClean)
                 contactsResults.postValue(contacts)
-            } else {
-                contactsResults.postValue(emptyList())
             }
 
 

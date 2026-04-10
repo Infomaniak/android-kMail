@@ -115,7 +115,7 @@ class SearchFragment : TwoPaneFragment() {
 
         searchViewModel.executePendingSearch()
 
-        threadListAdapter.updateSearchContacts(emptyList())
+        threadListAdapter.clearContacts()
         searchViewModel.contactsResults.observe(viewLifecycleOwner) { contacts ->
             threadListAdapter.updateSearchContacts(contacts)
             threadListAdapter.notifyDataSetChanged()
@@ -265,7 +265,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setAttachmentsUi() = with(searchViewModel) {
         binding.attachments.setOnCheckedChangeListener { _, isChecked ->
-
+            if (isChecked) threadListAdapter.clearContacts()
             setFilter(ThreadFilter.ATTACHMENTS, isChecked)
         }
     }
@@ -274,9 +274,18 @@ class SearchFragment : TwoPaneFragment() {
         binding.mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
 
             when (chipGroup.checkedChipId) {
-                R.id.read -> setFilter(ThreadFilter.SEEN)
-                R.id.unread -> setFilter(ThreadFilter.UNSEEN)
-                R.id.favorites -> setFilter(ThreadFilter.STARRED)
+                R.id.read -> {
+                    threadListAdapter.clearContacts()
+                    setFilter(ThreadFilter.SEEN)
+                }
+                R.id.unread -> {
+                    threadListAdapter.clearContacts()
+                    setFilter(ThreadFilter.UNSEEN)
+                }
+                R.id.favorites -> {
+                    threadListAdapter.clearContacts()
+                    setFilter(ThreadFilter.STARRED)
+                }
                 else -> unselectMutuallyExclusiveFilters()
             }
         }
