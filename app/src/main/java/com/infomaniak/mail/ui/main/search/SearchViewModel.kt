@@ -220,7 +220,7 @@ class SearchViewModel @Inject constructor(
 
             contactsResults.postValue(emptyList())
 
-            if (query.isNotBlank() && !query.contains("\"") && !isLengthTooShort(query)) {
+            if (!saveInHistory && query.isNotBlank() && !query.contains("\"") && !isLengthTooShort(query)) {
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
                 val contacts = mergedContactController.searchMergedContacts(queryClean)

@@ -303,6 +303,7 @@ class SearchFragment : TwoPaneFragment() {
             }
 
             handleEditorSearchAction { query ->
+                threadListAdapter.clearContacts()
                 searchViewModel.searchQuery(query, saveInHistory = true)
                 trackSearchEvent(MatomoName.ValidateSearch)
             }
