@@ -26,18 +26,15 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -51,46 +48,21 @@ class AvatarMergedContactData @Inject constructor(
 ) {
     private val ioCoroutineContext = globalCoroutineScope.coroutineContext(ioDispatcher)
 
-    private val _mergedContactFlow = MutableStateFlow<Map<String, Map<String, MergedContact>>>(emptyMap())
-    val mergedContactFlow: StateFlow<Map<String, Map<String, MergedContact>>> = _mergedContactFlow.asStateFlow()
-
-    private val _isBimiEnabledFlow = MutableStateFlow(false)
-    val isBimiEnabledFlow: StateFlow<Boolean> = _isBimiEnabledFlow.asStateFlow()
-
-    init {
-        globalCoroutineScope.launch(ioCoroutineContext) {
-            mergedContactController
-                .getMergedContactsAsync()
-                .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
-                .distinctUntilChanged()
-                .collect { newContacts ->
-                    _mergedContactFlow.value = newContacts
-                }
-        }
-
-        globalCoroutineScope.launch(ioCoroutineContext) {
-            mailboxController
-                .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-                .mapLatest { liveMailbox ->
-                    liveMailbox.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false
-                }
-                .distinctUntilChanged()
-                .collect { isBimiEnabled ->
-                    _isBimiEnabledFlow.value = isBimiEnabled
-                }
-        }
-    }
-
-
-    val mergedContactLiveData = mergedContactController
+    val mergedContactFlow: Flow<MergedContactDictionary> = mergedContactController
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
-        .asLiveData(ioCoroutineContext)
-
-    val isBimiEnabledLiveData = mailboxController
-        .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-        .mapLatest { it.obj?.featureFlags?.contains(FeatureFlag.BIMI) }
         .filterNotNull()
         .distinctUntilChanged()
-        .asLiveData(ioCoroutineContext)
+
+    val isBimiEnabledFlow: Flow<Boolean> =  mailboxController
+        .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+        .mapLatest { liveMailbox ->
+            liveMailbox.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false
+        }
+        .distinctUntilChanged()
+
+    @Deprecated(message = "Use Kotlin Flow instead of LiveData", replaceWith = ReplaceWith(expression = "mergedContactFlow", imports = ["kotlinx.coroutines.flow.Flow"]), level = DeprecationLevel.WARNING)
+    val mergedContactLiveData = mergedContactFlow.asLiveData(ioCoroutineContext)
+    @Deprecated(message = "Use Kotlin Flow instead of LiveData", replaceWith = ReplaceWith(expression = "isBimiEnabledFlow", imports = ["kotlinx.coroutines.flow.Flow"]), level = DeprecationLevel.WARNING)
+    val isBimiEnabledLiveData = isBimiEnabledFlow.asLiveData(ioCoroutineContext)
 }

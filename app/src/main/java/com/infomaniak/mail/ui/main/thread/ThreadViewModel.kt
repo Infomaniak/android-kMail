@@ -623,7 +623,7 @@ class ThreadViewModel @Inject constructor(
                     val reactionDetail = reactions[emoji]?.computeReactionDetail(
                         emoji = emoji,
                         context = appContext,
-                        mergedContactDictionary = avatarMergedContactData.mergedContactFlow.value,
+                        mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap(),
                         isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false,
                     )
                     if (reactionDetail != null) put(emoji, reactionDetail)

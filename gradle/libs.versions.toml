@@ -24,6 +24,7 @@ richHtmlEditor = "0.2.0"
 uiautomator = "2.3.0"
 uiTestJunit4 = "1.10.0"
 webkit = "1.14.0"
+coreKtx = "1.18.0"
 
 [libraries]
 compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "compose" }
@@ -51,6 +52,7 @@ espresso-web = { module = "androidx.test.espresso:espresso-web", version.ref = "
 fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "fragmentTesting" }
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiTestJunit4" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 [plugins]
 google-services = { id = "com.google.gms.google-services" }

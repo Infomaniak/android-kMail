@@ -28,23 +28,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.annotation.StringRes
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
-import coil3.asDrawable
-import coil3.imageLoader
-import coil3.request.CachePolicy
-import coil3.request.ErrorResult
-import coil3.request.ImageRequest
-import coil3.request.SuccessResult
-import coil3.request.allowHardware
-import coil3.svg.SvgDecoder
-import com.infomaniak.core.avatar.models.AvatarType
-import com.infomaniak.core.coil.generateInitialsAvatarDrawable
-import com.infomaniak.core.coil.getBackgroundColorGradientDrawable
+import com.infomaniak.core.coil.toBitmap
 import com.infomaniak.core.legacy.utils.NotificationUtilsCore
 import com.infomaniak.core.legacy.utils.NotificationUtilsCore.Companion.PENDING_INTENT_FLAGS
 import com.infomaniak.core.legacy.utils.clearStack
@@ -54,7 +41,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -67,6 +53,7 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AvatarTypeUtils.getAvatarType
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -77,6 +64,7 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.infomaniak.core.legacy.R as RCore
+
 
 @Singleton
 class NotificationUtils @Inject constructor(
@@ -187,8 +175,7 @@ class NotificationUtils @Inject constructor(
     suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
-        payload: NotificationPayload,
-        contacts: Map<String, Map<String, MergedContact>>
+        payload: NotificationPayload, contacts: MergedContactDictionary
     ): Boolean = with(payload) {
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
@@ -198,9 +185,10 @@ class NotificationUtils @Inject constructor(
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
         initMessageNotificationContent(
-            mailbox,
-            contentIntent,
-            notificationBuilder, payload = this,
+            mailbox = mailbox,
+            contentIntent = contentIntent,
+            notificationBuilder = notificationBuilder,
+            payload = this,
             contacts = contacts,
         )
         showNotifications(scope, mailboxId, notificationManagerCompat)
@@ -239,29 +227,6 @@ class NotificationUtils @Inject constructor(
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
-    suspend fun loadAsBitmap(url: String?, size: Int = 256): Bitmap? {
-        if (url.isNullOrBlank()) return null
-
-        val imageLoader = appContext.imageLoader
-
-        val request = ImageRequest.Builder(appContext)
-            .data(url)
-            .size(size)
-            .networkCachePolicy(policy = CachePolicy.ENABLED)
-            .allowHardware(false)
-            .decoderFactory(SvgDecoder.Factory())
-            .build()
-
-
-        return when (val result = imageLoader.execute(request)) {
-            is SuccessResult -> result.image.asDrawable(appContext.resources).toBitmap()
-            is ErrorResult -> {
-                SentryLog.e(TAG, "Failed to load SVG avatar: $url", result.throwable)
-                null
-            }
-        }
-    }
-
     private fun Context.undeterminedProgressMessageNotificationBuilder(
         @StringRes channelIdRes: Int,
         @StringRes titleRes: Int,
@@ -277,7 +242,7 @@ class NotificationUtils @Inject constructor(
         contentIntent: PendingIntent?,
         notificationBuilder: NotificationCompat.Builder,
         payload: NotificationPayload,
-        contacts: Map<String, Map<String, MergedContact>>,
+        contacts: MergedContactDictionary,
     ) = notificationBuilder.apply {
 
         if (payload.isSummary) {
@@ -295,26 +260,7 @@ class NotificationUtils @Inject constructor(
             context = appContext
         )
 
-        val largeIconBitmap: Bitmap? = when (avatarType) {
-            is AvatarType.WithInitials.Url -> {
-                loadAsBitmap(avatarType.url) ?: appContext.generateInitialsAvatarDrawable(
-                    initials = avatarType.initials,
-                    background = getBackgroundColorGradientDrawable(avatarType.colors.containerColor.toArgb()),
-                    initialsColor = avatarType.colors.contentColor.toArgb(),
-                ).toBitmap()
-            }
-            is AvatarType.WithInitials.Initials -> {
-                appContext.generateInitialsAvatarDrawable(
-                    initials = avatarType.initials,
-                    background = getBackgroundColorGradientDrawable(avatarType.colors.containerColor.toArgb()),
-                    initialsColor = avatarType.colors.contentColor.toArgb(),
-                ).toBitmap()
-            }
-            is AvatarType.DrawableResource -> {
-                ContextCompat.getDrawable(appContext, avatarType.resource)?.toBitmap()
-            }
-            else -> null
-        }
+        val largeIconBitmap: Bitmap? = avatarType?.toBitmap(appContext)
 
         setOnlyAlertOnce(true)
         setSubText(mailbox.emailIdn)
@@ -440,3 +386,5 @@ class NotificationUtils @Inject constructor(
         }
     }
 }
+
+
