@@ -157,7 +157,7 @@ class SearchViewModel @Inject constructor(
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
         if (isEnabled && currentFilters.contains(filter)) return@launch
         if (isEnabled) {
-            contactsResults.value = emptyList()
+            contactsResults.postValue(emptyList())
             trackSearchEvent(filter.matomoName)
             filter.select()
         } else {

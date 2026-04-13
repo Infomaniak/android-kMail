@@ -52,8 +52,8 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/newMailBullet"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
+                android:layout_width="@dimen/sizeNewMailBullet"
+                android:layout_height="@dimen/sizeNewMailBullet"
                 android:layout_marginStart="@dimen/marginStandardVerySmall"
                 android:layout_marginEnd="@dimen/marginStandardSmall"
                 android:contentDescription="@string/contentDescriptionIconNewMail"
