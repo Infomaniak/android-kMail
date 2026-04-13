@@ -126,6 +126,7 @@ import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
@@ -832,73 +833,67 @@ class NewMessageFragment : Fragment() {
             val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(html)
             val hasBlankSubject = isSubjectBlank()
 
-            var subjectValidated = !hasBlankSubject
-            var attachmentValidated = !shouldShowAttachmentReminder
-
-            lateinit var proceedToSend: () -> Unit
-
-            fun showSubjectDialog() {
-                trackNewMessageEvent(MatomoName.SendWithoutSubject)
-                var hasClickedContinue = false
-
-                descriptionDialog.show(
-                    title = getString(R.string.emailWithoutSubjectTitle),
-                    description = getString(R.string.emailWithoutSubjectDescription),
-                    positiveButtonText = R.string.buttonContinue,
-                    displayLoader = false,
-                    onPositiveButtonClicked = {
-                        trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
-                        hasClickedContinue = true
-                        subjectValidated = true
-                    },
-                    onCancel = {
-                        if (scheduled) newMessageViewModel.resetScheduledDate()
-                    },
-                    onDismiss = {
-                        if (hasClickedContinue) {
-                            proceedToSend()
-                        }
-                    }
-                )
-            }
-
-            fun showAttachmentDialog() {
-                trackNewMessageEvent(MatomoName.SendWithoutAttachment)
-                var hasClickedContinue = false
-
-                descriptionDialog.show(
-                    title = getString(R.string.attachmentsReminderTitle),
-                    description = getString(R.string.attachmentsReminderDescription),
-                    positiveButtonText = R.string.buttonContinue,
-                    displayLoader = false,
-                    onPositiveButtonClicked = {
-                        trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
-                        hasClickedContinue = true
-                        attachmentValidated = true
-                    },
-                    onCancel = {
-                        if (scheduled) newMessageViewModel.resetScheduledDate()
-                    },
-                    onDismiss = {
-                        if (hasClickedContinue) {
-                            proceedToSend()
-                        }
-                    }
-                )
-            }
-
-            proceedToSend = {
-                if (subjectValidated && attachmentValidated) {
-                    sendEmail()
-                }else if (!subjectValidated) {
-                    showSubjectDialog()
-                } else {
-                    showAttachmentDialog()
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (hasBlankSubject) {
+                    val isSendingCanceledBlankSubject = showSubjectDialog(scheduled)
+                    if (isSendingCanceledBlankSubject) return@launch
                 }
-            }
+                if (shouldShowAttachmentReminder) {
+                    val isSendingCanceledAttachmentsReminder = showAttachmentDialog(scheduled)
+                    if (isSendingCanceledAttachmentsReminder) return@launch
+                }
 
-            proceedToSend()
+                sendEmail()
+            }
         }
+    }
+
+    suspend fun showSubjectDialog(scheduled : Boolean): Boolean {
+        trackNewMessageEvent(MatomoName.SendWithoutSubject)
+
+        var isConfirm = false
+        val isSendingCanceled = CompletableDeferred<Boolean>()
+        descriptionDialog.show(
+            title = getString(R.string.emailWithoutSubjectTitle),
+            description = getString(R.string.emailWithoutSubjectDescription),
+            positiveButtonText = R.string.buttonContinue,
+            displayLoader = false,
+            onPositiveButtonClicked = {
+                trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
+                isConfirm = true
+            },
+            onCancel = {
+                if (scheduled) newMessageViewModel.resetScheduledDate()
+           },
+            onDismiss = {
+                isSendingCanceled.complete(!isConfirm)
+            })
+
+        return isSendingCanceled.await()
+    }
+
+    suspend fun showAttachmentDialog(scheduled : Boolean): Boolean {
+        trackNewMessageEvent(MatomoName.SendWithoutAttachment)
+
+        var isConfirm = false
+        val isSendingCanceled = CompletableDeferred<Boolean>()
+        descriptionDialog.show(
+            title = getString(R.string.attachmentsReminderTitle),
+            description = getString(R.string.attachmentsReminderDescription),
+            positiveButtonText = R.string.buttonContinue,
+            displayLoader = false,
+            onPositiveButtonClicked = {
+                trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
+                isConfirm = true
+            },
+            onCancel = {
+                if (scheduled) newMessageViewModel.resetScheduledDate()
+            },
+            onDismiss = {
+                isSendingCanceled.complete(!isConfirm)
+            })
+
+        return isSendingCanceled.await()
     }
 
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
