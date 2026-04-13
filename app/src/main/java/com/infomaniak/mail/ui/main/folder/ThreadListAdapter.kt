@@ -465,14 +465,6 @@ class ThreadListAdapter @Inject constructor(
         return null
     }
 
-    fun clearContacts() {
-        searchContact = emptyList()
-        val newDataSet = dataSet.filterNot { item ->
-            item is ThreadListItem.ContactItem || item is ThreadListItem.ContactHeader
-        }.toMutableList()
-        dataSet = newDataSet
-        notifyDataSetChanged()
-    }
 
     /**
      * Sometimes, we want to select a Thread before even having any Thread in the Adapter (example: coming from a Notification).

@@ -115,7 +115,6 @@ class SearchFragment : TwoPaneFragment() {
 
         searchViewModel.executePendingSearch()
 
-        threadListAdapter.clearContacts()
         searchViewModel.contactsResults.observe(viewLifecycleOwner) { contacts ->
             threadListAdapter.updateSearchContacts(contacts)
             threadListAdapter.notifyDataSetChanged()
@@ -265,7 +264,6 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setAttachmentsUi() = with(searchViewModel) {
         binding.attachments.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) threadListAdapter.clearContacts()
             setFilter(ThreadFilter.ATTACHMENTS, isChecked)
         }
     }
@@ -275,15 +273,12 @@ class SearchFragment : TwoPaneFragment() {
 
             when (chipGroup.checkedChipId) {
                 R.id.read -> {
-                    threadListAdapter.clearContacts()
                     setFilter(ThreadFilter.SEEN)
                 }
                 R.id.unread -> {
-                    threadListAdapter.clearContacts()
                     setFilter(ThreadFilter.UNSEEN)
                 }
                 R.id.favorites -> {
-                    threadListAdapter.clearContacts()
                     setFilter(ThreadFilter.STARRED)
                 }
                 else -> unselectMutuallyExclusiveFilters()
@@ -303,7 +298,6 @@ class SearchFragment : TwoPaneFragment() {
             }
 
             handleEditorSearchAction { query ->
-                threadListAdapter.clearContacts()
                 searchViewModel.searchQuery(query, saveInHistory = true)
                 trackSearchEvent(MatomoName.ValidateSearch)
             }

@@ -62,6 +62,13 @@ import kotlinx.coroutines.withContext
 import java.text.Normalizer
 import javax.inject.Inject
 
+enum class SearchUiState {
+    IDLE,
+    TYPING,
+    FILTERING,
+    VALIDATED
+}
+
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
@@ -87,6 +94,8 @@ class SearchViewModel @Inject constructor(
         private set
     var currentSearchQuery: String = ""
         private set
+
+    val uiState = MutableLiveData<SearchUiState>(SearchUiState.IDLE)
 
     val contactsResults = MutableLiveData<List<MergedContact>>()
     private var currentFilters = mutableSetOf<ThreadFilter>()
@@ -125,6 +134,15 @@ class SearchViewModel @Inject constructor(
         if (hasPendingSearch) search()
     }
 
+    private fun shouldShowContacts(): Boolean {
+        val state = uiState.value
+        val hasQuery = currentSearchQuery.isNotBlank()
+        val hasNoFilters = currentFilters.isEmpty()
+        val notValidated = state != SearchUiState.VALIDATED
+
+        return state == SearchUiState.TYPING && hasQuery && hasNoFilters && notValidated
+    }
+
     fun resetFolderFilter() {
         filterFolder = null
         isAllFoldersSelected = false
@@ -137,8 +155,11 @@ class SearchViewModel @Inject constructor(
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
         if (query.isNotBlank() && isLengthTooShort(query)) return@launch
-        if (saveInHistory){
+        if (saveInHistory) {
+            uiState.postValue(SearchUiState.VALIDATED)
             contactsResults.postValue(emptyList())
+        } else {
+            uiState.postValue(SearchUiState.TYPING)
         }
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
@@ -156,17 +177,32 @@ class SearchViewModel @Inject constructor(
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
         if (isEnabled && currentFilters.contains(filter)) return@launch
+
+        uiState.postValue(SearchUiState.FILTERING)
+        contactsResults.postValue(emptyList())
+
         if (isEnabled) {
-            contactsResults.postValue(emptyList())
             trackSearchEvent(filter.matomoName)
             filter.select()
         } else {
             filter.unselect()
+            if (currentFilters.isEmpty()) {
+                val newState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
+                uiState.postValue(newState)
+            }
         }
     }
 
     fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
         currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
+        val newState = if (currentFilters.isEmpty() && currentSearchQuery.isNotBlank()) {
+            SearchUiState.TYPING
+        } else if (currentFilters.isEmpty()) {
+            SearchUiState.IDLE
+        } else {
+            SearchUiState.FILTERING
+        }
+        uiState.postValue(newState)
         search(filters = currentFilters)
     }
 
@@ -213,18 +249,22 @@ class SearchViewModel @Inject constructor(
     ) = withContext(ioCoroutineContext) {
         cancelSearch()
 
-        contactsResults.postValue(emptyList())
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
 
-            contactsResults.postValue(emptyList())
+            val showContacts = shouldShowContacts() &&
+                    query.isNotBlank() &&
+                    !query.contains("\"") &&
+                    !isLengthTooShort(query)
 
-            if (!saveInHistory && query.isNotBlank() && !query.contains("\"") && !isLengthTooShort(query)) {
+            if (showContacts) {
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
                 val contacts = mergedContactController.searchMergedContacts(queryClean)
                 contactsResults.postValue(contacts)
+            }else{
+                contactsResults.postValue(emptyList())
             }
 
 
