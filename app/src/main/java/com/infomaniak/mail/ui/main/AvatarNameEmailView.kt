@@ -152,8 +152,6 @@ class AvatarNameEmailView @JvmOverloads constructor(
             marginStart = margin
         }
     }
-
-
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener(onClickListener)
     }

@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.service.autofill.Dataset
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -115,11 +116,6 @@ class SearchFragment : TwoPaneFragment() {
 
         searchViewModel.executePendingSearch()
 
-        searchViewModel.contactsResults.observe(viewLifecycleOwner) { contacts ->
-            threadListAdapter.updateSearchContacts(contacts)
-            threadListAdapter.notifyDataSetChanged()
-        }
-
         setupAdapter()
         setupListeners()
 
@@ -133,6 +129,7 @@ class SearchFragment : TwoPaneFragment() {
         observeVisibilityModeUpdates()
         observeSearchResults()
         observeHistory()
+        observeContactsResults()
     }
 
     private fun handleEdgeToEdge(): Unit = with(binding) {
@@ -404,6 +401,14 @@ class SearchFragment : TwoPaneFragment() {
             val hasInsertedSuccessfully = recentSearchAdapter.addSearchQuery(it)
             if (hasInsertedSuccessfully) localSettings.recentSearches = recentSearchAdapter.getSearchQueries()
             updateHistoryEmptyStateVisibility(true)
+        }
+    }
+
+    private fun observeContactsResults() {
+        searchViewModel.contactsResults.observe(viewLifecycleOwner) { contacts ->
+            threadListAdapter.updateSearchContacts(contacts)
+            threadListAdapter.dataSet = threadListAdapter.addContactOnList()
+            threadListAdapter.notifyDataSetChanged()
         }
     }
 

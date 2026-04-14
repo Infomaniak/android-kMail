@@ -28,4 +28,5 @@ sealed interface ThreadListItem {
     data class ContactItem(val contact: MergedContact) : ThreadListItem
     data class FlushFolderButton(val folderRole: Folder.FolderRole) : ThreadListItem
     data object LoadMore : ThreadListItem
+    data object Spacer : ThreadListItem
 }

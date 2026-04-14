@@ -50,7 +50,6 @@ import com.infomaniak.core.legacy.utils.capitalizeFirstChar
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
@@ -68,9 +67,9 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemBannerWithActionViewBinding
-import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.databinding.ItemContactHeaderBinding
 import com.infomaniak.mail.databinding.ItemContactSearchBinding
+import com.infomaniak.mail.databinding.ItemSpacerSmallBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadLoadMoreButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
@@ -128,8 +127,6 @@ class ThreadListAdapter @Inject constructor(
 
     private var searchContact = emptyList<MergedContact>()
 
-    private var spaceAfterLastContact: Int = 8
-
     private var folderRole: FolderRole? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
     private var isFolderNameVisible: Boolean = false
@@ -168,6 +165,7 @@ class ThreadListAdapter @Inject constructor(
             is ThreadListItem.FlushFolderButton -> DisplayType.FLUSH_FOLDER_BUTTON.layout
             is ThreadListItem.ContactItem -> DisplayType.CONTACT_ITEM.layout
             is ThreadListItem.ContactHeader -> DisplayType.CONTACT_HEADER.layout
+            is ThreadListItem.Spacer -> DisplayType.SPACER.layout
             ThreadListItem.LoadMore -> DisplayType.LOAD_MORE_BUTTON.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -205,6 +203,7 @@ class ThreadListAdapter @Inject constructor(
             R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
             R.layout.item_contact_search -> ItemContactSearchBinding.inflate(layoutInflater, parent, false)
             R.layout.item_contact_header -> ItemContactHeaderBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_spacer_small -> ItemSpacerSmallBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
 
@@ -212,12 +211,12 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-
         val payload = payloads.firstOrNull()
         if (payload !is NotificationType) {
             super.onBindViewHolder(holder, position, payloads)
             return@runCatchingRealm
         }
+
 
         if (payload == NotificationType.SELECTED_STATE && holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
@@ -251,15 +250,10 @@ class ThreadListAdapter @Inject constructor(
             }
             DisplayType.CONTACT_ITEM.layout -> {
                 val contactItem = item as ThreadListItem.ContactItem
-                val totalContacts = dataSet.count { it is ThreadListItem.ContactItem }
-
-                val contactsUpToThisPosition = dataSet.subList(0, position + 1).count { it is ThreadListItem.ContactItem }
-                val isLastContact = contactsUpToThisPosition == totalContacts
-
-                (this as ItemContactSearchBinding).displayContactItem(
-                    contactItem.contact,
-                    isLastContact
-                )
+                (this as ItemContactSearchBinding).displayContactItem(contactItem.contact)
+            }
+            DisplayType.SPACER.layout -> {
+                return
             }
         }
     }
@@ -627,21 +621,13 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    private fun ItemContactSearchBinding.displayContactItem(contact: MergedContact, isLastContact: Boolean) {
+    private fun ItemContactSearchBinding.displayContactItem(contact: MergedContact) {
         contactDetails.setMergedContact(contact)
         contactDetails.setAvatarMarginStart(0)
-        if (isLastContact) {
-            val marginBottom = root.context.resources.getDimensionPixelSize(R.dimen.spaceBetweenContactsAndThreads)
-            (contactDetails.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin = marginBottom
-        }
-
 
         contactWithSpace.setOnClickListener {
-            callbacks?.onContactClicked?.invoke(contact)
+            callbacks?.onContactClicked?.invoke(contact) // TODO: ripple
         }
-
-
-
     }
 
     private fun ItemContactHeaderBinding.displayContactHeader(totalContact: Int) {
@@ -789,6 +775,18 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
+    fun addContactOnList(): List<ThreadListItem> {
+        return mutableListOf<ThreadListItem>().apply {
+            if (searchContact.isNotEmpty()) {
+                add(ThreadListItem.ContactHeader)
+                searchContact.forEach { contact ->
+                    add(ThreadListItem.ContactItem(contact))
+                }
+                add(ThreadListItem.Spacer)
+            }
+        }
+    }
+
     private fun formatList(
         threads: List<Thread>,
         context: Context,
@@ -797,12 +795,7 @@ class ThreadListAdapter @Inject constructor(
         scope: CoroutineScope,
     ) = mutableListOf<ThreadListItem>().apply {
 
-        if (searchContact.isNotEmpty()) {
-            add(ThreadListItem.ContactHeader)
-            searchContact.forEach { contact ->
-                add(ThreadListItem.ContactItem(contact))
-            }
-        }
+        addAll(addContactOnList())
 
         if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
             add(ThreadListItem.FlushFolderButton(folderRole))
@@ -861,6 +854,7 @@ class ThreadListAdapter @Inject constructor(
 
     fun updateSearchContacts(contacts: List<MergedContact>) {
         searchContact = contacts
+        notifyDataSetChanged()
     }
 
     fun updateSelection() {
@@ -891,6 +885,7 @@ class ThreadListAdapter @Inject constructor(
         LOAD_MORE_BUTTON(R.layout.item_thread_load_more_button),
         CONTACT_HEADER(R.layout.item_contact_header),
         CONTACT_ITEM(R.layout.item_contact_search),
+        SPACER(R.layout.item_spacer_small)
     }
 
     enum class NotificationType {

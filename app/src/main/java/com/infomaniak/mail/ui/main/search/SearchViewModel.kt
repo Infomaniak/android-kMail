@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes.contact
+import com.infomaniak.mail.data.api.ApiRoutes.contacts
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -62,12 +63,7 @@ import kotlinx.coroutines.withContext
 import java.text.Normalizer
 import javax.inject.Inject
 
-enum class SearchUiState {
-    IDLE,
-    TYPING,
-    FILTERING,
-    VALIDATED
-}
+
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -258,13 +254,16 @@ class SearchViewModel @Inject constructor(
                     !query.contains("\"") &&
                     !isLengthTooShort(query)
 
-            if (showContacts) {
+            val contacts = if (showContacts) {
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
-                val contacts = mergedContactController.searchMergedContacts(queryClean)
-                contactsResults.postValue(contacts)
-            }else{
+                val contactsList = mergedContactController.searchMergedContacts(queryClean)
+
+                contactsResults.postValue(contactsList)
+                contactsList
+            } else {
                 contactsResults.postValue(emptyList())
+                emptyList()
             }
 
 
@@ -276,7 +275,7 @@ class SearchViewModel @Inject constructor(
             if (!shouldGetNextPage) resetPaginationData()
 
             computeSearchFilters(folder, filters, query)?.let { newFilters ->
-                fetchThreads(folder, newFilters, query, shouldGetNextPage)
+                fetchThreads(folder, newFilters, query, shouldGetNextPage, contacts.isNotEmpty())
                 if (saveInHistory) query.let(history::postValue)
             }
         }
@@ -304,6 +303,7 @@ class SearchViewModel @Inject constructor(
         newFilters: Set<ThreadFilter>,
         query: String,
         shouldGetNextPage: Boolean,
+        hasContacts: Boolean = false,
     ) {
         visibilityMode.postValue(VisibilityMode.LOADING)
 
@@ -339,7 +339,7 @@ class SearchViewModel @Inject constructor(
 
         val resultsVisibilityMode = when {
             newFilters.isEmpty() && isLengthTooShort(query) -> VisibilityMode.RECENT_SEARCHES
-            threadController.getSearchThreadsCount() == 0L -> VisibilityMode.NO_RESULTS
+            threadController.getSearchThreadsCount() == 0L && !hasContacts -> VisibilityMode.NO_RESULTS
             else -> VisibilityMode.RESULTS
         }
 
@@ -370,6 +370,13 @@ class SearchViewModel @Inject constructor(
         )
         val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
         threadController.saveSearchThreads(searchThreads)
+    }
+
+    enum class SearchUiState {
+        IDLE,
+        TYPING,
+        FILTERING,
+        VALIDATED
     }
 
     companion object {
