@@ -624,6 +624,7 @@ class ThreadListAdapter @Inject constructor(
     private fun ItemContactSearchBinding.displayContactItem(contact: MergedContact) {
         contactDetails.setMergedContact(contact)
         contactDetails.setAvatarMarginStart(0)
+        contactDetails.removeBackground()
 
         contactWithSpace.setOnClickListener {
             callbacks?.onContactClicked?.invoke(contact) // TODO: ripple

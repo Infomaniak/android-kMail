@@ -15,40 +15,49 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardViewMail"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardViewMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
         android:layout_marginVertical="2dp"
-        android:id="@+id/contactWithSpace"
-        android:background="@color/newMessageBackgroundColor">
+        android:layout_marginStart="@dimen/marginStandardVerySmall"
+        app:cardCornerRadius="@null"
+        app:cardPreventCornerOverlap="false"
+        app:shapeAppearanceOverlay="@style/RoundedDecoratedTextItemShapeAppearance">
 
-        <View
-            android:layout_width="@dimen/sizeNewMailBullet"
-            android:layout_height="@dimen/sizeNewMailBullet"
-            android:layout_marginStart="@dimen/marginStandardVerySmall"
-            android:layout_marginEnd="@dimen/marginStandardSmall"
-            android:layout_gravity="center_vertical" />
-
-        <com.infomaniak.mail.ui.main.AvatarNameEmailView
-            android:id="@+id/contactDetails"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/contactWithSpace"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="0dp"
-            android:layout_gravity="center_vertical"
-            app:processNameAndEmail="false"
-            tools:avatar="@tools:sample/avatars[11]"
-            tools:email="thiago@silva.com"
-            tools:name="@tools:sample/full_names" />
-    </LinearLayout>
+            android:background="?selectableItemBackground"
+            android:orientation="horizontal">
 
-</FrameLayout>
+            <View
+                android:layout_width="@dimen/sizeNewMailBullet"
+                android:layout_height="@dimen/sizeNewMailBullet"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/marginStandardVerySmall"
+                android:layout_marginEnd="@dimen/marginStandardSmall" />
+
+            <com.infomaniak.mail.ui.main.AvatarNameEmailView
+                android:id="@+id/contactDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="0dp"
+                android:layout_weight="1"
+                app:processNameAndEmail="false"
+                tools:avatar="@tools:sample/avatars[11]"
+                tools:email="thiago@silva.com"
+                tools:name="@tools:sample/full_names" />
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</com.google.android.material.card.MaterialCardView>

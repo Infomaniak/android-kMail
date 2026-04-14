@@ -152,6 +152,11 @@ class AvatarNameEmailView @JvmOverloads constructor(
             marginStart = margin
         }
     }
+
+    fun removeBackground() = with(binding){
+        root.background = null
+    }
+
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener(onClickListener)
     }
