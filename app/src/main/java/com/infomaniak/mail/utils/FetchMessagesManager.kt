@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -209,7 +210,8 @@ class FetchMessagesManager @Inject constructor(
             return@let cleanedDocument.wholeText().trim()
         }
 
-        fun Message.getNotificationPreview(): String = getFormattedPreview(appContext).content
+        fun Message.getNotificationPreview(totalUnseenReactionOnLastEmoji: Int): String =
+            getFormattedPreview(appContext, totalUnseenReactionOnLastEmoji).content
 
         ThreadController.fetchMessagesHeavyData(getDisplayedMessages(mailbox.featureFlags, localSettings), realm, okHttpClient)
 
@@ -222,7 +224,10 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        val notificationBody = message.getNotificationBody() ?: message.getNotificationPreview()
+        val totalUnseenReactionOnLastEmoji =
+            MessageController.getUnreadReactionCountByEmoji(uid, realm, message.emojiReaction)
+
+        val notificationBody = message.getNotificationBody() ?: message.getNotificationPreview(totalUnseenReactionOnLastEmoji)
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces

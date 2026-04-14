@@ -417,8 +417,14 @@ class Message : RealmObject, Snoozable {
         snoozeEndDate = flags.snoozeEndDate.toRealmInstant()
     }
 
-    fun getFormattedPreview(context: Context): FormatedPreview = when {
+    fun getFormattedPreview(context: Context, totalUnseenReactionOnLastEmoji: Int = 0 ): FormatedPreview = when {
         isEncrypted -> FormatedPreview.Encryption(context.getString(R.string.encryptedMessageHeader))
+        isReaction && totalUnseenReactionOnLastEmoji > 1 -> FormatedPreview.Reaction(context.resources.getQuantityString(
+            R.plurals.previewMultiReaction,
+            (totalUnseenReactionOnLastEmoji - 1),
+            emojiReaction,
+            from.firstOrNull()?.name.orEmpty(),
+            (totalUnseenReactionOnLastEmoji - 1)))
         isReaction -> FormatedPreview.Reaction(context.getString(R.string.previewReaction, from.first().name, emojiReaction))
         preview.isBlank() -> FormatedPreview.Empty(context.getString(R.string.noBodyDescription))
         else -> FormatedPreview.Body(preview.trim())
