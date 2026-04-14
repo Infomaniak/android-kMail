@@ -37,6 +37,8 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.loadCss
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 import kotlin.math.abs
 
 class WebViewUtils(context: Context) {
@@ -136,6 +138,12 @@ class WebViewUtils(context: Context) {
         private fun WebView.removeBackgroundJs() {
             val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
             evaluateJavascript(removeBackgroundStyleScript, null)
+        }
+
+        suspend fun WebView.evaluateJs(script: String): String = suspendCancellableCoroutine { continuation ->
+            evaluateJavascript(script) {
+                continuation.resume(it)
+            }
         }
 
         /**
