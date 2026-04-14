@@ -19,8 +19,6 @@ package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.service.autofill.Dataset
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,7 +45,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes.contacts
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -269,15 +266,9 @@ class SearchFragment : TwoPaneFragment() {
         binding.mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
 
             when (chipGroup.checkedChipId) {
-                R.id.read -> {
-                    setFilter(ThreadFilter.SEEN)
-                }
-                R.id.unread -> {
-                    setFilter(ThreadFilter.UNSEEN)
-                }
-                R.id.favorites -> {
-                    setFilter(ThreadFilter.STARRED)
-                }
+                R.id.read -> setFilter(ThreadFilter.SEEN)
+                R.id.unread -> setFilter(ThreadFilter.UNSEEN)
+                R.id.favorites -> setFilter(ThreadFilter.STARRED)
                 else -> unselectMutuallyExclusiveFilters()
             }
         }

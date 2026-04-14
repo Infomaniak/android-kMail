@@ -42,6 +42,7 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
             .sort(MergedContact::name.name)
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
+
     fun searchMergedContacts(searchQuery: String, limit: Int = 5): List<MergedContact> {
         return userInfoRealm.query<MergedContact>("name CONTAINS[c] $0 OR email CONTAINS[c] $0", searchQuery, searchQuery)
             .sort(MergedContact::name.name)

@@ -22,7 +22,6 @@ import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.text.Spannable
 import android.text.TextUtils.TruncateAt
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -245,8 +244,7 @@ class ThreadListAdapter @Inject constructor(
                 (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
             }
             DisplayType.CONTACT_HEADER.layout -> {
-                val totalContacts = dataSet.count { it is ThreadListItem.ContactItem }
-                (this as ItemContactHeaderBinding).displayContactHeader(totalContacts)
+                (this as ItemContactHeaderBinding).displayContactHeader()
             }
             DisplayType.CONTACT_ITEM.layout -> {
                 val contactItem = item as ThreadListItem.ContactItem
@@ -627,12 +625,12 @@ class ThreadListAdapter @Inject constructor(
         contactDetails.removeBackground()
 
         contactWithSpace.setOnClickListener {
-            callbacks?.onContactClicked?.invoke(contact) // TODO: ripple
+            callbacks?.onContactClicked?.invoke(contact)
         }
     }
 
-    private fun ItemContactHeaderBinding.displayContactHeader(totalContact: Int) {
-        contactsTitle.text = context.getString(R.string.contactsSearch) // TODO: manage plurals
+    private fun ItemContactHeaderBinding.displayContactHeader() {
+        contactsTitle.text = context.getString(R.string.contactsSearch)
     }
 
     override fun onSwipeStarted(item: ThreadListItem, viewHolder: ThreadListViewHolder) {
