@@ -65,6 +65,15 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         _openFilePicker = openFilePicker
     }
 
+    private fun getUrl(url: String): String {
+        val webUrl = android.util.Patterns.WEB_URL
+        val matcher = webUrl.matcher(url)
+        if (matcher.find() && url.isNotBlank()) {
+            return matcher.group()
+        }
+        return ""
+    }
+
     fun observeEditorFormatActions() = with(binding) {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
@@ -73,8 +82,11 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                 EditorAction.LINK -> if (buttonLink.isActivated) {
                     editorWebView.unlink()
                 } else {
-                    insertLinkDialog.show { displayText, url ->
-                        editorWebView.createLink(displayText, url)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val selectedText = getUrl(editorWebView.getSelectedText())
+                        insertLinkDialog.show(defaultUrlValue = selectedText) { displayText, url ->
+                            editorWebView.createLink(displayText, url)
+                        }
                     }
                 }
                 EditorAction.AI -> aiManager.openAiPrompt()
