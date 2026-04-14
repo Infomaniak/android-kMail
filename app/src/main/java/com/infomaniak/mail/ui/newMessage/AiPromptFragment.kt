@@ -92,7 +92,9 @@ class AiPromptFragment : Fragment() {
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateButton.setOnClickListener {
-            newMessageFragment.navigateToPropositionFragment()
+            viewLifecycleOwner.lifecycleScope.launch {
+                newMessageFragment.navigateToPropositionFragment()
+            }
         }
 
         // When the app is recreated or the prompt is opened when coming back from AiPropositionFragment,

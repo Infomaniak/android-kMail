@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.lib.richhtmleditor.executor.JsExecutableMethod
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
@@ -39,6 +40,12 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSanitizedHtml
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCheckIsEditorBodyEmptyScript
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
@@ -55,7 +62,6 @@ import com.infomaniak.core.legacy.R as RCore
 @FragmentScoped
 class NewMessageAiManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
-    private val editorContentManager: EditorContentManager,
     private val localSettings: LocalSettings,
 ) : NewMessageManager() {
 
@@ -67,6 +73,7 @@ class NewMessageAiManager @Inject constructor(
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
     private val black by lazy { context.getColor(RCore.color.black) }
+    private val checkIsEditorBodyEmptyScript by lazy { activityContext.getCheckIsEditorBodyEmptyScript() }
 
     private var aiPromptFragment: AiPromptFragment? = null
 
@@ -94,8 +101,18 @@ class NewMessageAiManager @Inject constructor(
 
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
+            newMessageViewModel.setPlaceholderVisibility(false)
             subject?.let(subjectTextField::setText)
-            editorContentManager.setContent(editorWebView, BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML))
+            setAiContent(content)
+        }
+    }
+
+    private fun setAiContent(content: String) {
+        val bodyContent = BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML)
+        val sanitizedContent = bodyContent.toSanitizedHtml()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.editorWebView.executeJsMethodWhenEditorIsSetup(JsExecutableMethod("setAiOutputContent", sanitizedContent))
         }
     }
 
@@ -207,15 +224,25 @@ class NewMessageAiManager @Inject constructor(
         }
     }
 
-    fun navigateToPropositionFragment() {
-
+    suspend fun navigateToPropositionFragment() {
+        calculateAiPropositionData()
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
+    }
 
+    private suspend fun calculateAiPropositionData() {
+        val isSubjectBlank = fragment.isSubjectBlank()
+        val formattedScript = checkIsEditorBodyEmptyScript.format(
+            INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME,
+            INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME,
+        )
+
+        val isBodyBlank = binding.editorWebView.evaluateJs(formattedScript) == "true"
         fragment.safeNavigate(
             NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
-                isSubjectBlank = fragment.isSubjectBlank(),
-                isBodyBlank = binding.editorWebView.isEmptyFlow.value ?: true,
+                isSubjectBlank = isSubjectBlank,
+                isBodyBlank = isBodyBlank,
             ),
         )
     }

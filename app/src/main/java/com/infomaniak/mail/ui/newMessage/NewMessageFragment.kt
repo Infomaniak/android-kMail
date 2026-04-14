@@ -58,6 +58,7 @@ import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
 import com.infomaniak.lib.richhtmleditor.StatusCommand.STRIKE_THROUGH
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNDERLINE
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNORDERED_LIST
+import com.infomaniak.lib.richhtmleditor.executor.JsExecutableMethod
 import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -94,11 +95,14 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -144,6 +148,8 @@ class NewMessageFragment : Fragment() {
     private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
+    private val fixStyle by lazy { requireContext().getFixStyleScript() }
+    private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -449,6 +455,7 @@ class NewMessageFragment : Fragment() {
         setEditorScript()
         editorAiAnimation.setAnimation(R.raw.euria)
         setToolbarEnabledStatus(false)
+        removeAllProperties()
         handleFocusChanges()
     }
 
@@ -460,8 +467,20 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setEditorScript() = with(binding.editorWebView) {
+        addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
+
+        val formattedAiContentScript = setAiContentScript.format(
+            INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME,
+            INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+        )
+        addScript(formattedAiContentScript)
+    }
+
+    private fun removeAllProperties() = viewLifecycleOwner.lifecycleScope.launch {
+        binding.editorWebView.executeJsMethodWhenEditorIsSetup(JsExecutableMethod("removeAllProperties"))
     }
 
     private fun handleFocusChanges() = with(newMessageViewModel) {
@@ -856,7 +875,7 @@ class NewMessageFragment : Fragment() {
         if (isTaskRoot) finishAndRemoveTask() else finish()
     }
 
-    fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
+    suspend fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
 
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 

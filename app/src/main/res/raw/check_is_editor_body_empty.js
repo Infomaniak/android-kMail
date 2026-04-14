@@ -15,23 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread.webViewClient
 
-import android.content.Context
-import android.webkit.WebView
-import com.infomaniak.mail.data.models.Attachment
+(function() {
+    const body = getEditor();
+    // We will clone the body so we don't modify the original HTML.
+    const clonedBody = body.cloneNode(true);
 
-class EditorWebViewClient(
-    context: Context,
-    cidDictionary: Map<String, Attachment>,
-    shouldLoadDistantResources: Boolean,
-    private val onPageFinished: () -> Unit,
-) : MessageWebViewClient(
-    context,
-    cidDictionary,
-    shouldLoadDistantResources,
-) {
-    override fun onPageFinished(webView: WebView, url: String?) {
-        onPageFinished()
-    }
-}
+    const elements = clonedBody.querySelectorAll(".%s, .%s, .%s");
+    elements.forEach( element => { element.remove(); });
+
+    return clonedBody.innerText.trim().length === 0;
+})()
