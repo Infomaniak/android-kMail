@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -166,14 +166,14 @@ class MessageController @Inject constructor(
             val containsPreview = "${Message::preview.name} CONTAINS[c] $0"
             val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] $0"
             val beginQuery = if (filtersQuery.isNotBlank()) "$filtersQuery AND " else ""
-            val featureFlag = if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) {
-                ""
-            } else {
+            val isNotAnEmoji = if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) {
                 " AND ${Message::emojiReaction.name} == nil"
+            } else {
+                ""
             }
 
             query<Message>(
-                query = "$beginQuery ($containsSubject OR $containsPreview OR $containsBody) ${featureFlag}",
+                query = "$beginQuery ($containsSubject OR $containsPreview OR $containsBody) ${isNotAnEmoji}",
                 searchQuery
             )
         } else {
