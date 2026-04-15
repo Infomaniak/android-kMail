@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var savedElements = [];
+let savedElements = [];
 
 function extractElements() {
     const elements = document.querySelectorAll(".%s, .%s, .%s");
@@ -27,9 +27,9 @@ function extractElements() {
 }
 
 function clearRemainingContent() {
-    var body = getEditor();
+    const body = getEditor();
     while (body.firstChild) {
-        body.removeChild(body.firstChild);
+        body.firstChild.remove()
     }
 }
 
