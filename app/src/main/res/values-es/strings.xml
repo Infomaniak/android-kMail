@@ -52,7 +52,7 @@
     <string name="addUnknownRecipientInvalidEmail">El correo electrónico no es válido</string>
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="addressBookTitle">Libreta de direcciones: %s</string>
-    <string name="aiButtonInsert">Insertar</string>
+    <string name="aiButtonInsert">Inserte</string>
     <string name="aiButtonRefine">Afinar</string>
     <string name="aiButtonRetry">Reintentar</string>
     <string name="aiDiscoveryDescription">Simplifique la redacción de sus mensajes con Inteligencia Artificial.</string>
@@ -76,7 +76,7 @@
     <string name="aiPromptGenerationLoader">Euria está escribiendo…</string>
     <string name="aiPromptPlaceholder">Dígale a Euria lo que quiere escribir. Por ejemplo \"%s\".</string>
     <string name="aiPromptTitle">Euria</string>
-    <string name="aiPromptValidateButton">Generar</string>
+    <string name="aiPromptValidateButton">Genere</string>
     <string name="aiReplaceSubjectDescription">El tema será:\n\n%s</string>
     <string name="aiReplaceSubjectTitle">¿Sustituir el asunto actual por la propuesta de Euria?</string>
     <string name="aiReplacementDialogDescription">Al pulsar \"Sustituir\", se perderá el contenido preexistente.</string>
