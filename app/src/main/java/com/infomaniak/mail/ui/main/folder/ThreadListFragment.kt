@@ -40,6 +40,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import com.google.android.datatransport.runtime.scheduling.SchedulingConfigModule_ConfigFactory.config
 import com.infomaniak.core.common.extensions.goToAppStore
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
@@ -557,33 +558,24 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(State.STARTED) {
                 threadListViewModel.availableService.collect { availableService ->
-                    val config = when (availableService) {
-                        AvailableService.NetworkNotAvailable -> {
-                            Pair(R.string.noNetwork, R.drawable.ic_no_network)
-                        }
-                        AvailableService.ServerNotAvailable -> {
-                            Pair(R.string.serverUnavailable, R.drawable.ic_cloud_slash)
-                        }
-                        else -> null
-                    }
-
                     TransitionManager.beginDelayedTransition(binding.root)
 
-                    if (config != null) {
-                        val (textRes, drawableRes) = config
+                    when(availableService){
+                        is ThreadListViewModel.AvailableService.DisplayUnavailableService -> {
+                            binding.networkWarning.isGone = false
+                            binding.networkWarning.text = getString(availableService.title)
 
-                        binding.networkWarning.isGone = false
-                        binding.networkWarning.text = getString(textRes)
+                            getDrawable(binding.context, availableService.icon)?.let { drawable ->
+                                binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+                            }
 
-                        getDrawable(binding.context, drawableRes)?.let { drawable ->
-                            binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+                            binding.updatedAt.isGone = true
+                            updateThreadsVisibility()
                         }
-
-                        binding.updatedAt.isGone = true
-                        updateThreadsVisibility()
-                    } else {
-                        binding.networkWarning.isGone = true
-                        binding.updatedAt.isGone = false
+                        is ThreadListViewModel.AvailableService.AllAvailable -> {
+                            binding.networkWarning.isGone = true
+                            binding.updatedAt.isGone = false
+                        }
                     }
                 }
             }

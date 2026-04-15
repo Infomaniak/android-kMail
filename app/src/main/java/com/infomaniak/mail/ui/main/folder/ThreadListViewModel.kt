@@ -19,6 +19,8 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.app.Application
 import android.text.format.DateUtils
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -40,14 +42,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-
-enum class AvailableService {
-    NetworkNotAvailable,
-    ServerNotAvailable,
-    AllAvailable,
-}
-
 
 @HiltViewModel
 class ThreadListViewModel @Inject constructor(
@@ -73,8 +67,8 @@ class ThreadListViewModel @Inject constructor(
     val availableService =
         NetworkAvailability().isNetworkAvailable.combine(serverStateManager.isServerAvailable) { isNetworkAvailable, isServerAvailable ->
             when {
-                !isNetworkAvailable -> AvailableService.NetworkNotAvailable
-                !isServerAvailable -> AvailableService.ServerNotAvailable
+                !isNetworkAvailable -> AvailableService.DisplayUnavailableService.NetworkNotAvailable
+                !isServerAvailable -> AvailableService.DisplayUnavailableService.ServerNotAvailable
                 else -> AvailableService.AllAvailable
             }
         }
@@ -120,6 +114,15 @@ class ThreadListViewModel @Inject constructor(
         Threads,
         NoNetwork,
         EmptyFolder,
+    }
+
+    sealed interface AvailableService {
+        sealed class DisplayUnavailableService(@StringRes val title: Int, @DrawableRes val icon: Int) : AvailableService {
+            data object NetworkNotAvailable : DisplayUnavailableService(com.infomaniak.mail.R.string.noNetwork, com.infomaniak.mail.R.drawable.ic_no_network)
+            data object ServerNotAvailable : DisplayUnavailableService(com.infomaniak.mail.R.string.serverUnavailable, com.infomaniak.mail.R.drawable.ic_cloud_slash)
+        }
+
+        data object AllAvailable : AvailableService
     }
 
     companion object {
