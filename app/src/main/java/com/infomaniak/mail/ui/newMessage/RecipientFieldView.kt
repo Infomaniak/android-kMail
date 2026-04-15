@@ -252,8 +252,12 @@ class RecipientFieldView @JvmOverloads constructor(
 
         doOnTextChanged { text, _, _, _ ->
             if (text?.isNotEmpty() == true) {
-                performContactSearch(text)
-                if (!isAutoCompletionOpened) openAutoCompletion()
+                if (text.contains(EMAIL_SEPARATORS_REGEX)) {
+                    addRecipientsFromInput(text.toString())
+                } else {
+                    performContactSearch(text)
+                    if (!isAutoCompletionOpened) openAutoCompletion()
+                }
             } else if (isAutoCompletionOpened) {
                 closeAutoCompletion()
             }
