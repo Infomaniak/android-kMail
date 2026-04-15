@@ -74,6 +74,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
                 getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
                 getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
+                getMergedContactFromEmailCallback = newMessageViewModel::getMergedContactFromEmail
             ),
         )
 
@@ -88,6 +89,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
                 getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
                 getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
+                getMergedContactFromEmailCallback = newMessageViewModel::getMergedContactFromEmail
             )
         )
 
@@ -102,6 +104,8 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
                 getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
                 getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
+                getMergedContactFromEmailCallback = newMessageViewModel::getMergedContactFromEmail
+
             )
         )
     }
