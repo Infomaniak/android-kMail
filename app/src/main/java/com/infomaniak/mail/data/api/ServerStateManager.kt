@@ -32,13 +32,13 @@ class ServerStateManager @Inject constructor() {
     private val _isServerAvailable = MutableStateFlow(true)
     val isServerAvailable: StateFlow<Boolean> = _isServerAvailable.asStateFlow()
 
+
+    suspend fun getMailboxes(okHttpClient: OkHttpClient? = null) = handleResponse(ApiRepository.getMailboxes(okHttpClient))
+    suspend fun getFolders(mailboxUuid: String) = handleResponse(ApiRepository.getFolders(mailboxUuid))
+
     private fun <T> handleResponse(response: ApiResponse<T>): ApiResponse<T> {
         _isServerAvailable.value = response.error?.exception !is ServerErrorException
         return response
     }
-
-
-    suspend fun getMailboxes(okHttpClient: OkHttpClient? = null) = handleResponse(ApiRepository.getMailboxes(okHttpClient))
-    suspend fun getFolders(mailboxUuid: String) = handleResponse(ApiRepository.getFolders(mailboxUuid))
 }
 

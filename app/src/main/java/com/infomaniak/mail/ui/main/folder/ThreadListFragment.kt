@@ -46,7 +46,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import com.google.android.datatransport.runtime.scheduling.SchedulingConfigModule_ConfigFactory.config
 import com.infomaniak.core.common.extensions.goToAppStore
 import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
@@ -635,7 +634,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 threadListViewModel.availableService.collect { availableService ->
                     TransitionManager.beginDelayedTransition(binding.root)
 
-                    when(availableService){
+                    when (availableService) {
                         is ThreadListViewModel.AvailableService.DisplayUnavailableService -> {
                             binding.networkWarning.isGone = false
                             binding.networkWarning.text = getString(availableService.title)
