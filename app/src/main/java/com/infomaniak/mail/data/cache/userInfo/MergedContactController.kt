@@ -69,6 +69,10 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
         return getMergedContactFromAddressBookQuery(contact).find().map { it }
     }
 
+    fun getMergedContactFromEmail(email: String): MergedContact? {
+        return null //TODO
+    }
+
     fun getMergedContactsAsync(): Flow<ResultsChange<MergedContact>> {
         return getMergedContactsQuery().asFlow()
     }

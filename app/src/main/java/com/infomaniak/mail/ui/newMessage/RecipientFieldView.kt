@@ -60,7 +60,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.min
 import com.infomaniak.core.legacy.R as RCore
-
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 @AndroidEntryPoint
 class RecipientFieldView @JvmOverloads constructor(
     context: Context,
@@ -121,6 +121,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)? = null
     private var getMergedContactFromContactGroup: ((ContactGroup) -> List<MergedContact>)? = null
     private var getMergedContactFromAddressBook: ((AddressBook) -> List<MergedContact>)? = null
+    private var getMergedContactFromEmail: ((String) -> MergedContact?)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -163,7 +164,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 onContactClicked = ::contactClicked,
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
-                    addRecipient(email = input, name = input)
+                    addRecipientsFromInput(input = input)
                 },
                 snackbarManager = snackbarManager,
                 getAddressBookWithGroup = { getAddressBookWithGroup?.invoke(it) },
@@ -260,7 +261,11 @@ class RecipientFieldView @JvmOverloads constructor(
 
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE && text?.isNotBlank() == true) {
-                contactAdapter.addFirstAvailableItem()
+                if (isAutoCompletionOpened && contactAdapter.itemCount > 0) {
+                    contactAdapter.addFirstAvailableItem()
+                } else {
+                    addRecipientsFromInput(text.toString())
+                }
             }
             true // Keep keyboard open
         }
@@ -373,35 +378,108 @@ class RecipientFieldView @JvmOverloads constructor(
             else -> emptyList()
         }
 
-        for (mergedContact in listOfContact) {
-            addRecipient(mergedContact.email, mergedContact.name)
-        }
+        val contactsToAdd = listOfContact.map { Pair(it.name, it.email) }
+        addMultipleRecipients(contactsToAdd)
     }
 
-    private fun addRecipient(email: String, name: String) {
+    private fun addMultipleRecipients(recipients: List<Pair<String, String>>) {
+        if (recipients.isEmpty()) return
 
-        if (!email.isEmail()) {
-            snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
-            return
-        }
-
-        if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
+        if (contactChipAdapter.itemCount + recipients.size > MAX_ALLOWED_RECIPIENT) {
             snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
         }
+
+        val newRecipients = recipients.mapNotNull { (name, email) ->
+            if (contactAdapter.addUsedContact(email)) {
+                Recipient().initLocalValues(email, name)
+            } else {
+                null
+            }
+        }
+
+        if (newRecipients.isEmpty()) return
 
         if (contactChipAdapter.isEmpty()) {
             expand()
             binding.chipsRecyclerView.isVisible = true
         }
 
-        val recipientIsNew = contactAdapter.addUsedContact(email)
-        if (recipientIsNew) {
-            val recipient = Recipient().initLocalValues(email, name)
-            contactChipAdapter.addChip(recipient)
-            onContactAdded?.invoke(recipient)
-            clearField()
+        val (added, skipped) = contactChipAdapter.addChips(newRecipients)
+
+        newRecipients.forEach { onContactAdded?.invoke(it) }
+
+        clearField()
+
+        if (skipped > 0) {
+            snackbarManager.setValue(
+                // context.getString(R.string.duplicateRecipientsSkipped, skipped))
+                "X emails sont dupliqué")
         }
+    }
+
+
+    fun getContactName(email: String): String {
+        return getMergedContactFromEmail?.invoke(email)?.name ?: email
+    }
+    private fun addRecipientsFromInput(input: String) {
+        val potentialEmails = input.split(EMAIL_SEPARATORS_REGEX).filter { it.isNotBlank() }.map { it.trim() }
+
+        val emailToAdd = mutableListOf<String>()
+        val invalidEmails = mutableListOf<String>()
+
+        potentialEmails.forEach { email ->
+
+            if (email.isEmail()) {
+                emailToAdd.add(email)
+            } else {
+                invalidEmails.add(email)
+            }
+        }
+
+        val recipientsToAdd = emailToAdd.map { email ->
+            getContactName(email) to email
+        }
+
+
+
+        val totalAfterAdd = contactChipAdapter.itemCount + recipientsToAdd.size
+
+
+        if (totalAfterAdd > MAX_ALLOWED_RECIPIENT) {
+            snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
+            return
+        }
+
+        if (recipientsToAdd.isNotEmpty()) {
+            addMultipleRecipients(recipientsToAdd)
+        }
+
+
+        // if (contactChipAdapter.isEmpty()) {
+        //     expand()
+        //     binding.chipsRecyclerView.isVisible = true
+        // }
+
+        // val recipientIsNew = contactAdapter.addUsedContact(email)
+        // if (recipientIsNew) {
+        //     val recipient = Recipient().initLocalValues(email, name)
+        //     contactChipAdapter.addChip(recipient)
+        //     onContactAdded?.invoke(recipient)
+        //     clearField()
+        // }
+
+        if (invalidEmails.isNotEmpty()){
+            snackbarManager.setValue(
+                // context.getString("Des emails sont invalides")
+                "X emails sont invalides"
+            )
+        }
+        // before
+        // if (!email.isEmail()) {
+        //     snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
+        //     return
+        // }
     }
 
     private fun showContactContextMenu(recipient: Recipient, anchor: BackspaceAwareChip, isForSingleChip: Boolean = false) {
@@ -443,6 +521,7 @@ class RecipientFieldView @JvmOverloads constructor(
             getAddressBookWithGroup = getAddressBookWithGroupCallback
             getMergedContactFromContactGroup = getMergedContactFromContactGroupCallback
             getMergedContactFromAddressBook = getMergedContactFromAddressBookCallback
+            getMergedContactFromEmail = getMergedContactFromEmailCallback
             gotFocus = gotFocusCallback
         }
     }
@@ -512,7 +591,8 @@ class RecipientFieldView @JvmOverloads constructor(
         val onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
         val getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
         val getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
-        val getMergedContactFromAddressBookCallback: (AddressBook) -> List<MergedContact>
+        val getMergedContactFromAddressBookCallback: (AddressBook) -> List<MergedContact>,
+        val getMergedContactFromEmailCallback: ((String) -> MergedContact?)?
     )
 
     companion object {
@@ -520,6 +600,7 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val MAX_ALLOWED_RECIPIENT = 99
         private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
         private const val NO_STROKE = 0.0f
+        private val EMAIL_SEPARATORS_REGEX = Regex("""[,;\s\r\n]+""")
 
         fun Chip.setChipStyle(displayAsExternal: Boolean, encryptionStatus: EncryptionStatus) = when {
             encryptionStatus == EncryptionStatus.Encrypted -> {
