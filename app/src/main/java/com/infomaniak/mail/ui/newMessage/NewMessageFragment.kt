@@ -94,6 +94,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
@@ -105,6 +106,7 @@ import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CL
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
@@ -151,7 +153,7 @@ class NewMessageFragment : Fragment() {
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
-
+    private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
@@ -478,6 +480,13 @@ class NewMessageFragment : Fragment() {
             INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
         )
         addScript(formattedAiContentScript)
+
+        val formattedGetEditorBodyScript = getEditorBodyScript.format(
+            INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME,
+            INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+        )
+        addScript(formattedGetEditorBodyScript)
     }
 
     private fun removeAllProperties() = viewLifecycleOwner.lifecycleScope.launch {
@@ -829,22 +838,20 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        binding.editorWebView.exportHtml { html ->
-            val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(html)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
+            val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
             val hasBlankSubject = isSubjectBlank()
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (hasBlankSubject) {
-                    val isSendingCanceledBlankSubject = showSubjectDialog(scheduled)
-                    if (isSendingCanceledBlankSubject) return@launch
-                }
-                if (shouldShowAttachmentReminder) {
-                    val isSendingCanceledAttachmentsReminder = showAttachmentDialog(scheduled)
-                    if (isSendingCanceledAttachmentsReminder) return@launch
-                }
-
-                sendEmail()
+            if (hasBlankSubject) {
+                val isSendingCanceledBlankSubject = showSubjectDialog(scheduled)
+                if (isSendingCanceledBlankSubject) return@launch
             }
+            if (shouldShowAttachmentReminder) {
+                val isSendingCanceledAttachmentsReminder = showAttachmentDialog(scheduled)
+                if (isSendingCanceledAttachmentsReminder) return@launch
+            }
+            sendEmail()
         }
     }
 
