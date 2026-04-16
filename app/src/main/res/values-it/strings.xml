@@ -674,9 +674,10 @@
     </plurals>
     <string name="toTitle">A:</string>
     <string name="tomorrowMorning">Domani mattina</string>
-    <plurals name="tooManyRecipients">
-        <item quantity="one">Non è possibile aggiungere questo indirizzo perché è stato raggiunto il limite di destinatari</item>
-        <item quantity="other">Non è possibile aggiungere questi indirizzi perché è stato raggiunto il limite di destinatari</item>
+    <string name="tooManyRecipients">Non è possibile aggiungere questo indirizzo perché è stato raggiunto il limite di destinatari</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d indirizzo non ha potuto essere aggiunto perché hai raggiunto il limite dei destinatari</item>
+        <item quantity="other">%d indirizzi non hanno potuto essere aggiunti perché hai raggiunto il limite dei destinatari</item>
     </plurals>
     <string name="trashFolder">Cestino</string>
     <string name="unblockButton">Sbloccare</string>

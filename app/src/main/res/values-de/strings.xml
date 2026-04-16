@@ -674,9 +674,10 @@
     </plurals>
     <string name="toTitle">An:</string>
     <string name="tomorrowMorning">Morgen früh</string>
-    <plurals name="tooManyRecipients">
-        <item quantity="one">Sie können diese Adresse nicht hinzufügen, da Sie die Höchstzahl an Empfängern erreicht haben</item>
-        <item quantity="other">Sie können diese Adressen nicht hinzufügen, da Sie die Höchstzahl an Empfängern erreicht haben</item>
+    <string name="tooManyRecipients">Sie können diese Adresse nicht hinzufügen, da Sie die Höchstzahl an Empfängern erreicht haben</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d Adresse konnte nicht hinzugefügt werden, da Sie das Empfängerlimit erreicht haben</item>
+        <item quantity="other">%d Adressen konnten nicht hinzugefügt werden, da Sie das Empfängerlimit erreicht haben</item>
     </plurals>
     <string name="trashFolder">Papierkorb</string>
     <string name="unblockButton">Entsperren</string>

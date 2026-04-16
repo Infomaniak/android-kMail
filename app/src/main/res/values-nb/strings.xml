@@ -674,9 +674,10 @@
     </plurals>
     <string name="toTitle">Til:</string>
     <string name="tomorrowMorning">I morgen tidlig</string>
-    <plurals name="tooManyRecipients">
-        <item quantity="one">Du kan ikke legge til denne adressen fordi du har nådd grensen for mottakere</item>
-        <item quantity="other">Du kan ikke legge til disse adressene fordi du har nådd grensen for mottakere</item>
+    <string name="tooManyRecipients">Du kan ikke legge til denne adressen fordi du har nådd grensen for mottakere</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d adresse kunne ikke legges til fordi du har nått grensen for mottakere</item>
+        <item quantity="other">%d adresser kunne ikke legges til fordi du har nått grensen for mottakere</item>
     </plurals>
     <string name="trashFolder">Papirkurv</string>
     <string name="unblockButton">Opphev blokkering</string>

@@ -1,3 +1,4 @@
+
 /*
  * Infomaniak Mail - Android
  * Copyright (C) 2023-2025 Infomaniak Network SA
@@ -105,7 +106,6 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
                 getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
                 getMergedContactFromEmailCallback = newMessageViewModel::getMergedContactFromEmail
-
             )
         )
     }

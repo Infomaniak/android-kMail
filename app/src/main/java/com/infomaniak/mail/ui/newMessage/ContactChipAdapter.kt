@@ -76,14 +76,8 @@ class ContactChipAdapter(
 
     fun addChips(newRecipients: List<Recipient>): Int {
         var added = 0
-        newRecipients.forEach { recipient ->
-            if (recipients.add(recipient)) {
-                added++
-            }
-        }
-        if (added > 0) {
-            notifyItemRangeInserted(itemCount - added, added)
-        }
+        newRecipients.forEach { recipient -> if (recipients.add(recipient)) added++ }
+        if (added > 0) notifyItemRangeInserted(itemCount - added, added)
 
         return added
     }

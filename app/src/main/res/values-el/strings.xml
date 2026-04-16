@@ -674,9 +674,10 @@
     </plurals>
     <string name="toTitle">Προς:</string>
     <string name="tomorrowMorning">Αύριο το πρωί</string>
-    <plurals name="tooManyRecipients">
-        <item quantity="one">Δεν μπορείτε να προσθέσετε αυτή τη διεύθυνση γιατί έχετε φτάσει το όριο παραληπτών</item>
-        <item quantity="other">Δεν μπορείτε να προσθέσετε αυτές τις διευθύνσεις γιατί έχετε φτάσει το όριο παραληπτών</item>
+    <string name="tooManyRecipients">Δεν μπορείτε να προσθέσετε αυτή τη διεύθυνση γιατί έχετε φτάσει το όριο παραληπτών</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d διεύθυνση δεν μπόρεσε να προστεθεί επειδή έχετε φτάσει στο όριο των παραληπτών</item>
+        <item quantity="other">%d διευθύνσεις δεν μπόρεσαν να προστεθούν επειδή έχετε φτάσει στο όριο των παραληπτών</item>
     </plurals>
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>

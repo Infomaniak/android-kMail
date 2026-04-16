@@ -170,8 +170,6 @@ class RecipientFieldView @JvmOverloads constructor(
                 getAddressBookWithGroup = { getAddressBookWithGroup?.invoke(it) },
             )
 
-
-
             contactChipAdapter = ContactChipAdapter(
                 openContextMenu = ::showContactContextMenu, onBackspace = { recipient ->
                     removeRecipient(recipient)
@@ -402,14 +400,11 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
-            snackbarManager.setValue(context.resources.getQuantityString(R.plurals.tooManyRecipients, 1))
+            snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
         }
 
-        if (contactChipAdapter.isEmpty()) {
-            expand()
-            binding.chipsRecyclerView.isVisible = true
-        }
+        updateChipsVisibility()
 
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
@@ -423,45 +418,98 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun addMultipleRecipients(recipients: List<Pair<String, String>>) {
         if (recipients.isEmpty()) return
 
-        if (contactChipAdapter.itemCount + recipients.size > MAX_ALLOWED_RECIPIENT) {
-            snackbarManager.setValue(context.resources.getQuantityString(R.plurals.tooManyRecipients, recipients.size))
-            return
-        }
+        val availableSlots = MAX_ALLOWED_RECIPIENT - contactChipAdapter.itemCount
+        val result = processRecipients(recipients, availableSlots)
 
-        val newRecipients = recipients.mapNotNull { (name, email) ->
-            if (contactAdapter.addUsedContact(email)) {
-                Recipient().initLocalValues(email, name)
-            } else {
-                null
-            }
-        }
+        showWarningSnackbars(
+            initialRecipientsSize = recipients.size,
+            initialAvailableSlots = availableSlots,
+            duplicateCount = result.duplicateCount,
+            outOfSpaceCount = result.outOfSpaceCount
+        )
 
-        val nbDuplicateRecipient = recipients.size - newRecipients.size
-        if (nbDuplicateRecipient > 0) {
-            snackbarManager.setValue(
-                context.resources.getQuantityString(
-                    R.plurals.addMultipleDuplicateEmails,
-                    nbDuplicateRecipient,
-                    nbDuplicateRecipient
-                )
-            )
+        updateChipsVisibility()
 
-            if (nbDuplicateRecipient == recipients.size) {
-                return
-            }
-        }
-
-        if (contactChipAdapter.isEmpty()) {
-            expand()
-            binding.chipsRecyclerView.isVisible = true
-        }
-
-        contactChipAdapter.addChips(newRecipients)
-        newRecipients.forEach { onContactAdded?.invoke(it) }
+        contactChipAdapter.addChips(result.acceptedRecipients)
+        result.acceptedRecipients.forEach { onContactAdded?.invoke(it) }
 
         clearField()
     }
 
+    private fun processRecipients(
+        recipients: List<Pair<String, String>>,
+        initialAvailableSlots: Int
+    ): ProcessedRecipientsResult {
+        var availableSlots = initialAvailableSlots
+        var duplicateCount = 0
+        var outOfSpaceCount = 0
+
+        val acceptedRecipients = buildList {
+            for ((name, email) in recipients) {
+                if (availableSlots <= 0) {
+                    outOfSpaceCount++
+                    continue
+                }
+
+                if (!contactAdapter.addUsedContact(email)) {
+                    duplicateCount++
+                    continue
+                }
+
+                availableSlots--
+                add(Recipient().initLocalValues(email, name))
+            }
+        }
+
+        return ProcessedRecipientsResult(acceptedRecipients, duplicateCount, outOfSpaceCount)
+    }
+
+    private fun showWarningSnackbars(
+        initialRecipientsSize: Int,
+        initialAvailableSlots: Int,
+        duplicateCount: Int,
+        outOfSpaceCount: Int
+    ) {
+        if (initialAvailableSlots == 0) {
+            snackbarManager.setValue(
+                context.resources.getQuantityString(
+                    R.plurals.tooManyRecipientsPaste,
+                    initialRecipientsSize,
+                    initialRecipientsSize
+                )
+            )
+            return
+        }
+
+        if (outOfSpaceCount > 0) {
+            snackbarManager.setValue(
+                context.resources.getQuantityString(
+                    R.plurals.tooManyRecipientsPaste,
+                    outOfSpaceCount,
+                    outOfSpaceCount
+                )
+            )
+            return
+        }
+
+        if (duplicateCount > 0) {
+            snackbarManager.setValue(
+                context.resources.getQuantityString(
+                    R.plurals.addMultipleDuplicateEmails,
+                    duplicateCount,
+                    duplicateCount
+                )
+            )
+            return
+        }
+    }
+
+    private fun updateChipsVisibility() {
+        if (contactChipAdapter.isEmpty()) {
+            expand()
+            binding.chipsRecyclerView.isVisible = true
+        }
+    }
 
     fun getContactName(email: String): String {
         return getMergedContactFromEmail?.invoke(email)?.name ?: email
@@ -485,19 +533,15 @@ class RecipientFieldView @JvmOverloads constructor(
             getContactName(email) to email
         }
 
-        val totalAfterAdd = contactChipAdapter.itemCount + recipientsToAdd.size
-
-
-        if (totalAfterAdd > MAX_ALLOWED_RECIPIENT) {
-            snackbarManager.setValue(context.resources.getQuantityString(R.plurals.tooManyRecipients, totalAfterAdd))
-            return
-        }
-
         addMultipleRecipients(recipientsToAdd)
 
         if (invalidEmails.isNotEmpty()) {
             snackbarManager.setValue(
-                context.resources.getQuantityString(R.plurals.addMultipleInvalidEmails, invalidEmails.size, invalidEmails.size)
+                context.resources.getQuantityString(
+                    R.plurals.addMultipleInvalidEmails,
+                    invalidEmails.size,
+                    invalidEmails.size
+                )
             )
         }
     }
@@ -648,6 +692,12 @@ class RecipientFieldView @JvmOverloads constructor(
             )
         }.applyTo(this)
     }
+
+    private data class ProcessedRecipientsResult(
+        val acceptedRecipients: List<Recipient>,
+        val duplicateCount: Int,
+        val outOfSpaceCount: Int
+    )
 
     private data class ChipStyle(
         val backgroundColor: Int,

@@ -674,9 +674,10 @@
     </plurals>
     <string name="toTitle">Aan:</string>
     <string name="tomorrowMorning">Morgenochtend</string>
-    <plurals name="tooManyRecipients">
-        <item quantity="one">U kunt dit adres niet toevoegen omdat u de limiet van ontvangers heeft bereikt</item>
-        <item quantity="other">U kunt deze adressen niet toevoegen omdat u de limiet van ontvangers heeft bereikt</item>
+    <string name="tooManyRecipients">U kunt dit adres niet toevoegen omdat u de limiet van ontvangers heeft bereikt</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d adres kon niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
+        <item quantity="other">%d adressen konden niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
     </plurals>
     <string name="trashFolder">Prullenbak</string>
     <string name="unblockButton">Deblokkeren</string>

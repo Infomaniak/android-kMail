@@ -724,11 +724,12 @@
     </plurals>
     <string name="toTitle">Do:</string>
     <string name="tomorrowMorning">Jutro rano</string>
-    <plurals name="tooManyRecipients">
-        <item quantity="one">Nie możesz dodać tego adresu, ponieważ osiągnąłeś/aś limit odbiorców</item>
-        <item quantity="few">Nie możesz dodać tych adresów, ponieważ osiągnąłeś limit odbiorców</item>
-        <item quantity="many">Nie możesz dodać tych adresów, ponieważ osiągnąłeś limit odbiorców</item>
-        <item quantity="other">Nie możesz dodać tych adresów, ponieważ osiągnąłeś limit odbiorców</item>
+    <string name="tooManyRecipients">Nie możesz dodać tego adresu, ponieważ osiągnąłeś/aś limit odbiorców</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d adres nie mógł zostać dodany, ponieważ osiągnięto limit odbiorców</item>
+        <item quantity="few">%d adresy nie mogły zostać dodane, ponieważ osiągnięto limit odbiorców</item>
+        <item quantity="many">%d adresów nie mogło zostać dodanych, ponieważ osiągnięto limit odbiorców</item>
+        <item quantity="other">%d adresów nie mogło zostać dodanych, ponieważ osiągnięto limit odbiorców</item>
     </plurals>
     <string name="trashFolder">Kosz</string>
     <string name="unblockButton">Odblokuj</string>

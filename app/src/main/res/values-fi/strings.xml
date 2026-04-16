@@ -674,9 +674,10 @@
     </plurals>
     <string name="toTitle">Vastaanottaja:</string>
     <string name="tomorrowMorning">Huomenna aamulla</string>
-    <plurals name="tooManyRecipients">
-        <item quantity="one">Et voi lisätä tätä osoitetta, koska olet saavuttanut vastaanottajien rajan</item>
-        <item quantity="other">Et voi lisätä näitä osoitteita, koska olet saavuttanut vastaanottajien rajan</item>
+    <string name="tooManyRecipients">Et voi lisätä tätä osoitetta, koska olet saavuttanut vastaanottajien rajan</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d osoite ei voitu lisätä, koska olet saavuttanut vastaanottajien enimmäismäärän</item>
+        <item quantity="other">%d osoitetta ei voitu lisätä, koska olet saavuttanut vastaanottajien enimmäismäärän</item>
     </plurals>
     <string name="trashFolder">Roskakori</string>
     <string name="unblockButton">Poista esto</string>
