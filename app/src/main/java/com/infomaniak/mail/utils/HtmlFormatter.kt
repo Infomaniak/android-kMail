@@ -251,8 +251,8 @@ class HtmlFormatter(private val html: String) {
             return loadScript(R.raw.editor_javascript_bridge)
         }
 
-        fun Context.getCheckIsEditorBodyEmptyScript(): String {
-            return loadScript(R.raw.check_is_editor_body_empty)
+        fun Context.getEditorBodyScript(): String {
+            return loadScript(R.raw.get_editor_body)
         }
 
         fun Context.getSetAiContentScript(): String {

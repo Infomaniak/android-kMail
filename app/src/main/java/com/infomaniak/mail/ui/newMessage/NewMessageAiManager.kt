@@ -41,7 +41,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSanitizedHtml
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCheckIsEditorBodyEmptyScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
@@ -73,7 +73,6 @@ class NewMessageAiManager @Inject constructor(
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
     private val black by lazy { context.getColor(RCore.color.black) }
-    private val checkIsEditorBodyEmptyScript by lazy { activityContext.getCheckIsEditorBodyEmptyScript() }
 
     private var aiPromptFragment: AiPromptFragment? = null
 
@@ -232,17 +231,12 @@ class NewMessageAiManager @Inject constructor(
 
     private suspend fun calculateAiPropositionData() {
         val isSubjectBlank = fragment.isSubjectBlank()
-        val formattedScript = checkIsEditorBodyEmptyScript.format(
-            INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
-            INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME,
-            INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME,
-        )
 
-        val isBodyBlank = binding.editorWebView.evaluateJs(formattedScript) == "true"
+        val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"").isBlank()
         fragment.safeNavigate(
             NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
                 isSubjectBlank = isSubjectBlank,
-                isBodyBlank = isBodyBlank,
+                isBodyBlank = body,
             ),
         )
     }
