@@ -141,6 +141,12 @@ class SearchViewModel @Inject constructor(
         unselectAllChipFilters()
     }
 
+    fun clearSearchState(){
+        currentSearchQuery = ""
+        contactsResults.value = emptyList()
+        resetFolderFilter()
+    }
+
     fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
         search()
     }

@@ -171,6 +171,13 @@ class SearchFragment : TwoPaneFragment() {
         }
     }
 
+    override fun handleOnBackPressed(){
+        if (!isOnlyRightShown()){
+            searchViewModel.clearSearchState()
+        }
+        super.handleOnBackPressed()
+    }
+
     private fun setupAdapter() {
         threadListAdapter(
             folderRole = null,
@@ -216,8 +223,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener {
-            searchViewModel.resetFolderFilter()
-            searchViewModel.contactsResults.value = emptyList()
+            searchViewModel.clearSearchState()
             findNavController().popBackStack()
         }
         swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
