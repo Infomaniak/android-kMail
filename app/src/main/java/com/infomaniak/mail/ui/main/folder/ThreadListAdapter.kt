@@ -853,7 +853,6 @@ class ThreadListAdapter @Inject constructor(
 
     fun updateSearchContacts(contacts: List<MergedContact>) {
         searchContact = contacts
-        notifyDataSetChanged()
     }
 
     fun updateSelection() {
