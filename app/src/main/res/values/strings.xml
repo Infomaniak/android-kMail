@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="appName" translatable="false">Infomaniak Mail</string>
-
     <string name="notification_channel_id_draft_service" translatable="false">draft_service_channel_id</string>
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
     <string name="notification_channel_id_sync_messages_service" translatable="false">sync_messages_service_channel_id</string>
@@ -53,6 +52,14 @@
     <string name="actionViewInDark">View in dark theme</string>
     <string name="actionViewInLight">View in light theme</string>
     <string name="addLinkTextPlaceholder">Text to display</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email has already been added</item>
+        <item quantity="other">%d emails have already been added</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email is invalid</item>
+        <item quantity="other">%d emails are invalid</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
     <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
     <string name="addUnknownRecipientTitle">Add a recipient</string>
@@ -671,7 +678,10 @@
     </plurals>
     <string name="toTitle">To:</string>
     <string name="tomorrowMorning">Tomorrow morning</string>
-    <string name="tooManyRecipients">You can’t add this address because you have reached the limit of recipients</string>
+    <plurals name="tooManyRecipients">
+        <item quantity="one">You can’t add this address because you have reached the limit of recipients</item>
+        <item quantity="other">You can’t add these addresses because you have reached the limit of recipients</item>
+    </plurals>
     <string name="trashFolder">Trash</string>
     <string name="unblockButton">Unblock</string>
     <string name="unknownDialogTitleExpeditor">Unknown expeditor</string>

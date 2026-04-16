@@ -48,6 +48,18 @@
     <string name="actionViewInDark">Zobacz w ciemnym motywie</string>
     <string name="actionViewInLight">Zobacz w jasnym motywie</string>
     <string name="addLinkTextPlaceholder">Tekst do wyświetlenia</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email został już dodany</item>
+        <item quantity="few">%d emaile zostały już dodane</item>
+        <item quantity="many">%d emaili zostało już dodanych</item>
+        <item quantity="other">%d emaili zostało już dodanych</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email jest nieprawidłowy</item>
+        <item quantity="few">%d emaile są nieprawidłowe</item>
+        <item quantity="many">%d emaili jest nieprawidłowych</item>
+        <item quantity="other">%d emaili jest nieprawidłowych</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">Ten adres e-mail jest już używany</string>
     <string name="addUnknownRecipientInvalidEmail">Adres e-mail jest nieprawidłowy</string>
     <string name="addUnknownRecipientTitle">Dodaj odbiorcę</string>
@@ -712,7 +724,12 @@
     </plurals>
     <string name="toTitle">Do:</string>
     <string name="tomorrowMorning">Jutro rano</string>
-    <string name="tooManyRecipients">Nie możesz dodać tego adresu, ponieważ osiągnąłeś/aś limit odbiorców</string>
+    <plurals name="tooManyRecipients">
+        <item quantity="one">Nie możesz dodać tego adresu, ponieważ osiągnąłeś/aś limit odbiorców</item>
+        <item quantity="few">Nie możesz dodać tych adresów, ponieważ osiągnąłeś limit odbiorców</item>
+        <item quantity="many">Nie możesz dodać tych adresów, ponieważ osiągnąłeś limit odbiorców</item>
+        <item quantity="other">Nie możesz dodać tych adresów, ponieważ osiągnąłeś limit odbiorców</item>
+    </plurals>
     <string name="trashFolder">Kosz</string>
     <string name="unblockButton">Odblokuj</string>
     <string name="unknownDialogTitleExpeditor">Nieznany nadawca</string>

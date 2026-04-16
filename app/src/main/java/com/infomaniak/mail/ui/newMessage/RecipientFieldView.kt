@@ -403,7 +403,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
-            snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
+            snackbarManager.setValue(context.resources.getQuantityString(R.plurals.tooManyRecipients, 1))
             return
         }
 
@@ -425,7 +425,7 @@ class RecipientFieldView @JvmOverloads constructor(
         if (recipients.isEmpty()) return
 
         if (contactChipAdapter.itemCount + recipients.size > MAX_ALLOWED_RECIPIENT) {
-            snackbarManager.setValue(context.getString(R.string.tooManyRecipients)) // TODO: change string to add plurals
+            snackbarManager.setValue(context.resources.getQuantityString(R.plurals.tooManyRecipients, recipients.size))
             return
         }
 
@@ -437,13 +437,17 @@ class RecipientFieldView @JvmOverloads constructor(
             }
         }
 
-        val skipped1 = recipients.size - newRecipients.size
-        if (skipped1 > 0) {
+        val nbDuplicateRecipient = recipients.size - newRecipients.size
+        if (nbDuplicateRecipient > 0) {
             snackbarManager.setValue(
-                // context.getString(R.string.duplicateRecipientsSkipped, skipped))
-                "${skipped1} emails are duplicated" //TODO: manage string + plurals
+                context.resources.getQuantityString(
+                    R.plurals.addMultipleDuplicateEmails,
+                    nbDuplicateRecipient,
+                    nbDuplicateRecipient
+                )
             )
-            if (skipped1 == recipients.size){
+
+            if (nbDuplicateRecipient == recipients.size) {
                 return
             }
         }
@@ -486,7 +490,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
 
         if (totalAfterAdd > MAX_ALLOWED_RECIPIENT) {
-            snackbarManager.setValue(context.getString(R.string.tooManyRecipients)) // TODO: check plurals
+            snackbarManager.setValue(context.resources.getQuantityString(R.plurals.tooManyRecipients, totalAfterAdd))
             return
         }
 
@@ -494,7 +498,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
         if (invalidEmails.isNotEmpty()) {
             snackbarManager.setValue(
-                "${invalidEmails.size} email addresses are invalid" // TODO: manage string
+                context.resources.getQuantityString(R.plurals.addMultipleInvalidEmails, invalidEmails.size, invalidEmails.size)
             )
         }
     }
