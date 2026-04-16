@@ -851,8 +851,10 @@ class ThreadListAdapter @Inject constructor(
         folderRole = newRole
     }
 
-    fun updateSearchContacts(contacts: List<MergedContact>) {
+    fun updateSearchContacts(contacts: List<MergedContact>, lifecycleScope: LifecycleCoroutineScope) {
         searchContact = contacts
+        val currentThreads = dataSet.filterIsInstance<ThreadListItem.Content>().map { it.thread }
+        updateList(currentThreads, lifecycleScope)
     }
 
     fun updateSelection() {

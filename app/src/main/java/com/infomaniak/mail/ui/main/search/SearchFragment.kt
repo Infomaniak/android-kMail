@@ -29,6 +29,7 @@ import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -403,9 +404,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun observeContactsResults() {
         searchViewModel.contactsResults.observe(viewLifecycleOwner) { contacts ->
-            threadListAdapter.updateSearchContacts(contacts)
-            threadListAdapter.dataSet = threadListAdapter.addContactOnList()
-            threadListAdapter.notifyDataSetChanged()
+            threadListAdapter.updateSearchContacts(contacts, viewLifecycleOwner.lifecycleScope)
         }
     }
 
