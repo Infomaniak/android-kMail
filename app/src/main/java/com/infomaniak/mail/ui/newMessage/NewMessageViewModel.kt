@@ -416,7 +416,7 @@ class NewMessageViewModel @Inject constructor(
         return mergedContactController.getMergedContactFromAddressBook(addressBook)
     }
 
-    fun getMergedContactFromEmail(email: String) : MergedContact?{
+    fun getMergedContactFromEmail(email: String): MergedContact? {
         return mergedContactController.getMergedContactFromEmail(email)
     }
 
@@ -764,21 +764,6 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun addRecipientsToField(recipients: List<Recipient>, type: FieldType){
-        if (recipients.isEmpty()) return
-
-        if (type == FieldType.CC || type == FieldType.BCC) otherRecipientsFieldsAreEmpty.value = false
-
-        val recipientsLiveData = when (type) {
-            FieldType.TO -> toLiveData
-            FieldType.CC -> ccLiveData
-            FieldType.BCC -> bccLiveData
-        }
-
-        recipientsLiveData.addRecipientsThenSetValue(recipients)
-
-    }
-
     fun addRecipientToField(recipient: Recipient, type: FieldType) {
 
         if (type == FieldType.CC || type == FieldType.BCC) otherRecipientsFieldsAreEmpty.value = false
@@ -1091,9 +1076,6 @@ class NewMessageViewModel @Inject constructor(
         if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
     }
 
-    private fun MutableLiveData<UiRecipients>.addRecipientsThenSetValue(recipients: List<Recipient>) {
-        updateRecipientsThenSetValue { it.addAll(recipients) }
-    }
     private fun MutableLiveData<UiRecipients>.addRecipientThenSetValue(recipient: Recipient) {
         updateRecipientsThenSetValue { it.add(recipient) }
     }

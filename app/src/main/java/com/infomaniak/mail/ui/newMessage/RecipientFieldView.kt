@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
@@ -522,7 +521,8 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun initRecipientField(
-        autoComplete: RecyclerView, callBackRecipientField: CallBackRecipientField
+        autoComplete: RecyclerView,
+        callBackRecipientField: CallBackRecipientField
     ) {
 
         val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
@@ -631,7 +631,8 @@ class RecipientFieldView @JvmOverloads constructor(
                     iconTint = R.color.encryptionIconColor,
                 )
             }
-            encryptionStatus == EncryptionStatus.PartiallyEncrypted || encryptionStatus == EncryptionStatus.Loading -> ChipStyle(
+            encryptionStatus == EncryptionStatus.PartiallyEncrypted ||
+                    encryptionStatus == EncryptionStatus.Loading -> ChipStyle(
                 backgroundColor = R.color.encryptionBackgroundColor,
                 textColor = R.color.encryptionTextColor,
                 icon = R.drawable.ic_lock_open_filled_pastille,
