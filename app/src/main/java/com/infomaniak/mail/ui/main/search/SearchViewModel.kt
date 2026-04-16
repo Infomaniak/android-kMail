@@ -89,6 +89,8 @@ class SearchViewModel @Inject constructor(
 
     val uiState = MutableLiveData<SearchUiState>(SearchUiState.IDLE)
 
+    private var currentUiState: SearchUiState = SearchUiState.IDLE
+
     val contactsResults = MutableLiveData<List<MergedContact>>()
     private var currentFilters = mutableSetOf<ThreadFilter>()
     var isAllFoldersSelected: Boolean = false
@@ -127,12 +129,11 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun shouldShowContacts(): Boolean {
-        val state = uiState.value
         val hasQuery = currentSearchQuery.isNotBlank()
         val hasNoFilters = currentFilters.isEmpty()
-        val notValidated = state != SearchUiState.VALIDATED
+        val notValidated = currentUiState != SearchUiState.VALIDATED
 
-        return state == SearchUiState.TYPING && hasQuery && hasNoFilters && notValidated
+        return currentUiState == SearchUiState.TYPING && hasQuery && hasNoFilters && notValidated
     }
 
     fun resetFolderFilter() {
@@ -141,7 +142,7 @@ class SearchViewModel @Inject constructor(
         unselectAllChipFilters()
     }
 
-    fun clearSearchState(){
+    fun clearSearchState() {
         currentSearchQuery = ""
         contactsResults.value = emptyList()
         resetFolderFilter()
@@ -153,11 +154,11 @@ class SearchViewModel @Inject constructor(
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
         if (query.isNotBlank() && isLengthTooShort(query)) return@launch
+
+        currentUiState = if (saveInHistory) SearchUiState.VALIDATED else SearchUiState.TYPING
+        uiState.postValue(currentUiState)
         if (saveInHistory) {
-            uiState.postValue(SearchUiState.VALIDATED)
             contactsResults.postValue(emptyList())
-        } else {
-            uiState.postValue(SearchUiState.TYPING)
         }
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
@@ -176,6 +177,7 @@ class SearchViewModel @Inject constructor(
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
         if (isEnabled && currentFilters.contains(filter)) return@launch
 
+        currentUiState = SearchUiState.FILTERING
         uiState.postValue(SearchUiState.FILTERING)
         contactsResults.postValue(emptyList())
 
