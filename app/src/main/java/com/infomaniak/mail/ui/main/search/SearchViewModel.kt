@@ -188,6 +188,7 @@ class SearchViewModel @Inject constructor(
             filter.unselect()
             if (currentFilters.isEmpty()) {
                 val newState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
+                currentUiState = newState
                 uiState.postValue(newState)
             }
         }
@@ -202,6 +203,7 @@ class SearchViewModel @Inject constructor(
         } else {
             SearchUiState.FILTERING
         }
+        currentUiState = newState
         uiState.postValue(newState)
         search(filters = currentFilters)
     }
