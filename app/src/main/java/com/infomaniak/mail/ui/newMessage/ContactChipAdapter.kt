@@ -74,21 +74,18 @@ class ContactChipAdapter(
         }
     }
 
-    fun addChips(newRecipients: List<Recipient>): Pair<Int, Int> {
+    fun addChips(newRecipients: List<Recipient>): Int {
         var added = 0
-        var duplicates = 0
         newRecipients.forEach { recipient ->
             if (recipients.add(recipient)) {
                 added++
-            } else {
-                duplicates++
             }
         }
-        if (added > 0){
+        if (added > 0) {
             notifyItemRangeInserted(itemCount - added, added)
         }
 
-        return Pair(added, duplicates)
+        return added
     }
 
     fun removeChip(recipient: Recipient) {
