@@ -454,7 +454,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             )
         }
 
-        val gestureDetector = GestureDetector(searchButton.context, object : GestureDetector.SimpleOnGestureListener() {
+        val gestureDetector = GestureDetector(userAvatar.context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {
                 return true
             }
@@ -470,7 +470,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                 val diffX = e2.x - e1.x
 
                 if (diffX >= -100 && diffX <= 100 && abs(diffY) > 5 && abs(velocityY) > 50) {
-                    handleAccountSwipe(isSwipeUp = diffY > 0)
+                    handleAccountSwipe(isSwipeDown = diffY > 0)
                     return true
                 }
                 return false
@@ -549,14 +549,14 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         }
     }
 
-    private fun handleAccountSwipe(isSwipeUp: Boolean) {
+    private fun handleAccountSwipe(isSwipeDown: Boolean) {
         val accounts = switchUserViewModel.accounts.value ?: return
         if (accounts.isEmpty()) return
 
         val currentIndex = accounts.indexOfFirst { it.id == AccountUtils.currentUserId }
         if (currentIndex == -1) return
 
-        val nextIndex = if (isSwipeUp) {
+        val nextIndex = if (isSwipeDown) {
             (currentIndex - 1).mod(accounts.size)
         } else {
             (currentIndex + 1).mod(accounts.size)
