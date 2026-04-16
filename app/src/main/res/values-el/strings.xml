@@ -48,6 +48,14 @@
     <string name="actionViewInDark">Προβολή σε σκούρο θέμα</string>
     <string name="actionViewInLight">Προβολή σε φωτεινό θέμα</string>
     <string name="addLinkTextPlaceholder">Κείμενο για εμφάνιση</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email έχει ήδη προστεθεί</item>
+        <item quantity="other">%d emails έχουν ήδη προστεθεί</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email είναι μη έγκυρο</item>
+        <item quantity="other">%d emails είναι μη έγκυρα</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">Το e-mail χρησιμοποιείται ήδη</string>
     <string name="addUnknownRecipientInvalidEmail">Το e-mail δεν είναι έγκυρο</string>
     <string name="addUnknownRecipientTitle">Προσθήκη παραλήπτη</string>
@@ -662,7 +670,10 @@
     </plurals>
     <string name="toTitle">Προς:</string>
     <string name="tomorrowMorning">Αύριο το πρωί</string>
-    <string name="tooManyRecipients">Δεν μπορείτε να προσθέσετε αυτή τη διεύθυνση γιατί έχετε φτάσει το όριο παραληπτών</string>
+    <plurals name="tooManyRecipients">
+        <item quantity="one">Δεν μπορείτε να προσθέσετε αυτή τη διεύθυνση γιατί έχετε φτάσει το όριο παραληπτών</item>
+        <item quantity="other">Δεν μπορείτε να προσθέσετε αυτές τις διευθύνσεις γιατί έχετε φτάσει το όριο παραληπτών</item>
+    </plurals>
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>

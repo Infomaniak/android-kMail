@@ -48,6 +48,14 @@
     <string name="actionViewInDark">Ver no tema escuro</string>
     <string name="actionViewInLight">Ver no tema claro</string>
     <string name="addLinkTextPlaceholder">Texto a exibir</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email já foi adicionado</item>
+        <item quantity="other">%d emails já foram adicionados</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email é inválido</item>
+        <item quantity="other">%d emails são inválidos</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">O e-mail já está sendo usado</string>
     <string name="addUnknownRecipientInvalidEmail">O e-mail é inválido</string>
     <string name="addUnknownRecipientTitle">Adicionar destinatário</string>
@@ -662,7 +670,10 @@
     </plurals>
     <string name="toTitle">Para:</string>
     <string name="tomorrowMorning">Amanhã de manhã</string>
-    <string name="tooManyRecipients">Não pode adicionar este endereço pois atingiu o limite de destinatários</string>
+    <plurals name="tooManyRecipients">
+        <item quantity="one">Não pode adicionar este endereço pois atingiu o limite de destinatários</item>
+        <item quantity="other">Não pode adicionar estes endereços pois atingiu o limite de destinatários</item>
+    </plurals>
     <string name="trashFolder">Lixo</string>
     <string name="unblockButton">Desbloquear</string>
     <string name="unknownRecipientTitle">(desconhecido)</string>

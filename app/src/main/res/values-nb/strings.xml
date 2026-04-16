@@ -48,6 +48,14 @@
     <string name="actionViewInDark">Vis i mørkt tema</string>
     <string name="actionViewInLight">Vis i lyst tema</string>
     <string name="addLinkTextPlaceholder">Tekst å vise</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email er allerede lagt til</item>
+        <item quantity="other">%d emails er allerede lagt til</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email er ugyldig</item>
+        <item quantity="other">%d emails er ugyldige</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">E-postadressen er allerede i bruk</string>
     <string name="addUnknownRecipientInvalidEmail">E-postadressen er ugyldig</string>
     <string name="addUnknownRecipientTitle">Legg til mottaker</string>
@@ -662,7 +670,10 @@
     </plurals>
     <string name="toTitle">Til:</string>
     <string name="tomorrowMorning">I morgen tidlig</string>
-    <string name="tooManyRecipients">Du kan ikke legge til denne adressen fordi du har nådd grensen for mottakere</string>
+    <plurals name="tooManyRecipients">
+        <item quantity="one">Du kan ikke legge til denne adressen fordi du har nådd grensen for mottakere</item>
+        <item quantity="other">Du kan ikke legge til disse adressene fordi du har nådd grensen for mottakere</item>
+    </plurals>
     <string name="trashFolder">Papirkurv</string>
     <string name="unblockButton">Opphev blokkering</string>
     <string name="unknownRecipientTitle">(ukjent)</string>
