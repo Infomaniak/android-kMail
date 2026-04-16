@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.content.res.ColorStateList
+import android.util.Patterns
 import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -65,13 +66,9 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         _openFilePicker = openFilePicker
     }
 
-    private fun getUrl(url: String): String {
-        val webUrl = android.util.Patterns.WEB_URL
-        val matcher = webUrl.matcher(url)
-        if (url.isNotBlank() && matcher.find()) {
-            return matcher.group()
-        }
-        return ""
+    private fun extractUrl(url: String): String {
+        val matcher = Patterns.WEB_URL.matcher(url)
+        return if (url.isNotBlank() && matcher.find()) matcher.group() else ""
     }
 
     fun observeEditorFormatActions() = with(binding) {
@@ -82,7 +79,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                     editorWebView.unlink()
                 } else {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val selectedText = getUrl(editorWebView.getSelectedText())
+                        val selectedText = extractUrl(editorWebView.getSelectedText())
                         insertLinkDialog.show(defaultUrlValue = selectedText) { displayText, url ->
                             editorWebView.createLink(displayText, url)
                         }
