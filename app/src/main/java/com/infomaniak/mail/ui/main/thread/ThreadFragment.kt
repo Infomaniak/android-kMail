@@ -739,13 +739,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun setupBackActionHandler() {
-        val mailbox = mainViewModel.currentMailbox.value
-        if (mailbox == null) {
-            snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
-            return
-        }
-
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
+            val mailbox = mainViewModel.currentMailbox.value
+            if (mailbox == null) {
+                snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+                return@getBackNavigationResult
+            }
             dateAndTimeScheduleDialog.show(
                 positiveButtonResId = R.string.buttonModify,
                 onDateSelected = { timestamp ->
@@ -758,6 +757,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
+            val mailbox = mainViewModel.currentMailbox.value
+            if (mailbox == null) {
+                snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+                return@getBackNavigationResult
+            }
             actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox)
         }
 
