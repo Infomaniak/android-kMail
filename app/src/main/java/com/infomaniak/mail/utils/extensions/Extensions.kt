@@ -369,7 +369,7 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
             parent = this,
             shouldFadeOutHeader = false,
             isHeader = { position ->
-                return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is ThreadListItem.TextSeparator
+                return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is ThreadListItem.SectionTitle
             },
         ),
     )

@@ -21,7 +21,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.sentry.SentryLog
@@ -52,6 +51,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -91,7 +92,6 @@ class SearchViewModel @Inject constructor(
 
     private var currentUiState: SearchUiState = SearchUiState.IDLE
 
-    val contactsResults = MutableLiveData<List<MergedContact>>()
     private var currentFilters = mutableSetOf<ThreadFilter>()
     var isAllFoldersSelected: Boolean = false
 
@@ -107,7 +107,12 @@ class SearchViewModel @Inject constructor(
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
     private var searchJob: Job? = null
-    val searchResults = threadController.getSearchThreadsAsync().asLiveData(ioCoroutineContext)
+    val threadsSearchResults = threadController.getSearchThreadsAsync()
+    val contactsResults = MutableStateFlow<List<MergedContact>>(emptyList())
+    val allSearchResults = combine(
+        contactsResults,
+        threadsSearchResults,
+    ) { contacts, threads -> SearchResults(contacts, threads.list) }
 
     private val currentMailboxFlow = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -157,7 +162,7 @@ class SearchViewModel @Inject constructor(
 
         if (saveInHistory) {
             currentUiState = SearchUiState.VALIDATED
-            contactsResults.postValue(emptyList())
+            contactsResults.value = emptyList()
         } else {
             currentUiState = SearchUiState.TYPING
         }
@@ -182,7 +187,7 @@ class SearchViewModel @Inject constructor(
 
         currentUiState = SearchUiState.FILTERING
         uiState.postValue(SearchUiState.FILTERING)
-        contactsResults.postValue(emptyList())
+        contactsResults.value = emptyList()
 
         if (isEnabled) {
             trackSearchEvent(filter.matomoName)
@@ -271,7 +276,6 @@ class SearchViewModel @Inject constructor(
             } else {
                 emptyList()
             }
-            contactsResults.postValue(contacts)
 
             mailboxController
                 .getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
@@ -284,6 +288,8 @@ class SearchViewModel @Inject constructor(
                 fetchThreads(folder, newFilters, query, shouldGetNextPage, contacts.isNotEmpty())
                 if (saveInHistory) query.let(history::postValue)
             }
+
+            contactsResults.emit(contacts)
         }
     }
 
@@ -377,6 +383,11 @@ class SearchViewModel @Inject constructor(
         val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
         threadController.saveSearchThreads(searchThreads)
     }
+
+    data class SearchResults(
+        val contacts: List<MergedContact>,
+        val threads: List<Thread>,
+    )
 
     enum class SearchUiState {
         IDLE,
