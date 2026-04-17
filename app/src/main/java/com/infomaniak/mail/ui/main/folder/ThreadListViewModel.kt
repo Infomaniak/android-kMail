@@ -19,8 +19,6 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.app.Application
 import android.text.format.DateUtils
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -114,15 +112,6 @@ class ThreadListViewModel @Inject constructor(
         Threads,
         NoNetwork,
         EmptyFolder,
-    }
-
-    sealed interface AvailableService {
-        sealed class DisplayUnavailableService(@StringRes val title: Int, @DrawableRes val icon: Int) : AvailableService {
-            data object NetworkNotAvailable : DisplayUnavailableService(com.infomaniak.mail.R.string.noNetwork, com.infomaniak.mail.R.drawable.ic_no_network)
-            data object ServerNotAvailable : DisplayUnavailableService(com.infomaniak.mail.R.string.serverUnavailable, com.infomaniak.mail.R.drawable.ic_cloud_slash)
-        }
-
-        data object AllAvailable : AvailableService
     }
 
     companion object {

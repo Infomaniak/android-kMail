@@ -631,11 +631,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private fun observeNetworkAndServerStatus() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(State.STARTED) {
-                threadListViewModel.availableService.collect { availableService ->
+                threadListViewModel.availableService.observe(viewLifecycleOwner) { availableService ->
                     TransitionManager.beginDelayedTransition(binding.root)
 
                     when (availableService) {
-                        is ThreadListViewModel.AvailableService.DisplayUnavailableService -> {
+                        is AvailableService.DisplayUnavailableService -> {
                             binding.networkWarning.isGone = false
                             binding.networkWarning.text = getString(availableService.title)
 
@@ -646,7 +646,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                             binding.updatedAt.isGone = true
                             updateThreadsVisibility()
                         }
-                        is ThreadListViewModel.AvailableService.AllAvailable -> {
+                        is AvailableService.AllAvailable -> {
                             binding.networkWarning.isGone = true
                             binding.updatedAt.isGone = false
                         }
