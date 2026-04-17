@@ -23,8 +23,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 
 sealed interface ThreadListItem {
     data class Content(val thread: Thread) : ThreadListItem
-    data class DateSeparator(val title: String) : ThreadListItem
-    data object ContactHeader : ThreadListItem
+    data class TextSeparator(val title: String) : ThreadListItem
     data class ContactItem(val contact: MergedContact) : ThreadListItem
     data class FlushFolderButton(val folderRole: Folder.FolderRole) : ThreadListItem
     data object LoadMore : ThreadListItem
