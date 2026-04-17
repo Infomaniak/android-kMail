@@ -555,28 +555,24 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     }
 
     private fun observeNetworkAndServerStatus() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(State.STARTED) {
-                threadListViewModel.availableService.observe(viewLifecycleOwner) { availableService ->
-                    TransitionManager.beginDelayedTransition(binding.root)
+        threadListViewModel.availableService.observe(viewLifecycleOwner) { availableService ->
+            TransitionManager.beginDelayedTransition(binding.root)
 
-                    when (availableService) {
-                        is AvailableService.DisplayUnavailableService -> {
-                            binding.networkWarning.isGone = false
-                            binding.networkWarning.text = getString(availableService.title)
+            when (availableService) {
+                is AvailableService.DisplayUnavailableService -> {
+                    binding.networkWarning.isGone = false
+                    binding.networkWarning.text = getString(availableService.title)
 
-                            getDrawable(binding.context, availableService.icon)?.let { drawable ->
-                                binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
-                            }
-
-                            binding.updatedAt.isGone = true
-                            updateThreadsVisibility()
-                        }
-                        is AvailableService.AllAvailable -> {
-                            binding.networkWarning.isGone = true
-                            binding.updatedAt.isGone = false
-                        }
+                    getDrawable(binding.context, availableService.icon)?.let { drawable ->
+                        binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
                     }
+
+                    binding.updatedAt.isGone = true
+                    updateThreadsVisibility()
+                }
+                is AvailableService.AllAvailable -> {
+                    binding.networkWarning.isGone = true
+                    binding.updatedAt.isGone = false
                 }
             }
         }
