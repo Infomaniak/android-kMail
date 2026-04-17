@@ -41,6 +41,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
@@ -556,11 +557,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     private fun observeNetworkAndServerStatus() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(State.STARTED) {
-                threadListViewModel.availableService.collect { availableService ->
+                threadListViewModel.availableService.observe(viewLifecycleOwner) { availableService ->
                     TransitionManager.beginDelayedTransition(binding.root)
 
                     when (availableService) {
-                        is ThreadListViewModel.AvailableService.DisplayUnavailableService -> {
+                        is AvailableService.DisplayUnavailableService -> {
                             binding.networkWarning.isGone = false
                             binding.networkWarning.text = getString(availableService.title)
 
@@ -571,7 +572,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                             binding.updatedAt.isGone = true
                             updateThreadsVisibility()
                         }
-                        is ThreadListViewModel.AvailableService.AllAvailable -> {
+                        is AvailableService.AllAvailable -> {
                             binding.networkWarning.isGone = true
                             binding.updatedAt.isGone = false
                         }
