@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
@@ -454,28 +455,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             )
         }
 
-        val gestureDetector = GestureDetector(userAvatar.context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onDown(e: MotionEvent): Boolean {
-                return true
-            }
-
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
-                safeNavigate(resId = R.id.accountBottomSheetDialog)
-                return true
-            }
-
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                if (e1 == null) return false
-                val diffY = e2.y - e1.y
-                val diffX = e2.x - e1.x
-
-                if (diffX >= -100 && diffX <= 100 && abs(diffY) > 5 && abs(velocityY) > 50) {
-                    handleAccountSwipe(isSwipeDown = diffY > 0)
-                    return true
-                }
-                return false
-            }
-        })
+        val gestureDetector = setupGestureDetector(userAvatar.context)
 
         @Suppress("ClickableViewAccessibility")
         userAvatar.setOnTouchListener { _, event ->
@@ -526,6 +506,30 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             }
         }
     }
+
+    private fun setupGestureDetector(context: Context) =
+        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean {
+                return true
+            }
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                safeNavigate(resId = R.id.accountBottomSheetDialog)
+                return true
+            }
+
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                if (e1 == null) return false
+                val diffY = e2.y - e1.y
+                val diffX = e2.x - e1.x
+
+                if (diffX >= -100 && diffX <= 100 && abs(diffY) > 5 && abs(velocityY) > 50) {
+                    handleAccountSwipe(isSwipeDown = diffY > 0)
+                    return true
+                }
+                return false
+            }
+        })
 
     /**
      * The boolean return value is used to know if we should keep the Thread in
