@@ -79,8 +79,12 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                     editorWebView.unlink()
                 } else {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val selectedText = extractUrl(editorWebView.getSelectedText())
-                        insertLinkDialog.show(defaultUrlValue = selectedText) { displayText, url ->
+                        val selectedText = editorWebView.getSelectedText()
+                        val defaultUrl = extractUrl(selectedText)
+                        insertLinkDialog.show(
+                            defaultUrlValue = defaultUrl,
+                            defaultDisplayNameValue = selectedText.takeIf { defaultUrl.isBlank() } ?: ""
+                        ) { displayText, url ->
                             editorWebView.createLink(displayText, url)
                         }
                     }
