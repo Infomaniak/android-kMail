@@ -27,6 +27,7 @@ import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.data.api.ServerStateManager
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
 import com.infomaniak.mail.utils.coroutineContext
@@ -46,6 +47,7 @@ class ThreadListViewModel @Inject constructor(
     application: Application,
     private val messageController: MessageController,
     private val searchUtils: SearchUtils,
+    private val networkManager: NetworkManager,
     private val serverStateManager: ServerStateManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -63,7 +65,7 @@ class ThreadListViewModel @Inject constructor(
     var currentThreadsCount: Int? = null
 
     val availableService =
-        NetworkAvailability().isNetworkAvailable.combine(serverStateManager.isServerAvailable) { isNetworkAvailable, isServerAvailable ->
+        networkManager.isNetworkAvailable.combine(serverStateManager.isServerAvailable) { isNetworkAvailable, isServerAvailable ->
             when {
                 !isNetworkAvailable -> AvailableService.DisplayUnavailableService.NetworkNotAvailable
                 !isServerAvailable -> AvailableService.DisplayUnavailableService.ServerNotAvailable
