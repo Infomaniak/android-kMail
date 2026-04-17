@@ -216,7 +216,6 @@ class ThreadListAdapter @Inject constructor(
             return@runCatchingRealm
         }
 
-
         if (payload == NotificationType.SELECTED_STATE && holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = (dataSet[position] as ThreadListItem.Content).thread
@@ -240,19 +239,13 @@ class ThreadListAdapter @Inject constructor(
                 (this as ItemBannerWithActionViewBinding)
                     .displayFlushFolderButton((item as ThreadListItem.FlushFolderButton).folderRole)
             }
-            DisplayType.LOAD_MORE_BUTTON.layout -> {
-                (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
-            }
-            DisplayType.CONTACT_HEADER.layout -> {
-                (this as ItemContactHeaderBinding).displayContactHeader()
-            }
+            DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
+            DisplayType.CONTACT_HEADER.layout -> (this as ItemContactHeaderBinding).displayContactHeader()
             DisplayType.CONTACT_ITEM.layout -> {
                 val contactItem = item as ThreadListItem.ContactItem
                 (this as ItemContactSearchBinding).displayContactItem(contactItem.contact)
             }
-            DisplayType.SPACER.layout -> {
-                return
-            }
+            DisplayType.SPACER.layout -> Unit
         }
     }
 
@@ -456,7 +449,6 @@ class ThreadListAdapter @Inject constructor(
 
         return null
     }
-
 
     /**
      * Sometimes, we want to select a Thread before even having any Thread in the Adapter (example: coming from a Notification).
@@ -778,9 +770,7 @@ class ThreadListAdapter @Inject constructor(
         return mutableListOf<ThreadListItem>().apply {
             if (searchContact.isNotEmpty()) {
                 add(ThreadListItem.ContactHeader)
-                searchContact.forEach { contact ->
-                    add(ThreadListItem.ContactItem(contact))
-                }
+                searchContact.forEach { contact -> add(ThreadListItem.ContactItem(contact)) }
                 add(ThreadListItem.Spacer)
             }
         }

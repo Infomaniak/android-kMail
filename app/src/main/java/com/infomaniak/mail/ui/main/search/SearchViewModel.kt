@@ -155,11 +155,14 @@ class SearchViewModel @Inject constructor(
     fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
         if (query.isNotBlank() && isLengthTooShort(query)) return@launch
 
-        currentUiState = if (saveInHistory) SearchUiState.VALIDATED else SearchUiState.TYPING
-        uiState.postValue(currentUiState)
         if (saveInHistory) {
+            currentUiState = SearchUiState.VALIDATED
             contactsResults.postValue(emptyList())
+        } else {
+            currentUiState = SearchUiState.TYPING
         }
+        uiState.postValue(currentUiState)
+
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
 
@@ -264,14 +267,11 @@ class SearchViewModel @Inject constructor(
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
                 val contactsList = mergedContactController.searchMergedContacts(queryClean)
-
-                contactsResults.postValue(contactsList)
                 contactsList
             } else {
-                contactsResults.postValue(emptyList())
                 emptyList()
             }
-
+            contactsResults.postValue(contacts)
 
             mailboxController
                 .getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)

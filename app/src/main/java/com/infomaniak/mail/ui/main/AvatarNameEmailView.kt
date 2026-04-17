@@ -147,14 +147,14 @@ class AvatarNameEmailView @JvmOverloads constructor(
         userEmail.text = searchQuery
     }
 
-    fun setAvatarMarginStart(margin: Int) = with(binding) {
-        avatarLayout.updateLayoutParams<MarginLayoutParams> {
+    fun setAvatarMarginStart(margin: Int) {
+        binding.avatarLayout.updateLayoutParams<MarginLayoutParams> {
             marginStart = margin
         }
     }
 
-    fun removeBackground() = with(binding){
-        root.background = null
+    fun removeBackground(){
+        binding.root.background = null
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {

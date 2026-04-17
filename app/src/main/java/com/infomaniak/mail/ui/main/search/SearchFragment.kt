@@ -172,8 +172,8 @@ class SearchFragment : TwoPaneFragment() {
         }
     }
 
-    override fun handleOnBackPressed(){
-        if (!isOnlyRightShown()){
+    override fun handleOnBackPressed() {
+        if (!isOnlyRightShown()) {
             searchViewModel.clearSearchState()
         }
         super.handleOnBackPressed()

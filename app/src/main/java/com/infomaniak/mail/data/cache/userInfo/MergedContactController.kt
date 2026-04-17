@@ -49,7 +49,6 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
             .limit(limit)
             .find()
-            .map { it }
     }
 
     private fun getMergedContactFromContactGroupQuery(contact: ContactGroup): RealmQuery<MergedContact> {
