@@ -563,9 +563,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                     binding.networkWarning.isGone = false
                     binding.networkWarning.text = getString(availableService.title)
 
-                    getDrawable(binding.root.context, availableService.icon)?.let { drawable ->
-                        binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
-                    }
+                    val drawable = getDrawable(binding.root.context, availableService.icon)
+                    binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
                     binding.updatedAt.isGone = true
                     updateThreadsVisibility()
