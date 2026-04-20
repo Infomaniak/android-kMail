@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.search
 
-import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
@@ -47,7 +46,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -55,13 +53,10 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
-import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.utils.ThreadListUtils
 import com.infomaniak.mail.utils.Utils.Shortcuts
-import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -71,8 +66,6 @@ import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -399,67 +392,8 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun observeSearchResults() = viewLifecycleOwner.lifecycleScope.launch {
         searchViewModel.allSearchResults.collectLatest { searchResults ->
-            with(searchResults) {
-                val formattedList = runCatchingRealm {
-                    formatSearchList(
-                        threads,
-                        contacts,
-                        requireContext(),
-                        localSettings.threadDensity,
-                        viewLifecycleOwner.lifecycleScope
-                    )
-                }.getOrDefault(emptyList())
-
-                threadListAdapter.updateListWithThreadListItems(formattedList, viewLifecycleOwner.lifecycleScope)
-            }
+            threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleOwner.lifecycleScope)
         }
-    }
-
-    private fun formatSearchList(
-        threads: List<Thread>,
-        contacts: List<MergedContact>,
-        context: Context,
-        threadDensity: ThreadDensity,
-        scope: CoroutineScope,
-    ) = mutableListOf<ThreadListItem>().apply {
-
-        when {
-            threadDensity == ThreadDensity.COMPACT -> {
-                threadListAdapter.cleanMultiSelectionItems(threads, scope)
-                addAll(threads.map { ThreadListItem.Content(it) })
-            }
-            else -> {
-                var previousSectionTitle = ""
-
-                contacts.forEach { contact ->
-                    scope.ensureActive()
-                    val sectionTitle = context.getString(R.string.contactsSearch)
-                    previousSectionTitle = addSectionTitle(sectionTitle, previousSectionTitle)
-                    add(ThreadListItem.ContactItem(contact))
-                }
-
-                if (contacts.isNotEmpty()) add(ThreadListItem.Spacer)
-
-                threads.forEach { thread ->
-                    scope.ensureActive()
-                    val sectionTitle = ThreadListUtils.getSectionTitle(thread, context)
-                    previousSectionTitle = addSectionTitle(sectionTitle, previousSectionTitle)
-
-                    add(ThreadListItem.Content(thread))
-                }
-            }
-        }
-    }
-
-    private fun MutableList<ThreadListItem>.addSectionTitle(
-        sectionTitle: String,
-        previousSectionTitle: String
-    ): String {
-        if (sectionTitle != previousSectionTitle) {
-            add(ThreadListItem.SectionTitle(sectionTitle))
-            return sectionTitle
-        }
-        return previousSectionTitle
     }
 
     private fun observeHistory() {
