@@ -271,7 +271,7 @@ class SearchViewModel @Inject constructor(
             val contacts = if (showContacts) {
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
-                val contactsList = mergedContactController.searchMergedContacts(queryClean)
+                val contactsList = mergedContactController.searchMergedContacts(query,queryClean)
                 contactsList
             } else {
                 emptyList()

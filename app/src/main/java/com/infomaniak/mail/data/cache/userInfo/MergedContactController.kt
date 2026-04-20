@@ -43,8 +43,13 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
 
-    fun searchMergedContacts(searchQuery: String, limit: Int = 5): List<MergedContact> {
-        return userInfoRealm.query<MergedContact>("name CONTAINS[c] $0 OR email CONTAINS[c] $0", searchQuery, searchQuery)
+    fun searchMergedContacts(searchQuery: String, searchQueryClean: String, limit: Int = 5): List<MergedContact> {
+        val queryStr = if (searchQuery != searchQueryClean) {
+            "(name CONTAINS[c] $0 OR email CONTAINS[c] $0) OR (name CONTAINS[c] $1 OR email CONTAINS[c] $1)"
+        } else {
+            "name CONTAINS[c] $0 OR email CONTAINS[c] $0"
+        }
+        return userInfoRealm.query<MergedContact>(queryStr, searchQuery, searchQueryClean)
             .sort(MergedContact::name.name)
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
             .limit(limit)
