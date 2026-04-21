@@ -94,7 +94,7 @@
     <string name="attachmentActionFile">Adjuntar un archivo</string>
     <string name="attachmentActionPhotoLibrary">Enviar una foto desde la fototeca</string>
     <string name="attachmentActionTitle">Añadir un archivo adjunto</string>
-    <string name="attachmentFileLimitReached">Los archivos que está intentando enviar superan el límite de archivos adjuntos de 25 MB.</string>
+    <string name="attachmentFileLimitReached">Los archivos que está intentando enviar superan el límite de archivos adjuntos de 25 MB</string>
     <plurals name="attachmentQuantity">
         <item quantity="one">%d anexo</item>
         <item quantity="other">%d archivos adjuntos</item>

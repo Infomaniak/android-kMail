@@ -270,7 +270,7 @@
     <string name="encryptedPasswordProtectionTitle">Wachtwoordbeveiliging</string>
     <string name="encryptedProtectionAdDescription">Bescherm uw bericht tegen ongeautoriseerde toegang met Infomaniak-versleuteling.</string>
     <string name="encryptedProtectionAdDescription1">Het onderwerp van het bericht blijft zichtbaar, maar de inhoud is volledig beveiligd.</string>
-    <string name="encryptedProtectionAdDescription1Bold">is de inhoud volledig beveiligd</string>
+    <string name="encryptedProtectionAdDescription1Bold">is de inhoud volledig beveiligd.</string>
     <string name="encryptedProtectionAdDescription2">Een wachtwoord is vereist voor ontvangers buiten Infomaniak.</string>
     <string name="encryptedProtectionAdDescription2Bold">ontvangers buiten Infomaniak.</string>
     <string name="encryptedProtectionAdTitle">Versleutel uw vertrouwelijke berichten</string>
