@@ -399,7 +399,7 @@ class RecipientFieldView @JvmOverloads constructor(
             return
         }
 
-        if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
+        if (contactChipAdapter.itemCount >= MAX_ALLOWED_RECIPIENT) {
             snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
         }
@@ -418,7 +418,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun addMultipleRecipients(recipients: List<Pair<String, String>>) {
         if (recipients.isEmpty()) return
 
-        val availableSlots = MAX_ALLOWED_RECIPIENT - contactChipAdapter.itemCount
+        val availableSlots = (MAX_ALLOWED_RECIPIENT - contactChipAdapter.itemCount).coerceAtLeast(0)
         val result = processRecipients(recipients, availableSlots)
 
         showWarningSnackbars(
