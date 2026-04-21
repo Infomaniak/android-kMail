@@ -103,7 +103,7 @@ object PerformSwipeActionManager {
                 handleDeleteSwipe(thread, position, folderRole, isPermanentDeleteFolder, currentMailbox)
             }
             SwipeAction.FAVORITE -> {
-                actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(threadsUids = listOf(thread.uid), mailbox = currentMailbox)
+                actionsViewModel.toggleThreadsFavoriteStatus(threadsUids = listOf(thread.uid), mailbox = currentMailbox)
                 true
             }
             SwipeAction.MOVE -> {
@@ -129,7 +129,7 @@ object PerformSwipeActionManager {
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                actionsViewModel.toggleThreadsSeenStatus(
                     threadsUids = listOf(thread.uid),
                     currentFolderId = mainViewModel.currentFolderId,
                     mailbox = currentMailbox
@@ -138,7 +138,7 @@ object PerformSwipeActionManager {
             }
 
             SwipeAction.SPAM -> {
-                actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+                actionsViewModel.toggleThreadsSpamStatus(
                     threads = setOf(thread),
                     currentFolderId = mainViewModel.currentFolderId,
                     mailbox = currentMailbox
@@ -173,7 +173,7 @@ object PerformSwipeActionManager {
         }
 
         fun onSuccess() {
-            actionsViewModel.archiveThreadsOrMessages(
+            actionsViewModel.archiveThreads(
                 threads = listOf(thread),
                 currentFolder = mainViewModel.currentFolder.value,
                 mailbox = currentMailBox
@@ -206,7 +206,7 @@ object PerformSwipeActionManager {
 
         fun onHandleDelete() {
             if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
-            actionsViewModel.deleteThreadsOrMessages(
+            actionsViewModel.deleteThreads(
                 threads = listOf(thread),
                 currentFolder = mainViewModel.currentFolder.value,
                 mailbox = currentMailBox

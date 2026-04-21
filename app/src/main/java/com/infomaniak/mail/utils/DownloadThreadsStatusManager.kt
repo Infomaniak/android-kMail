@@ -17,33 +17,35 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.core.network.NetworkAvailability
-import com.infomaniak.core.sentry.SentryLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NetworkManager @Inject constructor() {
+class DownloadThreadsStatusManager @Inject constructor() {
     /**
-     * A StateFlow that emits the current network availability status.
+     * A StateFlow that emits if the app is downloading threads.
      * It starts collecting immediately and keeps the latest value in memory.
      */
-    val isNetworkAvailable: StateFlow<Boolean> = NetworkAvailability().isNetworkAvailable
-        .onEach { available ->
-            SentryLog.d("NetworkManager", if (available) "Online" else "Offline")
-        }
+    private val _isDownloading = MutableStateFlow(false)
+    private val scope = CoroutineScope(Dispatchers.Default)
+    @OptIn(FlowPreview::class)
+    val isDownloading: StateFlow<Boolean> = _isDownloading
+        .debounce(50)
         .stateIn(
-            scope = CoroutineScope(Dispatchers.Default),
-            started = SharingStarted.Eagerly,
-            initialValue = true
+            scope = scope,
+            started = SharingStarted.Lazily,
+            initialValue = false
         )
 
-    val hasNetwork: Boolean
-        get() = isNetworkAvailable.value
+    fun updateState(isDownloading: Boolean) {
+        _isDownloading.value = isDownloading
+    }
 }

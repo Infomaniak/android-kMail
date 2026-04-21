@@ -140,13 +140,13 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.cancelSnooze.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.CancelSnooze, threadsCount, isFromBottomSheet = true)
-            lifecycleScope.launch { actionsViewModel.unsnoozeThreads(threads, mainViewModel.currentMailbox.value) }
+            lifecycleScope.launch { actionsViewModel.unsnoozeThreads(threads.toList(), mainViewModel.currentMailbox.value) }
             isMultiSelectOn = false
         }
 
         binding.spam.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
-            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+            actionsViewModel.toggleThreadsSpamStatus(
                 threads = threads,
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = currentMailbox,
@@ -171,11 +171,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     actionsViewModel.reportPhishing(
                         messages = messages,
                         currentFolder = mainViewModel.currentFolder.value,
-                        mailbox = currentMailbox
+                        mailbox = currentMailbox,
                     )
                 },
             )
-
             isMultiSelectOn = false
         }
 
@@ -203,10 +202,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
-            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+            actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = threadsUids,
                 mailbox = currentMailbox,
-                shouldFavorite = shouldFavorite
+                shouldFavorite = shouldFavorite,
             )
 
             isMultiSelectOn = false
@@ -244,11 +243,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionMove -> onMoveClicked(threadsCount, threadsUids, folderRole)
                 R.id.actionReadUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
-                    actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                    actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = threadsUids,
                         shouldRead = shouldRead,
                         currentFolderId = currentFolderId,
-                        mailbox = currentMailbox
+                        mailbox = currentMailbox,
                     )
                 }
                 R.id.actionArchive -> {
@@ -257,10 +256,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
-                        actionsViewModel.archiveThreadsOrMessages(
+                        actionsViewModel.archiveThreads(
                             threads = threads.toList(),
                             currentFolder = currentFolder,
-                            mailbox = currentMailbox
+                            mailbox = currentMailbox,
                         )
                     }
                 }
@@ -270,10 +269,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
-                        actionsViewModel.deleteThreadsOrMessages(
+                        actionsViewModel.deleteThreads(
                             threads = threads.toList(),
                             currentFolder = currentFolder,
-                            mailbox = currentMailbox
+                            mailbox = currentMailbox,
                         )
                     }
                 }

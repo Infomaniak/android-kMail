@@ -179,7 +179,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         override fun onDelete() {
             descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
-                actionsViewModel.deleteThreadsOrMessages(
+                actionsViewModel.deleteThreads(
                     threads = listOf(thread),
                     currentFolder = mainViewModel.currentFolder.value,
                     mailbox = mainViewModel.currentMailbox.value!!
@@ -192,7 +192,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         override fun onArchive() {
             descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
-                actionsViewModel.archiveThreadsOrMessages(
+                actionsViewModel.archiveThreads(
                     threads = listOf(thread),
                     currentFolder = mainViewModel.currentFolder.value,
                     mailbox = mainViewModel.currentMailbox.value!!
@@ -202,10 +202,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onReadUnread() {
             trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
-            actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+            actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
                 currentFolderId = mainViewModel.currentFolderId,
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
             twoPaneViewModel.closeThread()
         }
@@ -248,18 +248,18 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onFavorite() {
             trackBottomSheetThreadActionsEvent(MatomoName.Favorite, thread.isFavorite)
-            actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+            actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
         }
 
         override fun onSpam() {
             trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = isFromSpam)
-            actionsViewModel.toggleThreadsOrMessagesSpamStatus(
+            actionsViewModel.toggleThreadsSpamStatus(
                 threads = setOf(thread),
                 currentFolderId = mainViewModel.currentFolderId,
-                mailbox = mainViewModel.currentMailbox.value!!
+                mailbox = mainViewModel.currentMailbox.value!!,
             )
         }
 
@@ -280,7 +280,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     actionsViewModel.reportPhishing(
                         messages = junkMessages,
                         currentFolder = mainViewModel.currentFolder.value,
-                        mailbox = mainViewModel.currentMailbox.value!!
+                        mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 },
             )

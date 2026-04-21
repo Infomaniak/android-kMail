@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,15 +72,16 @@ class ThreadListMultiSelection {
         threadListFragment.binding.quickActionBar.setOnItemClickListener { menuId ->
             val selectedThreadsUids = selectedThreads.map { it.uid }
             val selectedThreadsCount = selectedThreadsUids.count()
+            val currentMailBox = currentMailbox.value ?: return@setOnItemClickListener
 
             when (menuId) {
                 R.id.quickActionUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedThreadsCount)
-                    actionsViewModel.toggleThreadsOrMessagesSeenStatus(
+                    actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
                         currentFolderId = currentFolderId,
-                        mailbox = currentMailbox.value!!
+                        mailbox = currentMailBox,
                     )
                     isMultiSelectOn = false
                 }
@@ -90,20 +91,20 @@ class ThreadListMultiSelection {
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
-                        actionsViewModel.archiveThreadsOrMessages(
+                        actionsViewModel.archiveThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
-                            mailbox = currentMailbox.value!!
+                            mailbox = currentMailBox,
                         )
                         isMultiSelectOn = false
                     }
                 }
                 R.id.quickActionFavorite -> {
                     trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
-                    actionsViewModel.toggleThreadsOrMessagesFavoriteStatus(
+                    actionsViewModel.toggleThreadsFavoriteStatus(
                         threadsUids = selectedThreadsUids,
-                        mailbox = currentMailbox.value!!,
-                        shouldFavorite = shouldMultiselectFavorite
+                        mailbox = currentMailBox,
+                        shouldFavorite = shouldMultiselectFavorite,
                     )
                     isMultiSelectOn = false
                 }
@@ -113,10 +114,10 @@ class ThreadListMultiSelection {
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
-                        actionsViewModel.deleteThreadsOrMessages(
+                        actionsViewModel.deleteThreads(
                             threads = selectedThreads.toList(),
                             currentFolder = currentFolder.value,
-                            mailbox = currentMailbox.value!!
+                            mailbox = currentMailBox,
                         )
                         isMultiSelectOn = false
                     }
@@ -124,6 +125,7 @@ class ThreadListMultiSelection {
                 R.id.quickActionMenu -> {
                     trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
                     val direction = if (selectedThreadsCount == 1) {
+                        isMultiSelectOn = false
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),
                             shouldLoadDistantResources = false,
