@@ -271,8 +271,6 @@ class MainViewModel @Inject constructor(
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
     private var currentThreadsLiveJob: Job? = null
-
-    val isNetworkAvailable = networkManager.isNetworkAvailable
     val hasNetwork: Boolean get() = networkManager.hasNetwork
 
     fun reassignCurrentThreadsLive() {
