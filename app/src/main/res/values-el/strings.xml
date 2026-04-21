@@ -579,7 +579,7 @@
     <string name="snackbarPhoneNumberCopiedToClipboard">Ο αριθμός αντιγράφηκε στο πρόχειρο</string>
     <string name="snackbarReportPhishingConfirmation">Η αναφορά ολοκληρώθηκε με επιτυχία</string>
     <string name="snackbarRestorationLaunched">Εκκίνηση επαναφοράς</string>
-    <string name="snackbarSaveInDraft">Το μήνυμα αποθηκεύτηκε στα πρόχειρα</string>
+    <string name="snackbarSaveInDraft">Το μήνυμα αποθηκεύτηκε στα πρόχειρα.</string>
     <string name="snackbarScheduleSaved">Το μήνυμα θα σταλεί στις %s</string>
     <string name="snackbarScheduling">Το μήνυμα προγραμματίζεται</string>
     <plurals name="snackbarSenderBlacklisted">

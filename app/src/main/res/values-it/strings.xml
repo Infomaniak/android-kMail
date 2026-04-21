@@ -94,7 +94,7 @@
     <string name="attachmentActionFile">Allegare un file</string>
     <string name="attachmentActionPhotoLibrary">Inviare una foto dalla libreria fotografica</string>
     <string name="attachmentActionTitle">Aggiungere un allegato</string>
-    <string name="attachmentFileLimitReached">I file che si sta tentando di inviare superano il limite di 25 MB per gli allegati.</string>
+    <string name="attachmentFileLimitReached">I file che si sta tentando di inviare superano il limite di 25 MB per gli allegati</string>
     <plurals name="attachmentQuantity">
         <item quantity="one">%d allegato</item>
         <item quantity="other">%d allegati</item>
@@ -272,7 +272,7 @@
     <string name="encryptedProtectionAdDescription1">L’oggetto del messaggio rimane visibile, ma il contenuto è completamente protetto.</string>
     <string name="encryptedProtectionAdDescription1Bold">il contenuto è completamente protetto.</string>
     <string name="encryptedProtectionAdDescription2">Per i destinatari esterni a Infomaniak sarà necessaria una password.</string>
-    <string name="encryptedProtectionAdDescription2Bold">i destinatari esterni a Infomaniak</string>
+    <string name="encryptedProtectionAdDescription2Bold">i destinatari esterni a Infomaniak.</string>
     <string name="encryptedProtectionAdTitle">Crittografia dei messaggi riservati</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Destinatari con password (%d)</string>
     <string name="encryptedStatePanelEnable">Il tuo messaggio è protetto.</string>
@@ -495,7 +495,7 @@
     <string name="settingsAutoAdvancePreviousThreadDescription">Visualizzazione della discussione precedente quando si archivia o si elimina</string>
     <string name="settingsAutoAdvancePreviousThreadTitle">Discussione precedente</string>
     <string name="settingsAutoAdvanceTitle">Avanzamento automatico</string>
-    <string name="settingsCancellationPeriodDescription">Hai la possibilità di annullare l’invio delle email fino a 30 secondi.</string>
+    <string name="settingsCancellationPeriodDescription">Hai la possibilità di annullare l’invio delle email fino a 30 secondi</string>
     <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>
     <string name="settingsDefault">Predefinito</string>
     <string name="settingsDelaySeconds">%d secondi</string>
@@ -533,7 +533,7 @@
     <string name="settingsSecurityBlockedRecipients">Destinatari bloccati/autorizzati</string>
     <string name="settingsSecuritySpamFilter">Filtro antispam</string>
     <string name="settingsSelectDisplayModeDescription">Seleziona una modalità di visualizzazione</string>
-    <string name="settingsSendAcknowledgement">Richiedi una conferma di ricezione per ogni e-mail inviata.</string>
+    <string name="settingsSendAcknowledgement">Richiedi una conferma di ricezione per ogni e-mail inviata</string>
     <string name="settingsSendIncludeOriginalMessage">Includi il messaggio originale nella risposta</string>
     <string name="settingsSendTitle">Invia</string>
     <string name="settingsSignatureDescription">Seleziona una firma predefinita</string>
@@ -543,7 +543,7 @@
     <string name="settingsSwipeActionReadUnread">Letto / non letto</string>
     <string name="settingsSwipeActionToDefine">Per definire</string>
     <string name="settingsSwipeActionsTitle">Azioni di scorrimento</string>
-    <string name="settingsSwipeDescription">Scorri gli elementi nella tua casella di posta e accedi rapidamente alle azioni più frequenti.</string>
+    <string name="settingsSwipeDescription">Scorri gli elementi nella tua casella di posta e accedi rapidamente alle azioni più frequenti</string>
     <string name="settingsSwipeLeft">Scorrimento del dito a sinistra</string>
     <string name="settingsSwipeRight">Scorrimento del dito a destra</string>
     <string name="settingsThemeDescription">Scelta del tema</string>
@@ -554,7 +554,7 @@
     <string name="settingsThreadModeWarningTitle">Passa alla modalità %s?</string>
     <string name="settingsTitle">Impostazioni</string>
     <string name="settingsTransferAsAttachment">Come allegato</string>
-    <string name="settingsTransferEmailsDescription">Quando si inoltra un’e-mail, scegliere la modalità di visualizzazione più adatta.</string>
+    <string name="settingsTransferEmailsDescription">Quando si inoltra un’e-mail, scegliere la modalità di visualizzazione più adatta</string>
     <string name="settingsTransferEmailsTitle">Trasferimento di e-mail</string>
     <string name="settingsTransferInBody">Nel corpo del messaggio</string>
     <string name="shareEmail">Condividi e-mail</string>

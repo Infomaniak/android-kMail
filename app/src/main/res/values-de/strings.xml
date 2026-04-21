@@ -272,7 +272,7 @@
     <string name="encryptedProtectionAdDescription1">Der Betreff der Nachricht bleibt sichtbar, aber der Inhalt ist vollständig gesichert.</string>
     <string name="encryptedProtectionAdDescription1Bold">der Inhalt ist vollständig gesichert.</string>
     <string name="encryptedProtectionAdDescription2">Für Empfänger ausserhalb von Infomaniak wird ein Passwort benötigt.</string>
-    <string name="encryptedProtectionAdDescription2Bold">Empfänger ausserhalb von Infomaniak</string>
+    <string name="encryptedProtectionAdDescription2Bold">Empfänger ausserhalb von Infomaniak.</string>
     <string name="encryptedProtectionAdTitle">Verschlüsseln Sie Ihre vertraulichen Nachrichten</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Empfänger mit Passwort (%d)</string>
     <string name="encryptedStatePanelEnable">Ihre Nachricht ist geschützt.</string>
@@ -316,7 +316,7 @@
     <string name="errorMoveDestinationNotFound">Der Zielordner besteht nicht</string>
     <string name="errorNewFolderAlreadyExists">Der Ordner besteht bereits</string>
     <string name="errorNewFolderInvalidCharacter">Der Ordnername enthält ungültige Zeichen</string>
-    <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>
+    <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein</string>
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>
     <string name="errorScheduleDelayTooShort">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</string>
