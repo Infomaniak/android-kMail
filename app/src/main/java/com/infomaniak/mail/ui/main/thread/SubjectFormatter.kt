@@ -43,11 +43,11 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
 
     fun generateSubjectContent(
         subjectData: SubjectData,
-        onExternalClicked: (title: Int, description: String) -> Unit,
+        onTagClicked: (title: Int, description: String) -> Unit,
     ): Pair<String, CharSequence> = with(subjectData) {
         val subject = appContext.formatSubject(thread.subject)
 
-        val spannedSubjectWithExternal = handleExternals(subject, onExternalClicked)
+        val spannedSubjectWithExternal = handleExternals(subject, onTagClicked)
         val spannedSubjectWithFolder = handleFolders(spannedSubjectWithExternal)
 
         return subject to spannedSubjectWithFolder
@@ -55,7 +55,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
 
     private fun SubjectData.handleExternals(
         previousContent: String,
-        onExternalClicked: (title: Int, description: String) -> Unit,
+        onTagClicked: (title: Int, description: String) -> Unit,
     ): CharSequence {
         if (!externalMailFlagEnabled) return previousContent
 
@@ -67,12 +67,12 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         return postFixWithExternal(
             previousContent = previousContent,
             tagRes = if (hasOrganisation) R.string.externalTag else R.string.unknownTag,
-            onExternalClicked = {
+            onTagClicked = {
                 val title = if (hasOrganisation) R.string.externalDialogTitleExpeditor else R.string.unknownDialogTitleExpeditor
                 val description = retrieveExternalPopupDescription(externalRecipientQuantity, externalRecipientEmail)
 
                 trackExternalEvent(MatomoName.ThreadTag)
-                onExternalClicked(title, description)
+                onTagClicked(title, description)
             }
         )
     }
@@ -88,12 +88,12 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
     private fun postFixWithExternal(
         previousContent: CharSequence,
         @StringRes tagRes: Int,
-        onExternalClicked: () -> Unit,
+        onTagClicked: () -> Unit,
     ) = appContext.postfixWithTag(
         original = previousContent,
         tagRes = tagRes,
         tagColor = TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground),
-        onClicked = onExternalClicked
+        onClicked = onTagClicked
     )
 
     private fun SubjectData.handleFolders(previousContent: CharSequence): CharSequence {
