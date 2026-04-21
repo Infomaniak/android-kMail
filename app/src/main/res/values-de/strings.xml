@@ -53,8 +53,8 @@
         <item quantity="other">%d E-Mails wurden bereits hinzugefügt</item>
     </plurals>
     <plurals name="addMultipleInvalidEmails">
-        <item quantity="one">%d E-Mails sind ungültig</item>
-        <item quantity="other">%d E-Mail ist ungültig</item>
+        <item quantity="one">%d E-Mail ist ungültig</item>
+        <item quantity="other">%d E-Mails sind ungültig</item>
     </plurals>
     <string name="addUnknownRecipientAlreadyUsed">Die E-Mail wird bereits verwendet</string>
     <string name="addUnknownRecipientInvalidEmail">Die E-Mail ist ungültig</string>
