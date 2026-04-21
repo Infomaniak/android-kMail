@@ -118,7 +118,7 @@ class SearchViewModel @Inject constructor(
         contactsResults,
         threadsSearchResults,
     ) { contacts, threads ->
-        runCatchingRealm { formatSearchList(threads.list, contacts, application, globalCoroutineScope) } .getOrDefault(emptyList())
+        runCatchingRealm { formatSearchList(threads.list, contacts, application, globalCoroutineScope) }.getOrDefault(emptyList())
     }
 
     private val currentMailboxFlow = mailboxController.getMailboxAsync(
@@ -188,38 +188,61 @@ class SearchViewModel @Inject constructor(
         }
         return previousSectionTitle
     }
+
     private fun formatSearchList(
         threads: List<Thread>,
         contacts: List<MergedContact>,
         context: Context,
         scope: CoroutineScope,
-    ) = mutableListOf<ThreadListItem>().apply {
-        when {
-            localSettings.threadDensity == ThreadDensity.COMPACT -> {
-                // Line taken from ThreadListAdapter.formatList() but apparently unnecessary
-                // threadListAdapter.cleanMultiSelectionItems(threads, scope)
-                addAll(threads.map { ThreadListItem.Content(it) })
+    ): List<ThreadListItem> {
+
+        if (localSettings.threadDensity == ThreadDensity.COMPACT) {
+            // Line taken from ThreadListAdapter.formatList() but apparently unnecessary
+            // threadListAdapter.cleanMultiSelectionItems(threads, scope)
+            return threads.map { ThreadListItem.Content(it) }
+        }
+
+        return buildList {
+            var previousSectionTitle = ""
+
+            addContacts(contacts, context, scope) { title ->
+                previousSectionTitle = addSectionTitle(title, previousSectionTitle)
             }
-            else -> {
-                var previousSectionTitle = ""
 
-                contacts.forEach { contact ->
-                    scope.ensureActive()
-                    val sectionTitle = context.getString(R.string.contactsSearch)
-                    previousSectionTitle = addSectionTitle(sectionTitle, previousSectionTitle)
-                    add(ThreadListItem.ContactItem(contact))
-                }
+            if (contacts.isNotEmpty()) add(ThreadListItem.Spacer)
 
-                if (contacts.isNotEmpty()) add(ThreadListItem.Spacer)
-
-                threads.forEach { thread ->
-                    scope.ensureActive()
-                    val sectionTitle = ThreadListUtils.getSectionTitle(thread, context)
-                    previousSectionTitle = addSectionTitle(sectionTitle, previousSectionTitle)
-
-                    add(ThreadListItem.Content(thread))
-                }
+            addThreads(threads, context, scope) { title ->
+                previousSectionTitle = addSectionTitle(title, previousSectionTitle)
             }
+        }
+    }
+
+    private fun MutableList<ThreadListItem>.addContacts(
+        contacts: List<MergedContact>,
+        context: Context,
+        scope: CoroutineScope,
+        updateSection: (String) -> Unit
+    ) {
+        val sectionTitle = context.getString(R.string.contactsSearch)
+
+        contacts.forEach { contact ->
+            scope.ensureActive()
+            updateSection(sectionTitle)
+            add(ThreadListItem.ContactItem(contact))
+        }
+    }
+
+    private fun MutableList<ThreadListItem>.addThreads(
+        threads: List<Thread>,
+        context: Context,
+        scope: CoroutineScope,
+        updateSection: (String) -> Unit
+    ) {
+        threads.forEach { thread ->
+            scope.ensureActive()
+            val sectionTitle = ThreadListUtils.getSectionTitle(thread, context)
+            updateSection(sectionTitle)
+            add(ThreadListItem.Content(thread))
         }
     }
 
