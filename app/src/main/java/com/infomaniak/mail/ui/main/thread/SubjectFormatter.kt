@@ -68,7 +68,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
             previousContent = previousContent,
             tagRes = if (hasOrganisation) R.string.externalTag else R.string.unknownTag,
             onExternalClicked = {
-                val title = if (hasOrganisation) R.string.externalDialogTitleRecipient else R.string.unknownDialogTitleRecipient
+                val title = if (hasOrganisation) R.string.externalDialogTitleExpeditor else R.string.unknownDialogTitleExpeditor
                 val description = retrieveExternalPopupDescription(externalRecipientQuantity, externalRecipientEmail)
 
                 trackExternalEvent(MatomoName.ThreadTag)

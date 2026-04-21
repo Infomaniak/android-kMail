@@ -670,6 +670,7 @@
     <string name="tooManyRecipients">You can’t add this address because you have reached the limit of recipients</string>
     <string name="trashFolder">Trash</string>
     <string name="unblockButton">Unblock</string>
+    <string name="unknownDialogTitleExpeditor">Unknown expeditor</string>
     <string name="unknownDialogTitleRecipient">Unknown recipient</string>
     <string name="unknownRecipientTitle">(unknown)</string>
     <string name="unknownTag">Unknown</string>
