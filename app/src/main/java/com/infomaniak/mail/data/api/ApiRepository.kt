@@ -69,7 +69,6 @@ import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxExternalMailInfo
 import com.infomaniak.mail.data.models.mailbox.MailboxHostingStatus
-import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
@@ -151,10 +150,6 @@ object ApiRepository : ApiRepositoryCore() {
 
     suspend fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
         return callApi(ApiRoutes.mailboxes(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor)
-    }
-
-    suspend fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
-        return callApi(ApiRoutes.manageMailboxes(), POST, mapOf("mail" to mailAddress, "password" to password))
     }
 
     suspend fun isInfomaniakMailboxes(emails: Set<String>): ApiResponse<List<MailboxHostingStatus>> {

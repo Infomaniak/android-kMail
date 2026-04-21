@@ -17,9 +17,9 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.core.network.INFOMANIAK_API_V1
 import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.common.utils.format
+import com.infomaniak.core.network.INFOMANIAK_API_V1
 import com.infomaniak.mail.MAIL_API
 import com.infomaniak.mail.utils.Utils
 import java.net.URLEncoder
@@ -38,10 +38,6 @@ object ApiRoutes {
 
     fun backups(mailboxHostingId: Int, mailboxName: String): String {
         return "${mailboxV1(mailboxHostingId, mailboxName)}/backups"
-    }
-
-    fun requestMailboxPassword(mailboxHostingId: Int, mailboxName: String): String {
-        return "${mailboxV1(mailboxHostingId, mailboxName)}/ask_password"
     }
 
     fun signatures(mailboxHostingId: Int, mailboxName: String): String {
@@ -107,17 +103,6 @@ object ApiRoutes {
         return "${securedProxy()}/1/mail_hostings/mailboxes/exist?mailboxes[]=$encodedEmails"
     }
 
-    fun updateMailboxPassword(mailboxId: Int): String {
-        return "${securedProxy()}/cache/invalidation/profile/workspace/mailbox/$mailboxId/update_password"
-    }
-
-    fun manageMailboxes(): String {
-        return "${securedProxy()}/profile/workspace/mailbox"
-    }
-
-    fun manageMailbox(mailboxId: Int): String {
-        return "${manageMailboxes()}/$mailboxId"
-    }
     //endregion
 
     //region Mailbox
