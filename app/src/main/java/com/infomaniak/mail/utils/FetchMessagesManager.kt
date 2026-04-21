@@ -229,7 +229,8 @@ class FetchMessagesManager @Inject constructor(
 
         val notificationBody = message.getNotificationBody() ?: message.getNotificationPreview(totalUnseenReactionOnLastEmoji)
 
-        val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
+        val sourceSubject = this.subject?.takeIf { message.isReaction } ?: message.subject
+        val subject = appContext.formatSubject(sourceSubject).take(MAX_CHAR_LIMIT)
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces
         val description = "$subject\n$formattedBody".take(MAX_CHAR_LIMIT)
 
