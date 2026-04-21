@@ -24,7 +24,7 @@
 
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>
-    <string name="accentColorSystemTitle">System color</string>
+    <string name="accentColorSystemTitle">System colour</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
     <string name="actionCancelSnooze">Cancel snooze</string>
@@ -486,7 +486,7 @@
     <string name="selectTimeDialogTitle">Select time</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sent messages</string>
-    <string name="settingsAccentColor">Accent color</string>
+    <string name="settingsAccentColor">Accent colour</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
     <string name="settingsAccountManagementTitle">Account management</string>
     <string name="settingsAppLock">App lock</string>
