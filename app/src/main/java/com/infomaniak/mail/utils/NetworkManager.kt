@@ -31,8 +31,6 @@ import javax.inject.Singleton
 
 @Singleton
 class NetworkManager @Inject constructor() {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     /**
      * A StateFlow that emits the current network availability status.
      * It starts collecting immediately and keeps the latest value in memory.
@@ -42,7 +40,7 @@ class NetworkManager @Inject constructor() {
             SentryLog.d("NetworkManager", if (available) "Online" else "Offline")
         }
         .stateIn(
-            scope = scope,
+            scope = CoroutineScope(Dispatchers.Default),
             started = SharingStarted.Eagerly,
             initialValue = true
         )

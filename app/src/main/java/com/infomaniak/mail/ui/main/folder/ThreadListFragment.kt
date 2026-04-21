@@ -41,6 +41,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
@@ -184,7 +185,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             localSettings = localSettings,
         )
 
-        observeNetworkStatus()
+        observeNetworkAndServerStatus()
         observeCurrentThreads()
         observeDownloadState()
         observeFilter()
@@ -553,14 +554,24 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         }
     }
 
-    private fun observeNetworkStatus() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(State.STARTED) {
-                mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
-                    TransitionManager.beginDelayedTransition(binding.root)
-                    binding.noNetwork.isGone = isNetworkAvailable
-                    binding.updatedAt.isGone = !isNetworkAvailable
-                    if (!isNetworkAvailable) updateThreadsVisibility()
+    private fun observeNetworkAndServerStatus() {
+        threadListViewModel.availableService.observe(viewLifecycleOwner) { availableService ->
+            TransitionManager.beginDelayedTransition(binding.root)
+
+            when (availableService) {
+                is AvailableService.DisplayUnavailableService -> {
+                    binding.networkWarning.isGone = false
+                    binding.networkWarning.text = getString(availableService.title)
+
+                    val drawable = getDrawable(binding.root.context, availableService.icon)
+                    binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+
+                    binding.updatedAt.isGone = true
+                    updateThreadsVisibility()
+                }
+                is AvailableService.AllAvailable -> {
+                    binding.networkWarning.isGone = true
+                    binding.updatedAt.isGone = false
                 }
             }
         }

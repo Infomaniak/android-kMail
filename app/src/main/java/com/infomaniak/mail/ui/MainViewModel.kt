@@ -42,6 +42,7 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.ServerStateManager
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
@@ -146,6 +147,7 @@ class MainViewModel @Inject constructor(
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
+    private val serverStateManager: ServerStateManager,
     private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
@@ -269,8 +271,6 @@ class MainViewModel @Inject constructor(
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
     private var currentThreadsLiveJob: Job? = null
-
-    val isNetworkAvailable = networkManager.isNetworkAvailable
     val hasNetwork: Boolean get() = networkManager.hasNetwork
 
     fun reassignCurrentThreadsLive() {
@@ -377,7 +377,7 @@ class MainViewModel @Inject constructor(
 
             // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")
-            with(ApiRepository.getMailboxes()) {
+            with(serverStateManager.getMailboxes()) {
                 if (isSuccess()) {
                     mailboxController.updateMailboxes(data!!)
 
@@ -501,7 +501,7 @@ class MainViewModel @Inject constructor(
 
     private suspend fun updateFolders(mailbox: Mailbox) {
         SentryLog.d(TAG, "Force refresh Folders")
-        ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
+        serverStateManager.getFolders(mailbox.uuid).data?.let { folders ->
             if (!mailboxContentRealm().isClosed()) {
                 folderController.update(mailbox, folders, mailboxContentRealm())
                 expandFoldersWithoutChildren()
