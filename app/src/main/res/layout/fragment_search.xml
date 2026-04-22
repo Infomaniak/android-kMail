@@ -206,6 +206,14 @@
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <View
+        android:id="@+id/dragSeparator"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="#CCCCCC"
+        android:clickable="true"
+        android:visibility="gone"/>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/threadHostFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"

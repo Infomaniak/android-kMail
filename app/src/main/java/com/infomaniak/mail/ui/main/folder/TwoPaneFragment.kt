@@ -17,10 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
@@ -58,6 +61,12 @@ abstract class TwoPaneFragment : Fragment() {
     val mainViewModel: MainViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
+    private var dragStartX = 0f
+    private var dragStartLeftWidth = 0
+    private val separatorWidthPx by lazy {
+        resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
+    }
+
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
     //  between the ThreadList's RecyclerView and its Adapter as it throws an NPE.
@@ -70,6 +79,7 @@ abstract class TwoPaneFragment : Fragment() {
     abstract val substituteClassName: String
     abstract fun getLeftPane(): View?
     abstract fun getRightPane(): FragmentContainerView?
+    abstract fun getDragSeparator(): View?
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
@@ -82,6 +92,7 @@ abstract class TwoPaneFragment : Fragment() {
         observeCurrentFolder()
         observeThreadUid()
         observeThreadNavigation()
+        observeDragSeparator()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -133,6 +144,35 @@ abstract class TwoPaneFragment : Fragment() {
 
         twoPaneViewModel.navArgs.observe(viewLifecycleOwner) { (resId, args) ->
             safelyNavigate(resId, args)
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun observeDragSeparator() {
+        getDragSeparator()?.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    dragStartX = event.rawX
+                    dragStartLeftWidth = getLeftPane()?.width ?: 0
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val deltaX = (event.rawX - dragStartX).toInt()
+                    val parentWidth = (view as ViewGroup).width
+                    val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
+                        (parentWidth * 0.15f).toInt(),
+                        (parentWidth * 0.85f).toInt()
+                    )
+
+                    getLeftPane()?.layoutParams?.width = newLeftWidth
+                    getRightPane()?.layoutParams?.width = parentWidth - newLeftWidth - separatorWidthPx
+                    view?.requestLayout()
+
+                    twoPaneViewModel.setLeftPaneRatio(newLeftWidth.toFloat() / parentWidth)
+                    true
+                }
+                else -> false
+            }
         }
     }
 
@@ -192,14 +232,25 @@ abstract class TwoPaneFragment : Fragment() {
                 rightPane.isVisible = true
             }
         }
+
+        getDragSeparator()?.let { dragSeparator ->
+            if (!isTabletOrFoldable() || rightWidth == 0) {
+                dragSeparator.isGone = true
+            } else {
+                val separatorWidth = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
+                if (dragSeparator.width != separatorWidth) dragSeparator.layoutParams?.width = separatorWidth
+                dragSeparator.isVisible = true
+            }
+        }
     }
 
-    private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
-        val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
-        val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
 
+    private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         return if (isTabletOrFoldable()) {
-            (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
+            val ratio = twoPaneViewModel.leftPaneRatio
+                ?: ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
+            val leftWidth = (ratio * widthPixels).toInt()
+            leftWidth to (widthPixels - leftWidth)
         } else {
             if (isThreadOpen) 0 to widthPixels else widthPixels to 0
         }

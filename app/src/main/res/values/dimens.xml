@@ -20,6 +20,7 @@
     <!-- TwoPane layout -->
     <dimen name="leftPaneWidthRatio">0.4</dimen>
     <dimen name="rightPaneWidthRatio">0.6</dimen>
+    <dimen name="dragSeparatorWidth">4dp</dimen>
 
     <!-- View sizes -->
     <dimen name="accountAvatarSize">110dp</dimen>

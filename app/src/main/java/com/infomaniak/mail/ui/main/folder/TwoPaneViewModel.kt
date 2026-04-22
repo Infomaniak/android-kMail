@@ -51,6 +51,7 @@ class TwoPaneViewModel @Inject constructor(
 
     val currentThreadUid: LiveData<String?> = state.getLiveData(CURRENT_THREAD_UID_KEY)
 
+    val leftPaneRatio: Float? get() = state[LEFT_PANE_RATIO_KEY]
     inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
@@ -68,6 +69,10 @@ class TwoPaneViewModel @Inject constructor(
 
     fun closeThread() {
         state[CURRENT_THREAD_UID_KEY] = null
+    }
+
+    fun setLeftPaneRatio(ratio: Float) {
+        state[LEFT_PANE_RATIO_KEY] = ratio.coerceIn(0.15f, 0.85f)
     }
 
     fun openDraft(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
@@ -120,5 +125,6 @@ class TwoPaneViewModel @Inject constructor(
 
     companion object {
         private const val CURRENT_THREAD_UID_KEY = "currentThreadUidKey"
+        private const val LEFT_PANE_RATIO_KEY = "leftPaneRatioKey"
     }
 }
