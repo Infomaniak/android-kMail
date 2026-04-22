@@ -118,7 +118,6 @@
     <string name="buttonAttachment">Add an attachment</string>
     <string name="buttonAttendees">Attendees</string>
     <string name="buttonBold">Bold</string>
-    <string name="buttonCamera">Take a picture</string>
     <string name="buttonCancelReminder">Cancel reminder</string>
     <string name="buttonClose">Close</string>
     <string name="buttonConfirm">Confirm</string>
@@ -148,7 +147,6 @@
     <string name="buttonRefuse">Refuse</string>
     <string name="buttonReschedule">Reschedule</string>
     <string name="buttonRestoreEmails">Restore emails</string>
-    <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
     <string name="buttonSendWithDifferentAddress">Send with a different address</string>

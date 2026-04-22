@@ -196,7 +196,6 @@ object MatomoMail : Matomo {
         Help("help"),
         ImportEmails("importEmails"),
         ImportFile("importFile"),
-        ImportFromCamera("importFromCamera"),
         InboxFolder("inboxFolder"),
         IncludeOriginalInReply("includeOriginalInReply"),
         Inline("inline"),

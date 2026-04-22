@@ -113,7 +113,6 @@
     <string name="buttonAttachment">Tilføj en vedhæftning</string>
     <string name="buttonAttendees">Deltagere</string>
     <string name="buttonBold">Fed</string>
-    <string name="buttonCamera">Tag et billede</string>
     <string name="buttonCancelReminder">Annuller påmindelse</string>
     <string name="buttonClose">Luk</string>
     <string name="buttonConfirm">Bekræft</string>
@@ -143,7 +142,6 @@
     <string name="buttonRefuse">Afvis</string>
     <string name="buttonReschedule">Omlæg</string>
     <string name="buttonRestoreEmails">Gendan e-mails</string>
-    <string name="buttonSchedule">Planlæg e-mail til senere afsendelse</string>
     <string name="buttonSee">Se</string>
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Send med en anden adresse</string>
