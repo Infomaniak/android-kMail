@@ -855,7 +855,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    suspend fun showSubjectDialog(scheduled : Boolean): Boolean {
+    private suspend fun showSubjectDialog(scheduled: Boolean): Boolean {
         trackNewMessageEvent(MatomoName.SendWithoutSubject)
 
         var isConfirm = false
@@ -879,7 +879,7 @@ class NewMessageFragment : Fragment() {
         return isSendingCanceled.await()
     }
 
-    suspend fun showAttachmentDialog(scheduled : Boolean): Boolean {
+    private suspend fun showAttachmentDialog(scheduled: Boolean): Boolean {
         trackNewMessageEvent(MatomoName.SendWithoutAttachment)
 
         var isConfirm = false
