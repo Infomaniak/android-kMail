@@ -94,6 +94,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -623,8 +624,8 @@ class ThreadViewModel @Inject constructor(
                     val reactionDetail = reactions[emoji]?.computeReactionDetail(
                         emoji = emoji,
                         context = appContext,
-                        mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap(),
-                        isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false,
+                        mergedContactDictionary = avatarMergedContactData.mergedContactFlow.firstOrNull() ?: emptyMap(),
+                        isBimiEnabled = avatarMergedContactData.isBimiEnabledFlow.firstOrNull() ?: false,
                     )
                     if (reactionDetail != null) put(emoji, reactionDetail)
                 }
