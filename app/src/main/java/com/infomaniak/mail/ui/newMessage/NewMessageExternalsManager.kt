@@ -85,7 +85,7 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
         }
     }
 
-    fun setupExternalBanner() = with(binding) {
+    fun setupExternalBanner(hasOrganisation: Boolean) = with(binding) {
         var externalRecipientEmail: String? = null
         var externalRecipientQuantity = 0
 
@@ -95,6 +95,12 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
             externalBanner.isGone = true
         }
 
+        val externalInformationTitle = if (hasOrganisation) {
+            R.string.externalDialogTitleRecipient
+        } else {
+            R.string.unknownDialogTitleRecipient
+        }
+        informationButton.setText(externalInformationTitle)
         informationButton.setOnClickListener {
             trackExternalEvent(MatomoName.BannerInfo)
 
@@ -105,7 +111,7 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
             )
 
             informationDialog.show(
-                title = R.string.externalDialogTitleRecipient,
+                title = externalInformationTitle,
                 description = description,
                 confirmButtonText = R.string.externalDialogConfirmButton,
             )
