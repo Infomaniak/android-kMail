@@ -594,24 +594,6 @@
                                     android:contentDescription="@string/buttonAttachment"
                                     app:icon="@drawable/ic_attachment" />
 
-                                <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/editorCamera"
-                                    style="@style/EditorIconButton"
-                                    android:layout_width="@dimen/newMessageToolbarItemWidth"
-                                    android:layout_height="match_parent"
-                                    android:contentDescription="@string/buttonCamera"
-                                    android:visibility="gone"
-                                    app:icon="@drawable/ic_editor_camera" />
-
-                                <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/editorClock"
-                                    style="@style/EditorIconButton"
-                                    android:layout_width="@dimen/newMessageToolbarItemWidth"
-                                    android:layout_height="match_parent"
-                                    android:contentDescription="@string/buttonSchedule"
-                                    android:visibility="gone"
-                                    app:icon="@drawable/ic_editor_clock" />
-
                                 <FrameLayout
                                     android:id="@+id/editorAi"
                                     android:layout_width="@dimen/newMessageToolbarItemWidth"

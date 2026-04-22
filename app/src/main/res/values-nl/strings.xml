@@ -113,7 +113,6 @@
     <string name="buttonAttachment">Een bijlage toevoegen</string>
     <string name="buttonAttendees">Deelnemers</string>
     <string name="buttonBold">Vet</string>
-    <string name="buttonCamera">Een foto maken</string>
     <string name="buttonCancelReminder">Herinnering annuleren</string>
     <string name="buttonClose">Sluiten</string>
     <string name="buttonConfirm">Bevestigen</string>
@@ -143,7 +142,6 @@
     <string name="buttonRefuse">Weigeren</string>
     <string name="buttonReschedule">Herschikken</string>
     <string name="buttonRestoreEmails">E-mails herstellen</string>
-    <string name="buttonSchedule">E-mail plannen om later te versturen</string>
     <string name="buttonSee">Bekijken</string>
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Versturen met een ander adres</string>

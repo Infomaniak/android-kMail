@@ -69,7 +69,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
-                EditorAction.CAMERA -> fragment.notYetImplemented()
                 EditorAction.LINK -> if (buttonLink.isActivated) {
                     editorWebView.unlink()
                 } else {
@@ -97,7 +96,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         }
 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
-        linkEditor(editorCamera, EditorAction.CAMERA)
         linkEditor(editorAi, EditorAction.AI)
         linkEditor(encryptionLockButtonView.encryptionButton, EditorAction.ENCRYPTION)
 
@@ -151,7 +149,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
 
     enum class EditorAction(val matomoName: MatomoName) {
         ATTACHMENT(MatomoName.ImportFile),
-        CAMERA(MatomoName.ImportFromCamera),
         LINK(MatomoName.AddLink),
         AI(MatomoName.AiWriter),
         BOLD(MatomoName.Bold),

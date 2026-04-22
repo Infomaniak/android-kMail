@@ -113,7 +113,6 @@
     <string name="buttonAttachment">Lisää liite</string>
     <string name="buttonAttendees">Osallistujat</string>
     <string name="buttonBold">Lihavoitu</string>
-    <string name="buttonCamera">Ota valokuva</string>
     <string name="buttonCancelReminder">Peruuta muistutus</string>
     <string name="buttonClose">Sulje</string>
     <string name="buttonConfirm">Vahvista</string>
@@ -143,7 +142,6 @@
     <string name="buttonRefuse">Hylkää</string>
     <string name="buttonReschedule">Aikatauluta uudelleen</string>
     <string name="buttonRestoreEmails">Palauta sähköpostit</string>
-    <string name="buttonSchedule">Ajasta sähköpostin lähetys</string>
     <string name="buttonSee">Katso</string>
     <string name="buttonSelectAll">Kaikki</string>
     <string name="buttonSendWithDifferentAddress">Lähetä toisella osoitteella</string>

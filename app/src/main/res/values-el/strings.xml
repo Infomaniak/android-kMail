@@ -113,7 +113,6 @@
     <string name="buttonAttachment">Προσθήκη συνημμένου</string>
     <string name="buttonAttendees">Συμμετέχοντες</string>
     <string name="buttonBold">Έντονα</string>
-    <string name="buttonCamera">Λήψη φωτογραφίας</string>
     <string name="buttonCancelReminder">Ακύρωση υπενθύμισης</string>
     <string name="buttonClose">Κλείσιμο</string>
     <string name="buttonConfirm">Επιβεβαίωση</string>
@@ -143,7 +142,6 @@
     <string name="buttonRefuse">Απόρριψη</string>
     <string name="buttonReschedule">Επαναπρογραμματισμός</string>
     <string name="buttonRestoreEmails">Επαναφορά e-mail</string>
-    <string name="buttonSchedule">Προγραμματισμός αποστολής e-mail</string>
     <string name="buttonSee">Προβολή</string>
     <string name="buttonSelectAll">Όλα</string>
     <string name="buttonSendWithDifferentAddress">Αποστολή με διαφορετική διεύθυνση</string>

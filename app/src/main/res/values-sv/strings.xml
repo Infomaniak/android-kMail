@@ -113,7 +113,6 @@
     <string name="buttonAttachment">Lägg till en bilaga</string>
     <string name="buttonAttendees">Deltagare</string>
     <string name="buttonBold">Fet</string>
-    <string name="buttonCamera">Ta ett foto</string>
     <string name="buttonCancelReminder">Avbryt påminnelse</string>
     <string name="buttonClose">Stäng</string>
     <string name="buttonConfirm">Bekräfta</string>
@@ -143,7 +142,6 @@
     <string name="buttonRefuse">Avböj</string>
     <string name="buttonReschedule">Schemalägg om</string>
     <string name="buttonRestoreEmails">Återställ e-post</string>
-    <string name="buttonSchedule">Schemalägg e-post för att skicka senare</string>
     <string name="buttonSee">Se</string>
     <string name="buttonSelectAll">Alla</string>
     <string name="buttonSendWithDifferentAddress">Skicka med en annan adress</string>

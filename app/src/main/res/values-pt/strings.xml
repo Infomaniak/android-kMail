@@ -113,7 +113,6 @@
     <string name="buttonAttachment">Adicionar um anexo</string>
     <string name="buttonAttendees">Participantes</string>
     <string name="buttonBold">Negrito</string>
-    <string name="buttonCamera">Tirar uma foto</string>
     <string name="buttonCancelReminder">Cancelar lembrete</string>
     <string name="buttonClose">Fechar</string>
     <string name="buttonConfirm">Confirmar</string>
@@ -143,7 +142,6 @@
     <string name="buttonRefuse">Recusar</string>
     <string name="buttonReschedule">Reagendar</string>
     <string name="buttonRestoreEmails">Restaurar e-mails</string>
-    <string name="buttonSchedule">Programar envio do e-mail</string>
     <string name="buttonSee">Ver</string>
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonSendWithDifferentAddress">Enviar com outro endereço</string>
