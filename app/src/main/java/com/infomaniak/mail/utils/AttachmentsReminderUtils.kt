@@ -20,15 +20,15 @@ package com.infomaniak.mail.utils
 object AttachmentsReminderUtils {
     private val frAttachmentsReminderRegex = listOf(
         "voir pi[eèé]ces? jointes?",
-        "voir fichiers? joints?",
-        "voir fichiers? associ[eèé]s?",
+        "fichiers? joints?",
+        "fichiers? associ[eèé]s?",
         "jointe?s? [aà] cet e-mail",
         "jointe?s? [aà] ce message",
         "je ((te|vous) )?joins",
         "j'ai joint",
         "ci(-| )joint",
-        "cf\\.?\\s*(pj|pi[eèé]ces? jointes?)",
-        "pi[eèé]ces? jointes?",
+        "cf\\.?\\s*(?:p\\.?j\\.?|pi[eèé]ces? jointes?)",
+        "pi[eèé]ces?(-|\\s)jointes?",
         "fichiers? joints?",
         "voir le fichier joint",
         "voir les fichiers joints",
@@ -62,7 +62,7 @@ object AttachmentsReminderUtils {
 
     private val deAttachmentsReminderRegex = listOf(
         "siehe Anhang",
-        "angeh\u00e4ngt",
+        "\\bangeh\u00e4ngt\\b",
         "hinzugef\u00fcgt",
         "Anhang hinzuf\u00fcgen",
         "Anhang anbei",
@@ -81,7 +81,8 @@ object AttachmentsReminderUtils {
     ).joinToString("|")
 
     private val esAttachmentsReminderRegex = listOf(
-        "ver (el\\s)?(archivo\\s)?(adjunto|incluido)",
+        "el archivo (adjunto|incluido)",
+        "los archivos (adjuntos|incluidos)",
         "se ha adjuntado",
         "adjuntados?",
         "se ha adjuntado a este (correo|mensaje)",
@@ -97,7 +98,7 @@ object AttachmentsReminderUtils {
         "a\u00f1adido adjunto",
         "adjunto a este correo",
         "en el adjunto",
-        "[^\\w]adjunto[^\\w]"
+        "[^\\w]adjunto?s?[^\\w]"
     ).joinToString("|")
 
     private val itAttachmentsReminderRegex = listOf(
@@ -271,9 +272,9 @@ object AttachmentsReminderUtils {
         ptAttachmentsReminderRegex,
         svAttachmentsReminderRegex,
     ).joinToString("|")
+
     private val pattern = Regex(fullRegex, RegexOption.IGNORE_CASE)
-    fun hasAttachmentKeyword(text: String): Boolean {
-        return pattern.containsMatchIn(text)
-    }
+
+    fun hasAttachmentKeyword(text: String): Boolean = pattern.containsMatchIn(text)
 }
 
