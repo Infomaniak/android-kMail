@@ -281,13 +281,20 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
+    <FrameLayout
         android:id="@+id/dragSeparator"
-        android:layout_width="10dp"
+        android:layout_width="48dp"
         android:layout_height="match_parent"
-        android:background="#CCCCCC"
         android:clickable="true"
-        android:visibility="gone"/>
+        android:focusable="true"
+        android:visibility="gone">
+        <View
+            android:id="@+id/dragSeparatorHandle"
+            android:layout_width="4dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:background="@drawable/item_vertical_drag_handle" />
+    </FrameLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/threadHostFragment"

@@ -19,9 +19,12 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
+import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -150,13 +153,19 @@ abstract class TwoPaneFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     private fun observeDragSeparator() {
         getDragSeparator()?.setOnTouchListener { _, event ->
+            val dragHandleVisual = ((view as? ViewGroup)?.getChildAt(1) as? ViewGroup)?.getChildAt(0)
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     dragStartX = event.rawX
                     dragStartLeftWidth = getLeftPane()?.width ?: 0
+
+                    dragHandleVisual?.alpha = 0.5f
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
+
+
+
                     val deltaX = (event.rawX - dragStartX).toInt()
                     val parentWidth = (view as ViewGroup).width
                     val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
@@ -169,6 +178,11 @@ abstract class TwoPaneFragment : Fragment() {
                     view?.requestLayout()
 
                     twoPaneViewModel.setLeftPaneRatio(newLeftWidth.toFloat() / parentWidth)
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    dragHandleVisual?.alpha = 1.0f
+
                     true
                 }
                 else -> false
@@ -237,7 +251,7 @@ abstract class TwoPaneFragment : Fragment() {
             if (!isTabletOrFoldable() || rightWidth == 0) {
                 dragSeparator.isGone = true
             } else {
-                val separatorWidth = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
+                val separatorWidth = resources.getDimensionPixelSize(R.dimen.dragSeparatorTouchWidth)
                 if (dragSeparator.width != separatorWidth) dragSeparator.layoutParams?.width = separatorWidth
                 dragSeparator.isVisible = true
             }

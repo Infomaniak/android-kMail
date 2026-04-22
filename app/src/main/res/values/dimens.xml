@@ -21,6 +21,7 @@
     <dimen name="leftPaneWidthRatio">0.4</dimen>
     <dimen name="rightPaneWidthRatio">0.6</dimen>
     <dimen name="dragSeparatorWidth">4dp</dimen>
+    <dimen name="dragSeparatorTouchWidth">16dp</dimen>
 
     <!-- View sizes -->
     <dimen name="accountAvatarSize">110dp</dimen>

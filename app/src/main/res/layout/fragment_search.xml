@@ -206,13 +206,19 @@
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <View
+    <FrameLayout
         android:id="@+id/dragSeparator"
-        android:layout_width="10dp"
+        android:layout_width="@dimen/dragSeparatorTouchWidth"
         android:layout_height="match_parent"
-        android:background="#CCCCCC"
         android:clickable="true"
-        android:visibility="gone"/>
+        android:visibility="gone">
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="#CCCCCC" />
+    </FrameLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/threadHostFragment"
