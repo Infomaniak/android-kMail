@@ -175,7 +175,8 @@ class NotificationUtils @Inject constructor(
     suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
-        payload: NotificationPayload, contacts: MergedContactDictionary
+        payload: NotificationPayload,
+        contacts: MergedContactDictionary
     ): Boolean = with(payload) {
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)

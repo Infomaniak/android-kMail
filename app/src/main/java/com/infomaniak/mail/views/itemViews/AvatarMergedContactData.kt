@@ -21,7 +21,6 @@ import androidx.lifecycle.asLiveData
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils
@@ -54,15 +53,21 @@ class AvatarMergedContactData @Inject constructor(
         .filterNotNull()
         .distinctUntilChanged()
 
-    val isBimiEnabledFlow: Flow<Boolean> =  mailboxController
+    val isBimiEnabledFlow: Flow<Boolean> = mailboxController
         .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-        .mapLatest { liveMailbox ->
-            liveMailbox.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false
-        }
+        .mapLatest { liveMailbox -> liveMailbox.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false }
         .distinctUntilChanged()
 
-    @Deprecated(message = "Use Kotlin Flow instead of LiveData", replaceWith = ReplaceWith(expression = "mergedContactFlow", imports = ["kotlinx.coroutines.flow.Flow"]), level = DeprecationLevel.WARNING)
+    @Deprecated(
+        message = "Use Kotlin Flow instead of LiveData",
+        replaceWith = ReplaceWith(expression = "mergedContactFlow", imports = ["kotlinx.coroutines.flow.Flow"]),
+        level = DeprecationLevel.WARNING
+    )
     val mergedContactLiveData = mergedContactFlow.asLiveData(ioCoroutineContext)
-    @Deprecated(message = "Use Kotlin Flow instead of LiveData", replaceWith = ReplaceWith(expression = "isBimiEnabledFlow", imports = ["kotlinx.coroutines.flow.Flow"]), level = DeprecationLevel.WARNING)
+    @Deprecated(
+        message = "Use Kotlin Flow instead of LiveData",
+        replaceWith = ReplaceWith(expression = "isBimiEnabledFlow", imports = ["kotlinx.coroutines.flow.Flow"]),
+        level = DeprecationLevel.WARNING
+    )
     val isBimiEnabledLiveData = isBimiEnabledFlow.asLiveData(ioCoroutineContext)
 }
