@@ -453,8 +453,11 @@ class NewMessageFragment : Fragment() {
 
         initEditorUi()
 
-        viewLifecycleOwner.lifecycleScope.launch { setupSendButtons() }
-        externalsManager.setupExternalBanner()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val mailbox = newMessageViewModel.currentMailbox()
+            setupSendButtons(mailbox)
+            externalsManager.setupExternalBanner(hasOrganisation = mailbox.kSuite is KSuite.Pro)
+        }
 
         scrim.setOnClickListener {
             scrim.isClickable = false
@@ -815,10 +818,7 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.deleteAttachment(position)
     }
 
-    private suspend fun setupSendButtons() = with(binding) {
-
-        val mailbox = newMessageViewModel.currentMailbox()
-
+    private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
             scheduleButton.isEnabled = it
             sendButton.isEnabled = it

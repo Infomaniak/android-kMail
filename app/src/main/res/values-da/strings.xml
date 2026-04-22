@@ -665,7 +665,10 @@
     <string name="tooManyRecipients">Du kan ikke tilføje denne adresse, fordi du har nået grænsen for modtagere</string>
     <string name="trashFolder">Papirkurv</string>
     <string name="unblockButton">Fjern blokering</string>
+    <string name="unknownDialogTitleExpeditor">Ukendt afsender</string>
+    <string name="unknownDialogTitleRecipient">Ukendt modtager</string>
     <string name="unknownRecipientTitle">(ukendt)</string>
+    <string name="unknownTag">Ukendt</string>
     <string name="unsubscribeButtonTitle">Afmeld</string>
     <string name="urlEntryTitle">Opret et hyperlink</string>
     <string name="urlPlaceholder">URL</string>

@@ -38,6 +38,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.work.Data
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.views.DividerItemDecorator
@@ -617,18 +618,19 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeSubjectUpdateTriggers() = with(binding) {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
-
+            val mailbox = result.mailbox ?: return@observe
             val (subjectWithoutTags, subjectWithTags) = subjectFormatter.generateSubjectContent(
                 subjectData = SubjectData(
                     thread = result.thread ?: return@observe,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
-                    aliases = result.mailbox?.aliases ?: emptyList(),
-                    externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
-                    trustedDomains = result.mailbox?.trustedDomains ?: emptyList(),
+                    aliases = mailbox.aliases,
+                    hasOrganisation = mailbox.kSuite is KSuite.Pro,
+                    externalMailFlagEnabled = mailbox.externalMailFlagEnabled,
+                    trustedDomains = mailbox.trustedDomains,
                 ),
-            ) { description ->
+            ) { title, description ->
                 informationDialog.show(
-                    title = R.string.externalDialogTitleExpeditor,
+                    title = title,
                     description = description,
                     confirmButtonText = R.string.externalDialogConfirmButton,
                 )

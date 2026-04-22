@@ -665,7 +665,10 @@
     <string name="tooManyRecipients">Du kan inte lägga till denna adress eftersom du har nått gränsen för mottagare</string>
     <string name="trashFolder">Papperskorg</string>
     <string name="unblockButton">Avblockera</string>
+    <string name="unknownDialogTitleExpeditor">Okänd avsändare</string>
+    <string name="unknownDialogTitleRecipient">Okänd mottagare</string>
     <string name="unknownRecipientTitle">(okänd)</string>
+    <string name="unknownTag">Okänd</string>
     <string name="unsubscribeButtonTitle">Avregistrera</string>
     <string name="urlEntryTitle">Skapa en hyperlänk</string>
     <string name="urlPlaceholder">URL</string>

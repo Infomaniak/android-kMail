@@ -23,6 +23,7 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils.TruncateAt
 import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
@@ -42,11 +43,11 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
 
     fun generateSubjectContent(
         subjectData: SubjectData,
-        onExternalClicked: (String) -> Unit,
+        onTagClicked: (title: Int, description: String) -> Unit,
     ): Pair<String, CharSequence> = with(subjectData) {
         val subject = appContext.formatSubject(thread.subject)
 
-        val spannedSubjectWithExternal = handleExternals(subject, onExternalClicked)
+        val spannedSubjectWithExternal = handleExternals(subject, onTagClicked)
         val spannedSubjectWithFolder = handleFolders(spannedSubjectWithExternal)
 
         return subject to spannedSubjectWithFolder
@@ -54,7 +55,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
 
     private fun SubjectData.handleExternals(
         previousContent: String,
-        onExternalClicked: (String) -> Unit,
+        onTagClicked: (title: Int, description: String) -> Unit,
     ): CharSequence {
         if (!externalMailFlagEnabled) return previousContent
 
@@ -63,28 +64,37 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         )
         if (externalRecipientQuantity == 0) return previousContent
 
-        return postFixWithExternal(previousContent, externalRecipientQuantity, externalRecipientEmail, onExternalClicked)
+        return postFixWithExternal(
+            previousContent = previousContent,
+            tagRes = if (hasOrganisation) R.string.externalTag else R.string.unknownTag,
+            onTagClicked = {
+                val title = if (hasOrganisation) R.string.externalDialogTitleExpeditor else R.string.unknownDialogTitleExpeditor
+                val description = retrieveExternalPopupDescription(externalRecipientQuantity, externalRecipientEmail)
+
+                trackExternalEvent(MatomoName.ThreadTag)
+                onTagClicked(title, description)
+            }
+        )
     }
 
-    private fun postFixWithExternal(
-        previousContent: CharSequence,
-        externalRecipientQuantity: Int,
-        externalRecipientEmail: String?,
-        onExternalClicked: (String) -> Unit,
-    ) = appContext.postfixWithTag(
-        previousContent,
-        R.string.externalTag,
-        TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground),
-    ) {
-        trackExternalEvent(MatomoName.ThreadTag)
-
-        val description = appContext.resources.getQuantityString(
+    private fun retrieveExternalPopupDescription(externalRecipientQuantity: Int, externalRecipientEmail: String?): String {
+        return appContext.resources.getQuantityString(
             R.plurals.externalDialogDescriptionExpeditor,
             externalRecipientQuantity,
             externalRecipientEmail,
         )
-        onExternalClicked(description)
     }
+
+    private fun postFixWithExternal(
+        previousContent: CharSequence,
+        @StringRes tagRes: Int,
+        onTagClicked: () -> Unit,
+    ) = appContext.postfixWithTag(
+        original = previousContent,
+        tagRes = tagRes,
+        tagColor = TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground),
+        onClicked = onTagClicked
+    )
 
     private fun SubjectData.handleFolders(previousContent: CharSequence): CharSequence {
         val folderName = getFolderName(thread)
@@ -140,6 +150,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         val thread: Thread,
         val emailDictionary: MergedContactDictionary,
         val aliases: List<String>,
+        val hasOrganisation: Boolean,
         val externalMailFlagEnabled: Boolean,
         val trustedDomains: List<String>,
     )

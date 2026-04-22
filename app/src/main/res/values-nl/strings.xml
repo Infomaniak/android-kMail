@@ -665,7 +665,10 @@
     <string name="tooManyRecipients">U kunt dit adres niet toevoegen omdat u de limiet van ontvangers heeft bereikt</string>
     <string name="trashFolder">Prullenbak</string>
     <string name="unblockButton">Deblokkeren</string>
+    <string name="unknownDialogTitleExpeditor">Onbekende afzender</string>
+    <string name="unknownDialogTitleRecipient">Onbekende ontvanger</string>
     <string name="unknownRecipientTitle">(onbekend)</string>
+    <string name="unknownTag">Onbekend</string>
     <string name="unsubscribeButtonTitle">Afmelden</string>
     <string name="urlEntryTitle">Een hyperlink maken</string>
     <string name="urlPlaceholder">URL</string>

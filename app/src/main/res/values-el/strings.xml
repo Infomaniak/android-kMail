@@ -665,7 +665,10 @@
     <string name="tooManyRecipients">Δεν μπορείτε να προσθέσετε αυτή τη διεύθυνση γιατί έχετε φτάσει το όριο παραληπτών</string>
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
+    <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>
+    <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>
+    <string name="unknownTag">Άγνωστο</string>
     <string name="unsubscribeButtonTitle">Κατάργηση εγγραφής</string>
     <string name="urlEntryTitle">Δημιουργία υπερσύνδεσμου</string>
     <string name="urlPlaceholder">URL</string>
