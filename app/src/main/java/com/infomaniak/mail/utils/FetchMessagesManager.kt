@@ -255,7 +255,7 @@ class FetchMessagesManager @Inject constructor(
                 payloadTitle = message.sender?.displayedName(appContext),
                 payloadContent = subject,
                 payloadDescription = description,
-                bimi = message.bimi,
+                bimi = message.bimi?.copyFromRealm(),
                 isBimiEnabled = isBimiEnabled,
             ),
             contacts = mergedContacts,

@@ -138,7 +138,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         notificationJobsBus.unregister(payload.notificationId)
 
         globalCoroutineScope.launch {
-            val mergedContacts = avatarMergedContactData.mergedContactFlow.first()
+            val mergedContacts = avatarMergedContactData.mergedContactFlow.firstOrNull() ?: emptyMap()
 
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
