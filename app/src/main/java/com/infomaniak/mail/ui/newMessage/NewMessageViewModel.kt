@@ -267,9 +267,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun shouldShowAttachmentReminder(uiBodyValue: String): Boolean {
         val hasAttachments = attachmentsLiveData.valueOrEmpty().isNotEmpty()
-        val plainText = jsoupParseWithLog(uiBodyValue).text()
-
-        return AttachmentReminderUtils.hasAttachmentKeyword(plainText) && !hasAttachments
+        return !hasAttachments && AttachmentReminderUtils.hasAttachmentKeyword(uiBodyValue)
     }
 
     // ------------- !IMPORTANT! -------------
