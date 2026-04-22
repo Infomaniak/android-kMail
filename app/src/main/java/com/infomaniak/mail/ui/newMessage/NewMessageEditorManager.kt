@@ -66,9 +66,10 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         _openFilePicker = openFilePicker
     }
 
-    private fun extractUrl(url: String): String {
-        val matcher = Patterns.WEB_URL.matcher(url)
-        return if (url.isNotBlank() && matcher.find()) matcher.group() else ""
+    private fun extractUrl(text: String): String {
+        val trimmedText = text.trim()
+        val matcher = Patterns.WEB_URL.matcher(trimmedText)
+        return if (text.isNotBlank() && matcher.matches()) trimmedText else ""
     }
 
     fun observeEditorFormatActions() = with(binding) {
