@@ -17,9 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
-object AttachmentReminderUtils {
-
-    private val FR_ATTACHMENTS_REMINDER_REGEX = listOf(
+object AttachmentsReminderUtils {
+    private val frAttachmentsReminderRegex = listOf(
         "voir pi[eèé]ces? jointes?",
         "voir fichiers? joints?",
         "voir fichiers? associ[eèé]s?",
@@ -41,7 +40,7 @@ object AttachmentReminderUtils {
         "[^\\w]jointe?s?[^\\w]"
     ).joinToString("|")
 
-    private val EN_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val enAttachmentsReminderRegex = listOf(
         "see (the\\s)?attach(ed|ments?)",
         "see included",
         "is attached",
@@ -61,7 +60,7 @@ object AttachmentReminderUtils {
         "[^\\w]attached[^\\w]"
     ).joinToString("|")
 
-    private val DE_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val deAttachmentsReminderRegex = listOf(
         "siehe Anhang",
         "angeh\u00e4ngt",
         "hinzugef\u00fcgt",
@@ -81,7 +80,7 @@ object AttachmentReminderUtils {
         "[^\\w]siehe Anlagen?[^\\w]"
     ).joinToString("|")
 
-    private val ES_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val esAttachmentsReminderRegex = listOf(
         "ver (el\\s)?(archivo\\s)?(adjunto|incluido)",
         "se ha adjuntado",
         "adjuntados?",
@@ -101,7 +100,7 @@ object AttachmentReminderUtils {
         "[^\\w]adjunto[^\\w]"
     ).joinToString("|")
 
-    private val IT_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val itAttachmentsReminderRegex = listOf(
         "(vedi\\s)?(in\\s)?allegat(o|i)",
         "vedi accluso",
         "\u00e8 allegato",
@@ -123,7 +122,7 @@ object AttachmentReminderUtils {
     ).joinToString("|")
 
 
-    private val DA_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val daAttachmentsReminderRegex = listOf(
         "se vedhæftet",
         "vedhæftet fil",
         "vedhæftede filer",
@@ -139,7 +138,7 @@ object AttachmentReminderUtils {
         "[^\\w]vedhæftet[^\\w]"
     ).joinToString("|")
 
-    private val NL_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val nlAttachmentsReminderRegex = listOf(
         "zie bijlage",
         "bijgevoegd",
         "in de bijlage",
@@ -157,7 +156,7 @@ object AttachmentReminderUtils {
         "[^\\w]bijlage[^\\w]"
     ).joinToString("|")
 
-    private val FI_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val fiAttachmentsReminderRegex = listOf(
         "katso liite",
         "liitteenä",
         "liitetty",
@@ -174,7 +173,7 @@ object AttachmentReminderUtils {
         "[^\\w]liite[^\\w]"
     ).joinToString("|")
 
-    private val EL_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val elAttachmentsReminderRegex = listOf(
         "δείτε συνημμένο",
         "συνημμένα αρχεία",
         "επισυνάπτεται",
@@ -188,7 +187,7 @@ object AttachmentReminderUtils {
         "[^\\w]συνημμέν[^\\w]"
     ).joinToString("|")
 
-    private val NB_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val nbAttachmentsReminderRegex = listOf(
         "se vedlegg",
         "vedlagt fil",
         "vedlagte filer",
@@ -204,7 +203,7 @@ object AttachmentReminderUtils {
         "[^\\w]vedlagt[^\\w]"
     ).joinToString("|")
 
-    private val PL_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val plAttachmentsReminderRegex = listOf(
         "zobacz załącznik",
         "załączone pliki",
         "załącznik do tego maila",
@@ -223,7 +222,7 @@ object AttachmentReminderUtils {
         "[^\\w]załącznik[^\\w]"
     ).joinToString("|")
 
-    private val PT_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val ptAttachmentsReminderRegex = listOf(
         "ver anexo",
         "ver anexos",
         "segue anexo",
@@ -240,7 +239,7 @@ object AttachmentReminderUtils {
         "[^\\w]anexo[^\\w]"
     ).joinToString("|")
 
-    private val SV_ATTACHMENTS_REMINDER_REGEX = listOf(
+    private val svAttachmentsReminderRegex = listOf(
         "se bifogad fil",
         "bifogade filer",
         "jag bifogar",
@@ -258,19 +257,19 @@ object AttachmentReminderUtils {
     ).joinToString("|")
 
     private val fullRegex = listOf(
-        FR_ATTACHMENTS_REMINDER_REGEX,
-        EN_ATTACHMENTS_REMINDER_REGEX,
-        DE_ATTACHMENTS_REMINDER_REGEX,
-        ES_ATTACHMENTS_REMINDER_REGEX,
-        IT_ATTACHMENTS_REMINDER_REGEX,
-        DA_ATTACHMENTS_REMINDER_REGEX,
-        NL_ATTACHMENTS_REMINDER_REGEX,
-        FI_ATTACHMENTS_REMINDER_REGEX,
-        EL_ATTACHMENTS_REMINDER_REGEX,
-        NB_ATTACHMENTS_REMINDER_REGEX,
-        PL_ATTACHMENTS_REMINDER_REGEX,
-        PT_ATTACHMENTS_REMINDER_REGEX,
-        SV_ATTACHMENTS_REMINDER_REGEX,
+        frAttachmentsReminderRegex,
+        enAttachmentsReminderRegex,
+        deAttachmentsReminderRegex,
+        esAttachmentsReminderRegex,
+        itAttachmentsReminderRegex,
+        daAttachmentsReminderRegex,
+        nlAttachmentsReminderRegex,
+        fiAttachmentsReminderRegex,
+        elAttachmentsReminderRegex,
+        nbAttachmentsReminderRegex,
+        plAttachmentsReminderRegex,
+        ptAttachmentsReminderRegex,
+        svAttachmentsReminderRegex,
     ).joinToString("|")
     private val pattern = Regex(fullRegex, RegexOption.IGNORE_CASE)
     fun hasAttachmentKeyword(text: String): Boolean {

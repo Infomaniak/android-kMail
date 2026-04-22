@@ -232,11 +232,11 @@ class NewMessageAiManager @Inject constructor(
     private suspend fun calculateAiPropositionData() {
         val isSubjectBlank = fragment.isSubjectBlank()
 
-        val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"").isBlank()
+        val isBodyBlank = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"").isBlank()
         fragment.safeNavigate(
             NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
                 isSubjectBlank = isSubjectBlank,
-                isBodyBlank = body,
+                isBodyBlank = isBodyBlank,
             ),
         )
     }
