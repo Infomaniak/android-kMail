@@ -117,19 +117,15 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         logoutUser(user = AccountUtils.currentUser!!)
     }
 
-    private fun observeAccounts() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                switchUserViewModel.accounts.collect { accountsList ->
-                    binding.root.title = requireContext().resources.getQuantityString(
-                        R.plurals.titleMyAccount,
-                        accountsList.size,
-                        accountsList.size,
-                    )
-                    accountsAdapter.initializeAccounts(accountsList)
-                }
-            }
-        }
+    private fun observeAccounts() = viewLifecycleOwner.lifecycleScope.launch {
+        val accountsList = switchUserViewModel.accounts.first()
+
+        binding.root.title = requireContext().resources.getQuantityString(
+            R.plurals.titleMyAccount,
+            accountsList.size,
+            accountsList.size,
+        )
+        accountsAdapter.initializeAccounts(accountsList)
     }
 
     private fun showEasterEggHalloween() = lifecycleScope.launch {

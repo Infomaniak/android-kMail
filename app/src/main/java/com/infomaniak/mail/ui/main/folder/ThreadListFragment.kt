@@ -460,9 +460,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         @SuppressLint("ClickableViewAccessibility")
         userAvatar.setOnTouchListener { view, event ->
             val isHandled = gestureDetector.onTouchEvent(event)
-            if (!isHandled && event.action == MotionEvent.ACTION_UP) {
-                view.performClick()
-            }
+            if (!isHandled && event.action == MotionEvent.ACTION_UP) view.performClick()
             isHandled
         }
 
@@ -522,12 +520,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                 return true
             }
 
-            override fun onFling(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 if (e1 == null) return false
 
                 val diffY = e2.y - e1.y
@@ -572,19 +565,12 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun handleAccountSwipe(isSwipeDown: Boolean) = lifecycleScope.launch {
         val accounts = switchUserViewModel.accounts.first()
-        if (accounts.isEmpty()) {
-            return@launch
-        }
-
+        if (accounts.isEmpty()) return@launch
+        
         val currentIndex = accounts.indexOfFirst { it.id == AccountUtils.currentUserId }
         if (currentIndex == -1) return@launch
 
-        val nextIndex = if (isSwipeDown) {
-            (currentIndex - 1).mod(accounts.size)
-        } else {
-            (currentIndex + 1).mod(accounts.size)
-        }
-
+        val nextIndex = (currentIndex + if (isSwipeDown) -1 else 1).mod(accounts.size)
         switchUserViewModel.switchAccount(accounts[nextIndex])
     }
 
