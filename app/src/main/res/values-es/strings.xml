@@ -640,7 +640,7 @@
         <item quantity="other">Borrar %d conversaciones</item>
     </plurals>
     <string name="threadListEmptyFolderAlertDescription">¿Estás seguro de que quieres borrar definitivamente todos los mensajes de esta carpeta?</string>
-    <string name="threadListEmptySpamButton">Spam vacío</string>
+    <string name="threadListEmptySpamButton">Vaciar spam</string>
     <string name="threadListEmptyTrashButton">Vaciar la papelera</string>
     <string name="threadListHeaderLastUpdate">Actualizado %s</string>
     <string name="threadListHeaderLastUpdateNow">ahora</string>
