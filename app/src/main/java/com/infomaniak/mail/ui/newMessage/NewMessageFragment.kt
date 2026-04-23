@@ -557,6 +557,7 @@ class NewMessageFragment : Fragment() {
 
     private fun setupShowQuotesButton() {
         binding.showQuotesButton.setOnClickListener {
+            trackNewMessageEvent(MatomoName.ShowQuote)
             newMessageViewModel.setQuotesButtonVisibility(isVisible = false)
             newMessageViewModel.includeQuotes()
         }
