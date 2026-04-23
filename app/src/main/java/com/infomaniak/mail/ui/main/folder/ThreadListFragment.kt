@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -45,6 +46,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -54,7 +56,6 @@ import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
@@ -111,6 +112,7 @@ import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -455,9 +457,13 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
         val gestureDetector = setupGestureDetector(userAvatar.context)
 
-        @Suppress("ClickableViewAccessibility")
-        userAvatar.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
+        @SuppressLint("ClickableViewAccessibility")
+        userAvatar.setOnTouchListener { view, event ->
+            val isHandled = gestureDetector.onTouchEvent(event)
+            if (!isHandled && event.action == MotionEvent.ACTION_UP) {
+                view.performClick()
+            }
+            isHandled
         }
 
         newMessageFab.setOnClickListener {
@@ -516,15 +522,28 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                 return true
             }
 
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
                 if (e1 == null) return false
+
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
 
-                if (diffX >= -100 && diffX <= 100 && abs(diffY) > 5 && abs(velocityY) > 50) {
+                val maxDiffXInPx = requireContext().resources.getDimension(R.dimen.maxHorizontalSwipeTolerance)
+                val minDiffYInPx = requireContext().resources.getDimension(R.dimen.minVerticalSwipeDistance)
+
+                if (abs(diffY) > abs(diffX) &&
+                    abs(diffY) > minDiffYInPx &&
+                    abs(diffX) <= maxDiffXInPx
+                ) {
                     handleAccountSwipe(isSwipeDown = diffY > 0)
                     return true
                 }
+
                 return false
             }
         })
@@ -788,7 +807,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun updateUnreadCount(unreadCount: Int) {
         binding.unreadCountChip.apply {
-            text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
+            text = resources.getQuantityString(
+                R.plurals.threadListHeaderUnreadCount,
+                unreadCount,
+                formatUnreadCount(unreadCount)
+            )
             isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
         }
     }
