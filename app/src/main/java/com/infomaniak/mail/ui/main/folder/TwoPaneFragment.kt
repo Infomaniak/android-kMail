@@ -19,16 +19,12 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.graphics.Rect
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
-import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -66,9 +62,9 @@ abstract class TwoPaneFragment : Fragment() {
 
     private var dragStartX = 0f
     private var dragStartLeftWidth = 0
-    private val separatorWidthPx by lazy {
-        resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
-    }
+    private val separatorWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth) }
+    val minLeftWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minLeftPaneWidth) }
+    val minRightWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minRightPaneWidth) }
 
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
@@ -152,25 +148,27 @@ abstract class TwoPaneFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun observeDragSeparator() {
-        getDragSeparator()?.setOnTouchListener { _, event ->
-            val dragHandleVisual = ((view as? ViewGroup)?.getChildAt(1) as? ViewGroup)?.getChildAt(0)
+        getDragSeparator()?.setOnTouchListener { separatorView, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     dragStartX = event.rawX
                     dragStartLeftWidth = getLeftPane()?.width ?: 0
 
-                    dragHandleVisual?.alpha = 0.5f
+                    separatorView.isPressed = true
+
+                    val width = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidthSelected)
+                    val param = getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams?.apply {
+                        this.width = width
+                    }
+                    getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams = param
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
-
-
-
                     val deltaX = (event.rawX - dragStartX).toInt()
                     val parentWidth = (view as ViewGroup).width
                     val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
-                        (parentWidth * 0.15f).toInt(),
-                        (parentWidth * 0.85f).toInt()
+                        (minLeftWidthPx),
+                        (parentWidth - minRightWidthPx)
                     )
 
                     getLeftPane()?.layoutParams?.width = newLeftWidth
@@ -181,8 +179,12 @@ abstract class TwoPaneFragment : Fragment() {
                     true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    dragHandleVisual?.alpha = 1.0f
-
+                    separatorView.isPressed = false
+                    val width = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
+                    val param = getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams?.apply {
+                        this.width = width
+                    }
+                    getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams = param
                     true
                 }
                 else -> false
@@ -251,8 +253,6 @@ abstract class TwoPaneFragment : Fragment() {
             if (!isTabletOrFoldable() || rightWidth == 0) {
                 dragSeparator.isGone = true
             } else {
-                val separatorWidth = resources.getDimensionPixelSize(R.dimen.dragSeparatorTouchWidth)
-                if (dragSeparator.width != separatorWidth) dragSeparator.layoutParams?.width = separatorWidth
                 dragSeparator.isVisible = true
             }
         }
@@ -262,7 +262,6 @@ abstract class TwoPaneFragment : Fragment() {
     private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         return if (isTabletOrFoldable()) {
             val ratio = twoPaneViewModel.leftPaneRatio
-                ?: ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
             val leftWidth = (ratio * widthPixels).toInt()
             leftWidth to (widthPixels - leftWidth)
         } else {
