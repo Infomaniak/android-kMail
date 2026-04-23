@@ -158,7 +158,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
             )
 
-            mainViewModel.isMultiSelectOn = false
+            isMultiSelectOn = false
         }
 
         binding.blockSender.setClosingOnClickListener {
@@ -180,7 +180,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                 }
             }
-            mainViewModel.isMultiSelectOn = false
+            isMultiSelectOn = false
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
