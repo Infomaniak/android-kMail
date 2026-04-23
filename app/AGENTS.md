@@ -9,8 +9,8 @@ Compose, Realm database, and multi-account support.
 
 ### High-Level Tech Stack
 
-- **Language**: Kotlin (Java 17, JVM target 17)
-- **Platform**: Android (minSdk 27, targetSdk 35, compileSdk 36)
+- **Language**: Kotlin — JVM target set via `javaVersion` in `build.gradle.kts`
+- **Platform**: Android — SDK versions (`appMinSdk`, `appTargetSdk`, `appCompileSdk`) set in `build.gradle.kts`
 - **Build System**: Gradle with Kotlin DSL
 - **Architecture**: MVVM with Repository pattern
 - **Dependency Injection**: Dagger Hilt
@@ -59,7 +59,7 @@ app/src/androidTest/            # Espresso UI tests
 - **Repository**: Data access via controllers (`ThreadController`, `DraftController`)
 - **DI**: Use Hilt `@Inject` constructor
 - **Database**: Models extend `RealmObject` or `EmbeddedRealmObject`
-- **SOLID/KISS**: Keep classes focused; MainActivity is already 682 lines
+- **SOLID/KISS**: Keep classes focused; prefer multiple smaller classes over one large class
 
 ### Commands
 
