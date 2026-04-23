@@ -17,11 +17,15 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
 import android.transition.TransitionManager
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
@@ -32,6 +36,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -41,6 +46,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -50,7 +56,6 @@ import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
@@ -85,6 +90,7 @@ import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -106,9 +112,11 @@ import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+import kotlin.math.abs
 import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
@@ -122,6 +130,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     override val substituteClassName: String = javaClass.name
+
+    private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
@@ -445,7 +455,14 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             )
         }
 
-        userAvatar.setOnClickListener { safeNavigate(resId = R.id.accountBottomSheetDialog) }
+        val gestureDetector = setupGestureDetector(userAvatar.context)
+
+        @SuppressLint("ClickableViewAccessibility")
+        userAvatar.setOnTouchListener { view, event ->
+            val isHandled = gestureDetector.onTouchEvent(event)
+            if (!isHandled && event.action == MotionEvent.ACTION_UP) view.performClick()
+            isHandled
+        }
 
         newMessageFab.setOnClickListener {
             trackNewMessageEvent(MatomoName.OpenFromFab)
@@ -492,6 +509,38 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         }
     }
 
+    private fun setupGestureDetector(context: Context) =
+        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean {
+                return true
+            }
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                safeNavigate(resId = R.id.accountBottomSheetDialog)
+                return true
+            }
+
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                if (e1 == null) return false
+
+                val diffY = e2.y - e1.y
+                val diffX = e2.x - e1.x
+
+                val maxDiffXInPx = requireContext().resources.getDimension(R.dimen.maxHorizontalSwipeTolerance)
+                val minDiffYInPx = requireContext().resources.getDimension(R.dimen.minVerticalSwipeDistance)
+
+                if (abs(diffY) > abs(diffX) &&
+                    abs(diffY) > minDiffYInPx &&
+                    abs(diffX) <= maxDiffXInPx
+                ) {
+                    handleAccountSwipe(isSwipeDown = diffY > 0)
+                    return true
+                }
+
+                return false
+            }
+        })
+
     /**
      * The boolean return value is used to know if we should keep the Thread in
      * the RecyclerView (true), or remove it when the swipe is done (false).
@@ -512,6 +561,17 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         } else {
             newMessageFab.shrink()
         }
+    }
+
+    private fun handleAccountSwipe(isSwipeDown: Boolean) = lifecycleScope.launch {
+        val accounts = switchUserViewModel.accounts.first()
+        if (accounts.isEmpty()) return@launch
+        
+        val currentIndex = accounts.indexOfFirst { it.id == AccountUtils.currentUserId }
+        if (currentIndex == -1) return@launch
+
+        val nextIndex = (currentIndex + if (isSwipeDown) -1 else 1).mod(accounts.size)
+        switchUserViewModel.switchAccount(accounts[nextIndex])
     }
 
     private fun setupUserAvatar() {
@@ -733,7 +793,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun updateUnreadCount(unreadCount: Int) {
         binding.unreadCountChip.apply {
-            text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
+            text = resources.getQuantityString(
+                R.plurals.threadListHeaderUnreadCount,
+                unreadCount,
+                formatUnreadCount(unreadCount)
+            )
             isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
         }
     }
