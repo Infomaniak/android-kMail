@@ -133,6 +133,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun observeReportPhishingResult() {
+        mainViewModel.isMultiSelectOn = false
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
@@ -334,7 +335,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 isVisible = true
             }
 
-            phishing.isVisible = !isFromSpam
+            phishing.isVisible = true
         }
 
         fun setBlockUserUi(blockSender: ActionItemView, potentialUsersToBlock: Map<Recipient, Message>, isFromSpam: Boolean) {

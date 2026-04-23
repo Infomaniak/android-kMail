@@ -254,6 +254,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeReportPhishingResult() {
+        mainViewModel.isMultiSelectOn = false
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
