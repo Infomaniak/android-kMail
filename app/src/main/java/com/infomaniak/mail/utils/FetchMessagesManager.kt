@@ -238,9 +238,8 @@ class FetchMessagesManager @Inject constructor(
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces
         val description = "$subject\n$formattedBody".take(MAX_CHAR_LIMIT)
 
-        val isBimiEnabled = avatarMergedContactData.isBimiEnabledFlow.first();
-        val mergedContacts = avatarMergedContactData.mergedContactFlow.first()
-
+        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
+        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
         // Show Message notification
         val hasShownNotification = notificationUtils.showMessageNotification(
             scope = coroutineScope,

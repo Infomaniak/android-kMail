@@ -138,7 +138,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         notificationJobsBus.unregister(payload.notificationId)
 
         globalCoroutineScope.launch {
-            val mergedContacts = avatarMergedContactData.mergedContactFlow.firstOrNull() ?: emptyMap()
+            val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
 
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
@@ -155,7 +155,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         matomoName: MatomoName,
         payload: NotificationPayload,
     ) = with(payload) {
-        val mergedContacts = avatarMergedContactData.mergedContactFlow.first()
+        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value
         val notificationShowingJob = globalCoroutineScope.launch {
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
@@ -165,7 +165,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
                         behaviorTitle = context.getString(undoNotificationTitle),
                     )
                 },
-                contacts = mergedContacts,
+                contacts = mergedContacts ?: emptyMap(),
             )
         }
 

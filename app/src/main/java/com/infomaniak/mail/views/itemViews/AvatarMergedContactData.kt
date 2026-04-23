@@ -25,12 +25,10 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
@@ -47,27 +45,16 @@ class AvatarMergedContactData @Inject constructor(
 ) {
     private val ioCoroutineContext = globalCoroutineScope.coroutineContext(ioDispatcher)
 
-    val mergedContactFlow: Flow<MergedContactDictionary> = mergedContactController
+    val mergedContactLiveData = mergedContactController
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
         .filterNotNull()
         .distinctUntilChanged()
+        .asLiveData(ioCoroutineContext)
 
-    val isBimiEnabledFlow: Flow<Boolean> = mailboxController
+    val isBimiEnabledLiveData = mailboxController
         .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
         .mapLatest { liveMailbox -> liveMailbox.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false }
         .distinctUntilChanged()
-
-    @Deprecated(
-        message = "Use Kotlin Flow instead of LiveData",
-        replaceWith = ReplaceWith(expression = "mergedContactFlow", imports = ["kotlinx.coroutines.flow.Flow"]),
-        level = DeprecationLevel.WARNING
-    )
-    val mergedContactLiveData = mergedContactFlow.asLiveData(ioCoroutineContext)
-    @Deprecated(
-        message = "Use Kotlin Flow instead of LiveData",
-        replaceWith = ReplaceWith(expression = "isBimiEnabledFlow", imports = ["kotlinx.coroutines.flow.Flow"]),
-        level = DeprecationLevel.WARNING
-    )
-    val isBimiEnabledLiveData = isBimiEnabledFlow.asLiveData(ioCoroutineContext)
+        .asLiveData(ioCoroutineContext)
 }
