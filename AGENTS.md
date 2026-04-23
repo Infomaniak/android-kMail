@@ -11,7 +11,7 @@ android-kMail/
 ├── Core/                    # Git submodule - shared library (see Core/AGENTS.md)
 │   ├── Auth/               # OAuth2, account management
 │   ├── Network/            # Ktor HTTP client
-│   ├── Ui/                 # Compose + XML components  
+│   ├── Ui/                 # Compose + XML components
 │   ├── Common/             # Shared utilities
 │   └── ... (30+ modules)
 ├── app/                     # Main Mail application (see app/AGENTS.md)
@@ -43,7 +43,7 @@ android-kMail/
 - **Authentication**: App uses `Core:Auth` for OAuth2 (tokens, account management)
 - **Networking**: App uses `Core:Network` with `HttpClientProvider` from `Core:Common`
 - **UI Components**: App uses `Core:Ui:Compose` and `Core:Ui:View` components
-- **Initialization**: `InfomaniakCore.init()` must be called in `MainApplication.kt`
+- **Initialization**: `MainApplication.kt` initializes Core via `NetworkConfiguration.init()` and `AuthConfiguration.init()` inside `configureInfomaniakCore()`
 
 ## Quick Commands
 
@@ -51,14 +51,14 @@ android-kMail/
 # Build Mail app
 ./gradlew :app:assembleStandardDebug
 
-# Build Core library only
-./gradlew Core:assemble
+# Build included Core modules
+./gradlew :Core:Legacy:assemble :Core:Legacy:Confetti:assemble
 
 # Run all tests
-./gradlew :app:testStandardDebugUnitTest && ./gradlew Core:test
+./gradlew :app:testStandardDebugUnitTest && ./gradlew :Core:Legacy:test :Core:Legacy:Confetti:test
 
-# Lint Core (uses ktlint in Core module)
-./gradlew Core:ktlintCheck
+# Lint included Core modules (uses ktlint)
+./gradlew :Core:Legacy:ktlintCheck :Core:Legacy:Confetti:ktlintCheck
 ```
 
 ## Important Rules

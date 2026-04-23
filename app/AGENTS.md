@@ -25,7 +25,7 @@ Compose, Realm database, and multi-account support.
 
 ```
 app/src/main/java/com/infomaniak/mail/
-├── MainApplication.kt          # Entry point, must call InfomaniakCore.init()
+├── MainApplication.kt          # Entry point, configures core via configureInfomaniakCore() (NetworkConfiguration.init() / AuthConfiguration.init())
 ├── MainActivity.kt             # Main coordinator (682 lines - keep focused)
 ├── data/                       # Data layer
 │   ├── cache/                  # Realm controllers (ThreadController, etc.)
