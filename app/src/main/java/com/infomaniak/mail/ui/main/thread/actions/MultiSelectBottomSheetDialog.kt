@@ -157,6 +157,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
             )
+
+            mainViewModel.isMultiSelectOn = false
         }
 
         binding.blockSender.setClosingOnClickListener {
@@ -254,7 +256,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeReportPhishingResult() {
-        mainViewModel.isMultiSelectOn = false
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()

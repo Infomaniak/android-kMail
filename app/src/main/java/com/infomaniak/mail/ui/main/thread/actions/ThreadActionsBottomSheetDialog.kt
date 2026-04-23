@@ -133,7 +133,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun observeReportPhishingResult() {
-        mainViewModel.isMultiSelectOn = false
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
@@ -264,6 +263,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 description = resources.getQuantityString(R.plurals.reportPhishingDescription, thread.messages.count()),
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(junkMessagesViewModel.threadsUids, junkMessages) },
             )
+
+            mainViewModel.isMultiSelectOn = false
         }
 
         override fun onBlockSender() {
