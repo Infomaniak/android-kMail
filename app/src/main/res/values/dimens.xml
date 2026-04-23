@@ -22,6 +22,11 @@
     <dimen name="rightPaneWidthRatio">0.6</dimen>
     <dimen name="dragSeparatorWidth">4dp</dimen>
     <dimen name="dragSeparatorTouchWidth">16dp</dimen>
+    <dimen name="minLeftPaneWidth">250dp</dimen>
+    <dimen name="minRightPaneWidth">300dp</dimen>
+    <dimen name="dragSeparatorWidth">1dp</dimen>
+    <dimen name="dragSeparatorWidthSelected">3dp</dimen>
+    <dimen name="dragSeparatorTouchWidth">8dp</dimen>
 
     <!-- View sizes -->
     <dimen name="accountAvatarSize">110dp</dimen>

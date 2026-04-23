@@ -208,16 +208,28 @@
 
     <FrameLayout
         android:id="@+id/dragSeparator"
-        android:layout_width="@dimen/dragSeparatorTouchWidth"
+        android:layout_width="48dp"
         android:layout_height="match_parent"
+        android:layout_marginStart="-24dp"
+        android:layout_marginEnd="-24dp"
         android:clickable="true"
-        android:visibility="gone">
+        android:focusable="true"
+        android:translationZ="10dp">
 
         <View
+            android:id="@+id/lineDragSeparator"
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="#CCCCCC" />
+            android:background="@drawable/item_drag_line" />
+
+
+        <View
+            android:id="@+id/dragSeparatorHandle"
+            android:layout_width="@dimen/dragSeparatorTouchWidth"
+            android:layout_height="25dp"
+            android:layout_gravity="center"
+            android:background="@drawable/item_vertical_drag_handle" />
     </FrameLayout>
 
     <androidx.fragment.app.FragmentContainerView
