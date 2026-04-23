@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
@@ -148,43 +149,52 @@ abstract class TwoPaneFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun observeDragSeparator() {
-        getDragSeparator()?.setOnTouchListener { separatorView, event ->
+        val separator = getDragSeparator() ?: return
+        val leftPane = getLeftPane() ?: return
+        val rightPane = getRightPane() ?: return
+        val lineSeparator = separator.findViewById<View>(R.id.lineDragSeparator)
+
+        val parentGroup = view as? ViewGroup ?: return
+
+        val widthSelected = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidthSelected)
+        val widthNormal = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
+
+        separator.setOnTouchListener { separatorView, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     dragStartX = event.rawX
-                    dragStartLeftWidth = getLeftPane()?.width ?: 0
-
+                    dragStartLeftWidth = leftPane.width
                     separatorView.isPressed = true
 
-                    val width = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidthSelected)
-                    val param = getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams?.apply {
-                        this.width = width
+                    lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
+                        width = widthSelected
                     }
-                    getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams = param
                     true
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     val deltaX = (event.rawX - dragStartX).toInt()
-                    val parentWidth = (view as ViewGroup).width
+                    val parentWidth = parentGroup.width
+
                     val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
-                        (minLeftWidthPx),
-                        (parentWidth - minRightWidthPx)
+                        minLeftWidthPx,
+                        parentWidth - minRightWidthPx
                     )
 
-                    getLeftPane()?.layoutParams?.width = newLeftWidth
-                    getRightPane()?.layoutParams?.width = parentWidth - newLeftWidth - separatorWidthPx
-                    view?.requestLayout()
+                    leftPane.layoutParams.width = newLeftWidth
+                    rightPane.layoutParams.width = parentWidth - newLeftWidth - separatorWidthPx
+                    parentGroup.requestLayout()
 
                     twoPaneViewModel.setLeftPaneRatio(newLeftWidth.toFloat() / parentWidth)
                     true
                 }
+
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     separatorView.isPressed = false
-                    val width = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
-                    val param = getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams?.apply {
-                        this.width = width
+
+                    lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
+                        width = widthNormal
                     }
-                    getDragSeparator()?.findViewById<View>(R.id.lineDragSeparator)?.layoutParams = param
                     true
                 }
                 else -> false
