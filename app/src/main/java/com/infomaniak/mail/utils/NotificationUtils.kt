@@ -254,7 +254,7 @@ class NotificationUtils @Inject constructor(
         }
 
         val avatarType = getAvatarType(
-            correspondent = payload.from.firstOrNull(),
+            correspondent = payload.from,
             bimi = payload.bimi,
             isBimiEnabled = payload.isBimiEnabled,
             contacts = contacts,

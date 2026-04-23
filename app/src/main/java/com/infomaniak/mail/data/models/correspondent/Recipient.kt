@@ -33,7 +33,7 @@ import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
-open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable, ContactAutocompletable {
+open class Recipient : EmbeddedRealmObject, Correspondent, ContactAutocompletable {
 
     override var email: String = ""
     override var name: String = ""

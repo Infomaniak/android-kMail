@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.data.models.correspondent
 
-import android.os.Parcelable
 import com.infomaniak.mail.data.api.ApiRoutes
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
@@ -32,7 +31,7 @@ import kotlinx.serialization.UseSerializers
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED", "PARCELABLE_PRIMARY_CONSTRUCTOR_IS_EMPTY")
-class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parcelable {
+class MergedContact() : RealmObject, Correspondent, ContactAutocompletable {
     @PrimaryKey
     var id: Long? = null
         private set

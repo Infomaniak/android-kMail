@@ -19,7 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.os.Parcelable
 import com.infomaniak.mail.data.models.Bimi
-import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
@@ -33,7 +33,7 @@ data class NotificationPayload(
     val userId: Int,
     val mailboxId: Int,
     val threadUid: String,
-    val from: List<Recipient>,
+    val from: Correspondent,
     val messageUid: String? = null,
     var notificationId: Int,
     var behavior: NotificationBehavior? = null,
@@ -43,7 +43,7 @@ data class NotificationPayload(
     private val payloadContent: String? = null,
     private val payloadDescription: String? = null,
 
-) : Parcelable {
+    ) : Parcelable {
 
     val isSummary get() = behavior?.type == NotificationType.SUMMARY
     val isUndo get() = behavior?.type == NotificationType.UNDO
