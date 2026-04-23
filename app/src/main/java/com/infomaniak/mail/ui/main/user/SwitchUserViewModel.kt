@@ -21,7 +21,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -31,7 +30,10 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -50,11 +52,16 @@ class SwitchUserViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).mapNotNull { it.obj }.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
-    val accounts = SingleLiveEvent<List<User>>()
-
-    fun getAccountsInDB() = viewModelScope.launch(ioDispatcher) {
-        accounts.postValue(AccountUtils.getAllUsersSync().sortedBy { it.displayName })
+    val accounts: SharedFlow<List<User>> = flow {
+        val users = AccountUtils.getAllUsersSync().sortedBy { it.displayName }
+        emit(users)
     }
+        .flowOn(ioDispatcher)
+        .shareIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            replay = 1,
+        )
 
     fun switchAccount(user: User) = viewModelScope.launch(ioDispatcher) {
         if (user.id != AccountUtils.currentUserId) {

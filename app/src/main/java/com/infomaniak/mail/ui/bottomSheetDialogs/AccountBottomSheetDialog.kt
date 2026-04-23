@@ -22,7 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -115,16 +117,19 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         logoutUser(user = AccountUtils.currentUser!!)
     }
 
-    private fun observeAccounts() = with(switchUserViewModel) {
-        accounts.observe(viewLifecycleOwner) {
-            binding.root.title = requireContext().resources.getQuantityString(
-                R.plurals.titleMyAccount,
-                it.size,
-                it.size,
-            )
-            accountsAdapter.initializeAccounts(it)
+    private fun observeAccounts() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                switchUserViewModel.accounts.collect { accountsList ->
+                    binding.root.title = requireContext().resources.getQuantityString(
+                        R.plurals.titleMyAccount,
+                        accountsList.size,
+                        accountsList.size,
+                    )
+                    accountsAdapter.initializeAccounts(accountsList)
+                }
+            }
         }
-        getAccountsInDB()
     }
 
     private fun showEasterEggHalloween() = lifecycleScope.launch {

@@ -189,8 +189,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             localSettings = localSettings,
         )
 
-        switchUserViewModel.getAccountsInDB()
-
         observeNetworkStatus()
         observeCurrentThreads()
         observeDownloadState()
@@ -553,12 +551,14 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         }
     }
 
-    private fun handleAccountSwipe(isSwipeDown: Boolean) {
-        val accounts = switchUserViewModel.accounts.value ?: return
-        if (accounts.isEmpty()) return
+    private fun handleAccountSwipe(isSwipeDown: Boolean) = lifecycleScope.launch {
+        val accounts = switchUserViewModel.accounts.first()
+        if (accounts.isEmpty()) {
+            return@launch
+        }
 
         val currentIndex = accounts.indexOfFirst { it.id == AccountUtils.currentUserId }
-        if (currentIndex == -1) return
+        if (currentIndex == -1) return@launch
 
         val nextIndex = if (isSwipeDown) {
             (currentIndex - 1).mod(accounts.size)
