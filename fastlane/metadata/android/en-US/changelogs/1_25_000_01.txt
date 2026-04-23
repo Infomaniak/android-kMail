@@ -1,0 +1,6 @@
+- Add quick switch between accounts by swiping the avatar
+- Handle plural forms in reaction notifications
+- Add missing emoji translations
+- Remove 'Re:' prefix from notifications when the message is a reaction
+- Fix 2FA screen not showing on app's cold start
+- Fix Euria button being cropped incorrectly
