@@ -25,7 +25,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -179,9 +178,11 @@ abstract class TwoPaneFragment : Fragment() {
                     val deltaX = (event.rawX - dragStartX).toInt()
                     val parentWidth = parentGroup.width
 
+                    val maxLeftWidth = parentWidth - minRightWidthPx
+                    val safeMaxLeftWidth = maxOf(minLeftWidthPx, maxLeftWidth)
                     val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
                         minLeftWidthPx,
-                        parentWidth - minRightWidthPx
+                        safeMaxLeftWidth
                     )
 
                     leftPane.layoutParams.width = newLeftWidth
@@ -264,9 +265,15 @@ abstract class TwoPaneFragment : Fragment() {
     private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         return if (isTabletOrFoldable()) {
             val ratio = twoPaneViewModel.leftPaneRatio
-            val leftWidth = (ratio * widthPixels).toInt().coerceIn(minLeftWidthPx, widthPixels - minRightWidthPx)
 
-            leftWidth to (widthPixels - leftWidth - separatorWidthPx)
+            val availableWidth = (widthPixels - separatorWidthPx).coerceAtLeast(0)
+            val leftWidth = if (availableWidth < minLeftWidthPx + minRightWidthPx) {
+                (ratio * availableWidth).toInt().coerceIn(0, availableWidth)
+            } else {
+                (ratio * availableWidth).toInt().coerceIn(minLeftWidthPx, availableWidth - minRightWidthPx)
+            }
+            leftWidth to (availableWidth - leftWidth)
+
         } else {
             if (isThreadOpen) 0 to widthPixels else widthPixels to 0
         }
