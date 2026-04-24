@@ -1183,8 +1183,6 @@ class NewMessageViewModel @Inject constructor(
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
 
-    data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
-
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName
 
