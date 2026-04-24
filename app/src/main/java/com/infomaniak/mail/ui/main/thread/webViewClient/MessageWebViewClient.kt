@@ -33,9 +33,10 @@ import java.io.ByteArrayInputStream
 abstract class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: Map<String, Attachment>,
-    private var shouldLoadDistantResources: Boolean,
+    private var _shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
 ) : WebViewClient() {
+    val shouldLoadDistantResources get() = _shouldLoadDistantResources
 
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
 
@@ -63,7 +64,7 @@ abstract class MessageWebViewClient(
             } ?: emptyResource
         }
 
-        val shouldLoadResource = shouldLoadDistantResources
+        val shouldLoadResource = _shouldLoadDistantResources
                 || url?.scheme.equals(DATA_SCHEME, ignoreCase = true)
                 || trustedUrls.any { it.find(url.toString()) != null }
 
@@ -76,7 +77,7 @@ abstract class MessageWebViewClient(
     }.getOrDefault(super.shouldInterceptRequest(view, request))
 
     fun unblockDistantResources() {
-        shouldLoadDistantResources = true
+        _shouldLoadDistantResources = true
     }
 
     companion object {
