@@ -283,9 +283,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         setSnoozeUi(threads)
-        ThreadActionsBottomSheetDialog.setSpamPhishingUi(
+        ThreadActionsBottomSheetDialog.setSpamUi(
             spam = binding.spam,
-            phishing = binding.phishing,
             isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         )
         hideFirstActionItemDivider()
