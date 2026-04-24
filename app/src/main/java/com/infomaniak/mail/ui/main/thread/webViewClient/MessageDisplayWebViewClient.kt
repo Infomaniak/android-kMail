@@ -36,7 +36,7 @@ class MessageDisplayWebViewClient(
     private val context: Context,
     cidDictionary: Map<String, Attachment>,
     private val messageUid: String,
-    private var shouldLoadDistantResources: Boolean,
+    shouldLoadDistantResources: Boolean,
     onBlockedResourcesDetected: () -> Unit,
     private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
     private val onPageFinished: (() -> Unit)?,
