@@ -221,14 +221,15 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="@drawable/item_drag_line" />
-
+            android:background="@drawable/item_drag_line"
+            android:duplicateParentState="true" />
 
         <View
             android:layout_width="@dimen/dragSeparatorTouchWidth"
             android:layout_height="25dp"
             android:layout_gravity="center"
-            android:background="@drawable/item_vertical_drag_handle" />
+            android:background="@drawable/item_vertical_drag_handle"
+            android:duplicateParentState="true" />
     </FrameLayout>
 
     <androidx.fragment.app.FragmentContainerView
