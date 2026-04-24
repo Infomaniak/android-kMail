@@ -55,7 +55,7 @@
             <item>
                 <shape android:shape="rectangle">
                     <size android:width="@dimen/dragSeparatorTouchWidth" android:height="25dp" />
-                    <solid android:color="?attr/colorOnSurfaceVariant" />
+                    <solid android:color="?attr/colorOutlineVariant" />
                     <corners android:radius="100dp" />
                 </shape>
             </item>

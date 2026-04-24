@@ -299,7 +299,6 @@
             android:background="@drawable/item_drag_line" />
 
         <View
-            android:id="@+id/dragSeparatorHandle"
             android:layout_width="@dimen/dragSeparatorTouchWidth"
             android:layout_height="25dp"
             android:layout_gravity="center"
@@ -313,6 +312,5 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:visibility="gone" />
-
 
 </LinearLayout>

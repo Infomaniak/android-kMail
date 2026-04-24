@@ -225,7 +225,6 @@
 
 
         <View
-            android:id="@+id/dragSeparatorHandle"
             android:layout_width="@dimen/dragSeparatorTouchWidth"
             android:layout_height="25dp"
             android:layout_gravity="center"
