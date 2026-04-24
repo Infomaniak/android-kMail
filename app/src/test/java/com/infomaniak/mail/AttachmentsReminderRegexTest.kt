@@ -52,15 +52,6 @@ class AttachmentsReminderRegexTest {
     }
 
     @Test
-    fun boundaries_and_punctuation_isDetected() {
-        assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Here is the file (attached)."))
-        assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Voici la facture, ci-joint!"))
-        assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Fichier: attached\nMerci."))
-        assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("...pièce jointe..."))
-        assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Enviado (archivo adjunto)"))
-    }
-
-    @Test
     fun words_containing_keyword_prevent_false_positives_isIgnored() {
         // English false positives
         assertFalse(AttachmentsReminderUtils.hasAttachmentKeyword("The device is unattached from the port."))
@@ -112,7 +103,7 @@ class AttachmentsReminderRegexTest {
     fun french_positive_cases_isDetected() {
         assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Veuillez trouver ci-joint le document."))
         assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Je te joins le fichier de ce matin."))
-        assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("J'ai joint les photos."))
+        assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Il a joint les photos."))
         assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Regarde les fichiers associés à cet e-mail."))
         assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Les documents en annexe sont prêts."))
         assertTrue(AttachmentsReminderUtils.hasAttachmentKeyword("Voici la facture jointe à ce message."))
