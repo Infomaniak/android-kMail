@@ -21,6 +21,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
+import android.R as RAndroid
 import com.google.android.material.textfield.TextInputEditText
 
 class BackspaceAwareTextInput @JvmOverloads constructor(
@@ -37,17 +38,16 @@ class BackspaceAwareTextInput @JvmOverloads constructor(
     }
 
     override fun onTextContextMenuItem(id: Int): Boolean {
-        if (id == android.R.id.paste) {
+        if (id == RAndroid.id.paste) {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = clipboard.primaryClip
 
             if (clip != null && clip.itemCount > 0) {
                 val pastedText = clip.getItemAt(0).text?.toString() ?: ""
-                if (onPasteIntercept?.invoke(pastedText) == true) {
-                    return true
-                }
+                if (onPasteIntercept?.invoke(pastedText) == true) return true
             }
         }
+
         return super.onTextContextMenuItem(id)
     }
 

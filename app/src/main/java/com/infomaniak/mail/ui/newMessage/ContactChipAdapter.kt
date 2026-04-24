@@ -74,12 +74,10 @@ class ContactChipAdapter(
         }
     }
 
-    fun addChips(newRecipients: List<Recipient>): Int {
+    fun addChips(newRecipients: List<Recipient>) {
         var added = 0
         newRecipients.forEach { recipient -> if (recipients.add(recipient)) added++ }
         if (added > 0) notifyItemRangeInserted(itemCount - added, added)
-
-        return added
     }
 
     fun removeChip(recipient: Recipient) {

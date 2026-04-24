@@ -171,10 +171,12 @@ class RecipientFieldView @JvmOverloads constructor(
             )
 
             contactChipAdapter = ContactChipAdapter(
-                openContextMenu = ::showContactContextMenu, onBackspace = { recipient ->
+                openContextMenu = ::showContactContextMenu,
+                onBackspace = { recipient ->
                     removeRecipient(recipient)
                     focusTextField()
-                })
+                }
+            )
 
             isSelfCollapsed = true
 
@@ -415,7 +417,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun addMultipleRecipients(recipients: List<Pair<String, String>>) {
+    private fun addMultipleRecipients(recipients: List<Recipient>) {
         if (recipients.isEmpty()) return
 
         val availableSlots = (MAX_ALLOWED_RECIPIENT - contactChipAdapter.itemCount).coerceAtLeast(0)
@@ -436,29 +438,24 @@ class RecipientFieldView @JvmOverloads constructor(
         clearField()
     }
 
-    private fun processRecipients(
-        recipients: List<Pair<String, String>>,
-        initialAvailableSlots: Int
-    ): ProcessedRecipientsResult {
+    private fun processRecipients(recipients: List<Recipient>, initialAvailableSlots: Int): ProcessedRecipientsResult {
         var availableSlots = initialAvailableSlots
         var duplicateCount = 0
         var outOfSpaceCount = 0
 
-        val acceptedRecipients = buildList {
-            for ((name, email) in recipients) {
-                if (availableSlots <= 0) {
-                    outOfSpaceCount++
-                    continue
-                }
-
-                if (!contactAdapter.addUsedContact(email)) {
-                    duplicateCount++
-                    continue
-                }
-
-                availableSlots--
-                add(Recipient().initLocalValues(email, name))
+        val acceptedRecipients = recipients.filter { recipientToAdd ->
+            if (availableSlots <= 0) {
+                outOfSpaceCount++
+                return@filter false
             }
+
+            if (!contactAdapter.addUsedContact(recipientToAdd.email)) {
+                duplicateCount++
+                return@filter false
+            }
+
+            availableSlots--
+            true
         }
 
         return ProcessedRecipientsResult(acceptedRecipients, duplicateCount, outOfSpaceCount)
@@ -468,40 +465,34 @@ class RecipientFieldView @JvmOverloads constructor(
         initialRecipientsSize: Int,
         initialAvailableSlots: Int,
         duplicateCount: Int,
-        outOfSpaceCount: Int
+        outOfSpaceCount: Int,
     ) {
-        if (initialAvailableSlots == 0) {
-            snackbarManager.setValue(
+        val warning = when {
+            initialAvailableSlots == 0 -> {
                 context.resources.getQuantityString(
                     R.plurals.tooManyRecipientsPaste,
                     initialRecipientsSize,
                     initialRecipientsSize
                 )
-            )
-            return
-        }
-
-        if (outOfSpaceCount > 0) {
-            snackbarManager.setValue(
+            }
+            outOfSpaceCount > 0 -> {
                 context.resources.getQuantityString(
                     R.plurals.tooManyRecipientsPaste,
                     outOfSpaceCount,
                     outOfSpaceCount
                 )
-            )
-            return
-        }
-
-        if (duplicateCount > 0) {
-            snackbarManager.setValue(
+            }
+            duplicateCount > 0 -> {
                 context.resources.getQuantityString(
                     R.plurals.addMultipleDuplicateEmails,
                     duplicateCount,
                     duplicateCount
                 )
-            )
-            return
+            }
+            else -> null
         }
+
+        warning?.let(snackbarManager::setValue)
     }
 
     private fun updateChipsVisibility() {
@@ -522,15 +513,11 @@ class RecipientFieldView @JvmOverloads constructor(
         val invalidEmails = mutableListOf<String>()
 
         potentialEmails.forEach { email ->
-            if (email.isEmail()) {
-                emailsToAdd.add(email)
-            } else {
-                invalidEmails.add(email)
-            }
+            if (email.isEmail()) emailsToAdd.add(email) else invalidEmails.add(email)
         }
 
-        val recipientsToAdd = emailsToAdd.map { email ->
-            getContactName(email) to email
+        val recipientsToAdd = emailsToAdd.map { emailToAdd ->
+            Recipient().initLocalValues(name = getContactName(emailToAdd), email = emailToAdd)
         }
 
         addMultipleRecipients(recipientsToAdd)
