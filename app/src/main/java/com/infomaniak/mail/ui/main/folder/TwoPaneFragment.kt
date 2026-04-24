@@ -53,6 +53,7 @@ import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import io.realm.kotlin.types.RealmInstant
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 abstract class TwoPaneFragment : Fragment() {
 
@@ -211,7 +212,9 @@ abstract class TwoPaneFragment : Fragment() {
         val deltaX = (currentRawX - dragStartX).toInt()
         val parentWidth = parentGroup.width
 
-        val maxLeftWidth = parentWidth - minRightWidthPx
+        val availableWidth = parentWidth - separatorWidthPx
+
+        val maxLeftWidth = availableWidth - minRightWidthPx
         val safeMaxLeftWidth = maxOf(minLeftWidthPx, maxLeftWidth)
 
         val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
@@ -223,7 +226,9 @@ abstract class TwoPaneFragment : Fragment() {
         rightPane.layoutParams.width = parentWidth - newLeftWidth - separatorWidthPx
         parentGroup.requestLayout()
 
-        twoPaneViewModel.leftPaneRatio = newLeftWidth.toFloat() / parentWidth
+        if (availableWidth > 0) {
+            twoPaneViewModel.leftPaneRatio = newLeftWidth.toFloat() / availableWidth
+        }
     }
 
     fun handleOnBackPressed() {
@@ -288,9 +293,9 @@ abstract class TwoPaneFragment : Fragment() {
 
             val availableWidth = (widthPixels - separatorWidthPx).coerceAtLeast(0)
             val leftWidth = if (availableWidth < minLeftWidthPx + minRightWidthPx) {
-                (ratio * availableWidth).toInt().coerceIn(0, availableWidth)
+                (ratio * availableWidth).roundToInt().coerceIn(0, availableWidth)
             } else {
-                (ratio * availableWidth).toInt().coerceIn(minLeftWidthPx, availableWidth - minRightWidthPx)
+                (ratio * availableWidth).roundToInt().coerceIn(minLeftWidthPx, availableWidth - minRightWidthPx)
             }
             leftWidth to (availableWidth - leftWidth)
 
