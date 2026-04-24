@@ -149,7 +149,7 @@ abstract class TwoPaneFragment : Fragment() {
         twoPaneViewModel.saveLeftPaneRatio()
         super.onStop()
     }
-    @SuppressLint("ClickableViewAccessibility")
+
     private fun observeDragSeparator() {
         val separator = getDragSeparator() ?: return
         val leftPane = getLeftPane() ?: return
@@ -193,9 +193,17 @@ abstract class TwoPaneFragment : Fragment() {
                     true
                 }
 
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                MotionEvent.ACTION_UP -> {
                     separatorView.isPressed = false
+                    lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
+                        width = widthNormal
+                    }
+                    separatorView.performClick()
+                    true
+                }
 
+                MotionEvent.ACTION_CANCEL -> {
+                    separatorView.isPressed = false
                     lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
                         width = widthNormal
                     }
