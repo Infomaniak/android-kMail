@@ -4,7 +4,7 @@
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 4 of the License, or
+  ~ the Free Software Foundation, either version 3 of the License, or
   ~ (at your option) any later version.
   ~
   ~ This program is distributed in the hope that it will be useful,
@@ -21,7 +21,7 @@
         <layer-list>
             <item>
                 <shape android:shape="rectangle">
-                    <size android:width="@dimen/dragSeparatorTouchWidth" android:height="25dp" />
+                    <size android:width="@dimen/dragSeparatorHandleWidth" android:height="@dimen/dragSeparatorHandleHeight" />
                     <solid android:color="?attr/colorPrimary" />
                     <corners android:radius="100dp" />
                 </shape>
@@ -54,7 +54,7 @@
         <layer-list>
             <item>
                 <shape android:shape="rectangle">
-                    <size android:width="@dimen/dragSeparatorTouchWidth" android:height="25dp" />
+                    <size android:width="@dimen/dragSeparatorHandleWidth" android:height="@dimen/dragSeparatorHandleHeight" />
                     <solid android:color="?attr/colorOutlineVariant" />
                     <corners android:radius="100dp" />
                 </shape>

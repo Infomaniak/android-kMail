@@ -51,7 +51,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var askEmailAcknowledgement by sharedValue("askEmailAcknowledgmentKey", false)
     var hasAlreadyEnabledNotifications by sharedValue("hasAlreadyEnabledNotificationsKey", false)
     var isAppLocked by sharedValue("isAppLockedKey", false)
-    var leftPaneRatio by sharedValue("leftPaneRatio", 0.4f)
+    var leftPaneRatio by sharedValue("leftPaneRatioKey", 0.4f)
     var threadDensity by sharedValue("threadDensityKey", ThreadDensity.LARGE)
     var theme by sharedValue("themeKey", if (SDK_INT >= 29) Theme.SYSTEM else Theme.LIGHT)
     var accentColor by sharedValue("accentColorKey", AccentColor.PINK)

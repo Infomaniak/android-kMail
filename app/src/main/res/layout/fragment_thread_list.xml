@@ -283,13 +283,13 @@
 
     <FrameLayout
         android:id="@+id/dragSeparator"
-        android:layout_width="48dp"
+        android:layout_width="@dimen/dragSeparatorTouchAreaWidth"
         android:layout_height="match_parent"
-        android:layout_marginStart="-24dp"
-        android:layout_marginEnd="-24dp"
+        android:layout_marginStart="@dimen/dragSeparatorTouchAreaMargin"
+        android:layout_marginEnd="@dimen/dragSeparatorTouchAreaMargin"
         android:clickable="true"
         android:focusable="true"
-        android:translationZ="10dp">
+        android:translationZ="@dimen/dragSeparatorTranslationZ">
 
         <View
             android:id="@+id/lineDragSeparator"
@@ -300,8 +300,8 @@
             android:duplicateParentState="true" />
 
         <View
-            android:layout_width="@dimen/dragSeparatorTouchWidth"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/dragSeparatorHandleWidth"
+            android:layout_height="@dimen/dragSeparatorHandleHeight"
             android:layout_gravity="center"
             android:background="@drawable/item_vertical_drag_handle"
             android:duplicateParentState="true" />

@@ -155,7 +155,6 @@ abstract class TwoPaneFragment : Fragment() {
         val leftPane = getLeftPane() ?: return
         val rightPane = getRightPane() ?: return
         val lineSeparator = separator.findViewById<View>(R.id.lineDragSeparator)
-
         val parentGroup = view as? ViewGroup ?: return
 
         val widthSelected = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidthSelected)
@@ -166,52 +165,65 @@ abstract class TwoPaneFragment : Fragment() {
                 MotionEvent.ACTION_DOWN -> {
                     dragStartX = event.rawX
                     dragStartLeftWidth = leftPane.width
-                    separatorView.isPressed = true
-
-                    lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
-                        width = widthSelected
-                    }
+                    updateSeparatorAppearance(separatorView, lineSeparator, true, widthSelected)
                     true
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    val deltaX = (event.rawX - dragStartX).toInt()
-                    val parentWidth = parentGroup.width
-
-                    val maxLeftWidth = parentWidth - minRightWidthPx
-                    val safeMaxLeftWidth = maxOf(minLeftWidthPx, maxLeftWidth)
-                    val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
-                        minLeftWidthPx,
-                        safeMaxLeftWidth
-                    )
-
-                    leftPane.layoutParams.width = newLeftWidth
-                    rightPane.layoutParams.width = parentWidth - newLeftWidth - separatorWidthPx
-                    parentGroup.requestLayout()
-
-                    twoPaneViewModel.leftPaneRatio = newLeftWidth.toFloat() / parentWidth
+                    handleDragMove(event.rawX, leftPane, rightPane, parentGroup)
                     true
                 }
 
                 MotionEvent.ACTION_UP -> {
-                    separatorView.isPressed = false
-                    lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
-                        width = widthNormal
-                    }
+                    updateSeparatorAppearance(separatorView, lineSeparator, false, widthNormal)
                     separatorView.performClick()
                     true
                 }
 
                 MotionEvent.ACTION_CANCEL -> {
-                    separatorView.isPressed = false
-                    lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
-                        width = widthNormal
-                    }
+                    updateSeparatorAppearance(separatorView, lineSeparator, false, widthNormal)
                     true
                 }
+
                 else -> false
             }
         }
+    }
+
+    private fun updateSeparatorAppearance(
+        separatorView: View,
+        lineSeparator: View?,
+        isPressed: Boolean,
+        lineWidth: Int
+    ) {
+        separatorView.isPressed = isPressed
+        lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
+            width = lineWidth
+        }
+    }
+
+    private fun handleDragMove(
+        currentRawX: Float,
+        leftPane: View,
+        rightPane: View,
+        parentGroup: ViewGroup
+    ) {
+        val deltaX = (currentRawX - dragStartX).toInt()
+        val parentWidth = parentGroup.width
+
+        val maxLeftWidth = parentWidth - minRightWidthPx
+        val safeMaxLeftWidth = maxOf(minLeftWidthPx, maxLeftWidth)
+
+        val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
+            minLeftWidthPx,
+            safeMaxLeftWidth
+        )
+
+        leftPane.layoutParams.width = newLeftWidth
+        rightPane.layoutParams.width = parentWidth - newLeftWidth - separatorWidthPx
+        parentGroup.requestLayout()
+
+        twoPaneViewModel.leftPaneRatio = newLeftWidth.toFloat() / parentWidth
     }
 
     fun handleOnBackPressed() {
