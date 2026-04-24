@@ -1,0 +1,6 @@
+- Ajout du passage rapide d'un compte à l'autre en swipant sur l'avatar
+- Gérer les formes plurielles dans les notifications de réaction
+- Ajouter les traductions manquantes des emojis
+- Supprimer le préfixe « Re: » des notifications lorsque le message est une réaction
+- Correction de l'écran d'authentification à deux facteurs ne s'affichant pas au démarrage à froid de l'application
+- Correction du bouton d'Euria rogné sur petit écran
