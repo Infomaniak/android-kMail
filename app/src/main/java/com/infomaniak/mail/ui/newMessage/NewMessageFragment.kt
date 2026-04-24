@@ -154,6 +154,7 @@ class NewMessageFragment : Fragment() {
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
+
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
@@ -839,18 +840,12 @@ class NewMessageFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
+            if (isSubjectBlank() && showSubjectDialog(scheduled)) return@launch
+
             val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
             val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
-            val hasBlankSubject = isSubjectBlank()
 
-            if (hasBlankSubject) {
-                val isSendingCanceledBlankSubject = showSubjectDialog(scheduled)
-                if (isSendingCanceledBlankSubject) return@launch
-            }
-            if (shouldShowAttachmentReminder) {
-                val isSendingCanceledAttachmentsReminder = showAttachmentDialog(scheduled)
-                if (isSendingCanceledAttachmentsReminder) return@launch
-            }
+            if (shouldShowAttachmentReminder && showAttachmentDialog(scheduled)) return@launch
             sendEmail()
         }
     }
@@ -869,12 +864,8 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
                 isConfirm = true
             },
-            onCancel = {
-                if (scheduled) newMessageViewModel.resetScheduledDate()
-           },
-            onDismiss = {
-                isSendingCanceled.complete(!isConfirm)
-            })
+            onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+            onDismiss = { isSendingCanceled.complete(!isConfirm) })
 
         return isSendingCanceled.await()
     }
@@ -893,12 +884,8 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
                 isConfirm = true
             },
-            onCancel = {
-                if (scheduled) newMessageViewModel.resetScheduledDate()
-            },
-            onDismiss = {
-                isSendingCanceled.complete(!isConfirm)
-            })
+            onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+            onDismiss = { isSendingCanceled.complete(!isConfirm) })
 
         return isSendingCanceled.await()
     }
