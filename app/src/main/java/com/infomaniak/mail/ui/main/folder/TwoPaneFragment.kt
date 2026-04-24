@@ -27,7 +27,6 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
@@ -272,8 +271,9 @@ abstract class TwoPaneFragment : Fragment() {
     private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         return if (isTabletOrFoldable()) {
             val ratio = twoPaneViewModel.leftPaneRatio
-            val leftWidth = (ratio * widthPixels).toInt()
-            leftWidth to (widthPixels - leftWidth)
+            val leftWidth = (ratio * widthPixels).toInt().coerceIn(minLeftWidthPx, widthPixels - minRightWidthPx)
+
+            leftWidth to (widthPixels - leftWidth - separatorWidthPx)
         } else {
             if (isThreadOpen) 0 to widthPixels else widthPixels to 0
         }

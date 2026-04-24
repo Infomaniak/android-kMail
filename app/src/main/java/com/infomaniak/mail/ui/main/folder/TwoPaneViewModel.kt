@@ -75,7 +75,7 @@ class TwoPaneViewModel @Inject constructor(
     }
 
     fun setLeftPaneRatio(ratio: Float) {
-        localSettings.leftPaneRatio =  ratio.coerceIn(0.15f, 0.85f)
+        localSettings.leftPaneRatio =  ratio
     }
 
     fun openDraft(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
