@@ -24,7 +24,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.ui.newMessage.BodyContentPayload
 import com.infomaniak.mail.ui.newMessage.BodyContentType
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.BodyData
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
 import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
@@ -229,4 +228,6 @@ object MessageBodyUtils {
 
         override fun hashCode(): Int = 31 * content.hashCode() + quote.hashCode()
     }
+
+    data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
 }
