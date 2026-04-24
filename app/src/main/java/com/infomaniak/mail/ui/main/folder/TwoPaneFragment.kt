@@ -238,37 +238,26 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun updateTwoPaneVisibilities() {
-
         val (leftWidth, rightWidth) = computeTwoPaneWidths(
             widthPixels = requireActivity().application.resources.displayMetrics.widthPixels,
             isThreadOpen = twoPaneViewModel.isThreadOpen,
         )
 
-        getLeftPane()?.let { leftPane ->
-            if (leftWidth == 0) {
-                leftPane.isGone = true
-            } else {
-                if (leftPane.width != leftWidth) leftPane.layoutParams?.width = leftWidth
-                leftPane.isVisible = true
+        getLeftPane()?.apply {
+            isVisible = leftWidth != 0
+            if (leftWidth != 0 && width != leftWidth) {
+                layoutParams?.width = leftWidth
             }
         }
 
-        getRightPane()?.let { rightPane ->
-            if (rightWidth == 0) {
-                rightPane.isGone = true
-            } else {
-                if (rightPane.width != rightWidth) rightPane.layoutParams?.width = rightWidth
-                rightPane.isVisible = true
+        getRightPane()?.apply {
+            isVisible = rightWidth != 0
+            if (rightWidth != 0 && width != rightWidth) {
+                layoutParams?.width = rightWidth
             }
         }
 
-        getDragSeparator()?.let { dragSeparator ->
-            if (!isTabletOrFoldable() || rightWidth == 0) {
-                dragSeparator.isGone = true
-            } else {
-                dragSeparator.isVisible = true
-            }
-        }
+        getDragSeparator()?.isVisible = isTabletOrFoldable() && rightWidth != 0
     }
 
 
