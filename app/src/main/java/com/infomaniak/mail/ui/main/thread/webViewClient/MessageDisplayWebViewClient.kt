@@ -87,7 +87,7 @@ class MessageDisplayWebViewClient(
                 }
             }
             val escapedMessageUid = looselyEscapeAsStringLiteralForJs(messageUid)
-            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, '$escapedMessageUid')")
+            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, $escapedMessageUid)")
             onPageFinished?.invoke()
         }
     }
