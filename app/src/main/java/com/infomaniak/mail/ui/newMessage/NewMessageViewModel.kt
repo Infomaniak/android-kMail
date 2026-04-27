@@ -388,13 +388,13 @@ class NewMessageViewModel @Inject constructor(
                 draft.identityId = currentMailbox().getDefaultSignatureWithFallback().id.toString()
             }
 
-            val doc = jsoupParseWithLog(draft.body)
-            doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
-
             val (body, signature, quote) = splitSignatureAndQuoteFromBody(draft)
             initialBody = body
-            initialSignature = signature?.let { BodyContentPayload(it, BodyContentType.HTML_UNSANITIZED) }
-            initialSanitizedQuote = quote?.sanitize()
+            if (signature != null) {
+                signature.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
+                initialSignature = BodyContentPayload(signature.outerHtml(), BodyContentType.HTML_UNSANITIZED)
+            }
+            initialSanitizedQuote = quote?.outerHtml()?.sanitize()
 
             return draft
         }

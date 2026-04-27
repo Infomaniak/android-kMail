@@ -135,16 +135,15 @@ object MessageBodyUtils {
      */
     fun splitSignatureAndQuoteFromHtml(document: Document): BodyData {
 
-        fun Document.split(divClassName: String, defaultValue: Element): Pair<Element, String?> {
+        fun Document.split(divClassName: String, defaultValue: Element): Pair<Element, Element?> {
             // We need to use select and not getElementByClass because getElementByClass adds a \n after every <br>.
             // The function remove() also adds \n after each <br> of it.
             // So we need to use select, save the second part of the split first, and then do remove, to save the correct value
             // for the snapshot to compare.
             return select(".$divClassName").firstOrNull()?.let {
-                val second = if (it.html().isBlank()) null else it.outerHtml()
+                val second = if (it.html().isBlank()) null else it
                 it.remove()
-                val first = body()
-                first to second
+                document to second
             } ?: (defaultValue to null)
         }
 
@@ -229,5 +228,5 @@ object MessageBodyUtils {
         override fun hashCode(): Int = 31 * content.hashCode() + quote.hashCode()
     }
 
-    data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
+    data class BodyData(val body: BodyContentPayload, val signature: Element?, val quote: Element?)
 }
