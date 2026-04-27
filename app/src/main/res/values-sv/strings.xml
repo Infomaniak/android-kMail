@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Länk kopierad till urklipp</string>
     <string name="snackbarMessageDeletedPermanently">Meddelande raderat</string>
     <string name="snackbarMessageMoved">Meddelande flyttat till %s</string>
+    <string name="snackbarMessageMovedToSpam">Meddelande flyttat till skräppost och användare blockerad</string>
     <string name="snackbarMoveCancelled">Flytt avbruten</string>
     <string name="snackbarPasswordCopied">Lösenord kopierat</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopierat till urklipp</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Konversationen flyttades till %s</item>
         <item quantity="other">Konversationerna flyttades till %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Konversationen flyttades till skräppost och användaren blockerades</item>
+        <item quantity="other">Konversationerna flyttades till skräppost och användarna blockerades</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Påminnelsen har avbrutits. Ditt meddelande är tillbaka i din inkorg</item>

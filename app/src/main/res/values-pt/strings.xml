@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Ligação copiada</string>
     <string name="snackbarMessageDeletedPermanently">Mensagem eliminada</string>
     <string name="snackbarMessageMoved">Mensagem movida para %s</string>
+    <string name="snackbarMessageMovedToSpam">Mensagem movida para spam e usuário bloqueado</string>
     <string name="snackbarMoveCancelled">Movimento cancelado</string>
     <string name="snackbarPasswordCopied">Palavra-passe copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversa movida para %s</item>
         <item quantity="other">Conversas movidas para %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Conversa movida para Spam e utilizador bloqueado</item>
+        <item quantity="other">Conversas movidas para Spam e utilizadores bloqueados</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess" tools:ignore="ImpliedQuantity">
         <item quantity="one">Lembrete cancelado. A sua mensagem voltou para a caixa de entrada</item>

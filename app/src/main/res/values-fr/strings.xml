@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Lien copié dans le presse-papiers</string>
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
+    <string name="snackbarMessageMovedToSpam">Message déplacé vers Spam et utilisateur bloqué</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
     <string name="snackbarPasswordCopied">Mot de passe copié</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numéro copié dans le presse-papiers</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversation déplacée vers %s</item>
         <item quantity="other">Conversations déplacées vers %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Conversation déplacée vers Spam et utilisateur bloqué</item>
+        <item quantity="other">Conversations déplacées vers Spam et utilisateurs bloqués</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess" tools:ignore="ImpliedQuantity">
         <item quantity="one">Rappel annulé. Votre message est revenu dans votre boîte de réception</item>

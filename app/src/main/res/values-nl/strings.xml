@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Link gekopieerd naar het klembord</string>
     <string name="snackbarMessageDeletedPermanently">Bericht verwijderd</string>
     <string name="snackbarMessageMoved">Bericht verplaatst naar %s</string>
+    <string name="snackbarMessageMovedToSpam">Bericht verplaatst naar spam en gebruiker geblokkeerd</string>
     <string name="snackbarMoveCancelled">Verplaatsing geannuleerd</string>
     <string name="snackbarPasswordCopied">Wachtwoord gekopieerd</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer gekopieerd naar het klembord</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversatie verplaatst naar %s</item>
         <item quantity="other">Conversaties verplaatst naar %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Conversatie verplaatst naar Spam en gebruiker geblokkeerd</item>
+        <item quantity="other">Conversaties verplaatst naar Spam en gebruikers geblokkeerd</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Herinnering geannuleerd. Uw bericht is terug in uw inbox</item>

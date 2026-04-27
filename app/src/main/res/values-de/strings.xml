@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Link in die Zwischenablage kopiert</string>
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
+    <string name="snackbarMessageMovedToSpam">Nachricht in den Spam verschoben und Benutzer blockiert</string>
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>
     <string name="snackbarPasswordCopied">Passwort kopiert</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer in die Zwischenablage kopiert</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Unterhaltung in %s verschoben</item>
         <item quantity="other">Unterhaltungen in %s verschoben</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Konversation in Spam verschoben und Benutzer gesperrt</item>
+        <item quantity="other">Konversationen in Spam verschoben und Benutzer gesperrt</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Erinnerung storniert. Ihre Nachricht ist zurück in Ihrem Posteingang</item>
