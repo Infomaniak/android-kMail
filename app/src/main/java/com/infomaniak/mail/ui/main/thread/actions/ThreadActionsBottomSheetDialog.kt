@@ -34,6 +34,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -316,6 +317,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToExecuteAction) },
             )
         }
+
+        override fun onSummary() = Unit
         //endregion
     }
 

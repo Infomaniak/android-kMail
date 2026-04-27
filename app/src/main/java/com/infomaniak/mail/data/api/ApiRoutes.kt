@@ -270,6 +270,10 @@ object ApiRoutes {
     fun aiShortcutNoContext(action: String, mailboxUuid: String): String {
         return "${ai()}/mobile/${action}${mailboxUuidParameter(mailboxUuid)}"
     }
+
+    fun aiResume(): String {
+        return "$MAIL_API/api/resume"
+    }
     //endregion
 
     //region SwissTransfer

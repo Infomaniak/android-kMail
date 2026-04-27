@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -27,11 +28,13 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
+import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -96,6 +99,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
             setFavoriteUi(message.isFavorite)
             setReactionUi(message.isValidReactionTarget)
+            setSummaryUi()
             setSpamUi(binding.spam, isFromSpam)
 
             observeReportPhishingResult()
@@ -272,6 +276,18 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     description = getString(R.string.reportDisplayProblemDescription),
                     onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(message.uid) },
                 )
+            }
+
+            override fun onSummary() {
+                // TODO: trackBottomSheetThreadActionsEvent(MatomoName.Summary)
+                lifecycleScope.launch {
+                    val summaryResult = ApiRepository.aiResume()
+                    if(summaryResult.result == ApiResponseStatus.SUCCESS){
+                        Log.i("myLog", "Summary : ${summaryResult.data}")
+                    }else {
+                        Log.i("myLog", "Error during summary")
+                    }
+                }
             }
             //endregion
         })
