@@ -48,12 +48,13 @@ class AvatarMergedContactData @Inject constructor(
     val mergedContactLiveData = mergedContactController
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
+        .filterNotNull()
+        .distinctUntilChanged()
         .asLiveData(ioCoroutineContext)
 
     val isBimiEnabledLiveData = mailboxController
         .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-        .mapLatest { it.obj?.featureFlags?.contains(FeatureFlag.BIMI) }
-        .filterNotNull()
+        .mapLatest { liveMailbox -> liveMailbox.obj?.featureFlags?.contains(FeatureFlag.BIMI) ?: false }
         .distinctUntilChanged()
         .asLiveData(ioCoroutineContext)
 }

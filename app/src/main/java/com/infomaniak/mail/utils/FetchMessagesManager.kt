@@ -40,9 +40,12 @@ import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.Notifi
 import com.infomaniak.mail.utils.NotificationUtils.Companion.EXTRA_MESSAGE_UID
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
+import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -52,6 +55,7 @@ class FetchMessagesManager @Inject constructor(
     private val notificationUtils: NotificationUtils,
     private val refreshController: RefreshController,
     private val localSettings: LocalSettings,
+    private val avatarMergedContactData: AvatarMergedContactData,
 ) {
 
     private lateinit var coroutineScope: CoroutineScope
@@ -234,6 +238,8 @@ class FetchMessagesManager @Inject constructor(
         val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces
         val description = "$subject\n$formattedBody".take(MAX_CHAR_LIMIT)
 
+        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
+        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
         // Show Message notification
         val hasShownNotification = notificationUtils.showMessageNotification(
             scope = coroutineScope,
@@ -243,11 +249,15 @@ class FetchMessagesManager @Inject constructor(
                 mailboxId = mailbox.mailboxId,
                 threadUid = uid,
                 messageUid = message.uid,
+                from = message.from.first().copyFromRealm(),
                 notificationId = uid.hashCode(),
                 payloadTitle = message.sender?.displayedName(appContext),
                 payloadContent = subject,
                 payloadDescription = description,
-            )
+                bimi = message.bimi?.copyFromRealm(),
+                isBimiEnabled = isBimiEnabled,
+            ),
+            contacts = mergedContacts,
         )
 
         // Show Group Summary notification
@@ -269,8 +279,13 @@ class FetchMessagesManager @Inject constructor(
                         type = NotificationType.SUMMARY,
                         behaviorContent = summaryText,
                     ),
+                    from = message.from.first().copyFromRealm(),
+                    bimi = message.bimi?.copyFromRealm(),
+                    isBimiEnabled = isBimiEnabled,
                 ),
-            )
+                contacts = mergedContacts,
+
+                )
         }
 
         return hasShownNotification

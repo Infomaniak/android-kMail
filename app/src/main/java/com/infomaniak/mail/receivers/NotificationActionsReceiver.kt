@@ -49,6 +49,7 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getUids
+import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
@@ -57,6 +58,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -78,6 +81,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    @Inject
+    lateinit var avatarMergedContactData: AvatarMergedContactData
 
     @Inject
     lateinit var notificationUtils: NotificationUtils
@@ -103,7 +109,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
+    private suspend fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
         // Undo action
         if (action == UNDO_ACTION) {
             trackNotificationActionEvent(MatomoName.CancelClicked)
@@ -128,26 +134,28 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     }
 
     private fun executeUndoAction(payload: NotificationPayload) {
-
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
 
         globalCoroutineScope.launch {
+            val mergedContacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
                 payload = payload.apply { behavior = null },
+                contacts = mergedContacts
             )
         }
     }
 
-    private fun executeAction(
+    private suspend fun executeAction(
         context: Context,
         folderRole: FolderRole,
         @StringRes undoNotificationTitle: Int,
         matomoName: MatomoName,
         payload: NotificationPayload,
     ) = with(payload) {
-
+        val mergedContacts = avatarMergedContactData.mergedContactLiveData.value
         val notificationShowingJob = globalCoroutineScope.launch {
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
@@ -157,6 +165,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
                         behaviorTitle = context.getString(undoNotificationTitle),
                     )
                 },
+                contacts = mergedContacts ?: emptyMap(),
             )
         }
 

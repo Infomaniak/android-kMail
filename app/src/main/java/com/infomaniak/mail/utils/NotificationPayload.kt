@@ -17,23 +17,33 @@
  */
 package com.infomaniak.mail.utils
 
+import android.os.Parcelable
+import com.infomaniak.mail.data.models.Bimi
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 /**
  * This payload contains all data needed to create a Message notification and its alternative behaviors.
  */
+
+@Parcelize
 data class NotificationPayload(
     val userId: Int,
     val mailboxId: Int,
     val threadUid: String,
+    val from: Correspondent,
     val messageUid: String? = null,
     var notificationId: Int,
     var behavior: NotificationBehavior? = null,
+    val bimi: Bimi? = null,
+    val isBimiEnabled: Boolean = false,
     private val payloadTitle: String? = null,
     private val payloadContent: String? = null,
     private val payloadDescription: String? = null,
-) : Serializable {
+
+    ) : Parcelable {
 
     val isSummary get() = behavior?.type == NotificationType.SUMMARY
     val isUndo get() = behavior?.type == NotificationType.UNDO

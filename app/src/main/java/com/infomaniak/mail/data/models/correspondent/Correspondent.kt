@@ -18,13 +18,14 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.content.Context
+import android.os.Parcelable
 import com.infomaniak.core.legacy.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.sentry.Sentry
 
-interface Correspondent {
+interface Correspondent : Parcelable {
     var email: String
     var name: String
 

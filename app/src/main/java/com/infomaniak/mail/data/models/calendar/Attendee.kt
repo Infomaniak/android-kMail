@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models.calendar
 
 import android.os.Parcel
-import android.os.Parcelable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.infomaniak.core.common.extensions.customReadBoolean
@@ -35,7 +34,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-class Attendee() : EmbeddedRealmObject, Correspondent, Parcelable {
+class Attendee() : EmbeddedRealmObject, Correspondent {
 
     //region Remote data
     @SerialName("address")

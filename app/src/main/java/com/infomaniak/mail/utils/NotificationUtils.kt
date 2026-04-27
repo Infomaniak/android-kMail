@@ -25,11 +25,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
+import com.infomaniak.core.coil.toBitmap
 import com.infomaniak.core.legacy.utils.NotificationUtilsCore
 import com.infomaniak.core.legacy.utils.NotificationUtilsCore.Companion.PENDING_INTENT_FLAGS
 import com.infomaniak.core.legacy.utils.clearStack
@@ -50,6 +52,8 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.EXTRA
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_ACTION
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
+import com.infomaniak.mail.utils.AvatarTypeUtils.getAvatarType
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -60,6 +64,7 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.infomaniak.core.legacy.R as RCore
+
 
 @Singleton
 class NotificationUtils @Inject constructor(
@@ -166,10 +171,12 @@ class NotificationUtils @Inject constructor(
         )
     }
 
+
     suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
+        contacts: MergedContactDictionary
     ): Boolean = with(payload) {
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
@@ -178,7 +185,13 @@ class NotificationUtils @Inject constructor(
         val contentIntent = getContentIntent(payload = this, isUndo)
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
-        initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
+        initMessageNotificationContent(
+            mailbox = mailbox,
+            contentIntent = contentIntent,
+            notificationBuilder = notificationBuilder,
+            payload = this,
+            contacts = contacts,
+        )
         showNotifications(scope, mailboxId, notificationManagerCompat)
         return@with true
     }
@@ -225,11 +238,12 @@ class NotificationUtils @Inject constructor(
         .setProgress(100, 0, true)
         .setPriority(priority)
 
-    private fun initMessageNotificationContent(
+    private suspend fun initMessageNotificationContent(
         mailbox: Mailbox,
         contentIntent: PendingIntent?,
         notificationBuilder: NotificationCompat.Builder,
         payload: NotificationPayload,
+        contacts: MergedContactDictionary,
     ) = notificationBuilder.apply {
 
         if (payload.isSummary) {
@@ -239,6 +253,16 @@ class NotificationUtils @Inject constructor(
             addActions(payload)
         }
 
+        val avatarType = getAvatarType(
+            correspondent = payload.from,
+            bimi = payload.bimi,
+            isBimiEnabled = payload.isBimiEnabled,
+            contacts = contacts,
+            context = appContext
+        )
+
+        val largeIconBitmap: Bitmap? = avatarType?.toBitmap(appContext)
+
         setOnlyAlertOnce(true)
         setSubText(mailbox.emailIdn)
         setContentText(payload.content)
@@ -246,6 +270,7 @@ class NotificationUtils @Inject constructor(
         setContentIntent(contentIntent)
         setGroup(mailbox.notificationGroupKey)
         setGroupSummary(payload.isSummary)
+        setLargeIcon(largeIconBitmap)
         setExtras(Bundle().apply { putString(EXTRA_MESSAGE_UID, payload.messageUid) })
         color = localSettings.accentColor.getPrimary(appContext)
 
@@ -362,3 +387,5 @@ class NotificationUtils @Inject constructor(
         }
     }
 }
+
+
