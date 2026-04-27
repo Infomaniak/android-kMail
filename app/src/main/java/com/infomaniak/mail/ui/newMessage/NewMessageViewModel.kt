@@ -1030,7 +1030,7 @@ class NewMessageViewModel @Inject constructor(
         // (the text could get hidden later with the show quotes button).
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
-        return doc.body().html()
+        return doc.html()
     }
 
     private fun Document.removeEmptyElements(className: String) {
