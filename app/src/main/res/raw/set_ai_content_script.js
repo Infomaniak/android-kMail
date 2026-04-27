@@ -16,14 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-let savedElements = [];
-
 function extractElements() {
+    let savedElements = [];
     const elements = document.querySelectorAll(".%s, .%s, .%s");
     elements.forEach( element => {
         savedElements.push(element.cloneNode(true));
         element.remove();
     });
+    return savedElements;
 }
 
 function clearRemainingContent() {
@@ -33,7 +33,7 @@ function clearRemainingContent() {
     }
 }
 
-function rebuildBody(aiContent) {
+function rebuildBody(aiContent, savedElements) {
     getEditor().insertAdjacentHTML('beforeEnd', aiContent);
     savedElements.forEach(quote => {
        getEditor().appendChild(quote);
@@ -41,7 +41,7 @@ function rebuildBody(aiContent) {
 }
 
 function setAiOutputContent(aiContent) {
-    extractElements();
+    let savedElements = extractElements();
     clearRemainingContent();
-    rebuildBody(aiContent);
+    rebuildBody(aiContent, savedElements);
 }
