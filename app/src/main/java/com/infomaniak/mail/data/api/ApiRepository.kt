@@ -91,6 +91,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.Response
 import java.io.File
 import java.util.Date
+import java.util.Locale
 import com.infomaniak.core.ksuite.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
 
 object ApiRepository : ApiRepositoryCore() {
@@ -494,6 +495,19 @@ object ApiRepository : ApiRepositoryCore() {
             method = POST,
             body = body,
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor
+        )
+    }
+
+    suspend fun aiResume(): ApiResponse<String> {
+        val languageCode = Locale.getDefault().language
+            .takeIf { it in listOf("fr", "es", "en", "it", "de") }
+            ?: "en"
+        val content = """message to summary""".trimMargin()
+        return callApi(
+            url = ApiRoutes.aiResume(),
+            method = POST,
+            body = mapOf("destination_language" to languageCode, "content" to content),
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }
 

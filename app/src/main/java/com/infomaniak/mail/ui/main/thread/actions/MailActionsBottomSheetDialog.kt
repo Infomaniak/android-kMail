@@ -71,6 +71,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onShare() = Unit
         override fun onSaveToKDrive() = Unit
         override fun onReportDisplayProblem() = Unit
+        override fun onSummary() = Unit
         //endregion
     }
 
@@ -107,6 +108,8 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
+        summary.setOnClickListener { onClickListener.onSummary() }
+
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
@@ -183,6 +186,10 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
+    fun setSummaryUi() = with(binding.summary) {
+        isVisible = true
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
@@ -203,5 +210,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onShare()
         fun onSaveToKDrive()
         fun onReportDisplayProblem()
+        fun onSummary()
     }
 }
