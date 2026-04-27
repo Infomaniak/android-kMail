@@ -572,7 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Ligação copiada</string>
     <string name="snackbarMessageDeletedPermanently">Mensagem eliminada</string>
     <string name="snackbarMessageMoved">Mensagem movida para %s</string>
-    <string name="snackbarMessageMovedToSpam">Mensagem movida para spam e usuário bloqueado</string>
+    <string name="snackbarMessageMovedToSpam">Mensagem movida para spam e utilizador bloqueado</string>
     <string name="snackbarMoveCancelled">Movimento cancelado</string>
     <string name="snackbarPasswordCopied">Palavra-passe copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado</string>
