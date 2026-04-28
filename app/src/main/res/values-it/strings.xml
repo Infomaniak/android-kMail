@@ -22,6 +22,7 @@
     <string name="actionArchive">Archivia</string>
     <string name="actionBlockSender">Blocca mittente</string>
     <string name="actionCancelSnooze">Annulla il posticipo</string>
+    <string name="actionCloseSummaryWindow">Chiudi la finestra di riepilogo</string>
     <string name="actionDelete">Cestina</string>
     <string name="actionEditMenu">Menu Modifica</string>
     <string name="actionForward">Inoltra</string>

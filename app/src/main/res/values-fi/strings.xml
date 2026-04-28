@@ -22,6 +22,7 @@
     <string name="actionArchive">Arkistoi</string>
     <string name="actionBlockSender">Estä lähettäjä</string>
     <string name="actionCancelSnooze">Peruuta torkku</string>
+    <string name="actionCloseSummaryWindow">Sulje yhteenvetoikkuna</string>
     <string name="actionDelete">Poista</string>
     <string name="actionEditMenu">Muokkaa valikkoa</string>
     <string name="actionForward">Välitä</string>
