@@ -44,6 +44,7 @@
     <string name="actionSnooze">Udsæt</string>
     <string name="actionSpam">Rapportér spam</string>
     <string name="actionStar">Tilføj til favoritter</string>
+    <string name="actionSummarize">Resumé</string>
     <string name="actionUnstar">Fjern fra favoritter</string>
     <string name="actionViewInDark">Vis i mørk tema</string>
     <string name="actionViewInLight">Vis i lyst tema</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Denne besked betragtes som spam. Vi anbefaler dig at flytte den til \"Spam\"-mappen.</string>
     <string name="messageReplyHeader">Den %1$s skrev %2$s:</string>
     <string name="messageShowQuotedText">Vis samtalen</string>
+    <string name="messageSummary">Beskedens resumé</string>
+    <string name="messageSummaryErrorRetry">Euria kunne ikke opsummere denne besked. Prøv venligst igen.</string>
+    <string name="messageSummaryLoading">Beskedens resumé…</string>
     <string name="mondayAfternoon">Mandag eftermiddag</string>
     <string name="mondayMorning">Mandag morgen</string>
     <string name="moveInSpamButton">Flyt til Spam</string>

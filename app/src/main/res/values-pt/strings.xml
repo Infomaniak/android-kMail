@@ -44,6 +44,7 @@
     <string name="actionSnooze">Adiar</string>
     <string name="actionSpam">Denunciar spam</string>
     <string name="actionStar">Adicionar aos favoritos</string>
+    <string name="actionSummarize">Resumir</string>
     <string name="actionUnstar">Remover dos favoritos</string>
     <string name="actionViewInDark">Ver no tema escuro</string>
     <string name="actionViewInLight">Ver no tema claro</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Esta mensagem é considerada spam. Recomendamos que a mova para a pasta \"Spam\".</string>
     <string name="messageReplyHeader">Em %1$s, %2$s escreveu:</string>
     <string name="messageShowQuotedText">Mostrar a conversa</string>
+    <string name="messageSummary">Resumo da mensagem</string>
+    <string name="messageSummaryErrorRetry">A Euria não conseguiu resumir esta mensagem. Por favor, tente novamente.</string>
+    <string name="messageSummaryLoading">Resumo da mensagem…</string>
     <string name="mondayAfternoon">Segunda-feira à tarde</string>
     <string name="mondayMorning">Segunda-feira de manhã</string>
     <string name="moveInSpamButton">Mover para Spam</string>

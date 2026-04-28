@@ -44,6 +44,7 @@
     <string name="actionSnooze">Poner en espera</string>
     <string name="actionSpam">Notificar spam</string>
     <string name="actionStar">Añadir a favoritos</string>
+    <string name="actionSummarize">Resumir</string>
     <string name="actionUnstar">Borrar de favoritos</string>
     <string name="actionViewInDark">Ver en tema oscuro</string>
     <string name="actionViewInLight">Ver en tema claro</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Este mensaje se considera spam. Le recomendamos que lo mueva a la carpeta \"Spam\".</string>
     <string name="messageReplyHeader">El %1$s, %2$s escribió:</string>
     <string name="messageShowQuotedText">Mostrar la conversación</string>
+    <string name="messageSummary">Resumen del mensaje</string>
+    <string name="messageSummaryErrorRetry">Euria no ha podido resumir este mensaje. Por favor, inténtelo de nuevo.</string>
+    <string name="messageSummaryLoading">Resumen del mensaje…</string>
     <string name="mondayAfternoon">Lunes por la tarde</string>
     <string name="mondayMorning">Lunes mañana</string>
     <string name="moveInSpamButton">Mover en Spam</string>

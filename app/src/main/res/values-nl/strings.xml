@@ -44,6 +44,7 @@
     <string name="actionSnooze">Snooze</string>
     <string name="actionSpam">Spam rapporteren</string>
     <string name="actionStar">Toevoegen aan favorieten</string>
+    <string name="actionSummarize">Samenvatten</string>
     <string name="actionUnstar">Uit favorieten verwijderen</string>
     <string name="actionViewInDark">Weergeven in donker thema</string>
     <string name="actionViewInLight">Weergeven in licht thema</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Dit bericht wordt als spam beschouwd. Wij raden u aan het naar de \"Spam\"-map te verplaatsen.</string>
     <string name="messageReplyHeader">Op %1$s schreef %2$s:</string>
     <string name="messageShowQuotedText">Gesprek weergeven</string>
+    <string name="messageSummary">Samenvatting van het bericht</string>
+    <string name="messageSummaryErrorRetry">Euria kon dit bericht niet samenvatten. Probeer het opnieuw.</string>
+    <string name="messageSummaryLoading">Samenvatting van het bericht…</string>
     <string name="mondayAfternoon">Maandagmiddag</string>
     <string name="mondayMorning">Maandagochtend</string>
     <string name="moveInSpamButton">Naar Spam verplaatsen</string>

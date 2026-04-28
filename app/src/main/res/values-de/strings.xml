@@ -44,6 +44,7 @@
     <string name="actionSnooze">In die Warteschlange verschieben</string>
     <string name="actionSpam">Spam melden</string>
     <string name="actionStar">Zu Favoriten hinzufügen</string>
+    <string name="actionSummarize">Zusammenfassen</string>
     <string name="actionUnstar">Aus Favoriten löschen</string>
     <string name="actionViewInDark">Ansicht im dunklen Thema</string>
     <string name="actionViewInLight">Ansicht im hellen Thema</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Diese Nachricht wird als Spam betrachtet. Wir empfehlen Ihnen, sie in den Ordner \"Spam\" zu verschieben.</string>
     <string name="messageReplyHeader">Am %1$s, %2$s schrieb:</string>
     <string name="messageShowQuotedText">Anzeigen der Konversation</string>
+    <string name="messageSummary">Zusammenfassung der Nachricht</string>
+    <string name="messageSummaryErrorRetry">Euria konnte diese Nachricht nicht zusammenfassen. Bitte versuchen Sie es erneut.</string>
+    <string name="messageSummaryLoading">Zusammenfassung der Nachricht…</string>
     <string name="mondayAfternoon">Montagnachmittag</string>
     <string name="mondayMorning">Montagmorgen</string>
     <string name="moveInSpamButton">Einzug von Spam</string>

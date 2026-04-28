@@ -44,6 +44,7 @@
     <string name="actionSnooze">Torkku</string>
     <string name="actionSpam">Ilmoita roskapostiksi</string>
     <string name="actionStar">Lisää suosikkeihin</string>
+    <string name="actionSummarize">Tee yhteenveto</string>
     <string name="actionUnstar">Poista suosikeista</string>
     <string name="actionViewInDark">Näytä tummassa teemassa</string>
     <string name="actionViewInLight">Näytä vaaleassa teemassa</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Tämä viesti katsotaan roskapostiksi. Suosittelemme siirtämään sen \"Roskaposti\"-kansioon.</string>
     <string name="messageReplyHeader">%1$s, %2$s kirjoitti:</string>
     <string name="messageShowQuotedText">Näytä keskustelu</string>
+    <string name="messageSummary">Viestin yhteenveto</string>
+    <string name="messageSummaryErrorRetry">Euria ei voinut tehdä yhteenvetoa tästä viestistä. Yritä uudelleen.</string>
+    <string name="messageSummaryLoading">Viestin yhteenveto…</string>
     <string name="mondayAfternoon">Maanantai-iltapäivä</string>
     <string name="mondayMorning">Maanantaiaamu</string>
     <string name="moveInSpamButton">Siirrä roskapostiin</string>

@@ -44,6 +44,7 @@
     <string name="actionSnooze">Sätt i vänteläge</string>
     <string name="actionSpam">Rapportera som spam</string>
     <string name="actionStar">Lägg till i favoriter</string>
+    <string name="actionSummarize">Sammanfatta</string>
     <string name="actionUnstar">Ta bort från favoriter</string>
     <string name="actionViewInDark">Visa i mörkt tema</string>
     <string name="actionViewInLight">Visa i ljust tema</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Detta meddelande anses vara spam. Vi rekommenderar dig att flytta det till mappen \"Spam\".</string>
     <string name="messageReplyHeader">Den %1$s skrev %2$s:</string>
     <string name="messageShowQuotedText">Visa konversationen</string>
+    <string name="messageSummary">Meddelandesammanfattning</string>
+    <string name="messageSummaryErrorRetry">Euria kunde inte sammanfatta detta meddelande. Försök igen.</string>
+    <string name="messageSummaryLoading">Meddelandesammanfattning…</string>
     <string name="mondayAfternoon">Måndag eftermiddag</string>
     <string name="mondayMorning">Måndag morgon</string>
     <string name="moveInSpamButton">Flytta till Spam</string>

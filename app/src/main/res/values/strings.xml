@@ -49,6 +49,7 @@
     <string name="actionSnooze">Snooze</string>
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
+    <string name="actionSummarize">Summarize</string>
     <string name="actionUnstar">Delete from favorites</string>
     <string name="actionViewInDark">View in dark theme</string>
     <string name="actionViewInLight">View in light theme</string>
@@ -387,6 +388,9 @@
     <string name="messageIsSpamShouldMoveToSpam">This message is considered to be spam. We recommend you to move it to the \"Spam\" folder.</string>
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
     <string name="messageShowQuotedText">Display the conversation</string>
+    <string name="messageSummary">Message summary</string>
+    <string name="messageSummaryErrorRetry">Euria could not summarize this message. Please try again.</string>
+    <string name="messageSummaryLoading">Message summary…</string>
     <string name="mondayAfternoon">Monday afternoon</string>
     <string name="mondayMorning">Monday morning</string>
     <string name="moveInSpamButton">Move in Spam</string>

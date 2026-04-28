@@ -44,6 +44,7 @@
     <string name="actionSnooze">Αναβολή</string>
     <string name="actionSpam">Αναφορά ως spam</string>
     <string name="actionStar">Προσθήκη στα αγαπημένα</string>
+    <string name="actionSummarize">Σύνοψη</string>
     <string name="actionUnstar">Διαγραφή από τα αγαπημένα</string>
     <string name="actionViewInDark">Προβολή σε σκούρο θέμα</string>
     <string name="actionViewInLight">Προβολή σε φωτεινό θέμα</string>
@@ -382,6 +383,9 @@
     <string name="messageIsSpamShouldMoveToSpam">Αυτό το μήνυμα θεωρείται ανεπιθύμητο. Σας συνιστούμε να το μετακινήσετε στο φάκελο \"Spam\".</string>
     <string name="messageReplyHeader">Στις %1$s, ο/η %2$s έγραψε:</string>
     <string name="messageShowQuotedText">Εμφάνιση συνομιλίας</string>
+    <string name="messageSummary">Σύνοψη του μηνύματος</string>
+    <string name="messageSummaryErrorRetry">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
+    <string name="messageSummaryLoading">Σύνοψη του μηνύματος…</string>
     <string name="mondayAfternoon">Δευτέρα απόγευμα</string>
     <string name="mondayMorning">Δευτέρα πρωί</string>
     <string name="moveInSpamButton">Μετακίνηση στα Spam</string>
