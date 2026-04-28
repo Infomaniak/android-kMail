@@ -282,14 +282,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onSummary() {
                 // TODO: trackBottomSheetThreadActionsEvent(MatomoName.Summary)
                 setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, message.uid)
-                // lifecycleScope.launch {
-                //     val summaryResult = ApiRepository.aiResume()
-                //     if(summaryResult.result == ApiResponseStatus.SUCCESS){
-                //         Log.i("myLog", "Summary : ${summaryResult.data}")
-                //     }else {
-                //         Log.i("myLog", "Error during summary")
-                //     }
-                // }
             }
             //endregion
         })

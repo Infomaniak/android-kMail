@@ -778,7 +778,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 val languageCode = requireContext().getCurrentLanguageCode()
-                val result = ApiRepository.aiResume(languageCode)
+                val result = ApiRepository.aiSummary(languageCode)
                 threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
                     AiSummaryState.Success(result.data ?: "")
                 } else {
