@@ -435,7 +435,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         val emojiDetails = getLocalEmojiReactionsDetailsFor(messageUid) ?: return@launch
                         binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
                     }
-                }
+                },
+                onAiSummaryRetry = ::retrySummarize
             ),
         )
 
@@ -777,8 +778,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             if (index >= 0) threadAdapter.notifyItemChanged(index)
 
             viewLifecycleOwner.lifecycleScope.launch {
+                val message = mainViewModel.getMessage(messageUid)
+                val content = message?.body?.value ?: message?.splitBody?.content ?: ""
                 val languageCode = requireContext().getCurrentLanguageCode()
-                val result = ApiRepository.aiSummary(languageCode)
+                val result = ApiRepository.aiSummary(languageCode, content)
                 threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
                     AiSummaryState.Success(result.data ?: "")
                 } else {
@@ -993,6 +996,26 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             resId = R.id.unencryptableRecipientsBottomSheetDialog,
             args = UnencryptableRecipientsBottomSheetDialogArgs(recipients.toTypedArray()).toBundle(),
         )
+    }
+
+    private fun retrySummarize(messageUid: String) {
+        threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiSummaryState.Loading
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index >= 0) threadAdapter.notifyItemChanged(index)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val message = mainViewModel.getMessage(messageUid)
+            val content = message?.body?.value ?: message?.splitBody?.content ?: ""
+            val languageCode = requireContext().getCurrentLanguageCode()
+            val result = ApiRepository.aiSummary(languageCode, content)
+
+            threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
+                AiSummaryState.Success(result.data ?: "")
+            } else {
+                AiSummaryState.Error
+            }
+            if (index >= 0) threadAdapter.notifyItemChanged(index)
+        }
     }
 
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
