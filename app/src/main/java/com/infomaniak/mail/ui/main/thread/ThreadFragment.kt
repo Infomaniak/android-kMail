@@ -123,6 +123,7 @@ import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAttributeColor
+import com.infomaniak.mail.utils.extensions.getCurrentLanguageCode
 import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
@@ -776,8 +777,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             if (index >= 0) threadAdapter.notifyItemChanged(index)
 
             viewLifecycleOwner.lifecycleScope.launch {
-                // val result = ApiRepository.aiResume(messageUid) // TODO: adapt aiResume with one param messageUid when backend supports this
-                val result = ApiRepository.aiResume() // temporary until backend is ready
+                val languageCode = requireContext().getCurrentLanguageCode()
+                val result = ApiRepository.aiResume(languageCode)
                 threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
                     AiSummaryState.Success(result.data ?: "")
                 } else {
