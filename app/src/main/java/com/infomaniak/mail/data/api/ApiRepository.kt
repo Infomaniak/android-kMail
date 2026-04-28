@@ -497,11 +497,11 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    suspend fun aiResume(languageCode: String): ApiResponse<String> {
+    suspend fun aiSummary(languageCode: String): ApiResponse<String> {
         val content =
             """message to summary""".trimMargin() // // TODO: Adapt aiResume to accept an additional messageUid parameter once the backend supports it
         return callApi(
-            url = ApiRoutes.aiResume(),
+            url = ApiRoutes.aiSummary(),
             method = POST,
             body = mapOf("destination_language" to languageCode, "content" to content),
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
