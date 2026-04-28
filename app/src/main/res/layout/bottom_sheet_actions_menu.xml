@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:icon="@drawable/ic_view_in_light"
+            app:icon="@drawable/ic_paragraph_shorten"
             app:title="Summary"
             app:visibleDivider="false"
             tools:visibility="visible" />
