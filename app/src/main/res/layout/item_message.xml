@@ -455,6 +455,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider" />
 
+        <include
+            android:id="@+id/bannerMessageLayout"
+            layout="@layout/layout_ai_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin"
+            app:layout_goneMarginTop="0dp"
+            tools:visibility="visible" />
+
         <com.infomaniak.mail.ui.main.thread.calendar.CalendarEventBannerView
             android:id="@+id/calendarEvent"
             android:layout_width="match_parent"
@@ -464,7 +477,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin"
+            app:layout_constraintTop_toBottomOf="@id/bannerMessageLayout"
             tools:visibility="visible" />
 
         <include

@@ -254,6 +254,7 @@ class ThreadAdapter(
         initMapForNewMessage(messageUi.message, position)
 
         bindHeader(messageUi.message)
+        bindAiSummary(messageUi.message)
         bindAlerts(messageUi)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
@@ -437,6 +438,41 @@ class ThreadAdapter(
         handleHeaderClick(message, areMessagesCollapsibles())
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
+    }
+
+    private fun MessageViewHolder.bindAiSummary(message: Message) = with(binding) {
+        val state = threadAdapterState.aiSummaryStateMap[message.uid]
+
+        if (state == null) {
+            bannerMessageLayout.root.isVisible = false
+            return
+        }
+
+        bannerMessageLayout.root.isVisible = true
+        bannerMessageLayout.iconAiAnimation.setAnimation(R.raw.euria)
+        when (state) {
+            is AiSummaryState.Loading -> {
+                bannerMessageLayout.tvTitle.text = "Résumé du message..."
+                // bannerMessageLayout.tvTitle.setTextColor(Color.parseColor("#1A73E8"))
+                bannerMessageLayout.tvContent.isVisible = false
+            }
+            is AiSummaryState.Success -> {
+                bannerMessageLayout.tvTitle.text = "Résumé du message"
+                // bannerMessageLayout.tvTitle.setTextColor(Color.parseColor("#37474F"))
+                bannerMessageLayout.tvContent.text = state.summary
+                bannerMessageLayout.tvContent.isVisible = true
+            }
+            is AiSummaryState.Error -> {
+                bannerMessageLayout.tvTitle.text = "Erreur lors du résumé"
+                // bannerMessageLayout.tvTitle.setTextColor(Color.parseColor("#37474F"))
+                bannerMessageLayout.tvContent.isVisible = false
+            }
+        }
+
+        bannerMessageLayout.btnClose.setOnClickListener {
+            threadAdapterState.aiSummaryStateMap.remove(message.uid)
+            bannerMessageLayout.root.isVisible = false
+        }
     }
 
     private fun ItemMessageBinding.setDetailedFieldsVisibility(message: Message) {
