@@ -44,6 +44,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setSpamUi
@@ -280,14 +281,15 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onSummary() {
                 // TODO: trackBottomSheetThreadActionsEvent(MatomoName.Summary)
-                lifecycleScope.launch {
-                    val summaryResult = ApiRepository.aiResume()
-                    if(summaryResult.result == ApiResponseStatus.SUCCESS){
-                        Log.i("myLog", "Summary : ${summaryResult.data}")
-                    }else {
-                        Log.i("myLog", "Error during summary")
-                    }
-                }
+                setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, message.uid)
+                // lifecycleScope.launch {
+                //     val summaryResult = ApiRepository.aiResume()
+                //     if(summaryResult.result == ApiResponseStatus.SUCCESS){
+                //         Log.i("myLog", "Summary : ${summaryResult.data}")
+                //     }else {
+                //         Log.i("myLog", "Error during summary")
+                //     }
+                // }
             }
             //endregion
         })

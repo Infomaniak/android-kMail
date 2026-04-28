@@ -42,6 +42,7 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.views.DividerItemDecorator
+import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -56,6 +57,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
@@ -341,6 +343,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
+                override val aiSummaryStateMap by threadState::aiSummaryStateMap
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
@@ -764,6 +767,25 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
+
+        getBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET) { messageUid: String ->
+            threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiSummaryState.Loading
+
+            val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+            if (index >= 0) threadAdapter.notifyItemChanged(index)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                // val result = ApiRepository.aiResume(messageUid) // TODO: adapt aiResume with one param messageUid when backend supports this
+                val result = ApiRepository.aiResume() // temporary until backend is ready
+                threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
+                    AiSummaryState.Success(result.data ?: "")
+                } else {
+                    AiSummaryState.Error
+                }
+
+                if (index >= 0) threadAdapter.notifyItemChanged(index)
+            }
+        }
     }
 
     private fun executeSavedSnoozeScheduleType(timestamp: Long) {
@@ -1108,6 +1130,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
+        const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"
