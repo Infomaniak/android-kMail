@@ -271,7 +271,7 @@ object ApiRoutes {
         return "${ai()}/mobile/${action}${mailboxUuidParameter(mailboxUuid)}"
     }
 
-    fun aiResume(): String {
+    fun aiSummary(): String {
         return "$MAIL_API/api/resume"
     }
     //endregion
