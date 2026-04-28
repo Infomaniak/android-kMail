@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Enlace copiado en el portapapeles</string>
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
+    <string name="snackbarMessageMovedToSpam">Mensaje movido a spam y usuario bloqueado</string>
     <string name="snackbarMoveCancelled">Desplazamiento cancelado</string>
     <string name="snackbarPasswordCopied">Contraseña copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado en el portapapeles</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversación trasladada a %s</item>
         <item quantity="other">Conversaciones trasladadas a %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Conversación movida a Spam y usuario bloqueado</item>
+        <item quantity="other">Conversaciones movidas a Spam y usuarios bloqueados</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Recordatorio cancelado. Tu mensaje ha vuelto a tu bandeja de entrada</item>

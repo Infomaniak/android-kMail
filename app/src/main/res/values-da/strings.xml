@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Link kopieret til udklipsholderen</string>
     <string name="snackbarMessageDeletedPermanently">Besked slettet</string>
     <string name="snackbarMessageMoved">Besked flyttet til %s</string>
+    <string name="snackbarMessageMovedToSpam">Besked flyttet til spam og bruger blokeret</string>
     <string name="snackbarMoveCancelled">Flytning annulleret</string>
     <string name="snackbarPasswordCopied">Adgangskode kopieret</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopieret til udklipsholderen</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Samtale flyttet til %s</item>
         <item quantity="other">Samtaler flyttet til %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Samtale flyttet til Spam og bruger blokeret</item>
+        <item quantity="other">Samtaler flyttet til Spam og brugere blokeret</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Påmindelse annulleret. Din besked er tilbage i din indbakke</item>

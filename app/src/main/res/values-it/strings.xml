@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Link copiato negli appunti</string>
     <string name="snackbarMessageDeletedPermanently">Messaggio cancellato</string>
     <string name="snackbarMessageMoved">Messaggio spostato a %s</string>
+    <string name="snackbarMessageMovedToSpam">Messaggio spostato nello spam e utente bloccato</string>
     <string name="snackbarMoveCancelled">Spostamento annullato</string>
     <string name="snackbarPasswordCopied">Password copiata</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero copiato negli appunti</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversazione spostata in %s</item>
         <item quantity="other">Conversazioni spostate in %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Conversazione spostata in Spam e utente bloccato</item>
+        <item quantity="other">Conversazioni spostate in Spam e utenti bloccati</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Promemoria annullato. Il tuo messaggio è tornato nella tua casella di posta</item>

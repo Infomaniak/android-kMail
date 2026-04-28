@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Linkki kopioitu leikepöydälle</string>
     <string name="snackbarMessageDeletedPermanently">Viesti poistettu</string>
     <string name="snackbarMessageMoved">Viesti siirretty kohteeseen %s</string>
+    <string name="snackbarMessageMovedToSpam">Viesti siirretty roskapostiksi ja käyttäjä estetty</string>
     <string name="snackbarMoveCancelled">Siirto peruutettu</string>
     <string name="snackbarPasswordCopied">Salasana kopioitu</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero kopioitu leikepöydälle</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Keskustelu siirretty kohteeseen %s</item>
         <item quantity="other">Keskustelut siirretty kohteeseen %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Keskustelu siirretty roskapostiin ja käyttäjä estetty</item>
+        <item quantity="other">Keskustelut siirretty roskapostiin ja käyttäjät estetty</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Muistutus peruutettu. Viestisi on palannut saapuneisiin</item>

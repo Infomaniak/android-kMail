@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Ο σύνδεσμος αντιγράφηκε στο πρόχειρο</string>
     <string name="snackbarMessageDeletedPermanently">Το μήνυμα διαγράφηκε</string>
     <string name="snackbarMessageMoved">Το μήνυμα μετακινήθηκε στο %s</string>
+    <string name="snackbarMessageMovedToSpam">Το μήνυμα μεταφέρθηκε στα spam και ο χρήστης εμποδίστηκε</string>
     <string name="snackbarMoveCancelled">Η μετακίνηση ακυρώθηκε</string>
     <string name="snackbarPasswordCopied">Ο κωδικός αντιγράφηκε</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Ο αριθμός αντιγράφηκε στο πρόχειρο</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Η συνομιλία μετακινήθηκε στο %s</item>
         <item quantity="other">Οι συνομιλίες μετακινήθηκαν στο %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Η συνομιλία μετακινήθηκε στα Ανεπιθύμητα και ο χρήστης αποκλείστηκε</item>
+        <item quantity="other">Οι συνομιλίες μετακινήθηκαν στα Ανεπιθύμητα και οι χρήστες αποκλείστηκαν</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Η υπενθύμιση ακυρώθηκε. Το μήνυμά σας επέστρεψε στα εισερχόμενά σας</item>

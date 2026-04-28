@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity,ImpliedQuantity">
     <string name="accentColorBlueTitle">Azul</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Cor do sistema</string>
@@ -572,6 +572,7 @@
     <string name="snackbarLinkCopiedToClipboard">Ligação copiada</string>
     <string name="snackbarMessageDeletedPermanently">Mensagem eliminada</string>
     <string name="snackbarMessageMoved">Mensagem movida para %s</string>
+    <string name="snackbarMessageMovedToSpam">Mensagem movida para spam e utilizador bloqueado</string>
     <string name="snackbarMoveCancelled">Movimento cancelado</string>
     <string name="snackbarPasswordCopied">Palavra-passe copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado</string>
@@ -597,6 +598,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversa movida para %s</item>
         <item quantity="other">Conversas movidas para %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Conversa movida para Spam e utilizador bloqueado</item>
+        <item quantity="other">Conversas movidas para Spam e utilizadores bloqueados</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess" tools:ignore="ImpliedQuantity">
         <item quantity="one">Lembrete cancelado. A sua mensagem voltou para a caixa de entrada</item>

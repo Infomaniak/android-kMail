@@ -962,11 +962,12 @@ class MainViewModel @Inject constructor(
     ) {
 
         val destination = destinationFolder.getLocalizedName(appContext)
+        val isSpam = destinationFolder.role == FolderRole.SPAM
 
         val snackbarTitle = when {
             apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
-            message == null -> appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
-            else -> appContext.getString(R.string.snackbarMessageMoved, destination)
+            message == null -> getMoveThreadSnackbarTitle(isSpam, threads.count(), destination)
+            else -> getMoveMessageSnackbarTitle(isSpam, destination)
         }
 
         val undoResources = apiResponses.mapNotNull { it.data?.undoResource }
@@ -984,6 +985,22 @@ class MainViewModel @Inject constructor(
         }
 
         snackbarManager.postValue(snackbarTitle, undoData)
+    }
+
+    private fun getMoveThreadSnackbarTitle(isSpam: Boolean, threadCount: Int, destination: String): String {
+        return if (isSpam) {
+            appContext.resources.getQuantityString(R.plurals.snackbarThreadMovedToSpam, threadCount)
+        } else {
+            appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, threadCount, destination)
+        }
+    }
+
+    private fun getMoveMessageSnackbarTitle(isSpam: Boolean, destination: String): String {
+        return if (isSpam) {
+            appContext.getString(R.string.snackbarMessageMovedToSpam)
+        } else {
+            appContext.getString(R.string.snackbarMessageMoved, destination)
+        }
     }
     //endregion
 

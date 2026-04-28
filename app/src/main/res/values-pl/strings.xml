@@ -592,6 +592,7 @@
     <string name="snackbarLinkCopiedToClipboard">Link skopiowany do schowka</string>
     <string name="snackbarMessageDeletedPermanently">Wiadomość usunięta</string>
     <string name="snackbarMessageMoved">Wiadomość przeniesiona do %s</string>
+    <string name="snackbarMessageMovedToSpam">Wiadomość przeniesiona do spamu i użytkownik zablokowany</string>
     <string name="snackbarMoveCancelled">Przeniesienie anulowane</string>
     <string name="snackbarPasswordCopied">Hasło skopiowane</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numer skopiowany do schowka</string>
@@ -625,6 +626,12 @@
         <item quantity="few">Konwersacje przeniesione do %s</item>
         <item quantity="many">Konwersacji przeniesionych do %s</item>
         <item quantity="other">Konwersacji przeniesionych do %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Konwersacja przeniesiona do Spam i użytkownik zablokowany</item>
+        <item quantity="few">Konwersacje przeniesione do Spam i użytkownicy zablokowani</item>
+        <item quantity="many">Konwersacji przeniesionych do Spam i użytkowników zablokowanych</item>
+        <item quantity="other">Konwersacji przeniesionych do Spam i użytkowników zablokowanych</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Przypomnienie anulowane. Twoja wiadomość wróciła do skrzynki odbiorczej</item>

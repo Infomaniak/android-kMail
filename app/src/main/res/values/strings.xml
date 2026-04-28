@@ -577,6 +577,7 @@
     <string name="snackbarLinkCopiedToClipboard">Link copied to clipboard</string>
     <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
+    <string name="snackbarMessageMovedToSpam">Message moved to Spam and user blocked</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>
     <string name="snackbarPasswordCopied">Password copied</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Number copied to clipboard</string>
@@ -602,6 +603,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversation moved to %s</item>
         <item quantity="other">Conversations moved to %s</item>
+    </plurals>
+    <plurals name="snackbarThreadMovedToSpam">
+        <item quantity="one">Conversation moved to Spam and user blocked</item>
+        <item quantity="other">Conversations moved to Spam and users blocked</item>
     </plurals>
     <plurals name="snackbarUnsnoozeSuccess">
         <item quantity="one">Reminder canceled. Your message is back in your inbox</item>
