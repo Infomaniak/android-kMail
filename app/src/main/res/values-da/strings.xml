@@ -22,6 +22,7 @@
     <string name="actionArchive">Arkivér</string>
     <string name="actionBlockSender">Bloker afsender</string>
     <string name="actionCancelSnooze">Annuller udsættelse</string>
+    <string name="actionCloseSummaryWindow">Luk resumévinduet</string>
     <string name="actionDelete">Slet</string>
     <string name="actionEditMenu">Rediger menu</string>
     <string name="actionForward">Videresend</string>

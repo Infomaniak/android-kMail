@@ -22,6 +22,7 @@
     <string name="actionArchive">Archivar</string>
     <string name="actionBlockSender">Bloquear remitente</string>
     <string name="actionCancelSnooze">Cancelar el aplazamiento</string>
+    <string name="actionCloseSummaryWindow">Cerrar la ventana de resumen</string>
     <string name="actionDelete">Borrar</string>
     <string name="actionEditMenu">Menú Edición</string>
     <string name="actionForward">Reenviar</string>

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.R.attr.banner
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -24,6 +25,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
+import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewConfiguration
 import android.view.ViewGroup
@@ -37,6 +39,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import com.google.android.gms.tasks.Tasks.call
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
@@ -443,36 +446,35 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindAiSummary(message: Message) = with(binding) {
         val state = threadAdapterState.aiSummaryStateMap[message.uid]
 
-        if (state == null) {
-            bannerMessageLayout.root.isVisible = false
-            return
-        }
+        bannerMessageLayout.root.isVisible = state is AiSummaryState.Loading || state is AiSummaryState.Success
+        errorBannerMessageLayout.root.isVisible = state is AiSummaryState.Error
 
-        bannerMessageLayout.root.isVisible = true
-        bannerMessageLayout.iconAiAnimation.setAnimation(R.raw.euria)
-        when (state) {
-            is AiSummaryState.Loading -> {
-                bannerMessageLayout.tvTitle.text = "Résumé du message..."
-                // bannerMessageLayout.tvTitle.setTextColor(Color.parseColor("#1A73E8"))
-                bannerMessageLayout.tvContent.isVisible = false
-            }
-            is AiSummaryState.Success -> {
-                bannerMessageLayout.tvTitle.text = "Résumé du message"
-                // bannerMessageLayout.tvTitle.setTextColor(Color.parseColor("#37474F"))
-                bannerMessageLayout.tvContent.text = state.summary
-                bannerMessageLayout.tvContent.isVisible = true
-            }
-            is AiSummaryState.Error -> {
-                bannerMessageLayout.tvTitle.text = "Erreur lors du résumé"
-                // bannerMessageLayout.tvTitle.setTextColor(Color.parseColor("#37474F"))
-                bannerMessageLayout.tvContent.isVisible = false
+        if (state == null) return@with
+
+        with(bannerMessageLayout) {
+            when (state) {
+                is AiSummaryState.Loading -> {
+                    tvTitle.setText(R.string.messageSummaryLoading)
+                    tvContent.isVisible = false
+                    iconAiAnimation.setAnimation(R.raw.euria)
+                }
+                is AiSummaryState.Success -> {
+                    tvTitle.setText(R.string.messageSummary)
+                    tvContent.text = state.summary
+                    tvContent.isVisible = true
+                    iconAiAnimation.setAnimation(R.raw.euria)
+                }
+                is AiSummaryState.Error -> Unit
             }
         }
 
-        bannerMessageLayout.btnClose.setOnClickListener {
+        val onCloseClicked = { targetRoot: View ->
             threadAdapterState.aiSummaryStateMap.remove(message.uid)
-            bannerMessageLayout.root.isVisible = false
+            targetRoot.isVisible = false
         }
+
+        bannerMessageLayout.btnClose.setOnClickListener { onCloseClicked(bannerMessageLayout.root) }
+        errorBannerMessageLayout.btnClose.setOnClickListener { onCloseClicked(errorBannerMessageLayout.root) }
     }
 
     private fun ItemMessageBinding.setDetailedFieldsVisibility(message: Message) {

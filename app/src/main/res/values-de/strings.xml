@@ -22,6 +22,7 @@
     <string name="actionArchive">Archiv</string>
     <string name="actionBlockSender">Absender blockieren</string>
     <string name="actionCancelSnooze">Schlummern abbrechen</string>
+    <string name="actionCloseSummaryWindow">Zusammenfassungsfenster schliessen</string>
     <string name="actionDelete">Löschen</string>
     <string name="actionEditMenu">Menü Bearbeiten</string>
     <string name="actionForward">Weiterleiten</string>

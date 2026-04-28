@@ -22,6 +22,7 @@
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
+    <string name="actionCloseSummaryWindow">Κλείσιμο του παραθύρου σύνοψης</string>
     <string name="actionDelete">Διαγραφή</string>
     <string name="actionEditMenu">Επεξεργασία μενού</string>
     <string name="actionForward">Προώθηση</string>

@@ -27,6 +27,7 @@
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
     <string name="actionCancelSnooze">Cancel snooze</string>
+    <string name="actionCloseSummaryWindow">Close summary window</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
     <string name="actionForward">Forward</string>

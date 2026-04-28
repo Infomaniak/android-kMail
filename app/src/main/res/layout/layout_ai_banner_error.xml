@@ -31,62 +31,54 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <FrameLayout
-            android:id="@+id/bannerAi"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+        <ImageView
+            android:id="@+id/iconAiWarning"
+            android:layout_width="@dimen/mediumIconSize"
+            android:layout_height="@dimen/mediumIconSize"
+            android:src="@drawable/ic_warning"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvTitle">
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/iconAiAnimation"
-                android:layout_width="@dimen/mediumIconSize"
-                android:layout_height="@dimen/mediumIconSize"
-                android:layout_gravity="center"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true" />
-        </FrameLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#F9A825" />
 
         <TextView
-            android:id="@+id/tvTitle"
+            android:id="@+id/tvErrorMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/messageSummaryErrorRetry"
             android:textColor="#37474F"
-            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/btnClose"
-            app:layout_constraintStart_toEndOf="@+id/bannerAi"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/messageSummary" />
+            app:layout_constraintStart_toEndOf="@+id/iconAiWarning"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRetry"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/aiButtonRetry"
+            android:textAllCaps="false"
+            android:textColor="#03A9F4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvErrorMessage" />
 
         <ImageView
             android:id="@+id/btnClose"
-            android:layout_width="@dimen/mediumIconSize"
-            android:layout_height="@dimen/mediumIconSize"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:contentDescription="@string/actionCloseSummaryWindow"
             android:focusable="true"
+            android:scaleType="center"
             android:src="@drawable/ic_close_small"
-            app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+            android:translationX="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvTitle"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="#8A92A3" />
-
-        <TextView
-            android:id="@+id/tvContent"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:lineSpacingExtra="4dp"
-            android:textColor="#424242"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle"
-            tools:text="This is a summary of the email" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

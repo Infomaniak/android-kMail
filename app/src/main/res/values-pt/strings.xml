@@ -22,6 +22,7 @@
     <string name="actionArchive">Arquivar</string>
     <string name="actionBlockSender">Bloquear remetente</string>
     <string name="actionCancelSnooze">Cancelar lembrete</string>
+    <string name="actionCloseSummaryWindow">Fechar a janela de resumo</string>
     <string name="actionDelete">Eliminar</string>
     <string name="actionEditMenu">Editar menu</string>
     <string name="actionForward">Encaminhar</string>
