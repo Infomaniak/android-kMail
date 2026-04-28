@@ -22,6 +22,7 @@
     <string name="actionArchive">Arkivera</string>
     <string name="actionBlockSender">Blockera avsändare</string>
     <string name="actionCancelSnooze">Avbryt vänteläge</string>
+    <string name="actionCloseSummaryWindow">Stäng sammanfattningsfönstret</string>
     <string name="actionDelete">Ta bort</string>
     <string name="actionEditMenu">Redigera meny</string>
     <string name="actionForward">Vidarebefordra</string>
