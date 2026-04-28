@@ -157,6 +157,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
             )
+
+            isMultiSelectOn = false
         }
 
         binding.blockSender.setClosingOnClickListener {
@@ -178,7 +180,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                 }
             }
-            mainViewModel.isMultiSelectOn = false
+            isMultiSelectOn = false
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
@@ -281,9 +283,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         setSnoozeUi(threads)
-        ThreadActionsBottomSheetDialog.setSpamPhishingUi(
+        ThreadActionsBottomSheetDialog.setSpamUi(
             spam = binding.spam,
-            phishing = binding.phishing,
             isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         )
         hideFirstActionItemDivider()
