@@ -660,6 +660,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                            isFromThreadList = false
                         ).toBundle(),
                     )
                 }
