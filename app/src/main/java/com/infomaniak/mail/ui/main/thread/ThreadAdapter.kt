@@ -505,6 +505,9 @@ class ThreadAdapter(
 
         bannerMessageLayout.btnClose.setOnClickListener { onCloseClicked(bannerMessageLayout.root) }
         errorBannerMessageLayout.btnClose.setOnClickListener { onCloseClicked(errorBannerMessageLayout.root) }
+        errorBannerMessageLayout.btnRetry.setOnClickListener {
+            threadAdapterCallbacks?.onAiSummaryRetry?.invoke(message.uid)
+        }
     }
 
     private fun ItemMessageBinding.setDetailedFieldsVisibility(message: Message) {
@@ -1157,6 +1160,7 @@ class ThreadAdapter(
         var onAddReaction: ((Message) -> Unit)? = null,
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
+        var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

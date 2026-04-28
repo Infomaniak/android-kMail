@@ -497,13 +497,14 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    suspend fun aiSummary(languageCode: String): ApiResponse<String> {
-        val content =
-            """message to summary""".trimMargin() // // TODO: Adapt aiResume to accept an additional messageUid parameter once the backend supports it
+    suspend fun aiSummary(languageCode: String, content: String? = null): ApiResponse<String> {
+        // TODO: Adapt aiSummary to accept an additional messageUid parameter once the backend supports it
+        val contentToSummarize = content ?: """message to summary""".trimMargin()
+
         return callApi(
             url = ApiRoutes.aiSummary(),
             method = POST,
-            body = mapOf("destination_language" to languageCode, "content" to content),
+            body = mapOf("destination_language" to languageCode, "content" to contentToSummarize),
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }
