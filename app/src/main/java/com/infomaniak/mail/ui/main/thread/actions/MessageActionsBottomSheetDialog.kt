@@ -113,7 +113,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setMoveUi(isFromDraft)
             setMarkUnreadUi(isFromDraft)
             setReportPhishingUi(isFromDraft)
-            setSummaryUi()
+            setSummaryUi(isFromThreadList = false)
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
