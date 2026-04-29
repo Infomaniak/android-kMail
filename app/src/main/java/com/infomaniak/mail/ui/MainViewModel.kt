@@ -137,6 +137,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
@@ -294,18 +295,13 @@ class MainViewModel @Inject constructor(
 
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
-    val isNetworkAvailable = NetworkAvailability().isNetworkAvailable.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val isNetworkAvailable = NetworkAvailability().isNetworkAvailable.onEach {
+        SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
     val hasNetwork: Boolean by isNetworkAvailable::value
 
     private var currentThreadsLiveJob: Job? = null
-
-    init {
-        viewModelScope.launch {
-            isNetworkAvailable.collect {
-                SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
-            }
-        }
-    }
 
     fun reassignCurrentThreadsLive() {
         currentThreadsLiveJob?.cancel()
