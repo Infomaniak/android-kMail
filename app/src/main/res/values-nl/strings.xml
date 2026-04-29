@@ -195,6 +195,7 @@
     <string name="contentDescriptionButtonSelectSignature">Een andere handtekening selecteren</string>
     <string name="contentDescriptionButtonSettings">Instellingen</string>
     <string name="contentDescriptionButtonShowPassword">Wachtwoord tonen</string>
+    <string name="contentDescriptionButtonWarning">Waarschuwing</string>
     <string name="contentDescriptionContactAlreadyUsed">Contact al gebruikt als ontvanger</string>
     <string name="contentDescriptionDownloadIndicator">Downloaden</string>
     <string name="contentDescriptionIconAttachments">Heeft bijlagen</string>

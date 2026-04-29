@@ -200,6 +200,7 @@
     <string name="contentDescriptionButtonSelectSignature">Select a different signature</string>
     <string name="contentDescriptionButtonSettings">Settings</string>
     <string name="contentDescriptionButtonShowPassword">Show password</string>
+    <string name="contentDescriptionButtonWarning">Warning</string>
     <string name="contentDescriptionContactAlreadyUsed">Contact already used as recipient</string>
     <string name="contentDescriptionDownloadIndicator">Downloading</string>
     <string name="contentDescriptionIconAttachments">Has attachments</string>

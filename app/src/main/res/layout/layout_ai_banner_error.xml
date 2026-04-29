@@ -17,11 +17,9 @@
   -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    app:cardBackgroundColor="#F6F8FC"
+    app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
     app:strokeWidth="0dp">
@@ -29,16 +27,19 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingStart="12dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="-2dp">
 
         <ImageView
             android:id="@+id/iconAiWarning"
             android:layout_width="@dimen/mediumIconSize"
             android:layout_height="@dimen/mediumIconSize"
+            android:contentDescription="@string/contentDescriptionButtonWarning"
             android:src="@drawable/ic_warning"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="#F9A825" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvErrorMessage"
@@ -47,20 +48,17 @@
             android:layout_marginStart="6dp"
             android:lineSpacingExtra="4dp"
             android:text="@string/messageSummaryErrorRetry"
-            android:textColor="#37474F"
             app:layout_constraintEnd_toStartOf="@+id/btnClose"
             app:layout_constraintStart_toEndOf="@+id/iconAiWarning"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRetry"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/TextButtonAlerts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/aiButtonRetry"
-            android:textAllCaps="false"
-            android:textColor="#03A9F4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvErrorMessage" />
 
@@ -68,6 +66,7 @@
             android:id="@+id/btnClose"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_marginBottom="14dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:contentDescription="@string/actionCloseSummaryWindow"
@@ -77,8 +76,7 @@
             android:translationX="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="#8A92A3" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -195,6 +195,7 @@
     <string name="contentDescriptionButtonSelectSignature">Valitse toinen allekirjoitus</string>
     <string name="contentDescriptionButtonSettings">Asetukset</string>
     <string name="contentDescriptionButtonShowPassword">Näytä salasana</string>
+    <string name="contentDescriptionButtonWarning">Varoitus</string>
     <string name="contentDescriptionContactAlreadyUsed">Yhteystieto on jo käytetty vastaanottajana</string>
     <string name="contentDescriptionDownloadIndicator">Lataus</string>
     <string name="contentDescriptionIconAttachments">Sisältää liitteitä</string>

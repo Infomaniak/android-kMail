@@ -197,6 +197,7 @@
     <string name="contentDescriptionButtonSelectSignature">Wybierz inny podpis</string>
     <string name="contentDescriptionButtonSettings">Ustawienia</string>
     <string name="contentDescriptionButtonShowPassword">Pokaż hasło</string>
+    <string name="contentDescriptionButtonWarning">Ostrzeżenie</string>
     <string name="contentDescriptionContactAlreadyUsed">Kontakt już użyty jako odbiorca</string>
     <string name="contentDescriptionDownloadIndicator">Pobieranie</string>
     <string name="contentDescriptionIconAttachments">Zawiera załączniki</string>

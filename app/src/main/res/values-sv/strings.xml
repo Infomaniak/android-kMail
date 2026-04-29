@@ -195,6 +195,7 @@
     <string name="contentDescriptionButtonSelectSignature">Välj en annan signatur</string>
     <string name="contentDescriptionButtonSettings">Inställningar</string>
     <string name="contentDescriptionButtonShowPassword">Visa lösenord</string>
+    <string name="contentDescriptionButtonWarning">Varning</string>
     <string name="contentDescriptionContactAlreadyUsed">Kontakt redan använd som mottagare</string>
     <string name="contentDescriptionDownloadIndicator">Laddar ner</string>
     <string name="contentDescriptionIconAttachments">Har bilagor</string>

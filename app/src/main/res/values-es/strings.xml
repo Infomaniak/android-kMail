@@ -195,6 +195,7 @@
     <string name="contentDescriptionButtonSelectSignature">Seleccione otra firma</string>
     <string name="contentDescriptionButtonSettings">Ajustes</string>
     <string name="contentDescriptionButtonShowPassword">Mostrar contraseña</string>
+    <string name="contentDescriptionButtonWarning">Advertencia</string>
     <string name="contentDescriptionContactAlreadyUsed">Contacto ya utilizado como destinatario</string>
     <string name="contentDescriptionDownloadIndicator">Descargar</string>
     <string name="contentDescriptionIconAttachments">Tiene accesorios</string>

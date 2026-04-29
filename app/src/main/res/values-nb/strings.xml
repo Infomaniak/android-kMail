@@ -195,6 +195,7 @@
     <string name="contentDescriptionButtonSelectSignature">Velg en annen signatur</string>
     <string name="contentDescriptionButtonSettings">Innstillinger</string>
     <string name="contentDescriptionButtonShowPassword">Vis passord</string>
+    <string name="contentDescriptionButtonWarning">Advarsel</string>
     <string name="contentDescriptionContactAlreadyUsed">Kontakt allerede brukt som mottaker</string>
     <string name="contentDescriptionDownloadIndicator">Laster ned</string>
     <string name="contentDescriptionIconAttachments">Har vedlegg</string>

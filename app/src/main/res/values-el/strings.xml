@@ -195,6 +195,7 @@
     <string name="contentDescriptionButtonSelectSignature">Επιλογή διαφορετικής υπογραφής</string>
     <string name="contentDescriptionButtonSettings">Ρυθμίσεις</string>
     <string name="contentDescriptionButtonShowPassword">Εμφάνιση κωδικού πρόσβασης</string>
+    <string name="contentDescriptionButtonWarning">Προειδοποίηση</string>
     <string name="contentDescriptionContactAlreadyUsed">Η επαφή χρησιμοποιείται ήδη ως παραλήπτης</string>
     <string name="contentDescriptionDownloadIndicator">Λήψη σε εξέλιξη</string>
     <string name="contentDescriptionIconAttachments">Περιέχει συνημμένα</string>

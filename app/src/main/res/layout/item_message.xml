@@ -460,11 +460,10 @@
             android:id="@+id/aiBannerContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin"
-            app:layout_goneMarginTop="0dp">
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin">
 
             <include
                 android:id="@+id/bannerMessageLayout"
@@ -481,8 +480,15 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:visibility="gone" />
-
         </FrameLayout>
+
+        <Space
+            android:id="@+id/aiBannerContainerBottomMargin"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/marginStandardMedium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/aiBannerContainer"/>
 
         <com.infomaniak.mail.ui.main.thread.calendar.CalendarEventBannerView
             android:id="@+id/calendarEvent"
@@ -493,7 +499,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aiBannerContainer"
+            app:layout_constraintTop_toBottomOf="@id/aiBannerContainerBottomMargin"
             tools:visibility="visible" />
 
         <include
