@@ -1,0 +1,3 @@
+- Make possible to report a thread or message as phishing from spam folder
+- Add profile picture/BIMI to email notifications
+- Fix network check not being updated leading to incorrect network status

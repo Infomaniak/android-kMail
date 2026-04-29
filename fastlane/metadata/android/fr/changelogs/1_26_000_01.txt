@@ -1,0 +1,3 @@
+- Ajout du signalement dans un fil de discussion ou un message comme hameçonnage depuis le dossier des courriers indésirables
+- Ajout d'une photo de profil/BIMI dans les notifications par e-mail
+- Correction du problème lié à la vérification du réseau qui n'était pas mise à jour, ce qui entraînait un état du réseau erroné
