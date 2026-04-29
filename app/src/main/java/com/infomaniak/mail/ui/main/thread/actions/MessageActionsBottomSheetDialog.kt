@@ -280,7 +280,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onSummary() {
-                // TODO: trackBottomSheetThreadActionsEvent(MatomoName.Summary)
+                trackBottomSheetThreadActionsEvent(MatomoName.Summary)
                 setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, message.uid)
             }
             //endregion
