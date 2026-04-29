@@ -138,6 +138,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -293,9 +294,8 @@ class MainViewModel @Inject constructor(
 
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
-    val isNetworkAvailable = NetworkAvailability(appContext).isNetworkAvailable
-    var hasNetwork: Boolean = true
-        private set
+    val isNetworkAvailable = NetworkAvailability().isNetworkAvailable.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val hasNetwork: Boolean by isNetworkAvailable::value
 
     private var currentThreadsLiveJob: Job? = null
 
@@ -303,7 +303,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             isNetworkAvailable.collect {
                 SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
-                hasNetwork = it
             }
         }
     }
