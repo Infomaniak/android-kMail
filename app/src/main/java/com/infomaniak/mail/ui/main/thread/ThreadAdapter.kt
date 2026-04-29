@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.R.attr.banner
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -39,7 +38,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
-import com.google.android.gms.tasks.Tasks.call
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
@@ -443,40 +441,47 @@ class ThreadAdapter(
         bindRecipientDetails(message, messageDate)
     }
 
-    private fun MessageViewHolder.bindAiSummary(message: Message) = with(binding) {
-        val state = threadAdapterState.aiSummaryStateMap[message.uid]
+    private fun MessageViewHolder.bindAiSummary(message: Message) {
+        val state = threadAdapterState.aiSummaryStateMap[message.uid] ?: return
 
-        bannerMessageLayout.root.isVisible = state is AiSummaryState.Loading || state is AiSummaryState.Success
-        errorBannerMessageLayout.root.isVisible = state is AiSummaryState.Error
+        with(binding.blockInformationView) {
+            root.isVisible = true
+            closeButton.isVisible = true
+            informationTitle.isVisible = true
 
-        if (state == null) return@with
+            iconAi.isVisible = state !is AiSummaryState.Error
+            icon.isVisible = state is AiSummaryState.Error
+            informationButton.isVisible = state is AiSummaryState.Error
+            informationDescription.isVisible = state is AiSummaryState.Success
 
-        with(bannerMessageLayout) {
             when (state) {
                 is AiSummaryState.Loading -> {
-                    tvTitle.setText(R.string.messageSummaryLoading)
-                    tvContent.isVisible = false
+                    informationTitle.setText(R.string.messageSummaryLoading)
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
+
                 is AiSummaryState.Success -> {
-                    tvTitle.setText(R.string.messageSummary)
-                    tvContent.text = state.summary
-                    tvContent.isVisible = true
+                    informationTitle.setText(R.string.messageSummary)
+                    informationDescription.text = state.summary
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
-                is AiSummaryState.Error -> Unit
+
+                is AiSummaryState.Error -> {
+                    // TODO: determine whether the “Retry” button should be displayed (depends on http code)
+                    informationTitle.setText(R.string.messageSummaryErrorRetry)
+                    informationButton.setText(R.string.aiButtonRetry)
+                    icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
+                }
             }
-        }
 
-        val onCloseClicked = { targetRoot: View ->
-            threadAdapterState.aiSummaryStateMap.remove(message.uid)
-            targetRoot.isVisible = false
-        }
+            closeButton.setOnClickListener {
+                threadAdapterState.aiSummaryStateMap.remove(message.uid)
+                root.isVisible = false
+            }
 
-        bannerMessageLayout.btnClose.setOnClickListener { onCloseClicked(bannerMessageLayout.root) }
-        errorBannerMessageLayout.btnClose.setOnClickListener { onCloseClicked(errorBannerMessageLayout.root) }
-        errorBannerMessageLayout.btnRetry.setOnClickListener {
-            threadAdapterCallbacks?.onAiSummaryRetry?.invoke(message.uid)
+            informationButton.setOnClickListener {
+                threadAdapterCallbacks?.onAiSummaryRetry?.invoke(message.uid)
+            }
         }
     }
 

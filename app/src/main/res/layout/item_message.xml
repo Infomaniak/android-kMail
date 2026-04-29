@@ -466,20 +466,12 @@
             app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin">
 
             <include
-                android:id="@+id/bannerMessageLayout"
-                layout="@layout/layout_ai_banner"
+                android:id="@+id/blockInformationView"
+                layout="@layout/view_information_block"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
-                tools:visibility="visible" />
+                android:visibility="gone"/>
 
-            <include
-                android:id="@+id/errorBannerMessageLayout"
-                layout="@layout/layout_ai_banner_error"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:visibility="gone" />
         </FrameLayout>
 
         <Space
