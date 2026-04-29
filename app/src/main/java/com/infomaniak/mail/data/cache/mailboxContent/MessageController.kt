@@ -78,7 +78,7 @@ class MessageController @Inject constructor(
         return getMessagesByUids(uids, mailboxContentRealm())
     }
 
-    suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message { // TODO: Function to use for summarizing the latest message
+    suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
         val messages = thread.getDisplayedMessages(featureFlags, this@MessageController.localSettings)
         return getLastMessageToExecuteActionWithExtraQuery(messages = messages) ?: messages.last()
     }
