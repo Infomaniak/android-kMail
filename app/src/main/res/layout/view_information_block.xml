@@ -30,13 +30,37 @@
         android:layout_margin="@dimen/marginStandardMedium"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/icon"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginEnd="@dimen/alternativeMargin"
-            tools:drawableStartCompat="@drawable/ic_warning" />
+            android:layout_marginEnd="@dimen/alternativeMargin">
+
+            <TextView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                tools:drawableStartCompat="@drawable/ic_warning" />
+
+            <FrameLayout
+                android:id="@+id/iconAi"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:visibility="gone">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/iconAiAnimation"
+                    android:layout_width="@dimen/mediumIconSize"
+                    android:layout_height="@dimen/mediumIconSize"
+                    android:layout_gravity="center"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true" />
+            </FrameLayout>
+
+        </FrameLayout>
+
 
         <LinearLayout
             android:layout_width="0dp"
