@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
+import android.R.id.message
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
@@ -48,6 +49,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -111,6 +113,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setSnoozeUi(thread.isSnoozed())
                 setReactionUi(canBeReactedTo = messageUidToReactTo != null)
                 setSpamUi(binding.spam, isFromSpam)
+                setSummaryUi(navigationArgs.isFromThreadList)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
@@ -318,7 +321,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             )
         }
 
-        override fun onSummary() = Unit
+        override fun onSummary() {
+             // trackBottomSheetThreadActionsEvent(MatomoName.???) TODO
+            setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, messageUidToExecuteAction)
+        }
         //endregion
     }
 

@@ -170,8 +170,8 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
-    fun setSummaryUi() = with(binding.summary) {
-        isVisible = true
+    fun setSummaryUi(isFromThreadList : Boolean) = with(binding.summary) {
+        isVisible = !isFromThreadList
     }
 
     interface OnActionClick {

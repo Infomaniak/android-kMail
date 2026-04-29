@@ -771,29 +771,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
 
-        // getBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET) { messageUid: String ->
-        //     threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiSummaryState.Loading
-        //
-        //     val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
-        //     if (index >= 0) threadAdapter.notifyItemChanged(index)
-        //
-        //     viewLifecycleOwner.lifecycleScope.launch {
-        //         val message = mainViewModel.getMessage(messageUid)
-        //         val content = message?.body?.value ?: message?.splitBody?.content ?: ""
-        //         val languageCode = requireContext().getCurrentLanguageCode()
-        //         val result = ApiRepository.aiSummary(languageCode, content)
-        //         threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
-        //             AiSummaryState.Success(result.data ?: "")
-        //         } else {
-        //             AiSummaryState.Error
-        //         }
-        //
-        //         if (index >= 0) threadAdapter.notifyItemChanged(index)
-        //     }
-        // }
-
         getBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET) { messageUid: String ->
-            summarize(messageUid) // todo: check si c'est bon ecrit comme ca puis rename la fonction
+            summarize(messageUid)
         }
     }
 
