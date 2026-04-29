@@ -99,6 +99,8 @@
         <item quantity="one">%d bilaga</item>
         <item quantity="other">%d bilagor</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Saknad bilaga</string>
+    <string name="attachmentsReminderDescription">Du nämnde en bilaga, men ingen fil har lagts till. Skicka ändå?</string>
     <string name="attendeesListTitle">Lista över deltagare (%d)</string>
     <string name="bccTitle">Dold kopia:</string>
     <string name="blockAnExpeditorTitle">Blockera en avsändare</string>

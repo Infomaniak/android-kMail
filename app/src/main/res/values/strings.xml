@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="appName" translatable="false">Infomaniak Mail</string>
-
     <string name="notification_channel_id_draft_service" translatable="false">draft_service_channel_id</string>
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
     <string name="notification_channel_id_sync_messages_service" translatable="false">sync_messages_service_channel_id</string>
@@ -104,6 +103,8 @@
         <item quantity="one">%d attachment</item>
         <item quantity="other">%d attachments</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Missing attachment</string>
+    <string name="attachmentsReminderDescription">You mentioned an attachment, but no file has been added. Send anyway?</string>
     <string name="attendeesListTitle">List of attendees (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Block a sender</string>

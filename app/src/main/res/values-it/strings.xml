@@ -99,6 +99,8 @@
         <item quantity="one">%d allegato</item>
         <item quantity="other">%d allegati</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Allegato mancante</string>
+    <string name="attachmentsReminderDescription">Hai menzionato un allegato, ma non è stato aggiunto alcun file. Si può inviare lo stesso?</string>
     <string name="attendeesListTitle">Elenco dei partecipanti (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Blocca un mittente</string>

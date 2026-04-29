@@ -99,6 +99,8 @@
         <item quantity="one">%d Anhang</item>
         <item quantity="other">%d Anhänge</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Fehlender Anhang</string>
+    <string name="attachmentsReminderDescription">Sie haben einen Anhang erwähnt, aber es ist keine Datei hinzugefügt worden. Trotzdem senden?</string>
     <string name="attendeesListTitle">Liste der Teilnehmer (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Einen Absender blockieren</string>

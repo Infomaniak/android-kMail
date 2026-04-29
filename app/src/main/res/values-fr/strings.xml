@@ -99,6 +99,8 @@
         <item quantity="one">%d pièce jointe</item>
         <item quantity="other">%d pièces jointes</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Pièce jointe manquante</string>
+    <string name="attachmentsReminderDescription">Vous avez mentionné une pièce jointe, mais aucun fichier n’a été ajouté. Envoyer quand même ?</string>
     <string name="attendeesListTitle">Liste des participants (%d)</string>
     <string name="bccTitle">Cci :</string>
     <string name="blockAnExpeditorTitle">Bloquer un expéditeur</string>

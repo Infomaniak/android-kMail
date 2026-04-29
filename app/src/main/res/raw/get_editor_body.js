@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+function getEditorBody() {
     const body = getEditor();
     // We will clone the body so we don't modify the original HTML.
     const clonedBody = body.cloneNode(true);
@@ -24,5 +24,5 @@
     const elements = clonedBody.querySelectorAll(".%s, .%s, .%s");
     elements.forEach( element => { element.remove(); });
 
-    return clonedBody.innerText.trim().length === 0;
-})()
+    return clonedBody.innerText.trim()
+}

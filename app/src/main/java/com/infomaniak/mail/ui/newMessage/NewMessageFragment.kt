@@ -94,6 +94,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
@@ -105,6 +106,7 @@ import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CL
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
@@ -126,6 +128,7 @@ import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
@@ -150,6 +153,7 @@ class NewMessageFragment : Fragment() {
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
+    private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -477,6 +481,13 @@ class NewMessageFragment : Fragment() {
             INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
         )
         addScript(formattedAiContentScript)
+
+        val formattedGetEditorBodyScript = getEditorBodyScript.format(
+            INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME,
+            INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+        )
+        addScript(formattedGetEditorBodyScript)
     }
 
     private fun removeAllProperties() = viewLifecycleOwner.lifecycleScope.launch {
@@ -828,22 +839,55 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (isSubjectBlank()) {
-            trackNewMessageEvent(MatomoName.SendWithoutSubject)
-            descriptionDialog.show(
-                title = getString(R.string.emailWithoutSubjectTitle),
-                description = getString(R.string.emailWithoutSubjectDescription),
-                displayLoader = false,
-                positiveButtonText = R.string.buttonContinue,
-                onPositiveButtonClicked = {
-                    trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
-                    sendEmail()
-                },
-                onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-            )
-        } else {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (isSubjectBlank() && showSubjectDialog(scheduled)) return@launch
+
+            val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
+            val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
+
+            if (shouldShowAttachmentReminder && showAttachmentDialog(scheduled)) return@launch
             sendEmail()
         }
+    }
+
+    private suspend fun showSubjectDialog(scheduled: Boolean): Boolean {
+        trackNewMessageEvent(MatomoName.SendWithoutSubject)
+
+        var isConfirm = false
+        val isSendingCanceled = CompletableDeferred<Boolean>()
+        descriptionDialog.show(
+            title = getString(R.string.emailWithoutSubjectTitle),
+            description = getString(R.string.emailWithoutSubjectDescription),
+            positiveButtonText = R.string.buttonContinue,
+            displayLoader = false,
+            onPositiveButtonClicked = {
+                trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
+                isConfirm = true
+            },
+            onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+            onDismiss = { isSendingCanceled.complete(!isConfirm) })
+
+        return isSendingCanceled.await()
+    }
+
+    private suspend fun showAttachmentDialog(scheduled: Boolean): Boolean {
+        trackNewMessageEvent(MatomoName.SendWithoutAttachment)
+
+        var isConfirm = false
+        val isSendingCanceled = CompletableDeferred<Boolean>()
+        descriptionDialog.show(
+            title = getString(R.string.attachmentsReminderTitle),
+            description = getString(R.string.attachmentsReminderDescription),
+            positiveButtonText = R.string.buttonContinue,
+            displayLoader = false,
+            onPositiveButtonClicked = {
+                trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
+                isConfirm = true
+            },
+            onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+            onDismiss = { isSendingCanceled.complete(!isConfirm) })
+
+        return isSendingCanceled.await()
     }
 
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
@@ -881,4 +925,5 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
+
 }

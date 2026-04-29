@@ -99,6 +99,8 @@
         <item quantity="one">%d anexo</item>
         <item quantity="other">%d archivos adjuntos</item>
     </plurals>
+    <string name="attachmentsReminderTitle">Archivo adjunto faltante</string>
+    <string name="attachmentsReminderDescription">Ha mencionado un archivo adjunto, pero no se ha añadido ningún archivo. ¿Lo envía de todos modos?</string>
     <string name="attendeesListTitle">Lista de asistentes (%d)</string>
     <string name="bccTitle">CCO:</string>
     <string name="blockAnExpeditorTitle">Bloquear un remitente</string>
