@@ -20,8 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    app:cardBackgroundColor="#F6F8FC"
+    app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
     app:strokeWidth="0dp">
@@ -29,7 +28,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="12dp">
 
         <FrameLayout
             android:id="@+id/bannerAi"
@@ -55,7 +54,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="12dp"
-            android:textColor="#37474F"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/btnClose"
             app:layout_constraintStart_toEndOf="@+id/bannerAi"
@@ -73,8 +71,7 @@
             android:src="@drawable/ic_close_small"
             app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvTitle"
-            app:tint="#8A92A3" />
+            app:layout_constraintTop_toTopOf="@+id/tvTitle" />
 
         <TextView
             android:id="@+id/tvContent"
@@ -82,7 +79,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:lineSpacingExtra="4dp"
-            android:textColor="#424242"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvTitle"
