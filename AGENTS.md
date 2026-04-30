@@ -9,6 +9,7 @@ This is a **composite Gradle build** with two main components:
 ```
 android-kMail/
 ├── Core/                    # Git submodule - shared library (see Core/AGENTS.md)
+│   ├── build-logic/        # Composite build - Gradle convention plugins (included via pluginManagement)
 │   ├── Auth/               # OAuth2, account management
 │   ├── Network/            # Ktor HTTP client
 │   ├── Ui/                 # Compose + XML components
@@ -35,6 +36,7 @@ android-kMail/
 ## Composite Build Explained
 
 - **Core is a Git submodule**: Changes in `Core/` are tracked separately and shared with other Infomaniak apps
+- **`Core/build-logic`**: Included as a composite build via `pluginManagement { includeBuild("Core/build-logic") }` in `settings.gradle.kts` — provides Gradle convention plugins required to build Core modules (e.g., `com.infomaniak.core.composite`)
 - **Immediate resolution**: App uses `com.infomaniak.core:<module>` which resolves locally (no Maven publishing needed)
 - **Impact**: Changes to Core affect ALL Infomaniak apps - be careful!
 
