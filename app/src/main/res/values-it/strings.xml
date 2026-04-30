@@ -403,6 +403,7 @@
     <string name="messageSummaryError">Euria non è riuscito a riassumere questo messaggio.</string>
     <string name="messageSummaryErrorRetry">Euria non è riuscito a riassumere questo messaggio. Riprova.</string>
     <string name="messageSummaryLoading">Riepilogo del messaggio…</string>
+    <string name="messageTranslateErrorRetry">Euria non è riuscito a tradurre questo messaggio. Riprova.</string>
     <string name="messageTranslatedTitle">Tradotto in %s</string>
     <string name="mondayAfternoon">Lunedì pomeriggio</string>
     <string name="mondayMorning">Lunedì mattina</string>
