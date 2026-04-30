@@ -578,25 +578,28 @@ class ThreadAdapter(
 
             iconAi.isVisible = state !is AiProcessState.Error
             icon.isVisible = state is AiProcessState.Error
-            informationButton.isVisible = state is AiProcessState.Error
+            informationButton.isVisible = state is AiProcessState.Error && state.code == "translation__api_not_available" // TODO: manage string for error code no_connection for example
             informationDescription.isVisible = state is AiProcessState.Success
 
             when (state) {
                 is AiProcessState.Loading -> {
-                    informationTitle.setText(R.string.messageSummaryLoading)
+                    informationTitle.setText(R.string.euriaTranslateMessage)
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
 
                 is AiProcessState.Success -> {
-                    informationTitle.setText(R.string.messageSummary)
+                    informationTitle.setText(R.string.genericMessageTranslated)
                     informationDescription.text = state.content
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
 
                 is AiProcessState.Error -> {
-                    // TODO: determine whether the “Retry” button should be displayed (depends on http code)
-                    informationTitle.setText(R.string.messageSummaryErrorRetry)
-                    informationButton.setText(R.string.aiButtonRetry)
+                    if (state.code == "translation__target_same_as_source"){ // TODO: write error code in ErrorCode.kt
+                        informationTitle.setText(R.string.translationTargetSameAsSource)
+                    }else{
+                        informationTitle.setText(R.string.messageTranslateErrorRetry)
+                        informationButton.setText(R.string.aiButtonRetry)
+                    }
                     icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
                 }
             }

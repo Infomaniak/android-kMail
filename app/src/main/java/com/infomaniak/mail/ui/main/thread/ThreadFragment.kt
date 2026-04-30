@@ -1163,7 +1163,7 @@ private fun translate(messageUid: String){
             threadViewModel.threadState.aiTranslateStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
                 AiProcessState.Success(result.data ?: "")
             } else {
-                AiProcessState.Error
+                AiProcessState.Error(result.error?.code ?: "")
             }
             if (index >= 0) threadAdapter.notifyItemChanged(index)
         }

@@ -402,6 +402,7 @@
     <string name="messageSummaryError">Euria konnte diese Nachricht nicht zusammenfassen.</string>
     <string name="messageSummaryErrorRetry">Euria konnte diese Nachricht nicht zusammenfassen. Bitte versuchen Sie es erneut.</string>
     <string name="messageSummaryLoading">Zusammenfassung der Nachricht…</string>
+    <string name="messageTranslateErrorRetry">Euria konnte diese Nachricht nicht übersetzen. Bitte versuchen Sie es erneut.</string>
     <string name="messageTranslatedTitle">Übersetzt in %s</string>
     <string name="mondayAfternoon">Montagnachmittag</string>
     <string name="mondayMorning">Montagmorgen</string>
