@@ -282,6 +282,7 @@ class ThreadAdapter(
 
         bindHeader(messageUi.message)
         bindAiSummary(messageUi.message)
+        bindAiTranslate(messageUi.message)
         bindAlerts(messageUi)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
@@ -563,6 +564,50 @@ class ThreadAdapter(
 
             informationButton.setOnClickListener {
                 threadAdapterCallbacks?.onAiSummaryRetry?.invoke(messageUid)
+            }
+        }
+    }
+
+    private fun MessageViewHolder.bindAiTranslate(message: Message) {
+        val state = threadAdapterState.aiTranslateStateMap[message.uid] ?: return
+
+        with(binding.blockInformationView) {
+            root.isVisible = true
+            closeButton.isVisible = true
+            informationTitle.isVisible = true
+
+            iconAi.isVisible = state !is AiProcessState.Error
+            icon.isVisible = state is AiProcessState.Error
+            informationButton.isVisible = state is AiProcessState.Error
+            informationDescription.isVisible = state is AiProcessState.Success
+
+            when (state) {
+                is AiProcessState.Loading -> {
+                    informationTitle.setText(R.string.messageSummaryLoading)
+                    iconAiAnimation.setAnimation(R.raw.euria)
+                }
+
+                is AiProcessState.Success -> {
+                    informationTitle.setText(R.string.messageSummary)
+                    informationDescription.text = state.content
+                    iconAiAnimation.setAnimation(R.raw.euria)
+                }
+
+                is AiProcessState.Error -> {
+                    // TODO: determine whether the “Retry” button should be displayed (depends on http code)
+                    informationTitle.setText(R.string.messageSummaryErrorRetry)
+                    informationButton.setText(R.string.aiButtonRetry)
+                    icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
+                }
+            }
+
+            closeButton.setOnClickListener {
+                threadAdapterState.aiSummaryStateMap.remove(message.uid)
+                root.isVisible = false
+            }
+
+            informationButton.setOnClickListener {
+                threadAdapterCallbacks?.onAiTranslateRetry?.invoke(message.uid)
             }
         }
     }
@@ -1221,6 +1266,7 @@ class ThreadAdapter(
         var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
         var onAiSummaryClose: ((messageUid: String) -> Unit)? = null,
         var showSnackbarRetry: (() -> Unit)? = null,
+        var onAiTranslateRetry: ((messageUid: String) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

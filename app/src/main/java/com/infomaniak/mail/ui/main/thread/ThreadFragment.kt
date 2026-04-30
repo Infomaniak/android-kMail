@@ -361,6 +361,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
                 override val aiSummaryStateMap by threadState::aiSummaryStateMap
+                override val aiTranslateStateMap by threadState::aiTranslateStateMap
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
@@ -833,6 +834,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         getBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET) { messageUid: String ->
             doAiAction(messageUid, AiAction.SUMMARY)
         }
+
+        getBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET) { messageUid: String ->
+            translate(messageUid)
+        }
     }
 
     private fun executeSavedSnoozeScheduleType(timestamp: Long) {
@@ -1144,6 +1149,27 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         timer.start()
     }
 
+private fun translate(messageUid: String){
+        threadViewModel.threadState.aiTranslateStateMap[messageUid] = AiProcessState.Loading
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index >= 0) threadAdapter.notifyItemChanged(index)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val message = mainViewModel.getMessage(messageUid)
+            val content = message?.body?.value ?: message?.splitBody?.content ?: ""
+            val languageCode = requireContext().getCurrentLanguageCode()
+            val result = ApiRepository.aiTranslate(languageCode,content)
+
+            threadViewModel.threadState.aiTranslateStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
+                AiProcessState.Success(result.data ?: "")
+            } else {
+                AiProcessState.Error
+            }
+            if (index >= 0) threadAdapter.notifyItemChanged(index)
+        }
+}
+
+
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
         mainViewModel.draftResource = draftResource
         threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
@@ -1286,6 +1312,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
+        const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"

@@ -322,6 +322,7 @@ object MatomoMail : Matomo {
         SpamSwipe("spamSwipe"),
         StrikeThrough("strikeThrough"),
         Summary("summary"),
+        Translate("translate"),
         Switch("switch"),
         SwitchAccount("switchAccount"),
         SwitchColor("switchColor"),
