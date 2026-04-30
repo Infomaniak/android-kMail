@@ -556,6 +556,7 @@
     <string name="settingsTransferEmailsTitle">E-mails doorsturen</string>
     <string name="settingsTransferInBody">In de tekst van het bericht</string>
     <string name="shareEmail">E-mail delen</string>
+    <string name="snackbarAdminDisabledMessageSending">Een beheerder heeft het verzenden van berichten uitgeschakeld</string>
     <string name="snackbarBlockUserConfirmation">De afzender is nu geblokkeerd</string>
     <string name="snackbarCalendarChoiceSent">Antwoord verwerkt</string>
     <string name="snackbarContactSaved">Nieuw contact succesvol geregistreerd</string>

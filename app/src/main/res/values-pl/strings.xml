@@ -576,6 +576,7 @@
     <string name="settingsTransferEmailsTitle">Przekaż wiadomości</string>
     <string name="settingsTransferInBody">W treści wiadomości</string>
     <string name="shareEmail">Udostępnij wiadomość</string>
+    <string name="snackbarAdminDisabledMessageSending">Administrator wyłączył wysyłanie wiadomości</string>
     <string name="snackbarBlockUserConfirmation">Nadawca został zablokowany</string>
     <string name="snackbarCalendarChoiceSent">Odpowiedź uwzględniona</string>
     <string name="snackbarContactSaved">Nowy kontakt został pomyślnie zapisany</string>

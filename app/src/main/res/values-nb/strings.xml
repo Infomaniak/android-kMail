@@ -556,6 +556,7 @@
     <string name="settingsTransferEmailsTitle">Videresend e-poster</string>
     <string name="settingsTransferInBody">I meldingskroppen</string>
     <string name="shareEmail">Del e-post</string>
+    <string name="snackbarAdminDisabledMessageSending">En administrator har deaktivert sending av meldinger</string>
     <string name="snackbarBlockUserConfirmation">Avsender er nå blokkert</string>
     <string name="snackbarCalendarChoiceSent">Svar tatt i betraktning</string>
     <string name="snackbarContactSaved">Ny kontakt registrert</string>

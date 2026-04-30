@@ -556,6 +556,7 @@
     <string name="settingsTransferEmailsTitle">E-Mails übertragen</string>
     <string name="settingsTransferInBody">Im Nachrichtentext</string>
     <string name="shareEmail">E-Mail austauschen</string>
+    <string name="snackbarAdminDisabledMessageSending">Ein Administrator hat den Nachrichtenversand deaktiviert</string>
     <string name="snackbarBlockUserConfirmation">Absender ist jetzt blockiert</string>
     <string name="snackbarCalendarChoiceSent">Antwort berücksichtigt</string>
     <string name="snackbarContactSaved">Neuer Kontakt erfolgreich registriert</string>
