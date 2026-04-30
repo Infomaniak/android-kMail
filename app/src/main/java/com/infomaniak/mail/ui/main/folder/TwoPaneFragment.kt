@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
@@ -26,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
@@ -63,8 +63,8 @@ abstract class TwoPaneFragment : Fragment() {
     private var dragStartX = 0f
     private var dragStartLeftWidth = 0
     private val separatorWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth) }
-    val minLeftWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minLeftPaneWidth) }
-    val minRightWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minRightPaneWidth) }
+    private val minLeftWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minLeftPaneWidth) }
+    private val minRightWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minRightPaneWidth) }
 
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
@@ -169,23 +169,19 @@ abstract class TwoPaneFragment : Fragment() {
                     updateSeparatorAppearance(separatorView, lineSeparator, true, widthSelected)
                     true
                 }
-
                 MotionEvent.ACTION_MOVE -> {
                     handleDragMove(event.rawX, leftPane, rightPane, parentGroup)
                     true
                 }
-
                 MotionEvent.ACTION_UP -> {
                     updateSeparatorAppearance(separatorView, lineSeparator, false, widthNormal)
                     separatorView.performClick()
                     true
                 }
-
                 MotionEvent.ACTION_CANCEL -> {
                     updateSeparatorAppearance(separatorView, lineSeparator, false, widthNormal)
                     true
                 }
-
                 else -> false
             }
         }
@@ -195,36 +191,27 @@ abstract class TwoPaneFragment : Fragment() {
         separatorView: View,
         lineSeparator: View?,
         isPressed: Boolean,
-        lineWidth: Int
+        lineWidth: Int,
     ) {
         separatorView.isPressed = isPressed
-        lineSeparator?.layoutParams = lineSeparator.layoutParams?.apply {
-            width = lineWidth
-        }
+        lineSeparator?.updateLayoutParams { width = lineWidth }
     }
 
     private fun handleDragMove(
         currentRawX: Float,
         leftPane: View,
         rightPane: View,
-        parentGroup: ViewGroup
+        parentGroup: ViewGroup,
     ) {
         val deltaX = (currentRawX - dragStartX).toInt()
         val parentWidth = parentGroup.width
-
         val availableWidth = parentWidth - separatorWidthPx
-
         val maxLeftWidth = availableWidth - minRightWidthPx
         val safeMaxLeftWidth = maxOf(minLeftWidthPx, maxLeftWidth)
+        val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(minLeftWidthPx, safeMaxLeftWidth)
 
-        val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(
-            minLeftWidthPx,
-            safeMaxLeftWidth
-        )
-
-        leftPane.layoutParams.width = newLeftWidth
-        rightPane.layoutParams.width = parentWidth - newLeftWidth - separatorWidthPx
-        parentGroup.requestLayout()
+        leftPane.updateLayoutParams { width = newLeftWidth }
+        rightPane.updateLayoutParams { width = parentWidth - newLeftWidth - separatorWidthPx }
 
         if (availableWidth > 0) {
             twoPaneViewModel.leftPaneRatio = newLeftWidth.toFloat() / availableWidth
@@ -272,14 +259,14 @@ abstract class TwoPaneFragment : Fragment() {
         getLeftPane()?.apply {
             isVisible = leftWidth != 0
             if (leftWidth != 0 && width != leftWidth) {
-                layoutParams?.width = leftWidth
+                updateLayoutParams { width = leftWidth }
             }
         }
 
         getRightPane()?.apply {
             isVisible = rightWidth != 0
             if (rightWidth != 0 && width != rightWidth) {
-                layoutParams?.width = rightWidth
+                updateLayoutParams { width = rightWidth }
             }
         }
 
@@ -290,7 +277,6 @@ abstract class TwoPaneFragment : Fragment() {
     private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         return if (isTabletOrFoldable()) {
             val ratio = twoPaneViewModel.leftPaneRatio
-
             val availableWidth = (widthPixels - separatorWidthPx).coerceAtLeast(0)
             val leftWidth = if (availableWidth < minLeftWidthPx + minRightWidthPx) {
                 (ratio * availableWidth).roundToInt().coerceIn(0, availableWidth)

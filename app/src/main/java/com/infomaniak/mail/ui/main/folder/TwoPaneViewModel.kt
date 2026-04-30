@@ -48,6 +48,7 @@ class TwoPaneViewModel @Inject constructor(
     private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
+    
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     val currentThreadUid: LiveData<String?> = state.getLiveData(CURRENT_THREAD_UID_KEY)
