@@ -24,7 +24,6 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
-import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewConfiguration
 import android.view.ViewGroup
@@ -479,24 +478,24 @@ class ThreadAdapter(
             closeButton.isVisible = true
             informationTitle.isVisible = true
 
-            iconAi.isVisible = state !is AiSummaryState.Error
-            icon.isVisible = state is AiSummaryState.Error
-            informationButton.isVisible = state is AiSummaryState.Error
-            informationDescription.isVisible = state is AiSummaryState.Success
+            iconAi.isVisible = state !is AiProcessState.Error
+            icon.isVisible = state is AiProcessState.Error
+            informationButton.isVisible = state is AiProcessState.Error
+            informationDescription.isVisible = state is AiProcessState.Success
 
             when (state) {
-                is AiSummaryState.Loading -> {
+                is AiProcessState.Loading -> {
                     informationTitle.setText(R.string.messageSummaryLoading)
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
 
-                is AiSummaryState.Success -> {
+                is AiProcessState.Success -> {
                     informationTitle.setText(R.string.messageSummary)
-                    informationDescription.text = state.summary
+                    informationDescription.text = state.content
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
 
-                is AiSummaryState.Error -> {
+                is AiProcessState.Error -> {
                     // TODO: determine whether the “Retry” button should be displayed (depends on http code)
                     informationTitle.setText(R.string.messageSummaryErrorRetry)
                     informationButton.setText(R.string.aiButtonRetry)

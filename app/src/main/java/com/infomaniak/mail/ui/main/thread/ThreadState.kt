@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 interface ThreadAdapterState {
     val isExpandedMap: MutableMap<String, Boolean>
     val isThemeTheSameMap: MutableMap<String, Boolean>
-    val aiSummaryStateMap: MutableMap<String, AiSummaryState>
+    val aiSummaryStateMap: MutableMap<String, AiProcessState>
     val verticalScroll: Int?
     val isCalendarEventExpandedMap: MutableMap<String, Boolean>
 }
@@ -38,7 +38,7 @@ class ThreadState {
     private val _hasSuperCollapsedBlockBeenClicked: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val hasSuperCollapsedBlockBeenClicked: StateFlow<Boolean> = _hasSuperCollapsedBlockBeenClicked.asStateFlow()
     var verticalScroll: Int? = null
-    val aiSummaryStateMap: MutableMap<String, AiSummaryState> = mutableMapOf()
+    val aiSummaryStateMap: MutableMap<String, AiProcessState> = mutableMapOf()
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
     val cachedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
@@ -63,8 +63,8 @@ class ThreadState {
     }
 }
 
-sealed class AiSummaryState {
-    data object Loading : AiSummaryState()
-    data class Success(val summary: String) : AiSummaryState()
-    data object Error : AiSummaryState()
+sealed class AiProcessState {
+    data object Loading : AiProcessState()
+    data class Success(val content: String) : AiProcessState()
+    data object Error : AiProcessState()
 }
