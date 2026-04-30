@@ -18,7 +18,7 @@
 <resources>
 
     <!-- TwoPane layout -->
-    <dimen name="minLeftPaneWidth">250dp</dimen>
+    <dimen name="minLeftPaneWidth">275dp</dimen>
     <dimen name="minRightPaneWidth">300dp</dimen>
     <dimen name="dragSeparatorWidth">1dp</dimen>
     <dimen name="dragSeparatorWidthSelected">3dp</dimen>
