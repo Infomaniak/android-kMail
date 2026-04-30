@@ -49,6 +49,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -120,6 +121,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setMarkUnreadUi(isFromDraft)
                 setReportPhishingUi(isFromDraft)
                 setSummaryUi(navigationArgs.isFromThreadList)
+                setTranslateUi(navigationArgs.isFromThreadList)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
@@ -338,6 +340,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         override fun onSummary() {
             trackBottomSheetThreadActionsEvent(MatomoName.Summary)
             setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, messageUidToExecuteAction)
+        }
+
+        override fun onTranslate() {
+            trackBottomSheetThreadActionsEvent(MatomoName.Translate)
+            setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, messageUidToExecuteAction)
         }
         //endregion
     }

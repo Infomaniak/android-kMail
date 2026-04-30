@@ -73,6 +73,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onSaveToKDrive() = Unit
         override fun onReportDisplayProblem() = Unit
         override fun onSummary() = Unit
+        override fun onTranslate() = Unit
         //endregion
     }
 
@@ -110,6 +111,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
         summary.setOnClickListener { onClickListener.onSummary() }
+        translate.setOnClickListener { onClickListener.onTranslate() }
 
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
@@ -214,6 +216,10 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = !isFromThreadList
     }
 
+    fun setTranslateUi(isFromThreadList : Boolean) = with(binding.translate) {
+        isVisible = !isFromThreadList
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
@@ -235,5 +241,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onSaveToKDrive()
         fun onReportDisplayProblem()
         fun onSummary()
+        fun onTranslate()
     }
 }

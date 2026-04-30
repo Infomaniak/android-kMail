@@ -27,6 +27,7 @@ interface ThreadAdapterState {
     val isExpandedMap: MutableMap<String, Boolean>
     val isThemeTheSameMap: MutableMap<String, Boolean>
     val aiSummaryStateMap: MutableMap<String, AiProcessState>
+    val aiTranslateStateMap: MutableMap<String, AiProcessState>
     val verticalScroll: Int?
     val isCalendarEventExpandedMap: MutableMap<String, Boolean>
 }
@@ -39,6 +40,7 @@ class ThreadState {
     val hasSuperCollapsedBlockBeenClicked: StateFlow<Boolean> = _hasSuperCollapsedBlockBeenClicked.asStateFlow()
     var verticalScroll: Int? = null
     val aiSummaryStateMap: MutableMap<String, AiProcessState> = mutableMapOf()
+    val aiTranslateStateMap: MutableMap<String, AiProcessState> = mutableMapOf()
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
     val cachedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
@@ -56,6 +58,7 @@ class ThreadState {
         isFirstOpening = true
         superCollapsedBlock = null
         aiSummaryStateMap.clear()
+        aiTranslateStateMap.clear()
     }
 
     fun clickSuperCollapsedBlock() {
