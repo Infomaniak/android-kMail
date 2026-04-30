@@ -274,6 +274,10 @@ object ApiRoutes {
     fun aiSummary(): String {
         return "$MAIL_API/api/resume"
     }
+
+    fun aiTranslate(): String {
+        return "$MAIL_API/api/translate"
+    }
     //endregion
 
     //region SwissTransfer
