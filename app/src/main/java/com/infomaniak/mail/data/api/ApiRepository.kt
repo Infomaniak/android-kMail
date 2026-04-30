@@ -507,6 +507,18 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
+    suspend fun aiTranslate(languageCode: String, content: String? = null): ApiResponse<String> {
+        // TODO: Adapt aiTranslate to accept an additional messageUid parameter once the backend supports it
+        val contentToBeTranslated = content ?: """message to be translated""".trimMargin()
+
+        return callApi(
+            url = ApiRoutes.aiTranslate(),
+            method = POST,
+            body = mapOf("destination_language" to languageCode, "content" to content), // TODO: Adapt body to accept an additional languageCode parameter once the backend supports it
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
+        )
+    }
+
     private fun getAiBodyFromMessages(messages: List<AiMessage>) = mapOf("messages" to messages, "output" to "mail")
 
     suspend fun getFeatureFlags(currentMailboxUuid: String): ApiResponse<List<String>> {
