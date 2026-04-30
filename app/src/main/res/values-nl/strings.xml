@@ -159,11 +159,13 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Versturen met een ander adres</string>
     <string name="buttonShare">Delen</string>
+    <string name="buttonShowOriginal">Oorspronkelijk bericht weergeven</string>
     <string name="buttonStart">Starten</string>
     <string name="buttonStartSync">Synchronisatie starten</string>
     <string name="buttonStrikeThrough">Doorhalen</string>
     <string name="buttonTextOptionsClose">Tekstopmaak sluiten</string>
     <string name="buttonTextOptionsOpen">Tekstopmaak openen</string>
+    <string name="buttonTranslate">Vertaal</string>
     <string name="buttonTry">Proberen</string>
     <string name="buttonUnderline">Onderstrepen</string>
     <string name="buttonUnorderedList">Ongeordende lijst</string>
@@ -338,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Kan de map niet maken</string>
     <string name="errorUnableToFlushFolder">Map kan niet worden geleegd</string>
     <string name="errorUserAlreadySynchronized">Gebruiker is al gesynchroniseerd</string>
+    <string name="euriaTranslateMessage">Euria vertaalt uw bericht…</string>
     <string name="expeditorAuthenticationDescription">De herkomst van deze afzender is geauthenticeerd.</string>
     <string name="externalDialogConfirmButton">Ik begrijp het</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -359,6 +362,7 @@
         <item quantity="other">%d bestanden verzonden via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Van:</string>
+    <string name="genericMessageTranslated">Bericht vertaald</string>
     <string name="googlePlayServicesAreRequired">Google Play Services zijn vereist</string>
     <string name="groupContactsTitle">Groep: %s</string>
     <string name="inboxFolder">Inbox</string>
@@ -398,6 +402,7 @@
     <string name="messageSummaryError">Euria kon dit bericht niet samenvatten.</string>
     <string name="messageSummaryErrorRetry">Euria kon dit bericht niet samenvatten. Probeer het opnieuw.</string>
     <string name="messageSummaryLoading">Samenvatting van het bericht…</string>
+    <string name="messageTranslatedTitle">Vertaald in %s</string>
     <string name="mondayAfternoon">Maandagmiddag</string>
     <string name="mondayMorning">Maandagochtend</string>
     <string name="moveInSpamButton">Naar Spam verplaatsen</string>
@@ -687,6 +692,7 @@
         <item quantity="one">%d adres kon niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
         <item quantity="other">%d adressen konden niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Dit bericht is al in uw taal</string>
     <string name="trashFolder">Prullenbak</string>
     <string name="unblockButton">Deblokkeren</string>
     <string name="unknownDialogTitleExpeditor">Onbekende afzender</string>

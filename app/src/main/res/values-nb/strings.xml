@@ -159,11 +159,13 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Send med en annen adresse</string>
     <string name="buttonShare">Del</string>
+    <string name="buttonShowOriginal">Vis opprinnelig melding</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synkronisering</string>
     <string name="buttonStrikeThrough">Gjennomstreking</string>
     <string name="buttonTextOptionsClose">Lukk tekstformatering</string>
     <string name="buttonTextOptionsOpen">Åpne tekstformatering</string>
+    <string name="buttonTranslate">Oversett</string>
     <string name="buttonTry">Prøv</string>
     <string name="buttonUnderline">Understreking</string>
     <string name="buttonUnorderedList">Usortert liste</string>
@@ -338,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Kan ikke opprette mappen</string>
     <string name="errorUnableToFlushFolder">Mappen kan ikke tømmes</string>
     <string name="errorUserAlreadySynchronized">Bruker er allerede synkronisert</string>
+    <string name="euriaTranslateMessage">Euria oversetter meldingen din…</string>
     <string name="expeditorAuthenticationDescription">Avsenderens opprinnelse har blitt autentisert.</string>
     <string name="externalDialogConfirmButton">Jeg forstår</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -359,6 +362,7 @@
         <item quantity="other">%d filer sendt via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Fra:</string>
+    <string name="genericMessageTranslated">Melding oversatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services kreves</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
     <string name="inboxFolder">Innboks</string>
@@ -398,6 +402,7 @@
     <string name="messageSummaryError">Euria kunne ikke oppsummere denne meldingen.</string>
     <string name="messageSummaryErrorRetry">Euria kunne ikke oppsummere denne meldingen. Vennligst prøv igjen.</string>
     <string name="messageSummaryLoading">Meldingens oppsummering…</string>
+    <string name="messageTranslatedTitle">Oversatt i %s</string>
     <string name="mondayAfternoon">Mandag ettermiddag</string>
     <string name="mondayMorning">Mandag morgen</string>
     <string name="moveInSpamButton">Flytt til Spam</string>
@@ -687,6 +692,7 @@
         <item quantity="one">%d adresse kunne ikke legges til fordi du har nått grensen for mottakere</item>
         <item quantity="other">%d adresser kunne ikke legges til fordi du har nått grensen for mottakere</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Denne meldingen er allerede på ditt språk</string>
     <string name="trashFolder">Papirkurv</string>
     <string name="unblockButton">Opphev blokkering</string>
     <string name="unknownDialogTitleExpeditor">Ukjent avsender</string>

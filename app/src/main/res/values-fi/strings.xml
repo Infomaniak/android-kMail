@@ -159,11 +159,13 @@
     <string name="buttonSelectAll">Kaikki</string>
     <string name="buttonSendWithDifferentAddress">Lähetä toisella osoitteella</string>
     <string name="buttonShare">Jaa</string>
+    <string name="buttonShowOriginal">Näytä alkuperäinen viesti</string>
     <string name="buttonStart">Aloita</string>
     <string name="buttonStartSync">Aloita synkronointi</string>
     <string name="buttonStrikeThrough">Yliviivaus</string>
     <string name="buttonTextOptionsClose">Sulje tekstin muotoilu</string>
     <string name="buttonTextOptionsOpen">Avaa tekstin muotoilu</string>
+    <string name="buttonTranslate">Käännä</string>
     <string name="buttonTry">Kokeile</string>
     <string name="buttonUnderline">Alleviivaus</string>
     <string name="buttonUnorderedList">Luettelomerkit</string>
@@ -338,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Kansiota ei voitu luoda</string>
     <string name="errorUnableToFlushFolder">Kansiota ei voi tyhjentää</string>
     <string name="errorUserAlreadySynchronized">Käyttäjä on jo synkronoitu</string>
+    <string name="euriaTranslateMessage">Euria kääntää viestisi…</string>
     <string name="expeditorAuthenticationDescription">Lähettäjän alkuperä on vahvistettu.</string>
     <string name="externalDialogConfirmButton">Ymmärrän</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -359,6 +362,7 @@
         <item quantity="other">%d tiedostoa lähetetty SwissTransferin kautta</item>
     </plurals>
     <string name="fromTitle">Lähettäjä:</string>
+    <string name="genericMessageTranslated">Viesti käännetty</string>
     <string name="googlePlayServicesAreRequired">Google Play Services vaaditaan</string>
     <string name="groupContactsTitle">Ryhmä: %s</string>
     <string name="inboxFolder">Saapuneet</string>
@@ -398,6 +402,7 @@
     <string name="messageSummaryError">Euria ei voinut tehdä yhteenvetoa tästä viestistä.</string>
     <string name="messageSummaryErrorRetry">Euria ei voinut tehdä yhteenvetoa tästä viestistä. Yritä uudelleen.</string>
     <string name="messageSummaryLoading">Viestin yhteenveto…</string>
+    <string name="messageTranslatedTitle">Käännetty %s</string>
     <string name="mondayAfternoon">Maanantai-iltapäivä</string>
     <string name="mondayMorning">Maanantaiaamu</string>
     <string name="moveInSpamButton">Siirrä roskapostiin</string>
@@ -687,6 +692,7 @@
         <item quantity="one">%d osoite ei voitu lisätä, koska olet saavuttanut vastaanottajien enimmäismäärän</item>
         <item quantity="other">%d osoitetta ei voitu lisätä, koska olet saavuttanut vastaanottajien enimmäismäärän</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Tämä viesti on jo omalla kielelläsi</string>
     <string name="trashFolder">Roskakori</string>
     <string name="unblockButton">Poista esto</string>
     <string name="unknownDialogTitleExpeditor">Tuntematon lähettäjä</string>

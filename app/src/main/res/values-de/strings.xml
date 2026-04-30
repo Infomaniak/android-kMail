@@ -159,11 +159,13 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Senden mit abweichender Adresse</string>
     <string name="buttonShare">Teilen Sie</string>
+    <string name="buttonShowOriginal">Originalnachricht anzeigen</string>
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStartSync">Start der Synchronisierung</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>
     <string name="buttonTextOptionsClose">Textformatierung schliessen</string>
     <string name="buttonTextOptionsOpen">Offene Textformatierung</string>
+    <string name="buttonTranslate">Übersetzen Sie</string>
     <string name="buttonTry">Probieren</string>
     <string name="buttonUnderline">Unterstreichen Sie</string>
     <string name="buttonUnorderedList">Unsortierte Liste</string>
@@ -338,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
     <string name="errorUserAlreadySynchronized">Benutzer ist bereits synchronisiert</string>
+    <string name="euriaTranslateMessage">Euria übersetzt Ihre Nachricht…</string>
     <string name="expeditorAuthenticationDescription">Die Herkunft dieses Absenders wurde authentifiziert.</string>
     <string name="externalDialogConfirmButton">Ich habe verstanden</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -359,6 +362,7 @@
         <item quantity="other">%d Dateien gesendet von SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Von:</string>
+    <string name="genericMessageTranslated">Nachricht übersetzt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
     <string name="inboxFolder">Posteingang</string>
@@ -398,6 +402,7 @@
     <string name="messageSummaryError">Euria konnte diese Nachricht nicht zusammenfassen.</string>
     <string name="messageSummaryErrorRetry">Euria konnte diese Nachricht nicht zusammenfassen. Bitte versuchen Sie es erneut.</string>
     <string name="messageSummaryLoading">Zusammenfassung der Nachricht…</string>
+    <string name="messageTranslatedTitle">Übersetzt in %s</string>
     <string name="mondayAfternoon">Montagnachmittag</string>
     <string name="mondayMorning">Montagmorgen</string>
     <string name="moveInSpamButton">Einzug von Spam</string>
@@ -687,6 +692,7 @@
         <item quantity="one">%d Adresse konnte nicht hinzugefügt werden, da Sie das Empfängerlimit erreicht haben</item>
         <item quantity="other">%d Adressen konnten nicht hinzugefügt werden, da Sie das Empfängerlimit erreicht haben</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Diese Nachricht ist bereits in Ihrer Sprache</string>
     <string name="trashFolder">Papierkorb</string>
     <string name="unblockButton">Entsperren</string>
     <string name="unknownDialogTitleExpeditor">Unbekannter Spediteur</string>

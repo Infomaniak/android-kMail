@@ -159,11 +159,13 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Send med en anden adresse</string>
     <string name="buttonShare">Del</string>
+    <string name="buttonShowOriginal">Vis den oprindelige besked</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synkronisering</string>
     <string name="buttonStrikeThrough">Gennemstreget</string>
     <string name="buttonTextOptionsClose">Luk tekstformatering</string>
     <string name="buttonTextOptionsOpen">Åbn tekstformatering</string>
+    <string name="buttonTranslate">Oversæt</string>
     <string name="buttonTry">Prøv</string>
     <string name="buttonUnderline">Understreget</string>
     <string name="buttonUnorderedList">Usorteret liste</string>
@@ -338,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Kan ikke oprette mappen</string>
     <string name="errorUnableToFlushFolder">Mappen kan ikke tømmes</string>
     <string name="errorUserAlreadySynchronized">Brugeren er allerede synkroniseret</string>
+    <string name="euriaTranslateMessage">Euria oversætter din besked…</string>
     <string name="expeditorAuthenticationDescription">Afsenderens oprindelse er blevet autentificeret.</string>
     <string name="externalDialogConfirmButton">Jeg forstår</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -359,6 +362,7 @@
         <item quantity="other">%d filer sendt via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Fra:</string>
+    <string name="genericMessageTranslated">Besked oversat</string>
     <string name="googlePlayServicesAreRequired">Google Play Services er påkrævet</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
     <string name="inboxFolder">Indbakke</string>
@@ -398,6 +402,7 @@
     <string name="messageSummaryError">Euria kunne ikke opsummere denne besked.</string>
     <string name="messageSummaryErrorRetry">Euria kunne ikke opsummere denne besked. Prøv venligst igen.</string>
     <string name="messageSummaryLoading">Beskedens resumé…</string>
+    <string name="messageTranslatedTitle">Oversat i %s</string>
     <string name="mondayAfternoon">Mandag eftermiddag</string>
     <string name="mondayMorning">Mandag morgen</string>
     <string name="moveInSpamButton">Flyt til Spam</string>
@@ -687,6 +692,7 @@
         <item quantity="one">%d adresse kunne ikke tilføjes, fordi du har nået grænsen for modtagere</item>
         <item quantity="other">%d adresser kunne ikke tilføjes, fordi du har nået grænsen for modtagere</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Denne besked er allerede på dit sprog</string>
     <string name="trashFolder">Papirkurv</string>
     <string name="unblockButton">Fjern blokering</string>
     <string name="unknownDialogTitleExpeditor">Ukendt afsender</string>
