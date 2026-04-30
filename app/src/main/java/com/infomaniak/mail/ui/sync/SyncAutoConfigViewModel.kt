@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -48,7 +47,6 @@ class SyncAutoConfigViewModel @Inject constructor(
     private val snackbarManager: SnackbarManager,
 ) : AndroidViewModel(application) {
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var credentialsJob: Job? = null
 
     fun isSyncAppUpToDate(): Boolean = runCatching {
@@ -61,7 +59,7 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     fun configureUserAutoSync(launchAutoSyncIntent: (Intent) -> Unit) {
         credentialsJob?.cancel()
-        credentialsJob = viewModelScope.launch(ioCoroutineContext) {
+        credentialsJob = viewModelScope.launch(ioDispatcher) {
             fetchCredentials(scope = this)?.let { password ->
                 setupAutoSyncIntent(password, launchAutoSyncIntent)
             }

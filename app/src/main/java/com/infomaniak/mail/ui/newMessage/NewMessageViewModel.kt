@@ -704,7 +704,7 @@ class NewMessageViewModel @Inject constructor(
         currentAttachments: List<Attachment>,
         uris: List<Uri>,
         completion: (List<Attachment>) -> Unit,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    ) = viewModelScope.launch(ioDispatcher) {
         completion(importAttachments(currentAttachments, uris))
     }
 
@@ -787,7 +787,7 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.isDisplayedAsExternal) trackExternalEvent(MatomoName.DeleteRecipient)
     }
 
-    fun deleteAttachment(position: Int) = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteAttachment(position: Int) = viewModelScope.launch(ioDispatcher) {
         runCatching {
             val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
             val attachment = attachments[position]

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -39,8 +38,6 @@ class MykSuiteViewModel @Inject constructor(
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
 ) : ViewModel() {
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
     val myKSuiteMailboxResult = SingleLiveEvent<Mailbox?>()
     val myKSuiteDataResult = SingleLiveEvent<MyKSuiteData?>()
 
@@ -48,7 +45,7 @@ class MykSuiteViewModel @Inject constructor(
         myKSuiteMailboxResult.postValue(mailboxController.getMailbox(userId = AccountUtils.currentUserId, mailboxId = mailboxId))
     }
 
-    fun refreshMyKSuite() = viewModelScope.launch(ioCoroutineContext) {
+    fun refreshMyKSuite() = viewModelScope.launch(ioDispatcher) {
         myKSuiteDataResult.postValue(myKSuiteDataUtils.fetchData())
     }
 }

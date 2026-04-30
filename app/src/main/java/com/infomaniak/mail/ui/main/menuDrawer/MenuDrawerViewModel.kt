@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -34,13 +33,11 @@ class MenuDrawerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
     val areMailboxesExpanded = MutableLiveData(false)
     val areCustomFoldersExpanded = MutableLiveData(true)
     val areActionsExpanded = MutableLiveData(false)
 
-    fun toggleFolderCollapsingState(rootFolderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+    fun toggleFolderCollapsingState(rootFolderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioDispatcher) {
         folderController.updateFolder(rootFolderId) {
             it.isCollapsed = shouldCollapse
         }

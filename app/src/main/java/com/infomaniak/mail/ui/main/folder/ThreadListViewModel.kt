@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
-import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -46,7 +45,6 @@ class ThreadListViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var updatedAtJob: Job? = null
 
     val isRecoveringFinished = MutableLiveData(true)
@@ -60,7 +58,7 @@ class ThreadListViewModel @Inject constructor(
 
     fun startUpdatedAtJob() {
         updatedAtJob?.cancel()
-        updatedAtJob = viewModelScope.launch(ioCoroutineContext) {
+        updatedAtJob = viewModelScope.launch(ioDispatcher) {
             while (true) {
                 delay(DateUtils.MINUTE_IN_MILLIS)
                 ensureActive()
@@ -69,7 +67,7 @@ class ThreadListViewModel @Inject constructor(
         }
     }
 
-    fun deleteSearchData() = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteSearchData() = viewModelScope.launch(ioDispatcher) {
         // Delete Search data in case they couldn't be deleted at the end of the previous Search.
         searchUtils.deleteRealmSearchData()
     }
@@ -89,7 +87,7 @@ class ThreadListViewModel @Inject constructor(
         isWebViewOutdated.value = canShowWebViewOutdated && hasOutdatedMajorVersion
     }
 
-    suspend fun getEmojiReactionsFor(messageUid: String): Map<String, Reaction>? = withContext(ioCoroutineContext) {
+    suspend fun getEmojiReactionsFor(messageUid: String): Map<String, Reaction>? = withContext(ioDispatcher) {
         messageController.getMessage(messageUid)?.let { message ->
             message.emojiReactions.associateBy { it.emoji }
         }
