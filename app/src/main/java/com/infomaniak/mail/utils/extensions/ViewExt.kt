@@ -26,7 +26,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 
-fun View.setSendingButtonListener(
+fun View.setSendingClickListener(
     buttonState: SendingButtonState,
     onActionBlocked: () -> Unit,
     onActionExecute: () -> Unit
@@ -51,8 +51,9 @@ private fun View.applyDisabledColor(buttonState: SendingButtonState) {
     val color = ContextCompat.getColor(context, R.color.disabledIconColor)
     when (this) {
         is MaterialButton -> {
-            this.iconTint = ColorStateList.valueOf(color)
-            this.setTextColor(color)
+            // this.iconTint = ColorStateList.valueOf(color)
+            // this.setTextColor(color)
+            this.backgroundTintList = ColorStateList.valueOf(color)
         }
 
         is MaterialToolbar -> {
