@@ -1030,7 +1030,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun summarize(messageUid: String) {
-        threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiSummaryState.Loading
+        threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiProcessState.Loading
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
         if (index >= 0) threadAdapter.notifyItemChanged(index)
 
@@ -1041,9 +1041,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             val result = ApiRepository.aiSummary(languageCode, content)
 
             threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
-                AiSummaryState.Success(result.data ?: "")
+                AiProcessState.Success(result.data ?: "")
             } else {
-                AiSummaryState.Error
+                AiProcessState.Error
             }
             if (index >= 0) threadAdapter.notifyItemChanged(index)
         }
