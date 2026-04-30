@@ -108,6 +108,10 @@ object ErrorCode {
     const val EMOJI_REACTION_ALREADY_USED = "emoji_reaction__already_used"
     //endregion
 
+    //region Message
+    const val MESSAGE_CANNOT_SEND_MESSAGE = "message__cannot_send_message"
+    //endregion
+
     //region Encryption
     const val ENCRYPTION_PASSWORD_IS_REQUIRED = "encryption_password_is_required"
     //endregion
@@ -172,6 +176,9 @@ object ErrorCode {
         EmojiReactionNotAllowedReason.EmojiReactionRecipientNotAllowed,
         EmojiReactions.maxReactionReached,
         EmojiReactions.alreadyUsed,
+
+        // Message
+        ApiErrorCode(MESSAGE_CANNOT_SEND_MESSAGE, R.string.snackbarAdminDisabledMessageSending),
     )
 
     object EmojiReactions {

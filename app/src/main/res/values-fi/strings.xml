@@ -556,6 +556,7 @@
     <string name="settingsTransferEmailsTitle">Välitä sähköpostit</string>
     <string name="settingsTransferInBody">Viestin rungossa</string>
     <string name="shareEmail">Jaa sähköposti</string>
+    <string name="snackbarAdminDisabledMessageSending">Järjestelmänvalvoja on poistanut viestinlähetyksen käytöstä</string>
     <string name="snackbarBlockUserConfirmation">Lähettäjä on nyt estetty</string>
     <string name="snackbarCalendarChoiceSent">Vastaus otettu huomioon</string>
     <string name="snackbarContactSaved">Uusi yhteystieto rekisteröity onnistuneesti</string>

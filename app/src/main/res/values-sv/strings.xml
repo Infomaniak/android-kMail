@@ -556,6 +556,7 @@
     <string name="settingsTransferEmailsTitle">Vidarebefordra e-post</string>
     <string name="settingsTransferInBody">I meddelandetexten</string>
     <string name="shareEmail">Dela e-post</string>
+    <string name="snackbarAdminDisabledMessageSending">En administratör har inaktiverat meddelandesändning</string>
     <string name="snackbarBlockUserConfirmation">Avsändaren är nu blockerad</string>
     <string name="snackbarCalendarChoiceSent">Svar beaktat</string>
     <string name="snackbarContactSaved">Ny kontakt registrerad</string>

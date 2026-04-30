@@ -561,6 +561,7 @@
     <string name="settingsTransferEmailsTitle">Transfer emails</string>
     <string name="settingsTransferInBody">In the message body</string>
     <string name="shareEmail">Share email</string>
+    <string name="snackbarAdminDisabledMessageSending">An administrator has disabled message sending</string>
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarCalendarChoiceSent">Response taken into account</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>

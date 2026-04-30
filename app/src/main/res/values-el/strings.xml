@@ -556,6 +556,7 @@
     <string name="settingsTransferEmailsTitle">Προώθηση email</string>
     <string name="settingsTransferInBody">Στο σώμα του μηνύματος</string>
     <string name="shareEmail">Κοινοποίηση email</string>
+    <string name="snackbarAdminDisabledMessageSending">Ένας διαχειριστής έχει απενεργοποιήσει την αποστολή μηνυμάτων</string>
     <string name="snackbarBlockUserConfirmation">Ο αποστολέας έχει αποκλειστεί</string>
     <string name="snackbarCalendarChoiceSent">Η απάντηση καταχωρήθηκε</string>
     <string name="snackbarContactSaved">Η επαφή καταχωρήθηκε με επιτυχία</string>
