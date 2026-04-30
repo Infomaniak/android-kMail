@@ -101,6 +101,7 @@ import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.extensions.SendingButtonState
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
@@ -109,6 +110,7 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.extensions.setSendingClickListener
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
@@ -464,10 +466,16 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             isHandled
         }
 
-        newMessageFab.setOnClickListener {
-            trackNewMessageEvent(MatomoName.OpenFromFab)
-            safeNavigateToNewMessageActivity()
-        }
+        newMessageFab.setSendingClickListener(
+            buttonState = mailbox(). SendingButtonState.SendingBlocked,
+            onActionBlocked = {
+                snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
+            },
+            onActionExecute = {
+                trackNewMessageEvent(MatomoName.OpenFromFab)
+                safeNavigateToNewMessageActivity()
+            }
+        )
 
         threadsList.scrollListener = object : OnListScrollListener {
             override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
