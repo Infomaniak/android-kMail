@@ -159,11 +159,13 @@
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonSendWithDifferentAddress">Enviar com outro endereço</string>
     <string name="buttonShare">Partilhar</string>
+    <string name="buttonShowOriginal">Mostrar mensagem original</string>
     <string name="buttonStart">Iniciar</string>
     <string name="buttonStartSync">Iniciar sincronização</string>
     <string name="buttonStrikeThrough">Riscar</string>
     <string name="buttonTextOptionsClose">Fechar formatação de texto</string>
     <string name="buttonTextOptionsOpen">Abrir formatação de texto</string>
+    <string name="buttonTranslate">Traduzir</string>
     <string name="buttonTry">Experimentar</string>
     <string name="buttonUnderline">Sublinhar</string>
     <string name="buttonUnorderedList">Lista não ordenada</string>
@@ -338,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Não foi possível criar a pasta</string>
     <string name="errorUnableToFlushFolder">Não foi possível esvaziar a pasta</string>
     <string name="errorUserAlreadySynchronized">O utilizador já está sincronizado</string>
+    <string name="euriaTranslateMessage">Euria traduz a sua mensagem…</string>
     <string name="expeditorAuthenticationDescription">A origem deste remetente foi autenticada.</string>
     <string name="externalDialogConfirmButton">Compreendo</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -359,6 +362,7 @@
         <item quantity="other">%d ficheiros enviados via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">De:</string>
+    <string name="genericMessageTranslated">Mensagem traduzida</string>
     <string name="googlePlayServicesAreRequired">Os Google Play Services são necessários</string>
     <string name="groupContactsTitle">Grupo: %s</string>
     <string name="inboxFolder">Caixa de entrada</string>
@@ -399,6 +403,7 @@
     <string name="messageSummaryError">A Euria não conseguiu resumir esta mensagem.</string>
     <string name="messageSummaryErrorRetry">A Euria não conseguiu resumir esta mensagem. Por favor, tente novamente.</string>
     <string name="messageSummaryLoading">Resumo da mensagem…</string>
+    <string name="messageTranslatedTitle">Traduzido em %s</string>
     <string name="mondayAfternoon">Segunda-feira à tarde</string>
     <string name="mondayMorning">Segunda-feira de manhã</string>
     <string name="moveInSpamButton">Mover para Spam</string>
@@ -689,6 +694,7 @@
         <item quantity="one">%d endereço não pôde ser adicionado porque atingiu o limite de destinatários</item>
         <item quantity="other">%d endereços não puderam ser adicionados porque atingiu o limite de destinatários</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Esta mensagem já está na sua língua</string>
     <string name="trashFolder">Lixo</string>
     <string name="unblockButton">Desbloquear</string>
     <string name="unknownDialogTitleExpeditor">Remetente desconhecido</string>
