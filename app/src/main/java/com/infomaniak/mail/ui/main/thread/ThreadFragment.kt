@@ -547,8 +547,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             
             val canSendEmails = mainViewModel.currentPermissionsLive.value?.canSendEmails ?: true
             if (!canSendEmails) {
-                quickActionBar.applyDisabledColorByMenuId(R.id.quickActionReply)
-                quickActionBar.applyDisabledColorByMenuId(R.id.quickActionForward)
+                quickActionBar.disableByMenuId(R.id.quickActionReply)
+                quickActionBar.disableByMenuId(R.id.quickActionForward)
             }
 
 
@@ -836,29 +836,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     trackThreadActionsEvent(MatomoName.OpenBottomSheet)
                     threadViewModel.clickOnQuickActionBar(menuId)
                 }
-
-                R.id.quickActionReply, R.id.quickActionForward -> {
-
-                    val executeAction: () -> Unit = {
-                        when (menuId) {
-                            R.id.quickActionReply -> {
-                                trackThreadActionsEvent(MatomoName.Reply)
-                            }
-                            R.id.quickActionForward -> {
-                                trackThreadActionsEvent(MatomoName.Forward)
-                            }
-                        }
-                        threadViewModel.clickOnQuickActionBar(menuId)
-                    }
-
-                    val blockAction = {
-                        snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
-                    }
-
-                    mainViewModel.executeIfCanSendEmails(
-                        onBlocked = blockAction,
-                        onExecute = executeAction
-                    )
+                R.id.quickActionReply -> {
+                    trackThreadActionsEvent(MatomoName.Reply)
+                }
+                R.id.quickActionForward -> {
+                    trackThreadActionsEvent(MatomoName.Forward)
                 }
             }
         }
