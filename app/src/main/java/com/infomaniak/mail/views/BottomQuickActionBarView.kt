@@ -85,10 +85,10 @@ class BottomQuickActionBarView @JvmOverloads constructor(
         }
     }
 
-    fun applyDisabledColorByMenuId(@IdRes menuId: Int) {
+    fun disableByMenuId(@IdRes menuId: Int) {
         for (index in 0 until menu.size) {
             if (menu[index].itemId == menuId) {
-                buttons[index].applyDisabledColor()
+                disable(index)
                 return
             }
         }

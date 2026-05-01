@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
+import android.R.attr.text
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -114,6 +115,14 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionForward -> onClickListener.onForward()
                 R.id.actionDelete -> onClickListener.onDelete()
             }
+        }
+
+        val canSend = mainViewModel.currentPermissionsLive.value?.canSendEmails ?: true
+        if (!canSend) {
+            binding.mainActions.disableByMenuId(R.id.actionReply)
+            binding.mainActions.disableByMenuId(R.id.actionReplyAll)
+            binding.mainActions.disableByMenuId(R.id.actionForward)
+            binding.addReaction.isEnabled = false
         }
     }
 

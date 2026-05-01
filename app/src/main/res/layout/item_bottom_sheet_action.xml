@@ -46,7 +46,7 @@
             android:layout_marginVertical="@dimen/marginStandardMedium"
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:contentDescription="@string/contentDescriptionSchedule"
-            app:tint="?attr/colorPrimary"
+            app:tint="@color/primary_color_disabled"
             tools:src="@drawable/ic_afternoon_schedule" />
 
         <TextView
@@ -57,6 +57,7 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:ellipsize="end"
+            android:textColor="@color/primary_text_color_disabled"
             android:maxLines="2"
             tools:text="@string/restoreEmailsTitle" />
 
