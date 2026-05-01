@@ -22,9 +22,30 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
+
+fun View.bindSendingClickListener(
+    lifecycleOwner: LifecycleOwner,
+    permissionLive: LiveData<MailboxPermissions?>,
+    onActionBlocked: () -> Unit,
+    onActionExecute: () -> Unit
+) {
+    permissionLive.observe(lifecycleOwner) { permissions ->
+        val canSendEmails = permissions?.canSendEmails ?: true
+        val buttonState = if (canSendEmails) SendingButtonState.Send else SendingButtonState.SendingBlocked
+
+        this.setSendingClickListener(
+            buttonState = buttonState,
+            onActionBlocked = onActionBlocked,
+            onActionExecute = onActionExecute
+        )
+    }
+}
 
 fun View.setSendingClickListener(
     buttonState: SendingButtonState,

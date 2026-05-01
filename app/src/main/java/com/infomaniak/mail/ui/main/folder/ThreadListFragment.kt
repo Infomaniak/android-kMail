@@ -101,16 +101,15 @@ import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.SendingButtonState
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.bindSendingClickListener
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.extensions.setSendingClickListener
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
@@ -466,8 +465,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             isHandled
         }
 
-        newMessageFab.setSendingClickListener(
-            buttonState = mailbox(). SendingButtonState.SendingBlocked,
+        newMessageFab.bindSendingClickListener(
+            lifecycleOwner = viewLifecycleOwner,
+            permissionLive = mainViewModel.currentPermissionsLive,
             onActionBlocked = {
                 snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
             },
@@ -574,7 +574,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     private fun handleAccountSwipe(isSwipeDown: Boolean) = lifecycleScope.launch {
         val accounts = switchUserViewModel.accounts.first()
         if (accounts.isEmpty()) return@launch
-        
+
         val currentIndex = accounts.indexOfFirst { it.id == AccountUtils.currentUserId }
         if (currentIndex == -1) return@launch
 
