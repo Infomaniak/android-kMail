@@ -26,6 +26,7 @@ import android.view.WindowInsets
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.getResourceIdOrThrow
@@ -37,6 +38,7 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
+import com.infomaniak.mail.utils.extensions.applyDisabledColor
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 
 class BottomQuickActionBarView @JvmOverloads constructor(
@@ -80,6 +82,15 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     fun setOnItemClickListener(callback: (menuId: Int) -> Unit) {
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener { callback(menu[index].itemId) }
+        }
+    }
+
+    fun applyDisabledColorByMenuId(@IdRes menuId: Int) {
+        for (index in 0 until menu.size) {
+            if (menu[index].itemId == menuId) {
+                buttons[index].applyDisabledColor()
+                return
+            }
         }
     }
 
