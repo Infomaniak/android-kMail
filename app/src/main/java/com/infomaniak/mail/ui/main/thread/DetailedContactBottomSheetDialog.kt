@@ -27,6 +27,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -61,6 +62,11 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         contactDetails.setCorrespondent(navigationArgs.recipient, bimi)
 
         setupListeners()
+
+        val canSend = mainViewModel.currentPermissionsLive.value?.canSendEmails ?: true
+        if (!canSend) {
+            binding.writeMail.isEnabled = false
+        }
     }
 
     private fun setupListeners() = with(binding) {
