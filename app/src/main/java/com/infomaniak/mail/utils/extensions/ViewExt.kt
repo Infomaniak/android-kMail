@@ -18,14 +18,15 @@
 package com.infomaniak.mail.utils.extensions
 
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 
@@ -54,7 +55,7 @@ fun View.setSendingClickListener(
 ) {
 
     if (buttonState != SendingButtonState.Send) {
-        this.applyDisabledColor(buttonState)
+        this.applyDisabledColor()
     }
 
     this.setOnClickListener {
@@ -67,35 +68,28 @@ fun View.setSendingClickListener(
 }
 
 
-private fun View.applyDisabledColor(buttonState: SendingButtonState) {
-
+fun View.applyDisabledColor() {
     val color = ContextCompat.getColor(context, R.color.disabledIconColor)
+
     when (this) {
-        is MaterialButton -> {
-            // this.iconTint = ColorStateList.valueOf(color)
-            // this.setTextColor(color)
+        is ExtendedFloatingActionButton -> {
             this.backgroundTintList = ColorStateList.valueOf(color)
         }
 
-        is MaterialToolbar -> {
-            this.navigationIcon?.setTint(color)
-            // this.menu.forEach { item ->
-            //     item.icon?.setTint(color)
-            // }
-            this.setTitleTextColor(color)
+        is MaterialButton -> {
+            this.setTextColor(color)
+            this.iconTint = ColorStateList.valueOf(color)
         }
 
-        // is ActionItemView -> {
-        //     this.setIconColor(color)
+        // is ImageView -> {
+        //     this.setColorFilter(color)
+        // }
+        //
+        // is TextView -> {
+        //     this.setTextColor(color)
         // }
 
-        is ImageView -> {
-            this.setColorFilter(color)
-        }
-
-        is TextView -> {
-            this.setTextColor(color)
-        }
+        else -> Log.i("elouan", "not supported : $this")
     }
 }
 

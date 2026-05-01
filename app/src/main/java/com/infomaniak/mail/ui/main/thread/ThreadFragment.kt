@@ -544,6 +544,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 localSettings,
             )
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
+            
+            val canSendEmails = mainViewModel.currentPermissionsLive.value?.canSendEmails ?: true
+            if (!canSendEmails) {
+                quickActionBar.applyDisabledColorByMenuId(R.id.quickActionReply)
+                quickActionBar.applyDisabledColorByMenuId(R.id.quickActionForward)
+            }
+
 
             thread.snoozeEndDate?.let { snoozeEndDate ->
                 val formattedDate = context.formatDayOfWeekAdaptiveYear(snoozeEndDate.toDate())
@@ -813,14 +820,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
-                R.id.quickActionReply -> {
-                    trackThreadActionsEvent(MatomoName.Reply)
-                    threadViewModel.clickOnQuickActionBar(menuId)
-                }
-                R.id.quickActionForward -> {
-                    trackThreadActionsEvent(MatomoName.Forward)
-                    threadViewModel.clickOnQuickActionBar(menuId)
-                }
                 R.id.quickActionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Archive, isFromArchive)
@@ -836,6 +835,30 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 R.id.quickActionMenu -> {
                     trackThreadActionsEvent(MatomoName.OpenBottomSheet)
                     threadViewModel.clickOnQuickActionBar(menuId)
+                }
+
+                R.id.quickActionReply, R.id.quickActionForward -> {
+
+                    val executeAction: () -> Unit = {
+                        when (menuId) {
+                            R.id.quickActionReply -> {
+                                trackThreadActionsEvent(MatomoName.Reply)
+                            }
+                            R.id.quickActionForward -> {
+                                trackThreadActionsEvent(MatomoName.Forward)
+                            }
+                        }
+                        threadViewModel.clickOnQuickActionBar(menuId)
+                    }
+
+                    val blockAction = {
+                        snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
+                    }
+
+                    mainViewModel.executeIfCanSendEmails(
+                        onBlocked = blockAction,
+                        onExecute = executeAction
+                    )
                 }
             }
         }

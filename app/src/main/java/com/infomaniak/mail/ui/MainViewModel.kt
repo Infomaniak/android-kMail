@@ -388,6 +388,14 @@ class MainViewModel @Inject constructor(
         } ?: appContext.launchNoValidMailboxesActivity()
     }
 
+    fun executeIfCanSendEmails(
+        onBlocked: () -> Unit,
+        onExecute: () -> Unit
+    ) {
+        val canSend = currentPermissionsLive.value?.canSendEmails ?: true
+        if (canSend) onExecute() else onBlocked()
+    }
+
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
         currentMailbox.value?.let {
             appContext.cancelNotification(it.notificationGroupId)
