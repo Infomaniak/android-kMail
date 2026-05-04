@@ -43,19 +43,6 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
 
-    fun searchMergedContacts(searchQuery: String, searchQueryClean: String, limit: Int = 5): List<MergedContact> {
-        val queryStr = if (searchQuery != searchQueryClean) {
-            "(name CONTAINS[c] $0 OR email CONTAINS[c] $0) OR (name CONTAINS[c] $1 OR email CONTAINS[c] $1)"
-        } else {
-            "name CONTAINS[c] $0 OR email CONTAINS[c] $0"
-        }
-        return userInfoRealm.query<MergedContact>(queryStr, searchQuery, searchQueryClean)
-            .sort(MergedContact::name.name)
-            .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
-            .limit(limit)
-            .find()
-    }
-
     private fun getMergedContactFromContactGroupQuery(contact: ContactGroup): RealmQuery<MergedContact> {
         return userInfoRealm.query<MergedContact>("${MergedContact::remoteContactGroupIds.name} == $0", contact.id)
             .sort(MergedContact::name.name)
@@ -70,6 +57,17 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
 
     private fun getMergedContactFromEmailQuery(email: String): RealmQuery<MergedContact> {
         return userInfoRealm.query<MergedContact>("${MergedContact::email.name} == $0", email)
+    
+	private fun searchMergedContactsQuery(searchQuery: String,searchQueryClean: String, limit: Int): RealmQuery<MergedContact>{
+        val queryStr = if (searchQuery != searchQueryClean) {
+            "(name CONTAINS[c] $0 OR email CONTAINS[c] $0) OR (name CONTAINS[c] $1 OR email CONTAINS[c] $1)"
+        } else {
+            "name CONTAINS[c] $0 OR email CONTAINS[c] $0"
+        }
+            .sort(MergedContact::name.name)
+        return userInfoRealm.query<MergedContact>(queryStr, searchQuery, searchQueryClean)
+            .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
+            .limit(limit)
     }
     //endregion
 
@@ -92,6 +90,10 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
 
     fun getMergedContactsAsync(): Flow<ResultsChange<MergedContact>> {
         return getMergedContactsQuery().asFlow()
+    }
+
+    suspend fun searchMergedContacts(searchQuery: String, searchQueryClean: String, limit: Int = 5): List<MergedContact> {
+        return searchMergedContactsQuery(searchQuery, searchQueryClean, limit).findSuspend()
     }
     //endregion
 
