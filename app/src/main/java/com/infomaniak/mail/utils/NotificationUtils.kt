@@ -52,6 +52,7 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.EXTRA
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_ACTION
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AvatarTypeUtils.getAvatarType
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.realm.kotlin.Realm
@@ -250,7 +251,7 @@ class NotificationUtils @Inject constructor(
             setContentTitle(null)
             setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
         } else {
-            addActions(payload)
+            addActions(mailbox, payload)
         }
 
         val avatarType = getAvatarType(
@@ -299,7 +300,7 @@ class NotificationUtils @Inject constructor(
     }
 
     @SuppressLint("WrongConstant")
-    private fun NotificationCompat.Builder.addActions(payload: NotificationPayload) {
+    private fun NotificationCompat.Builder.addActions(mailbox: Mailbox, payload: NotificationPayload) {
 
         fun createBroadcastAction(@StringRes title: Int, intent: Intent): NotificationCompat.Action {
             val requestCode = UUID.randomUUID().hashCode()
@@ -339,21 +340,26 @@ class NotificationUtils @Inject constructor(
             title = R.string.actionDelete,
             intent = createBroadcastIntent(DELETE_ACTION),
         )
-        val replyAction = createActivityAction(
-            title = R.string.actionReply,
-            activity = LaunchActivity::class.java,
-            args = LaunchActivityArgs(
-                userId = payload.userId,
-                mailboxId = payload.mailboxId,
-                replyToMessageUid = payload.messageUid,
-                draftMode = DraftMode.REPLY,
-                notificationId = payload.notificationId,
-            ).toBundle(),
-        )
 
         addAction(archiveAction)
         addAction(deleteAction)
-        addAction(replyAction)
+
+        val canSendEmails = mailbox.permissions?.canSendEmails ?: true
+        if (canSendEmails){
+            val replyAction = createActivityAction(
+                title = R.string.actionReply,
+                activity = LaunchActivity::class.java,
+                args = LaunchActivityArgs(
+                    userId = payload.userId,
+                    mailboxId = payload.mailboxId,
+                    replyToMessageUid = payload.messageUid,
+                    draftMode = DraftMode.REPLY,
+                    notificationId = payload.notificationId,
+                ).toBundle(),
+            )
+
+            addAction(replyAction)
+        }
     }
 
     suspend fun updateUserAndMailboxes(mailboxController: MailboxController, tag: String) {
