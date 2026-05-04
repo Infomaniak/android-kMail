@@ -229,7 +229,7 @@ class MessagesActionsUseCase @Inject constructor(
                 messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, mailbox.featureFlags)
             }
         } else {
-            threads.flatMap { thread -> messageController.getUnseenMessages(thread) }
+            threads.flatMap { thread -> messageController.getAllThreadMessagesAndDuplicates(thread) }
         }
 
         return handleToggleSeenStatus(messagesToToggle, isSeen, mailbox, threadsUids)
