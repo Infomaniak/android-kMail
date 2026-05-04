@@ -196,6 +196,9 @@ class MainViewModel @Inject constructor(
 
     val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
 
+    val canSendEmails: Boolean
+        get() = currentPermissionsLive.value?.canSendEmails ?: true
+
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection

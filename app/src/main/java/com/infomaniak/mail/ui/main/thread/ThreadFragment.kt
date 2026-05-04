@@ -544,9 +544,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 localSettings,
             )
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
-            
-            val canSendEmails = mainViewModel.currentPermissionsLive.value?.canSendEmails ?: true
-            if (!canSendEmails) {
+
+            if (!mainViewModel.canSendEmails) {
                 quickActionBar.disableByMenuId(R.id.quickActionReply)
                 quickActionBar.disableByMenuId(R.id.quickActionForward)
             }

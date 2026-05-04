@@ -117,8 +117,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             }
         }
 
-        val canSend = mainViewModel.currentPermissionsLive.value?.canSendEmails ?: true
-        if (!canSend) {
+        if (!mainViewModel.canSendEmails) {
             binding.mainActions.disableByMenuId(R.id.actionReply)
             binding.mainActions.disableByMenuId(R.id.actionReplyAll)
             binding.mainActions.disableByMenuId(R.id.actionForward)
