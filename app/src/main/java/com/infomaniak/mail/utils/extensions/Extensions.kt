@@ -101,12 +101,13 @@ import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.folder.ThreadListItem
-import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
+import com.infomaniak.mail.ui.main.thread.webViewClient.EditorWebViewClient
+import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ApiErrorException
@@ -257,29 +258,25 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
         SimpleColorFilter(illuColors.color)
     }
 }
+//endregion
 
-fun WebView.initWebViewClientAndBridge(
+//region WebViewClient
+fun WebView.initDisplayWebViewClientAndBridge(
     attachments: List<Attachment>,
     messageUid: String,
     shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: (() -> Unit)? = null,
+    onBlockedResourcesDetected: () -> Unit,
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
     onPageFinished: (() -> Unit)? = null,
-    onWebViewFinishedLoading: (() -> Unit)? = null,
-): MessageWebViewClient {
+    onWebViewFinishedLoading: () -> Unit,
+): MessageDisplayWebViewClient {
 
-    WebViewUtils.initJavascriptBridge(onWebViewFinishedLoading)
-    addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
+    WebViewUtils.initMessageDisplayJavascriptBridge(onWebViewFinishedLoading)
+    addJavascriptInterface(WebViewUtils.messageDisplayJsBridge, "kmail")
 
-    val cidDictionary = mutableMapOf<String, Attachment>().apply {
-        attachments.forEach {
-            it.contentId?.let { cid ->
-                if (cid.isNotBlank()) this[cid] = it
-            }
-        }
-    }
+    val cidDictionary = attachments.toCidDictionary()
 
-    return MessageWebViewClient(
+    return MessageDisplayWebViewClient(
         context,
         cidDictionary,
         messageUid,
@@ -289,6 +286,38 @@ fun WebView.initWebViewClientAndBridge(
         onPageFinished,
     ).also {
         webViewClient = it
+    }
+}
+
+fun WebView.initEditorWebviewBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
+    WebViewUtils.initEditorJsBridge(onInlineImagesDeleted)
+    addJavascriptInterface(WebViewUtils.editorJsBridge, "kmail")
+}
+
+fun WebView.initEditorWebviewClient(
+    attachments: List<Attachment>,
+    shouldLoadDistantResources: Boolean,
+    onPageFinished: () -> Unit,
+): EditorWebViewClient {
+    val cidDictionary = attachments.toCidDictionary()
+
+    return EditorWebViewClient(
+        context,
+        cidDictionary,
+        shouldLoadDistantResources,
+        onPageFinished,
+    ).also {
+        webViewClient = it
+    }
+}
+
+private fun List<Attachment>.toCidDictionary(): Map<String, Attachment> {
+    return buildMap {
+        forEach<Attachment> {
+            it.contentId?.let { cid ->
+                if (cid.isNotBlank()) this[cid] = it
+            }
+        }
     }
 }
 //endregion

@@ -15,16 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
-import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
-import javax.inject.Inject
-import javax.inject.Singleton
+function reportOverScroll(clientWidth, scrollWidth, messageUid) {
+    globalThis.kmail.reportOverScroll(clientWidth, scrollWidth, messageUid);
+}
 
-@Singleton
-class SignatureUtils @Inject constructor() {
-    fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
-        return """<div id="$EDITOR_LOCAL_SIGNATURE_ID" class="$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME">$signatureContent</div>"""
-    }
+function reportError(error, scriptFirstLine, messageUid) {
+    globalThis.kmail.reportError(error.name, error.message, error.stack, scriptFirstLine, messageUid);
+}
+
+function webviewFinishedLoading() {
+    globalThis.kmail.webviewFinishedLoading();
 }

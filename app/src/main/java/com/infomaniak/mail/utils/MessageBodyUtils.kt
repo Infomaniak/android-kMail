@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,30 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
+import com.infomaniak.mail.ui.newMessage.BodyContentPayload
+import com.infomaniak.mail.ui.newMessage.BodyContentType
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
 import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
+import com.infomaniak.mail.utils.extensions.htmlToText
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 
 object MessageBodyUtils {
 
     const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
     const val INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME = "ik_mail_quote"
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
+    // This ID is used for finding the signature to replace it. REMOVE before sending the email.
+    const val EDITOR_LOCAL_SIGNATURE_ID = "ikEditorLocalSignature"
 
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
@@ -63,6 +70,7 @@ object MessageBodyUtils {
         "[name=\"quote\"]", // GMX
     )
 
+    //region Split
     suspend fun splitContentAndQuote(body: Body): SplitBody {
 
         val bodyContent = body.value
@@ -113,12 +121,68 @@ object MessageBodyUtils {
         return htmlDocument.outerHtml() to quotes
     }
 
-    fun addPrintHeader(context: Context, message: Message, htmlDocument: Document) {
-        htmlDocument.body().apply {
-            attr("style", "margin: 40px")
-            insertChildren(0, createPrintHeader(context, message))
-        }
+    fun String.isHtmlBlank(): Boolean {
+        return htmlToText().isBlank()
     }
+
+    private fun splitSignatureAndQuoteFromHtml(body: String): BodyData {
+        val doc = jsoupParseWithLog(body)
+        return splitSignatureAndQuoteFromHtml(doc)
+    }
+
+    /**
+     * This only takes into account infomaniak's quotes and signatures.
+     */
+    fun splitSignatureAndQuoteFromHtml(document: Document): BodyData {
+
+        fun Document.split(divClassName: String, defaultValue: Element): Pair<Element, Element?> {
+            // We need to use select and not getElementByClass because getElementByClass adds a \n after every <br>.
+            // The function remove() also adds \n after each <br> of it.
+            // So we need to use select, save the second part of the split first, and then do remove, to save the correct value
+            // for the snapshot to compare.
+            return select(".$divClassName").firstOrNull()?.let {
+                val second = if (it.html().isBlank()) null else it
+                it.remove()
+                document to second
+            } ?: (defaultValue to null)
+        }
+
+        document.outputSettings().prettyPrint(false)
+
+        val (bodyWithQuote, signature) = document.split(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, document)
+
+        val replyPosition = document.getElementPositionOrMax(".$INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME")
+        val forwardPosition = document.getElementPositionOrMax(".$INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME")
+        val (body, quote) = if (replyPosition < forwardPosition) {
+            document.split(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        } else {
+            document.split(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        }
+
+        return BodyData(BodyContentPayload(body.html(), BodyContentType.HTML_UNSANITIZED), signature, quote)
+    }
+
+    fun splitSignatureAndQuoteFromBody(draft: Draft): BodyData {
+        val remoteBody = draft.body
+        if (remoteBody.isEmpty()) return BodyData(BodyContentPayload.emptyBody(), null, null)
+
+        val (body, signature, quote) = when (draft.mimeType) {
+            Utils.TEXT_PLAIN -> BodyData(
+                body = BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML),
+                signature = null,
+                quote = null
+            )
+            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody)
+            else -> error("Cannot load an email which is not of type text/plain or text/html")
+        }
+
+        return BodyData(body, signature, quote)
+    }
+
+    private fun Document.getElementPositionOrMax(className: String): Int {
+        return this.selectFirst(className)?.sourceRange()?.start()?.pos() ?: Int.MAX_VALUE
+    }
+    //endregion
 
     fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>): String {
         return body + formatSubBodiesContent(subBodies)
@@ -135,6 +199,13 @@ object MessageBodyUtils {
         }
 
         return subBodiesContent
+    }
+
+    fun addPrintHeader(context: Context, message: Message, htmlDocument: Document) {
+        htmlDocument.body().apply {
+            attr("style", "margin: 40px")
+            insertChildren(0, createPrintHeader(context, message))
+        }
     }
 
     //region Utils
@@ -156,4 +227,6 @@ object MessageBodyUtils {
 
         override fun hashCode(): Int = 31 * content.hashCode() + quote.hashCode()
     }
+
+    data class BodyData(val body: BodyContentPayload, val signature: Element?, val quote: Element?)
 }

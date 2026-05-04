@@ -148,6 +148,7 @@ object MatomoMail : Matomo {
         DeleteDraft("deleteDraft"),
         DeleteExecuted("deleteExecuted"),
         DeleteFromHistory("deleteFromHistory"),
+        ShowQuote("showQuote"),
         DeleteQuote("deleteQuote"),
         DeleteRecipient("deleteRecipient"),
         DeleteSearch("deleteSearch"),

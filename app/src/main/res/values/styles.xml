@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2025 Infomaniak Network SA
+  ~ Copyright (C) 2022-2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -144,6 +144,16 @@
         <item name="android:textSize">14sp</item>
         <item name="cornerRadius">@dimen/textButtonCornerRadius</item>
         <item name="iconPadding">@dimen/marginStandardSmall</item>
+    </style>
+
+    <style name="ShowQuoteTextButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
+        <item name="android:insetLeft">@dimen/alternativeMargin</item>
+        <item name="android:insetTop">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetRight">@dimen/alternativeMargin</item>
+        <item name="android:insetBottom">@dimen/marginStandardVerySmall</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">@dimen/marginStandardVerySmall</item>
     </style>
 
     <style name="TextButtonPrimary" parent="Widget.Material3.Button">

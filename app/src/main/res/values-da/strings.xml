@@ -187,8 +187,6 @@
     <string name="contentDescriptionButtonDelete">Slet %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Slet kladde</string>
     <string name="contentDescriptionButtonDeleteHistory">Slet historikpost</string>
-    <string name="contentDescriptionButtonDeleteQuote">Slet citerede beskeder</string>
-    <string name="contentDescriptionButtonDeleteSignature">Slet signatur</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Udvid kontovalg</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Udvid tilpassede mapper</string>
     <string name="contentDescriptionButtonExpandFolder">Udvid mappe %s</string>
