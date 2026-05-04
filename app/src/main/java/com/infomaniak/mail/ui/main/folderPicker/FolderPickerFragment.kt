@@ -157,7 +157,7 @@ class FolderPickerFragment : Fragment() {
 
     private fun onFolderSelected(folder: Folder?) {
         when (navigationArgs.action) {
-            FolderPickerAction.MOVE -> handleMove(folder?.id)
+            FolderPickerAction.MOVE -> if (folder != null) handleMove(folder.id)
             FolderPickerAction.SEARCH -> {
                 searchViewModel.selectAllFoldersFilter(folder == null)
                 searchViewModel.selectFolder(folder)
@@ -167,9 +167,9 @@ class FolderPickerFragment : Fragment() {
         findNavController().popBackStack()
     }
 
-    private fun handleMove(folderId: String?) = with(navigationArgs) {
+    private fun handleMove(folderId: String) = with(navigationArgs) {
         val mailbox = mainViewModel.currentMailbox.value
-        if (folderId == null || mailbox == null) {
+        if (mailbox == null) {
             snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
             return@with
         }
