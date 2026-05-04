@@ -20,11 +20,12 @@ package com.infomaniak.mail.ui.main.folder
 import android.content.res.Configuration
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
@@ -52,11 +53,18 @@ import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import io.realm.kotlin.types.RealmInstant
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
+
+    private var dragStartX = 0f
+    private var dragStartLeftWidth = 0
+    private val separatorWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth) }
+    private val minLeftWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minLeftPaneWidth) }
+    private val minRightWidthPx by lazy { resources.getDimensionPixelSize(R.dimen.minRightPaneWidth) }
 
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
@@ -70,6 +78,7 @@ abstract class TwoPaneFragment : Fragment() {
     abstract val substituteClassName: String
     abstract fun getLeftPane(): View?
     abstract fun getRightPane(): FragmentContainerView?
+    abstract fun getDragSeparator(): View?
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
@@ -82,6 +91,7 @@ abstract class TwoPaneFragment : Fragment() {
         observeCurrentFolder()
         observeThreadUid()
         observeThreadNavigation()
+        observeDragSeparator()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -136,6 +146,78 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        twoPaneViewModel.saveLeftPaneRatio()
+        super.onStop()
+    }
+
+    private fun observeDragSeparator() {
+        val separator = getDragSeparator() ?: return
+        val leftPane = getLeftPane() ?: return
+        val rightPane = getRightPane() ?: return
+        val lineSeparator = separator.findViewById<View>(R.id.lineDragSeparator)
+        val parentGroup = view as? ViewGroup ?: return
+
+        val widthSelected = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidthSelected)
+        val widthNormal = resources.getDimensionPixelSize(R.dimen.dragSeparatorWidth)
+
+        separator.setOnTouchListener { separatorView, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    dragStartX = event.rawX
+                    dragStartLeftWidth = leftPane.width
+                    updateSeparatorAppearance(separatorView, lineSeparator, true, widthSelected)
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    handleDragMove(event.rawX, leftPane, rightPane, parentGroup)
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    updateSeparatorAppearance(separatorView, lineSeparator, false, widthNormal)
+                    separatorView.performClick()
+                    true
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    updateSeparatorAppearance(separatorView, lineSeparator, false, widthNormal)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun updateSeparatorAppearance(
+        separatorView: View,
+        lineSeparator: View?,
+        isPressed: Boolean,
+        lineWidth: Int,
+    ) {
+        separatorView.isPressed = isPressed
+        lineSeparator?.updateLayoutParams { width = lineWidth }
+    }
+
+    private fun handleDragMove(
+        currentRawX: Float,
+        leftPane: View,
+        rightPane: View,
+        parentGroup: ViewGroup,
+    ) {
+        val deltaX = (currentRawX - dragStartX).toInt()
+        val parentWidth = parentGroup.width
+        val availableWidth = parentWidth - separatorWidthPx
+        val maxLeftWidth = availableWidth - minRightWidthPx
+        val safeMaxLeftWidth = maxOf(minLeftWidthPx, maxLeftWidth)
+        val newLeftWidth = (dragStartLeftWidth + deltaX).coerceIn(minLeftWidthPx, safeMaxLeftWidth)
+
+        leftPane.updateLayoutParams { width = newLeftWidth }
+        rightPane.updateLayoutParams { width = parentWidth - newLeftWidth - separatorWidthPx }
+
+        if (availableWidth > 0) {
+            twoPaneViewModel.leftPaneRatio = newLeftWidth.toFloat() / availableWidth
+        }
+    }
+
     fun handleOnBackPressed() {
         when {
             isOnlyRightShown() -> {
@@ -169,37 +251,40 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun updateTwoPaneVisibilities() {
-
         val (leftWidth, rightWidth) = computeTwoPaneWidths(
             widthPixels = requireActivity().application.resources.displayMetrics.widthPixels,
             isThreadOpen = twoPaneViewModel.isThreadOpen,
         )
 
-        getLeftPane()?.let { leftPane ->
-            if (leftWidth == 0) {
-                leftPane.isGone = true
-            } else {
-                if (leftPane.width != leftWidth) leftPane.layoutParams?.width = leftWidth
-                leftPane.isVisible = true
+        getLeftPane()?.apply {
+            isVisible = leftWidth != 0
+            if (leftWidth != 0 && width != leftWidth) {
+                updateLayoutParams { width = leftWidth }
             }
         }
 
-        getRightPane()?.let { rightPane ->
-            if (rightWidth == 0) {
-                rightPane.isGone = true
-            } else {
-                if (rightPane.width != rightWidth) rightPane.layoutParams?.width = rightWidth
-                rightPane.isVisible = true
+        getRightPane()?.apply {
+            isVisible = rightWidth != 0
+            if (rightWidth != 0 && width != rightWidth) {
+                updateLayoutParams { width = rightWidth }
             }
         }
+
+        getDragSeparator()?.isVisible = isTabletOrFoldable() && rightWidth != 0
     }
 
-    private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
-        val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
-        val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
 
+    private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         return if (isTabletOrFoldable()) {
-            (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
+            val ratio = twoPaneViewModel.leftPaneRatio
+            val availableWidth = (widthPixels - separatorWidthPx).coerceAtLeast(0)
+            val leftWidth = if (availableWidth < minLeftWidthPx + minRightWidthPx) {
+                (ratio * availableWidth).roundToInt().coerceIn(0, availableWidth)
+            } else {
+                (ratio * availableWidth).roundToInt().coerceIn(minLeftWidthPx, availableWidth - minRightWidthPx)
+            }
+            leftWidth to (availableWidth - leftWidth)
+
         } else {
             if (isThreadOpen) 0 to widthPixels else widthPixels to 0
         }

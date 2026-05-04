@@ -17,9 +17,10 @@
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:layout_margin="@dimen/marginStandardMedium"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
@@ -33,20 +34,22 @@
     <TextView
         android:id="@+id/title"
         style="@style/H2"
-        android:layout_width="@dimen/noMailTextViewSize"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
         android:gravity="center"
+        android:maxWidth="@dimen/noMailTextViewSize"
         tools:text="@string/emptyStateInboxTitle" />
 
     <TextView
         android:id="@+id/description"
         style="@style/Body.Secondary"
-        android:layout_width="@dimen/noMailTextViewSize"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardVerySmall"
         android:gravity="center"
         android:lineSpacingMultiplier="1"
+        android:maxWidth="@dimen/noMailTextViewSize"
         tools:text="@string/emptyStateInboxDescription" />
 
 </LinearLayout>

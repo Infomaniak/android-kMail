@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <size android:width="@dimen/dragSeparatorHandleWidth" android:height="@dimen/dragSeparatorHandleHeight" />
+                    <solid android:color="?attr/colorPrimary" />
+                    <corners android:radius="100dp" />
+                </shape>
+            </item>
+            <item android:gravity="top" android:left="3dp" android:right="3dp" android:top="7dp">
+                <shape android:shape="oval">
+                    <size android:height="2dp" />
+                    <solid android:color="@color/backgroundColor" />
+                </shape>
+            </item>
+            <item android:gravity="center_vertical" android:left="3dp" android:right="3dp">
+                <shape android:shape="oval">
+                    <size android:height="2dp" />
+                    <solid android:color="@color/backgroundColor" />
+                </shape>
+            </item>
+            <item android:bottom="7dp" android:gravity="bottom" android:left="3dp" android:right="3dp">
+                <shape android:shape="oval">
+                    <size android:height="2dp" />
+                    <solid android:color="@color/backgroundColor" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <size android:width="@dimen/dragSeparatorHandleWidth" android:height="@dimen/dragSeparatorHandleHeight" />
+                    <solid android:color="?attr/colorOutlineVariant" />
+                    <corners android:radius="100dp" />
+                </shape>
+            </item>
+            <item android:gravity="top" android:left="3dp" android:right="3dp" android:top="7dp">
+                <shape android:shape="oval">
+                    <size android:height="2dp" />
+                    <solid android:color="@color/backgroundColor" />
+                </shape>
+            </item>
+            <item android:gravity="center_vertical" android:left="3dp" android:right="3dp">
+                <shape android:shape="oval">
+                    <size android:height="2dp" />
+                    <solid android:color="@color/backgroundColor" />
+                </shape>
+            </item>
+            <item android:bottom="7dp" android:gravity="bottom" android:left="3dp" android:right="3dp">
+                <shape android:shape="oval">
+                    <size android:height="2dp" />
+                    <solid android:color="@color/backgroundColor" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+</selector>

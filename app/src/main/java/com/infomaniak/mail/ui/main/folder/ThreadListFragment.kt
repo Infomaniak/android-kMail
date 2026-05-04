@@ -212,6 +212,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     override fun getRightPane(): FragmentContainerView? = _binding?.threadHostFragment
 
+    override fun getDragSeparator(): View? = _binding?.dragSeparator
+
     override fun getAnchor(): View? {
         return if (isOnlyRightShown()) {
             _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()

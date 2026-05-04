@@ -18,8 +18,16 @@
 <resources>
 
     <!-- TwoPane layout -->
-    <dimen name="leftPaneWidthRatio">0.4</dimen>
-    <dimen name="rightPaneWidthRatio">0.6</dimen>
+    <dimen name="minLeftPaneWidth">275dp</dimen>
+    <dimen name="minRightPaneWidth">300dp</dimen>
+    <dimen name="dragSeparatorWidth">1dp</dimen>
+    <dimen name="dragSeparatorWidthSelected">3dp</dimen>
+    <dimen name="dragSeparatorHandleWidth">8dp</dimen>
+    <dimen name="dragSeparatorHandleHeight">25dp</dimen>
+    <dimen name="dragSeparatorTouchAreaWidth">48dp</dimen>
+    <dimen name="dragSeparatorTouchAreaMargin">-24dp</dimen>
+    <dimen name="dragSeparatorTranslationZ">10dp</dimen>
+
 
     <!-- View sizes -->
     <dimen name="accountAvatarSize">110dp</dimen>

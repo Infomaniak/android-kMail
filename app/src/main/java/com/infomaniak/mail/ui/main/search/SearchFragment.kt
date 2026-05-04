@@ -159,6 +159,8 @@ class SearchFragment : TwoPaneFragment() {
 
     override fun getRightPane(): FragmentContainerView? = _binding?.threadHostFragment
 
+    override fun getDragSeparator(): View? = _binding?.dragSeparator
+
     override fun getAnchor(): View? {
         return if (isOnlyLeftShown()) {
             null

@@ -26,6 +26,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -44,13 +45,15 @@ import javax.inject.Inject
 class TwoPaneViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val draftController: DraftController,
+    private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-
+    
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     val currentThreadUid: LiveData<String?> = state.getLiveData(CURRENT_THREAD_UID_KEY)
 
+    var leftPaneRatio: Float = localSettings.leftPaneRatio
     inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
@@ -62,12 +65,21 @@ class TwoPaneViewModel @Inject constructor(
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val navArgs = SingleLiveEvent<NavData>()
 
+    override fun onCleared() {
+        saveLeftPaneRatio()
+        super.onCleared()
+    }
+
     fun openThread(uid: String) {
         state[CURRENT_THREAD_UID_KEY] = uid
     }
 
     fun closeThread() {
         state[CURRENT_THREAD_UID_KEY] = null
+    }
+
+    fun saveLeftPaneRatio() {
+        localSettings.leftPaneRatio = leftPaneRatio
     }
 
     fun openDraft(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
