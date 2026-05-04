@@ -35,6 +35,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -166,19 +167,15 @@ private fun AccountDropdownMenu(
     ) {
         userWithMailboxes.mailboxesUi.forEach { mailbox ->
             DropdownMenuItem(
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_envelope),
-                            tint = MaterialTheme.colorScheme.primary,
-                            contentDescription = null
-                        )
-                        Text(
-                            modifier = Modifier.padding(horizontal = Margin.Small),
-                            text = mailbox.emailIdn
-                        )
-                    }
+                colors = MenuDefaults.itemColors(leadingIconColor = MaterialTheme.colorScheme.primary),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_envelope),
+                        contentDescription = null
+                    )
                 },
+                enabled = mailbox.canSendEmails,
+                text = { Text(text = mailbox.emailIdn) },
                 onClick = {
                     isDropDownExpanded.value = false
                     onClickMailbox(
