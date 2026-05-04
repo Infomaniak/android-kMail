@@ -63,8 +63,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setupListeners()
 
-        val canSend = mainViewModel.currentPermissionsLive.value?.canSendEmails ?: true
-        if (!canSend) {
+        if (!mainViewModel.canSendEmails) {
             binding.writeMail.isEnabled = false
         }
     }
