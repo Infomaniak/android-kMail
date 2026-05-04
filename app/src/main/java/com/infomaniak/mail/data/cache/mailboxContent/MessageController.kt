@@ -42,6 +42,7 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.TRUE_PREDICATE
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -100,8 +101,8 @@ class MessageController @Inject constructor(
         )
     }
 
-    suspend fun getUnseenMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, "${Message::isSeen.name} == false")
+    suspend fun getAllThreadMessagesAndDuplicates(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, TRUE_PREDICATE)
     }
 
     suspend fun getFavoriteMessages(thread: Thread): List<Message> {

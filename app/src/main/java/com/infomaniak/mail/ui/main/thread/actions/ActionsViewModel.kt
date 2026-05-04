@@ -192,6 +192,10 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
     ) {
+        if (currentFolderId == null) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return
+        }
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return
 
         val result = messagesActionsUseCase.moveMessagesTo(
@@ -201,7 +205,7 @@ class ActionsViewModel @Inject constructor(
         )
 
         with(result) {
-            if (apiResponses.atLeastOneSucceeded() && currentFolderId != null) {
+            if (apiResponses.atLeastOneSucceeded()) {
                 refreshFoldersAsync(
                     mailbox = mailbox,
                     messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
@@ -354,18 +358,18 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToMove = messagesActionsUseCase.getMessagesFromThreadsToMove(threads)
-        handleArchiveMessage(messagesToMove, currentFolder, mailbox)
+        handleArchiveMessages(messagesToMove, currentFolder, mailbox)
     }
 
     fun archiveMessages(
         messages: List<Message>,
         currentFolder: Folder?,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        handleArchiveMessage(messages, currentFolder, mailbox)
+        handleArchiveMessages(messages, currentFolder, mailbox)
     }
 
-    private suspend fun handleArchiveMessage(
+    private suspend fun handleArchiveMessages(
         messages: List<Message>,
         currentFolder: Folder?,
         mailbox: Mailbox,
@@ -445,7 +449,11 @@ class ActionsViewModel @Inject constructor(
     //endregion
 
     //region Phishing
-    fun reportPhishing(messages: List<Message>, currentFolder: Folder?, mailbox: Mailbox) {
+    fun reportPhishing(
+        messages: List<Message>,
+        currentFolder: Folder?,
+        mailbox: Mailbox,
+    ) {
         viewModelScope.launch(ioCoroutineContext) {
             val result = messagesActionsUseCase.reportPhishing(
                 messages = messages,
@@ -599,11 +607,9 @@ class ActionsViewModel @Inject constructor(
     fun modifyScheduledDraft(
         unscheduleDraftUrl: String,
         onSuccess: () -> Unit,
-        mailbox: Mailbox
+        mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = mailbox
         val apiResponse = messagesActionsUseCase.unscheduleDraft(unscheduleDraftUrl)
-
         if (apiResponse.isSuccess()) {
             val draftFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
                 snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
@@ -619,9 +625,7 @@ class ActionsViewModel @Inject constructor(
 
     fun unscheduleDraft(unscheduleDraftUrl: String, mailbox: Mailbox, openFolder: (folderId: String) -> Unit) =
         viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = mailbox
             val apiResponse = messagesActionsUseCase.unscheduleDraft(unscheduleDraftUrl)
-
             if (apiResponse.isSuccess()) {
                 val scheduledDraftsFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
                     snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
@@ -656,7 +660,6 @@ class ActionsViewModel @Inject constructor(
 
     fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String, mailbox: Mailbox) =
         viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = mailbox
             val apiResponse = messagesActionsUseCase.deleteDraft(targetMailboxUuid, remoteDraftUuid)
 
             if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
