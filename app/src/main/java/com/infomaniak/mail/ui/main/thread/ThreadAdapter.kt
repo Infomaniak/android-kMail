@@ -138,6 +138,18 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
+    override fun onViewRecycled(holder: ThreadAdapterViewHolder) {
+        super.onViewRecycled(holder)
+        if (holder is MessageViewHolder) {
+            with(holder.binding) {
+                bodyWebView.stopLoading()
+                fullMessageWebView.stopLoading()
+                bodyWebView.isVisible = false
+                fullMessageWebView.isVisible = false
+            }
+        }
+    }
+
     override fun getItemCount(): Int = items.count()
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
