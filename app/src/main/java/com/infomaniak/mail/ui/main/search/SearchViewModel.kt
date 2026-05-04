@@ -170,20 +170,10 @@ class SearchViewModel @Inject constructor(
     }
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
-        if (isEnabled && currentFilters.contains(filter)) return@launch
-        if (isEnabled) currentUiState = SearchUiState.FILTERING
-
-        contactsResults.value = emptyList()
-
         if (isEnabled) {
-            trackSearchEvent(filter.matomoName)
-            filter.select()
+            enableFilter(filter)
         } else {
-            val isGoingToEmpty = currentFilters.size == 1 && currentFilters.contains(filter)
-            if (isGoingToEmpty) {
-                currentUiState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
-            }
-            filter.unselect()
+            disableFilter(filter)
         }
     }
 
@@ -205,6 +195,25 @@ class SearchViewModel @Inject constructor(
     fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
         if (isLastPage) return@launch
         search(shouldGetNextPage = true)
+    }
+
+    private suspend fun enableFilter(filter: ThreadFilter) {
+        if (currentFilters.contains(filter)) return
+
+        currentUiState = SearchUiState.FILTERING
+        contactsResults.value = emptyList()
+        trackSearchEvent(filter.matomoName)
+        filter.select()
+    }
+
+    private suspend fun disableFilter(filter: ThreadFilter) {
+        contactsResults.value = emptyList()
+
+        val isGoingToEmpty = currentFilters.size == 1 && currentFilters.contains(filter)
+        if (isGoingToEmpty) {
+            currentUiState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
+        }
+        filter.unselect()
     }
 
     private fun shouldShowContacts(): Boolean {
