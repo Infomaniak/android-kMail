@@ -636,9 +636,13 @@ class MainActivity : BaseActivity() {
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
-        val intent = Intent(this, NewMessageActivity::class.java)
-        args?.let(intent::putExtras)
-        newMessageActivityResultLauncher.launch(intent)
+        if (!mainViewModel.canSendEmails) {
+            snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
+        }else{
+            val intent = Intent(this, NewMessageActivity::class.java)
+            args?.let(intent::putExtras)
+            newMessageActivityResultLauncher.launch(intent)
+        }
     }
 
     fun navigateToSyncAutoConfigActivity() {
