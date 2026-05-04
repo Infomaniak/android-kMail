@@ -29,12 +29,14 @@ import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.setMargins
+import com.infomaniak.core.legacy.utils.setPagination
 import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -46,6 +48,7 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -54,7 +57,6 @@ import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -65,6 +67,8 @@ import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchFragment : TwoPaneFragment() {
@@ -169,6 +173,11 @@ class SearchFragment : TwoPaneFragment() {
         }
     }
 
+    override fun handleOnBackPressed() {
+        if (!isOnlyRightShown()) searchViewModel.clearSearchState()
+        super.handleOnBackPressed()
+    }
+
     private fun setupAdapter() {
         threadListAdapter(
             folderRole = null,
@@ -200,6 +209,14 @@ class SearchFragment : TwoPaneFragment() {
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
                 override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
+
+                override var onContactClicked: ((MergedContact) -> Unit)? = { contact ->
+                    val emailWithQuotes = "\"${contact.email}\""
+                    binding.searchBar.searchTextInput.apply {
+                        setText(emailWithQuotes)
+                        setSelection(emailWithQuotes.length)
+                    }
+                }
             },
         )
 
@@ -208,7 +225,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener {
-            searchViewModel.resetFolderFilter()
+            searchViewModel.clearSearchState()
             findNavController().popBackStack()
         }
         swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
@@ -249,7 +266,6 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setAttachmentsUi() = with(searchViewModel) {
         binding.attachments.setOnCheckedChangeListener { _, isChecked ->
-
             setFilter(ThreadFilter.ATTACHMENTS, isChecked)
         }
     }
@@ -375,8 +391,10 @@ class SearchFragment : TwoPaneFragment() {
         }
     }
 
-    private fun observeSearchResults() {
-        searchViewModel.searchResults.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter)
+    private fun observeSearchResults() = viewLifecycleOwner.lifecycleScope.launch {
+        searchViewModel.allSearchResults.collectLatest { searchResults ->
+            threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun observeHistory() {

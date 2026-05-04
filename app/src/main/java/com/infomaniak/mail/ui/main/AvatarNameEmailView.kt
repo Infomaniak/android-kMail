@@ -28,6 +28,8 @@ import androidx.annotation.ColorInt
 import androidx.core.text.toSpannable
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.marginStart
+import androidx.core.view.updateLayoutParams
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.mail.R
@@ -143,6 +145,16 @@ class AvatarNameEmailView @JvmOverloads constructor(
         userAvatar.loadUnknownUserAvatar()
         userName.text = context.getString(R.string.addUnknownRecipientTitle)
         userEmail.text = searchQuery
+    }
+
+    fun setAvatarMarginStart(margin: Int) {
+        binding.avatarLayout.updateLayoutParams<MarginLayoutParams> {
+            marginStart = margin
+        }
+    }
+
+    fun removeBackground() {
+        binding.root.background = null
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {

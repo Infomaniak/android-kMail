@@ -38,14 +38,6 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.card.MaterialCardView
-import com.infomaniak.core.common.utils.format
-import com.infomaniak.core.common.utils.isInTheFuture
-import com.infomaniak.core.common.utils.isThisMonth
-import com.infomaniak.core.common.utils.isThisWeek
-import com.infomaniak.core.common.utils.isThisYear
-import com.infomaniak.core.common.utils.isToday
-import com.infomaniak.core.common.utils.isYesterday
-import com.infomaniak.core.legacy.utils.capitalizeFirstChar
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.core.matomo.Matomo.TrackerAction
@@ -61,12 +53,15 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemBannerWithActionViewBinding
-import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
+import com.infomaniak.mail.databinding.ItemContactSearchBinding
+import com.infomaniak.mail.databinding.ItemSpacerSmallBinding
 import com.infomaniak.mail.databinding.ItemThreadLoadMoreButtonBinding
+import com.infomaniak.mail.databinding.ItemThreadSectionTitleBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
@@ -75,13 +70,12 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.NextThreadTarget.NEXT_C
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.NextThreadTarget.PREVIOUS_CHRONOLOGICAL_THREAD
 import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.ThreadListUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.isEmail
-import com.infomaniak.mail.utils.extensions.isLastWeek
 import com.infomaniak.mail.utils.extensions.postfixWithTag
-import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -154,8 +148,10 @@ class ThreadListAdapter @Inject constructor(
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (dataSet[position]) {
             is ThreadListItem.Content -> DisplayType.THREAD.layout
-            is ThreadListItem.DateSeparator -> DisplayType.DATE_SEPARATOR.layout
+            is ThreadListItem.SectionTitle -> DisplayType.TEXT_SEPARATOR.layout
             is ThreadListItem.FlushFolderButton -> DisplayType.FLUSH_FOLDER_BUTTON.layout
+            is ThreadListItem.ContactItem -> DisplayType.CONTACT_ITEM.layout
+            is ThreadListItem.Spacer -> DisplayType.SPACER.layout
             ThreadListItem.LoadMore -> DisplayType.LOAD_MORE_BUTTON.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -172,7 +168,8 @@ class ThreadListAdapter @Inject constructor(
     override fun getItemId(position: Int): Long = runCatchingRealm {
         return when (val item = dataSet[position]) {
             is ThreadListItem.Content -> item.thread.uid.hashCode().toLong()
-            is ThreadListItem.DateSeparator -> item.title.hashCode().toLong()
+            is ThreadListItem.SectionTitle -> item.title.hashCode().toLong()
+            is ThreadListItem.ContactItem -> item.contact.email.hashCode().toLong()
             else -> super.getItemId(position)
         }
     }.getOrDefault(super.getItemId(position))
@@ -186,9 +183,11 @@ class ThreadListAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadListViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
-            R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_section_title -> ItemThreadSectionTitleBinding.inflate(layoutInflater, parent, false)
             R.layout.item_banner_with_action_view -> ItemBannerWithActionViewBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_contact_search -> ItemContactSearchBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_spacer_small -> ItemSpacerSmallBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
 
@@ -196,7 +195,6 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-
         val payload = payloads.firstOrNull()
         if (payload !is NotificationType) {
             super.onBindViewHolder(holder, position, payloads)
@@ -219,16 +217,19 @@ class ThreadListAdapter @Inject constructor(
             DisplayType.THREAD.layout -> {
                 (this as CardviewThreadItemBinding).displayThread((item as ThreadListItem.Content).thread, position)
             }
-            DisplayType.DATE_SEPARATOR.layout -> {
-                (this as ItemThreadDateSeparatorBinding).displayDateSeparator((item as ThreadListItem.DateSeparator).title)
+            DisplayType.TEXT_SEPARATOR.layout -> {
+                (this as ItemThreadSectionTitleBinding).displayDateSeparator((item as ThreadListItem.SectionTitle).title)
             }
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> {
                 (this as ItemBannerWithActionViewBinding)
                     .displayFlushFolderButton((item as ThreadListItem.FlushFolderButton).folderRole)
             }
-            DisplayType.LOAD_MORE_BUTTON.layout -> {
-                (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
+            DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
+            DisplayType.CONTACT_ITEM.layout -> {
+                val contactItem = item as ThreadListItem.ContactItem
+                (this as ItemContactSearchBinding).displayContactItem(contactItem.contact)
             }
+            DisplayType.SPACER.layout -> Unit
         }
     }
 
@@ -566,7 +567,7 @@ class ThreadListAdapter @Inject constructor(
         setTextColor(context.getColor(R.color.primaryTextColor))
     }
 
-    private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
+    private fun ItemThreadSectionTitleBinding.displayDateSeparator(title: String) {
         sectionTitle.text = title
     }
 
@@ -591,6 +592,16 @@ class ThreadListAdapter @Inject constructor(
         loadMoreButton.setOnClickListener {
             if (dataSet.last() is ThreadListItem.LoadMore) dataSet = dataSet.toMutableList().apply { removeLastOrNull() }
             callbacks?.onLoadMoreClicked?.invoke()
+        }
+    }
+
+    private fun ItemContactSearchBinding.displayContactItem(contact: MergedContact) {
+        contactDetails.setMergedContact(contact)
+        contactDetails.setAvatarMarginStart(0)
+        contactDetails.removeBackground()
+
+        contactWithSpace.setOnClickListener {
+            callbacks?.onContactClicked?.invoke(contact)
         }
     }
 
@@ -714,6 +725,20 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
+    fun updateListWithThreadListItems(
+        threadListItems: List<ThreadListItem>,
+        lifecycleScope: LifecycleCoroutineScope
+    ) {
+        formatListJob?.cancel()
+        formatListJob = lifecycleScope.launch {
+            Dispatchers.Main {
+                // Put back "Load more" button if it was already there
+                dataSet = if (isLoadMoreDisplayed) threadListItems + ThreadListItem.LoadMore else threadListItems
+                refreshSelectedPositionIfPossible()
+            }
+        }
+    }
+
     private fun checkShouldUpdateOpenedThreadPosition(currentUid: String): Boolean {
 
         val currentPos = openedThreadPosition
@@ -760,9 +785,9 @@ class ThreadListAdapter @Inject constructor(
                 threads.forEach { thread ->
                     scope.ensureActive()
 
-                    val sectionTitle = thread.getSectionTitle(context)
+                    val sectionTitle = ThreadListUtils.getSectionTitle(thread, context)
                     if (sectionTitle != previousSectionTitle) {
-                        add(ThreadListItem.DateSeparator(sectionTitle))
+                        add(ThreadListItem.SectionTitle(sectionTitle))
                         previousSectionTitle = sectionTitle
                     }
 
@@ -772,25 +797,12 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    private fun cleanMultiSelectionItems(threads: List<Thread>, scope: CoroutineScope) {
+    fun cleanMultiSelectionItems(threads: List<Thread>, scope: CoroutineScope) {
         if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
             multiSelection?.selectedItems?.removeAll {
                 scope.ensureActive()
                 !threads.contains(it)
             }
-        }
-    }
-
-    private fun Thread.getSectionTitle(context: Context): String = with(internalDate.toDate()) {
-        return when {
-            isInTheFuture() -> context.getString(R.string.comingSoon)
-            isToday() -> context.getString(R.string.threadListSectionToday)
-            isYesterday() -> context.getString(R.string.messageDetailsYesterday)
-            isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)
-            isLastWeek() -> context.getString(R.string.threadListSectionLastWeek)
-            isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
-            isThisYear() -> format(FULL_MONTH).capitalizeFirstChar()
-            else -> format(MONTH_AND_YEAR).capitalizeFirstChar()
         }
     }
 
@@ -821,9 +833,11 @@ class ThreadListAdapter @Inject constructor(
 
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
-        DATE_SEPARATOR(R.layout.item_thread_date_separator),
+        TEXT_SEPARATOR(R.layout.item_thread_section_title),
         FLUSH_FOLDER_BUTTON(R.layout.item_banner_with_action_view),
         LOAD_MORE_BUTTON(R.layout.item_thread_load_more_button),
+        CONTACT_ITEM(R.layout.item_contact_search),
+        SPACER(R.layout.item_spacer_small)
     }
 
     enum class NotificationType {
@@ -834,9 +848,6 @@ class ThreadListAdapter @Inject constructor(
 
     companion object {
         private const val SWIPE_ANIMATION_THRESHOLD = 0.15f
-
-        private const val FULL_MONTH = "MMMM"
-        private const val MONTH_AND_YEAR = "MMMM yyyy"
     }
 
     class ThreadListViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {
