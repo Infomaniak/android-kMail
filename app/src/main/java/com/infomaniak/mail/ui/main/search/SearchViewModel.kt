@@ -179,11 +179,11 @@ class SearchViewModel @Inject constructor(
             trackSearchEvent(filter.matomoName)
             filter.select()
         } else {
-            filter.unselect()
-            if (currentFilters.isEmpty()) {
-                val newState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
-                currentUiState = newState
+            val isGoingToEmpty = currentFilters.size == 1 && currentFilters.contains(filter)
+            if (isGoingToEmpty) {
+                currentUiState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
             }
+            filter.unselect()
         }
     }
 
