@@ -343,9 +343,9 @@ class SearchViewModel @Inject constructor(
                     !isLengthTooShort(query)
 
             val contacts = if (showContacts) {
-                val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
+                val searchQueryNoAccents = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
-                mergedContactController.searchMergedContacts(query, queryClean)
+                mergedContactController.searchMergedContacts(query, searchQueryNoAccents)
             } else {
                 emptyList()
             }
