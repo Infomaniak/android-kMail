@@ -65,7 +65,11 @@ class SelectMailboxViewModel @Inject constructor(
                 initials = user.getInitials(),
                 fullName = user.displayName ?: user.run { "$firstname $lastname" },
                 mailboxesUi = mailboxController.getMailboxes(user.id).map { mailbox ->
-                    MailboxUi(mailboxId = mailbox.mailboxId, emailIdn = mailbox.emailIdn)
+                    MailboxUi(
+                        mailboxId = mailbox.mailboxId,
+                        emailIdn = mailbox.emailIdn,
+                        canSendEmails = mailbox.permissions?.canSendEmails ?: true
+                    )
                 }
             )
         }
@@ -85,7 +89,11 @@ class SelectMailboxViewModel @Inject constructor(
         if (defaultMailbox != null) {
             val selectedMailbox = SelectedMailboxUi(
                 userId = currentUser.id,
-                mailboxUi = MailboxUi(mailboxId = defaultMailbox.mailboxId, emailIdn = defaultMailbox.emailIdn),
+                mailboxUi = MailboxUi(
+                    mailboxId = defaultMailbox.mailboxId,
+                    emailIdn = defaultMailbox.emailIdn,
+                    canSendEmails = defaultMailbox.permissions?.canSendEmails ?: true
+                ),
                 avatarUrl = currentUser.avatar,
                 initials = currentUser.getInitials()
             )
@@ -126,7 +134,8 @@ class SelectMailboxViewModel @Inject constructor(
 
     data class MailboxUi(
         val mailboxId: Int,
-        val emailIdn: String
+        val emailIdn: String,
+        val canSendEmails: Boolean = true,
     )
 
     data class SelectedMailboxUi(
