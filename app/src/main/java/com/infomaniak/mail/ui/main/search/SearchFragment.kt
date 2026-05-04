@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.setMargins
+import com.infomaniak.core.legacy.utils.setPagination
 import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -173,9 +174,7 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     override fun handleOnBackPressed() {
-        if (!isOnlyRightShown()) {
-            searchViewModel.clearSearchState()
-        }
+        if (!isOnlyRightShown()) searchViewModel.clearSearchState()
         super.handleOnBackPressed()
     }
 
@@ -213,8 +212,10 @@ class SearchFragment : TwoPaneFragment() {
 
                 override var onContactClicked: ((MergedContact) -> Unit)? = { contact ->
                     val emailWithQuotes = "\"${contact.email}\""
-                    binding.searchBar.searchTextInput.setText(emailWithQuotes)
-                    binding.searchBar.searchTextInput.setSelection(emailWithQuotes.length)
+                    binding.searchBar.searchTextInput.apply {
+                        setText(emailWithQuotes)
+                        setSelection(emailWithQuotes.length)
+                    }
                 }
             },
         )

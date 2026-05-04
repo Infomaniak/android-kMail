@@ -153,7 +153,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         }
     }
 
-    fun removeBackground(){
+    fun removeBackground() {
         binding.root.background = null
     }
 

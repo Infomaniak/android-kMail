@@ -93,8 +93,6 @@ class SearchViewModel @Inject constructor(
     var currentSearchQuery: String = ""
         private set
 
-    val uiState = MutableLiveData<SearchUiState>(SearchUiState.IDLE)
-
     private var currentUiState: SearchUiState = SearchUiState.IDLE
 
     private var currentFilters = mutableSetOf<ThreadFilter>()
@@ -114,10 +112,7 @@ class SearchViewModel @Inject constructor(
     private var searchJob: Job? = null
     val threadsSearchResults = threadController.getSearchThreadsAsync()
     val contactsResults = MutableStateFlow<List<MergedContact>>(emptyList())
-    val allSearchResults = combine(
-        contactsResults,
-        threadsSearchResults,
-    ) { contacts, threads ->
+    val allSearchResults = combine(contactsResults, threadsSearchResults) { contacts, threads ->
         runCatchingRealm { formatSearchList(threads.list, contacts, application, globalCoroutineScope) }.getOrDefault(emptyList())
     }
 
@@ -140,20 +135,6 @@ class SearchViewModel @Inject constructor(
         if (hasPendingSearch) search()
     }
 
-    private fun shouldShowContacts(): Boolean {
-        val hasQuery = currentSearchQuery.isNotBlank()
-        val hasNoFilters = currentFilters.isEmpty()
-        val notValidated = currentUiState != SearchUiState.VALIDATED
-
-        return currentUiState == SearchUiState.TYPING && hasQuery && hasNoFilters && notValidated
-    }
-
-    fun resetFolderFilter() {
-        filterFolder = null
-        isAllFoldersSelected = false
-        unselectAllChipFilters()
-    }
-
     fun clearSearchState() {
         currentSearchQuery = ""
         contactsResults.value = emptyList()
@@ -173,10 +154,73 @@ class SearchViewModel @Inject constructor(
         } else {
             currentUiState = SearchUiState.TYPING
         }
-        uiState.postValue(currentUiState)
 
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
+
+    fun selectAllFoldersFilter(isSelected: Boolean) {
+        isAllFoldersSelected = isSelected
+    }
+
+    fun selectFolder(folder: Folder?) {
+        filterFolder = folder
+        viewModelScope.launch(ioCoroutineContext) {
+            search(folder = folder)
+        }
+    }
+
+    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
+        if (isEnabled && currentFilters.contains(filter)) return@launch
+        if (isEnabled) currentUiState = SearchUiState.FILTERING
+
+        contactsResults.value = emptyList()
+
+        if (isEnabled) {
+            trackSearchEvent(filter.matomoName)
+            filter.select()
+        } else {
+            filter.unselect()
+            if (currentFilters.isEmpty()) {
+                val newState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
+                currentUiState = newState
+            }
+        }
+    }
+
+    fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
+        currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
+        val newState = when {
+            currentFilters.isEmpty() && currentSearchQuery.isNotBlank() -> SearchUiState.TYPING
+            currentFilters.isEmpty() -> SearchUiState.IDLE
+            else -> SearchUiState.FILTERING
+        }
+        currentUiState = newState
+        search(filters = currentFilters)
+    }
+
+    fun unselectAllChipFilters() {
+        currentFilters.removeAll(ThreadFilter.entries)
+    }
+
+    fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
+        if (isLastPage) return@launch
+        search(shouldGetNextPage = true)
+    }
+
+    private fun shouldShowContacts(): Boolean {
+        val hasQuery = currentSearchQuery.isNotBlank()
+        val hasNoFilters = currentFilters.isEmpty()
+        val notValidated = currentUiState != SearchUiState.VALIDATED
+
+        return currentUiState == SearchUiState.TYPING && hasQuery && hasNoFilters && notValidated
+    }
+
+    private fun resetFolderFilter() {
+        filterFolder = null
+        isAllFoldersSelected = false
+        unselectAllChipFilters()
+    }
+
 
     private fun MutableList<ThreadListItem>.addSectionTitle(
         sectionTitle: String,
@@ -246,60 +290,6 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun selectAllFoldersFilter(isSelected: Boolean) {
-        isAllFoldersSelected = isSelected
-    }
-
-    fun selectFolder(folder: Folder?) {
-        filterFolder = folder
-        viewModelScope.launch(ioCoroutineContext) {
-            search(folder = folder)
-        }
-    }
-
-    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
-        if (isEnabled && currentFilters.contains(filter)) return@launch
-
-        currentUiState = SearchUiState.FILTERING
-        uiState.postValue(SearchUiState.FILTERING)
-        contactsResults.value = emptyList()
-
-        if (isEnabled) {
-            trackSearchEvent(filter.matomoName)
-            filter.select()
-        } else {
-            filter.unselect()
-            if (currentFilters.isEmpty()) {
-                val newState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
-                currentUiState = newState
-                uiState.postValue(newState)
-            }
-        }
-    }
-
-    fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
-        currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
-        val newState = if (currentFilters.isEmpty() && currentSearchQuery.isNotBlank()) {
-            SearchUiState.TYPING
-        } else if (currentFilters.isEmpty()) {
-            SearchUiState.IDLE
-        } else {
-            SearchUiState.FILTERING
-        }
-        currentUiState = newState
-        uiState.postValue(newState)
-        search(filters = currentFilters)
-    }
-
-    fun unselectAllChipFilters() {
-        currentFilters.removeAll(ThreadFilter.entries)
-    }
-
-    fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
-        if (isLastPage) return@launch
-        search(shouldGetNextPage = true)
-    }
-
     private suspend fun ThreadFilter.select() {
         search(filters = searchUtils.selectFilter(filter = this, currentFilters).also { currentFilters = it })
     }
@@ -346,8 +336,7 @@ class SearchViewModel @Inject constructor(
             val contacts = if (showContacts) {
                 val queryClean = Normalizer.normalize(query, Normalizer.Form.NFD)
                     .replace("\\p{M}".toRegex(), "")
-                val contactsList = mergedContactController.searchMergedContacts(query, queryClean)
-                contactsList
+                mergedContactController.searchMergedContacts(query, queryClean)
             } else {
                 emptyList()
             }
@@ -360,7 +349,7 @@ class SearchViewModel @Inject constructor(
             if (!shouldGetNextPage) resetPaginationData()
 
             computeSearchFilters(folder, filters, query)?.let { newFilters ->
-                fetchThreads(folder, newFilters, query, shouldGetNextPage, contacts.isNotEmpty())
+                fetchThreads(folder, newFilters, query, shouldGetNextPage, hasContacts = contacts.isNotEmpty())
                 if (saveInHistory) query.let(history::postValue)
             }
 
@@ -390,7 +379,7 @@ class SearchViewModel @Inject constructor(
         newFilters: Set<ThreadFilter>,
         query: String,
         shouldGetNextPage: Boolean,
-        hasContacts: Boolean = false,
+        hasContacts: Boolean,
     ) {
         visibilityMode.postValue(VisibilityMode.LOADING)
 
@@ -459,7 +448,7 @@ class SearchViewModel @Inject constructor(
         threadController.saveSearchThreads(searchThreads)
     }
 
-    enum class SearchUiState {
+    private enum class SearchUiState {
         IDLE,
         TYPING,
         FILTERING,
