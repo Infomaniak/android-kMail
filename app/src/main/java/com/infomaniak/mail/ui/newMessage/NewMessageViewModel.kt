@@ -416,6 +416,10 @@ class NewMessageViewModel @Inject constructor(
         return mergedContactController.getMergedContactFromAddressBook(addressBook)
     }
 
+    fun getMergedContactFromEmail(email: String): MergedContact? {
+        return mergedContactController.getMergedContactFromEmail(email)
+    }
+
     private fun saveNavArgsToSavedState(localUuid: String) {
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
 

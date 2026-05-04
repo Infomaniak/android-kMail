@@ -54,6 +54,10 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
             .sort(MergedContact::name.name)
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
+
+    private fun getMergedContactFromEmailQuery(email: String): RealmQuery<MergedContact> {
+        return userInfoRealm.query<MergedContact>("${MergedContact::email.name} == $0", email)
+    }
     //endregion
 
     //region Get data
@@ -67,6 +71,10 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
 
     fun getMergedContactFromAddressBook(contact: AddressBook): List<MergedContact> {
         return getMergedContactFromAddressBookQuery(contact).find().map { it }
+    }
+
+    fun getMergedContactFromEmail(email: String): MergedContact? {
+        return getMergedContactFromEmailQuery(email).find().firstOrNull()
     }
 
     fun getMergedContactsAsync(): Flow<ResultsChange<MergedContact>> {

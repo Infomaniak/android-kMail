@@ -48,6 +48,14 @@
     <string name="actionViewInDark">Weergeven in donker thema</string>
     <string name="actionViewInLight">Weergeven in licht thema</string>
     <string name="addLinkTextPlaceholder">Weer te geven tekst</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email is al toegevoegd</item>
+        <item quantity="other">%d emails zijn al toegevoegd</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email is ongeldig</item>
+        <item quantity="other">%d emails zijn ongeldig</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">Het e-mailadres wordt al gebruikt</string>
     <string name="addUnknownRecipientInvalidEmail">Het e-mailadres is ongeldig</string>
     <string name="addUnknownRecipientTitle">Een ontvanger toevoegen</string>
@@ -667,6 +675,10 @@
     <string name="toTitle">Aan:</string>
     <string name="tomorrowMorning">Morgenochtend</string>
     <string name="tooManyRecipients">U kunt dit adres niet toevoegen omdat u de limiet van ontvangers heeft bereikt</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d adres kon niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
+        <item quantity="other">%d adressen konden niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
+    </plurals>
     <string name="trashFolder">Prullenbak</string>
     <string name="unblockButton">Deblokkeren</string>
     <string name="unknownDialogTitleExpeditor">Onbekende afzender</string>

@@ -17,9 +17,11 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import android.content.ClipboardManager
 import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
+import android.R as RAndroid
 import com.google.android.material.textfield.TextInputEditText
 
 class BackspaceAwareTextInput @JvmOverloads constructor(
@@ -28,13 +30,32 @@ class BackspaceAwareTextInput @JvmOverloads constructor(
 ) : TextInputEditText(context, attrs) {
 
     private var backspaceOnEmptyField: () -> Unit = {}
+    private var onPasteIntercept: ((String) -> Boolean)? = null
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_DEL && text.isNullOrEmpty()) backspaceOnEmptyField()
         return super.onKeyDown(keyCode, event)
     }
 
+    override fun onTextContextMenuItem(id: Int): Boolean {
+        if (id == RAndroid.id.paste) {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = clipboard.primaryClip
+
+            if (clip != null && clip.itemCount > 0) {
+                val pastedText = clip.getItemAt(0).text?.toString() ?: ""
+                if (onPasteIntercept?.invoke(pastedText) == true) return true
+            }
+        }
+
+        return super.onTextContextMenuItem(id)
+    }
+
     fun setBackspaceOnEmptyFieldListener(listener: () -> Unit) {
         backspaceOnEmptyField = listener
+    }
+
+    fun setOnPasteInterceptListener(listener: (String) -> Boolean) {
+        onPasteIntercept = listener
     }
 }

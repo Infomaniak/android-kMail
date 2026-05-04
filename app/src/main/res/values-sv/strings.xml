@@ -48,6 +48,14 @@
     <string name="actionViewInDark">Visa i mörkt tema</string>
     <string name="actionViewInLight">Visa i ljust tema</string>
     <string name="addLinkTextPlaceholder">Text att visa</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email har redan lagts till</item>
+        <item quantity="other">%d emails har redan lagts till</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email är ogiltig</item>
+        <item quantity="other">%d emails är ogiltiga</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">E-postadressen används redan</string>
     <string name="addUnknownRecipientInvalidEmail">E-postadressen är ogiltig</string>
     <string name="addUnknownRecipientTitle">Lägg till mottagare</string>
@@ -667,6 +675,10 @@
     <string name="toTitle">Till:</string>
     <string name="tomorrowMorning">I morgon bitti</string>
     <string name="tooManyRecipients">Du kan inte lägga till denna adress eftersom du har nått gränsen för mottagare</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d adress kunde inte läggas till eftersom du har nått gränsen för mottagare</item>
+        <item quantity="other">%d adresser kunde inte läggas till eftersom du har nått gränsen för mottagare</item>
+    </plurals>
     <string name="trashFolder">Papperskorg</string>
     <string name="unblockButton">Avblockera</string>
     <string name="unknownDialogTitleExpeditor">Okänd avsändare</string>

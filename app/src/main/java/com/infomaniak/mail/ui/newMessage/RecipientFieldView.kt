@@ -121,6 +121,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)? = null
     private var getMergedContactFromContactGroup: ((ContactGroup) -> List<MergedContact>)? = null
     private var getMergedContactFromAddressBook: ((AddressBook) -> List<MergedContact>)? = null
+    private var getMergedContactFromEmail: ((String) -> MergedContact?)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -163,7 +164,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 onContactClicked = ::contactClicked,
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
-                    addRecipient(email = input, name = input)
+                    addRecipientsFromInput(input = input)
                 },
                 snackbarManager = snackbarManager,
                 getAddressBookWithGroup = { getAddressBookWithGroup?.invoke(it) },
@@ -184,6 +185,7 @@ class RecipientFieldView @JvmOverloads constructor(
             setToggleRelatedListeners()
             setTextInputListeners()
             setPopupMenuListeners()
+            setPasteListeners(textInput)
 
             if (isInEditMode) {
                 singleChip.root.isVisible = canCollapseEverything
@@ -260,7 +262,11 @@ class RecipientFieldView @JvmOverloads constructor(
 
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE && text?.isNotBlank() == true) {
-                contactAdapter.addFirstAvailableItem()
+                if (isAutoCompletionOpened && contactAdapter.itemCount > 0) {
+                    contactAdapter.addFirstAvailableItem()
+                } else {
+                    addRecipientsFromInput(text.toString())
+                }
             }
             true // Keep keyboard open
         }
@@ -283,6 +289,17 @@ class RecipientFieldView @JvmOverloads constructor(
                 updateCollapsedChipValues(isCollapsed = true)
             }
             contactPopupWindow.dismiss()
+        }
+    }
+
+    private fun setPasteListeners(textInput: BackspaceAwareTextInput) {
+        textInput.setOnPasteInterceptListener { pastedText ->
+            if (pastedText.contains(EMAIL_SEPARATORS_REGEX)) {
+                addRecipientsFromInput(pastedText)
+                true
+            } else {
+                false
+            }
         }
     }
 
@@ -379,21 +396,17 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
-
         if (!email.isEmail()) {
             snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
             return
         }
 
-        if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
+        if (contactChipAdapter.itemCount >= MAX_ALLOWED_RECIPIENT) {
             snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
         }
 
-        if (contactChipAdapter.isEmpty()) {
-            expand()
-            binding.chipsRecyclerView.isVisible = true
-        }
+        updateChipsVisibility()
 
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
@@ -401,6 +414,122 @@ class RecipientFieldView @JvmOverloads constructor(
             contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
+        }
+    }
+
+    private fun addMultipleRecipients(recipients: List<Recipient>) {
+        if (recipients.isEmpty()) return
+
+        val availableSlots = (MAX_ALLOWED_RECIPIENT - contactChipAdapter.itemCount).coerceAtLeast(0)
+        val result = processRecipients(recipients, availableSlots)
+
+        showWarningSnackbars(
+            initialRecipientsSize = recipients.size,
+            initialAvailableSlots = availableSlots,
+            duplicateCount = result.duplicateCount,
+            outOfSpaceCount = result.outOfSpaceCount
+        )
+
+        updateChipsVisibility()
+
+        contactChipAdapter.addChips(result.acceptedRecipients)
+        result.acceptedRecipients.forEach { onContactAdded?.invoke(it) }
+
+        clearField()
+    }
+
+    private fun processRecipients(recipients: List<Recipient>, initialAvailableSlots: Int): ProcessedRecipientsResult {
+        var availableSlots = initialAvailableSlots
+        var duplicateCount = 0
+        var outOfSpaceCount = 0
+
+        val acceptedRecipients = recipients.filter { recipientToAdd ->
+            if (availableSlots <= 0) {
+                outOfSpaceCount++
+                return@filter false
+            }
+
+            if (!contactAdapter.addUsedContact(recipientToAdd.email)) {
+                duplicateCount++
+                return@filter false
+            }
+
+            availableSlots--
+            true
+        }
+
+        return ProcessedRecipientsResult(acceptedRecipients, duplicateCount, outOfSpaceCount)
+    }
+
+    private fun showWarningSnackbars(
+        initialRecipientsSize: Int,
+        initialAvailableSlots: Int,
+        duplicateCount: Int,
+        outOfSpaceCount: Int,
+    ) {
+        val warning = when {
+            initialAvailableSlots == 0 -> {
+                context.resources.getQuantityString(
+                    R.plurals.tooManyRecipientsPaste,
+                    initialRecipientsSize,
+                    initialRecipientsSize
+                )
+            }
+            outOfSpaceCount > 0 -> {
+                context.resources.getQuantityString(
+                    R.plurals.tooManyRecipientsPaste,
+                    outOfSpaceCount,
+                    outOfSpaceCount
+                )
+            }
+            duplicateCount > 0 -> {
+                context.resources.getQuantityString(
+                    R.plurals.addMultipleDuplicateEmails,
+                    duplicateCount,
+                    duplicateCount
+                )
+            }
+            else -> null
+        }
+
+        warning?.let(snackbarManager::setValue)
+    }
+
+    private fun updateChipsVisibility() {
+        if (contactChipAdapter.isEmpty()) {
+            expand()
+            binding.chipsRecyclerView.isVisible = true
+        }
+    }
+
+    fun getContactName(email: String): String {
+        return getMergedContactFromEmail?.invoke(email)?.name ?: email
+    }
+
+    private fun addRecipientsFromInput(input: String) {
+        val potentialEmails = input.split(EMAIL_SEPARATORS_REGEX).filter { it.isNotBlank() }.map { it.trim() }
+
+        val emailsToAdd = mutableListOf<String>()
+        val invalidEmails = mutableListOf<String>()
+
+        potentialEmails.forEach { email ->
+            if (email.isEmail()) emailsToAdd.add(email) else invalidEmails.add(email)
+        }
+
+        val recipientsToAdd = emailsToAdd.map { emailToAdd ->
+            Recipient().initLocalValues(name = getContactName(emailToAdd), email = emailToAdd)
+        }
+
+        addMultipleRecipients(recipientsToAdd)
+
+        if (invalidEmails.isNotEmpty()) {
+            snackbarManager.setValue(
+                context.resources.getQuantityString(
+                    R.plurals.addMultipleInvalidEmails,
+                    invalidEmails.size,
+                    invalidEmails.size
+                )
+            )
         }
     }
 
@@ -443,6 +572,7 @@ class RecipientFieldView @JvmOverloads constructor(
             getAddressBookWithGroup = getAddressBookWithGroupCallback
             getMergedContactFromContactGroup = getMergedContactFromContactGroupCallback
             getMergedContactFromAddressBook = getMergedContactFromAddressBookCallback
+            getMergedContactFromEmail = getMergedContactFromEmailCallback
             gotFocus = gotFocusCallback
         }
     }
@@ -512,7 +642,8 @@ class RecipientFieldView @JvmOverloads constructor(
         val onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
         val getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
         val getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
-        val getMergedContactFromAddressBookCallback: (AddressBook) -> List<MergedContact>
+        val getMergedContactFromAddressBookCallback: (AddressBook) -> List<MergedContact>,
+        val getMergedContactFromEmailCallback: ((String) -> MergedContact?)?
     )
 
     companion object {
@@ -520,6 +651,7 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val MAX_ALLOWED_RECIPIENT = 99
         private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
         private const val NO_STROKE = 0.0f
+        private val EMAIL_SEPARATORS_REGEX = Regex("""[,;\s\r\n]+""")
 
         fun Chip.setChipStyle(displayAsExternal: Boolean, encryptionStatus: EncryptionStatus) = when {
             encryptionStatus == EncryptionStatus.Encrypted -> {
@@ -547,6 +679,12 @@ class RecipientFieldView @JvmOverloads constructor(
             )
         }.applyTo(this)
     }
+
+    private data class ProcessedRecipientsResult(
+        val acceptedRecipients: List<Recipient>,
+        val duplicateCount: Int,
+        val outOfSpaceCount: Int
+    )
 
     private data class ChipStyle(
         val backgroundColor: Int,

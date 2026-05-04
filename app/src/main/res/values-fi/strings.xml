@@ -48,6 +48,14 @@
     <string name="actionViewInDark">Näytä tummassa teemassa</string>
     <string name="actionViewInLight">Näytä vaaleassa teemassa</string>
     <string name="addLinkTextPlaceholder">Näytettävä teksti</string>
+    <plurals name="addMultipleDuplicateEmails">
+        <item quantity="one">%d email on jo lisätty</item>
+        <item quantity="other">%d emailia on jo lisätty</item>
+    </plurals>
+    <plurals name="addMultipleInvalidEmails">
+        <item quantity="one">%d email on virheellinen</item>
+        <item quantity="other">%d emailia ovat virheellisiä</item>
+    </plurals>
     <string name="addUnknownRecipientAlreadyUsed">Sähköpostiosoite on jo käytössä</string>
     <string name="addUnknownRecipientInvalidEmail">Sähköpostiosoite on virheellinen</string>
     <string name="addUnknownRecipientTitle">Lisää vastaanottaja</string>
@@ -667,6 +675,10 @@
     <string name="toTitle">Vastaanottaja:</string>
     <string name="tomorrowMorning">Huomenna aamulla</string>
     <string name="tooManyRecipients">Et voi lisätä tätä osoitetta, koska olet saavuttanut vastaanottajien rajan</string>
+    <plurals name="tooManyRecipientsPaste">
+        <item quantity="one">%d osoite ei voitu lisätä, koska olet saavuttanut vastaanottajien enimmäismäärän</item>
+        <item quantity="other">%d osoitetta ei voitu lisätä, koska olet saavuttanut vastaanottajien enimmäismäärän</item>
+    </plurals>
     <string name="trashFolder">Roskakori</string>
     <string name="unblockButton">Poista esto</string>
     <string name="unknownDialogTitleExpeditor">Tuntematon lähettäjä</string>
