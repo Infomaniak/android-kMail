@@ -108,14 +108,17 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     }
 
     private fun Intent.getNotificationPayload(): NotificationPayload? {
-        return runCatching {
+        return try {
             if (Build.VERSION.SDK_INT >= 33) {
                 getParcelableExtra(EXTRA_PAYLOAD, NotificationPayload::class.java)
             } else {
                 @Suppress("DEPRECATION")
                 getParcelableExtra(EXTRA_PAYLOAD)
             }
-        }.getOrNull()
+        } catch (exception: Exception) {
+            Sentry.captureException(exception)
+            null
+        }
     }
 
     private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
