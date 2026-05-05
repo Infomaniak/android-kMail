@@ -30,7 +30,6 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.core.ui.showToast
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
@@ -39,6 +38,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
@@ -93,7 +93,6 @@ class NewMessageActivity : BaseActivity() {
             finish()
         }
 
-        setupSnackbar()
         setupNavController()
         setupFeatureFlagIfMailTo()
     }
@@ -122,8 +121,12 @@ class NewMessageActivity : BaseActivity() {
                             Pair(R.navigation.new_message_navigation, R.id.newMessageFragment)
                         }
                         else -> {
-                            applicationContext.showToast(R.string.snackbarAdminDisabledMessageSending)
-                            Pair(R.navigation.main_navigation, R.id.mainActivity)
+                            Intent(this@NewMessageActivity, MainActivity::class.java).apply {
+                                putExtra(MainActivity.EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR, true)
+                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                            }.also(::startActivity)
+                            finish()
+                            return@launch
                         }
                     }
                 }
@@ -135,6 +138,8 @@ class NewMessageActivity : BaseActivity() {
             val navGraph = navController.navInflater.inflate(graphResId)
             navGraph.setStartDestination(startDestinationId)
             navController.graph = navGraph
+
+            setupSnackbar()
         }
     }
 
