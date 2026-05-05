@@ -140,6 +140,11 @@ object MessageBodyUtils {
             // The function remove() also adds \n after each <br> of it.
             // So we need to use select, save the second part of the split first, and then do remove, to save the correct value
             // for the snapshot to compare.
+            //
+            // The first element of the pair needs to be "document" because if there are style tags inside the body of the editor
+            // JSoup will add them to the head tag automatically. So we always need to send the whole doc.html() to not loose any
+            // style. Style can end up inside the <body> of the editor when loading a draft.body that contains a whole
+            // <html><head><style>...</style></head><body>...</body></html>.
             return select(".$divClassName").firstOrNull()?.let {
                 val second = if (it.html().isBlank()) null else it
                 it.remove()

@@ -1038,6 +1038,10 @@ class NewMessageViewModel @Inject constructor(
         // (the text could get hidden later with the show quotes button).
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+
+        // If there are style tags inside the body of the editor JSoup will add them to the head tag automatically. So we always
+        // need to send the whole doc.html() to not loose any style. Style can end up inside the <body> of the editor when
+        // loading a draft.body that contains a whole <html><head><style>...</style></head><body>...</body></html>.
         return doc.html()
     }
 
