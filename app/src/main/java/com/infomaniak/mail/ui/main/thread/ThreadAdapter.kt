@@ -120,6 +120,8 @@ class ThreadAdapter(
     private val manuallyAllowedMessagesUids = mutableSetOf<String>()
 
     private lateinit var recyclerView: RecyclerView
+
+    private var canSendEmails: Boolean = true
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
 
     private val scaledTouchSlop by lazy { ViewConfiguration.get(recyclerView.context).scaledTouchSlop }
@@ -194,10 +196,17 @@ class ThreadAdapter(
                 is NotifyType.MessagesCollapseStateChanged -> {
                     holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
                 }
+                NotifyType.UpdatePermissions -> holder.handlePermissionsPayload(canSendEmails)
             }
         }
     }.getOrDefault(Unit)
 
+    fun updateEmailsPermission(canSend: Boolean) {
+        if (this.canSendEmails != canSend) {
+            this.canSendEmails = canSend
+            notifyItemRangeChanged(0, itemCount, NotifyType.UpdatePermissions)
+        }
+    }
     private fun MessageViewHolder.handleToggleLightModePayload(messageUid: String) = with(threadAdapterState) {
         isThemeTheSameMap[messageUid] = !isThemeTheSameMap[messageUid]!!
         toggleContentAndQuoteTheme(messageUid)
@@ -246,7 +255,7 @@ class ThreadAdapter(
         }
 
         if (item is MessageUi) {
-            (holder as MessageViewHolder).bindMail(item, position)
+            (holder as MessageViewHolder).bindMail(item, position, canSendEmails)
         } else {
             (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
         }
@@ -262,7 +271,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int) {
+    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int, canSendEmails: Boolean) {
 
         initMapForNewMessage(messageUi.message, position)
 
@@ -274,6 +283,11 @@ class ThreadAdapter(
         bindEmojiReactions(messageUi)
 
         onExpandOrCollapseMessage(messageUi.message, shouldTrack = false)
+        handlePermissionsPayload(canSendEmails)
+    }
+
+    private fun MessageViewHolder.handlePermissionsPayload(canSend: Boolean) {
+        binding.replyButton.isEnabled = canSend
     }
 
     private fun MessageViewHolder.bindCalendarEvent(message: Message) {
@@ -960,6 +974,7 @@ class ThreadAdapter(
         data object OnlyRebindCalendarAttendance : NotifyType
         data object OnlyRebindEmojiReactions : NotifyType
         data object UnsubscribeRebind : NotifyType
+        data object UpdatePermissions : NotifyType
         @JvmInline
         value class MessagesCollapseStateChanged(val isCollapsible: Boolean) : NotifyType
     }

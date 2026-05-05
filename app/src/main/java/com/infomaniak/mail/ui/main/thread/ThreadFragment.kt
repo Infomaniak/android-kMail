@@ -33,8 +33,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.work.Data
@@ -220,6 +222,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         permissionUtils.registerDownloadManagerPermission(fragment = this)
 
         observeLightThemeToggle()
+        observeCanSendEmails()
         observeThreadLive()
         observeMessagesLive()
         observeMessagesAreCollapsibles()
@@ -525,6 +528,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeLightThemeToggle() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
+    }
+
+    private fun observeCanSendEmails() {
+        mainViewModel.canSendEmailsLive.observe(viewLifecycleOwner) { canSend ->
+            threadAdapter.updateEmailsPermission(canSend)
+        }
     }
 
     private fun observeThreadLive() = with(binding) {

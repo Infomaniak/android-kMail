@@ -196,9 +196,6 @@ class MainViewModel @Inject constructor(
 
     val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
 
-    val canSendEmails: Boolean
-        get() = currentPermissionsLive.value?.canSendEmails ?: true
-
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection
@@ -276,6 +273,14 @@ class MainViewModel @Inject constructor(
     val currentPermissionsLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(permissionsController::getPermissionsAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
+
+    val canSendEmailsLive: LiveData<Boolean> = currentPermissionsLive.map { permissions ->
+        permissions?.canSendEmails ?: true
+    }
+
+    val canSendEmails: Boolean
+        get() = currentPermissionsLive.value?.canSendEmails ?: true
+
     //endregion
 
     //region Current Folder
