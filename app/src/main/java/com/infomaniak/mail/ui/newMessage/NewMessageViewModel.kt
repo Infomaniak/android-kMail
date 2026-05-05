@@ -88,7 +88,6 @@ import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
-import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
@@ -390,7 +389,7 @@ class NewMessageViewModel @Inject constructor(
             val (body, signature, quote) = splitSignatureAndQuoteFromBody(draft)
             initialBody = body
             if (signature != null) {
-                signature.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).attr("id", EDITOR_LOCAL_SIGNATURE_ID)
+                signature.attr("id", EDITOR_LOCAL_SIGNATURE_ID)
                 initialSignature = BodyContentPayload(signature.outerHtml(), BodyContentType.HTML_UNSANITIZED)
             }
             initialSanitizedQuote = quote?.outerHtml()?.sanitize()
