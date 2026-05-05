@@ -95,6 +95,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -391,6 +392,8 @@ fun List<Message>.getFoldersIds(exception: String? = null): ImpactedFolders {
 
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
+
+fun List<Thread>.getThreadsUids(): List<String> = map { it.uid }
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
 
