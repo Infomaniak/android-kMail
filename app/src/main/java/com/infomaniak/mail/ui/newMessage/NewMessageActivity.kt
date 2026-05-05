@@ -30,6 +30,7 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import com.infomaniak.core.ui.showToast
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
@@ -107,25 +108,32 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun setupNagGraphStartDestination() {
-        val navGraph = navController.navInflater.inflate(R.navigation.new_message_navigation)
         lifecycleScope.launch {
-            when (intent.action) {
+            val (graphResId, startDestinationId) = when (intent.action) {
                 Intent.ACTION_SEND,
                 Intent.ACTION_SEND_MULTIPLE,
                 Intent.ACTION_VIEW,
                 Intent.ACTION_SENDTO -> {
-                    navGraph.setStartDestination(
-                        if (newMessageViewModel.hasMultiMailboxes()) {
-                            R.id.selectMailboxFragment
-                        } else {
-                            R.id.newMessageFragment
+                    when {
+                        newMessageViewModel.hasMultiMailboxes() -> {
+                            Pair(R.navigation.new_message_navigation, R.id.selectMailboxFragment)
                         }
-                    )
+                        newMessageViewModel.canSendMails() -> {
+                            Pair(R.navigation.new_message_navigation, R.id.newMessageFragment)
+                        }
+                        else -> {
+                            applicationContext.showToast(R.string.snackbarAdminDisabledMessageSending)
+                            Pair(R.navigation.main_navigation, R.id.mainActivity)
+                        }
+                    }
                 }
                 else -> {
-                    navGraph.setStartDestination(R.id.newMessageFragment)
+                    Pair(R.navigation.new_message_navigation, R.id.newMessageFragment)
                 }
             }
+
+            val navGraph = navController.navInflater.inflate(graphResId)
+            navGraph.setStartDestination(startDestinationId)
             navController.graph = navGraph
         }
     }
