@@ -1,0 +1,4 @@
+- Ajout de la recherche par contact
+- Possibilité de redimensionner le panneau sur les tablettes et les appareils pliables
+- Possibilité de coller plusieurs destinataires à la fois
+- Correction de l'action de suppression des notifications qui ne fonctionnait pas dans certains cas
