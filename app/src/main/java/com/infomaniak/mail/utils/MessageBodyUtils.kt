@@ -151,12 +151,11 @@ object MessageBodyUtils {
 
         val (bodyWithQuote, signature) = document.split(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, document)
 
-        val replyPosition = document.getElementPositionOrMax(".$INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME")
-        val forwardPosition = document.getElementPositionOrMax(".$INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME")
-        val (body, quote) = if (replyPosition < forwardPosition) {
-            document.split(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        val rootQuoteClassName = document.getRootQuoteClassNameOrNull()
+        val (body, quote) = if (rootQuoteClassName == null) {
+            bodyWithQuote to null
         } else {
-            document.split(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+            document.split(rootQuoteClassName, bodyWithQuote)
         }
 
         return BodyData(BodyContentPayload(body.html(), BodyContentType.HTML_UNSANITIZED), signature, quote)
@@ -179,8 +178,13 @@ object MessageBodyUtils {
         return BodyData(body, signature, quote)
     }
 
-    private fun Document.getElementPositionOrMax(className: String): Int {
-        return this.selectFirst(className)?.sourceRange()?.start()?.pos() ?: Int.MAX_VALUE
+    private fun Document.getRootQuoteClassNameOrNull(): String? {
+        val rootQuote = selectFirst(".${INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}, .${INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}")
+        return when {
+            rootQuote == null -> null
+            rootQuote.hasClass(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME) -> INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+            else -> INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+        }
     }
     //endregion
 
