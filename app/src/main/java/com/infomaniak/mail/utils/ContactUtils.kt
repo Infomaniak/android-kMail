@@ -75,8 +75,9 @@ object ContactUtils {
                     val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.PHOTO_THUMBNAIL_URI))
 
                     emails.forEach { email ->
-                        val key = Recipient().initLocalValues(email, name)
-                        contacts[key] = MergedContact(email, name, photoUri, comesFromApi = false)
+                        Recipient.createValidRecipientOrNull(email = email, name = name)?.let { key ->
+                            contacts[key] = MergedContact(email, name, photoUri, comesFromApi = false)
+                        }
                     }
                 }
             }
@@ -88,10 +89,10 @@ object ContactUtils {
     fun mergeApiContactsIntoPhoneContacts(apiContacts: List<Contact>, phoneMergedContacts: MutableMap<Recipient, MergedContact>) {
         apiContacts.forEach { apiContact ->
             apiContact.emails.forEach { email ->
-                val key = Recipient().initLocalValues(email, apiContact.name)
-
-                phoneMergedContacts[key]?.updatePhoneContactWithApiContact(apiContact) ?: run {
-                    phoneMergedContacts[key] = MergedContact(email, apiContact, comesFromApi = true)
+                Recipient.createValidRecipientOrNull(email = email, name = apiContact.name)?.let { key ->
+                    phoneMergedContacts[key]?.updatePhoneContactWithApiContact(apiContact) ?: run {
+                        phoneMergedContacts[key] = MergedContact(email, apiContact, comesFromApi = true)
+                    }
                 }
             }
         }

@@ -57,8 +57,8 @@ open class Recipient : EmbeddedRealmObject, Correspondent, ContactAutocompletabl
 
     override var contactId = name + email
 
-    fun initLocalValues(email: String? = null, name: String? = null, hasExternalProvider: Boolean? = null): Recipient {
-        email?.let { this.email = it }
+    private fun initLocalValues(email: String, name: String? = null, hasExternalProvider: Boolean? = null): Recipient {
+        email.let { this.email = it }
         name?.let { this.name = it }
         hasExternalProvider?.let { this.hasExternalProvider = it }
 
@@ -102,6 +102,15 @@ open class Recipient : EmbeddedRealmObject, Correspondent, ContactAutocompletabl
             parcel.writeString(email)
             parcel.writeString(name)
             parcel.customWriteBoolean(hasExternalProvider)
+        }
+
+        fun createValidRecipientOrNull(
+            email: String,
+            name: String? = null,
+            hasExternalProvider: Boolean? = null
+        ): Recipient? {
+            if (!email.isEmail()) return null
+            return Recipient().initLocalValues(email, name, hasExternalProvider)
         }
     }
 }

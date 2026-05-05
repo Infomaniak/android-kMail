@@ -66,7 +66,7 @@ class EncryptionPasswordFragment : Fragment() {
         binding.userChipsRecyclerView.adapter = contactChipAdapter.apply {
             isEncryptionActivated = true
             unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toSet()
-            unencryptableRecipients?.forEach { addChip(Recipient().initLocalValues(email = it)) }
+            unencryptableRecipients?.forEach { Recipient.createValidRecipientOrNull(email = it)?.let(::addChip) }
         }
     }
 

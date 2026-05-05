@@ -54,7 +54,6 @@ import com.infomaniak.mail.ui.newMessage.encryption.EncryptableView
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionStatus
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.extensions.isEmail
 import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -396,7 +395,9 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
-        if (!email.isEmail()) {
+        val recipient = Recipient.createValidRecipientOrNull(email = email, name = name)
+
+        if (recipient == null) {
             snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
             return
         }
@@ -410,7 +411,6 @@ class RecipientFieldView @JvmOverloads constructor(
 
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            val recipient = Recipient().initLocalValues(email, name)
             contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
@@ -509,25 +509,22 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun addRecipientsFromInput(input: String) {
         val potentialEmails = input.split(EMAIL_SEPARATORS_REGEX).filter { it.isNotBlank() }.map { it.trim() }
 
-        val emailsToAdd = mutableListOf<String>()
-        val invalidEmails = mutableListOf<String>()
+        val validRecipients = mutableListOf<Recipient>()
+        var invalidEmailsCount = 0
 
         potentialEmails.forEach { email ->
-            if (email.isEmail()) emailsToAdd.add(email) else invalidEmails.add(email)
+            val recipient = Recipient.createValidRecipientOrNull(email = email, name = getContactName(email))
+            recipient?.let(validRecipients::add) ?: invalidEmailsCount++
         }
 
-        val recipientsToAdd = emailsToAdd.map { emailToAdd ->
-            Recipient().initLocalValues(name = getContactName(emailToAdd), email = emailToAdd)
-        }
+        addMultipleRecipients(validRecipients)
 
-        addMultipleRecipients(recipientsToAdd)
-
-        if (invalidEmails.isNotEmpty()) {
+        if (invalidEmailsCount > 0) {
             snackbarManager.setValue(
                 context.resources.getQuantityString(
                     R.plurals.addMultipleInvalidEmails,
-                    invalidEmails.size,
-                    invalidEmails.size
+                    invalidEmailsCount,
+                    invalidEmailsCount,
                 )
             )
         }
