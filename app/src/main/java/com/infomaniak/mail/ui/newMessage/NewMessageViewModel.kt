@@ -430,8 +430,13 @@ class NewMessageViewModel @Inject constructor(
             signature = chooseSignature(currentMailbox().email, signatures, draftMode, previousMessage)
             setSignatureIdentity(signature)
         }
-        val encapsulatedSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
-        initialSignature = BodyContentPayload(encapsulatedSignature, BodyContentType.HTML_UNSANITIZED)
+
+        initialSignature = if (signature.isDummy) {
+            null
+        } else {
+            val encapsulatedSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+            BodyContentPayload(encapsulatedSignature, BodyContentType.HTML_UNSANITIZED)
+        }
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
     }
