@@ -87,6 +87,7 @@ import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.Emoj
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
+import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
@@ -237,6 +238,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         observeDraftWorkerResults()
 
         observeThreadOpening()
+        observeCalculateThreadPosition()
         observeAutoAdvance()
 
         setupBackActionHandler()
@@ -734,8 +736,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
     }
 
+    private fun observeCalculateThreadPosition() {
+        actionsViewModel.calculateCurrentThreadPosition.observe(viewLifecycleOwner) { calculateThreadPosition() }
+    }
+
     private fun observeAutoAdvance() {
-        mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner, ::tryToAutoAdvance)
+        actionsViewModel.tryToAutoAdvance.observe(viewLifecycleOwner) { tryToAutoAdvance() }
     }
 
     private fun setupBackActionHandler() {
@@ -1098,20 +1104,30 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         twoPaneViewModel.safelyNavigate(resId, args)
     }
 
-    private fun tryToAutoAdvance(listThreadUids: List<String>) = with(twoPaneFragment.threadListAdapter) {
-        if (!listThreadUids.contains(openedThreadUid)) return@with
+    private fun calculateThreadPosition() = viewLifecycleOwner.lifecycleScope.launch {
+        val currentThread = threadViewModel.threadLive.value
+        currentThread?.let {
+            val currentThreadPosition =
+                twoPaneFragment.threadListAdapter.dataSet
+                    .indexOfFirst { it is ThreadListItem.Content && it.thread.uid == currentThread.uid }
+            actionsViewModel.updateCurrentThreadPosition(currentThreadPosition, currentThread.uid)
+        }
+    }
 
-        openedThreadPosition?.let {
-            val data = getNextThreadToOpenByPosition(it)
+    private fun tryToAutoAdvance() = with(twoPaneFragment.threadListAdapter) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            actionsViewModel.currentThread?.let { (position, uid) ->
+                val data = getNextThreadToOpenByPosition(position)
 
-            data?.let { (nextThread, index) ->
-                if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
-                    selectNewThread(newPosition = index, nextThread.uid)
+                data?.let { (nextThread, index) ->
+                    if (nextThread.uid != uid && !nextThread.isOnlyOneDraft) {
+                        selectNewThread(newPosition = index, nextThread.uid)
+                    }
+
+                    twoPaneFragment.navigateToThread(nextThread)
+                } ?: run {
+                    twoPaneViewModel.closeThread()
                 }
-
-                twoPaneFragment.navigateToThread(nextThread)
-            } ?: run {
-                twoPaneViewModel.closeThread()
             }
         }
     }

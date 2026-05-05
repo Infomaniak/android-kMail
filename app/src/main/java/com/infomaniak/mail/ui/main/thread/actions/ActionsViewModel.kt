@@ -80,8 +80,20 @@ class ActionsViewModel @Inject constructor(
     var draftResource: String? = null
     //endregion
 
+    //region AutoAdvance
+    val calculateCurrentThreadPosition = SingleLiveEvent<Unit>()
+    var currentThread: Pair<Int, String>? = null
+    val tryToAutoAdvance = SingleLiveEvent<Unit>()
+    //endregion
+
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
+
+    //region AutoAdvance
+    fun updateCurrentThreadPosition(currentPosition: Int, currentUid: String) {
+        currentThread = currentPosition to currentUid
+    }
+    //endregion
 
     //region Spam
     fun moveToSpamFolder(messagesUid: List<String>, currentFolderId: String?, mailbox: Mailbox) {
@@ -196,9 +208,14 @@ class ActionsViewModel @Inject constructor(
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return
         }
+
+        calculateCurrentThreadPosition.postValue(Unit)
+
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return
+        val currentFolder = folderController.getFolder(currentFolderId) ?: return
 
         val result = messagesActionsUseCase.moveMessagesTo(
+            currentFolder = currentFolder,
             destinationFolder = destinationFolder,
             mailbox = mailbox,
             messages = messages,
@@ -206,6 +223,9 @@ class ActionsViewModel @Inject constructor(
 
         with(result) {
             if (apiResponses.atLeastOneSucceeded()) {
+                currentThread?.let { (_, uid) ->
+                    if (movedThreads.isNotEmpty() && movedThreads.contains(uid)) tryToAutoAdvance.postValue(Unit)
+                }
                 refreshFoldersAsync(
                     mailbox = mailbox,
                     messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
@@ -275,15 +295,20 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) {
+        if (currentFolder == null) return
+        
         val shouldPermanentlyDelete = isPermanentDeleteFolder(
             role = folderRoleUtils.getActionFolderRole(messagesToDelete, currentFolder)
         )
 
         if (shouldPermanentlyDelete) {
+            calculateCurrentThreadPosition.postValue(Unit)
+
             val result = messagesActionsUseCase.permanentlyDelete(
                 messagesToDelete = messagesToDelete,
                 mailbox = mailbox,
                 onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
+                currentFolder = currentFolder,
             ) ?: run {
                 snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
                 return
@@ -291,6 +316,9 @@ class ActionsViewModel @Inject constructor(
 
             with(result) {
                 if (apiResponses.atLeastOneSucceeded()) {
+                    currentThread?.let { (_, uid) ->
+                        if (uidsToMove.isNotEmpty() && uidsToMove.contains(uid)) tryToAutoAdvance.postValue(Unit)
+                    }
                     refreshFoldersAsync(
                         mailbox = mailbox,
                         messagesFoldersIds = messagesToDelete.getFoldersIds(),
