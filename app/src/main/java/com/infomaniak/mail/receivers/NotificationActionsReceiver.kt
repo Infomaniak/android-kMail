@@ -23,7 +23,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
-import com.infomaniak.core.legacy.utils.serializableExtra
+import com.infomaniak.core.legacy.utils.parcelableExtra
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.R
@@ -58,8 +58,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -103,13 +101,22 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         globalCoroutineScope.launch(ioDispatcher) {
-            val payload = intent.serializableExtra(EXTRA_PAYLOAD) as? NotificationPayload ?: return@launch
+            val payload = intent.getNotificationPayload() ?: return@launch
             val action = intent.action!!
             handleNotificationIntent(context, payload, action)
         }
     }
 
-    private suspend fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
+    private fun Intent.getNotificationPayload(): NotificationPayload? {
+        return try {
+            parcelableExtra(EXTRA_PAYLOAD)
+        } catch (exception: Exception) {
+            Sentry.captureException(exception)
+            null
+        }
+    }
+
+    private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
         // Undo action
         if (action == UNDO_ACTION) {
             trackNotificationActionEvent(MatomoName.CancelClicked)
@@ -148,7 +155,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         }
     }
 
-    private suspend fun executeAction(
+    private fun executeAction(
         context: Context,
         folderRole: FolderRole,
         @StringRes undoNotificationTitle: Int,
