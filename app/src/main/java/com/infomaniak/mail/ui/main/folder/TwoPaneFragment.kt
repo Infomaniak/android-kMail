@@ -218,7 +218,7 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    fun handleOnBackPressed() {
+    open fun handleOnBackPressed() {
         when {
             isOnlyRightShown() -> {
                 if (SDK_INT >= 29) requireActivity().window.isNavigationBarContrastEnforced = true

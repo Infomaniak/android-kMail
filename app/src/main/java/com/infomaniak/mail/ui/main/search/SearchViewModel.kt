@@ -18,29 +18,36 @@
 package com.infomaniak.mail.ui.main.search
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.DUMMY_FOLDER_ID
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
+import com.infomaniak.mail.utils.ThreadListUtils
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
@@ -50,11 +57,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.Normalizer
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,6 +73,7 @@ class SearchViewModel @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
+    private val mergedContactController: MergedContactController,
     private val refreshController: RefreshController,
     private val savedStateHandle: SavedStateHandle,
     private val searchUtils: SearchUtils,
@@ -82,6 +93,8 @@ class SearchViewModel @Inject constructor(
     var currentSearchQuery: String = ""
         private set
 
+    private var currentUiState: SearchUiState = SearchUiState.IDLE
+
     private var currentFilters = mutableSetOf<ThreadFilter>()
     var isAllFoldersSelected: Boolean = false
 
@@ -97,7 +110,11 @@ class SearchViewModel @Inject constructor(
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
     private var searchJob: Job? = null
-    val searchResults = threadController.getSearchThreadsAsync().asLiveData(ioCoroutineContext)
+    val threadsSearchResults = threadController.getSearchThreadsAsync()
+    val contactsResults = MutableStateFlow<List<MergedContact>>(emptyList())
+    val allSearchResults = combine(contactsResults, threadsSearchResults) { contacts, threads ->
+        runCatchingRealm { formatSearchList(threads.list, contacts, application, globalCoroutineScope) }.getOrDefault(emptyList())
+    }
 
     private val currentMailboxFlow = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -118,10 +135,10 @@ class SearchViewModel @Inject constructor(
         if (hasPendingSearch) search()
     }
 
-    fun resetFolderFilter() {
-        filterFolder = null
-        isAllFoldersSelected = false
-        unselectAllChipFilters()
+    fun clearSearchState() {
+        currentSearchQuery = ""
+        contactsResults.value = emptyList()
+        resetFolderFilter()
     }
 
     fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
@@ -130,6 +147,14 @@ class SearchViewModel @Inject constructor(
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
         if (query.isNotBlank() && isLengthTooShort(query)) return@launch
+
+        if (saveInHistory) {
+            currentUiState = SearchUiState.VALIDATED
+            contactsResults.value = emptyList()
+        } else {
+            currentUiState = SearchUiState.TYPING
+        }
+
         search(query.trim().also { currentSearchQuery = it }, saveInHistory)
     }
 
@@ -145,17 +170,21 @@ class SearchViewModel @Inject constructor(
     }
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
-        if (isEnabled && currentFilters.contains(filter)) return@launch
         if (isEnabled) {
-            trackSearchEvent(filter.matomoName)
-            filter.select()
+            enableFilter(filter)
         } else {
-            filter.unselect()
+            disableFilter(filter)
         }
     }
 
     fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
         currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
+        val newState = when {
+            currentFilters.isEmpty() && currentSearchQuery.isNotBlank() -> SearchUiState.TYPING
+            currentFilters.isEmpty() -> SearchUiState.IDLE
+            else -> SearchUiState.FILTERING
+        }
+        currentUiState = newState
         search(filters = currentFilters)
     }
 
@@ -166,6 +195,108 @@ class SearchViewModel @Inject constructor(
     fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
         if (isLastPage) return@launch
         search(shouldGetNextPage = true)
+    }
+
+    private suspend fun enableFilter(filter: ThreadFilter) {
+        if (currentFilters.contains(filter)) return
+
+        currentUiState = SearchUiState.FILTERING
+        contactsResults.value = emptyList()
+        trackSearchEvent(filter.matomoName)
+        filter.select()
+    }
+
+    private suspend fun disableFilter(filter: ThreadFilter) {
+        contactsResults.value = emptyList()
+
+        val isGoingToEmpty = currentFilters.size == 1 && currentFilters.contains(filter)
+        if (isGoingToEmpty) {
+            currentUiState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
+        }
+        filter.unselect()
+    }
+
+    private fun shouldShowContacts(): Boolean {
+        val hasQuery = currentSearchQuery.isNotBlank()
+        val hasNoFilters = currentFilters.isEmpty()
+        val notValidated = currentUiState != SearchUiState.VALIDATED
+
+        return currentUiState == SearchUiState.TYPING && hasQuery && hasNoFilters && notValidated
+    }
+
+    private fun resetFolderFilter() {
+        filterFolder = null
+        isAllFoldersSelected = false
+        unselectAllChipFilters()
+    }
+
+
+    private fun MutableList<ThreadListItem>.addSectionTitle(
+        sectionTitle: String,
+        previousSectionTitle: String
+    ): String {
+        if (sectionTitle != previousSectionTitle) {
+            add(ThreadListItem.SectionTitle(sectionTitle))
+            return sectionTitle
+        }
+        return previousSectionTitle
+    }
+
+    private fun formatSearchList(
+        threads: List<Thread>,
+        contacts: List<MergedContact>,
+        context: Context,
+        scope: CoroutineScope,
+    ): List<ThreadListItem> {
+
+        if (localSettings.threadDensity == ThreadDensity.COMPACT) {
+            // Line taken from ThreadListAdapter.formatList() but apparently unnecessary
+            // threadListAdapter.cleanMultiSelectionItems(threads, scope)
+            return threads.map { ThreadListItem.Content(it) }
+        }
+
+        return buildList {
+            var previousSectionTitle = ""
+
+            addContacts(contacts, context, scope) { title ->
+                previousSectionTitle = addSectionTitle(title, previousSectionTitle)
+            }
+
+            if (contacts.isNotEmpty()) add(ThreadListItem.Spacer)
+
+            addThreads(threads, context, scope) { title ->
+                previousSectionTitle = addSectionTitle(title, previousSectionTitle)
+            }
+        }
+    }
+
+    private fun MutableList<ThreadListItem>.addContacts(
+        contacts: List<MergedContact>,
+        context: Context,
+        scope: CoroutineScope,
+        updateSection: (String) -> Unit
+    ) {
+        val sectionTitle = context.getString(R.string.contactsSearch)
+
+        contacts.forEach { contact ->
+            scope.ensureActive()
+            updateSection(sectionTitle)
+            add(ThreadListItem.ContactItem(contact))
+        }
+    }
+
+    private fun MutableList<ThreadListItem>.addThreads(
+        threads: List<Thread>,
+        context: Context,
+        scope: CoroutineScope,
+        updateSection: (String) -> Unit
+    ) {
+        threads.forEach { thread ->
+            scope.ensureActive()
+            val sectionTitle = ThreadListUtils.getSectionTitle(thread, context)
+            updateSection(sectionTitle)
+            add(ThreadListItem.Content(thread))
+        }
     }
 
     private suspend fun ThreadFilter.select() {
@@ -182,6 +313,7 @@ class SearchViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        contactsResults.value = emptyList()
         cancelSearch()
         globalCoroutineScope.launch(ioDispatcher) {
             searchUtils.deleteRealmSearchData()
@@ -200,9 +332,23 @@ class SearchViewModel @Inject constructor(
         shouldGetNextPage: Boolean = false,
     ) = withContext(ioCoroutineContext) {
         cancelSearch()
+
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
+
+            val showContacts = shouldShowContacts() &&
+                    query.isNotBlank() &&
+                    !query.contains("\"") &&
+                    !isLengthTooShort(query)
+
+            val contacts = if (showContacts) {
+                val searchQueryNoAccents = Normalizer.normalize(query, Normalizer.Form.NFD)
+                    .replace("\\p{M}".toRegex(), "")
+                mergedContactController.searchMergedContacts(query, searchQueryNoAccents)
+            } else {
+                emptyList()
+            }
 
             mailboxController
                 .getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
@@ -212,9 +358,11 @@ class SearchViewModel @Inject constructor(
             if (!shouldGetNextPage) resetPaginationData()
 
             computeSearchFilters(folder, filters, query)?.let { newFilters ->
-                fetchThreads(folder, newFilters, query, shouldGetNextPage)
+                fetchThreads(folder, newFilters, query, shouldGetNextPage, hasContacts = contacts.isNotEmpty())
                 if (saveInHistory) query.let(history::postValue)
             }
+
+            contactsResults.emit(contacts)
         }
     }
 
@@ -240,6 +388,7 @@ class SearchViewModel @Inject constructor(
         newFilters: Set<ThreadFilter>,
         query: String,
         shouldGetNextPage: Boolean,
+        hasContacts: Boolean,
     ) {
         visibilityMode.postValue(VisibilityMode.LOADING)
 
@@ -275,7 +424,7 @@ class SearchViewModel @Inject constructor(
 
         val resultsVisibilityMode = when {
             newFilters.isEmpty() && isLengthTooShort(query) -> VisibilityMode.RECENT_SEARCHES
-            threadController.getSearchThreadsCount() == 0L -> VisibilityMode.NO_RESULTS
+            threadController.getSearchThreadsCount() == 0L && !hasContacts -> VisibilityMode.NO_RESULTS
             else -> VisibilityMode.RESULTS
         }
 
@@ -306,6 +455,13 @@ class SearchViewModel @Inject constructor(
         )
         val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
         threadController.saveSearchThreads(searchThreads)
+    }
+
+    private enum class SearchUiState {
+        IDLE,
+        TYPING,
+        FILTERING,
+        VALIDATED
     }
 
     companion object {

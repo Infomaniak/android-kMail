@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 
@@ -28,4 +29,5 @@ interface ThreadListAdapterCallbacks {
     var onPositionClickedChanged: (position: Int, previousPosition: Int) -> Unit
     var deleteThreadInRealm: (threadUid: String) -> Unit
     val getFeatureFlags: () -> Mailbox.FeatureFlagSet?
+    var onContactClicked: ((MergedContact) -> Unit)?
 }

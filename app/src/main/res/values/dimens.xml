@@ -99,6 +99,8 @@
     <integer name="loginLayoutAnimationDuration">300</integer>
     <dimen name="newMessageBottomBarElevation">10dp</dimen>
     <dimen name="textButtonCornerRadius">16dp</dimen>
+    <dimen name="sizeNewMailBullet">8dp</dimen>
+    <dimen name="spaceBetweenContactsAndThreads">8dp</dimen>
     <dimen name="maxHorizontalSwipeTolerance">100dp</dimen>
     <dimen name="minVerticalSwipeDistance">32dp</dimen>
 </resources>
