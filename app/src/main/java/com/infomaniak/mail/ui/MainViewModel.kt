@@ -169,8 +169,6 @@ class MainViewModel @Inject constructor(
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
 
-    val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
-
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection
@@ -885,15 +883,6 @@ class MainViewModel @Inject constructor(
 
     fun deleteThreadInRealm(threadUid: String) = viewModelScope.launch(ioCoroutineContext) {
         threadController.deleteThread(threadUid)
-    }
-
-    private suspend fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
-        val isWorkingWithThread = message == null
-        return isWorkingWithThread || threadHasOnlyOneMessageLeft(threadsUids.first())
-    }
-
-    private suspend fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
-        return messageController.getMessagesCountInThread(threadUid, featureFlagsLive.value, mailboxContentRealm()) == 1
     }
 
     fun shareThreadUrl(messageUid: String) {
