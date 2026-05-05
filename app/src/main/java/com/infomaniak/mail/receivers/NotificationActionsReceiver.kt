@@ -21,9 +21,9 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.core.legacy.utils.parcelableExtra
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.R
@@ -109,12 +109,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     private fun Intent.getNotificationPayload(): NotificationPayload? {
         return try {
-            if (Build.VERSION.SDK_INT >= 33) {
-                getParcelableExtra(EXTRA_PAYLOAD, NotificationPayload::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                getParcelableExtra(EXTRA_PAYLOAD)
-            }
+            parcelableExtra(EXTRA_PAYLOAD)
         } catch (exception: Exception) {
             Sentry.captureException(exception)
             null
