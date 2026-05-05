@@ -64,12 +64,13 @@ class MessagesActionsUseCase @Inject constructor(
 
     // Move Region
     suspend fun moveMessagesTo(
+        currentFolder: Folder,
         destinationFolder: Folder,
         mailbox: Mailbox,
         messages: List<Message>,
     ): MoveMessagesResult {
 
-        val movedThreads = moveOutMessagesThreadsLocally(messages, destinationFolder)
+        val movedThreads = moveOutMessagesThreadsLocally(messages, currentFolder)
         val featureFlags = mailbox.featureFlags
 
         val apiResponses = moveMessages(
@@ -111,12 +112,12 @@ class MessagesActionsUseCase @Inject constructor(
         return apiResponses
     }
 
-    private suspend fun moveOutMessagesThreadsLocally(messages: List<Message>, destinationFolder: Folder): List<String> {
+    private suspend fun moveOutMessagesThreadsLocally(messages: List<Message>, currentFolder: Folder): List<String> {
         val uidsToMove = mutableListOf<String>()
         mailboxContentRealm().run {
             messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
                 val realmThread = ThreadController.getThreadBlocking(thread.uid, realm = this) ?: return@forEach
-                val nbMessagesInCurrentFolder = realmThread.messages.count { it.folderId != destinationFolder.id }
+                val nbMessagesInCurrentFolder = realmThread.messages.count { it.folderId != currentFolder.id }
                 if (nbMessagesInCurrentFolder == 0) uidsToMove.add(thread.uid)
             }
         }
@@ -134,6 +135,7 @@ class MessagesActionsUseCase @Inject constructor(
     ): MoveMessagesResult? {
         if (currentFolderId == null) return null
 
+        val currentFolder = folderController.getFolder(currentFolderId) ?: return null
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return null
 
         var messagesToMove: List<Message>
@@ -145,7 +147,7 @@ class MessagesActionsUseCase @Inject constructor(
             messagesToMove = getMessagesFromThreadsToMove(threads)
         }
 
-        return moveMessagesTo(destinationFolder, mailbox, messagesToMove)
+        return moveMessagesTo(currentFolder, destinationFolder, mailbox, messagesToMove)
     }
     // End Region
 
@@ -155,7 +157,8 @@ class MessagesActionsUseCase @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
     ): MoveMessagesResult? {
-        val folder = if (currentFolderId != null) folderController.getFolder(currentFolderId) else null
+        if (currentFolderId == null) return null
+        val folder = folderController.getFolder(currentFolderId) ?: return null
         val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
 
         val destinationFolderRole = if (folderRole == FolderRole.SPAM) FolderRole.INBOX else FolderRole.SPAM
@@ -164,7 +167,7 @@ class MessagesActionsUseCase @Inject constructor(
 
         val unscheduleMessages = messageController.getUnscheduledMessages(messages)
 
-        return moveMessagesTo(destinationFolder, mailbox, unscheduleMessages)
+        return moveMessagesTo(folder, destinationFolder, mailbox, unscheduleMessages)
     }
 
     suspend fun getMessagesFromThreadsToSpamOrHam(threads: Set<Thread>): List<Message> {
@@ -185,6 +188,7 @@ class MessagesActionsUseCase @Inject constructor(
         messagesToDelete: List<Message>,
         mailbox: Mailbox,
         onApiFinished: () -> Unit,
+        currentFolder: Folder
     ): DeleteResult? {
         if (messagesToDelete.isEmpty()) {
             return null
@@ -193,7 +197,7 @@ class MessagesActionsUseCase @Inject constructor(
         val uids = messagesToDelete.getUids()
         val destinationFolder = folderController.getFolder(FolderRole.TRASH) ?: return null
 
-        val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, destinationFolder)
+        val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, currentFolder)
 
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
@@ -210,7 +214,7 @@ class MessagesActionsUseCase @Inject constructor(
     }
 
     suspend fun getMessagesFromThreadsToDelete(threads: List<Thread>): List<Message> {
-        return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = true) }
+        return threads.flatMap { messageController.getAllThreadMessagesAndDuplicates(it) }
     }
 
     suspend fun getMessagesToDelete(messages: List<Message>) = messageController.getMessagesAndDuplicates(messages)
