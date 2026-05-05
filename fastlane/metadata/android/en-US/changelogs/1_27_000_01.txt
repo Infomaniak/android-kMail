@@ -1,0 +1,4 @@
+- Display up to 5 matching contacts during search
+- Enable panel resizing on tablets and foldable devices
+- Allow pasting multiple recipients at once
+- Fix the notification's delete action not doing anything in some cases
