@@ -80,6 +80,11 @@ class EmojiReactionsView @JvmOverloads constructor(
         addView(composeView)
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        setAddReactionEnabledState(enabled)
+    }
+
     private fun TypedArray.getDimensionOrNull(@StyleableRes index: Int): Float? {
         return if (hasValue(index)) getDimension(index, -1f) else null
     }
