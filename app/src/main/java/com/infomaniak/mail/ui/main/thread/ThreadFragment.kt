@@ -23,6 +23,7 @@ import android.graphics.drawable.InsetDrawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,6 +39,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.work.Data
+import com.google.android.gms.tasks.Tasks.call
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
@@ -530,7 +532,20 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeCanSendEmails() {
         mainViewModel.canSendEmailsLive.observe(viewLifecycleOwner) { canSend ->
+            Log.i("elouan", "ThreadFragment : ${canSend}")
             threadAdapter.updateEmailsPermission(canSend)
+            updateQuickActionBarSendingState(canSend)
+        }
+    }
+
+    private fun updateQuickActionBarSendingState(canSend: Boolean) = with(binding.quickActionBar) {
+        Log.i("elouan", "updateQuickActionBarSendingState canSend : ${canSend}")
+        if (canSend) {
+            enable(R.id.quickActionReply)
+            enable(R.id.quickActionForward)
+        } else {
+            disableByMenuId(R.id.quickActionReply)
+            disableByMenuId(R.id.quickActionForward)
         }
     }
 

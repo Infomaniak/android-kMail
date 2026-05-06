@@ -123,6 +123,13 @@ class MainActionsView @JvmOverloads constructor(
         textViews[index].isEnabled = false
     }
 
+    fun enableByMenuId(@IdRes menuId: Int) {
+        val index = getIndexOfMenuItem(menuId)
+        if (index < 0) return
+        buttons[index].isEnabled = true
+        textViews[index].isEnabled = true
+    }
+
     private fun setAction(index: Int, drawable: Drawable?, title: String) {
         buttons[index].apply {
             icon = drawable

@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -116,12 +117,28 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             }
         }
 
-        if (!mainViewModel.canSendEmails) {
-            binding.mainActions.disableByMenuId(R.id.actionReply)
-            binding.mainActions.disableByMenuId(R.id.actionReplyAll)
-            binding.mainActions.disableByMenuId(R.id.actionForward)
-            binding.addReaction.isEnabled = false
+        Log.i("elouan", "call updateEmailActionState : ${mainViewModel.canSendEmails}")
+        updateEmailActionsState(mainViewModel.canSendEmails)
+        observeCanSendEmails()
+    }
+
+    private fun observeCanSendEmails() {
+        mainViewModel.canSendEmailsLive.observe(viewLifecycleOwner) { canSend ->
+            Log.i("elouan", "mailActionsBottomSheetDialog canSend : ${canSend}")
+            updateEmailActionsState(canSend)
         }
+    }
+
+    private fun updateEmailActionsState(canSendEmails: Boolean) {
+        Log.i("elouan", "updateEmailActionsState : ${canSendEmails}")
+        listOf(R.id.actionReply, R.id.actionReplyAll, R.id.actionForward).forEach { id ->
+            if (canSendEmails) {
+                binding.mainActions.enableByMenuId(id)
+            } else {
+                binding.mainActions.disableByMenuId(id)
+            }
+        }
+        binding.addReaction.isEnabled = canSendEmails
     }
 
     private fun setShareTrailingContent() {

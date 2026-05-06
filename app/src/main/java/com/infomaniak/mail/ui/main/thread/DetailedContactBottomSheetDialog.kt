@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,6 +67,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         if (!mainViewModel.canSendEmails) {
             binding.writeMail.isEnabled = false
         }
+        observeCanSendEmails()
     }
 
     private fun setupListeners() = with(binding) {
@@ -84,6 +86,13 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         copyAddress.setClosingOnClickListener {
             trackContactActionsEvent(MatomoName.CopyEmailAddress)
             copyRecipientEmailToClipboard(navigationArgs.recipient, snackbarManager)
+        }
+    }
+
+    private fun observeCanSendEmails(){
+        mainViewModel.canSendEmailsLive.observe(viewLifecycleOwner) { canSend ->
+            Log.i("elouan", "observeCanSendEmails : ${canSend}")
+            binding.writeMail.isEnabled = canSend
         }
     }
 }

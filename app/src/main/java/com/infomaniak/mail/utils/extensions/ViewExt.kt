@@ -18,12 +18,14 @@
 package com.infomaniak.mail.utils.extensions
 
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.infomaniak.mail.R
+import androidx.appcompat.R as RAndroid
 
 fun View.bindSendingClickListener(
     lifecycleOwner: LifecycleOwner,
@@ -32,6 +34,7 @@ fun View.bindSendingClickListener(
     onActionExecute: () -> Unit
 ) {
     canSendEmailsLive.observe(lifecycleOwner) { canSendEmails ->
+        Log.i("elouan", "ThreadListFragment : ${canSendEmails}")
         val buttonState = if (canSendEmails) SendingButtonState.Send else SendingButtonState.SendingBlocked
 
         this.setSendingClickListener(
@@ -48,9 +51,7 @@ fun View.setSendingClickListener(
     onActionExecute: () -> Unit
 ) {
 
-    if (buttonState != SendingButtonState.Send) {
-        this.applyDisabledColor()
-    }
+    this.applyColor(buttonState)
 
     this.setOnClickListener {
         when (buttonState) {
@@ -61,8 +62,12 @@ fun View.setSendingClickListener(
 }
 
 
-fun View.applyDisabledColor() {
-    val color = ContextCompat.getColor(context, R.color.disabledIconColor)
+fun View.applyColor(buttonState: SendingButtonState) {
+    val color = if (buttonState == SendingButtonState.SendingBlocked) {
+        ContextCompat.getColor(context, R.color.disabledIconColor)
+    } else {
+        context.getAttributeColor(RAndroid.attr.colorPrimary)
+    }
 
     if (this is ExtendedFloatingActionButton) this.backgroundTintList = ColorStateList.valueOf(color)
 }

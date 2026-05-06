@@ -130,6 +130,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -274,9 +275,12 @@ class MainViewModel @Inject constructor(
         it?.let(permissionsController::getPermissionsAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
-    val canSendEmailsLive: LiveData<Boolean> = currentPermissionsLive.map { permissions ->
-        permissions?.canSendEmails ?: true
-    }
+    val canSendEmailsLive: LiveData<Boolean> = _currentMailboxObjectId.flatMapLatest { mailboxObjectId ->
+        mailboxObjectId?.let { id ->
+            mailboxController.getMailboxAsync(id).map { it.obj?.permissions?.canSendEmails ?: true }
+        } ?: emptyFlow()
+    }.distinctUntilChanged()
+        .asLiveData(ioCoroutineContext)
 
     val canSendEmails: Boolean
         get() = currentPermissionsLive.value?.canSendEmails ?: true
