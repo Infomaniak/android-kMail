@@ -52,7 +52,6 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.EXTRA
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_ACTION
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AvatarTypeUtils.getAvatarType
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.realm.kotlin.Realm
@@ -345,7 +344,7 @@ class NotificationUtils @Inject constructor(
         addAction(deleteAction)
 
         val canSendEmails = mailbox.permissions?.canSendEmails ?: true
-        if (canSendEmails){
+        if (canSendEmails) {
             val replyAction = createActivityAction(
                 title = R.string.actionReply,
                 activity = LaunchActivity::class.java,

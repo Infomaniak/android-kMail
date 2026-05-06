@@ -38,7 +38,6 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
-import com.infomaniak.mail.utils.extensions.applyDisabledColor
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 
 class BottomQuickActionBarView @JvmOverloads constructor(

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.R.attr.text
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

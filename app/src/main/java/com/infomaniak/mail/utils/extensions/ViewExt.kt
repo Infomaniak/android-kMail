@@ -18,18 +18,12 @@
 package com.infomaniak.mail.utils.extensions
 
 import android.content.res.ColorStateList
-import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes.permissions
-import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 
 fun View.bindSendingClickListener(
     lifecycleOwner: LifecycleOwner,

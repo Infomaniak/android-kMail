@@ -118,6 +118,7 @@ class MainActionsView @JvmOverloads constructor(
 
     fun disableByMenuId(@IdRes menuId: Int) {
         val index = getIndexOfMenuItem(menuId)
+        if (index < 0) return
         buttons[index].isEnabled = false
         textViews[index].isEnabled = false
     }
