@@ -642,7 +642,7 @@ class MainViewModel @Inject constructor(
 
     private suspend fun updateContacts() {
         ApiRepository.getContacts().data?.let { apiContacts ->
-            val phoneMergedContacts = getPhoneContacts(appContext)
+            val phoneMergedContacts = getPhoneContacts(appContext, ioDispatcher)
             mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
             mergedContactController.update(phoneMergedContacts.values.toList())
         }

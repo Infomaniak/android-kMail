@@ -30,14 +30,18 @@ import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
 object ContactUtils {
 
-    suspend fun getPhoneContacts(context: Context): MutableMap<Recipient, MergedContact> {
+    suspend fun getPhoneContacts(
+        context: Context,
+        dispatcher: CoroutineContext = Dispatchers.IO,
+    ): MutableMap<Recipient, MergedContact> {
         if (!context.hasPermissions(arrayOf(Manifest.permission.READ_CONTACTS))) return mutableMapOf()
 
         return runCatching {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 val emails = context.getLocalEmails()
                 if (emails.isEmpty()) mutableMapOf() else context.getMergedEmailsContacts(emails)
             }
