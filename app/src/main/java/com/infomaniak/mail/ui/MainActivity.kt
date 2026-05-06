@@ -458,6 +458,8 @@ class MainActivity : BaseActivity() {
     private fun handleAdminDisabledSendingSnackbarIfNeeded(intent: Intent) {
         if (!intent.getBooleanExtra(EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR, false)) return
         snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
+        intent.removeExtra(EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR)
+        setIntent(intent)
     }
 
     private fun handleOnBackPressed() = with(binding) {
