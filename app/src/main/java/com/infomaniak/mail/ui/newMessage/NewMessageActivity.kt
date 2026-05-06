@@ -79,7 +79,6 @@ class NewMessageActivity : BaseActivity() {
         ShortcutManagerCompat.reportShortcutUsed(this@NewMessageActivity, Shortcuts.NEW_MESSAGE.id)
         setContentView(binding.root)
         addTwoFactorAuthOverlay()
-        setupNagGraphStartDestination()
 
         if (!isAuth()) {
             finish()
@@ -93,6 +92,7 @@ class NewMessageActivity : BaseActivity() {
             finish()
         }
 
+        setupNavGraphStartDestination()
         setupNavController()
         setupFeatureFlagIfMailTo()
     }
@@ -106,41 +106,38 @@ class NewMessageActivity : BaseActivity() {
         return true
     }
 
-    private fun setupNagGraphStartDestination() {
+    private fun setupNavGraphStartDestination() {
         lifecycleScope.launch {
-            val (graphResId, startDestinationId) = when (intent.action) {
+            val isSendIntent = intent.action in setOf(
                 Intent.ACTION_SEND,
                 Intent.ACTION_SEND_MULTIPLE,
                 Intent.ACTION_VIEW,
-                Intent.ACTION_SENDTO -> {
-                    when {
-                        newMessageViewModel.hasMultiMailboxes() -> {
-                            Pair(R.navigation.new_message_navigation, R.id.selectMailboxFragment)
-                        }
-                        newMessageViewModel.canSendMails() -> {
-                            Pair(R.navigation.new_message_navigation, R.id.newMessageFragment)
-                        }
-                        else -> {
-                            Intent(this@NewMessageActivity, MainActivity::class.java).apply {
-                                putExtra(MainActivity.EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR, true)
-                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                            }.also(::startActivity)
-                            finish()
-                            return@launch
-                        }
-                    }
-                }
+                Intent.ACTION_SENDTO
+            )
+
+            val startDestinationId = when {
+                isSendIntent && newMessageViewModel.hasMultiMailboxes() -> R.id.selectMailboxFragment
+                newMessageViewModel.canSendEmails() -> R.id.newMessageFragment
                 else -> {
-                    Pair(R.navigation.new_message_navigation, R.id.newMessageFragment)
+                    handleDisabledSending()
+                    return@launch
                 }
             }
 
-            val navGraph = navController.navInflater.inflate(graphResId)
+            val navGraph = navController.navInflater.inflate(R.navigation.new_message_navigation)
             navGraph.setStartDestination(startDestinationId)
             navController.graph = navGraph
 
             setupSnackbar()
         }
+    }
+
+    private fun handleDisabledSending() {
+        Intent(this@NewMessageActivity, MainActivity::class.java).apply {
+            putExtra(MainActivity.EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR, true)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }.also(::startActivity)
+        finish()
     }
 
     private fun setupSnackbar() {
