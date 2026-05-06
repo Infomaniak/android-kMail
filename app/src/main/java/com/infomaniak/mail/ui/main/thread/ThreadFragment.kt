@@ -536,52 +536,59 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
     }
 
-    private fun observeThreadLive() = with(binding) {
-
+    private fun observeThreadLive() {
         threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
-
             if (thread == null) {
                 twoPaneViewModel.closeThread()
                 return@observe
             }
 
-            iconFavorite.apply {
-                setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
-                val color = if (thread.isFavorite) {
-                    context.getColor(R.color.favoriteYellow)
-                } else {
-                    context.getAttributeColor(RAndroid.attr.colorPrimary)
-                }
-                iconTint = ColorStateList.valueOf(color)
-            }
+            updateFavoriteIcon(thread.isFavorite)
+            setupQuickActionBar(thread)
+            setupSnoozeAlert(thread)
+        }
+    }
 
-            val shouldDisplayScheduledDraftActions = thread.containsOnlyScheduledDrafts(
-                mainViewModel.featureFlagsLive.value,
-                localSettings,
-            )
-            quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
+    private fun updateFavoriteIcon(isFavorite: Boolean) = with(binding.iconFavorite) {
+        val iconRes = if (isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star
+        val color = if (isFavorite) {
+            context.getColor(R.color.favoriteYellow)
+        } else {
+            context.getAttributeColor(RAndroid.attr.colorPrimary)
+        }
 
-            if (!mainViewModel.canSendEmails) {
-                quickActionBar.disableByMenuId(R.id.quickActionReply)
-                quickActionBar.disableByMenuId(R.id.quickActionForward)
-            }
+        setIconResource(iconRes)
+        iconTint = ColorStateList.valueOf(color)
+    }
 
+    private fun setupQuickActionBar(thread: Thread) = with(binding.quickActionBar) {
+        val shouldDisplayScheduledDraftActions = thread.containsOnlyScheduledDrafts(
+            mainViewModel.featureFlagsLive.value,
+            localSettings
+        )
 
-            thread.snoozeEndDate?.let { snoozeEndDate ->
-                val formattedDate = context.formatDayOfWeekAdaptiveYear(snoozeEndDate.toDate())
-                snoozeAlert.setDescription(getString(R.string.snoozeAlertTitle, formattedDate))
-            }
+        init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
-            snoozeAlert.apply {
-                onAction1 {
-                    trackSnoozeEvent(MatomoName.ModifySnooze)
-                    navigateToSnoozeBottomSheet(SnoozeScheduleType.Modify(thread.uid))
-                }
-                onAction2 {
-                    trackSnoozeEvent(MatomoName.CancelSnooze)
-                    unsnoozeThread(thread)
-                }
-            }
+        if (!mainViewModel.canSendEmails) {
+            disableByMenuId(R.id.quickActionReply)
+            disableByMenuId(R.id.quickActionForward)
+        }
+    }
+
+    private fun setupSnoozeAlert(thread: Thread) = with(binding.snoozeAlert) {
+        thread.snoozeEndDate?.let { snoozeEndDate ->
+            val formattedDate = context.formatDayOfWeekAdaptiveYear(snoozeEndDate.toDate())
+            setDescription(getString(R.string.snoozeAlertTitle, formattedDate))
+        }
+
+        onAction1 {
+            trackSnoozeEvent(MatomoName.ModifySnooze)
+            navigateToSnoozeBottomSheet(SnoozeScheduleType.Modify(thread.uid))
+        }
+
+        onAction2 {
+            trackSnoozeEvent(MatomoName.CancelSnooze)
+            unsnoozeThread(thread)
         }
     }
 
