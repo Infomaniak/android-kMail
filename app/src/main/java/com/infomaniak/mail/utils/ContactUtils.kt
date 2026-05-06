@@ -21,6 +21,7 @@ import android.Manifest
 import android.content.Context
 import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.provider.ContactsContract.CommonDataKinds.Email
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
@@ -28,15 +29,15 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 object ContactUtils {
 
     suspend fun getPhoneContacts(
         context: Context,
-        dispatcher: CoroutineContext = Dispatchers.IO,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): MutableMap<Recipient, MergedContact> {
         if (!context.hasPermissions(arrayOf(Manifest.permission.READ_CONTACTS))) return mutableMapOf()
 
@@ -45,7 +46,7 @@ object ContactUtils {
                 val emails = context.getLocalEmails()
                 if (emails.isEmpty()) mutableMapOf() else context.getMergedEmailsContacts(emails)
             }
-        }.getOrElse { exception ->
+        }.cancellable().getOrElse { exception ->
             Sentry.captureException(exception)
             mutableMapOf()
         }
