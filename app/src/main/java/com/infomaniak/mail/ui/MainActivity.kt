@@ -441,8 +441,17 @@ class MainActivity : BaseActivity() {
         notificationManagerCompat.cancel(GENERIC_NEW_MAILS_NOTIFICATION_ID)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleNewIntent(intent)
+    }
+
     override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
         super.onNewIntent(intent, caller)
+        handleNewIntent(intent)
+    }
+    
+    private fun handleNewIntent(intent: Intent) {
         handleAdminDisabledSendingSnackbarIfNeeded(intent)
     }
 
