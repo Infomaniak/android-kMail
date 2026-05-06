@@ -93,6 +93,15 @@ class BottomQuickActionBarView @JvmOverloads constructor(
         }
     }
 
+    fun enableByMenuId(@IdRes menuId: Int) {
+        for (index in 0 until menu.size) {
+            if (menu[index].itemId == menuId) {
+                enable(index)
+                return
+            }
+        }
+    }
+
     fun changeIcon(index: Int, @DrawableRes icon: Int) {
         buttons[index].setIconResource(icon)
     }

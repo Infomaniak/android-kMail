@@ -18,23 +18,22 @@
 package com.infomaniak.mail.utils.extensions
 
 import android.content.res.ColorStateList
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.infomaniak.core.common.observe
 import com.infomaniak.mail.R
+import kotlinx.coroutines.flow.SharedFlow
 import androidx.appcompat.R as RAndroid
 
 fun View.bindSendingClickListener(
     lifecycleOwner: LifecycleOwner,
-    canSendEmailsLive: LiveData<Boolean>,
+    canSendEmailsFlow: SharedFlow<Boolean>,
     onActionBlocked: () -> Unit,
     onActionExecute: () -> Unit
 ) {
-    canSendEmailsLive.observe(lifecycleOwner) { canSendEmails ->
-        Log.i("elouan", "ThreadListFragment : ${canSendEmails}")
+    canSendEmailsFlow.observe(lifecycleOwner) { canSendEmails ->
         val buttonState = if (canSendEmails) SendingButtonState.Send else SendingButtonState.SendingBlocked
 
         this.setSendingClickListener(

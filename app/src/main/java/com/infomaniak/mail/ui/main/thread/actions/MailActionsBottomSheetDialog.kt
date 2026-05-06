@@ -18,12 +18,12 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -117,20 +117,17 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             }
         }
 
-        Log.i("elouan", "call updateEmailActionState : ${mainViewModel.canSendEmails}")
         updateEmailActionsState(mainViewModel.canSendEmails)
         observeCanSendEmails()
     }
 
     private fun observeCanSendEmails() {
-        mainViewModel.canSendEmailsLive.observe(viewLifecycleOwner) { canSend ->
-            Log.i("elouan", "mailActionsBottomSheetDialog canSend : ${canSend}")
+        mainViewModel.canSendEmailsFlow.observe(viewLifecycleOwner) { canSend ->
             updateEmailActionsState(canSend)
         }
     }
 
     private fun updateEmailActionsState(canSendEmails: Boolean) {
-        Log.i("elouan", "updateEmailActionsState : ${canSendEmails}")
         listOf(R.id.actionReply, R.id.actionReplyAll, R.id.actionForward).forEach { id ->
             if (canSendEmails) {
                 binding.mainActions.enableByMenuId(id)

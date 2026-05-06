@@ -18,17 +18,16 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -89,9 +88,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun observeCanSendEmails(){
-        mainViewModel.canSendEmailsLive.observe(viewLifecycleOwner) { canSend ->
-            Log.i("elouan", "observeCanSendEmails : ${canSend}")
+    private fun observeCanSendEmails() {
+        mainViewModel.canSendEmailsFlow.observe(viewLifecycleOwner) { canSend ->
             binding.writeMail.isEnabled = canSend
         }
     }

@@ -127,14 +127,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -275,12 +276,15 @@ class MainViewModel @Inject constructor(
         it?.let(permissionsController::getPermissionsAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
-    val canSendEmailsLive: LiveData<Boolean> = _currentMailboxObjectId.flatMapLatest { mailboxObjectId ->
-        mailboxObjectId?.let { id ->
-            mailboxController.getMailboxAsync(id).map { it.obj?.permissions?.canSendEmails ?: true }
-        } ?: emptyFlow()
-    }.distinctUntilChanged()
-        .asLiveData(ioCoroutineContext)
+    val canSendEmailsFlow: SharedFlow<Boolean> = _currentMailboxObjectId.flatMapLatest {
+        it?.let(permissionsController::getPermissionsAsync) ?: flowOf(null)
+    }.map { permissions ->
+        permissions?.canSendEmails ?: true
+    }.shareIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        replay = 1
+    )
 
     val canSendEmails: Boolean
         get() = currentPermissionsLive.value?.canSendEmails ?: true
@@ -496,8 +500,11 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.accessId, mailbox.hostingId)) {
             if (isSuccess()) {
-                mailboxController.updateMailbox(mailbox.objectId) {
-                    it.permissions = data
+                mailboxController.updateMailbox(mailbox.objectId) { localMailbox ->
+                    localMailbox.permissions = null
+                }
+                mailboxController.updateMailbox(mailbox.objectId) { localMailbox ->
+                    localMailbox.permissions = data
                 }
             }
         }
