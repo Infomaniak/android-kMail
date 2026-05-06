@@ -321,7 +321,7 @@ class NewMessageViewModel @Inject constructor(
 
     suspend fun canSendEmails(): Boolean {
         val mailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-        return mailbox?.permissions?.canSendEmails ?: false
+        return mailbox?.permissions?.canSendEmails ?: true
     }
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
