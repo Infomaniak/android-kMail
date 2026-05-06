@@ -94,7 +94,6 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.htmlToText
-import com.infomaniak.mail.utils.extensions.isEmail
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -660,7 +659,7 @@ class NewMessageViewModel @Inject constructor(
          */
         fun parseEmailWithName(recipient: String): Recipient? {
             val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.destructured
-            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
+            return nameAndEmail?.let { (name, email) -> Recipient.createValidRecipientOrNull(email = email, name = name) }
         }
 
         /**
@@ -671,11 +670,11 @@ class NewMessageViewModel @Inject constructor(
          */
         fun String.splitToRecipientList() = split(",", ";").mapNotNull {
             val email = it.trim()
-            if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
+            Recipient.createValidRecipientOrNull(email = email, name = email) ?: parseEmailWithName(email)
         }.takeIf { it.isNotEmpty() }
 
         fun Intent.getRecipientsFromIntent(recipientsFlag: String): List<Recipient>? {
-            return getStringArrayExtra(recipientsFlag)?.map { Recipient().initLocalValues(it, it) }
+            return getStringArrayExtra(recipientsFlag)?.mapNotNull { Recipient.createValidRecipientOrNull(email = it, name = it) }
         }
 
         val mailToIntent = runCatching { MailTo.parse(uri!!) }.getOrNull()

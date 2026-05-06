@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
-import android.os.Parcelable
 import com.infomaniak.core.common.extensions.customReadBoolean
 import com.infomaniak.core.common.extensions.customWriteBoolean
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
@@ -57,8 +56,8 @@ open class Recipient : EmbeddedRealmObject, Correspondent, ContactAutocompletabl
 
     override var contactId = name + email
 
-    fun initLocalValues(email: String? = null, name: String? = null, hasExternalProvider: Boolean? = null): Recipient {
-        email?.let { this.email = it }
+    private fun initLocalValues(email: String, name: String? = null, hasExternalProvider: Boolean? = null): Recipient {
+        this.email = email
         name?.let { this.name = it }
         hasExternalProvider?.let { this.hasExternalProvider = it }
 
@@ -102,6 +101,15 @@ open class Recipient : EmbeddedRealmObject, Correspondent, ContactAutocompletabl
             parcel.writeString(email)
             parcel.writeString(name)
             parcel.customWriteBoolean(hasExternalProvider)
+        }
+
+        fun createValidRecipientOrNull(
+            email: String,
+            name: String? = null,
+            hasExternalProvider: Boolean? = null
+        ): Recipient? {
+            if (!email.isEmail()) return null
+            return Recipient().initLocalValues(email, name, hasExternalProvider)
         }
     }
 }
