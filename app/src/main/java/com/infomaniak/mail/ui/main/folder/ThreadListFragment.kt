@@ -472,7 +472,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
         newMessageFab.bindSendingClickListener(
             lifecycleOwner = viewLifecycleOwner,
-            permissionLive = mainViewModel.currentPermissionsLive,
+            canSendEmailsLive = mainViewModel.canSendEmailsLive,
             onActionBlocked = {
                 snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
             },

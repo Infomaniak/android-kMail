@@ -28,16 +28,16 @@ import androidx.lifecycle.LiveData
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes.permissions
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 
 fun View.bindSendingClickListener(
     lifecycleOwner: LifecycleOwner,
-    permissionLive: LiveData<MailboxPermissions?>,
+    canSendEmailsLive: LiveData<Boolean>,
     onActionBlocked: () -> Unit,
     onActionExecute: () -> Unit
 ) {
-    permissionLive.observe(lifecycleOwner) { permissions ->
-        val canSendEmails = permissions?.canSendEmails ?: true
+    canSendEmailsLive.observe(lifecycleOwner) { canSendEmails ->
         val buttonState = if (canSendEmails) SendingButtonState.Send else SendingButtonState.SendingBlocked
 
         this.setSendingClickListener(
@@ -62,7 +62,6 @@ fun View.setSendingClickListener(
         when (buttonState) {
             SendingButtonState.Send -> onActionExecute()
             SendingButtonState.SendingBlocked -> onActionBlocked()
-            SendingButtonState.Disabled -> Unit
         }
     }
 }
@@ -71,31 +70,11 @@ fun View.setSendingClickListener(
 fun View.applyDisabledColor() {
     val color = ContextCompat.getColor(context, R.color.disabledIconColor)
 
-    when (this) {
-        is ExtendedFloatingActionButton -> {
-            this.backgroundTintList = ColorStateList.valueOf(color)
-        }
-
-        is MaterialButton -> {
-            this.setTextColor(color)
-            this.iconTint = ColorStateList.valueOf(color)
-        }
-
-        // is ImageView -> {
-        //     this.setColorFilter(color)
-        // }
-        //
-        // is TextView -> {
-        //     this.setTextColor(color)
-        // }
-
-        else -> Log.i("elouan", "not supported : $this")
-    }
+    if (this is ExtendedFloatingActionButton) this.backgroundTintList = ColorStateList.valueOf(color)
 }
 
 
 enum class SendingButtonState {
     Send,
-    SendingBlocked,
-    Disabled
+    SendingBlocked
 }

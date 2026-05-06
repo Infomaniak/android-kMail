@@ -853,9 +853,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 }
                 R.id.quickActionReply -> {
                     trackThreadActionsEvent(MatomoName.Reply)
+                    threadViewModel.clickOnQuickActionBar(menuId)
                 }
                 R.id.quickActionForward -> {
                     trackThreadActionsEvent(MatomoName.Forward)
+                    threadViewModel.clickOnQuickActionBar(menuId)
                 }
             }
         }
