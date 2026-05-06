@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
-import android.app.Activity
-import android.content.Context
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
@@ -42,31 +40,25 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 import kotlin.math.roundToInt
-import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalSplittiesApi::class)
 @FragmentScoped
 class NewMessageAiManager @Inject constructor(
-    @ActivityContext private val activityContext: Context,
     private val editorContentManager: EditorContentManager,
     private val localSettings: LocalSettings,
 ) : NewMessageManager() {
-
-    private inline val activity get() = activityContext as Activity
 
     private var _aiViewModel: AiViewModel? = null
     private inline val aiViewModel: AiViewModel get() = _aiViewModel!!
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
-    private val black by lazy { context.getColor(RCore.color.black) }
 
     private var aiPromptFragment: AiPromptFragment? = null
 
