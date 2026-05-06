@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
-import android.content.Context
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
@@ -41,7 +40,6 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -52,7 +50,6 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalSplittiesApi::class)
 @FragmentScoped
 class NewMessageAiManager @Inject constructor(
-    @ActivityContext private val activityContext: Context,
     private val editorContentManager: EditorContentManager,
     private val localSettings: LocalSettings,
 ) : NewMessageManager() {
