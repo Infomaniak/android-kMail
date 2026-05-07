@@ -201,7 +201,8 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messages = messageController.getMessages(messagesUids)
-        handleMessagesMove(destinationFolderId, messages, currentFolderId, mailbox)
+        val messagesToMove = messagesActions.getMessagesToMove(messages, currentFolderId)
+        handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
     }
 
     private suspend fun handleMessagesMove(
@@ -328,11 +329,7 @@ class ActionsViewModel @Inject constructor(
             // If deleteMessages is empty we will do the auto advance after deleting permanently
             if (onlyPermanentlyDeleteMessages) calculateCurrentThreadPosition.postValue(Unit)
             handlePermanentlyDeleteMessages(
-                permanentlyDeleteMessages = permanentlyDeleteMessages,
-                mailbox = mailbox,
-                currentFolder = currentFolder,
-                shouldAutoAdvanceAndRefresh = onlyPermanentlyDeleteMessages,
-                messagesToDelete = messagesToDelete
+                permanentlyDeleteMessages, mailbox, currentFolder, onlyPermanentlyDeleteMessages, messagesToDelete
             )
         }
 
@@ -438,7 +435,8 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        handleArchiveMessages(messages, currentFolder, mailbox)
+        val messagesToMove = messagesActions.getMessagesToMove(messages, currentFolder?.id)
+        handleArchiveMessages(messagesToMove, currentFolder, mailbox)
     }
 
     private suspend fun handleArchiveMessages(
@@ -676,7 +674,6 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-        fun List<ApiResponse<*>>.getFailedCall() = firstOrNull { it.data != true }
     fun modifyScheduledDraft(
         unscheduleDraftUrl: String,
         onSuccess: () -> Unit,
@@ -689,7 +686,6 @@ class ActionsViewModel @Inject constructor(
                 return@launch
             }
 
-        val (resources, foldersIds, destinationFolderId) = undoData
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
             onSuccess()
         } else {
@@ -697,7 +693,6 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-        val apiResponses = resources.map { ApiRepository.undoAction(it) }
     fun unscheduleDraft(unscheduleDraftUrl: String, mailbox: Mailbox, openFolder: (folderId: String) -> Unit) =
         viewModelScope.launch(ioCoroutineContext) {
             val apiResponse = messagesActions.unscheduleDraft(unscheduleDraftUrl)
@@ -707,12 +702,6 @@ class ActionsViewModel @Inject constructor(
                     return@launch
                 }
 
-        if (apiResponses.atLeastOneSucceeded()) {
-            // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-            sharedUtils.refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = foldersIds,
-                destinationFolderId = destinationFolderId,
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolder.id)))
             }
 
@@ -737,12 +726,8 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-        val failedCall = apiResponses.getFailedCall()
     //region Delete
 
-        val snackbarTitle = when {
-            failedCall == null -> R.string.snackbarMoveCancelled
-            else -> failedCall.translateError()
     fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String, mailbox: Mailbox) =
         viewModelScope.launch(ioCoroutineContext) {
             val apiResponse = messagesActions.deleteDraft(targetMailboxUuid, remoteDraftUuid)
@@ -759,16 +744,12 @@ class ActionsViewModel @Inject constructor(
             showDeletedDraftSnackbar(apiResponse)
         }
 
-        snackbarManager.postValue(appContext.getString(snackbarTitle))
     private fun showDeletedDraftSnackbar(apiResponse: ApiResponse<Unit>) {
         val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
         snackbarManager.postValue(appContext.getString(titleRes))
     }
     //endregion
 
-    private fun onDownloadStart() {
-        isDownloadingChanges.postValue(true)
-    }
     //region Undo action
     fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         if (undoData == null) return@launch

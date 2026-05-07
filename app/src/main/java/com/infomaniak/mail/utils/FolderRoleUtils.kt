@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.isSnoozed
