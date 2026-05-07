@@ -517,7 +517,9 @@ class ThreadAdapter(
                         informationTitle.setText(R.string.messageSummaryErrorRetry)
                         informationButton.isEnabled = true
                         informationButton.hideProgressCatching(R.string.aiButtonRetry)
-                        if (state.isRetry) threadAdapterCallbacks?.showSnackbarRetry?.invoke(message.uid)
+                        if (state.isRetry && !state.wasLoaderShown) {
+                            threadAdapterCallbacks?.showSnackbarRetry?.invoke(message.uid)
+                        }
                     }else{
                         informationTitle.setText(R.string.messageSummaryError)
                         informationButton.isVisible = false
