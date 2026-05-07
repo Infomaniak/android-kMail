@@ -195,6 +195,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
+                NotifyType.AiSummaryStateChanged -> holder.bindAiSummary(item.message)
                 is NotifyType.MessagesCollapseStateChanged -> {
                     holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
                 }
@@ -1044,6 +1045,7 @@ class ThreadAdapter(
         data object OnlyRebindEmojiReactions : NotifyType
         data object UnsubscribeRebind : NotifyType
         data object UpdatePermissions : NotifyType
+        data object AiSummaryStateChanged : NotifyType
         @JvmInline
         value class MessagesCollapseStateChanged(val isCollapsible: Boolean) : NotifyType
     }
