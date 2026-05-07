@@ -87,7 +87,7 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionArchive -> threadListFragment.lifecycleScope.launch {
                     threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
-                        folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
+                        folderRole = threadListFragment.folderRoleUtils.getThreadsActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
@@ -109,8 +109,9 @@ class ThreadListMultiSelection {
                     isMultiSelectOn = false
                 }
                 R.id.quickActionDelete -> threadListFragment.lifecycleScope.launch {
+                    val allMessages = selectedThreads.flatMap { it.messages }
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
+                        folderRoles = threadListFragment.folderRoleUtils.getActionFolderRoles(allMessages),
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
@@ -224,7 +225,8 @@ class ThreadListMultiSelection {
 
             val isSelectionEmpty = selectedThreads.isEmpty()
             threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
-                val isFromArchive = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
+                val isFromArchive =
+                    threadListFragment.folderRoleUtils.getThreadsActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
                 for (index in 0 until getButtonCount()) {
                     val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
                     if (shouldDisable) disable(index) else enable(index)

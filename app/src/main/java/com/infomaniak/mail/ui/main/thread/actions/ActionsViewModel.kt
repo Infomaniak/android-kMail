@@ -296,16 +296,18 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) {
         if (currentFolder == null) return
-        
-        val shouldPermanentlyDelete = isPermanentDeleteFolder(
-            role = folderRoleUtils.getActionFolderRole(messagesToDelete, currentFolder)
-        )
 
-        if (shouldPermanentlyDelete) {
-            calculateCurrentThreadPosition.postValue(Unit)
+        val permanentlyDeleteMessages = messagesToDelete.filter { message ->
+            isPermanentDeleteFolder(role = folderRoleUtils.getActionFolderRole(message))
+        }
+
+        val deleteMessages = messagesToDelete.filter { !permanentlyDeleteMessages.contains(it) }
+
+        if (permanentlyDeleteMessages.isNotEmpty()) {
+            if (deleteMessages.isEmpty()) calculateCurrentThreadPosition.postValue(Unit)
 
             val result = messagesActionsUseCase.permanentlyDelete(
-                messagesToDelete = messagesToDelete,
+                messagesToDelete = permanentlyDeleteMessages,
                 mailbox = mailbox,
                 onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
                 currentFolder = currentFolder,
@@ -316,20 +318,23 @@ class ActionsViewModel @Inject constructor(
 
             with(result) {
                 if (apiResponses.atLeastOneSucceeded()) {
-                    currentThread?.let { (_, uid) ->
-                        if (uidsToMove.isNotEmpty() && uidsToMove.contains(uid)) tryToAutoAdvance.postValue(Unit)
+                    if (deleteMessages.isEmpty()) {
+                        currentThread?.let { (_, uid) ->
+                            if (uidsToMove.isNotEmpty() && uidsToMove.contains(uid)) tryToAutoAdvance.postValue(Unit)
+                        }
+
+                        refreshFoldersAsync(
+                            mailbox = mailbox,
+                            messagesFoldersIds = messagesToDelete.getFoldersIds(),
+                            currentFolderId = currentFolder.id,
+                            threadsUids = uidsToMove,
+                        )
+                        showDeleteSnackbar(
+                            apiResponses = apiResponses,
+                            messages = messagesToDelete,
+                            numberOfImpactedThreads = messagesToDelete.count(),
+                        )
                     }
-                    refreshFoldersAsync(
-                        mailbox = mailbox,
-                        messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                        currentFolderId = currentFolder?.id,
-                        threadsUids = uidsToMove,
-                    )
-                    showDeleteSnackbar(
-                        apiResponses = apiResponses,
-                        messages = messagesToDelete,
-                        numberOfImpactedThreads = messagesToDelete.count(),
-                    )
                 }
 
                 if (apiResponses.atLeastOneFailed() && uidsToMove.isNotEmpty()) {
@@ -339,7 +344,10 @@ class ActionsViewModel @Inject constructor(
                 }
             }
 
-        } else {
+        }
+
+        if (deleteMessages.isNotEmpty()) {
+            calculateCurrentThreadPosition.postValue(Unit)
             val destinationFolder = folderController.getFolder(FolderRole.TRASH)
             if (destinationFolder == null) {
                 snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
@@ -348,8 +356,8 @@ class ActionsViewModel @Inject constructor(
 
             moveMessagesTo(
                 destinationFolderId = destinationFolder.id,
-                messagesUids = messagesToDelete.getUids(),
-                currentFolderId = currentFolder?.id,
+                messagesUids = deleteMessages.getUids(),
+                currentFolderId = currentFolder.id,
                 mailbox = mailbox,
             )
         }
@@ -402,7 +410,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) {
-        val role = folderRoleUtils.getActionFolderRole(messages, currentFolder)
+        val role = folderRoleUtils.getThreadActionFolderRole(messages.first().threads.first())
         val isFromArchive = role == FolderRole.ARCHIVE
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return
@@ -485,7 +493,6 @@ class ActionsViewModel @Inject constructor(
         viewModelScope.launch(ioCoroutineContext) {
             val result = messagesActionsUseCase.reportPhishing(
                 messages = messages,
-                currentFolder = currentFolder,
                 mailbox = mailbox,
                 onReportSuccess = {
                     toggleMessagesSpamStatus(

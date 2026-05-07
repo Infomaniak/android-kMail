@@ -471,6 +471,10 @@
     <string name="reviewAlertTitle">Aimez-vous Infomaniak Mail ?</string>
     <string name="saveToDriveDeviceItem">Enregistrer sur l’appareil</string>
     <string name="saveToDriveItem">Enregistrer dans kDrive</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">Cette conversation sera supprimée et les envois programmés seront annulés.</item>
+        <item quantity="other">Ces conversations seront supprimées et les envois programmés seront annulés.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Programmer l’envoi</string>
     <string name="scheduledEmailHeader">Cet e-mail sera envoyé à cette date : %s</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>

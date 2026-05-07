@@ -57,7 +57,7 @@ class FolderRoleUtilsTest {
 
     @Test
     fun threadInbox_should_be_INBOX() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadInbox) }
+        val folderRole = runBlocking { folderRoleUtils.getThreadActionFolderRole(threadInbox) }
         assertTrue(folderRole == FolderRole.INBOX)
     }
 
@@ -69,7 +69,7 @@ class FolderRoleUtilsTest {
 
     @Test
     fun threadDraft_should_be_DRAFT() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadDraft) }
+        val folderRole = runBlocking { folderRoleUtils.getThreadActionFolderRole(threadDraft) }
         assertTrue(folderRole == FolderRole.DRAFT)
     }
 
@@ -81,19 +81,19 @@ class FolderRoleUtilsTest {
 
     @Test
     fun threadSnoozed_should_be_SNOOZED() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadSnoozed) }
+        val folderRole = runBlocking { folderRoleUtils.getThreadActionFolderRole(threadSnoozed) }
         assertTrue(folderRole == FolderRole.SNOOZED)
     }
 
     @Test
     fun threadSearchInbox_should_be_INBOX() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadSearchInbox) }
+        val folderRole = runBlocking { folderRoleUtils.getThreadActionFolderRole(threadSearchInbox) }
         assertTrue(folderRole == FolderRole.INBOX)
     }
 
     @Test
     fun threadSearchSnoozed_should_be_SNOOZED() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadSearchSnoozed) }
+        val folderRole = runBlocking { folderRoleUtils.getThreadActionFolderRole(threadSearchSnoozed) }
         assertTrue(folderRole == FolderRole.SNOOZED)
     }
 

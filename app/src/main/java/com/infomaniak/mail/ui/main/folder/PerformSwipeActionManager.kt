@@ -100,7 +100,7 @@ object PerformSwipeActionManager {
                 handleArchiveSwipe(thread, position, folderRole, currentMailbox)
             }
             SwipeAction.DELETE -> {
-                handleDeleteSwipe(thread, position, folderRole, isPermanentDeleteFolder, currentMailbox)
+                handleDeleteSwipe(thread, position, isPermanentDeleteFolder, currentMailbox)
             }
             SwipeAction.FAVORITE -> {
                 actionsViewModel.toggleThreadsFavoriteStatus(threadsUids = listOf(thread.uid), mailbox = currentMailbox)
@@ -192,7 +192,6 @@ object PerformSwipeActionManager {
     private fun ThreadListFragment.handleDeleteSwipe(
         thread: Thread,
         position: Int,
-        folderRole: FolderRole?,
         isPermanentDeleteFolder: Boolean,
         currentMailBox: Mailbox
     ): Boolean {
@@ -213,8 +212,9 @@ object PerformSwipeActionManager {
             )
         }
 
+        val folderRoles = thread.messages.mapNotNull { message -> message.folder.role }
         return descriptionDialog.deleteWithConfirmationPopup(
-            folderRole = folderRole,
+            folderRoles = folderRoles,
             count = 1,
             displayLoader = false,
             onCancel = ::onCancel,
