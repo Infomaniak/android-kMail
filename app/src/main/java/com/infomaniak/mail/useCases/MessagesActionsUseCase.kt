@@ -159,9 +159,9 @@ class MessagesActionsUseCase @Inject constructor(
     ): MoveMessagesResult? {
         if (currentFolderId == null) return null
         val folder = folderController.getFolder(currentFolderId) ?: return null
-        val folderRole = folderRoleUtils.getActionFolderRole(messages, folder)
+        val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
 
-        val destinationFolderRole = if (folderRole == FolderRole.SPAM) FolderRole.INBOX else FolderRole.SPAM
+        val destinationFolderRole = if (messagesFolderRoles.contains(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
 
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
 
@@ -369,7 +369,6 @@ class MessagesActionsUseCase @Inject constructor(
     // Phishing Region
     suspend fun reportPhishing(
         messages: List<Message>,
-        currentFolder: Folder?,
         mailbox: Mailbox,
         onReportSuccess: suspend () -> Unit,
     ): ApiCallResult {
@@ -379,7 +378,9 @@ class MessagesActionsUseCase @Inject constructor(
         val response = ApiRepository.reportPhishing(mailbox.uuid, messagesUids)
 
         return if (response.isSuccess()) {
-            if (folderRoleUtils.getActionFolderRole(messages, currentFolder) != FolderRole.SPAM) {
+            val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
+            if (messagesFolderRoles.any { folderRole -> folderRole != FolderRole.SPAM }) {
+                // Mark successfully report messages as spam
                 onReportSuccess()
             }
             ApiCallResult.Success(R.string.snackbarReportPhishingConfirmation)

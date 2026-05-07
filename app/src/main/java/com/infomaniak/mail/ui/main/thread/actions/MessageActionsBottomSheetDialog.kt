@@ -115,7 +115,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
             }
 
-            initActionClickListener(messageUid, message, threadUid)
+            val messageFolderRole = folderRoleUtils.getActionFolderRole(message)
+            initActionClickListener(messageUid, message, threadUid, messageFolderRole)
         }
         Unit
     }
@@ -151,7 +152,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         )
     }
 
-    private fun initActionClickListener(messageUid: String, message: Message, threadUid: String) {
+    private fun initActionClickListener(messageUid: String, message: Message, threadUid: String, messageFolderRole: FolderRole?) {
         initOnClickListener(object : OnActionClick {
             //region Main actions
             override fun onReply() {
@@ -173,7 +174,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                descriptionDialog.deleteWithConfirmationPopup(message.folder.role, count = 1) {
+                descriptionDialog.deleteWithConfirmationPopup(listOfNotNull(messageFolderRole), count = 1) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
                     actionsViewModel.deleteMessages(
                         messages = listOf(message),
@@ -186,7 +187,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             //region Actions
             override fun onArchive() {
-                descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
+                descriptionDialog.archiveWithConfirmationPopup(messageFolderRole, count = 1) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
                     actionsViewModel.archiveMessages(
                         messages = listOf(message),

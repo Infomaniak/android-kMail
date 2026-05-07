@@ -546,7 +546,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     return@collect
                 }
 
-                initUi(thread.uid, folderRole = folderRoleUtils.getActionFolderRole(thread))
+                val allFolderRoles = folderRoleUtils.getActionFolderRoles(thread.messages)
+                initUi(
+                    thread.uid,
+                    folderRole = folderRoleUtils.getThreadActionFolderRole(thread),
+                    messagesFolderRoles = allFolderRoles
+                )
             }
         }
     }
@@ -891,7 +896,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         threadView.isVisible = true
     }
 
-    private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
+    private fun initUi(threadUid: String, folderRole: FolderRole?, messagesFolderRoles: List<FolderRole>) = with(binding) {
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
             actionsViewModel.toggleThreadsFavoriteStatus(
@@ -930,7 +935,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 }
                 R.id.quickActionDelete -> {
-                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+                    descriptionDialog.deleteWithConfirmationPopup(messagesFolderRoles, count = 1) {
                         trackThreadActionsEvent(MatomoName.Delete)
                         val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
                         actionsViewModel.deleteThreads(

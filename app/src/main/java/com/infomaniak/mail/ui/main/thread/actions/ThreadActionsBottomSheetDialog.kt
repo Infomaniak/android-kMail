@@ -77,6 +77,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
 
     private var folderRole: FolderRole? = null
+    private var messagesFolderRoles: List<FolderRole> = emptyList()
     private var isFromArchive: Boolean = false
     private var isFromSpam: Boolean = false
 
@@ -103,7 +104,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
                 junkMessagesViewModel.threadsUids = listOf(thread.uid)
 
-                folderRole = folderRoleUtils.getActionFolderRole(thread)
+                messagesFolderRoles = folderRoleUtils.getActionFolderRoles(thread.messages)
+                folderRole = folderRoleUtils.getThreadActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
                 isFromSpam = folderRole == FolderRole.SPAM
 
@@ -187,7 +189,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         override fun onDelete() {
-            descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+            descriptionDialog.deleteWithConfirmationPopup(messagesFolderRoles, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
                 actionsViewModel.deleteThreads(
                     threads = listOf(thread),

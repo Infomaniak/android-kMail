@@ -117,8 +117,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
 
         lifecycleScope.launch {
-            val folderRole = folderRoleUtils.getActionFolderRole(threads)
-            setupMainActions(threads, threadsUids, shouldRead, folderRole)
+            val folderRole = folderRoleUtils.getThreadsActionFolderRole(threads)
+            val messages = threads.flatMap { it.messages }
+            val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
+            setupMainActions(threads, threadsUids, shouldRead, folderRole, messagesFolderRoles)
         }
 
         setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
@@ -225,7 +227,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         threads: Set<Thread>,
         threadsUids: List<String>,
         shouldRead: Boolean,
-        folderRole: FolderRole?
+        folderRole: FolderRole?,
+        messagesFolderRoles: List<FolderRole>
     ) {
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             val currentMailbox = mainViewModel.currentMailbox.value ?: run {
@@ -265,7 +268,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = folderRole,
+                        folderRoles = messagesFolderRoles,
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)

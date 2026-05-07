@@ -472,6 +472,10 @@
     <string name="reviewAlertTitle">Σας αρέσει το Infomaniak Mail;</string>
     <string name="saveToDriveDeviceItem">Αποθήκευση στη συσκευή</string>
     <string name="saveToDriveItem">Αποθήκευση στο kDrive</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">Αυτή η συνομιλία θα διαγραφεί και όλες οι προγραμματισμένες παραδόσεις θα ακυρωθούν.</item>
+        <item quantity="other">Αυτές οι συνομιλίες θα διαγραφούν και όλες οι προγραμματισμένες παραδόσεις θα ακυρωθούν.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Προγραμματισμός αποστολής</string>
     <string name="scheduledEmailHeader">Αυτό το email θα σταλεί στις: %s</string>
     <string name="scheduledMessagesFolder">Προγραμματισμένα μηνύματα</string>

@@ -472,6 +472,10 @@
     <string name="reviewAlertTitle">Vindt u Infomaniak Mail leuk?</string>
     <string name="saveToDriveDeviceItem">Opslaan op apparaat</string>
     <string name="saveToDriveItem">Opslaan in kDrive</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">Dit gesprek wordt verwijderd en alle geplande leveringen worden geannuleerd.</item>
+        <item quantity="other">Deze gesprekken worden verwijderd en alle geplande leveringen worden geannuleerd.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Verzending plannen</string>
     <string name="scheduledEmailHeader">Deze e-mail wordt verzonden op: %s</string>
     <string name="scheduledMessagesFolder">Geplande berichten</string>

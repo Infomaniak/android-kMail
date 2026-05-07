@@ -472,6 +472,10 @@
     <string name="reviewAlertTitle">Kan du lide Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Gem på enhed</string>
     <string name="saveToDriveItem">Gem i kDrive</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">Denne samtale vil blive slettet, og alle planlagte leveringer vil blive annulleret.</item>
+        <item quantity="other">Disse samtaler vil blive slettet, og alle planlagte leveringer vil blive annulleret.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Planlæg afsendelse</string>
     <string name="scheduledEmailHeader">Denne e-mail vil blive sendt på denne dato: %s</string>
     <string name="scheduledMessagesFolder">Planlagte beskeder</string>
