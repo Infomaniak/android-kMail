@@ -1083,11 +1083,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             aiSummaryRetryTimers[messageUid]?.cancel()
             aiSummaryRetryTimers.remove(messageUid)
 
+            val retryingState = threadViewModel.threadState.aiSummaryStateMap[messageUid]
+            val wasLoaderShown = retryingState is AiProcessState.Retrying && retryingState.isLoaderVisible
+
             threadViewModel.threadState.aiSummaryStateMap[messageUid] = when {
                 result.result == ApiResponseStatus.SUCCESS -> AiProcessState.Success(result.data ?: "")
-                result.error?.code == ErrorCode.RESUME_CONTENT_NOT_RESUMED -> AiProcessState.Error(canRetry = false, isRetry = isRetry)
-                result.error?.code == ErrorCode.TRANSLATION__API_NOT_AVAILABLE -> AiProcessState.Error(canRetry = true, isRetry = isRetry)
-                else -> AiProcessState.Error(canRetry = true, isRetry = isRetry)
+                result.error?.code == ErrorCode.RESUME_CONTENT_NOT_RESUMED -> AiProcessState.Error(canRetry = false, isRetry = isRetry, wasLoaderShown = wasLoaderShown)
+                result.error?.code == ErrorCode.TRANSLATION__API_NOT_AVAILABLE -> AiProcessState.Error(canRetry = true, isRetry = isRetry, wasLoaderShown = wasLoaderShown)
+                else -> AiProcessState.Error(canRetry = true, isRetry = isRetry, wasLoaderShown = wasLoaderShown)
             }
 
             if (index >= 0) threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
