@@ -117,8 +117,8 @@ class MessagesActionsUseCase @Inject constructor(
         mailboxContentRealm().run {
             messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
                 val realmThread = ThreadController.getThreadBlocking(thread.uid, realm = this) ?: return@forEach
-                val nbMessagesInCurrentFolder = realmThread.messages.count { it.folderId != currentFolder.id }
-                if (nbMessagesInCurrentFolder == 0) uidsToMove.add(thread.uid)
+                val allMessagesInThreadWillMove = messages.containsAll(realmThread.messages)
+                if (allMessagesInThreadWillMove) uidsToMove.add(realmThread.uid)
             }
         }
 
@@ -195,8 +195,6 @@ class MessagesActionsUseCase @Inject constructor(
         }
 
         val uids = messagesToDelete.getUids()
-        val destinationFolder = folderController.getFolder(FolderRole.TRASH) ?: return null
-
         val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, currentFolder)
 
         val apiResponses = ApiRepository.deleteMessages(
@@ -268,7 +266,7 @@ class MessagesActionsUseCase @Inject constructor(
      * @param mailbox The Mailbox where the Threads & Messages are located
      * @param messages The Messages to mark as read
      */
-    suspend fun markMessagesAsSeen(
+    private suspend fun markMessagesAsSeen(
         mailbox: Mailbox,
         messages: List<Message>,
         threadsUids: List<String>? = null,
