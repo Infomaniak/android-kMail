@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.annotation.SuppressLint
-import android.app.ComponentCaller
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -446,11 +445,6 @@ class MainActivity : BaseActivity() {
         handleNewIntent(intent)
     }
 
-    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
-        super.onNewIntent(intent, caller)
-        handleNewIntent(intent)
-    }
-    
     private fun handleNewIntent(intent: Intent) {
         handleAdminDisabledSendingSnackbarIfNeeded(intent)
     }

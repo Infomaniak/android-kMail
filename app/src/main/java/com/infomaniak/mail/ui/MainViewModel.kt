@@ -501,9 +501,6 @@ class MainViewModel @Inject constructor(
         with(ApiRepository.getPermissions(mailbox.accessId, mailbox.hostingId)) {
             if (isSuccess()) {
                 mailboxController.updateMailbox(mailbox.objectId) { localMailbox ->
-                    localMailbox.permissions = null
-                }
-                mailboxController.updateMailbox(mailbox.objectId) { localMailbox ->
                     localMailbox.permissions = data
                 }
             }
