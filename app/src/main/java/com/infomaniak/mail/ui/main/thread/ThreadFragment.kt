@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
@@ -41,6 +42,7 @@ import androidx.work.Data
 import com.infomaniak.core.common.observe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.views.DividerItemDecorator
@@ -109,6 +111,7 @@ import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
+import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -206,6 +209,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
+    private val aiSummaryRetryTimers = mutableMapOf<String, CountDownTimer>()
+
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
     private val isNotInSpam: Boolean
@@ -286,6 +291,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     override fun onDestroyView() {
+        aiSummaryRetryTimers.values.forEach { it.cancel() }
+        aiSummaryRetryTimers.clear()
+
         threadAdapter.resetCallbacks()
         super.onDestroyView()
         _binding = null
@@ -449,7 +457,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
                     }
                 },
-                onAiSummaryRetry = ::summarize
+                onAiSummaryRetry = ::summarize,
+                showSnackbarRetry = ::createSnackBarRetry
             ),
         )
 
@@ -1029,10 +1038,37 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
+    private fun createSnackBarRetry(messageUid: String){
+        snackbarManager.setValue(getString(R.string.messageSummaryErrorRetry))
+    }
+
     private fun summarize(messageUid: String) {
-        threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiProcessState.Loading
+        val currentState = threadViewModel.threadState.aiSummaryStateMap[messageUid]
+        val isRetry = currentState is AiProcessState.Error
+
+        aiSummaryRetryTimers[messageUid]?.cancel()
+        aiSummaryRetryTimers.remove(messageUid)
+
+        threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (isRetry) {
+            AiProcessState.Retrying(isLoaderVisible = false)
+        } else {
+            AiProcessState.Loading
+        }
+
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
         if (index >= 0) threadAdapter.notifyItemChanged(index)
+
+        if (isRetry) {
+            val timer = Utils.createRefreshTimer {
+                val state = threadViewModel.threadState.aiSummaryStateMap[messageUid]
+                if (state is AiProcessState.Retrying) {
+                    threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiProcessState.Retrying(isLoaderVisible = true)
+                    if (index >= 0) threadAdapter.notifyItemChanged(index)
+                }
+            }
+            aiSummaryRetryTimers[messageUid] = timer
+            timer.start()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             val message = mainViewModel.getMessage(messageUid)
@@ -1040,11 +1076,16 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             val languageCode = requireContext().getCurrentLanguageCode()
             val result = ApiRepository.aiSummary(languageCode, content)
 
-            threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
-                AiProcessState.Success(result.data ?: "")
-            } else {
-                AiProcessState.Error
+            aiSummaryRetryTimers[messageUid]?.cancel()
+            aiSummaryRetryTimers.remove(messageUid)
+
+            threadViewModel.threadState.aiSummaryStateMap[messageUid] = when {
+                result.result == ApiResponseStatus.SUCCESS -> AiProcessState.Success(result.data ?: "")
+                result.error?.code == ErrorCode.RESUME_CONTENT_NOT_RESUMED -> AiProcessState.Error(canRetry = false)
+                result.error?.code == ErrorCode.TRANSLATION__API_NOT_AVAILABLE -> AiProcessState.Error(canRetry = true)
+                else -> AiProcessState.Error(canRetry = true)
             }
+
             if (index >= 0) threadAdapter.notifyItemChanged(index)
         }
     }

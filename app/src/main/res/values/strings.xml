@@ -399,6 +399,7 @@
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
     <string name="messageShowQuotedText">Display the conversation</string>
     <string name="messageSummary">Message summary</string>
+    <string name="messageSummaryError">Euria could not summarize this message.</string>
     <string name="messageSummaryErrorRetry">Euria could not summarize this message. Please try again.</string>
     <string name="messageSummaryLoading">Message summary…</string>
     <string name="mondayAfternoon">Monday afternoon</string>

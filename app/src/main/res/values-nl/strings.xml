@@ -395,6 +395,7 @@
     <string name="messageReplyHeader">Op %1$s schreef %2$s:</string>
     <string name="messageShowQuotedText">Gesprek weergeven</string>
     <string name="messageSummary">Samenvatting van het bericht</string>
+    <string name="messageSummaryError">Euria kon dit bericht niet samenvatten.</string>
     <string name="messageSummaryErrorRetry">Euria kon dit bericht niet samenvatten. Probeer het opnieuw.</string>
     <string name="messageSummaryLoading">Samenvatting van het bericht…</string>
     <string name="mondayAfternoon">Maandagmiddag</string>

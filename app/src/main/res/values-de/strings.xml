@@ -395,6 +395,7 @@
     <string name="messageReplyHeader">Am %1$s, %2$s schrieb:</string>
     <string name="messageShowQuotedText">Anzeigen der Konversation</string>
     <string name="messageSummary">Zusammenfassung der Nachricht</string>
+    <string name="messageSummaryError">Euria konnte diese Nachricht nicht zusammenfassen.</string>
     <string name="messageSummaryErrorRetry">Euria konnte diese Nachricht nicht zusammenfassen. Bitte versuchen Sie es erneut.</string>
     <string name="messageSummaryLoading">Zusammenfassung der Nachricht…</string>
     <string name="mondayAfternoon">Montagnachmittag</string>
