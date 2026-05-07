@@ -94,7 +94,7 @@ object ErrorCode {
     const val TOO_MANY_REQUESTS = "too_many_request"
     const val OBJECT_NOT_FOUND = "object_not_found"
     const val RESUME_CONTENT_NOT_RESUMED = "resume__content_not_resumed"
-    const val TRANSLATION__API_NOT_AVAILABLE = "translation__api_not_available"
+    const val TRANSLATION_API_NOT_AVAILABLE = "translation__api_not_available"
     //endregion
 
     //region Snooze

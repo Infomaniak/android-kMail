@@ -32,7 +32,6 @@ fun Context.getCurrentLanguageCode(): String {
 
     val cleanCode = languageCode?.lowercase()?.take(2) ?: defaultLanguage
 
-    // TODO: temporary fallback (waiting for the backend to do it)
-    return if (cleanCode in listOf("fr", "es", "en", "it", "de")) cleanCode else defaultLanguage
+    return cleanCode
 }
 

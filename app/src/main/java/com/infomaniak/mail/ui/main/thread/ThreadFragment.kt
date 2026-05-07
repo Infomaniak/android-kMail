@@ -46,6 +46,7 @@ import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.views.DividerItemDecorator
+import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -1038,59 +1039,85 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun createSnackBarRetry(messageUid: String){
+    private fun createSnackBarRetry(){
         snackbarManager.setValue(getString(R.string.messageSummaryErrorRetry))
     }
 
     private fun summarize(messageUid: String) {
-        val currentState = threadViewModel.threadState.aiSummaryStateMap[messageUid]
-        val isRetry = currentState is AiProcessState.Error
+        val isRetry = threadViewModel.threadState.aiSummaryStateMap[messageUid] is AiProcessState.Error
 
-        aiSummaryRetryTimers[messageUid]?.cancel()
-        aiSummaryRetryTimers.remove(messageUid)
+        cancelRetryTimer(messageUid)
 
-        threadViewModel.threadState.aiSummaryStateMap[messageUid] = if (isRetry) {
-            AiProcessState.Retrying(isLoaderVisible = false)
-        } else {
-            AiProcessState.Loading
-        }
+        val initialState = if (isRetry) AiProcessState.Retrying(isLoaderVisible = false) else AiProcessState.Loading
+        updateAiSummaryState(messageUid, initialState)
 
-        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
-        if (index >= 0) threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
-
-        if (isRetry) {
-            val timer = Utils.createRefreshTimer {
-                val state = threadViewModel.threadState.aiSummaryStateMap[messageUid]
-                if (state is AiProcessState.Retrying) {
-                    threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiProcessState.Retrying(isLoaderVisible = true)
-                    if (index >= 0) threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
-                }
-            }
-            aiSummaryRetryTimers[messageUid] = timer
-            timer.start()
-        }
+        startRetryTimerIfNeeded(messageUid, isRetry)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val message = mainViewModel.getMessage(messageUid)
-            val content = message?.body?.value ?: message?.splitBody?.content ?: ""
-            val languageCode = requireContext().getCurrentLanguageCode()
-            val result = ApiRepository.aiSummary(languageCode, content)
-
-            aiSummaryRetryTimers[messageUid]?.cancel()
-            aiSummaryRetryTimers.remove(messageUid)
-
-            val retryingState = threadViewModel.threadState.aiSummaryStateMap[messageUid]
-            val wasLoaderShown = retryingState is AiProcessState.Retrying && retryingState.isLoaderVisible
-
-            threadViewModel.threadState.aiSummaryStateMap[messageUid] = when {
-                result.result == ApiResponseStatus.SUCCESS -> AiProcessState.Success(result.data ?: "")
-                result.error?.code == ErrorCode.RESUME_CONTENT_NOT_RESUMED -> AiProcessState.Error(canRetry = false, isRetry = isRetry, wasLoaderShown = wasLoaderShown)
-                result.error?.code == ErrorCode.TRANSLATION__API_NOT_AVAILABLE -> AiProcessState.Error(canRetry = true, isRetry = isRetry, wasLoaderShown = wasLoaderShown)
-                else -> AiProcessState.Error(canRetry = true, isRetry = isRetry, wasLoaderShown = wasLoaderShown)
-            }
-
-            if (index >= 0) threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
+            processSummaryApiCall(messageUid, isRetry)
         }
+    }
+
+    private suspend fun processSummaryApiCall(messageUid: String, isRetry: Boolean) {
+        val content = getMessageContent(messageUid)
+        val languageCode = requireContext().getCurrentLanguageCode()
+        val result = ApiRepository.aiSummary(languageCode, content)
+
+        cancelRetryTimer(messageUid)
+
+        val currentState = threadViewModel.threadState.aiSummaryStateMap[messageUid]
+        val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
+
+        val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
+        updateAiSummaryState(messageUid, finalState)
+    }
+
+    private suspend fun getMessageContent(messageUid: String): String {
+        val message = mainViewModel.getMessage(messageUid)
+        return message?.body?.value ?: message?.splitBody?.content ?: ""
+    }
+
+    private fun mapApiResultToState(
+        result: ApiResponse<String>,
+        isRetry: Boolean,
+        wasLoaderShown: Boolean
+    ): AiProcessState {
+        if (result.result == ApiResponseStatus.SUCCESS) {
+            return AiProcessState.Success(result.data ?: "")
+        }
+
+        val canRetry = result.error?.code != ErrorCode.RESUME_CONTENT_NOT_RESUMED
+        return AiProcessState.Error(
+            canRetry = canRetry,
+            isRetry = isRetry,
+            wasLoaderShown = wasLoaderShown
+        )
+    }
+    private fun updateAiSummaryState(messageUid: String, newState: AiProcessState) {
+        threadViewModel.threadState.aiSummaryStateMap[messageUid] = newState
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index >= 0) {
+            threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
+        }
+    }
+
+    private fun cancelRetryTimer(messageUid: String) {
+        aiSummaryRetryTimers[messageUid]?.cancel()
+        aiSummaryRetryTimers.remove(messageUid)
+    }
+
+    private fun startRetryTimerIfNeeded(messageUid: String, isRetry: Boolean) {
+        if (!isRetry) return
+
+        val timer = Utils.createRefreshTimer {
+            val state = threadViewModel.threadState.aiSummaryStateMap[messageUid]
+            if (state is AiProcessState.Retrying) {
+                updateAiSummaryState(messageUid, AiProcessState.Retrying(isLoaderVisible = true))
+            }
+        }
+
+        aiSummaryRetryTimers[messageUid] = timer
+        timer.start()
     }
 
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
