@@ -395,6 +395,7 @@
     <string name="messageReplyHeader">%1$s, %2$s kirjoitti:</string>
     <string name="messageShowQuotedText">Näytä keskustelu</string>
     <string name="messageSummary">Viestin yhteenveto</string>
+    <string name="messageSummaryError">Euria ei voinut tehdä yhteenvetoa tästä viestistä.</string>
     <string name="messageSummaryErrorRetry">Euria ei voinut tehdä yhteenvetoa tästä viestistä. Yritä uudelleen.</string>
     <string name="messageSummaryLoading">Viestin yhteenveto…</string>
     <string name="mondayAfternoon">Maanantai-iltapäivä</string>

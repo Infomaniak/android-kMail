@@ -395,6 +395,7 @@
     <string name="messageReplyHeader">Em %1$s, %2$s escreveu:</string>
     <string name="messageShowQuotedText">Mostrar a conversa</string>
     <string name="messageSummary">Resumo da mensagem</string>
+    <string name="messageSummaryError">A Euria não conseguiu resumir esta mensagem.</string>
     <string name="messageSummaryErrorRetry">A Euria não conseguiu resumir esta mensagem. Por favor, tente novamente.</string>
     <string name="messageSummaryLoading">Resumo da mensagem…</string>
     <string name="mondayAfternoon">Segunda-feira à tarde</string>

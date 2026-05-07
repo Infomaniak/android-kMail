@@ -395,6 +395,7 @@
     <string name="messageReplyHeader">Il %1$s, %2$s ha scritto:</string>
     <string name="messageShowQuotedText">Visualizza la conversazione</string>
     <string name="messageSummary">Riepilogo del messaggio</string>
+    <string name="messageSummaryError">Euria non è riuscito a riassumere questo messaggio.</string>
     <string name="messageSummaryErrorRetry">Euria non è riuscito a riassumere questo messaggio. Riprova.</string>
     <string name="messageSummaryLoading">Riepilogo del messaggio…</string>
     <string name="mondayAfternoon">Lunedì pomeriggio</string>

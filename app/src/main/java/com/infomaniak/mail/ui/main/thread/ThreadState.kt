@@ -65,6 +65,7 @@ class ThreadState {
 
 sealed class AiProcessState {
     data object Loading : AiProcessState()
+    data class Retrying(val isLoaderVisible: Boolean = false) : AiProcessState()
     data class Success(val content: String) : AiProcessState()
-    data object Error : AiProcessState()
+    data class Error(val canRetry: Boolean) : AiProcessState()
 }
