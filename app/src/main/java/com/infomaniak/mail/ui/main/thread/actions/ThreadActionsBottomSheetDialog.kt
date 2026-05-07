@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.R.id.message
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
@@ -35,7 +34,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
@@ -338,7 +336,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         override fun onSummary() {
-             trackBottomSheetThreadActionsEvent(MatomoName.Summary)
+            trackBottomSheetThreadActionsEvent(MatomoName.Summary)
             setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, messageUidToExecuteAction)
         }
         //endregion

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.R.id.closeButton
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -481,8 +482,19 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindAiSummary(message: Message) {
-        val state = threadAdapterState.aiSummaryStateMap[message.uid] ?: return
+        val state = threadAdapterState.aiSummaryStateMap[message.uid]
 
+        if (state == null) {
+            binding.blockInformationView.root.isVisible = false
+            return
+        }
+
+        setupBaseVisibility(state)
+        handleProcessState(state)
+        setupListeners(message.uid)
+    }
+
+    private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState) {
         with(binding.blockInformationView) {
             root.isVisible = true
             closeButton.isVisible = true
@@ -494,53 +506,69 @@ class ThreadAdapter(
             icon.isVisible = isErrorOrRetrying
             informationButton.isVisible = isErrorOrRetrying
             informationDescription.isVisible = state is AiProcessState.Success
+        }
+    }
 
+    private fun MessageViewHolder.handleProcessState(state: AiProcessState) {
+        with(binding.blockInformationView) {
             when (state) {
                 is AiProcessState.Loading -> {
                     informationTitle.setText(R.string.messageSummaryLoading)
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
-
-                is AiProcessState.Retrying -> {
-                    informationTitle.setText(R.string.messageSummaryErrorRetry)
-                    icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
-                    informationButton.isEnabled = false
-                    if (state.isLoaderVisible) {
-                        informationButton.showProgressCatching(context.getColor(R.color.primaryTextColor))
-                    } else {
-                        informationButton.hideProgressCatching(R.string.aiButtonRetry)
-                    }
-                }
-
                 is AiProcessState.Success -> {
                     informationTitle.setText(R.string.messageSummary)
                     informationDescription.text = state.content
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
-
-                is AiProcessState.Error -> {
-                    icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
-                    if (state.canRetry){
-                        informationTitle.setText(R.string.messageSummaryErrorRetry)
-                        informationButton.isEnabled = true
-                        informationButton.hideProgressCatching(R.string.aiButtonRetry)
-                        if (state.isRetry && !state.wasLoaderShown) {
-                            threadAdapterCallbacks?.showSnackbarRetry?.invoke(message.uid)
-                        }
-                    }else{
-                        informationTitle.setText(R.string.messageSummaryError)
-                        informationButton.isVisible = false
-                    }
-                }
+                is AiProcessState.Retrying -> handleRetryingState(state)
+                is AiProcessState.Error -> handleErrorState(state)
             }
+        }
+    }
 
+    private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying) {
+        with(binding.blockInformationView) {
+            informationTitle.setText(R.string.messageSummaryErrorRetry)
+            icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
+            informationButton.isEnabled = false
+
+            if (state.isLoaderVisible) {
+                informationButton.showProgressCatching(context.getColor(R.color.primaryTextColor))
+            } else {
+                informationButton.hideProgressCatching(R.string.aiButtonRetry)
+            }
+        }
+    }
+
+    private fun MessageViewHolder.handleErrorState(state: AiProcessState.Error) {
+        with(binding.blockInformationView) {
+            icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
+
+            if (state.canRetry) {
+                informationTitle.setText(R.string.messageSummaryErrorRetry)
+                informationButton.isEnabled = true
+                informationButton.hideProgressCatching(R.string.aiButtonRetry)
+
+                if (state.isRetry && !state.wasLoaderShown) {
+                    threadAdapterCallbacks?.showSnackbarRetry?.invoke()
+                }
+            } else {
+                informationTitle.setText(R.string.messageSummaryError)
+                informationButton.isVisible = false
+            }
+        }
+    }
+
+    private fun MessageViewHolder.setupListeners(messageUid: String) {
+        with(binding.blockInformationView) {
             closeButton.setOnClickListener {
-                threadAdapterState.aiSummaryStateMap.remove(message.uid)
+                threadAdapterState.aiSummaryStateMap.remove(messageUid)
                 root.isVisible = false
             }
 
             informationButton.setOnClickListener {
-                threadAdapterCallbacks?.onAiSummaryRetry?.invoke(message.uid)
+                threadAdapterCallbacks?.onAiSummaryRetry?.invoke(messageUid)
             }
         }
     }
@@ -1200,7 +1228,7 @@ class ThreadAdapter(
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
         var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
-        var showSnackbarRetry: ((messageUid: String) -> Unit)? = null,
+        var showSnackbarRetry: (() -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {
