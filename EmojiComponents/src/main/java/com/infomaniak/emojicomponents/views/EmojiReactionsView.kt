@@ -53,7 +53,11 @@ class EmojiReactionsView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val reactionsState = mutableStateListOf<Reaction>()
-    private var isAddReactionEnabled by mutableStateOf(true)
+    private var isViewEnabled by mutableStateOf(true)
+    private var isAddReactionEnabledForMessage by mutableStateOf(true)
+    private val isAddReactionEnabled: Boolean
+        get() = isViewEnabled && isAddReactionEnabledForMessage
+
 
     private var addReactionClickListener: (() -> Unit)? = null
     private var onEmojiClickListener: ((emoji: String) -> Unit)? = null
@@ -82,7 +86,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
-        setAddReactionEnabledState(enabled)
+        isViewEnabled = enabled
     }
 
     private fun TypedArray.getDimensionOrNull(@StyleableRes index: Int): Float? {
@@ -144,7 +148,7 @@ class EmojiReactionsView @JvmOverloads constructor(
     }
 
     fun setAddReactionEnabledState(isEnabled: Boolean) {
-        isAddReactionEnabled = isEnabled
+        isAddReactionEnabledForMessage = isEnabled
     }
 
     @Composable
