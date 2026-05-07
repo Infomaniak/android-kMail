@@ -44,6 +44,8 @@ import com.infomaniak.core.common.utils.FormatData
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.common.utils.formatWithLocal
 import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.ui.view.extension.hideProgressCatching
+import com.infomaniak.core.ui.view.extension.showProgressCatching
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -485,15 +487,28 @@ class ThreadAdapter(
             closeButton.isVisible = true
             informationTitle.isVisible = true
 
-            iconAi.isVisible = state !is AiProcessState.Error
-            icon.isVisible = state is AiProcessState.Error
-            informationButton.isVisible = state is AiProcessState.Error
+            val isErrorOrRetrying = state is AiProcessState.Error || state is AiProcessState.Retrying
+
+            iconAi.isVisible = !isErrorOrRetrying
+            icon.isVisible = isErrorOrRetrying
+            informationButton.isVisible = isErrorOrRetrying
             informationDescription.isVisible = state is AiProcessState.Success
 
             when (state) {
                 is AiProcessState.Loading -> {
                     informationTitle.setText(R.string.messageSummaryLoading)
                     iconAiAnimation.setAnimation(R.raw.euria)
+                }
+
+                is AiProcessState.Retrying -> {
+                    informationTitle.setText(R.string.messageSummaryErrorRetry)
+                    icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
+                    informationButton.isEnabled = false
+                    if (state.isLoaderVisible) {
+                        informationButton.showProgressCatching(context.getColor(R.color.primaryTextColor))
+                    } else {
+                        informationButton.hideProgressCatching(R.string.aiButtonRetry)
+                    }
                 }
 
                 is AiProcessState.Success -> {
@@ -503,10 +518,16 @@ class ThreadAdapter(
                 }
 
                 is AiProcessState.Error -> {
-                    // TODO: determine whether the “Retry” button should be displayed (depends on http code)
-                    informationTitle.setText(R.string.messageSummaryErrorRetry)
-                    informationButton.setText(R.string.aiButtonRetry)
                     icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
+                    if (state.canRetry){
+                        informationTitle.setText(R.string.messageSummaryErrorRetry)
+                        informationButton.isEnabled = true
+                        informationButton.hideProgressCatching(R.string.aiButtonRetry)
+                        threadAdapterCallbacks?.showSnackbarRetry?.invoke(message.uid)
+                    }else{
+                        informationTitle.setText(R.string.messageSummaryError)
+                        informationButton.isVisible = false
+                    }
                 }
             }
 
@@ -1175,6 +1196,7 @@ class ThreadAdapter(
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
         var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
+        var showSnackbarRetry: ((messageUid: String) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

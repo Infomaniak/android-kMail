@@ -412,6 +412,7 @@
     <string name="messageReplyHeader">Dnia %1$s, %2$s napisał/ napisała:</string>
     <string name="messageShowQuotedText">Wyświetl rozmowę</string>
     <string name="messageSummary">Podsumowanie wiadomości</string>
+    <string name="messageSummaryError">Euria nie mógł podsumować tej wiadomości.</string>
     <string name="messageSummaryErrorRetry">Euria nie mógł podsumować tej wiadomości. Spróbuj ponownie.</string>
     <string name="messageSummaryLoading">Podsumowanie wiadomości…</string>
     <string name="mondayAfternoon">Poniedziałek po południu</string>

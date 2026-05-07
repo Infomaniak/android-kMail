@@ -396,6 +396,7 @@
     <string name="messageReplyHeader">Στις %1$s, ο/η %2$s έγραψε:</string>
     <string name="messageShowQuotedText">Εμφάνιση συνομιλίας</string>
     <string name="messageSummary">Σύνοψη του μηνύματος</string>
+    <string name="messageSummaryError">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα.</string>
     <string name="messageSummaryErrorRetry">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
     <string name="messageSummaryLoading">Σύνοψη του μηνύματος…</string>
     <string name="mondayAfternoon">Δευτέρα απόγευμα</string>

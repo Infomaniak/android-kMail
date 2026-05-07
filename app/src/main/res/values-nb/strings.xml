@@ -396,6 +396,7 @@
     <string name="messageReplyHeader">%1$s skrev %2$s:</string>
     <string name="messageShowQuotedText">Vis samtalen</string>
     <string name="messageSummary">Meldingens oppsummering</string>
+    <string name="messageSummaryError">Euria kunne ikke oppsummere denne meldingen.</string>
     <string name="messageSummaryErrorRetry">Euria kunne ikke oppsummere denne meldingen. Vennligst prøv igjen.</string>
     <string name="messageSummaryLoading">Meldingens oppsummering…</string>
     <string name="mondayAfternoon">Mandag ettermiddag</string>

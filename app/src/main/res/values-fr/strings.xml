@@ -396,6 +396,7 @@
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="messageShowQuotedText">Afficher la conversation</string>
     <string name="messageSummary">Résumé du message</string>
+    <string name="messageSummaryError">Euria n’a pas pu résumer ce message.</string>
     <string name="messageSummaryErrorRetry">Euria n’a pas pu résumer ce message. Veuillez réessayer.</string>
     <string name="messageSummaryLoading">Résumé du message…</string>
     <string name="mondayAfternoon">Lundi après-midi</string>

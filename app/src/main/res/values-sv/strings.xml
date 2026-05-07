@@ -396,6 +396,7 @@
     <string name="messageReplyHeader">Den %1$s skrev %2$s:</string>
     <string name="messageShowQuotedText">Visa konversationen</string>
     <string name="messageSummary">Meddelandesammanfattning</string>
+    <string name="messageSummaryError">Euria kunde inte sammanfatta detta meddelande.</string>
     <string name="messageSummaryErrorRetry">Euria kunde inte sammanfatta detta meddelande. Försök igen.</string>
     <string name="messageSummaryLoading">Meddelandesammanfattning…</string>
     <string name="mondayAfternoon">Måndag eftermiddag</string>
