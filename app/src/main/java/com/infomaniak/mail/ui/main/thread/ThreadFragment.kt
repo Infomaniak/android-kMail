@@ -1056,14 +1056,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
-        if (index >= 0) threadAdapter.notifyItemChanged(index)
+        if (index >= 0) threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
 
         if (isRetry) {
             val timer = Utils.createRefreshTimer {
                 val state = threadViewModel.threadState.aiSummaryStateMap[messageUid]
                 if (state is AiProcessState.Retrying) {
                     threadViewModel.threadState.aiSummaryStateMap[messageUid] = AiProcessState.Retrying(isLoaderVisible = true)
-                    if (index >= 0) threadAdapter.notifyItemChanged(index)
+                    if (index >= 0) threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
                 }
             }
             aiSummaryRetryTimers[messageUid] = timer
@@ -1086,7 +1086,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 else -> AiProcessState.Error(canRetry = true, isRetry = isRetry)
             }
 
-            if (index >= 0) threadAdapter.notifyItemChanged(index)
+            if (index >= 0) threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
         }
     }
 
