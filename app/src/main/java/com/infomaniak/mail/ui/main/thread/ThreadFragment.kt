@@ -1085,9 +1085,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
             threadViewModel.threadState.aiSummaryStateMap[messageUid] = when {
                 result.result == ApiResponseStatus.SUCCESS -> AiProcessState.Success(result.data ?: "")
-                result.error?.code == ErrorCode.RESUME_CONTENT_NOT_RESUMED -> AiProcessState.Error(canRetry = false)
-                result.error?.code == ErrorCode.TRANSLATION__API_NOT_AVAILABLE -> AiProcessState.Error(canRetry = true)
-                else -> AiProcessState.Error(canRetry = true)
+                result.error?.code == ErrorCode.RESUME_CONTENT_NOT_RESUMED -> AiProcessState.Error(canRetry = false, isRetry = isRetry)
+                result.error?.code == ErrorCode.TRANSLATION__API_NOT_AVAILABLE -> AiProcessState.Error(canRetry = true, isRetry = isRetry)
+                else -> AiProcessState.Error(canRetry = true, isRetry = isRetry)
             }
 
             if (index >= 0) threadAdapter.notifyItemChanged(index)
