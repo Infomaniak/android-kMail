@@ -127,15 +127,11 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun updateEmailActionsState(canSendEmails: Boolean) {
+    private fun updateEmailActionsState(canSendEmails: Boolean) = with(binding) {
         listOf(R.id.actionReply, R.id.actionReplyAll, R.id.actionForward).forEach { id ->
-            if (canSendEmails) {
-                binding.mainActions.enableByMenuId(id)
-            } else {
-                binding.mainActions.disableByMenuId(id)
-            }
+            if (canSendEmails) mainActions.enableByMenuId(id) else mainActions.disableByMenuId(id)
         }
-        binding.addReaction.isEnabled = canSendEmails
+        addReaction.isEnabled = canSendEmails
     }
 
     private fun setShareTrailingContent() {
