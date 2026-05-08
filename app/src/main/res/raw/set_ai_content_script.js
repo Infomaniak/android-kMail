@@ -27,14 +27,11 @@ function extractElements() {
 }
 
 function clearRemainingContent() {
-    const body = getEditor();
-    while (body.firstChild) {
-        body.firstChild.remove()
-    }
+    getEditor().replaceChildren()
 }
 
 function rebuildBody(aiContent, savedElements) {
-    getEditor().insertAdjacentHTML('beforeEnd', aiContent);
+    getEditor().insertAdjacentHTML('beforeend', aiContent);
     savedElements.forEach(quote => {
        getEditor().appendChild(quote);
     })
