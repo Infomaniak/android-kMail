@@ -319,7 +319,7 @@
                         tools:visibility="visible" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/show_quotes_button"
+                        android:id="@+id/showQuotesButton"
                         style="@style/ShowQuoteTextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
