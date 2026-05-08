@@ -1105,6 +1105,15 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             wasLoaderShown = wasLoaderShown
         )
     }
+
+    private fun updateAiSummaryState(messageUid: String, newState: AiProcessState) {
+        threadViewModel.threadState.aiSummaryStateMap[messageUid] = newState
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index >= 0) {
+            threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
+        }
+    }
+
     private fun updateAiProcessState(messageUid: String, aiAction: AiAction, newState: AiProcessState) {
         getStateMap(aiAction)[messageUid] = newState
 
