@@ -458,8 +458,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
                     }
                 },
-                onAiSummaryRetry = ::summarize,
-                showSnackbarRetry = ::createSnackBarRetry
+                onAiSummaryRetry = { messageUid -> doAiAction(messageUid, AiAction.SUMMARY) },
+                showSnackbarRetry = ::createSnackBarRetry,
             ),
         )
 
@@ -830,7 +830,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET) { messageUid: String ->
-            summarize(messageUid)
+            doAiAction(messageUid, AiAction.SUMMARY)
         }
     }
 
@@ -1039,37 +1039,42 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun createSnackBarRetry(){
+    private fun createSnackBarRetry() {
         snackbarManager.setValue(getString(R.string.messageSummaryErrorRetry))
     }
 
-    private fun summarize(messageUid: String) {
-        val isRetry = threadViewModel.threadState.aiSummaryStateMap[messageUid] is AiProcessState.Error
+    private fun getStateMap(action: AiAction) = threadViewModel.threadState.aiSummaryStateMap
 
-        cancelRetryTimer(messageUid)
+    private fun getTimerMap(action: AiAction) = aiSummaryRetryTimers
+
+    private fun doAiAction(messageUid: String, aiAction: AiAction) {
+        val isRetry = getStateMap(aiAction)[messageUid] is AiProcessState.Error
+
+        cancelRetryTimer(messageUid, aiAction)
 
         val initialState = if (isRetry) AiProcessState.Retrying(isLoaderVisible = false) else AiProcessState.Loading
-        updateAiSummaryState(messageUid, initialState)
+        updateAiProcessState(messageUid, aiAction, initialState)
 
-        startRetryTimerIfNeeded(messageUid, isRetry)
+        startRetryTimerIfNeeded(messageUid, aiAction, isRetry)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            processSummaryApiCall(messageUid, isRetry)
+            processAiApiCall(messageUid, aiAction, isRetry)
         }
     }
 
-    private suspend fun processSummaryApiCall(messageUid: String, isRetry: Boolean) {
+    private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
         val content = getMessageContent(messageUid)
         val languageCode = requireContext().getCurrentLanguageCode()
+
         val result = ApiRepository.aiSummary(languageCode, content)
 
-        cancelRetryTimer(messageUid)
+        cancelRetryTimer(messageUid, aiAction)
 
-        val currentState = threadViewModel.threadState.aiSummaryStateMap[messageUid]
+        val currentState = getStateMap(aiAction)[messageUid]
         val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
 
         val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
-        updateAiSummaryState(messageUid, finalState)
+        updateAiProcessState(messageUid, aiAction, finalState)
     }
 
     private suspend fun getMessageContent(messageUid: String): String {
@@ -1086,37 +1091,40 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             return AiProcessState.Success(result.data ?: "")
         }
 
-        val canRetry = result.error?.code != ErrorCode.RESUME_CONTENT_NOT_RESUMED
+        val canRetry = result.error?.code == ErrorCode.TRANSLATION_API_NOT_AVAILABLE
         return AiProcessState.Error(
             canRetry = canRetry,
             isRetry = isRetry,
             wasLoaderShown = wasLoaderShown
         )
     }
-    private fun updateAiSummaryState(messageUid: String, newState: AiProcessState) {
-        threadViewModel.threadState.aiSummaryStateMap[messageUid] = newState
+    private fun updateAiProcessState(messageUid: String, aiAction: AiAction, newState: AiProcessState) {
+        getStateMap(aiAction)[messageUid] = newState
+
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
         if (index >= 0) {
-            threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
+            val notifyType = ThreadAdapter.NotifyType.AiSummaryStateChanged
+            threadAdapter.notifyItemChanged(index, notifyType)
         }
     }
 
-    private fun cancelRetryTimer(messageUid: String) {
-        aiSummaryRetryTimers[messageUid]?.cancel()
-        aiSummaryRetryTimers.remove(messageUid)
+    private fun cancelRetryTimer(messageUid: String, aiAction: AiAction) {
+        val timersMap = getTimerMap(aiAction)
+        timersMap[messageUid]?.cancel()
+        timersMap.remove(messageUid)
     }
 
-    private fun startRetryTimerIfNeeded(messageUid: String, isRetry: Boolean) {
+    private fun startRetryTimerIfNeeded(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
         if (!isRetry) return
 
         val timer = Utils.createRefreshTimer {
-            val state = threadViewModel.threadState.aiSummaryStateMap[messageUid]
+            val state = getStateMap(aiAction)[messageUid]
             if (state is AiProcessState.Retrying) {
-                updateAiSummaryState(messageUid, AiProcessState.Retrying(isLoaderVisible = true))
+                updateAiProcessState(messageUid, aiAction, AiProcessState.Retrying(isLoaderVisible = true))
             }
         }
 
-        aiSummaryRetryTimers[messageUid] = timer
+        getTimerMap(aiAction)[messageUid] = timer
         timer.start()
     }
 
@@ -1246,6 +1254,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     enum class NextThreadTarget {
         PREVIOUS_CHRONOLOGICAL_THREAD,
         NEXT_CHRONOLOGICAL_THREAD,
+    }
+
+    enum class AiAction {
+        SUMMARY,
     }
 
     companion object {
