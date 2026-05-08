@@ -94,10 +94,6 @@ class WebViewUtils(context: Context) {
             messageDisplayJsBridge = MessageDisplayJavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
         }
 
-        fun initEditorJsBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
-            editorJsBridge = EditorJavascriptBridge(onInlineImagesDeleted = onInlineImagesDeleted)
-        }
-
         private fun WebSettings.setupCommonWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")
             javaScriptEnabled = true

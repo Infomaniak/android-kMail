@@ -92,6 +92,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
@@ -290,8 +291,8 @@ fun WebView.initDisplayWebViewClientAndBridge(
 }
 
 fun WebView.initEditorWebviewBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
-    WebViewUtils.initEditorJsBridge(onInlineImagesDeleted)
-    addJavascriptInterface(WebViewUtils.editorJsBridge, "kmail")
+    val editorJsBridge = EditorJavascriptBridge(onInlineImagesDeleted)
+    addJavascriptInterface(editorJsBridge, "kmail")
 }
 
 fun WebView.initEditorWebviewClient(
