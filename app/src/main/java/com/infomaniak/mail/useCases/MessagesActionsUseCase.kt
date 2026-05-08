@@ -117,8 +117,9 @@ class MessagesActionsUseCase @Inject constructor(
         mailboxContentRealm().run {
             messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
                 val realmThread = ThreadController.getThreadBlocking(thread.uid, realm = this) ?: return@forEach
-                val allMessagesInThreadWillMove = messages.containsAll(realmThread.messages)
-                if (allMessagesInThreadWillMove) uidsToMove.add(realmThread.uid)
+                val messagesInThreadNotMoving = realmThread.messages.filterNot { messages.contains(it) }
+                val messagesInCurrentFolder = messagesInThreadNotMoving.count { it.folderId == currentFolder.id }
+                if (messagesInCurrentFolder == 0) uidsToMove.add(realmThread.uid)
             }
         }
 
