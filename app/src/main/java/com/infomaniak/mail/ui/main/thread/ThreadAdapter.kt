@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.R.id.closeButton
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -71,6 +70,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.AiAction
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
@@ -202,6 +202,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
                 NotifyType.AiSummaryStateChanged -> holder.bindAiSummary(item.message)
+                NotifyType.AiTranslateStateChanged -> holder.bindAiSummary(item.message)
                 is NotifyType.MessagesCollapseStateChanged -> {
                     holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
                 }
@@ -287,7 +288,7 @@ class ThreadAdapter(
 
         bindHeader(messageUi.message)
         bindAiSummary(messageUi.message)
-        bindAiTranslate(messageUi.message)
+        // bindAiTranslate(messageUi.message)
         bindAlerts(messageUi)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
@@ -571,53 +572,6 @@ class ThreadAdapter(
 
             informationButton.setOnClickListener {
                 threadAdapterCallbacks?.onAiSummaryRetry?.invoke(messageUid)
-            }
-        }
-    }
-
-    private fun MessageViewHolder.bindAiTranslate(message: Message) {
-        val state = threadAdapterState.aiTranslateStateMap[message.uid] ?: return
-
-        with(binding.blockInformationView) {
-            root.isVisible = true
-            closeButton.isVisible = true
-            informationTitle.isVisible = true
-
-            iconAi.isVisible = state !is AiProcessState.Error
-            icon.isVisible = state is AiProcessState.Error
-            informationButton.isVisible = state is AiProcessState.Error && state.code == "translation__api_not_available" // TODO: manage string for error code no_connection for example
-            informationDescription.isVisible = state is AiProcessState.Success
-
-            when (state) {
-                is AiProcessState.Loading -> {
-                    informationTitle.setText(R.string.euriaTranslateMessage)
-                    iconAiAnimation.setAnimation(R.raw.euria)
-                }
-
-                is AiProcessState.Success -> {
-                    informationTitle.setText(R.string.genericMessageTranslated)
-                    informationDescription.text = state.content
-                    iconAiAnimation.setAnimation(R.raw.euria)
-                }
-
-                is AiProcessState.Error -> {
-                    if (state.code == "translation__target_same_as_source"){ // TODO: write error code in ErrorCode.kt
-                        informationTitle.setText(R.string.translationTargetSameAsSource)
-                    }else{
-                        informationTitle.setText(R.string.messageTranslateErrorRetry)
-                        informationButton.setText(R.string.aiButtonRetry)
-                    }
-                    icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
-                }
-            }
-
-            closeButton.setOnClickListener {
-                threadAdapterState.aiSummaryStateMap.remove(message.uid)
-                root.isVisible = false
-            }
-
-            informationButton.setOnClickListener {
-                threadAdapterCallbacks?.onAiTranslateRetry?.invoke(message.uid)
             }
         }
     }
@@ -1133,6 +1087,7 @@ class ThreadAdapter(
         data object UnsubscribeRebind : NotifyType
         data object UpdatePermissions : NotifyType
         data object AiSummaryStateChanged : NotifyType
+        data object AiTranslateStateChanged : NotifyType
         @JvmInline
         value class MessagesCollapseStateChanged(val isCollapsible: Boolean) : NotifyType
     }
@@ -1278,8 +1233,8 @@ class ThreadAdapter(
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
         var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
         var onAiSummaryClose: ((messageUid: String) -> Unit)? = null,
-        var showSnackbarRetry: (() -> Unit)? = null,
         var onAiTranslateRetry: ((messageUid: String) -> Unit)? = null,
+        var showSnackbarRetry: (() -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {
