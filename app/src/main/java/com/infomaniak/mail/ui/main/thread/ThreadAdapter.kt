@@ -794,7 +794,10 @@ class ThreadAdapter(
         }
 
         setQuoteInitialCollapsedState(hasQuote)
-        quoteButton.setOnClickListener { toggleWebViews(message) }
+        quoteButton.setOnClickListener {
+            trackMessageEvent(MatomoName.ShowQuote)
+            toggleWebViews(message)
+        }
         quoteButtonFrameLayout.isVisible = hasQuote
 
         initWebViewClientIfNeeded(
