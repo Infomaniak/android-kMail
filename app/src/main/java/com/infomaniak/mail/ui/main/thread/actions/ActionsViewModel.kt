@@ -698,7 +698,7 @@ class ActionsViewModel @Inject constructor(
             val apiResponse = messagesActionsUseCase.deleteDraft(targetMailboxUuid, remoteDraftUuid)
 
             if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
-                val draftFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
+                val draftFolder = folderController.getFolder(FolderRole.DRAFT) ?: run {
                     snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
                     return@launch
                 }
