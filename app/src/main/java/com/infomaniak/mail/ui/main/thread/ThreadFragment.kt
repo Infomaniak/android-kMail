@@ -211,6 +211,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private val aiSummaryRetryTimers = mutableMapOf<String, CountDownTimer>()
+    private val aiTranslateRetryTimers = mutableMapOf<String, CountDownTimer>()
+
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -461,6 +463,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 },
                 onAiSummaryRetry = { messageUid -> doAiAction(messageUid, AiAction.SUMMARY) },
                 onAiSummaryClose = { messageUid -> threadViewModel.removeSummary(messageUid)},
+                onAiTranslateRetry = { messageUid -> doAiAction(messageUid, AiAction.TRANSLATE) },
                 showSnackbarRetry = ::createSnackBarRetry,
             ),
         )
@@ -836,7 +839,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET) { messageUid: String ->
-            translate(messageUid)
+            doAiAction(messageUid, AiAction.TRANSLATE)
         }
     }
 
@@ -1049,9 +1052,15 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         snackbarManager.setValue(getString(R.string.messageSummaryErrorRetry))
     }
 
-    private fun getStateMap(action: AiAction) = threadViewModel.threadState.aiSummaryStateMap
+    private fun getStateMap(action: AiAction) = when (action) {
+        AiAction.SUMMARY -> threadViewModel.threadState.aiSummaryStateMap
+        AiAction.TRANSLATE -> threadViewModel.threadState.aiTranslateStateMap
+    }
 
-    private fun getTimerMap(action: AiAction) = aiSummaryRetryTimers
+    private fun getTimerMap(action: AiAction) = when (action) {
+        AiAction.SUMMARY -> aiSummaryRetryTimers
+        AiAction.TRANSLATE -> aiTranslateRetryTimers
+    }
 
     private fun doAiAction(messageUid: String, aiAction: AiAction) {
         val isRetry = getStateMap(aiAction)[messageUid] is AiProcessState.Error
@@ -1072,7 +1081,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         val content = getMessageContent(messageUid)
         val languageCode = requireContext().getCurrentLanguageCode()
 
-        val result = ApiRepository.aiSummary(languageCode, content)
+        val result = when(aiAction){
+            AiAction.SUMMARY -> ApiRepository.aiSummary(languageCode, content)
+            AiAction.TRANSLATE -> ApiRepository.aiTranslate(languageCode, content)
+        }
 
         cancelRetryTimer(messageUid, aiAction)
 
@@ -1111,20 +1123,15 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun updateAiSummaryState(messageUid: String, newState: AiProcessState) {
-        threadViewModel.threadState.aiSummaryStateMap[messageUid] = newState
-        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
-        if (index >= 0) {
-            threadAdapter.notifyItemChanged(index, ThreadAdapter.NotifyType.AiSummaryStateChanged)
-        }
-    }
-
     private fun updateAiProcessState(messageUid: String, aiAction: AiAction, newState: AiProcessState) {
         getStateMap(aiAction)[messageUid] = newState
 
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
         if (index >= 0) {
-            val notifyType = ThreadAdapter.NotifyType.AiSummaryStateChanged
+            val notifyType = when (aiAction) {
+                AiAction.SUMMARY -> ThreadAdapter.NotifyType.AiSummaryStateChanged
+                AiAction.TRANSLATE -> ThreadAdapter.NotifyType.AiTranslateStateChanged
+            }
             threadAdapter.notifyItemChanged(index, notifyType)
         }
     }
@@ -1148,27 +1155,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         getTimerMap(aiAction)[messageUid] = timer
         timer.start()
     }
-
-private fun translate(messageUid: String){
-        threadViewModel.threadState.aiTranslateStateMap[messageUid] = AiProcessState.Loading
-        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
-        if (index >= 0) threadAdapter.notifyItemChanged(index)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            val message = mainViewModel.getMessage(messageUid)
-            val content = message?.body?.value ?: message?.splitBody?.content ?: ""
-            val languageCode = requireContext().getCurrentLanguageCode()
-            val result = ApiRepository.aiTranslate(languageCode,content)
-
-            threadViewModel.threadState.aiTranslateStateMap[messageUid] = if (result.result == ApiResponseStatus.SUCCESS) {
-                AiProcessState.Success(result.data ?: "")
-            } else {
-                AiProcessState.Error(result.error?.code ?: "")
-            }
-            if (index >= 0) threadAdapter.notifyItemChanged(index)
-        }
-}
-
 
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
         mainViewModel.draftResource = draftResource
@@ -1300,6 +1286,7 @@ private fun translate(messageUid: String){
 
     enum class AiAction {
         SUMMARY,
+        TRANSLATE,
     }
 
     companion object {
