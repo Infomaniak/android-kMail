@@ -853,7 +853,7 @@ class NewMessageFragment : Fragment() {
     private suspend fun showSubjectDialog(scheduled: Boolean): Boolean {
         trackNewMessageEvent(MatomoName.SendWithoutSubject)
 
-        var isConfirm = false
+        var hasConfirmed = false
         val isSendingCanceled = CompletableDeferred<Boolean>()
         descriptionDialog.show(
             title = getString(R.string.emailWithoutSubjectTitle),
@@ -862,10 +862,10 @@ class NewMessageFragment : Fragment() {
             displayLoader = false,
             onPositiveButtonClicked = {
                 trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
-                isConfirm = true
+                hasConfirmed = true
             },
             onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-            onDismiss = { isSendingCanceled.complete(!isConfirm) })
+            onDismiss = { isSendingCanceled.complete(!hasConfirmed) })
 
         return isSendingCanceled.await()
     }
@@ -873,7 +873,7 @@ class NewMessageFragment : Fragment() {
     private suspend fun showAttachmentDialog(scheduled: Boolean): Boolean {
         trackNewMessageEvent(MatomoName.SendWithoutAttachment)
 
-        var isConfirm = false
+        var hasConfirmed = false
         val isSendingCanceled = CompletableDeferred<Boolean>()
         descriptionDialog.show(
             title = getString(R.string.attachmentsReminderTitle),
@@ -882,10 +882,10 @@ class NewMessageFragment : Fragment() {
             displayLoader = false,
             onPositiveButtonClicked = {
                 trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
-                isConfirm = true
+                hasConfirmed = true
             },
             onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-            onDismiss = { isSendingCanceled.complete(!isConfirm) })
+            onDismiss = { isSendingCanceled.complete(!hasConfirmed) })
 
         return isSendingCanceled.await()
     }
