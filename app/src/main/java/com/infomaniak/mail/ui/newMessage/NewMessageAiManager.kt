@@ -28,6 +28,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDirections
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.safeNavigate
@@ -220,12 +222,13 @@ class NewMessageAiManager @Inject constructor(
     }
 
     suspend fun navigateToPropositionFragment() {
-        calculateAiPropositionData()
+        val direction = getAiPropositionFragmentDirection()
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
+        fragment.safelyNavigate(direction)
     }
 
-    private suspend fun calculateAiPropositionData() {
+    private suspend fun getAiPropositionFragmentDirection(): NavDirections {
         val isSubjectBlank = fragment.isSubjectBlank()
         val formattedScript = checkIsEditorBodyEmptyScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
@@ -234,11 +237,9 @@ class NewMessageAiManager @Inject constructor(
         )
 
         val isBodyBlank = binding.editorWebView.evaluateJs(formattedScript) == "true"
-        fragment.safeNavigate(
-            NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
-                isSubjectBlank = isSubjectBlank,
-                isBodyBlank = isBodyBlank,
-            ),
+        return NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
+            isSubjectBlank = isSubjectBlank,
+            isBodyBlank = isBodyBlank,
         )
     }
 
