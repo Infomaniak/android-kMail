@@ -1027,7 +1027,9 @@ class NewMessageViewModel @Inject constructor(
      */
     private fun removeUnwantedHtml(html: String): String {
         val doc = jsoupParseWithLog(html)
-        // This assures that jsoup doesn't add line breaks that will impact the snapshot comparison
+        // This assures that jsoup doesn't add line breaks that will impact the snapshot comparison when the user reopens the draft
+        // and adds something and deletes it, leaving the draft back in its original state. This wouldn't be an issue if we had
+        // parsed the html before comparing the snapshot.
         doc.outputSettings().prettyPrint(false)
 
         // Remove id used for replacing signature.
