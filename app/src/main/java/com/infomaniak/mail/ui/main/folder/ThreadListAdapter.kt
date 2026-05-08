@@ -47,6 +47,7 @@ import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
+import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
@@ -601,6 +602,7 @@ class ThreadListAdapter @Inject constructor(
         contactDetails.removeBackground()
 
         contactWithSpace.setOnClickListener {
+            trackSearchEvent(MatomoName.SelectContact)
             callbacks?.onContactClicked?.invoke(contact)
         }
     }
