@@ -201,8 +201,8 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
-                NotifyType.AiSummaryStateChanged -> holder.bindAiSummary(item.message)
-                NotifyType.AiTranslateStateChanged -> holder.bindAiSummary(item.message)
+                NotifyType.AiSummaryStateChanged -> holder.bindAiAction(item.message, AiAction.SUMMARY)
+                NotifyType.AiTranslateStateChanged -> holder.bindAiAction(item.message, AiAction.TRANSLATE)
                 is NotifyType.MessagesCollapseStateChanged -> {
                     holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
                 }
@@ -287,8 +287,7 @@ class ThreadAdapter(
         initMapForNewMessage(messageUi.message, position)
 
         bindHeader(messageUi.message)
-        bindAiSummary(messageUi.message)
-        // bindAiTranslate(messageUi.message)
+        bindAiAction(messageUi.message)
         bindAlerts(messageUi)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
@@ -483,8 +482,19 @@ class ThreadAdapter(
         bindRecipientDetails(message, messageDate)
     }
 
-    private fun MessageViewHolder.bindAiSummary(message: Message) {
-        val state = threadAdapterState.aiSummaryStateMap[message.uid]
+    private fun getStateMap(action: AiAction, messageUid: String) = when (action) {
+        AiAction.SUMMARY -> threadAdapterState.aiSummaryStateMap[messageUid]
+        AiAction.TRANSLATE -> threadAdapterState.aiTranslateStateMap[messageUid]
+    }
+
+    private fun MessageViewHolder.bindAiAction(message: Message, aiAction: ThreadFragment.AiAction? = null) {
+        if (aiAction == null){
+            bindAiAction(message, AiAction.TRANSLATE)
+            bindAiAction(message, AiAction.SUMMARY)
+            return
+        }
+
+        val state = getStateMap(aiAction, message.uid)
 
         if (state == null) {
             binding.blockInformationView.root.isVisible = false
