@@ -187,8 +187,6 @@
     <string name="contentDescriptionButtonDelete">Supprimer %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
     <string name="contentDescriptionButtonDeleteHistory">Supprimer l’entrée de l’historique</string>
-    <string name="contentDescriptionButtonDeleteQuote">Supprimer les messages cités</string>
-    <string name="contentDescriptionButtonDeleteSignature">Supprimer la signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Déplier la sélection de compte</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Déplier les dossiers personnalisés</string>
     <string name="contentDescriptionButtonExpandFolder">Déplier le dossier %s</string>

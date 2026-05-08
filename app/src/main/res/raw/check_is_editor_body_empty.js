@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function reportOverScroll(clientWidth, scrollWidth, messageUid) {
-    window.kmail.reportOverScroll(clientWidth, scrollWidth, messageUid);
-}
+(function() {
+    const body = getEditor();
+    // We will clone the body so we don't modify the original HTML.
+    const clonedBody = body.cloneNode(true);
 
-function reportError(error, scriptFirstLine, messageUid) {
-    window.kmail.reportError(error.name, error.message, error.stack, scriptFirstLine, messageUid);
-}
+    const elements = clonedBody.querySelectorAll(".%s, .%s, .%s");
+    elements.forEach( element => { element.remove(); });
 
-function webviewFinishedLoading() {
-    window.kmail.webviewFinishedLoading();
-}
+    return clonedBody.innerText.trim().length === 0;
+})()

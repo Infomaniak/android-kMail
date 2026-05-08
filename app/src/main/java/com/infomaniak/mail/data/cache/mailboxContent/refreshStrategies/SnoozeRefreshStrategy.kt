@@ -70,7 +70,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
 
     /**
      * In the case of the Snooze refresh strategy, the Message could already exist (because it comes from the INBOX).
-     * In this situation, we don't want to loose its data (for example the body).
+     * In this situation, we don't want to lose its data (for example the body).
      * So we take the [remoteMessage] (because it contains the up-to-date data about the snooze state),
      * we give it the localMessage local values, then we upsert it into Realm.
      */

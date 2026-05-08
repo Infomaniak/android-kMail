@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
+import android.content.Context
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
@@ -27,9 +28,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDirections
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.lib.richhtmleditor.executor.JsExecutableMethod
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
@@ -37,9 +41,16 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSanitizedHtml
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCheckIsEditorBodyEmptyScript
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -50,7 +61,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalSplittiesApi::class)
 @FragmentScoped
 class NewMessageAiManager @Inject constructor(
-    private val editorContentManager: EditorContentManager,
+    @ApplicationContext private val appContext: Context,
     private val localSettings: LocalSettings,
 ) : NewMessageManager() {
 
@@ -59,6 +70,7 @@ class NewMessageAiManager @Inject constructor(
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
+    private val checkIsEditorBodyEmptyScript by lazy { appContext.getCheckIsEditorBodyEmptyScript() }
 
     private var aiPromptFragment: AiPromptFragment? = null
 
@@ -86,8 +98,18 @@ class NewMessageAiManager @Inject constructor(
 
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
+            newMessageViewModel.setPlaceholderVisibility(false)
             subject?.let(subjectTextField::setText)
-            editorContentManager.setContent(editorWebView, BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML))
+            setAiContent(content)
+        }
+    }
+
+    private fun setAiContent(content: String) {
+        val bodyContent = BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML)
+        val sanitizedContent = bodyContent.toSanitizedHtml()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.editorWebView.executeJsMethodWhenEditorIsSetup(JsExecutableMethod("setAiOutputContent", sanitizedContent))
         }
     }
 
@@ -199,16 +221,25 @@ class NewMessageAiManager @Inject constructor(
         }
     }
 
-    fun navigateToPropositionFragment() {
-
+    suspend fun navigateToPropositionFragment() {
+        val direction = getAiPropositionFragmentDirection()
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
+        fragment.safelyNavigate(direction)
+    }
 
-        fragment.safeNavigate(
-            NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
-                isSubjectBlank = fragment.isSubjectBlank(),
-                isBodyBlank = binding.editorWebView.isEmptyFlow.value ?: true,
-            ),
+    private suspend fun getAiPropositionFragmentDirection(): NavDirections {
+        val isSubjectBlank = fragment.isSubjectBlank()
+        val formattedScript = checkIsEditorBodyEmptyScript.format(
+            INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME,
+            INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME,
+        )
+
+        val isBodyBlank = binding.editorWebView.evaluateJs(formattedScript) == "true"
+        return NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
+            isSubjectBlank = isSubjectBlank,
+            isBodyBlank = isBodyBlank,
         )
     }
 

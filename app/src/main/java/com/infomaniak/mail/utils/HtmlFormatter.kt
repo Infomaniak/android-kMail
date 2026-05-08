@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -214,12 +214,17 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
+        fun Context.getMessageDisplayStyle(): String = loadCss(R.raw.message_display_style)
+
         fun Context.getCustomStyle(): String = loadCss(
             R.raw.style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary)),
         )
 
-        fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
+        fun Context.getCustomEditorStyle(): String = loadCss(
+            R.raw.editor_style,
+            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
+        )
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
@@ -228,12 +233,30 @@ class HtmlFormatter(private val html: String) {
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
         )
 
+        fun Context.getIncludeQuotesScript(): String = loadScript(R.raw.include_quotes_script)
+
+        fun Context.getDeletedInlineImagesObserverScript(): String = loadScript(R.raw.deleted_inline_images_observer)
+
+        fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
+
         fun Context.getFixStyleScript(): String {
             return loadScript(R.raw.fix_email_style)
         }
 
-        fun Context.getJsBridgeScript(): String {
-            return loadScript(R.raw.javascript_bridge)
+        fun Context.getMessageDisplayJavascriptBridge(): String {
+            return loadScript(R.raw.message_display_javascript_bridge)
+        }
+
+        fun Context.getEditorJsBridgeScript(): String {
+            return loadScript(R.raw.editor_javascript_bridge)
+        }
+
+        fun Context.getCheckIsEditorBodyEmptyScript(): String {
+            return loadScript(R.raw.check_is_editor_body_empty)
+        }
+
+        fun Context.getSetAiContentScript(): String {
+            return loadScript(R.raw.set_ai_content_script)
         }
     }
 }
