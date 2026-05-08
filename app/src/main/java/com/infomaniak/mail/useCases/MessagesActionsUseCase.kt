@@ -113,18 +113,21 @@ class MessagesActionsUseCase @Inject constructor(
     }
 
     private suspend fun moveOutMessagesThreadsLocally(messages: List<Message>, currentFolder: Folder): List<String> {
-        val uidsToMove = mutableListOf<String>()
+        val threadsUidsToMove = mutableListOf<String>()
+        val movingMessageUids = messages.getUids().toSet()
         mailboxContentRealm().run {
             messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
                 val realmThread = ThreadController.getThreadBlocking(thread.uid, realm = this) ?: return@forEach
-                val messagesInThreadNotMoving = realmThread.messages.filterNot { messages.contains(it) }
+                val messagesInThreadNotMoving = realmThread.messages.filterNot { it.uid in movingMessageUids }
                 val messagesInCurrentFolder = messagesInThreadNotMoving.count { it.folderId == currentFolder.id }
-                if (messagesInCurrentFolder == 0) uidsToMove.add(realmThread.uid)
+                if (messagesInCurrentFolder == 0) threadsUidsToMove.add(realmThread.uid)
             }
         }
 
-        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
-        return uidsToMove
+        if (threadsUidsToMove.isNotEmpty()) {
+            threadController.updateIsLocallyMovedOutStatus(threadsUids = threadsUidsToMove, hasBeenMovedOut = true)
+        }
+        return threadsUidsToMove
     }
 
     suspend fun moveThreadsOrMessagesTo(
