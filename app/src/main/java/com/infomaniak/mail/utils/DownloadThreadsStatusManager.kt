@@ -32,7 +32,6 @@ import javax.inject.Singleton
 class DownloadThreadsStatusManager @Inject constructor() {
     /**
      * A StateFlow that emits if the app is downloading threads.
-     * It starts collecting immediately and keeps the latest value in memory.
      */
     private val _isDownloading = MutableStateFlow(false)
     private val scope = CoroutineScope(Dispatchers.Default)
