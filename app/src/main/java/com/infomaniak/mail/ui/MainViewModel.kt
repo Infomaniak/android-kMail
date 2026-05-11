@@ -604,7 +604,13 @@ class MainViewModel @Inject constructor(
         val isSpam = destinationFolder.role == FolderRole.SPAM
 
         val snackbarTitle = when {
-            apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
+            apiResponses.allFailed() -> {
+                if (apiResponses.isNotEmpty()) {
+                    appContext.getString(apiResponses.first().translateError())
+                } else {
+                    appContext.getString(RCore.string.anErrorHasOccurred)
+                }
+            }
             threadsMovedCount > 0 || messagesMoved.count() > 1 -> getMoveThreadSnackbarTitle(
                 isSpam,
                 threadsMovedCount,
