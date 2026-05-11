@@ -69,27 +69,14 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     private fun extractUrl(text: String): String {
         val trimmedText = text.trim()
         val matcher = Patterns.WEB_URL.matcher(trimmedText)
-        return if (text.isNotBlank() && matcher.matches()) trimmedText else ""
+        return if (matcher.matches()) trimmedText else ""
     }
 
     fun observeEditorFormatActions() = with(binding) {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
-                EditorAction.LINK -> if (buttonLink.isActivated) {
-                    editorWebView.unlink()
-                } else {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        val selectedText = editorWebView.getSelectedText()
-                        val defaultUrl = extractUrl(selectedText)
-                        insertLinkDialog.show(
-                            defaultUrlValue = defaultUrl,
-                            defaultDisplayNameValue = selectedText.takeIf { defaultUrl.isBlank() } ?: ""
-                        ) { displayText, url ->
-                            editorWebView.createLink(displayText, url)
-                        }
-                    }
-                }
+                EditorAction.LINK -> handleLink()
                 EditorAction.AI -> aiManager.openAiPrompt()
                 EditorAction.BOLD -> editorWebView.toggleBold()
                 EditorAction.ITALIC -> editorWebView.toggleItalic()
@@ -97,6 +84,23 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                 EditorAction.STRIKE_THROUGH -> editorWebView.toggleStrikeThrough()
                 EditorAction.UNORDERED_LIST -> editorWebView.toggleUnorderedList()
                 EditorAction.ENCRYPTION -> encryptionManager.toggleEncryption()
+            }
+        }
+    }
+
+    private fun handleLink() = with(binding){
+        if (buttonLink.isActivated) {
+            editorWebView.unlink()
+        } else {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val selectedText = editorWebView.getSelectedText()
+                val defaultUrl = extractUrl(selectedText)
+                insertLinkDialog.show(
+                    defaultUrlValue = defaultUrl,
+                    defaultDisplayNameValue = selectedText.takeIf { defaultUrl.isBlank() } ?: ""
+                ) { displayText, url ->
+                    editorWebView.createLink(displayText, url)
+                }
             }
         }
     }
