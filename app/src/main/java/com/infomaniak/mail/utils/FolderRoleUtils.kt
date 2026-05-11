@@ -48,8 +48,9 @@ class FolderRoleUtils @Inject constructor(
         return folderRoles
     }
 
-    suspend fun getActionFolderRole(message: Message): FolderRole? {
-        return getActionFolderRole(message.folderId, message)
+    fun getActionFolderRole(message: Message): FolderRole? {
+        val folderRole = message.folder.role
+        return if (folderRole == FolderRole.INBOX && message.isSnoozed()) FolderRole.SNOOZED else folderRole
     }
 
     /**
