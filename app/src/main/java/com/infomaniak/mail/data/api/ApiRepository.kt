@@ -514,7 +514,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.aiTranslate(),
             method = POST,
-            body = mapOf("destination_language" to languageCode, "content" to contentToBeTranslated), // TODO: Adapt body to accept an additional languageCode parameter once the backend supports it
+            body = mapOf("destination_language" to languageCode, "content" to contentToBeTranslated),
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }

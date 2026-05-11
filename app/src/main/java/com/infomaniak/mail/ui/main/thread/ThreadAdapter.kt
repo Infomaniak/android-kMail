@@ -481,7 +481,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindAiAction(message: Message, aiAction: ThreadFragment.AiAction? = null) {
-        if (aiAction == null){
+        if (aiAction == null) {
             bindAiAction(message, AiAction.TRANSLATE)
             bindAiAction(message, AiAction.SUMMARY)
             return
@@ -495,7 +495,7 @@ class ThreadAdapter(
         }
 
         setupBaseVisibility(state)
-        handleProcessState(state)
+        handleProcessState(state, aiAction)
         setupListeners(message.uid)
     }
 
@@ -514,7 +514,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.handleProcessState(state: AiProcessState) {
+    private fun MessageViewHolder.handleProcessState(state: AiProcessState, aiAction: AiAction) {
         with(binding.blockInformationView) {
             when (state) {
                 is AiProcessState.Loading -> {
@@ -527,7 +527,7 @@ class ThreadAdapter(
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
                 is AiProcessState.Retrying -> handleRetryingState(state)
-                is AiProcessState.Error -> handleErrorState(state)
+                is AiProcessState.Error -> handleErrorState(state, aiAction)
             }
         }
     }
@@ -546,20 +546,32 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.handleErrorState(state: AiProcessState.Error) {
+    private fun MessageViewHolder.handleErrorState(state: AiProcessState.Error, aiAction: AiAction) {
         with(binding.blockInformationView) {
             icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
 
             if (state.canRetry) {
-                informationTitle.setText(R.string.messageSummaryErrorRetry)
+                val errorMessage = if (aiAction == AiAction.SUMMARY) {
+                    R.string.messageSummaryErrorRetry
+                } else {
+                    R.string.messageTranslateErrorRetry
+                }
+                informationTitle.setText(errorMessage)
                 informationButton.isEnabled = true
                 informationButton.hideProgressCatching(R.string.aiButtonRetry)
 
                 if (state.isRetry && !state.wasLoaderShown) {
-                    threadAdapterCallbacks?.showSnackbarRetry?.invoke()
+                    threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessage)
                 }
             } else {
-                informationTitle.setText(R.string.messageSummaryError)
+                val errorMessage = if (aiAction == AiAction.SUMMARY) {
+                    R.string.messageSummaryError
+                } else if (state.targetSameAsSource) {
+                    R.string.translationTargetSameAsSource
+                } else {
+                    R.string.messageTranslateError
+                }
+                informationTitle.setText(errorMessage)
                 informationButton.isVisible = false
             }
         }
@@ -1234,7 +1246,7 @@ class ThreadAdapter(
         var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
         var onAiSummaryClose: ((messageUid: String) -> Unit)? = null,
         var onAiTranslateRetry: ((messageUid: String) -> Unit)? = null,
-        var showSnackbarRetry: (() -> Unit)? = null,
+        var showSnackbarRetry: ((errorMessage: Int) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

@@ -402,6 +402,7 @@
     <string name="messageSummaryError">A Euria não conseguiu resumir esta mensagem.</string>
     <string name="messageSummaryErrorRetry">A Euria não conseguiu resumir esta mensagem. Por favor, tente novamente.</string>
     <string name="messageSummaryLoading">Resumo da mensagem…</string>
+    <string name="messageTranslateError">A Euria não conseguiu traduzir esta mensagem.</string>
     <string name="messageTranslateErrorRetry">A Euria não conseguiu traduzir esta mensagem. Por favor, tente novamente.</string>
     <string name="messageTranslatedTitle">Traduzido em %s</string>
     <string name="mondayAfternoon">Segunda-feira à tarde</string>
