@@ -735,9 +735,7 @@ class ActionsViewModel @Inject constructor(
         snackbarManager.postValue(appContext.getString(titleRes))
     }
     //endregion
-
-    //endregion
-
+    
     //region Undo action
     fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         if (undoData == null) return@launch
@@ -785,5 +783,5 @@ class ActionsViewModel @Inject constructor(
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
         downloadThreadsStatusManager.updateState(isDownloading = false)
     }
-    //
+    //endregion
 }
