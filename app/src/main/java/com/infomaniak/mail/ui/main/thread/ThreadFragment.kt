@@ -1163,7 +1163,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             val currentThreadPosition =
                 twoPaneFragment.threadListAdapter.dataSet
                     .indexOfFirst { it is ThreadListItem.Content && it.thread.uid == currentThread.uid }
-            actionsViewModel.updateCurrentThreadPosition(currentThreadPosition, currentThread.uid)
+            if (currentThreadPosition >= 0) {
+                actionsViewModel.updateCurrentThreadPosition(currentThreadPosition, currentThread.uid)
+            }
         }
     }
 
