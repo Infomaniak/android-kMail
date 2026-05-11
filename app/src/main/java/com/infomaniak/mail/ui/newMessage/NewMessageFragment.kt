@@ -850,45 +850,56 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private suspend fun showSubjectDialog(isScheduled: Boolean): Boolean {
-        trackNewMessageEvent(MatomoName.SendWithoutSubject)
+    private suspend fun showConfirmationDialog(
+        titleRes: Int,
+        descriptionRes: Int,
+        trackEvent: MatomoName,
+        trackConfirmEvent: MatomoName,
+        isScheduled: Boolean,
+    ): Boolean {
+        trackNewMessageEvent(trackEvent)
 
+        // This flag lets us wait for the dialog to be fully dismissed before deciding
+        // whether to continue. Without it, the next dialog could open too early and stay stuck loading.
         var hasConfirmed = false
         val isSendingCanceled = CompletableDeferred<Boolean>()
+
         descriptionDialog.show(
-            title = getString(R.string.emailWithoutSubjectTitle),
-            description = getString(R.string.emailWithoutSubjectDescription),
+            title = getString(titleRes),
+            description = getString(descriptionRes),
             positiveButtonText = R.string.buttonContinue,
             displayLoader = false,
             onPositiveButtonClicked = {
-                trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
+                trackNewMessageEvent(trackConfirmEvent)
                 hasConfirmed = true
             },
-            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
-            onDismiss = { isSendingCanceled.complete(!hasConfirmed) })
+            onCancel = {
+                if (isScheduled) newMessageViewModel.resetScheduledDate()
+            },
+            onDismiss = {
+                isSendingCanceled.complete(!hasConfirmed)
+            },
+        )
 
         return isSendingCanceled.await()
     }
 
-    private suspend fun showAttachmentDialog(isScheduled: Boolean): Boolean {
-        trackNewMessageEvent(MatomoName.SendWithoutAttachment)
+    private suspend fun showSubjectDialog(isScheduled: Boolean) = showConfirmationDialog(
+        titleRes = R.string.emailWithoutSubjectTitle,
+        descriptionRes = R.string.emailWithoutSubjectDescription,
+        trackEvent = MatomoName.SendWithoutSubject,
+        trackConfirmEvent = MatomoName.SendWithoutSubjectConfirm,
+        isScheduled = isScheduled,
+    )
 
-        var hasConfirmed = false
-        val isSendingCanceled = CompletableDeferred<Boolean>()
-        descriptionDialog.show(
-            title = getString(R.string.attachmentsReminderTitle),
-            description = getString(R.string.attachmentsReminderDescription),
-            positiveButtonText = R.string.buttonContinue,
-            displayLoader = false,
-            onPositiveButtonClicked = {
-                trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
-                hasConfirmed = true
-            },
-            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
-            onDismiss = { isSendingCanceled.complete(!hasConfirmed) })
+    private suspend fun showAttachmentDialog(isScheduled: Boolean) = showConfirmationDialog(
+        titleRes = R.string.attachmentsReminderTitle,
+        descriptionRes = R.string.attachmentsReminderDescription,
+        trackEvent = MatomoName.SendWithoutAttachment,
+        trackConfirmEvent = MatomoName.SendWithoutAttachmentConfirm,
+        isScheduled = isScheduled,
+    )
 
-        return isSendingCanceled.await()
-    }
 
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
 
