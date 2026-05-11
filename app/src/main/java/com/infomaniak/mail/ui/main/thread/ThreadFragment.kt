@@ -461,6 +461,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
                     }
                 },
+                onAiBannerRetry = { messageUid, aiAction -> doAiAction(messageUid, aiAction) },
                 onAiSummaryRetry = { messageUid -> doAiAction(messageUid, AiAction.SUMMARY) },
                 onAiSummaryClose = { messageUid -> threadViewModel.removeSummary(messageUid)},
                 onAiTranslateRetry = { messageUid -> doAiAction(messageUid, AiAction.TRANSLATE) },

@@ -526,16 +526,17 @@ class ThreadAdapter(
                     informationDescription.text = state.content
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
-                is AiProcessState.Retrying -> handleRetryingState(state)
+                is AiProcessState.Retrying -> handleRetryingState(state, aiAction)
                 is AiProcessState.Error -> handleErrorState(state, aiAction)
                 is AiProcessState.Dismissed -> Unit
             }
         }
     }
 
-    private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying) {
+    private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying, aiAction: AiAction) {
         with(binding.blockInformationView) {
-            informationTitle.setText(R.string.messageSummaryErrorRetry)
+            val errorMessage = if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+            informationTitle.setText(errorMessage)
             icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
             informationButton.isEnabled = false
 
@@ -586,9 +587,7 @@ class ThreadAdapter(
                 threadAdapterCallbacks?.onAiSummaryClose?.invoke(messageUid)
             }
 
-            informationButton.setOnClickListener {
-                threadAdapterCallbacks?.onAiSummaryRetry?.invoke(messageUid)
-            }
+            informationButton.setOnClickListener {threadAdapterCallbacks?.onAiBannerRetry?.invoke(messageUid, aiAction) }
         }
     }
 
@@ -1244,6 +1243,7 @@ class ThreadAdapter(
         var onAddReaction: ((Message) -> Unit)? = null,
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
+        var onAiBannerRetry: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
         var onAiSummaryClose: ((messageUid: String) -> Unit)? = null,
         var onAiTranslateRetry: ((messageUid: String) -> Unit)? = null,
