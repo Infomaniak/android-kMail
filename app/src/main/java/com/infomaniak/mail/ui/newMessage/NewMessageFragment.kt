@@ -295,7 +295,7 @@ class NewMessageFragment : Fragment() {
 
         fun scheduleDraft(timestamp: Long) {
             newMessageViewModel.setScheduleDate(Date(timestamp))
-            tryToSendEmail(scheduled = true)
+            tryToSendEmail(isScheduled = true)
         }
 
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
@@ -822,35 +822,35 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    private fun tryToSendEmail(scheduled: Boolean = false) {
+    private fun tryToSendEmail(isScheduled: Boolean = false) {
 
         fun setSnackbarActivityResult() {
             val resultIntent = Intent()
             resultIntent.putExtra(
                 MainActivity.DRAFT_ACTION_KEY,
-                if (scheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
+                if (isScheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
             )
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
 
         fun sendEmail() {
-            newMessageViewModel.draftAction = if (scheduled) DraftAction.SCHEDULE else DraftAction.SEND
+            newMessageViewModel.draftAction = if (isScheduled) DraftAction.SCHEDULE else DraftAction.SEND
             setSnackbarActivityResult()
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            if (isSubjectBlank() && showSubjectDialog(scheduled)) return@launch
+            if (isSubjectBlank() && showSubjectDialog(isScheduled)) return@launch
 
             val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
             val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
 
-            if (shouldShowAttachmentReminder && showAttachmentDialog(scheduled)) return@launch
+            if (shouldShowAttachmentReminder && showAttachmentDialog(isScheduled)) return@launch
             sendEmail()
         }
     }
 
-    private suspend fun showSubjectDialog(scheduled: Boolean): Boolean {
+    private suspend fun showSubjectDialog(isScheduled: Boolean): Boolean {
         trackNewMessageEvent(MatomoName.SendWithoutSubject)
 
         var hasConfirmed = false
@@ -864,13 +864,13 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
                 hasConfirmed = true
             },
-            onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
             onDismiss = { isSendingCanceled.complete(!hasConfirmed) })
 
         return isSendingCanceled.await()
     }
 
-    private suspend fun showAttachmentDialog(scheduled: Boolean): Boolean {
+    private suspend fun showAttachmentDialog(isScheduled: Boolean): Boolean {
         trackNewMessageEvent(MatomoName.SendWithoutAttachment)
 
         var hasConfirmed = false
@@ -884,7 +884,7 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(MatomoName.SendWithoutAttachmentConfirm)
                 hasConfirmed = true
             },
-            onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
             onDismiss = { isSendingCanceled.complete(!hasConfirmed) })
 
         return isSendingCanceled.await()
