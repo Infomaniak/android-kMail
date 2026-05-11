@@ -1,0 +1,5 @@
+- Add an attachment reminder alert if the user forgot to add the attachment
+- Auto-fill URL field when adding a link from selected text in the editor
+- Add signature and quotes in RichHtmlEditorWebview. Signature is now editable
+- Remove display of old thread during loading on slow devices
+- Ensure creation of 'Recipient' with valid email, to avoid emails that can't be sent and then disappear
