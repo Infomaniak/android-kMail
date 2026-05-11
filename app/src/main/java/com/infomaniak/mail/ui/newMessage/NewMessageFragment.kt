@@ -860,7 +860,7 @@ class NewMessageFragment : Fragment() {
         trackNewMessageEvent(trackEvent)
 
         // This flag lets us wait for the dialog to be fully dismissed before deciding
-        // whether to continue. Without it, the next dialog could open too early and stay stuck loading.
+        // whether to continue. Without it, the next dialog could open too early and stay stucked in loading state.
         var hasConfirmed = false
         val isSendingCanceled = CompletableDeferred<Boolean>()
 
@@ -873,12 +873,8 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(trackConfirmEvent)
                 hasConfirmed = true
             },
-            onCancel = {
-                if (isScheduled) newMessageViewModel.resetScheduledDate()
-            },
-            onDismiss = {
-                isSendingCanceled.complete(!hasConfirmed)
-            },
+            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
+            onDismiss = { isSendingCanceled.complete(!hasConfirmed) },
         )
 
         return isSendingCanceled.await()
