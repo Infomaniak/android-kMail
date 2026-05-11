@@ -496,14 +496,14 @@ class ThreadAdapter(
 
         val state = getStateMap(aiAction, message.uid)
 
-        if (state == null) {
+        if (state == null || state is AiProcessState.Dismissed) {
             binding.blockInformationView.root.isVisible = false
             return
         }
 
         setupBaseVisibility(state)
         handleProcessState(state, aiAction)
-        setupListeners(message.uid)
+        setupListeners(message.uid, aiAction)
     }
 
     private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState) {
@@ -535,6 +535,7 @@ class ThreadAdapter(
                 }
                 is AiProcessState.Retrying -> handleRetryingState(state)
                 is AiProcessState.Error -> handleErrorState(state, aiAction)
+                is AiProcessState.Dismissed -> Unit
             }
         }
     }
@@ -584,10 +585,10 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.setupListeners(messageUid: String) {
+    private fun MessageViewHolder.setupListeners(messageUid: String, aiAction: AiAction) {
         with(binding.blockInformationView) {
             closeButton.setOnClickListener {
-                threadAdapterState.aiSummaryStateMap.remove(messageUid)
+                threadAdapterCallbacks?.onAiBannerClose?.invoke(messageUid, aiAction)
                 root.isVisible = false
                 threadAdapterCallbacks?.onAiSummaryClose?.invoke(messageUid)
             }
@@ -1257,6 +1258,7 @@ class ThreadAdapter(
         var onAiSummaryClose: ((messageUid: String) -> Unit)? = null,
         var onAiTranslateRetry: ((messageUid: String) -> Unit)? = null,
         var showSnackbarRetry: ((errorMessage: Int) -> Unit)? = null,
+        var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {
