@@ -464,7 +464,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiSummaryRetry = { messageUid -> doAiAction(messageUid, AiAction.SUMMARY) },
                 onAiSummaryClose = { messageUid -> threadViewModel.removeSummary(messageUid)},
                 onAiTranslateRetry = { messageUid -> doAiAction(messageUid, AiAction.TRANSLATE) },
-                showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage))},
+                showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage)) },
+                onAiBannerClose = { messageUid, aiAction -> dismissAiAction(messageUid, aiAction) }
             ),
         )
 
@@ -1073,11 +1074,21 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
     }
 
+    private fun dismissAiAction(messageUid: String, aiAction: AiAction) {
+        getStateMap(aiAction)[messageUid] = AiProcessState.Dismissed
+
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index >= 0) {
+            val notifyType = if (aiAction == AiAction.SUMMARY) ThreadAdapter.NotifyType.AiSummaryStateChanged else ThreadAdapter.NotifyType.AiTranslateStateChanged
+            threadAdapter.notifyItemChanged(index, notifyType)
+        }
+    }
+
     private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
         val content = getMessageContent(messageUid)
         val languageCode = requireContext().getCurrentLanguageCode()
 
-        val result = when(aiAction){
+        val result = when (aiAction) {
             AiAction.SUMMARY -> ApiRepository.aiSummary(languageCode, content)
             AiAction.TRANSLATE -> ApiRepository.aiTranslate(languageCode, content)
         }
@@ -1089,6 +1100,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
 
+        val latestState = getStateMap(aiAction)[messageUid]
+        if (latestState is AiProcessState.Dismissed) return
         val summaryContent = result.data
         if (summaryContent != null) {
             threadViewModel.saveSummary(messageUid,summaryContent)
