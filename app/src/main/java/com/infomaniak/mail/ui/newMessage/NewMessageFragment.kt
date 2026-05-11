@@ -94,6 +94,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
@@ -105,6 +106,7 @@ import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CL
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
@@ -126,6 +128,7 @@ import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
@@ -150,6 +153,7 @@ class NewMessageFragment : Fragment() {
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
+    private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -291,7 +295,7 @@ class NewMessageFragment : Fragment() {
 
         fun scheduleDraft(timestamp: Long) {
             newMessageViewModel.setScheduleDate(Date(timestamp))
-            tryToSendEmail(scheduled = true)
+            tryToSendEmail(isScheduled = true)
         }
 
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
@@ -477,6 +481,13 @@ class NewMessageFragment : Fragment() {
             INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
         )
         addScript(formattedAiContentScript)
+
+        val formattedGetEditorBodyScript = getEditorBodyScript.format(
+            INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
+            INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME,
+            INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+        )
+        addScript(formattedGetEditorBodyScript)
     }
 
     private fun removeAllProperties() = viewLifecycleOwner.lifecycleScope.launch {
@@ -811,40 +822,80 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    private fun tryToSendEmail(scheduled: Boolean = false) {
+    private fun tryToSendEmail(isScheduled: Boolean = false) {
 
         fun setSnackbarActivityResult() {
             val resultIntent = Intent()
             resultIntent.putExtra(
                 MainActivity.DRAFT_ACTION_KEY,
-                if (scheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
+                if (isScheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
             )
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
 
         fun sendEmail() {
-            newMessageViewModel.draftAction = if (scheduled) DraftAction.SCHEDULE else DraftAction.SEND
+            newMessageViewModel.draftAction = if (isScheduled) DraftAction.SCHEDULE else DraftAction.SEND
             setSnackbarActivityResult()
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (isSubjectBlank()) {
-            trackNewMessageEvent(MatomoName.SendWithoutSubject)
-            descriptionDialog.show(
-                title = getString(R.string.emailWithoutSubjectTitle),
-                description = getString(R.string.emailWithoutSubjectDescription),
-                displayLoader = false,
-                positiveButtonText = R.string.buttonContinue,
-                onPositiveButtonClicked = {
-                    trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
-                    sendEmail()
-                },
-                onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-            )
-        } else {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (isSubjectBlank() && showSubjectDialog(isScheduled)) return@launch
+
+            val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
+            val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
+
+            if (shouldShowAttachmentReminder && showAttachmentDialog(isScheduled)) return@launch
             sendEmail()
         }
     }
+
+    private suspend fun showConfirmationDialog(
+        titleRes: Int,
+        descriptionRes: Int,
+        trackEvent: MatomoName,
+        trackConfirmEvent: MatomoName,
+        isScheduled: Boolean,
+    ): Boolean {
+        trackNewMessageEvent(trackEvent)
+
+        // This flag lets us wait for the dialog to be fully dismissed before deciding
+        // whether to continue. Without it, the next dialog could open too early and stay stucked in loading state.
+        var hasConfirmed = false
+        val isSendingCanceled = CompletableDeferred<Boolean>()
+
+        descriptionDialog.show(
+            title = getString(titleRes),
+            description = getString(descriptionRes),
+            positiveButtonText = R.string.buttonContinue,
+            displayLoader = false,
+            onPositiveButtonClicked = {
+                trackNewMessageEvent(trackConfirmEvent)
+                hasConfirmed = true
+            },
+            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
+            onDismiss = { isSendingCanceled.complete(!hasConfirmed) },
+        )
+
+        return isSendingCanceled.await()
+    }
+
+    private suspend fun showSubjectDialog(isScheduled: Boolean) = showConfirmationDialog(
+        titleRes = R.string.emailWithoutSubjectTitle,
+        descriptionRes = R.string.emailWithoutSubjectDescription,
+        trackEvent = MatomoName.SendWithoutSubject,
+        trackConfirmEvent = MatomoName.SendWithoutSubjectConfirm,
+        isScheduled = isScheduled,
+    )
+
+    private suspend fun showAttachmentDialog(isScheduled: Boolean) = showConfirmationDialog(
+        titleRes = R.string.attachmentsReminderTitle,
+        descriptionRes = R.string.attachmentsReminderDescription,
+        trackEvent = MatomoName.SendWithoutAttachment,
+        trackConfirmEvent = MatomoName.SendWithoutAttachmentConfirm,
+        isScheduled = isScheduled,
+    )
+
 
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
 
@@ -881,4 +932,5 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
+
 }

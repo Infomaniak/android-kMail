@@ -42,6 +42,7 @@ open class DescriptionAlertDialog @Inject constructor(
     private var onPositiveButtonClicked: (() -> Unit)? = null
     private var onNegativeButtonClicked: (() -> Unit)? = null
     private var onCancelled: (() -> Unit)? = null
+    private var onDismissed: (() -> Unit)? = null
 
     protected fun initDialog(customThemeRes: Int? = null) = with(binding) {
         val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
@@ -57,6 +58,7 @@ open class DescriptionAlertDialog @Inject constructor(
         onPositiveButtonClicked = null
         onNegativeButtonClicked = null
         onCancelled = null
+        onDismissed = null
         resetLoadingAndDismiss()
     }
 
@@ -69,11 +71,12 @@ open class DescriptionAlertDialog @Inject constructor(
         @StringRes negativeButtonText: Int? = null,
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)? = null,
+        onDismiss: (() -> Unit)? = null,
         onCancel: (() -> Unit)? = null,
     ) {
         showDialogWithBasicInfo(title, description, displayCancelButton, positiveButtonText, negativeButtonText)
         if (displayLoader) initProgress()
-        setupListeners(displayLoader, onPositiveButtonClicked, onNegativeButtonClicked, onCancel)
+        setupListeners(displayLoader, onPositiveButtonClicked, onNegativeButtonClicked, onCancel, onDismiss)
     }
 
     private fun setupListeners(
@@ -81,6 +84,7 @@ open class DescriptionAlertDialog @Inject constructor(
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)?,
         onCancel: (() -> Unit)?,
+        onDismiss: (() -> Unit)?,
     ) = with(alertDialog) {
 
         this@DescriptionAlertDialog.onPositiveButtonClicked = onPositiveButtonClicked
@@ -99,6 +103,13 @@ open class DescriptionAlertDialog @Inject constructor(
             onCancelled = it
             setOnCancelListener { onCancelled?.invoke() }
         }
+
+        onDismiss?.let {
+            onDismissed = it
+            setOnDismissListener { onDismissed?.invoke() }
+        }
+
+        this@DescriptionAlertDialog
     }
 
     protected fun showDialogWithBasicInfo(
