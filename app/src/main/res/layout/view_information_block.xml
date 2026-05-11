@@ -24,29 +24,32 @@
     app:cardBackgroundColor="@color/informationBlockBackground"
     app:cardCornerRadius="4dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/marginStandardMedium"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <FrameLayout
+            android:id="@+id/iconContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/alternativeMargin">
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
+                android:layout_gravity="center_vertical"
                 tools:drawableStartCompat="@drawable/ic_warning" />
 
             <FrameLayout
                 android:id="@+id/iconAi"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
+                android:layout_height="wrap_content"
+                android:paddingTop="1dp"
+                android:layout_gravity="center_vertical"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:visibility="gone">
 
@@ -58,17 +61,41 @@
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true" />
             </FrameLayout>
-
         </FrameLayout>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/closeButton"
+            style="@style/IconButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            app:icon="@drawable/ic_close_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginStart="@dimen/alternativeMargin"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:layout_marginEnd="@dimen/alternativeMargin"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:divider="@drawable/spacer_standard_medium"
             android:orientation="vertical"
-            android:showDividers="middle">
+            android:showDividers="middle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/closeButton"
+            app:layout_constraintStart_toEndOf="@id/iconContainer"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/informationTitle"
@@ -92,6 +119,7 @@
                 android:id="@+id/informationButton"
                 style="@style/TextButtonSecondary"
                 android:layout_width="wrap_content"
+                android:layout_marginTop="-16dp"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:text="@string/buttonLogInDifferentAccount"
@@ -99,13 +127,5 @@
 
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/closeButton"
-            style="@style/IconButtonSmall"
-            android:layout_marginStart="@dimen/alternativeMargin"
-            android:visibility="gone"
-            app:icon="@drawable/ic_close_small"
-            tools:visibility="visible" />
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
