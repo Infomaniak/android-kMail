@@ -304,7 +304,7 @@ class MessagesActionsUseCase @Inject constructor(
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, isSeen = true)
+        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true)
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
     }
