@@ -1,0 +1,5 @@
+- Ajout d'une alerte de rappel concernant les pièces jointes si l'utilisateur a oublié de les joindre
+- Remplissage automatique du champ URL lors de l'ajout d'un lien à partir d'un texte sélectionné dans l'éditeur
+- Ajout de la signature et des réponses dans RichHtmlEditorWebview. La signature est désormais modifiable.
+- Suppression de l'affichage de l'ancien fil de discussion pendant le chargement sur les appareils lents
+- Fix d'un cas où le champ « Destinataire » pouvait contenir une adresse e-mail invalide, afin d'éviter que les e-mails ne puissent être envoyés et disparaissent
