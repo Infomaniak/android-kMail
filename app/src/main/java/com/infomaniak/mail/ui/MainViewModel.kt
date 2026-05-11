@@ -746,9 +746,9 @@ class MainViewModel @Inject constructor(
                     messagesFoldersIds = messages.getFoldersIds(),
                     destinationFolderId = newFolderId,
                     currentFolderId = currentFolderId,
-                    threadsUids = threadsUids,
+                    threadsUids = movedThreads,
                 )
-                showMoveSnackbar(threadsUids.count(), messages, apiResponses, destinationFolder)
+                showMoveSnackbar(movedThreads.count(), messages, apiResponses, destinationFolder)
                 isMovedToNewFolder.postValue(true)
             }
 
