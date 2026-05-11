@@ -23,7 +23,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,7 +36,6 @@ class DownloadThreadsStatusManager @Inject constructor() {
     private val scope = CoroutineScope(Dispatchers.Default)
     @OptIn(FlowPreview::class)
     val isDownloading: StateFlow<Boolean> = _isDownloading
-        .debounce(50)
         .stateIn(
             scope = scope,
             started = SharingStarted.Lazily,
