@@ -419,6 +419,7 @@
     <string name="messageSummaryError">Euria nie mógł podsumować tej wiadomości.</string>
     <string name="messageSummaryErrorRetry">Euria nie mógł podsumować tej wiadomości. Spróbuj ponownie.</string>
     <string name="messageSummaryLoading">Podsumowanie wiadomości…</string>
+    <string name="messageTranslateError">Euria nie mógł przetłumaczyć tej wiadomości.</string>
     <string name="messageTranslateErrorRetry">Euria nie mógł przetłumaczyć tej wiadomości. Spróbuj ponownie.</string>
     <string name="messageTranslatedTitle">Przetłumaczone w %s</string>
     <string name="mondayAfternoon">Poniedziałek po południu</string>

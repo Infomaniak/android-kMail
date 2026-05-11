@@ -468,7 +468,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiSummaryRetry = { messageUid -> doAiAction(messageUid, AiAction.SUMMARY) },
                 onAiSummaryClose = { messageUid -> threadViewModel.removeSummary(messageUid)},
                 onAiTranslateRetry = { messageUid -> doAiAction(messageUid, AiAction.TRANSLATE) },
-                showSnackbarRetry = ::createSnackBarRetry,
+                showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage))},
             ),
         )
 
@@ -1052,10 +1052,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun createSnackBarRetry() {
-        snackbarManager.setValue(getString(R.string.messageSummaryErrorRetry))
-    }
-
     private fun getStateMap(action: AiAction) = when (action) {
         AiAction.SUMMARY -> threadViewModel.threadState.aiSummaryStateMap
         AiAction.TRANSLATE -> threadViewModel.threadState.aiTranslateStateMap
@@ -1120,10 +1116,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         val canRetry = result.error?.code == ErrorCode.TRANSLATION_API_NOT_AVAILABLE
+        val targetSameAsSource = result.error?.code == ErrorCode.TRANSLATION_TARGET_SAME_AS_SOURCE
         return AiProcessState.Error(
             canRetry = canRetry,
             isRetry = isRetry,
-            wasLoaderShown = wasLoaderShown
+            wasLoaderShown = wasLoaderShown,
+            targetSameAsSource = targetSameAsSource,
         )
     }
 

@@ -407,6 +407,7 @@
     <string name="messageSummaryError">Euria could not summarize this message.</string>
     <string name="messageSummaryErrorRetry">Euria could not summarize this message. Please try again.</string>
     <string name="messageSummaryLoading">Message summary…</string>
+    <string name="messageTranslateError">Euria could not translate this message.</string>
     <string name="messageTranslateErrorRetry">Euria could not translate this message. Please try again.</string>
     <string name="messageTranslatedTitle">Translated in %s</string>
     <string name="mondayAfternoon">Monday afternoon</string>

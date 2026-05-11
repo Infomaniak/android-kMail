@@ -403,6 +403,7 @@
     <string name="messageSummaryError">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα.</string>
     <string name="messageSummaryErrorRetry">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
     <string name="messageSummaryLoading">Σύνοψη του μηνύματος…</string>
+    <string name="messageTranslateError">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα.</string>
     <string name="messageTranslateErrorRetry">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
     <string name="messageTranslatedTitle">Μεταφράστηκε σε %s</string>
     <string name="mondayAfternoon">Δευτέρα απόγευμα</string>

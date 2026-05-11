@@ -403,6 +403,7 @@
     <string name="messageSummaryError">Euria kunne ikke oppsummere denne meldingen.</string>
     <string name="messageSummaryErrorRetry">Euria kunne ikke oppsummere denne meldingen. Vennligst prøv igjen.</string>
     <string name="messageSummaryLoading">Meldingens oppsummering…</string>
+    <string name="messageTranslateError">Euria kunne ikke oversette denne meldingen.</string>
     <string name="messageTranslateErrorRetry">Euria kunne ikke oversette denne meldingen. Vennligst prøv igjen.</string>
     <string name="messageTranslatedTitle">Oversatt i %s</string>
     <string name="mondayAfternoon">Mandag ettermiddag</string>

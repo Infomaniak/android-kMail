@@ -403,6 +403,7 @@
     <string name="messageSummaryError">Euria kon dit bericht niet samenvatten.</string>
     <string name="messageSummaryErrorRetry">Euria kon dit bericht niet samenvatten. Probeer het opnieuw.</string>
     <string name="messageSummaryLoading">Samenvatting van het bericht…</string>
+    <string name="messageTranslateError">Euria kon dit bericht niet vertalen.</string>
     <string name="messageTranslateErrorRetry">Euria kon dit bericht niet vertalen. Probeer het opnieuw.</string>
     <string name="messageTranslatedTitle">Vertaald in %s</string>
     <string name="mondayAfternoon">Maandagmiddag</string>
