@@ -204,15 +204,18 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
     ) {
-        if (currentFolderId == null) {
+        val destinationFolder = folderController.getFolder(destinationFolderId)
+        if (currentFolderId == null || destinationFolder == null) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return
+        }
+
+        val currentFolder = folderController.getFolder(currentFolderId) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return
         }
 
         calculateCurrentThreadPosition.postValue(Unit)
-
-        val destinationFolder = folderController.getFolder(destinationFolderId) ?: return
-        val currentFolder = folderController.getFolder(currentFolderId) ?: return
 
         val result = messagesActionsUseCase.moveMessagesTo(
             currentFolder = currentFolder,
@@ -309,47 +312,12 @@ class ActionsViewModel @Inject constructor(
         val deleteMessages = messagesToDelete.filter { !permanentlyDeleteMessages.contains(it) }
 
         if (permanentlyDeleteMessages.isNotEmpty()) {
-            if (deleteMessages.isEmpty()) calculateCurrentThreadPosition.postValue(Unit)
-
-            val result = messagesActionsUseCase.permanentlyDelete(
-                messagesToDelete = permanentlyDeleteMessages,
-                mailbox = mailbox,
-                onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
-                currentFolder = currentFolder,
-            ) ?: run {
-                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-                return
-            }
-
-            with(result) {
-                if (apiResponses.atLeastOneSucceeded()) {
-                    if (deleteMessages.isEmpty()) {
-                        currentThread?.let { (_, uid) ->
-                            if (uidsToMove.isNotEmpty() && uidsToMove.contains(uid)) tryToAutoAdvance.postValue(Unit)
-                        }
-
-                        refreshFoldersAsync(
-                            mailbox = mailbox,
-                            messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                            currentFolderId = currentFolder.id,
-                            threadsUids = uidsToMove,
-                        )
-                        val numberOfImpactedThreads = messagesToDelete.map { it.threads.first().uid }.distinct().count()
-                        showDeleteSnackbar(
-                            apiResponses = apiResponses,
-                            messages = messagesToDelete,
-                            numberOfImpactedThreads = numberOfImpactedThreads,
-                        )
-                    }
-                }
-
-                if (apiResponses.atLeastOneFailed() && uidsToMove.isNotEmpty()) {
-                    viewModelScope.launch(ioCoroutineContext) {
-                        threadController.updateIsLocallyMovedOutStatus(threadsUids = uidsToMove, hasBeenMovedOut = false)
-                    }
-                }
-            }
-
+            val onlyPermanentlyDeleteMessages = deleteMessages.isEmpty()
+            // If deleteMessages is empty we will do the auto advance after deleting permanently
+            if (onlyPermanentlyDeleteMessages) calculateCurrentThreadPosition.postValue(Unit)
+            handlePermanentlyDeleteMessages(
+                permanentlyDeleteMessages, mailbox, currentFolder, onlyPermanentlyDeleteMessages, messagesToDelete
+            )
         }
 
         if (deleteMessages.isNotEmpty()) {
@@ -366,6 +334,52 @@ class ActionsViewModel @Inject constructor(
                 currentFolderId = currentFolder.id,
                 mailbox = mailbox,
             )
+        }
+    }
+
+    private suspend fun handlePermanentlyDeleteMessages(
+        permanentlyDeleteMessages: List<Message>,
+        mailbox: Mailbox,
+        currentFolder: Folder,
+        shouldAutoAdvanceAndRefresh: Boolean,
+        messagesToDelete: List<Message>
+    ) {
+        val result = messagesActionsUseCase.permanentlyDelete(
+            messagesToDelete = permanentlyDeleteMessages,
+            mailbox = mailbox,
+            onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
+            currentFolder = currentFolder,
+        ) ?: run {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return
+        }
+
+        with(result) {
+            // if there are only permanently delete messages, we should autoadvance and refresh the folder here.
+            if (apiResponses.atLeastOneSucceeded() && shouldAutoAdvanceAndRefresh) {
+                currentThread?.let { (_, uid) ->
+                    if (uidsToMove.isNotEmpty() && uidsToMove.contains(uid)) tryToAutoAdvance.postValue(Unit)
+                }
+
+                refreshFoldersAsync(
+                    mailbox = mailbox,
+                    messagesFoldersIds = messagesToDelete.getFoldersIds(),
+                    currentFolderId = currentFolder.id,
+                    threadsUids = uidsToMove,
+                )
+                val numberOfImpactedThreads = messagesToDelete.map { it.threads.first().uid }.distinct().count()
+                showDeleteSnackbar(
+                    apiResponses = apiResponses,
+                    messages = messagesToDelete,
+                    numberOfImpactedThreads = numberOfImpactedThreads,
+                )
+            }
+
+            if (apiResponses.atLeastOneFailed() && uidsToMove.isNotEmpty()) {
+                viewModelScope.launch(ioCoroutineContext) {
+                    threadController.updateIsLocallyMovedOutStatus(threadsUids = uidsToMove, hasBeenMovedOut = false)
+                }
+            }
         }
     }
 
