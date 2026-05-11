@@ -253,9 +253,14 @@ class ActionsViewModel @Inject constructor(
     ) {
 
         val destination = destinationFolder.getLocalizedName(appContext)
-
         val snackbarTitle = when {
-            apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
+            apiResponses.allFailed() -> {
+                if (apiResponses.isNotEmpty()) {
+                    appContext.getString(apiResponses.first().translateError())
+                } else {
+                    appContext.getString(RCore.string.anErrorHasOccurred)
+                }
+            }
             threadsMoved.count() > 0 || messagesMoved.count() > 1 -> {
                 appContext.resources.getQuantityString(
                     R.plurals.snackbarThreadMoved,
