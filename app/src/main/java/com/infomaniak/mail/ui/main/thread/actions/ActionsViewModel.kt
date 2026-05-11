@@ -764,7 +764,7 @@ class ActionsViewModel @Inject constructor(
 
     private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        downloadThreadsStatusManager.updateState(false)
+        downloadThreadsStatusManager.updateState(isDownloading = false)
     }
     //
 }
