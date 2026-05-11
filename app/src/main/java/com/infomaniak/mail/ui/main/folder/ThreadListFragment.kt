@@ -350,8 +350,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun setupOnRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            if (downloadThreadsStatusManager.isDownloading.value) return@setOnRefreshListener
-            mainViewModel.forceRefreshThreads()
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (downloadThreadsStatusManager.isDownloading.first()) return@launch
+                mainViewModel.forceRefreshThreads()
+            }
         }
     }
 

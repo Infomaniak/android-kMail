@@ -552,7 +552,7 @@ class MainViewModel @Inject constructor(
 
     fun getOnePageOfOldMessages() = viewModelScope.launch(ioCoroutineContext) {
 
-        if (downloadThreadsStatusManager.isDownloading.value) return@launch
+        if (downloadThreadsStatusManager.isDownloading.first()) return@launch
 
         refreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
