@@ -267,7 +267,7 @@ class MainViewModel @Inject constructor(
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
     private var currentThreadsLiveJob: Job? = null
-    
+
     val isNetworkAvailable = networkManager.isNetworkAvailable
     val hasNetwork: Boolean get() = networkManager.hasNetwork
 
@@ -739,6 +739,7 @@ class MainViewModel @Inject constructor(
                     mailbox = currentMailbox.value!!,
                     messagesFoldersIds = messages.getFoldersIds(),
                     destinationFolderId = newFolderId,
+                    currentFolderId = currentFolderId,
                     threadsUids = threadsUids,
                 )
                 showMoveSnackbar(threadsUids.count(), messages, apiResponses, destinationFolder)

@@ -329,10 +329,11 @@ class ActionsViewModel @Inject constructor(
                             currentFolderId = currentFolder.id,
                             threadsUids = uidsToMove,
                         )
+                        val numberOfImpactedThreads = messagesToDelete.map { it.threads.first().uid }.distinct().count()
                         showDeleteSnackbar(
                             apiResponses = apiResponses,
                             messages = messagesToDelete,
-                            numberOfImpactedThreads = messagesToDelete.count(),
+                            numberOfImpactedThreads = numberOfImpactedThreads,
                         )
                     }
                 }
