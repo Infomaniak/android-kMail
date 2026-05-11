@@ -518,11 +518,13 @@ class ThreadAdapter(
         with(binding.blockInformationView) {
             when (state) {
                 is AiProcessState.Loading -> {
-                    informationTitle.setText(R.string.messageSummaryLoading)
+                    val title = if (aiAction == AiAction.SUMMARY) R.string.messageSummaryLoading else R.string.euriaTranslateMessage
+                    informationTitle.setText(title)
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
                 is AiProcessState.Success -> {
-                    informationTitle.setText(R.string.messageSummary)
+                    val title = if (aiAction == AiAction.SUMMARY) R.string.messageSummary else R.string.genericMessageTranslated
+                    informationTitle.setText(title)
                     informationDescription.text = state.content
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
