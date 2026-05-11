@@ -105,7 +105,7 @@ class MessagesActionsUseCase @Inject constructor(
             alsoMoveReactionMessages = alsoMoveReactionMessages,
         )
 
-        // TODO: Will unsync permantly the mailbox if one message in one of the batches did succeed but some other messages in the
+        // TODO: Will unsync permanently the mailbox if one message in one of the batches did succeed but some other messages in the
         //  same batch or in other batches that are target by emoji reactions did not
         if (alsoMoveReactionMessages && apiResponses.atLeastOneSucceeded()) deleteEmojiReactionMessagesLocally(messagesToMove)
 
