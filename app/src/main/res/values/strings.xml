@@ -96,7 +96,7 @@
     <string name="aiReplacementDialogTitle">Replace already existing content?</string>
     <string name="alertBlockedImagesDescription">For your safety certain contents have been blocked from your message.</string>
     <string name="alertBlockedImagesDisplayContent">Display content</string>
-    <string name="alertSenderNoReply">Caution, the sender of this email appears not to want a reply.</string>
+    <string name="alertSenderNoReply">Please note: The sender of this email does not appear to want a response.</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
     <string name="attachMailboxDescription1">If you already have an Infomaniak email address, connect now</string>
