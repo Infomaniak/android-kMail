@@ -33,7 +33,10 @@ class Body : EmbeddedRealmObject {
     @Serializable(FlatteningSubBodiesSerializer::class)
     @SerialName("subBody")
     var subBodies = realmListOf<SubBody>()
+    var summary: String? = null
     //endregion
+
+    val hasSummary: Boolean get() = summary != null
 
     companion object
 }
