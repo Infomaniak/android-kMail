@@ -44,6 +44,7 @@ class ThreadState {
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
     val cachedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
+    val cachedTranslatedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
     var isFirstOpening: Boolean = true
     var superCollapsedBlock: SuperCollapsedBlock? = null
 
@@ -55,6 +56,7 @@ class ThreadState {
         isCalendarEventExpandedMap.clear()
         treatedMessagesForCalendarEvent.clear()
         cachedSplitBodies.clear()
+        cachedTranslatedSplitBodies.clear()
         isFirstOpening = true
         superCollapsedBlock = null
         aiSummaryStateMap.clear()
@@ -69,7 +71,7 @@ class ThreadState {
 sealed class AiProcessState {
     data object Loading : AiProcessState()
     data class Retrying(val isLoaderVisible: Boolean = false) : AiProcessState()
-    data class Success(val content: String) : AiProcessState()
+    data class Success(val content: String = "") : AiProcessState()
     data class Error(
         val canRetry: Boolean,
         val isRetry: Boolean = true,

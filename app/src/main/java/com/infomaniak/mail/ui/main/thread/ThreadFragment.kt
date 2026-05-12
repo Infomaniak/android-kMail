@@ -42,7 +42,6 @@ import androidx.work.Data
 import com.infomaniak.core.common.observe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.views.DividerItemDecorator
@@ -71,6 +70,7 @@ import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
@@ -114,10 +114,13 @@ import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBott
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FolderRoleUtils
+import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
+import com.infomaniak.mail.utils.Utils
+import com.infomaniak.core.legacy.utils.Utils as UtilsLegacy
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
@@ -466,7 +469,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiSummaryClose = { messageUid -> threadViewModel.removeSummary(messageUid)},
                 onAiTranslateRetry = { messageUid -> doAiAction(messageUid, AiAction.TRANSLATE) },
                 showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage)) },
-                onAiBannerClose = { messageUid, aiAction -> dismissAiAction(messageUid, aiAction) }
+                onAiBannerClose = { messageUid, aiAction -> dismissAiAction(messageUid, aiAction) },
+                onShowOriginal = { messageUid -> showOriginalMessage(messageUid) },
             ),
         )
 
@@ -1075,6 +1079,20 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
     }
 
+    private fun showOriginalMessage(messageUid: String) {
+        threadViewModel.removeTranslation(messageUid)
+
+        val originalSplitBody = threadViewModel.threadState.cachedSplitBodies[messageUid]
+        val message = threadAdapter.currentList
+            .filterIsInstance<MessageUi>()
+            .firstOrNull { it.message.uid == messageUid }
+            ?.message
+
+        message?.splitBody = originalSplitBody
+        dismissAiAction(messageUid, AiAction.TRANSLATE)
+        reloadMessageInAdapter(messageUid)
+    }
+
     private fun dismissAiAction(messageUid: String, aiAction: AiAction) {
         getStateMap(aiAction)[messageUid] = AiProcessState.Dismissed
 
@@ -1099,8 +1117,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         val currentState = getStateMap(aiAction)[messageUid]
         val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
 
-        val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
-
         val latestState = getStateMap(aiAction)[messageUid]
         if (latestState is AiProcessState.Dismissed) return
         val summaryContent = result.data
@@ -1108,7 +1124,36 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             threadViewModel.saveSummary(messageUid,summaryContent)
         }
 
-        updateAiProcessState(messageUid, aiAction, finalState)
+        val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
+
+        if (finalState is AiProcessState.Success && aiAction == AiAction.TRANSLATE) {
+            val translatedHtml = result.data ?: ""
+            threadViewModel.saveTranslation(messageUid, translatedHtml)
+
+            val message = mainViewModel.getMessage(messageUid)
+            val bodyType = message?.body?.type ?: Utils.TEXT_HTML
+            val translatedBody = Body().apply {
+                value = translatedHtml
+                type = bodyType
+            }
+            val translatedSplitBody = MessageBodyUtils.splitContentAndQuote(translatedBody)
+            threadViewModel.threadState.cachedTranslatedSplitBodies[messageUid] = translatedSplitBody
+
+            message?.splitBody = translatedSplitBody
+
+            updateAiProcessState(messageUid, aiAction, AiProcessState.Success())
+
+            reloadMessageInAdapter(messageUid)
+        } else {
+            updateAiProcessState(messageUid, aiAction, finalState)
+        }
+    }
+
+    private fun reloadMessageInAdapter(messageUid: String) {
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index >= 0) {
+            threadAdapter.notifyItemChanged(index)
+        }
     }
 
     private suspend fun getMessageContent(messageUid: String): String {
@@ -1157,7 +1202,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun startRetryTimerIfNeeded(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
         if (!isRetry) return
 
-        val timer = Utils.createRefreshTimer {
+        val timer = UtilsLegacy.createRefreshTimer {
             val state = getStateMap(aiAction)[messageUid]
             if (state is AiProcessState.Retrying) {
                 updateAiProcessState(messageUid, aiAction, AiProcessState.Retrying(isLoaderVisible = true))

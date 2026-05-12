@@ -48,6 +48,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -405,11 +406,28 @@ class ThreadViewModel @Inject constructor(
         if (message.body == null) return@withContext message
 
         message.apply {
-            body?.let {
+            body?.let { bodyObj ->
                 val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
-                if (isNotAlreadySplit) threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                splitBody = threadState.cachedSplitBodies[message.uid]
+                if (isNotAlreadySplit) {
+                    threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(bodyObj)
+                }
 
+                if (bodyObj.isTranslated) {
+                    val isTranslatedNotSplit = !threadState.cachedTranslatedSplitBodies.contains(message.uid)
+                    if (isTranslatedNotSplit) {
+                        val translatedBody = Body().apply {
+                            value = bodyObj.translatedValue ?: ""
+                            type = bodyObj.type
+                        }
+                        threadState.cachedTranslatedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(translatedBody)
+                    }
+                    splitBody = threadState.cachedTranslatedSplitBodies[message.uid]
+
+                    if (threadState.aiTranslateStateMap[message.uid] == null) {
+                        threadState.aiTranslateStateMap[message.uid] = AiProcessState.Success()
+                    }
+                } else {
+                    splitBody = threadState.cachedSplitBodies[message.uid]
                 it.summary?.let { summaryText ->
                     if (threadState.aiSummaryStateMap[message.uid] == null) {
                         threadState.aiSummaryStateMap[message.uid] =
@@ -422,6 +440,10 @@ class ThreadViewModel @Inject constructor(
         return@withContext message
     }
 
+    fun saveTranslation(messageUid: String, translatedHtml: String) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                localMessage?.body?.translatedValue = translatedHtml
     fun saveSummary(messageUid: String, summaryText: String) = viewModelScope.launch(ioCoroutineContext) {
         mailboxContentRealm().write {
             MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
@@ -436,6 +458,14 @@ class ThreadViewModel @Inject constructor(
                 localMessage?.body?.summary = null
             }
         }
+	}
+    fun removeTranslation(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                localMessage?.body?.translatedValue = null
+            }
+        }
+        threadState.cachedTranslatedSplitBodies.remove(messageUid)
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {

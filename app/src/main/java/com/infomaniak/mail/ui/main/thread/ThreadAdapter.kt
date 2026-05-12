@@ -482,8 +482,8 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.bindAiAction(message: Message, aiAction: ThreadFragment.AiAction? = null) {
         if (aiAction == null) {
-            bindAiAction(message, AiAction.TRANSLATE)
             bindAiAction(message, AiAction.SUMMARY)
+            bindAiAction(message, AiAction.TRANSLATE)
             return
         }
 
@@ -494,23 +494,24 @@ class ThreadAdapter(
             return
         }
 
-        setupBaseVisibility(state)
+        setupBaseVisibility(state, aiAction)
         handleProcessState(state, aiAction)
         setupListeners(message.uid, aiAction)
     }
 
-    private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState) {
+    private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState, aiAction: AiAction) {
         with(binding.blockInformationView) {
             root.isVisible = true
             closeButton.isVisible = true
             informationTitle.isVisible = true
 
             val isErrorOrRetrying = state is AiProcessState.Error || state is AiProcessState.Retrying
+            val isTranslateSuccess = state is AiProcessState.Success && aiAction == AiAction.TRANSLATE
 
             iconAi.isVisible = !isErrorOrRetrying
             icon.isVisible = isErrorOrRetrying
-            informationButton.isVisible = isErrorOrRetrying
-            informationDescription.isVisible = state is AiProcessState.Success
+            informationButton.isVisible = isErrorOrRetrying || isTranslateSuccess
+            informationDescription.isVisible = state is AiProcessState.Success && aiAction == AiAction.SUMMARY
         }
     }
 
@@ -518,14 +519,23 @@ class ThreadAdapter(
         with(binding.blockInformationView) {
             when (state) {
                 is AiProcessState.Loading -> {
-                    val title = if (aiAction == AiAction.SUMMARY) R.string.messageSummaryLoading else R.string.euriaTranslateMessage
+                    val title =
+                        if (aiAction == AiAction.SUMMARY) R.string.messageSummaryLoading else R.string.euriaTranslateMessage
                     informationTitle.setText(title)
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
                 is AiProcessState.Success -> {
-                    val title = if (aiAction == AiAction.SUMMARY) R.string.messageSummary else R.string.genericMessageTranslated
-                    informationTitle.setText(title)
-                    informationDescription.text = state.content
+                    if (aiAction == AiAction.SUMMARY) {
+                        informationTitle.setText(R.string.messageSummary)
+                        informationDescription.text = state.content
+                        informationDescription.isVisible = true
+                        informationButton.isVisible = false
+                    } else {
+                        informationTitle.setText(R.string.genericMessageTranslated)
+                        informationDescription.isVisible = false
+                        informationButton.isVisible = true
+                        informationButton.hideProgressCatching(R.string.buttonShowOriginal)
+                    }
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
                 is AiProcessState.Retrying -> handleRetryingState(state, aiAction)
@@ -537,7 +547,8 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying, aiAction: AiAction) {
         with(binding.blockInformationView) {
-            val errorMessage = if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+            val errorMessage =
+                if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
             informationTitle.setText(errorMessage)
             icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
             informationButton.isEnabled = false
@@ -589,7 +600,14 @@ class ThreadAdapter(
                 threadAdapterCallbacks?.onAiSummaryClose?.invoke(messageUid)
             }
 
-            informationButton.setOnClickListener {threadAdapterCallbacks?.onAiBannerRetry?.invoke(messageUid, aiAction) }
+            informationButton.setOnClickListener {
+                val state = getStateMap(aiAction, messageUid)
+                if (state is AiProcessState.Success && aiAction == AiAction.TRANSLATE) {
+                    threadAdapterCallbacks?.onShowOriginal?.invoke(messageUid)
+                } else {
+                    threadAdapterCallbacks?.onAiBannerRetry?.invoke(messageUid, aiAction)
+                }
+            }
         }
     }
 
@@ -1251,6 +1269,7 @@ class ThreadAdapter(
         var onAiTranslateRetry: ((messageUid: String) -> Unit)? = null,
         var showSnackbarRetry: ((errorMessage: Int) -> Unit)? = null,
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
+        var onShowOriginal: ((messageUid: String) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {
