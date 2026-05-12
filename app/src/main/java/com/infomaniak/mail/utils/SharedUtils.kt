@@ -290,6 +290,15 @@ class SharedUtils @Inject constructor(
             return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && isSnoozeAvailable()
         }
 
+        fun hasNoReplyRecipients(message: Message, isReplyAll: Boolean): Boolean {
+            val noReplyMailRegex = listOf("no-reply", "noreply", "postmaster", "catchall").joinToString("|")
+            val pattern = Regex(noReplyMailRegex, RegexOption.LITERAL)
+            val hasNoReplyRecipients = message.getRecipientsForReplyTo(isReplyAll).first.any { recipient ->
+                pattern.containsMatchIn(recipient.email)
+            }
+            return hasNoReplyRecipients
+        }
+
         sealed interface AutomaticUnsnoozeResult {
             data class Success(val impactedFolders: ImpactedFolders) : AutomaticUnsnoozeResult
             data object CannotBeUnsnoozedError : AutomaticUnsnoozeResult
