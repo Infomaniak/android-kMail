@@ -83,12 +83,14 @@
             tools:visibility="visible" />
 
         <LinearLayout
+            android:id="@+id/linearLayoutContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/alternativeMargin"
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:layout_marginEnd="@dimen/alternativeMargin"
             android:layout_marginBottom="@dimen/marginStandardMedium"
+            tools:layout_marginBottom="@dimen/marginComplementaryButton"
             android:divider="@drawable/spacer_standard_medium"
             android:orientation="vertical"
             android:showDividers="middle"
