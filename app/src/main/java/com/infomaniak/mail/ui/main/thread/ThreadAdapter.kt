@@ -548,7 +548,9 @@ class ThreadAdapter(
                         informationTitle.setText(R.string.genericMessageTranslated)
                         informationDescription.isVisible = false
                         informationButton.isVisible = true
+                        informationButton.isEnabled = true
                         informationButton.hideProgressCatching(R.string.buttonShowOriginal)
+                        closeButton.isVisible = false
                     }
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }

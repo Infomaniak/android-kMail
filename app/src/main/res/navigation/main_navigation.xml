@@ -191,6 +191,14 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
+        <argument
+            android:name="isAlreadyTranslated"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="isAlreadySummarized"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog
@@ -211,6 +219,14 @@
         <argument
             android:name="isFromThreadList"
             android:defaultValue="true"
+            app:argType="boolean" />
+        <argument
+            android:name="isAlreadyTranslated"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="isAlreadySummarized"
+            android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
 

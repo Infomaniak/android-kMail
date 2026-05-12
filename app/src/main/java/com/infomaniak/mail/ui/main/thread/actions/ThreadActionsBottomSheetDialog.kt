@@ -120,8 +120,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setMoveUi(isFromDraft)
                 setMarkUnreadUi(isFromDraft)
                 setReportPhishingUi(isFromDraft)
-                setSummaryUi(navigationArgs.isFromThreadList)
-                setTranslateUi(navigationArgs.isFromThreadList)
+                setSummaryUi(isFromThreadList = navigationArgs.isFromThreadList)
+                setTranslateUi(isFromThreadList = navigationArgs.isFromThreadList)
+                setSummaryEnabled(isEnabled = !navigationArgs.isAlreadySummarized)
+                setTranslateEnabled(isEnabled = !navigationArgs.isAlreadyTranslated)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }

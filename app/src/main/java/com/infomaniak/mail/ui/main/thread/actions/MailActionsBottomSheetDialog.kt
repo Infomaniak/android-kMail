@@ -212,12 +212,20 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
-    fun setSummaryUi(isFromThreadList : Boolean) = with(binding.summary) {
+    fun setSummaryUi(isFromThreadList: Boolean) = with(binding.summary) {
         isVisible = !isFromThreadList
     }
 
-    fun setTranslateUi(isFromThreadList : Boolean) = with(binding.translate) {
+    fun setTranslateUi(isFromThreadList: Boolean) = with(binding.translate) {
         isVisible = !isFromThreadList
+    }
+
+    fun setTranslateEnabled(isEnabled: Boolean) = with(binding.translate) {
+        this.isEnabled = isEnabled
+    }
+
+    fun setSummaryEnabled(isEnabled: Boolean) = with(binding.summary) {
+        this.isEnabled = isEnabled
     }
 
     interface OnActionClick {

@@ -113,6 +113,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setReportPhishingUi(isFromDraft)
             setSummaryUi(isFromThreadList = false)
             setTranslateUi(isFromThreadList = false)
+            setSummaryEnabled(isEnabled = !navigationArgs.isAlreadySummarized)
+            setTranslateEnabled(isEnabled = !navigationArgs.isAlreadyTranslated)
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()

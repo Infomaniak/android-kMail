@@ -683,12 +683,18 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     )
                 }
                 R.id.quickActionMenu -> {
+                    val lastMessage = threadViewModel.quickActionBarClicks.value?.message
+                    val translateState = lastMessage?.let { threadViewModel.threadState.aiTranslateStateMap[it.uid] }
+                    val summaryState = lastMessage?.let { threadViewModel.threadState.aiSummaryStateMap[it.uid] }
+
                     safeNavigate(
                         resId = R.id.threadActionsBottomSheetDialog,
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                            isFromThreadList = false
+                            isFromThreadList = false,
+                            isAlreadyTranslated = translateState is AiProcessState.Success || translateState is AiProcessState.Loading,
+                            isAlreadySummarized = summaryState is AiProcessState.Success || summaryState is AiProcessState.Loading,
                         ).toBundle(),
                     )
                 }
@@ -991,6 +997,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
+        val translateState = threadViewModel.threadState.aiTranslateStateMap[uid]
+        val summaryState = threadViewModel.threadState.aiSummaryStateMap[uid]
+
         safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
             args = MessageActionsBottomSheetDialogArgs(
@@ -998,6 +1007,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadViewModel.threadState.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
+                isAlreadyTranslated = translateState is AiProcessState.Success || translateState is AiProcessState.Loading,
+                isAlreadySummarized = summaryState is AiProcessState.Success || summaryState is AiProcessState.Loading,
             ).toBundle(),
         )
     }
