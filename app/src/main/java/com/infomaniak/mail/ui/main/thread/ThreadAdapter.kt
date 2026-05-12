@@ -558,6 +558,7 @@ class ThreadAdapter(
             closeButton.setOnClickListener {
                 threadAdapterState.aiSummaryStateMap.remove(messageUid)
                 root.isVisible = false
+                threadAdapterCallbacks?.onAiSummaryClose?.invoke(messageUid)
             }
 
             informationButton.setOnClickListener {
@@ -1218,6 +1219,7 @@ class ThreadAdapter(
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
         var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
+        var onAiSummaryClose: ((messageUid: String) -> Unit)? = null,
         var showSnackbarRetry: (() -> Unit)? = null,
     )
 
