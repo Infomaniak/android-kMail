@@ -142,8 +142,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun handleReply(isReplyAll: Boolean, thread: Thread, messageUidToExecuteAction: String) {
-        trackBottomSheetThreadActionsEvent(if (isReplyAll) MatomoName.ReplyAll else MatomoName.Reply)
-
         val activity = requireActivity() as MainActivity
         val message = thread.messages.find { message -> message.uid == messageUidToExecuteAction } ?: return
         val hasNoReplyRecipients = SharedUtils.hasNoReplyRecipients(message, isReplyAll)
@@ -151,6 +149,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         descriptionDialog.replyWithConfirmationPopup(
             hasNoReplyRecipients = hasNoReplyRecipients,
             onPositiveButtonClicked = {
+                trackBottomSheetThreadActionsEvent(if (isReplyAll) MatomoName.ReplyAll else MatomoName.Reply)
                 safeNavigateToNewMessageActivity(
                     currentActivity = activity,
                     draftMode = if (isReplyAll) DraftMode.REPLY_ALL else DraftMode.REPLY,
