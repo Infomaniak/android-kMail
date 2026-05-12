@@ -96,6 +96,7 @@
     <string name="aiReplacementDialogTitle">Zamienić istniejącą treść?</string>
     <string name="alertBlockedImagesDescription">Dla Twojego bezpieczeństwa zablokowaliśmy niektóre treści w tej wiadomości.</string>
     <string name="alertBlockedImagesDisplayContent">Wyświetl treść</string>
+    <string name="alertSenderNoReply">Uwaga, nadawca tej wiadomości e-mail wydaje się nie oczekiwać odpowiedzi.</string>
     <string name="appSecurityDescription">Chroń dostęp do aplikacji, włączając blokadę telefonu.</string>
     <string name="archiveFolder">Zarchiwizowane</string>
     <string name="attachMailboxDescription1">Jeśli masz już adres e-mail Infomaniak, zaloguj się teraz</string>
@@ -113,8 +114,8 @@
         <item quantity="many">%d załączników</item>
         <item quantity="other">%d załącznika</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Brakujący załącznik</string>
     <string name="attachmentsReminderDescription">Wspomniałeś o załączniku, ale nie dodano żadnego pliku. Wysłać mimo to?</string>
+    <string name="attachmentsReminderTitle">Brakujący załącznik</string>
     <string name="attendeesListTitle">Lista uczestników (%d)</string>
     <string name="bccTitle">UDW:</string>
     <string name="blockAnExpeditorTitle">Zablokuj nadawcę</string>

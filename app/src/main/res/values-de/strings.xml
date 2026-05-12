@@ -92,6 +92,7 @@
     <string name="aiReplacementDialogTitle">Bestehende Inhalte ersetzen?</string>
     <string name="alertBlockedImagesDescription">Bestimmte Inhalte Ihrer Nachricht wurden zu Ihrer Sicherheit blockiert.</string>
     <string name="alertBlockedImagesDisplayContent">Inhalt anzeigen</string>
+    <string name="alertSenderNoReply">Achtung, der Absender dieser E-Mail möchte offenbar keine Antwort.</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
     <string name="attachMailboxDescription1">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>
@@ -107,8 +108,8 @@
         <item quantity="one">%d Anhang</item>
         <item quantity="other">%d Anhänge</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Fehlender Anhang</string>
     <string name="attachmentsReminderDescription">Sie haben einen Anhang erwähnt, aber es ist keine Datei hinzugefügt worden. Trotzdem senden?</string>
+    <string name="attachmentsReminderTitle">Fehlender Anhang</string>
     <string name="attendeesListTitle">Liste der Teilnehmer (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Einen Absender blockieren</string>

@@ -92,6 +92,7 @@
     <string name="aiReplacementDialogTitle">Bestaande inhoud vervangen?</string>
     <string name="alertBlockedImagesDescription">Voor uw veiligheid zijn bepaalde inhoud van uw bericht geblokkeerd.</string>
     <string name="alertBlockedImagesDisplayContent">Inhoud weergeven</string>
+    <string name="alertSenderNoReply">Let op, de verzender van deze e-mail lijkt geen antwoord te wensen.</string>
     <string name="appSecurityDescription">Bescherm de toegang tot uw app door de vergrendeling van uw telefoon in te schakelen.</string>
     <string name="archiveFolder">Gearchiveerd</string>
     <string name="attachMailboxDescription1">Als u al een Infomaniak e-mailadres heeft, log dan nu in</string>
@@ -107,8 +108,8 @@
         <item quantity="one">%d bijlage</item>
         <item quantity="other">%d bijlagen</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Ontbrekende bijlage</string>
     <string name="attachmentsReminderDescription">U heeft een bijlage genoemd, maar er is geen bestand toegevoegd. Toch versturen?</string>
+    <string name="attachmentsReminderTitle">Ontbrekende bijlage</string>
     <string name="attendeesListTitle">Lijst van deelnemers (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Een afzender blokkeren</string>
