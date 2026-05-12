@@ -51,6 +51,7 @@ import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -407,21 +408,48 @@ class ThreadViewModel @Inject constructor(
         if (message.body == null) return@withContext message
 
         message.apply {
-            body?.let {
+            body?.let { bodyObj ->
                 val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
-                if (isNotAlreadySplit) threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                splitBody = threadState.cachedSplitBodies[message.uid]
+                if (isNotAlreadySplit) {
+                    threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(bodyObj)
+                }
 
-                it.summary?.let { summaryText ->
+                if (bodyObj.isTranslated) {
+                    val isTranslatedNotSplit = !threadState.cachedTranslatedSplitBodies.contains(message.uid)
+                    if (isTranslatedNotSplit) {
+                        val translatedBody = Body().apply {
+                            value = bodyObj.translatedValue ?: ""
+                            type = bodyObj.type
+                        }
+                        threadState.cachedTranslatedSplitBodies[message.uid] =
+                            MessageBodyUtils.splitContentAndQuote(translatedBody)
+                    }
+                    splitBody = threadState.cachedTranslatedSplitBodies[message.uid]
+
+                    if (threadState.aiTranslateStateMap[message.uid] == null) {
+                        threadState.aiTranslateStateMap[message.uid] = AiProcessState.Success()
+                    }
+                } else {
+                    splitBody = threadState.cachedSplitBodies[message.uid]
+                }
+
+                bodyObj.summary?.let { summaryText ->
                     if (threadState.aiSummaryStateMap[message.uid] == null) {
-                        threadState.aiSummaryStateMap[message.uid] =
-                            AiProcessState.Success(content = summaryText)
+                        threadState.aiSummaryStateMap[message.uid] = AiProcessState.Success(content = summaryText)
                     }
                 }
             }
         }
 
         return@withContext message
+    }
+
+    fun saveTranslation(messageUid: String, translatedHtml: String) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                localMessage?.body?.translatedValue = translatedHtml
+            }
+        }
     }
 
     fun saveSummary(messageUid: String, summaryText: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -438,6 +466,15 @@ class ThreadViewModel @Inject constructor(
                 localMessage?.body?.summary = null
             }
         }
+    }
+
+    fun removeTranslation(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                localMessage?.body?.translatedValue = null
+            }
+        }
+        threadState.cachedTranslatedSplitBodies.remove(messageUid)
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
@@ -506,7 +543,10 @@ class ThreadViewModel @Inject constructor(
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
             messagesUids = messages.getUids(),
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsFlow.first(), localSettings)
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(
+                featureFlagsFlow.first(),
+                localSettings
+            )
         )
 
         if (apiResponses.atLeastOneSucceeded()) {
@@ -541,7 +581,10 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    private suspend fun fetchCalendarEvent(item: Any, forceFetch: Boolean): Pair<Message, ApiResponse<CalendarEventResponse>>? {
+    private suspend fun fetchCalendarEvent(
+        item: Any,
+        forceFetch: Boolean
+    ): Pair<Message, ApiResponse<CalendarEventResponse>>? {
 
         if (item !is MessageUi) return null
         val message: Message = item.message
@@ -560,7 +603,10 @@ class ThreadViewModel @Inject constructor(
         return message to apiResponse
     }
 
-    private fun MutableRealm.updateCalendarEventBlocking(message: Message, apiResponse: ApiResponse<CalendarEventResponse>) {
+    private fun MutableRealm.updateCalendarEventBlocking(
+        message: Message,
+        apiResponse: ApiResponse<CalendarEventResponse>
+    ) {
 
         if (!apiResponse.isSuccess()) {
             Sentry.captureMessage("Failed loading calendar event") { scope ->
@@ -702,7 +748,10 @@ class ThreadViewModel @Inject constructor(
         return fakeReactions
     }
 
-    private suspend fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
+    private suspend fun fakeEmojiReactionState(
+        state: EmojiReactionState,
+        localReactions: Set<String>
+    ): EmojiReactionStateUi {
         val shouldFake = state.emoji in localReactions && !state.hasReacted
 
         val authors = state.authors.mapNotNullTo(mutableListOf<EmojiReactionAuthorUi>()) { author ->
