@@ -470,9 +470,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 },
                 onAiBannerRetry = { messageUid, aiAction -> doAiAction(messageUid, aiAction) },
-                onAiSummaryRetry = { messageUid -> doAiAction(messageUid, AiAction.SUMMARY) },
-                onAiSummaryClose = { messageUid -> threadViewModel.removeSummary(messageUid) },
-                onAiTranslateRetry = { messageUid -> doAiAction(messageUid, AiAction.TRANSLATE) },
                 showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage)) },
                 onAiBannerClose = { messageUid, aiAction -> dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> showOriginalMessage(messageUid) },
@@ -1112,6 +1109,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun dismissAiAction(messageUid: String, aiAction: AiAction) {
         getStateMap(aiAction)[messageUid] = AiProcessState.Dismissed
 
+        when (aiAction) {
+            AiAction.SUMMARY -> threadViewModel.removeSummary(messageUid)
+            AiAction.TRANSLATE -> threadViewModel.removeTranslation(messageUid)
+        }
+
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
         if (index >= 0) {
             val notifyType = if (aiAction == AiAction.SUMMARY) {
@@ -1140,34 +1142,37 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         val latestState = getStateMap(aiAction)[messageUid]
         if (latestState is AiProcessState.Dismissed) return
-        val summaryContent = result.data
-        if (summaryContent != null) {
-            threadViewModel.saveSummary(messageUid, summaryContent)
-        }
+
 
         val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
 
-        if (finalState is AiProcessState.Success && aiAction == AiAction.TRANSLATE) {
-            val translatedHtml = result.data ?: ""
-            threadViewModel.saveTranslation(messageUid, translatedHtml)
+        if (finalState is AiProcessState.Success) {
+            when (aiAction) {
+                AiAction.TRANSLATE -> {
+                    val translatedHtml = result.data ?: ""
+                    threadViewModel.saveTranslation(messageUid, translatedHtml)
 
-            val message = mainViewModel.getMessage(messageUid)
-            val bodyType = message?.body?.type ?: Utils.TEXT_HTML
-            val translatedBody = Body().apply {
-                value = translatedHtml
-                type = bodyType
+                    val message = mainViewModel.getMessage(messageUid)
+                    val bodyType = message?.body?.type ?: Utils.TEXT_HTML
+                    val translatedBody = Body().apply {
+                        value = translatedHtml
+                        type = bodyType
+                    }
+                    val translatedSplitBody = MessageBodyUtils.splitContentAndQuote(translatedBody)
+                    threadViewModel.threadState.cachedTranslatedSplitBodies[messageUid] = translatedSplitBody
+
+                    message?.splitBody = translatedSplitBody
+                    reloadMessageInAdapter(messageUid)
+                }
+                AiAction.SUMMARY -> {
+                    val summaryContent = result.data
+                    if (summaryContent != null) {
+                        threadViewModel.saveSummary(messageUid, summaryContent)
+                    }
+                }
             }
-            val translatedSplitBody = MessageBodyUtils.splitContentAndQuote(translatedBody)
-            threadViewModel.threadState.cachedTranslatedSplitBodies[messageUid] = translatedSplitBody
-
-            message?.splitBody = translatedSplitBody
-
-            updateAiProcessState(messageUid, aiAction, AiProcessState.Success())
-
-            reloadMessageInAdapter(messageUid)
-        } else {
-            updateAiProcessState(messageUid, aiAction, finalState)
         }
+        updateAiProcessState(messageUid, aiAction, finalState)
     }
 
     private fun reloadMessageInAdapter(messageUid: String) {

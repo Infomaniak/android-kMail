@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SplitBody
 import com.infomaniak.mail.data.models.message.SubBody
+import com.infomaniak.mail.ui.main.thread.AiProcessState
 import com.infomaniak.mail.ui.newMessage.BodyContentPayload
 import com.infomaniak.mail.ui.newMessage.BodyContentType
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
@@ -33,8 +34,11 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import kotlin.collections.contains
+import kotlin.collections.set
 
 object MessageBodyUtils {
 

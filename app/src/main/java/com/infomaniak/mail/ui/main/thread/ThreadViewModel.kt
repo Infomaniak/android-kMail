@@ -54,6 +54,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.SplitBody
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.DefaultDispatcher
 import com.infomaniak.mail.di.IoDispatcher
@@ -178,15 +179,15 @@ class ThreadViewModel @Inject constructor(
     private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
 
     /**
-    * Flow tracking the unsubscribe status of each message, keyed by its UID.
-    *
-    * Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress], [UnsubscribeState.Completed])
-    * is updated in this map, and the entire map is re-emitted to trigger a refresh of the [MessageUi].
-    *
-    * This flow is collected inside a [combine] to ensure that unsubscribe statuses are preserved
-    * even when other changes (e.g., sorting, filtering, content updates) trigger a full rebuild
-    * of the [MessageUi] list.
-    */
+     * Flow tracking the unsubscribe status of each message, keyed by its UID.
+     *
+     * Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress], [UnsubscribeState.Completed])
+     * is updated in this map, and the entire map is re-emitted to trigger a refresh of the [MessageUi].
+     *
+     * This flow is collected inside a [combine] to ensure that unsubscribe statuses are preserved
+     * even when other changes (e.g., sorting, filtering, content updates) trigger a full rebuild
+     * of the [MessageUi] list.
+     */
     private val unsubscribeStateByMessageUid = MutableStateFlow<Map<String, UnsubscribeState>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -405,75 +406,70 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
-        if (message.body == null) return@withContext message
+        val bodyObj = message.body ?: return@withContext message
 
-        message.apply {
-            body?.let { bodyObj ->
-                val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
-                if (isNotAlreadySplit) {
-                    threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(bodyObj)
-                }
-
-                if (bodyObj.isTranslated) {
-                    val isTranslatedNotSplit = !threadState.cachedTranslatedSplitBodies.contains(message.uid)
-                    if (isTranslatedNotSplit) {
-                        val translatedBody = Body().apply {
-                            value = bodyObj.translatedValue ?: ""
-                            type = bodyObj.type
-                        }
-                        threadState.cachedTranslatedSplitBodies[message.uid] =
-                            MessageBodyUtils.splitContentAndQuote(translatedBody)
-                    }
-                    splitBody = threadState.cachedTranslatedSplitBodies[message.uid]
-
-                    if (threadState.aiTranslateStateMap[message.uid] == null) {
-                        threadState.aiTranslateStateMap[message.uid] = AiProcessState.Success()
-                    }
-                } else {
-                    splitBody = threadState.cachedSplitBodies[message.uid]
-                }
-
-                bodyObj.summary?.let { summaryText ->
-                    if (threadState.aiSummaryStateMap[message.uid] == null) {
-                        threadState.aiSummaryStateMap[message.uid] = AiProcessState.Success(content = summaryText)
-                    }
-                }
-            }
+        val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
+        if (isNotAlreadySplit) {
+            threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(bodyObj)
         }
+
+        if (bodyObj.isTranslated) {
+            message.splitBody = loadTranslatedSplitBody(message.uid, bodyObj)
+
+            if (threadState.aiTranslateStateMap[message.uid] == null) {
+                threadState.aiTranslateStateMap[message.uid] = AiProcessState.Success()
+            }
+        } else {
+            message.splitBody = threadState.cachedSplitBodies[message.uid]
+        }
+
+        insertSummaryIfExists(bodyObj, message)
 
         return@withContext message
     }
 
-    fun saveTranslation(messageUid: String, translatedHtml: String) = viewModelScope.launch(ioCoroutineContext) {
-        mailboxContentRealm().write {
-            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
-                localMessage?.body?.translatedValue = translatedHtml
+    private fun insertSummaryIfExists(bodyObj: Body, message: Message) {
+        bodyObj.summary?.let { summaryText ->
+            if (threadState.aiSummaryStateMap[message.uid] == null) {
+                threadState.aiSummaryStateMap[message.uid] = AiProcessState.Success(content = summaryText)
             }
         }
+    }
+
+    private suspend fun loadTranslatedSplitBody(messageUid: String, bodyObj: Body): SplitBody? {
+        val isTranslatedNotSplit = !threadState.cachedTranslatedSplitBodies.contains(messageUid)
+        if (isTranslatedNotSplit) {
+            val translatedBody = Body().apply {
+                value = bodyObj.translatedValue ?: ""
+                type = bodyObj.type
+            }
+            threadState.cachedTranslatedSplitBodies[messageUid] = MessageBodyUtils.splitContentAndQuote(translatedBody)
+        }
+        return threadState.cachedTranslatedSplitBodies[messageUid]
+    }
+
+    private suspend fun updateLocalMessageBody(messageUid: String, updateAction: (Message?) -> Unit) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                updateAction(localMessage)
+            }
+        }
+    }
+
+    fun saveTranslation(messageUid: String, translatedHtml: String) = viewModelScope.launch(ioCoroutineContext) {
+        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = translatedHtml }
     }
 
     fun saveSummary(messageUid: String, summaryText: String) = viewModelScope.launch(ioCoroutineContext) {
-        mailboxContentRealm().write {
-            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
-                localMessage?.body?.summary = summaryText
-            }
-        }
+        updateLocalMessageBody(messageUid) { it?.body?.summary = summaryText }
     }
 
     fun removeSummary(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        mailboxContentRealm().write {
-            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
-                localMessage?.body?.summary = null
-            }
-        }
+        updateLocalMessageBody(messageUid) { it?.body?.summary = null }
     }
 
     fun removeTranslation(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        mailboxContentRealm().write {
-            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
-                localMessage?.body?.translatedValue = null
-            }
-        }
+        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = null }
         threadState.cachedTranslatedSplitBodies.remove(messageUid)
     }
 
@@ -630,7 +626,10 @@ class ThreadViewModel @Inject constructor(
                     val hasUserStoredEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent()
                     scope.setExtra("event has userStoredEvent", hasUserStoredEvent.toString())
                     scope.setExtra("event is canceled", calendarEventResponse.isCanceled.toString())
-                    scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
+                    scope.setExtra(
+                        "event has attachmentEvent",
+                        calendarEventResponse.hasAttachmentEvent().toString()
+                    )
                 }
             }
         }
@@ -695,7 +694,8 @@ class ThreadViewModel @Inject constructor(
                     val reactionDetail = reactions[emoji]?.computeReactionDetail(
                         emoji = emoji,
                         context = appContext,
-                        mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap(),
+                        mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value
+                            ?: emptyMap(),
                         isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false,
                     )
                     if (reactionDetail != null) put(emoji, reactionDetail)
@@ -714,7 +714,8 @@ class ThreadViewModel @Inject constructor(
         if (item is Message) {
             val localReactions = fakeReactions[item.messageId] ?: emptySet()
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
-            val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
+            val canUnsubscribeOrNull =
+                if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
             MessageUi(
                 message = item,
                 emojiReactionsState = reactions,
