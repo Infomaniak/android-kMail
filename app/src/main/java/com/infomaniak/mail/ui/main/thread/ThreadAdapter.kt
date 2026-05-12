@@ -606,7 +606,6 @@ class ThreadAdapter(
             closeButton.setOnClickListener {
                 threadAdapterCallbacks?.onAiBannerClose?.invoke(messageUid, aiAction)
                 root.isVisible = false
-                threadAdapterCallbacks?.onAiSummaryClose?.invoke(messageUid)
             }
 
             informationButton.setOnClickListener {
@@ -1273,9 +1272,6 @@ class ThreadAdapter(
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
         var onAiBannerRetry: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
-        var onAiSummaryRetry: ((messageUid: String) -> Unit)? = null,
-        var onAiSummaryClose: ((messageUid: String) -> Unit)? = null,
-        var onAiTranslateRetry: ((messageUid: String) -> Unit)? = null,
         var showSnackbarRetry: ((errorMessage: Int) -> Unit)? = null,
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
