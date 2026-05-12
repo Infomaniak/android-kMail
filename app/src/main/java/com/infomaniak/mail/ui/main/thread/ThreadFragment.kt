@@ -120,7 +120,6 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.core.legacy.utils.Utils as UtilsLegacy
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
@@ -156,6 +155,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
 import androidx.appcompat.R as RAndroid
+import com.infomaniak.core.legacy.utils.Utils as UtilsLegacy
 
 @AndroidEntryPoint
 class ThreadFragment : Fragment(), PickerEmojiObserver {
@@ -678,12 +678,18 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     )
                 }
                 R.id.quickActionMenu -> {
+                    val lastMessage = threadViewModel.quickActionBarClicks.value?.message
+                    val translateState = lastMessage?.let { threadViewModel.threadState.aiTranslateStateMap[it.uid] }
+                    val summaryState = lastMessage?.let { threadViewModel.threadState.aiSummaryStateMap[it.uid] }
+
                     safeNavigate(
                         resId = R.id.threadActionsBottomSheetDialog,
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                            isFromThreadList = false
+                            isFromThreadList = false,
+                            isAlreadyTranslated = translateState is AiProcessState.Success || translateState is AiProcessState.Loading,
+                            isAlreadySummarized = summaryState is AiProcessState.Success || summaryState is AiProcessState.Loading,
                         ).toBundle(),
                     )
                 }
@@ -986,6 +992,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
+        val translateState = threadViewModel.threadState.aiTranslateStateMap[uid]
+        val summaryState = threadViewModel.threadState.aiSummaryStateMap[uid]
+
         safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
             args = MessageActionsBottomSheetDialogArgs(
@@ -993,6 +1002,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadViewModel.threadState.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
+                isAlreadyTranslated = translateState is AiProcessState.Success || translateState is AiProcessState.Loading,
+                isAlreadySummarized = summaryState is AiProcessState.Success || summaryState is AiProcessState.Loading,
             ).toBundle(),
         )
     }
@@ -1098,7 +1109,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
         if (index >= 0) {
-            val notifyType = if (aiAction == AiAction.SUMMARY) ThreadAdapter.NotifyType.AiSummaryStateChanged else ThreadAdapter.NotifyType.AiTranslateStateChanged
+            val notifyType =
+                if (aiAction == AiAction.SUMMARY) ThreadAdapter.NotifyType.AiSummaryStateChanged else ThreadAdapter.NotifyType.AiTranslateStateChanged
             threadAdapter.notifyItemChanged(index, notifyType)
         }
     }

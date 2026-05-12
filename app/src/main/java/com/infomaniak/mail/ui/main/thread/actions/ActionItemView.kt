@@ -89,6 +89,14 @@ class ActionItemView @JvmOverloads constructor(
         }
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        binding.root.isEnabled = enabled
+
+        binding.icon.isEnabled = enabled
+        binding.title.isEnabled = enabled
+    }
+
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener(onClickListener)
     }
