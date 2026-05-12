@@ -470,16 +470,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin">
 
-            <include
+            <com.infomaniak.mail.views.InformationBlockView
                 android:id="@+id/blockInformationViewSummary"
-                layout="@layout/view_information_block"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"/>
 
-            <include
+            <com.infomaniak.mail.views.InformationBlockView
                 android:id="@+id/blockInformationViewTranslate"
-                layout="@layout/view_information_block"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"/>
