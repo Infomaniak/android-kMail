@@ -409,10 +409,33 @@ class ThreadViewModel @Inject constructor(
                 val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
                 if (isNotAlreadySplit) threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
                 splitBody = threadState.cachedSplitBodies[message.uid]
+
+                it.summary?.let { summaryText ->
+                    if (threadState.aiSummaryStateMap[message.uid] == null) {
+                        threadState.aiSummaryStateMap[message.uid] =
+                            AiProcessState.Success(content = summaryText)
+                    }
+                }
             }
         }
 
         return@withContext message
+    }
+
+    fun saveSummary(messageUid: String, summaryText: String) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                localMessage?.body?.summary = summaryText
+            }
+        }
+    }
+
+    fun removeSummary(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                localMessage?.body?.summary = null
+            }
+        }
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {

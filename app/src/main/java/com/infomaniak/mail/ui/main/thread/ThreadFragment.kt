@@ -459,6 +459,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 },
                 onAiSummaryRetry = { messageUid -> doAiAction(messageUid, AiAction.SUMMARY) },
+                onAiSummaryClose = { messageUid -> threadViewModel.removeSummary(messageUid)},
                 showSnackbarRetry = ::createSnackBarRetry,
             ),
         )
@@ -1074,6 +1075,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
 
         val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
+
+        val summaryContent = result.data
+        if (summaryContent != null) {
+            threadViewModel.saveSummary(messageUid,summaryContent)
+        }
+
         updateAiProcessState(messageUid, aiAction, finalState)
     }
 
