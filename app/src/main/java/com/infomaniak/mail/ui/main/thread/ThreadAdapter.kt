@@ -69,6 +69,7 @@ import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
+import com.infomaniak.mail.databinding.ViewInformationBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.AiAction
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
@@ -482,7 +483,7 @@ class ThreadAdapter(
         bindRecipientDetails(message, messageDate)
     }
 
-    private fun getStateMap(action: AiAction, messageUid: String) = when (action) {
+    private fun getStateMap(aiAction: AiAction, messageUid: String) = when (aiAction) {
         AiAction.SUMMARY -> threadAdapterState.aiSummaryStateMap[messageUid]
         AiAction.TRANSLATE -> threadAdapterState.aiTranslateStateMap[messageUid]
     }
@@ -496,18 +497,24 @@ class ThreadAdapter(
 
         val state = getStateMap(aiAction, message.uid)
 
+        val targetView = if (aiAction == AiAction.SUMMARY) {
+            binding.blockInformationViewSummary
+        } else {
+            binding.blockInformationViewTranslate
+        }
+
         if (state == null || state is AiProcessState.Dismissed) {
-            binding.blockInformationView.root.isVisible = false
+            targetView.root.isVisible = false
             return
         }
 
-        setupBaseVisibility(state, aiAction)
-        handleProcessState(state, aiAction)
-        setupListeners(message.uid, aiAction)
+        setupBaseVisibility(state, aiAction, targetView)
+        handleProcessState(state, aiAction, targetView)
+        setupListeners(message.uid, aiAction, targetView)
     }
 
-    private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState, aiAction: AiAction) {
-        with(binding.blockInformationView) {
+    private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+        with(targetView) {
             root.isVisible = true
             closeButton.isVisible = true
             informationTitle.isVisible = true
@@ -522,8 +529,8 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.handleProcessState(state: AiProcessState, aiAction: AiAction) {
-        with(binding.blockInformationView) {
+    private fun MessageViewHolder.handleProcessState(state: AiProcessState, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+        with(targetView) {
             when (state) {
                 is AiProcessState.Loading -> {
                     val title =
@@ -545,15 +552,15 @@ class ThreadAdapter(
                     }
                     iconAiAnimation.setAnimation(R.raw.euria)
                 }
-                is AiProcessState.Retrying -> handleRetryingState(state, aiAction)
-                is AiProcessState.Error -> handleErrorState(state, aiAction)
+                is AiProcessState.Retrying -> handleRetryingState(state, aiAction, targetView)
+                is AiProcessState.Error -> handleErrorState(state, aiAction, targetView)
                 is AiProcessState.Dismissed -> Unit
             }
         }
     }
 
-    private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying, aiAction: AiAction) {
-        with(binding.blockInformationView) {
+    private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+        with(targetView) {
             val errorMessage =
                 if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
             informationTitle.setText(errorMessage)
@@ -568,8 +575,8 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.handleErrorState(state: AiProcessState.Error, aiAction: AiAction) {
-        with(binding.blockInformationView) {
+    private fun MessageViewHolder.handleErrorState(state: AiProcessState.Error, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+        with(targetView) {
             icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
 
             if (state.canRetry) {
@@ -599,8 +606,8 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.setupListeners(messageUid: String, aiAction: AiAction) {
-        with(binding.blockInformationView) {
+    private fun MessageViewHolder.setupListeners(messageUid: String, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+        with(targetView) {
             closeButton.setOnClickListener {
                 threadAdapterCallbacks?.onAiBannerClose?.invoke(messageUid, aiAction)
                 root.isVisible = false
