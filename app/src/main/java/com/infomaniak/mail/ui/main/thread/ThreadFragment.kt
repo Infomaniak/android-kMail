@@ -109,6 +109,7 @@ import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBott
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -127,6 +128,7 @@ import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
+import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ALL_EMOJI_SENT_STATUS
@@ -362,8 +364,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAttachmentOptionsClicked = ::navigateToAttachmentActions,
                 onDownloadAllClicked = ::downloadAllAttachments,
                 onReplyClicked = { message ->
-                    trackMessageActionsEvent(MatomoName.Reply)
-                    replyTo(message)
+                    val hasNoReplyRecipients = SharedUtils.hasNoReplyRecipients(message, isReplyAll = false)
+                    descriptionDialog.replyWithConfirmationPopup(
+                        hasNoReplyRecipients = hasNoReplyRecipients,
+                        onPositiveButtonClicked = {
+                            trackMessageActionsEvent(MatomoName.Reply)
+                            replyTo(message)
+                        })
                 },
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
@@ -629,7 +636,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun observeQuickActionBarClicks() {
         threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (threadUid, lastMessageToReplyTo, menuId) ->
             when (menuId) {
-                R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
+                R.id.quickActionReply -> {
+                    val hasNoReplyRecipients = SharedUtils.hasNoReplyRecipients(lastMessageToReplyTo, isReplyAll = false)
+                    descriptionDialog.replyWithConfirmationPopup(
+                        hasNoReplyRecipients = hasNoReplyRecipients,
+                        onPositiveButtonClicked = { replyTo(lastMessageToReplyTo) })
+                }
                 R.id.quickActionForward -> {
                     twoPaneViewModel.navigateToNewMessage(
                         draftMode = DraftMode.FORWARD,

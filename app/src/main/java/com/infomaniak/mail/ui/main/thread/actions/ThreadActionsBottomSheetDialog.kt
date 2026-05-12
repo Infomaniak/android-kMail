@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
@@ -57,6 +58,7 @@ import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.extensions.notYetImplemented
+import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -139,6 +141,27 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
     }
 
+    private fun handleReply(isReplyAll: Boolean, thread: Thread, messageUidToExecuteAction: String) {
+        trackBottomSheetThreadActionsEvent(if (isReplyAll) MatomoName.ReplyAll else MatomoName.Reply)
+
+        val activity = requireActivity() as MainActivity
+        val message = thread.messages.find { message -> message.uid == messageUidToExecuteAction } ?: return
+        val hasNoReplyRecipients = SharedUtils.hasNoReplyRecipients(message, isReplyAll)
+
+        descriptionDialog.replyWithConfirmationPopup(
+            hasNoReplyRecipients = hasNoReplyRecipients,
+            onPositiveButtonClicked = {
+                safeNavigateToNewMessageActivity(
+                    currentActivity = activity,
+                    draftMode = if (isReplyAll) DraftMode.REPLY_ALL else DraftMode.REPLY,
+                    previousMessageUid = messageUidToExecuteAction,
+                    currentClassName = currentClassName,
+                    shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+                )
+            }
+        )
+    }
+
     private fun onActionClick(
         thread: Thread,
         messageUidToExecuteAction: String,
@@ -146,23 +169,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     ) = object : OnActionClick {
         //region Main actions
         override fun onReply() {
-            trackBottomSheetThreadActionsEvent(MatomoName.Reply)
-            safeNavigateToNewMessageActivity(
-                draftMode = DraftMode.REPLY,
-                previousMessageUid = messageUidToExecuteAction,
-                currentClassName = currentClassName,
-                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-            )
+            handleReply(isReplyAll = false, thread, messageUidToExecuteAction)
         }
 
         override fun onReplyAll() {
-            trackBottomSheetThreadActionsEvent(MatomoName.ReplyAll)
-            safeNavigateToNewMessageActivity(
-                draftMode = DraftMode.REPLY_ALL,
-                previousMessageUid = messageUidToExecuteAction,
-                currentClassName = currentClassName,
-                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-            )
+            handleReply(isReplyAll = true, thread, messageUidToExecuteAction)
         }
 
         override fun onForward() {

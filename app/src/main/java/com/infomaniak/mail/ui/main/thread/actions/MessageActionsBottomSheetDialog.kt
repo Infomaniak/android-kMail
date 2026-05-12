@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
@@ -45,11 +46,13 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setSpamUi
 import com.infomaniak.mail.utils.FolderRoleUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
+import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -127,27 +130,33 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
     }
 
-    private fun initActionClickListener(messageUid: String, message: Message, threadUid: String) {
-        initOnClickListener(object : OnActionClick {
-            //region Main actions
-            override fun onReply() {
-                trackBottomSheetMessageActionsEvent(MatomoName.Reply)
+    private fun handleReply(isReplyAll: Boolean, message: Message, messageUid: String) {
+        val activity = requireActivity() as MainActivity
+        val hasNoReplyRecipients = SharedUtils.hasNoReplyRecipients(message, isReplyAll)
+        descriptionDialog.replyWithConfirmationPopup(
+            hasNoReplyRecipients = hasNoReplyRecipients,
+            onPositiveButtonClicked = {
+                trackBottomSheetMessageActionsEvent(if (isReplyAll) MatomoName.ReplyAll else MatomoName.Reply)
                 safeNavigateToNewMessageActivity(
-                    draftMode = DraftMode.REPLY,
+                    currentActivity = activity,
+                    draftMode = if (isReplyAll) DraftMode.REPLY_ALL else DraftMode.REPLY,
                     previousMessageUid = messageUid,
                     currentClassName = currentClassName,
                     shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                 )
             }
+        )
+    }
+
+    private fun initActionClickListener(messageUid: String, message: Message, threadUid: String) {
+        initOnClickListener(object : OnActionClick {
+            //region Main actions
+            override fun onReply() {
+                handleReply(isReplyAll = false, message, messageUid)
+            }
 
             override fun onReplyAll() {
-                trackBottomSheetMessageActionsEvent(MatomoName.ReplyAll)
-                safeNavigateToNewMessageActivity(
-                    draftMode = DraftMode.REPLY_ALL,
-                    previousMessageUid = messageUid,
-                    currentClassName = currentClassName,
-                    shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-                )
+                handleReply(isReplyAll = true, message, messageUid)
             }
 
             override fun onForward() {

@@ -81,12 +81,14 @@ fun Fragment.safelyAnimatedNavigation(
 }
 
 fun Fragment.safeNavigateToNewMessageActivity(
+    currentActivity: MainActivity? = null,
     draftMode: Draft.DraftMode,
     previousMessageUid: String,
     currentClassName: String? = null,
     shouldLoadDistantResources: Boolean = false,
 ) {
     safeNavigateToNewMessageActivity(
+        currentActivity = currentActivity,
         args = NewMessageActivityArgs(
             arrivedFromExistingDraft = false,
             draftMode = draftMode,
@@ -97,8 +99,16 @@ fun Fragment.safeNavigateToNewMessageActivity(
     )
 }
 
-fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) (requireActivity() as MainActivity).navigateToNewMessageActivity(args)
+fun Fragment.safeNavigateToNewMessageActivity(
+    args: Bundle? = null,
+    currentActivity: MainActivity? = null,
+    currentClassName: String? = null
+) {
+    if (currentActivity != null) {
+        currentActivity.navigateToNewMessageActivity(args)
+    } else {
+        if (canNavigate(currentClassName)) (requireActivity() as MainActivity).navigateToNewMessageActivity(args)
+    }
 }
 
 fun Fragment.navigateToDownloadProgressDialog(
