@@ -99,6 +99,7 @@ import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import com.infomaniak.mail.utils.extensions.initDisplayWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.toggleChevron
+import com.infomaniak.mail.views.InformationBlockView
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -504,7 +505,7 @@ class ThreadAdapter(
         }
 
         if (state == null || state is AiProcessState.Dismissed) {
-            targetView.root.isVisible = false
+            targetView.isVisible = false
             return
         }
 
@@ -513,46 +514,45 @@ class ThreadAdapter(
         setupListeners(message.uid, aiAction, targetView)
     }
 
-    private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+    private fun MessageViewHolder.setupBaseVisibility(state: AiProcessState, aiAction: AiAction, targetView: InformationBlockView) {
         with(targetView) {
-            root.isVisible = true
-            closeButton.isVisible = true
-            informationTitle.isVisible = true
+            isVisible = true
+            isCloseButtonVisible = true
 
             val isErrorOrRetrying = state is AiProcessState.Error || state is AiProcessState.Retrying
             val isTranslateSuccess = state is AiProcessState.Success && aiAction == AiAction.TRANSLATE
 
-            iconAi.isVisible = !isErrorOrRetrying
-            icon.isVisible = isErrorOrRetrying
-            informationButton.isVisible = isErrorOrRetrying || isTranslateSuccess
-            informationDescription.isVisible = state is AiProcessState.Success && aiAction == AiAction.SUMMARY
+            isAiIconVisible = !isErrorOrRetrying
+            isIconVisible = isErrorOrRetrying
+            isButtonVisible = isErrorOrRetrying || isTranslateSuccess
+
+            if (!(state is AiProcessState.Success && aiAction == AiAction.SUMMARY)) {
+                description = null
+            }
         }
     }
 
-    private fun MessageViewHolder.handleProcessState(state: AiProcessState, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+    private fun MessageViewHolder.handleProcessState(state: AiProcessState, aiAction: AiAction, targetView: InformationBlockView) {
+        val ctx = targetView.context
         with(targetView) {
             when (state) {
                 is AiProcessState.Loading -> {
-                    val title =
-                        if (aiAction == AiAction.SUMMARY) R.string.messageSummaryLoading else R.string.euriaTranslateMessage
-                    informationTitle.setText(title)
-                    iconAiAnimation.setAnimation(R.raw.euria)
+                    val titleRes = if (aiAction == AiAction.SUMMARY) R.string.messageSummaryLoading else R.string.euriaTranslateMessage
+                    title = ctx.getString(titleRes)
+                    setAnimation(R.raw.euria)
                 }
                 is AiProcessState.Success -> {
                     if (aiAction == AiAction.SUMMARY) {
-                        informationTitle.setText(R.string.messageSummary)
-                        informationDescription.text = state.content
-                        informationDescription.isVisible = true
-                        informationButton.isVisible = false
+                        title = ctx.getString(R.string.messageSummary)
+                        description = state.content
+                        isButtonVisible = false
                     } else {
-                        informationTitle.setText(R.string.genericMessageTranslated)
-                        informationDescription.isVisible = false
-                        informationButton.isVisible = true
-                        informationButton.isEnabled = true
-                        informationButton.hideProgressCatching(R.string.buttonShowOriginal)
-                        closeButton.isVisible = false
+                        title = ctx.getString(R.string.genericMessageTranslated)
+                        isButtonVisible = true
+                        isButtonEnabled = true
+                        hideButtonProgress(R.string.buttonShowOriginal)
                     }
-                    iconAiAnimation.setAnimation(R.raw.euria)
+                    setAnimation(R.raw.euria)
                 }
                 is AiProcessState.Retrying -> handleRetryingState(state, aiAction, targetView)
                 is AiProcessState.Error -> handleErrorState(state, aiAction, targetView)
@@ -561,61 +561,56 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+    private fun MessageViewHolder.handleRetryingState(state: AiProcessState.Retrying, aiAction: AiAction, targetView: InformationBlockView) {
+        val ctx = targetView.context
         with(targetView) {
-            val errorMessage =
-                if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
-            informationTitle.setText(errorMessage)
-            icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
-            informationButton.isEnabled = false
+            val errorMessageRes = if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+            title = ctx.getString(errorMessageRes)
+            setIconRes(R.drawable.ic_warning)
+            isButtonEnabled = false
 
             if (state.isLoaderVisible) {
-                informationButton.showProgressCatching(context.getColor(R.color.primaryTextColor))
+                showButtonProgress(ctx.getColor(R.color.primaryTextColor))
             } else {
-                informationButton.hideProgressCatching(R.string.aiButtonRetry)
+                hideButtonProgress(R.string.aiButtonRetry)
             }
         }
     }
 
-    private fun MessageViewHolder.handleErrorState(state: AiProcessState.Error, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+    private fun MessageViewHolder.handleErrorState(state: AiProcessState.Error, aiAction: AiAction, targetView: InformationBlockView) {
+        val ctx = targetView.context
         with(targetView) {
-            icon.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_warning, 0, 0, 0)
+            setIconRes(R.drawable.ic_warning)
 
             if (state.canRetry) {
-                val errorMessage = if (aiAction == AiAction.SUMMARY) {
-                    R.string.messageSummaryErrorRetry
-                } else {
-                    R.string.messageTranslateErrorRetry
-                }
-                informationTitle.setText(errorMessage)
-                informationButton.isEnabled = true
-                informationButton.hideProgressCatching(R.string.aiButtonRetry)
+                val errorMessageRes = if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+                title = ctx.getString(errorMessageRes)
+                isButtonEnabled = true
+                hideButtonProgress(R.string.aiButtonRetry)
 
                 if (state.isRetry && !state.wasLoaderShown) {
-                    threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessage)
+                    threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessageRes)
                 }
             } else {
-                val errorMessage = if (aiAction == AiAction.SUMMARY) {
-                    R.string.messageSummaryError
-                } else if (state.targetSameAsSource) {
-                    R.string.translationTargetSameAsSource
-                } else {
-                    R.string.messageTranslateError
+                val errorMessageRes = when {
+                    aiAction == AiAction.SUMMARY -> R.string.messageSummaryError
+                    state.targetSameAsSource -> R.string.translationTargetSameAsSource
+                    else -> R.string.messageTranslateError
                 }
-                informationTitle.setText(errorMessage)
-                informationButton.isVisible = false
+                title = ctx.getString(errorMessageRes)
+                isButtonVisible = false
             }
         }
     }
 
-    private fun MessageViewHolder.setupListeners(messageUid: String, aiAction: AiAction, targetView: ViewInformationBlockBinding) {
+    private fun MessageViewHolder.setupListeners(messageUid: String, aiAction: AiAction, targetView: InformationBlockView) {
         with(targetView) {
-            closeButton.setOnClickListener {
+            setOnCloseListener {
                 threadAdapterCallbacks?.onAiBannerClose?.invoke(messageUid, aiAction)
-                root.isVisible = false
+                isVisible = false
             }
 
-            informationButton.setOnClickListener {
+            setOnActionClicked {
                 val state = getStateMap(aiAction, messageUid)
                 if (state is AiProcessState.Success && aiAction == AiAction.TRANSLATE) {
                     threadAdapterCallbacks?.onShowOriginal?.invoke(messageUid)
