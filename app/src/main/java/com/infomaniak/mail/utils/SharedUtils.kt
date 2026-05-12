@@ -293,10 +293,9 @@ class SharedUtils @Inject constructor(
         fun hasNoReplyRecipients(message: Message, isReplyAll: Boolean): Boolean {
             val noReplyMailRegex = listOf("no-reply", "noreply", "postmaster", "catchall").joinToString("|")
             val pattern = Regex(noReplyMailRegex, RegexOption.IGNORE_CASE)
-            val hasNoReplyRecipients = message.getRecipientsForReplyTo(isReplyAll).first.any { recipient ->
-                pattern.containsMatchIn(recipient.email)
-            }
-            return hasNoReplyRecipients
+            val (toRecipients, ccRecipients) = message.getRecipientsForReplyTo(isReplyAll)
+            val allRecipients = toRecipients + ccRecipients
+            return allRecipients.any { recipient -> pattern.containsMatchIn(recipient.email) }
         }
 
         sealed interface AutomaticUnsnoozeResult {
