@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.useCases.MessagesActionsUseCase
+import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.NotificationPayload
@@ -90,7 +90,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     lateinit var refreshController: RefreshController
 
     @Inject
-    lateinit var messagesActionsUseCase: MessagesActionsUseCase
+    lateinit var messagesActions: MessagesActions
 
     @Inject
     @IoDispatcher
@@ -187,7 +187,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val threads = message.threads.filter { it.folderId == message.folderId }
 
             val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
-            val messages = messagesActionsUseCase.getMessagesToMove(threads, message)
+            val messages = messagesActions.getMessagesToMove(threads, message)
             val destinationFolder = folderController.getFolder(folderRole) ?: return@launch
             val okHttpClient = AccountUtils.getHttpClient(userId)
 

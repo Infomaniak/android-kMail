@@ -81,7 +81,7 @@ import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSaniti
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
-import com.infomaniak.mail.useCases.MessagesActionsUseCase
+import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AttachmentsReminderUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
@@ -156,7 +156,7 @@ class NewMessageViewModel @Inject constructor(
     private val contactGroupController: ContactGroupController,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val draftInitManager: DraftInitManager,
-    private val messagesActionsUseCase: MessagesActionsUseCase,
+    private val messagesActions: MessagesActions,
     private val signatureUtils: SignatureUtils,
     private val snackbarManager: SnackbarManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -535,7 +535,7 @@ class NewMessageViewModel @Inject constructor(
         val message = previousMessageUid?.let { MessageController.getMessage(it, realm) } ?: return
         if (message.isSeen) return
 
-        messagesActionsUseCase.toggleMessagesSeenStatus(
+        messagesActions.toggleMessagesSeenStatus(
             mailbox = mailbox,
             shouldRead = true,
             messages = listOf(message),

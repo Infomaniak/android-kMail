@@ -38,7 +38,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
-import com.infomaniak.mail.useCases.MessagesActionsUseCase
+import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.DownloadThreadsStatusManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -67,7 +67,7 @@ class ActionsViewModel @Inject constructor(
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
     private val messageController: MessageController,
-    private val messagesActionsUseCase: MessagesActionsUseCase,
+    private val messagesActions: MessagesActions,
     private val sharedUtils: SharedUtils,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
@@ -109,7 +109,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMarkAsSpam = messagesActionsUseCase.getMessagesFromThreadsToSpamOrHam(threads)
+        val messagesToMarkAsSpam = messagesActions.getMessagesFromThreadsToSpamOrHam(threads)
         handleToggleSpamMessages(messagesToMarkAsSpam, currentFolderId, mailbox, displaySnackbar)
     }
 
@@ -129,7 +129,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
         displaySnackbar: Boolean = true,
     ) {
-        val result = messagesActionsUseCase.toggleMessagesSpamStatus(
+        val result = messagesActions.toggleMessagesSpamStatus(
             messages = messages,
             currentFolderId = currentFolderId,
             mailbox = mailbox,
@@ -162,14 +162,14 @@ class ActionsViewModel @Inject constructor(
     }
 
     fun activateSpamFilter(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        messagesActionsUseCase.activateSpamFilter(mailbox)
+        messagesActions.activateSpamFilter(mailbox)
     }
 
     fun unblockMail(email: String, mailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
         if (mailbox == null) return@launch
 
-        val result = messagesActionsUseCase.unblockMail(email, mailbox)
-        if (result is MessagesActionsUseCase.ApiCallResult.Error) {
+        val result = messagesActions.unblockMail(email, mailbox)
+        if (result is MessagesActions.ApiCallResult.Error) {
             snackbarManager.postValue(appContext.getString(result.messageRes))
         }
     }
@@ -183,7 +183,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val threads: List<Thread> = threadController.getThreads(threadsUids).toList()
-        val messagesToMove = messagesActionsUseCase.getMessagesFromThreadsToMove(threads)
+        val messagesToMove = messagesActions.getMessagesFromThreadsToMove(threads)
 
         handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
     }
@@ -217,7 +217,7 @@ class ActionsViewModel @Inject constructor(
 
         calculateCurrentThreadPosition.postValue(Unit)
 
-        val result = messagesActionsUseCase.moveMessagesTo(
+        val result = messagesActions.moveMessagesTo(
             currentFolder = currentFolder,
             destinationFolder = destinationFolder,
             mailbox = mailbox,
@@ -274,7 +274,7 @@ class ActionsViewModel @Inject constructor(
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = messagesActionsUseCase.getUndoData(messagesMoved, apiResponses, destinationFolder)
+        val undoData = messagesActions.getUndoData(messagesMoved, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
     //endregion
@@ -285,7 +285,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToDelete = messagesActionsUseCase.getMessagesFromThreadsToDelete(threads)
+        val messagesToDelete = messagesActions.getMessagesFromThreadsToDelete(threads)
         handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
     }
 
@@ -294,7 +294,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToDelete = messagesActionsUseCase.getMessagesToDelete(messages)
+        val messagesToDelete = messagesActions.getMessagesToDelete(messages)
         handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
     }
 
@@ -344,7 +344,7 @@ class ActionsViewModel @Inject constructor(
         shouldAutoAdvanceAndRefresh: Boolean,
         messagesToDelete: List<Message>
     ) {
-        val result = messagesActionsUseCase.permanentlyDelete(
+        val result = messagesActions.permanentlyDelete(
             messagesToDelete = permanentlyDeleteMessages,
             mailbox = mailbox,
             onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
@@ -413,7 +413,7 @@ class ActionsViewModel @Inject constructor(
         currentFolder: Folder?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMove = messagesActionsUseCase.getMessagesFromThreadsToMove(threads)
+        val messagesToMove = messagesActions.getMessagesFromThreadsToMove(threads)
         handleArchiveMessages(messagesToMove, currentFolder, mailbox)
     }
 
@@ -447,7 +447,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
-        val result = messagesActionsUseCase.toggleThreadsSeenStatus(threadsUids, shouldRead, mailbox)
+        val result = messagesActions.toggleThreadsSeenStatus(threadsUids, shouldRead, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -463,7 +463,7 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val result = messagesActionsUseCase.toggleMessagesSeenStatus(messages, shouldRead, mailbox)
+        val result = messagesActions.toggleMessagesSeenStatus(messages, shouldRead, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -481,7 +481,7 @@ class ActionsViewModel @Inject constructor(
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val result = messagesActionsUseCase.toggleThreadsFavorite(threadsUids, shouldFavorite, mailbox)
+        val result = messagesActions.toggleThreadsFavorite(threadsUids, shouldFavorite, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -495,7 +495,7 @@ class ActionsViewModel @Inject constructor(
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val result = messagesActionsUseCase.toggleMessagesFavorite(messages, shouldFavorite, mailbox)
+        val result = messagesActions.toggleMessagesFavorite(messages, shouldFavorite, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -512,7 +512,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) {
         viewModelScope.launch(ioCoroutineContext) {
-            val result = messagesActionsUseCase.reportPhishing(
+            val result = messagesActions.reportPhishing(
                 messages = messages,
                 mailbox = mailbox,
                 onReportSuccess = {
@@ -526,11 +526,11 @@ class ActionsViewModel @Inject constructor(
             )
 
             when (result) {
-                is MessagesActionsUseCase.ApiCallResult.Success -> {
+                is MessagesActions.ApiCallResult.Success -> {
                     reportPhishingTrigger.postValue(Unit)
                     snackbarManager.postValue(appContext.getString(result.messageRes))
                 }
-                is MessagesActionsUseCase.ApiCallResult.Error -> {
+                is MessagesActions.ApiCallResult.Error -> {
                     snackbarManager.postValue(appContext.getString(result.messageRes))
                 }
             }
@@ -540,12 +540,12 @@ class ActionsViewModel @Inject constructor(
 
     //region BlockUser
     fun blockUser(folderId: String, shortUid: Int, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        when (val result = messagesActionsUseCase.blockUser(folderId, shortUid, mailbox)) {
-            is MessagesActionsUseCase.ApiCallResult.Success -> {
+        when (val result = messagesActions.blockUser(folderId, shortUid, mailbox)) {
+            is MessagesActions.ApiCallResult.Success -> {
                 reportPhishingTrigger.postValue(Unit)
                 snackbarManager.postValue(appContext.getString(result.messageRes))
             }
-            is MessagesActionsUseCase.ApiCallResult.Error -> {
+            is MessagesActions.ApiCallResult.Error -> {
                 snackbarManager.postValue(appContext.getString(result.messageRes))
             }
         }
@@ -557,31 +557,31 @@ class ActionsViewModel @Inject constructor(
     suspend fun snoozeThreads(date: Date, threadUids: List<String>, currentFolderId: String?, mailbox: Mailbox?): Boolean {
         if (mailbox == null) return false
 
-        val result = messagesActionsUseCase.snoozeThreads(
+        val result = messagesActions.snoozeThreads(
             date = date,
             threadUids = threadUids,
             currentFolderId = currentFolderId,
             mailbox = mailbox,
         )
 
-        if (result is MessagesActionsUseCase.SnoozeResult.Success) {
+        if (result is MessagesActions.SnoozeResult.Success) {
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
         }
 
         val message = when (result) {
-            is MessagesActionsUseCase.SnoozeResult.Success -> {
+            is MessagesActions.SnoozeResult.Success -> {
                 val formattedDate = appContext.dayOfWeekDateWithoutYear(result.date)
                 appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, result.threadCount, formattedDate)
             }
-            is MessagesActionsUseCase.SnoozeResult.Error -> appContext.getString(result.messageRes)
+            is MessagesActions.SnoozeResult.Error -> appContext.getString(result.messageRes)
         }
 
         snackbarManager.postValue(message)
-        return result is MessagesActionsUseCase.SnoozeResult.Success
+        return result is MessagesActions.SnoozeResult.Success
     }
 
     suspend fun rescheduleSnoozedThreads(date: Date, threadUids: List<String>, mailbox: Mailbox): BatchSnoozeResult {
-        val result = messagesActionsUseCase.rescheduleSnoozedThreads(
+        val result = messagesActions.rescheduleSnoozedThreads(
             date = date,
             threadUids = threadUids,
             mailbox = mailbox,
@@ -610,7 +610,7 @@ class ActionsViewModel @Inject constructor(
         }
 
         viewModelScope.launch(ioCoroutineContext) {
-            val result = messagesActionsUseCase.unsnoozeThreads(threads, mailbox)
+            val result = messagesActions.unsnoozeThreads(threads, mailbox)
 
             if (result is BatchSnoozeResult.Success) {
                 refreshFoldersAsync(mailbox, result.impactedFolders)
@@ -648,7 +648,7 @@ class ActionsViewModel @Inject constructor(
     //region Drafts
     fun rescheduleDraft(scheduleDate: Date, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
-            with(messagesActionsUseCase.rescheduleDraft(resource, scheduleDate)) {
+            with(messagesActions.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
                     refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
                 } else {
@@ -665,7 +665,7 @@ class ActionsViewModel @Inject constructor(
         onSuccess: () -> Unit,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = messagesActionsUseCase.unscheduleDraft(unscheduleDraftUrl)
+        val apiResponse = messagesActions.unscheduleDraft(unscheduleDraftUrl)
         if (apiResponse.isSuccess()) {
             val draftFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
                 snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
@@ -681,7 +681,7 @@ class ActionsViewModel @Inject constructor(
 
     fun unscheduleDraft(unscheduleDraftUrl: String, mailbox: Mailbox, openFolder: (folderId: String) -> Unit) =
         viewModelScope.launch(ioCoroutineContext) {
-            val apiResponse = messagesActionsUseCase.unscheduleDraft(unscheduleDraftUrl)
+            val apiResponse = messagesActions.unscheduleDraft(unscheduleDraftUrl)
             if (apiResponse.isSuccess()) {
                 val scheduledDraftsFolder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS) ?: run {
                     snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
@@ -716,7 +716,7 @@ class ActionsViewModel @Inject constructor(
 
     fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String, mailbox: Mailbox) =
         viewModelScope.launch(ioCoroutineContext) {
-            val apiResponse = messagesActionsUseCase.deleteDraft(targetMailboxUuid, remoteDraftUuid)
+            val apiResponse = messagesActions.deleteDraft(targetMailboxUuid, remoteDraftUuid)
 
             if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
                 val draftFolder = folderController.getFolder(FolderRole.DRAFT) ?: run {
@@ -735,13 +735,13 @@ class ActionsViewModel @Inject constructor(
         snackbarManager.postValue(appContext.getString(titleRes))
     }
     //endregion
-    
+
     //region Undo action
     fun undoAction(undoData: UndoData?, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         if (undoData == null) return@launch
 
-        val result = messagesActionsUseCase.undoAction(undoData)
-        if (result is MessagesActionsUseCase.ApiCallResult.Success) {
+        val result = messagesActions.undoAction(undoData)
+        if (result is MessagesActions.ApiCallResult.Success) {
             with(undoData) {
                 refreshFoldersAsync(
                     mailbox = mailbox,
@@ -752,8 +752,8 @@ class ActionsViewModel @Inject constructor(
         }
 
         val message = when (result) {
-            is MessagesActionsUseCase.ApiCallResult.Success -> appContext.getString(result.messageRes)
-            is MessagesActionsUseCase.ApiCallResult.Error -> appContext.getString(result.messageRes)
+            is MessagesActions.ApiCallResult.Success -> appContext.getString(result.messageRes)
+            is MessagesActions.ApiCallResult.Error -> appContext.getString(result.messageRes)
         }
 
         snackbarManager.postValue(message)
