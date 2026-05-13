@@ -59,7 +59,7 @@ import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
-import com.infomaniak.mail.useCases.MessagesActionsUseCase
+import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
@@ -94,7 +94,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -123,7 +122,7 @@ class ThreadViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
-    private val messagesActionsUseCase: MessagesActionsUseCase,
+    private val messagesActions: MessagesActions,
     private val refreshController: RefreshController,
     private val snackbarManager: SnackbarManager,
     private val threadController: ThreadController,
@@ -417,7 +416,7 @@ class ThreadViewModel @Inject constructor(
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
 
-        val result = messagesActionsUseCase.toggleThreadsSeenStatus(
+        val result = messagesActions.toggleThreadsSeenStatus(
             threadsUids = listOf(thread.uid),
             shouldRead = true,
             mailbox = mailbox(),

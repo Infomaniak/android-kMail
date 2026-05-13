@@ -69,7 +69,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.useCases.MessagesActionsUseCase
+import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -144,7 +144,7 @@ class MainViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
-    private val messagesActionsUseCase: MessagesActionsUseCase,
+    private val messagesActions: MessagesActions,
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
     private val networkManager: NetworkManager,
     private val permissionsController: PermissionsController,
@@ -632,7 +632,7 @@ class MainViewModel @Inject constructor(
             else -> getMoveMessageSnackbarTitle(isSpam, destination)
         }
 
-        val undoData = messagesActionsUseCase.getUndoData(messagesMoved, apiResponses, destinationFolder)
+        val undoData = messagesActions.getUndoData(messagesMoved, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
 
@@ -741,7 +741,7 @@ class MainViewModel @Inject constructor(
             return@launch
         }
 
-        val result = messagesActionsUseCase.moveThreadsOrMessagesTo(
+        val result = messagesActions.moveThreadsOrMessagesTo(
             destinationFolderId = newFolderId,
             threadsUids = threadsUids,
             messagesUids = messagesUids,

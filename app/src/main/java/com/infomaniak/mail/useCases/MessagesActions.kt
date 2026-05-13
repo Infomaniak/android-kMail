@@ -52,7 +52,7 @@ import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.core.legacy.R as RCore
 
-class MessagesActionsUseCase @Inject constructor(
+class MessagesActions @Inject constructor(
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
