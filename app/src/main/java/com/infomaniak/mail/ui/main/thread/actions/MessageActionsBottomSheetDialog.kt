@@ -304,7 +304,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onTranslate() {
-                trackBottomSheetThreadActionsEvent(MatomoName.Summary)
+                trackBottomSheetThreadActionsEvent(MatomoName.Translate)
                 setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, message.uid)
             }
             //endregion
