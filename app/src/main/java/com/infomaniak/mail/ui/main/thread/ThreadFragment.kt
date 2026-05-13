@@ -1103,6 +1103,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun dismissAiAction(messageUid: String, aiAction: AiAction) {
+        cancelRetryTimer(messageUid, aiAction)
         getStateMap(aiAction)[messageUid] = AiProcessState.Dismissed
 
         when (aiAction) {
