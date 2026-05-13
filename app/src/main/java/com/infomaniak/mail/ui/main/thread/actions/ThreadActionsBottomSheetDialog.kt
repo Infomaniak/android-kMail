@@ -50,6 +50,7 @@ import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -69,6 +70,7 @@ import com.infomaniak.core.common.R as RCore
 class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
@@ -301,7 +303,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 },
             )
 
-            mainViewModel.isMultiSelectOn = false
+            multiselectionViewModel.isMultiSelectOn = false
         }
 
         override fun onBlockSender() {
@@ -323,7 +325,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                 }
             }
-            mainViewModel.isMultiSelectOn = false
+            multiselectionViewModel.isMultiSelectOn = false
         }
 
         override fun onPrint() {

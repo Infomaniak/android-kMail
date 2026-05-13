@@ -135,8 +135,10 @@ object PerformSwipeActionManager {
         }
 
         SwipeAction.DELETE -> {
+            val folderRoles =
+                thread.messages.mapNotNull { message -> if (message.isSnoozed()) FolderRole.SNOOZED else message.folder.role }
             host.descriptionDialog.deleteWithConfirmationPopup(
-                folderRole = folderRole,
+                folderRoles = folderRoles,
                 count = 1,
                 displayLoader = false,
                 onCancel = {

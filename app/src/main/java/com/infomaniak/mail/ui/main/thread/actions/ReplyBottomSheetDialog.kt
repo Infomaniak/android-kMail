@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoCategory
@@ -30,12 +31,14 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 
 open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetReplyBinding by safeBinding()
-    override val mainViewModel: MainViewModel? = null
+    val mainViewModel: MainViewModel? = null
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val navigationArgs: ReplyBottomSheetDialogArgs by navArgs()
 
     private val currentClassName: String by lazy { ReplyBottomSheetDialog::class.java.name }

@@ -54,6 +54,7 @@ import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -72,7 +73,8 @@ import com.infomaniak.core.common.R as RCore
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
-    override val mainViewModel: MainViewModel by activityViewModels()
+    val mainViewModel: MainViewModel by activityViewModels()
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
@@ -95,7 +97,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(mainViewModel) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(multiselectionViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
         // This `.toSet()` is used to make an immutable local copy of `selectedThreads`.

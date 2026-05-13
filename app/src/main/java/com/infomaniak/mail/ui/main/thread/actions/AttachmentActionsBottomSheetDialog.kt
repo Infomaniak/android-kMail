@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
@@ -47,7 +48,8 @@ import javax.inject.Inject
 class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetAttachmentActionsBinding by safeBinding()
-    override val mainViewModel: MainViewModel by activityViewModels()
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
+    val mainViewModel: MainViewModel by activityViewModels()
     private val attachmentActionsViewModel: AttachmentActionsViewModel by viewModels()
 
     @Inject

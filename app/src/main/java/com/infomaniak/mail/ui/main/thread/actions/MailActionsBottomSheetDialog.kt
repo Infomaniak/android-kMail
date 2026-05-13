@@ -41,7 +41,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     protected var binding: BottomSheetActionsMenuBinding by safeBinding()
 
-    override val mainViewModel: MainViewModel by activityViewModels()
+    val mainViewModel: MainViewModel by activityViewModels()
     protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     abstract val shouldCloseMultiSelection: Boolean

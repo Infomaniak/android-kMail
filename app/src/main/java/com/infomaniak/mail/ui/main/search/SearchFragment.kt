@@ -38,9 +38,9 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
-import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -64,8 +64,6 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.folder.MultiSelectionBinding
-import com.infomaniak.mail.ui.main.folder.MultiSelectionHost
 import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
 import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
@@ -76,6 +74,9 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionBinding
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -101,13 +102,16 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
+    private val multiselectionViewModel: MultiselectionViewModel by viewModels()
+
     @Inject
     override lateinit var folderRoleUtils: FolderRoleUtils
+
     @Inject
     override lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun safeNavigation(directions: NavDirections) {
-        safeNavigate(directions)
+        safelyNavigate(directions)
     }
 
     override fun disableSwipeDirection(direction: DirectionFlag) {
@@ -115,7 +119,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     }
 
     override fun unlockSwipeActionsIfSet() = with(binding.mailRecyclerView) {
-        val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
+        val isMultiSelectClosed = multiselectionViewModel.isMultiSelectOn.not()
 
         val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
         val isLeftEnabled = isLeftSet && isMultiSelectClosed
@@ -202,9 +206,10 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
             actionsViewModel = actionsViewModel,
+            multiselectionViewModel = multiselectionViewModel,
             host = this,
+            folderRoleUtils = folderRoleUtils,
             activity = (requireActivity() as MainActivity),
-            searchViewModel = searchViewModel,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
         )
@@ -346,9 +351,9 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
                 override val getFeatureFlags: () -> FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
             },
             multiSelection = object : MultiSelectionListener<Thread> {
-                override var isEnabled by mainViewModel::isMultiSelectOn
-                override val selectedItems by mainViewModel::selectedThreads
-                override val publishSelectedItems = mainViewModel::publishSelectedItems
+                override var isEnabled by multiselectionViewModel::isMultiSelectOn
+                override val selectedItems by multiselectionViewModel::selectedThreads
+                override val publishSelectedItems = multiselectionViewModel::publishSelectedItems
             },
         )
 
@@ -362,10 +367,10 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         }
         multiselectToolbar.cancel.setOnClickListener {
             trackMultiSelectionEvent(MatomoName.Cancel)
-            mainViewModel.isMultiSelectOn = false
+            multiselectionViewModel.isMultiSelectOn = false
         }
         multiselectToolbar.selectAll.setOnClickListener {
-            mainViewModel.selectOrUnselectAll()
+            multiselectionViewModel.selectOrUnselectAll(mainViewModel.currentThreadsLive)
             threadListAdapter.updateSelection()
         }
         mailRecyclerView.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
@@ -581,13 +586,13 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         searchViewModel.visibilityMode.observe(viewLifecycleOwner, ::updateUi)
     }
 
-    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(mainViewModel) {
+    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(multiselectionViewModel) {
         if (isMultiSelectOn) {
             val previousThreads = threadListAdapter.dataSet.filterIsInstance<ThreadListItem.Content>()
             var shouldPublish = false
             deletedIndices.forEach {
                 val thread = previousThreads.getOrElse(it) { return@forEach }.thread
-                val isRemoved = mainViewModel.selectedThreads.remove(thread)
+                val isRemoved = selectedThreads.remove(thread)
                 if (isRemoved) shouldPublish = true
             }
             if (shouldPublish) publishSelectedItems()
@@ -649,7 +654,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     }
 
     private fun observeMultiSelect() {
-        mainViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
+        multiselectionViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
             val autoTransition = AutoTransition()
             autoTransition.duration = TOOLBAR_FADE_DURATION
             TransitionManager.beginDelayedTransition(binding.horizontalScrollViewFilters, autoTransition)

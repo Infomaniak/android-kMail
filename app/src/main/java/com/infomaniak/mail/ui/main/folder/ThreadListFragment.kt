@@ -46,9 +46,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
-
 import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
@@ -94,6 +94,9 @@ import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionBinding
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -134,6 +137,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val multiselectionViewModel: MultiselectionViewModel by viewModels()
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
 
     override val substituteClassName: String = javaClass.name
@@ -152,15 +156,16 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     @Inject
     override lateinit var descriptionDialog: DescriptionAlertDialog
 
+    @Inject
+    override lateinit var folderRoleUtils: FolderRoleUtils
+
     override fun safeNavigation(directions: NavDirections) {
-        safeNavigate(directions)
+        safelyNavigate(directions)
     }
 
     override fun disableSwipeDirection(direction: DirectionFlag) {
         binding.threadsList.disableSwipeDirection(direction)
     }
-
-    override lateinit var folderRoleUtils: FolderRoleUtils
 
     @Inject
     lateinit var downloadThreadsStatusManager: DownloadThreadsStatusManager
@@ -204,9 +209,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
             actionsViewModel = actionsViewModel,
+            multiselectionViewModel = multiselectionViewModel,
             activity = (requireActivity() as MainActivity),
             host = this,
-            searchViewModel = null,
+            folderRoleUtils = folderRoleUtils,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
         )
@@ -355,7 +361,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     }
 
     override fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
-        val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
+        val isMultiSelectClosed = multiselectionViewModel.isMultiSelectOn.not()
 
         val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
         val isLeftEnabled = isLeftSet && isMultiSelectClosed
@@ -439,9 +445,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 override var onContactClicked: ((MergedContact) -> Unit)? = null
             },
             multiSelection = object : MultiSelectionListener<Thread> {
-                override var isEnabled by mainViewModel::isMultiSelectOn
-                override val selectedItems by mainViewModel::selectedThreads
-                override val publishSelectedItems = mainViewModel::publishSelectedItems
+                override var isEnabled by multiselectionViewModel::isMultiSelectOn
+                override val selectedItems by multiselectionViewModel::selectedThreads
+                override val publishSelectedItems = multiselectionViewModel::publishSelectedItems
             },
         )
 
@@ -491,10 +497,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
         multiselectToolbar.cancel.setOnClickListener {
             trackMultiSelectionEvent(MatomoName.Cancel)
-            mainViewModel.isMultiSelectOn = false
+            multiselectionViewModel.isMultiSelectOn = false
         }
         multiselectToolbar.selectAll.setOnClickListener {
-            mainViewModel.selectOrUnselectAll()
+            multiselectionViewModel.selectOrUnselectAll(mainViewModel.currentThreadsLive)
             threadListAdapter.updateSelection()
         }
 
@@ -862,7 +868,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 unreadCount,
                 formatUnreadCount(unreadCount)
             )
-            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
+            isGone = unreadCount == 0 || multiselectionViewModel.isMultiSelectOn
         }
     }
 
@@ -872,13 +878,13 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         binding.toolbar.title = folderName
     }
 
-    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(mainViewModel) {
+    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(multiselectionViewModel) {
         if (isMultiSelectOn) {
             val previousThreads = threadListAdapter.dataSet.filterIsInstance<ThreadListItem.Content>()
             var shouldPublish = false
             deletedIndices.forEach {
                 val thread = previousThreads.getOrElse(it) { return@forEach }.thread
-                val isRemoved = mainViewModel.selectedThreads.remove(thread)
+                val isRemoved = selectedThreads.remove(thread)
                 if (isRemoved) shouldPublish = true
             }
             if (shouldPublish) publishSelectedItems()

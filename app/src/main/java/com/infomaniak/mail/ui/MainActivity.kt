@@ -76,6 +76,7 @@ import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.ui.sync.discovery.SyncDiscoveryManager
@@ -115,6 +116,7 @@ class MainActivity : BaseActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
     private val actionsViewModel: ActionsViewModel by viewModels()
+    private val multiselectionViewModel: MultiselectionViewModel by viewModels()
 
     private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let(MainActivityArgs::fromBundle) }
 
@@ -467,7 +469,7 @@ class MainActivity : BaseActivity() {
         }
 
         fun closeMultiSelect() {
-            mainViewModel.isMultiSelectOn = false
+            multiselectionViewModel.isMultiSelectOn = false
         }
 
         fun popBack() {
@@ -481,7 +483,7 @@ class MainActivity : BaseActivity() {
         onBackPressedDispatcher.addCallback(this@MainActivity) {
             when {
                 drawerLayout.isOpen -> closeDrawer()
-                mainViewModel.isMultiSelectOn -> closeMultiSelect()
+                multiselectionViewModel.isMultiSelectOn -> closeMultiSelect()
                 else -> popBack()
             }
         }

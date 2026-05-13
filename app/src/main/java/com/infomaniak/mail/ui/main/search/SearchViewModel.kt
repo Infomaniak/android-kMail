@@ -93,8 +93,6 @@ class SearchViewModel @Inject constructor(
     inline val selectedMessages
         get() = selectedMessagesLiveData.value!!
 
-    val isEveryMessageSelected
-        get() = runCatchingRealm { selectedMessages.count() == searchResults.value?.list?.count() }.getOrDefault(false)
     var filterFolder: Folder? = null
         private set
     var currentSearchQuery: String = ""

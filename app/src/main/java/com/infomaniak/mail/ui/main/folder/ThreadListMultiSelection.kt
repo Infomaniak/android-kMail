@@ -17,14 +17,11 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-// import com.infomaniak.mail.ui.main.folder.`<no name provided>`.computeReadFavoriteStatus
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavDirections
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
@@ -35,51 +32,24 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
+import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import kotlinx.coroutines.launch
 
-interface MultiSelectionHost : LifecycleOwner {
-    val multiSelectionBinding: MultiSelectionBinding
-    val folderRoleUtils: com.infomaniak.mail.utils.FolderRoleUtils
-    val descriptionDialog: com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-    val threadListAdapter: ThreadListAdapter
-    fun safeNavigation(directions: NavDirections)
-    fun disableSwipeDirection(direction: DirectionFlag)
-    fun unlockSwipeActionsIfSet()
-    fun directionToThreadActionsBottomSheetDialog(
-        threadUid: String,
-        shouldLoadDistantResources: Boolean,
-        shouldCloseMultiSelection: Boolean
-    ): NavDirections
-
-    fun directionsToMultiSelectBottomSheetDialog(): NavDirections
-}
-
-interface MultiSelectionBinding {
-    val quickActionBar: com.infomaniak.mail.views.BottomQuickActionBarView
-    val multiselectToolbar: com.infomaniak.mail.databinding.ViewMultiselectionInfoToolbarBinding
-    val toolbarLayout: android.view.View
-    val toolbar: android.view.View
-    val threadsList: android.view.ViewGroup
-    val newMessageFab: android.view.View?
-    val unreadCountChip: android.view.View?
-}
-
 class ThreadListMultiSelection {
 
     lateinit var mainViewModel: MainViewModel
-
+    lateinit var multiselectionViewModel: MultiselectionViewModel
     lateinit var actionsViewModel: ActionsViewModel
-    private lateinit var threadListFragment: ThreadListFragment
 
     lateinit var mainActivity: MainActivity
-    lateinit var searchViewModel: SearchViewModel
     private lateinit var host: MultiSelectionHost
-
+    private lateinit var folderRoleUtils: FolderRoleUtils
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
 
@@ -88,86 +58,32 @@ class ThreadListMultiSelection {
 
     fun initMultiSelection(
         mainViewModel: MainViewModel,
+        multiselectionViewModel: MultiselectionViewModel,
         actionsViewModel: ActionsViewModel,
         activity: MainActivity,
         host: MultiSelectionHost,
-        searchViewModel: SearchViewModel?,
+        folderRoleUtils: FolderRoleUtils,
         unlockSwipeActionsIfSet: () -> Unit,
         localSettings: LocalSettings,
     ) {
         this.mainViewModel = mainViewModel
+        this.multiselectionViewModel = multiselectionViewModel
         this.actionsViewModel = actionsViewModel
         this.mainActivity = activity
         this.host = host
+        this.folderRoleUtils = folderRoleUtils
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
         this.localSettings = localSettings
 
-        if (searchViewModel != null) {
-            this.searchViewModel = searchViewModel
-            setupMessageMultiSelectionActions()
-        } else setupMultiSelectionActions()
-
+        setupMultiSelectionActions()
         observerMultiSelection()
     }
 
-    private fun setupMessageMultiSelectionActions() = with(searchViewModel) {
-        host.multiSelectionBinding.quickActionBar.setOnItemClickListener { menuId ->
-            val selectedMessagesUids = selectedMessages.map { it.uid }
-            val selectedMessagesCount = selectedMessagesUids.count()
-
-            when (menuId) {
-                R.id.quickActionUnread -> {
-                    trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedMessagesCount)
-                    actionsViewModel.toggleMessagesSeenStatus(
-                        selectedMessages.toList(),
-                        false,
-                        mainViewModel.currentFolderId,
-                        mainViewModel.currentMailbox.value!!
-                    )
-                    mainViewModel.isMultiSelectOn = false
-                }
-                // R.id.quickActionArchive -> host.lifecycleScope.launch {
-                //     trackMultiSelectActionEvent(MatomoName.Archive, selectedMessagesCount)
-                //     mainViewModel.archiveThreads(selectedMessagesUids)
-                //     isMultiSelectOn = false
-                // }
-                // R.id.quickActionFavorite -> {
-                //     trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
-                //     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
-                //     isMultiSelectOn = false
-                // }
-                // R.id.quickActionDelete -> host.lifecycleScope.launch {
-                //     host.descriptionDialog.deleteWithConfirmationPopup(
-                //         folderRole = host.folderRoleUtils.getActionFolderRole(selectedThreads),
-                //         count = selectedThreadsCount,
-                //     ) {
-                //         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
-                //         deleteThreads(selectedThreadsUids)
-                //         isMultiSelectOn = false
-                //     }
-                // }
-                // R.id.quickActionMenu -> {
-                //     trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
-                //     val direction = if (selectedThreadsCount == 1) {
-                //         host.directionToThreadActionsBottomSheetDialog(
-                //             threadUid = selectedThreadsUids.single(),
-                //             shouldLoadDistantResources = false,
-                //             shouldCloseMultiSelection = true,
-                //         )
-                //     } else {
-                //         host.directionsToMultiSelectBottomSheetDialog()
-                //     }
-                //     host.safeNavigation(direction)
-                // }
-            }
-        }
-    }
-
-    private fun setupMultiSelectionActions() = with(mainViewModel) {
+    private fun setupMultiSelectionActions() = with(multiselectionViewModel) {
         host.multiSelectionBinding.quickActionBar.setOnItemClickListener { menuId ->
             val selectedThreadsUids = selectedThreads.map { it.uid }
             val selectedThreadsCount = selectedThreadsUids.count()
-            val currentMailBox = currentMailbox.value ?: return@setOnItemClickListener
+            val currentMailBox = mainViewModel.currentMailbox.value ?: return@setOnItemClickListener
 
             when (menuId) {
                 R.id.quickActionUnread -> {
@@ -175,7 +91,7 @@ class ThreadListMultiSelection {
                     actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
-                        currentFolderId = currentFolderId,
+                        currentFolderId = mainViewModel.currentFolderId,
                         mailbox = currentMailBox,
                     )
                     isMultiSelectOn = false
@@ -188,7 +104,7 @@ class ThreadListMultiSelection {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
                         actionsViewModel.archiveThreads(
                             threads = selectedThreads.toList(),
-                            currentFolder = currentFolder.value,
+                            currentFolder = mainViewModel.currentFolder.value,
                             mailbox = currentMailBox,
                         )
                         isMultiSelectOn = false
@@ -234,10 +150,10 @@ class ThreadListMultiSelection {
     }
 
     private fun observerMultiSelection() = with(host) {
-        mainViewModel.isMultiSelectOnLiveData.observe(host) { isMultiSelectOn ->
+        multiselectionViewModel.isMultiSelectOnLiveData.observe(host) { isMultiSelectOn ->
             threadListAdapter.updateSelection()
             if (localSettings.threadDensity != ThreadDensity.LARGE) TransitionManager.beginDelayedTransition(host.multiSelectionBinding.threadsList)
-            if (!isMultiSelectOn) mainViewModel.selectedThreads.clear()
+            if (!isMultiSelectOn) multiselectionViewModel.selectedThreads.clear()
 
             displaySelectionToolbar(isMultiSelectOn)
             lockDrawerAndSwipe(isMultiSelectOn)
@@ -245,9 +161,9 @@ class ThreadListMultiSelection {
             displayMultiSelectActions(isMultiSelectOn)
         }
 
-        mainViewModel.selectedThreadsLiveData.observe(host) { selectedThreads ->
+        multiselectionViewModel.selectedThreadsLiveData.observe(host) { selectedThreads ->
             if (selectedThreads.isEmpty()) {
-                mainViewModel.isMultiSelectOn = false
+                multiselectionViewModel.isMultiSelectOn = false
             } else {
                 updateSelectedCount(selectedThreads)
                 updateSelectAllLabel()
@@ -297,7 +213,10 @@ class ThreadListMultiSelection {
     }
 
     private fun updateSelectAllLabel() {
-        val selectAllLabel = if (mainViewModel.isEverythingSelected) R.string.buttonUnselectAll else R.string.buttonSelectAll
+        val currentThreadsSelected = mainViewModel.currentThreadsLive.value?.list?.count() ?: 0
+        val isEverythingSelected = multiselectionViewModel.isEverythingSelected(currentThreadsSelected)
+        val selectAllLabel =
+            if (isEverythingSelected) R.string.buttonUnselectAll else R.string.buttonSelectAll
         host.multiSelectionBinding.multiselectToolbar.selectAll.setText(selectAllLabel)
     }
 

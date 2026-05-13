@@ -18,16 +18,16 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.bottomSheetDialogs.EdgeToEdgeBottomSheetDialog
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 
 abstract class ActionsBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
-    abstract val mainViewModel: MainViewModel?
+    abstract val multiselectionViewModel: MultiselectionViewModel?
 
     protected fun ActionItemView.setClosingOnClickListener(shouldCloseMultiSelection: Boolean = false, callback: () -> Unit) {
         setOnClickListener {
-            if (shouldCloseMultiSelection) mainViewModel?.isMultiSelectOn = false
+            if (shouldCloseMultiSelection) multiselectionViewModel?.isMultiSelectOn = false
             findNavController().popBackStack()
             callback()
         }
@@ -35,7 +35,7 @@ abstract class ActionsBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     protected fun MainActionsView.setClosingOnClickListener(shouldCloseMultiSelection: Boolean = false, callback: (Int) -> Unit) {
         setOnItemClickListener { id ->
-            if (shouldCloseMultiSelection) mainViewModel?.isMultiSelectOn = false
+            if (shouldCloseMultiSelection) multiselectionViewModel?.isMultiSelectOn = false
             findNavController().popBackStack()
             callback(id)
         }

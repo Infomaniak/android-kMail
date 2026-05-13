@@ -32,6 +32,7 @@ import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.extensions.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
@@ -43,7 +44,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetDetailedContactBinding by safeBinding()
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
-    override val mainViewModel: MainViewModel by activityViewModels()
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
+    val mainViewModel: MainViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { DetailedContactBottomSheetDialog::class.java.name }
 
