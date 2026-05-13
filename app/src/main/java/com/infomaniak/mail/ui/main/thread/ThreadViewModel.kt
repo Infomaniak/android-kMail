@@ -425,7 +425,7 @@ class ThreadViewModel @Inject constructor(
         return@withContext message
     }
 
-    private fun insertSummaryIfExists(bodyObj: Body, message: Message){
+    private fun insertSummaryIfExists(bodyObj: Body, message: Message) {
         bodyObj.summary?.let { summaryText ->
             if (threadState.aiSummaryStateMap[message.uid] == null) {
                 threadState.aiSummaryStateMap[message.uid] = AiProcessState.Success(content = summaryText)
@@ -444,6 +444,7 @@ class ThreadViewModel @Inject constructor(
         }
         return threadState.cachedTranslatedSplitBodies[messageUid]
     }
+
     private suspend fun updateLocalMessageBody(messageUid: String, updateAction: (Message?) -> Unit) {
         mailboxContentRealm().write {
             MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
@@ -535,10 +536,7 @@ class ThreadViewModel @Inject constructor(
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
             messagesUids = messages.getUids(),
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(
-                featureFlagsFlow.first(),
-                localSettings
-            )
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsFlow.first(), localSettings)
         )
 
         if (apiResponses.atLeastOneSucceeded()) {
@@ -573,10 +571,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    private suspend fun fetchCalendarEvent(
-        item: Any,
-        forceFetch: Boolean
-    ): Pair<Message, ApiResponse<CalendarEventResponse>>? {
+    private suspend fun fetchCalendarEvent(item: Any, forceFetch: Boolean): Pair<Message, ApiResponse<CalendarEventResponse>>? {
 
         if (item !is MessageUi) return null
         val message: Message = item.message
@@ -595,10 +590,7 @@ class ThreadViewModel @Inject constructor(
         return message to apiResponse
     }
 
-    private fun MutableRealm.updateCalendarEventBlocking(
-        message: Message,
-        apiResponse: ApiResponse<CalendarEventResponse>
-    ) {
+    private fun MutableRealm.updateCalendarEventBlocking(message: Message, apiResponse: ApiResponse<CalendarEventResponse>) {
 
         if (!apiResponse.isSuccess()) {
             Sentry.captureMessage("Failed loading calendar event") { scope ->
@@ -622,10 +614,7 @@ class ThreadViewModel @Inject constructor(
                     val hasUserStoredEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent()
                     scope.setExtra("event has userStoredEvent", hasUserStoredEvent.toString())
                     scope.setExtra("event is canceled", calendarEventResponse.isCanceled.toString())
-                    scope.setExtra(
-                        "event has attachmentEvent",
-                        calendarEventResponse.hasAttachmentEvent().toString()
-                    )
+                    scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
                 }
             }
         }
@@ -690,8 +679,7 @@ class ThreadViewModel @Inject constructor(
                     val reactionDetail = reactions[emoji]?.computeReactionDetail(
                         emoji = emoji,
                         context = appContext,
-                        mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value
-                            ?: emptyMap(),
+                        mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap(),
                         isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false,
                     )
                     if (reactionDetail != null) put(emoji, reactionDetail)
@@ -710,8 +698,7 @@ class ThreadViewModel @Inject constructor(
         if (item is Message) {
             val localReactions = fakeReactions[item.messageId] ?: emptySet()
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
-            val canUnsubscribeOrNull =
-                if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
+            val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
             MessageUi(
                 message = item,
                 emojiReactionsState = reactions,
@@ -745,10 +732,7 @@ class ThreadViewModel @Inject constructor(
         return fakeReactions
     }
 
-    private suspend fun fakeEmojiReactionState(
-        state: EmojiReactionState,
-        localReactions: Set<String>
-    ): EmojiReactionStateUi {
+    private suspend fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
         val shouldFake = state.emoji in localReactions && !state.hasReacted
 
         val authors = state.authors.mapNotNullTo(mutableListOf<EmojiReactionAuthorUi>()) { author ->

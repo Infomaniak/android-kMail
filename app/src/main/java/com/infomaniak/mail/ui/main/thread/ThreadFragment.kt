@@ -216,7 +216,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val aiSummaryRetryTimers = mutableMapOf<String, CountDownTimer>()
     private val aiTranslateRetryTimers = mutableMapOf<String, CountDownTimer>()
 
-
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
     private val isNotInSpam: Boolean
@@ -1110,11 +1109,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
-        if (index >= 0) {
-            val notifyType =
-                if (aiAction == AiAction.SUMMARY) ThreadAdapter.NotifyType.AiSummaryStateChanged else ThreadAdapter.NotifyType.AiTranslateStateChanged
-            threadAdapter.notifyItemChanged(index, notifyType)
+        if (index < 0) return
+
+        val notifyType = if (aiAction == AiAction.SUMMARY) {
+            ThreadAdapter.NotifyType.AiSummaryStateChanged
+        } else {
+            ThreadAdapter.NotifyType.AiTranslateStateChanged
         }
+        threadAdapter.notifyItemChanged(index, notifyType)
     }
 
     private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
@@ -1129,41 +1131,43 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         cancelRetryTimer(messageUid, aiAction)
 
         val currentState = getStateMap(aiAction)[messageUid]
+        if (currentState is AiProcessState.Dismissed) return
+
         val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
 
-        val latestState = getStateMap(aiAction)[messageUid]
-        if (latestState is AiProcessState.Dismissed) return
-
-
         val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
-
         if (finalState is AiProcessState.Success) {
             when (aiAction) {
-                AiAction.TRANSLATE -> {
-                    val translatedHtml = result.data ?: ""
-                    threadViewModel.saveTranslation(messageUid, translatedHtml)
-
-                    val message = mainViewModel.getMessage(messageUid)
-                    val bodyType = message?.body?.type ?: Utils.TEXT_HTML
-                    val translatedBody = Body().apply {
-                        value = translatedHtml
-                        type = bodyType
-                    }
-                    val translatedSplitBody = MessageBodyUtils.splitContentAndQuote(translatedBody)
-                    threadViewModel.threadState.cachedTranslatedSplitBodies[messageUid] = translatedSplitBody
-
-                    message?.splitBody = translatedSplitBody
-                    reloadMessageInAdapter(messageUid)
-                }
-                AiAction.SUMMARY -> {
-                    val summaryContent = result.data
-                    if (summaryContent != null) {
-                        threadViewModel.saveSummary(messageUid, summaryContent)
-                    }
-                }
+                AiAction.TRANSLATE -> handleTranslateSuccess(messageUid, result.data)
+                AiAction.SUMMARY -> handleSummarySuccess(messageUid, result.data)
             }
         }
         updateAiProcessState(messageUid, aiAction, finalState)
+    }
+
+    private suspend fun handleTranslateSuccess(messageUid: String, data: String?) {
+        val translatedHtml = data ?: ""
+        threadViewModel.saveTranslation(messageUid, translatedHtml)
+
+        val message = mainViewModel.getMessage(messageUid)
+        val bodyType = message?.body?.type ?: Utils.TEXT_HTML
+
+        val translatedBody = Body().apply {
+            value = translatedHtml
+            type = bodyType
+        }
+
+        val translatedSplitBody = MessageBodyUtils.splitContentAndQuote(translatedBody)
+        threadViewModel.threadState.cachedTranslatedSplitBodies[messageUid] = translatedSplitBody
+
+        message?.splitBody = translatedSplitBody
+        reloadMessageInAdapter(messageUid)
+    }
+
+    private fun handleSummarySuccess(messageUid: String, summaryContent: String?) {
+        if (summaryContent != null) {
+            threadViewModel.saveSummary(messageUid, summaryContent)
+        }
     }
 
     private fun reloadMessageInAdapter(messageUid: String) {
@@ -1199,15 +1203,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun updateAiProcessState(messageUid: String, aiAction: AiAction, newState: AiProcessState) {
         getStateMap(aiAction)[messageUid] = newState
-
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
-        if (index >= 0) {
-            val notifyType = when (aiAction) {
-                AiAction.SUMMARY -> ThreadAdapter.NotifyType.AiSummaryStateChanged
-                AiAction.TRANSLATE -> ThreadAdapter.NotifyType.AiTranslateStateChanged
-            }
-            threadAdapter.notifyItemChanged(index, notifyType)
+        if (index < 0) return
+
+        val notifyType = when (aiAction) {
+            AiAction.SUMMARY -> ThreadAdapter.NotifyType.AiSummaryStateChanged
+            AiAction.TRANSLATE -> ThreadAdapter.NotifyType.AiTranslateStateChanged
         }
+        threadAdapter.notifyItemChanged(index, notifyType)
     }
 
     private fun cancelRetryTimer(messageUid: String, aiAction: AiAction) {

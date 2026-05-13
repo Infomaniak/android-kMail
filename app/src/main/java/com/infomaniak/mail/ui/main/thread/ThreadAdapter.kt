@@ -514,12 +514,13 @@ class ThreadAdapter(
         val hasSavedState = (aiAction == AiAction.TRANSLATE && message.body?.isTranslated == true) ||
                 (aiAction == AiAction.SUMMARY && message.body?.hasSummary == true)
 
-        if ((state == null && !hasSavedState)){
+        if ((state == null && !hasSavedState)) {
             targetView.isVisible = false
             return null
         }
 
-        val effectiveState = state ?: AiProcessState.Success(if (aiAction == AiAction.SUMMARY) message.body?.summary ?: "" else "")
+        val effectiveState =
+            state ?: AiProcessState.Success(if (aiAction == AiAction.SUMMARY) message.body?.summary ?: "" else "")
 
         with(targetView) {
             isVisible = true
@@ -549,8 +550,11 @@ class ThreadAdapter(
         with(targetView) {
             when (state) {
                 is AiProcessState.Loading -> {
-                    val titleRes =
-                        if (aiAction == AiAction.SUMMARY) R.string.messageSummaryLoading else R.string.euriaTranslateMessage
+                    val titleRes = if (aiAction == AiAction.SUMMARY) {
+                        R.string.messageSummaryLoading
+                    } else {
+                        R.string.euriaTranslateMessage
+                    }
                     title = ctx.getString(titleRes)
                     setAnimation(R.raw.euria)
                 }
@@ -582,8 +586,11 @@ class ThreadAdapter(
     ) {
         val ctx = targetView.context
         with(targetView) {
-            val errorMessageRes =
-                if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+            val errorMessageRes = if (aiAction == AiAction.SUMMARY) {
+                R.string.messageSummaryErrorRetry
+            } else {
+                R.string.messageTranslateErrorRetry
+            }
             title = ctx.getString(errorMessageRes)
             setIconRes(R.drawable.ic_warning)
             isButtonEnabled = false
@@ -606,8 +613,11 @@ class ThreadAdapter(
             setIconRes(R.drawable.ic_warning)
 
             if (state.canRetry) {
-                val errorMessageRes =
-                    if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+                val errorMessageRes = if (aiAction == AiAction.SUMMARY) {
+                    R.string.messageSummaryErrorRetry
+                } else {
+                    R.string.messageTranslateErrorRetry
+                }
                 title = ctx.getString(errorMessageRes)
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)

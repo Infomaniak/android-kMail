@@ -37,7 +37,6 @@ class Body : EmbeddedRealmObject {
     var summary: String? = null
     //endregion
     val isTranslated: Boolean get() = translatedValue != null
-
     val hasSummary: Boolean get() = summary != null
 
     companion object
