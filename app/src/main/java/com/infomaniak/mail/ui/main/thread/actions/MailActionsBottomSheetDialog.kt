@@ -113,7 +113,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         summary.setOnClickListener { onClickListener.onSummary() }
         translate.setOnClickListener { onClickListener.onTranslate() }
 
-
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
                 R.id.actionReply -> onClickListener.onReply()

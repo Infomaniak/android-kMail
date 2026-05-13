@@ -513,14 +513,12 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    suspend fun aiTranslate(languageCode: String, content: String? = null): ApiResponse<String> {
+    suspend fun aiTranslate(languageCode: String, content: String): ApiResponse<String> {
         // TODO: Adapt aiTranslate to accept an additional messageUid parameter once the backend supports it
-        val contentToBeTranslated = content ?: """message to be translated""".trimMargin()
-
         return callApi(
             url = ApiRoutes.aiTranslate(),
             method = POST,
-            body = mapOf("destination_language" to languageCode, "content" to contentToBeTranslated),
+            body = mapOf("destination_language" to languageCode, "content" to content),
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }

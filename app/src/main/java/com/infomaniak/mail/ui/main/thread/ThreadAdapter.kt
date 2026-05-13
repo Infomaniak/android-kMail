@@ -486,7 +486,7 @@ class ThreadAdapter(
         AiAction.TRANSLATE -> threadAdapterState.aiTranslateStateMap[messageUid]
     }
 
-    private fun MessageViewHolder.bindAiAction(message: Message, aiAction: ThreadFragment.AiAction? = null) {
+    private fun MessageViewHolder.bindAiAction(message: Message, aiAction: AiAction? = null) {
         if (aiAction == null) {
             bindAiAction(message, AiAction.SUMMARY)
             bindAiAction(message, AiAction.TRANSLATE)
@@ -507,7 +507,7 @@ class ThreadAdapter(
         setupListeners(message.uid, aiAction, targetView)
     }
 
-    private fun MessageViewHolder.setupBaseVisibility(
+    private fun setupBaseVisibility(
         state: AiProcessState?,
         aiAction: AiAction,
         targetView: InformationBlockView,
@@ -521,12 +521,13 @@ class ThreadAdapter(
         val hasSavedState = (aiAction == AiAction.TRANSLATE && message.body?.isTranslated == true) ||
                 (aiAction == AiAction.SUMMARY && message.body?.hasSummary == true)
 
-        if ((state == null && !hasSavedState)){
+        if ((state == null && !hasSavedState)) {
             targetView.isVisible = false
             return null
         }
 
-        val effectiveState = state ?: AiProcessState.Success(if (aiAction == AiAction.SUMMARY) message.body?.summary ?: "" else "")
+        val effectiveState =
+            state ?: AiProcessState.Success(if (aiAction == AiAction.SUMMARY) message.body?.summary ?: "" else "")
 
         with(targetView) {
             isVisible = true
@@ -547,7 +548,7 @@ class ThreadAdapter(
         return effectiveState
     }
 
-    private fun MessageViewHolder.handleProcessState(
+    private fun handleProcessState(
         state: AiProcessState?,
         aiAction: AiAction,
         targetView: InformationBlockView
@@ -556,8 +557,11 @@ class ThreadAdapter(
         with(targetView) {
             when (state) {
                 is AiProcessState.Loading -> {
-                    val titleRes =
-                        if (aiAction == AiAction.SUMMARY) R.string.messageSummaryLoading else R.string.euriaTranslateMessage
+                    val titleRes = if (aiAction == AiAction.SUMMARY) {
+                        R.string.messageSummaryLoading
+                    } else {
+                        R.string.euriaTranslateMessage
+                    }
                     title = ctx.getString(titleRes)
                     setAnimation(R.raw.euria)
                 }
@@ -582,15 +586,18 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.handleRetryingState(
+    private fun handleRetryingState(
         state: AiProcessState.Retrying,
         aiAction: AiAction,
         targetView: InformationBlockView
     ) {
         val ctx = targetView.context
         with(targetView) {
-            val errorMessageRes =
-                if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+            val errorMessageRes = if (aiAction == AiAction.SUMMARY) {
+                R.string.messageSummaryErrorRetry
+            } else {
+                R.string.messageTranslateErrorRetry
+            }
             title = ctx.getString(errorMessageRes)
             setIconRes(R.drawable.ic_warning)
             isButtonEnabled = false
@@ -603,7 +610,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.handleErrorState(
+    private fun handleErrorState(
         state: AiProcessState.Error,
         aiAction: AiAction,
         targetView: InformationBlockView
@@ -613,8 +620,11 @@ class ThreadAdapter(
             setIconRes(R.drawable.ic_warning)
 
             if (state.canRetry) {
-                val errorMessageRes =
-                    if (aiAction == AiAction.SUMMARY) R.string.messageSummaryErrorRetry else R.string.messageTranslateErrorRetry
+                val errorMessageRes = if (aiAction == AiAction.SUMMARY) {
+                    R.string.messageSummaryErrorRetry
+                } else {
+                    R.string.messageTranslateErrorRetry
+                }
                 title = ctx.getString(errorMessageRes)
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
