@@ -466,7 +466,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerRetry = { messageUid, aiAction -> doAiAction(messageUid, aiAction) },
                 showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage)) },
                 onAiBannerClose = { messageUid, aiAction -> dismissAiAction(messageUid, aiAction) },
-                onShowOriginal = { messageUid -> showOriginalMessage(messageUid) },
+                onShowOriginal = { messageUid -> dismissAiAction(messageUid, AiAction.TRANSLATE) },
             ),
         )
 
@@ -1087,8 +1087,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun showOriginalMessage(messageUid: String) {
-        threadViewModel.removeTranslation(messageUid)
-
         val originalSplitBody = threadViewModel.threadState.cachedSplitBodies[messageUid]
         val message = threadAdapter.currentList
             .filterIsInstance<MessageUi>()
@@ -1096,7 +1094,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             ?.message
 
         message?.splitBody = originalSplitBody
-        dismissAiAction(messageUid, AiAction.TRANSLATE)
         reloadMessageInAdapter(messageUid)
     }
 
@@ -1105,7 +1102,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         when (aiAction) {
             AiAction.SUMMARY -> threadViewModel.removeSummary(messageUid)
-            AiAction.TRANSLATE -> threadViewModel.removeTranslation(messageUid)
+            AiAction.TRANSLATE -> {
+                threadViewModel.removeTranslation(messageUid)
+                showOriginalMessage(messageUid)
+            }
         }
 
         val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
