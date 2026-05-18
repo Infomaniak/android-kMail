@@ -101,10 +101,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
             setFavoriteUi(message.isFavorite)
             setReactionUi(message.isValidReactionTarget)
-            setSummaryUi(isFromThreadList = false)
-            setTranslateUi(isFromThreadList = false)
-            setSummaryEnabled(isEnabled = !navigationArgs.isAlreadySummarized)
-            setTranslateEnabled(isEnabled = !navigationArgs.isAlreadyTranslated)
+            setSummaryUi(isEnabled = !navigationArgs.isAlreadySummarized)
+            setTranslateUi(isEnabled = !navigationArgs.isAlreadyTranslated)
             setSpamUi(binding.spam, isFromSpam)
 
             observeReportPhishingResult()

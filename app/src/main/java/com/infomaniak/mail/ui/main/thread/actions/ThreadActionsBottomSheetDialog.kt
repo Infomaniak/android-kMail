@@ -48,8 +48,6 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -114,10 +112,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setSnoozeUi(thread.isSnoozed())
                 setReactionUi(canBeReactedTo = messageUidToReactTo != null)
                 setSpamUi(binding.spam, isFromSpam)
-                setSummaryUi(isFromThreadList = navigationArgs.isFromThreadList)
-                setTranslateUi(isFromThreadList = navigationArgs.isFromThreadList)
-                setSummaryEnabled(isEnabled = !navigationArgs.isAlreadySummarized)
-                setTranslateEnabled(isEnabled = !navigationArgs.isAlreadyTranslated)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
@@ -333,15 +327,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             )
         }
 
-        override fun onSummary() {
-            trackBottomSheetThreadActionsEvent(MatomoName.Summary)
-            setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, messageUidToExecuteAction)
-        }
+        override fun onSummary() = Unit
 
-        override fun onTranslate() {
-            trackBottomSheetThreadActionsEvent(MatomoName.Translate)
-            setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, messageUidToExecuteAction)
-        }
+        override fun onTranslate() = Unit
         //endregion
     }
 
