@@ -507,12 +507,11 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    suspend fun aiTranslate(languageCode: String, content: String): ApiResponse<String> {
-        // TODO: Adapt aiTranslate to accept an additional messageUid parameter once the backend supports it
+    suspend fun aiTranslate(languageCode: String, mailboxUuid: String, msgUid: String): ApiResponse<String> {
         return callApi(
             url = ApiRoutes.aiTranslate(),
             method = POST,
-            body = mapOf("destination_language" to languageCode, "content" to content),
+            body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }

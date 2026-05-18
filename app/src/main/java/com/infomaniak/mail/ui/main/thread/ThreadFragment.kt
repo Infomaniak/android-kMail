@@ -1126,7 +1126,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         val result = when (aiAction) {
             AiAction.SUMMARY -> ApiRepository.aiSummary(languageCode, content)
-            AiAction.TRANSLATE -> ApiRepository.aiTranslate(languageCode, content)
+            AiAction.TRANSLATE -> {
+                val mailbox = mainViewModel.currentMailbox.value ?: mainViewModel.openMailbox()
+                mailbox?.let { ApiRepository.aiTranslate(languageCode, it.uuid, messageUid) }
+            }
         }
 
         cancelRetryTimer(messageUid, aiAction)
@@ -1137,7 +1140,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
 
         val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
-        if (finalState is AiProcessState.Success) {
+        if (finalState is AiProcessState.Success && result != null) {
             when (aiAction) {
                 AiAction.TRANSLATE -> handleTranslateSuccess(messageUid, result.data)
                 AiAction.SUMMARY -> handleSummarySuccess(messageUid, result.data)
@@ -1184,10 +1187,18 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun mapApiResultToState(
-        result: ApiResponse<String>,
+        result: ApiResponse<String>?,
         isRetry: Boolean,
         wasLoaderShown: Boolean
     ): AiProcessState {
+        if (result == null) {
+            return AiProcessState.Error(
+                canRetry = true,
+                isRetry = isRetry,
+                wasLoaderShown = wasLoaderShown,
+                targetSameAsSource = false,
+            )
+        }
         if (result.result == ApiResponseStatus.SUCCESS) {
             return AiProcessState.Success(result.data ?: "")
         }
