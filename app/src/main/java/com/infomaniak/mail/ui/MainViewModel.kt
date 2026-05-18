@@ -375,7 +375,7 @@ class MainViewModel @Inject constructor(
         emit(openMailbox())
     }
 
-    private suspend fun openMailbox(): Mailbox? {
+    suspend fun openMailbox(): Mailbox? {
         SentryLog.d(TAG, "Load current mailbox from local")
 
         val mailbox = mailboxController.getMailboxWithFallback(
