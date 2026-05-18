@@ -679,18 +679,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     )
                 }
                 R.id.quickActionMenu -> {
-                    val lastMessage = threadViewModel.quickActionBarClicks.value?.message
-                    val translateState = lastMessage?.let { threadViewModel.threadState.aiTranslateStateMap[it.uid] }
-                    val summaryState = lastMessage?.let { threadViewModel.threadState.aiSummaryStateMap[it.uid] }
-
                     safeNavigate(
                         resId = R.id.threadActionsBottomSheetDialog,
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                            isFromThreadList = false,
-                            isAlreadyTranslated = translateState is AiProcessState.Success || translateState is AiProcessState.Loading,
-                            isAlreadySummarized = summaryState is AiProcessState.Success || summaryState is AiProcessState.Loading,
                         ).toBundle(),
                     )
                 }

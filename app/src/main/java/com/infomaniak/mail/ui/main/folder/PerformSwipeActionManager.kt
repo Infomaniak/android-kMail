@@ -141,7 +141,6 @@ object PerformSwipeActionManager {
                 ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                     threadUid = thread.uid,
                     shouldLoadDistantResources = false,
-                    isFromThreadList = true,
                 )
             )
             true
