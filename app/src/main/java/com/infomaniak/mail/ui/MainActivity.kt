@@ -106,6 +106,7 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.math.max
 import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.legacy.R as RCoreLegacy
 
@@ -399,7 +400,8 @@ class MainActivity : BaseActivity() {
             snackbarManager.setValue(
                 title = getString(R.string.snackbarEmailSent),
                 buttonTitle = RCore.string.buttonCancel,
-                customBehavior = { mainViewModel.unsendDraft(cancelResourceUrl) })
+                customBehavior = { mainViewModel.unsendDraft(cancelResourceUrl) },
+                length = max(0,(localSettings.cancelDelay - 2) * 1000))
         }
     }
 
