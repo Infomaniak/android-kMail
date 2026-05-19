@@ -42,7 +42,7 @@ class SnackbarManager @Inject constructor() {
         onUndoData: ((data: UndoData) -> Unit)? = null,
     ) = with(snackbarFeedback) {
         removeObservers(activity)
-        observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
+        observe(activity) { (title, undoData, buttonTitleRes, customBehavior, length) ->
             val action: (() -> Unit)? = if (undoData != null) {
                 { onUndoData?.invoke(undoData) }
             } else {
@@ -59,6 +59,7 @@ class SnackbarManager @Inject constructor() {
                 anchor = getAnchor?.invoke(),
                 actionButtonTitle = buttonTitle,
                 onActionClicked = safeAction,
+                length = length
             )
         }
     }
@@ -75,12 +76,24 @@ class SnackbarManager @Inject constructor() {
         }
     }
 
-    fun setValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
-        snackbarFeedback.value = SnackbarData(title, undoData, buttonTitle, customBehavior)
+    fun setValue(
+        title: String,
+        undoData: UndoData? = null,
+        buttonTitle: Int? = null,
+        customBehavior: (() -> Unit)? = null,
+        length: Int = Snackbar.LENGTH_LONG,
+    ) {
+        snackbarFeedback.value = SnackbarData(title, undoData, buttonTitle, customBehavior, length)
     }
 
-    fun postValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
-        snackbarFeedback.postValue(SnackbarData(title, undoData, buttonTitle, customBehavior))
+    fun postValue(
+        title: String,
+        undoData: UndoData? = null,
+        buttonTitle: Int? = null,
+        customBehavior: (() -> Unit)? = null,
+        length: Int = Snackbar.LENGTH_LONG,
+    ) {
+        snackbarFeedback.postValue(SnackbarData(title, undoData, buttonTitle, customBehavior, length))
     }
 
     private data class SnackbarData(
@@ -88,6 +101,7 @@ class SnackbarManager @Inject constructor() {
         val undoData: UndoData?,
         @StringRes val buttonTitle: Int?,
         val customBehavior: (() -> Unit)?,
+        val length: Int = Snackbar.LENGTH_LONG,
     )
 
     data class UndoData(
