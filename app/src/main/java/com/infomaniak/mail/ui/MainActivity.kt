@@ -106,7 +106,7 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import com.infomaniak.core.legacy.R as RCore
+import com.infomaniak.core.legacy.R as RCoreLegacy
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -402,7 +402,7 @@ class MainActivity : BaseActivity() {
 
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
-            buttonTitle = RCore.string.buttonCancel,
+            buttonTitle = RCoreLegacy.string.buttonCancel,
             customBehavior = { mainViewModel.unscheduleDraft(unscheduleDraftUrl) },
         )
     }
@@ -555,7 +555,7 @@ class MainActivity : BaseActivity() {
                 trackInAppUpdateEvent(if (isWantingUpdate) MatomoName.DiscoverNow else MatomoName.DiscoverLater)
             },
             onInstallStart = { trackInAppUpdateEvent(MatomoName.InstallUpdate) },
-            onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },
+            onInstallFailure = { snackbarManager.setValue(getString(RCoreLegacy.string.errorUpdateInstall)) },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
                 SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
                 mainViewModel.canInstallUpdate.value = isUpdateDownloaded
@@ -601,8 +601,8 @@ class MainActivity : BaseActivity() {
             reviewDialogTitleStyle = R.style.DialogReviewStyleTextAppearance,
             reviewAlertDialogData = ReviewAlertDialogData(
                 title = getString(R.string.reviewAlertTitle),
-                positiveText = getString(RCore.string.buttonYes),
-                negativeText = getString(RCore.string.buttonNo),
+                positiveText = getString(RCoreLegacy.string.buttonYes),
+                negativeText = getString(RCoreLegacy.string.buttonNo),
                 onPositiveButtonClicked = { userChoice = ReviewAlertDialog.DialogAction.Positive },
                 onNegativeButtonClicked = { userChoice = ReviewAlertDialog.DialogAction.Negative },
                 onDismiss = { continuation.resume(userChoice) }
