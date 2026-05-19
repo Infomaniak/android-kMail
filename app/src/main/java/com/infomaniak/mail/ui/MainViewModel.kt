@@ -854,7 +854,12 @@ class MainViewModel @Inject constructor(
 
     fun unsendDraft(unsendDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.unsendDraft(unsendDraftUrl)
-        if (!apiResponse.isSuccess()) snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
+        delay(300L)
+        if (apiResponse.isSuccess()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarSendCancelled))
+        }else{
+            snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
+        }
     }
 
     private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
