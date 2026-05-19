@@ -852,6 +852,11 @@ class MainViewModel @Inject constructor(
         showUnscheduledDraftSnackbar(apiResponse)
     }
 
+    fun unsendDraft(unsendDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.unsendDraft(unsendDraftUrl)
+        if (!apiResponse.isSuccess()) snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
+    }
+
     private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
 
         fun openDraftFolder() = viewModelScope.launch { folderController.getFolder(FolderRole.DRAFT)?.id?.let(::openFolder) }
