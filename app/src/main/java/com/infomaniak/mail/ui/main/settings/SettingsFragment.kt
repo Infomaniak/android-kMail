@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.settings
 
+import android.R.attr.subtitle
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -47,9 +48,11 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.settings.send.SendSettingsFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
+import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
@@ -185,6 +188,13 @@ class SettingsFragment : Fragment() {
             settingsThreadMode.setSubtitle(threadMode.localisedNameRes)
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
             settingsAutomaticAdvance.setSubtitle(autoAdvanceMode.localisedNameRes)
+            val cancelDelay = cancelDelay
+            val cancelDelaySubtitle = if (cancelDelay == 0) {
+                getString(R.string.settingsDisabled)
+            } else {
+                getString(R.string.settingsDelaySeconds, cancelDelay)
+            }
+            settingsCancellationPeriod.setSubtitle(cancelDelaySubtitle)
             lifecycleScope.launch {
                 UserDatabase().userDao().allUsers.map { list -> list.any { it.isStaff } }.collectLatest { hasStaffAccount ->
                     if (!hasStaffAccount) return@collectLatest
@@ -236,6 +246,10 @@ class SettingsFragment : Fragment() {
 
         settingsAutomaticAdvance.setOnClickListener {
             safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToAutoAdvanceSettings(), currentClassName)
+        }
+
+        settingsCancellationPeriod.setOnClickListener {
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToCancelDelaySetting(), currentClassName)
         }
 
         settingsThreadListDensity.setOnClickListener {

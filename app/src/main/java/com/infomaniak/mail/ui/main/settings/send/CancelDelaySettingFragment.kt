@@ -26,7 +26,6 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentCancelDelaySettingBinding
-import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -49,7 +48,6 @@ class CancelDelaySettingFragment : Fragment() {
         checkInitialValue()
 
         binding.radioGroup.onItemCheckedListener { _, value, _ ->
-            notYetImplemented()
             val seconds = value?.toInt() ?: throw NullPointerException("Radio button had no associated value")
             localSettings.cancelDelay = seconds
         }
