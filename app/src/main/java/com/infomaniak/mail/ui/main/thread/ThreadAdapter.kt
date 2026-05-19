@@ -289,6 +289,7 @@ class ThreadAdapter(
     private fun MessageViewHolder.handlePermissionsPayload(canSendEmails: Boolean) = with(binding) {
         replyButton.isEnabled = canSendEmails
         emojiReactions.isEnabled = canSendEmails
+        scheduleAlert.isEnabled = canSendEmails
     }
 
     private fun MessageViewHolder.bindCalendarEvent(message: Message) {
