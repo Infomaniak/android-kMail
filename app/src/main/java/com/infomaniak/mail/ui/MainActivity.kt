@@ -106,6 +106,7 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.legacy.R as RCoreLegacy
 
 @AndroidEntryPoint
@@ -351,7 +352,8 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
-                    showSentDraftSnackbar()
+                    val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
+                    showSentDraftSnackbar(cancelResourceUrl)
                 }
                 DraftAction.SCHEDULE -> {
                     val scheduleDate = getString(DraftsActionsWorker.SCHEDULED_DRAFT_DATE_KEY)
@@ -389,9 +391,16 @@ class MainActivity : BaseActivity() {
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
-    private fun showSentDraftSnackbar() {
+    private fun showSentDraftSnackbar(cancelResourceUrl: String?) {
         showSendingSnackbarTimer.cancel()
-        snackbarManager.setValue(getString(R.string.snackbarEmailSent))
+        if (cancelResourceUrl == null) {
+            snackbarManager.setValue(getString(R.string.snackbarEmailSent))
+        } else {
+            snackbarManager.setValue(
+                title = getString(R.string.snackbarEmailSent),
+                buttonTitle = RCore.string.buttonCancel,
+                customBehavior = { mainViewModel.unsendDraft(cancelResourceUrl) })
+        }
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
