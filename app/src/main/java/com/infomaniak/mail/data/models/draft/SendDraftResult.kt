@@ -24,4 +24,7 @@ import kotlinx.serialization.Serializable
 data class SendDraftResult(
     @SerialName("etop")
     val scheduledMessageEtop: String,
+
+    @SerialName("cancel_resource")
+    val cancelResourceUrl: String?,
 )
