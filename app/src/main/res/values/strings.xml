@@ -595,6 +595,7 @@
     <string name="snackbarSaveInDraft">Your message has been saved in drafts.</string>
     <string name="snackbarScheduleSaved">The message will be sent on %s</string>
     <string name="snackbarScheduling">The message is being scheduled</string>
+    <string name="snackbarSendCancelled">Send cancelled</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Sender successfully blacklisted</item>
         <item quantity="other">Senders successfully blacklisted</item>

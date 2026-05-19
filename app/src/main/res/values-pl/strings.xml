@@ -615,6 +615,7 @@
     <string name="snackbarSaveInDraft">Twoja wiadomość została zapisana w wersjach roboczych.</string>
     <string name="snackbarScheduleSaved">Wiadomość zostanie wysłana %s</string>
     <string name="snackbarScheduling">Wiadomość jest planowana</string>
+    <string name="snackbarSendCancelled">Wysyłanie anulowane</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Nadawca pomyślnie dodany do czarnej listy</item>
         <item quantity="few">Nadawcy pomyślnie dodani do czarnej listy</item>

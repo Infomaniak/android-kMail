@@ -591,6 +591,7 @@
     <string name="snackbarSaveInDraft">Uw bericht is opgeslagen in concepten.</string>
     <string name="snackbarScheduleSaved">Het bericht wordt verzonden op %s</string>
     <string name="snackbarScheduling">Het bericht wordt gepland</string>
+    <string name="snackbarSendCancelled">Verzenden geannuleerd</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Afzender succesvol op de blacklist gezet</item>
         <item quantity="other">Afzenders succesvol op de blacklist gezet</item>

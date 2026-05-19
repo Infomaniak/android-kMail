@@ -591,6 +591,7 @@
     <string name="snackbarSaveInDraft">Viestisi on tallennettu luonnoksiin.</string>
     <string name="snackbarScheduleSaved">Viesti lähetetään %s</string>
     <string name="snackbarScheduling">Viestiä ajastetaan</string>
+    <string name="snackbarSendCancelled">Lähetys peruttu</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Lähettäjä lisätty mustalle listalle onnistuneesti</item>
         <item quantity="other">Lähettäjät lisätty mustalle listalle onnistuneesti</item>
