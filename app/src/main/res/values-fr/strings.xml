@@ -591,6 +591,7 @@
     <string name="snackbarSaveInDraft">Votre message a été sauvegardé dans les brouillons.</string>
     <string name="snackbarScheduleSaved">Le message sera envoyé le %s</string>
     <string name="snackbarScheduling">Le message est en cours de planification</string>
+    <string name="snackbarSendCancelled">Envoi annulé</string>
     <plurals name="snackbarSenderBlacklisted" tools:ignore="ImpliedQuantity">
         <item quantity="one">Expéditeur blacklisté avec succès</item>
         <item quantity="other">Expéditeurs blacklistés avec succès</item>

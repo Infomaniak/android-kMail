@@ -591,6 +591,7 @@
     <string name="snackbarSaveInDraft">Το μήνυμα αποθηκεύτηκε στα πρόχειρα.</string>
     <string name="snackbarScheduleSaved">Το μήνυμα θα σταλεί στις %s</string>
     <string name="snackbarScheduling">Το μήνυμα προγραμματίζεται</string>
+    <string name="snackbarSendCancelled">Αποστολή ακυρώθηκε</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Ο αποστολέας προστέθηκε επιτυχώς στη μαύρη λίστα</item>
         <item quantity="other">Οι αποστολείς προστέθηκαν επιτυχώς στη μαύρη λίστα</item>

@@ -591,6 +591,7 @@
     <string name="snackbarSaveInDraft">A sua mensagem foi guardada nos rascunhos.</string>
     <string name="snackbarScheduleSaved">A mensagem será enviada em %s</string>
     <string name="snackbarScheduling">A programar a mensagem</string>
+    <string name="snackbarSendCancelled">Envio cancelado</string>
     <plurals name="snackbarSenderBlacklisted" tools:ignore="ImpliedQuantity">
         <item quantity="one">Remetente colocado na lista negra com sucesso</item>
         <item quantity="other">Remetentes colocados na lista negra com sucesso</item>

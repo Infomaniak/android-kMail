@@ -591,6 +591,7 @@
     <string name="snackbarSaveInDraft">Meldingen din er lagret i utkast.</string>
     <string name="snackbarScheduleSaved">Meldingen vil bli sendt %s</string>
     <string name="snackbarScheduling">Meldingen planlegges</string>
+    <string name="snackbarSendCancelled">Sending avbrutt</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Avsender blokkert</item>
         <item quantity="other">Avsendere blokkert</item>

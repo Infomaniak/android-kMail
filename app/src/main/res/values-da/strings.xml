@@ -591,6 +591,7 @@
     <string name="snackbarSaveInDraft">Din besked er blevet gemt i kladder.</string>
     <string name="snackbarScheduleSaved">Beskeden vil blive sendt den %s</string>
     <string name="snackbarScheduling">Beskeden planlægges</string>
+    <string name="snackbarSendCancelled">Afsendelse annulleret</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Afsender succesfuldt sortlistet</item>
         <item quantity="other">Afsendere succesfuldt sortlistet</item>
