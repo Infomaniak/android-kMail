@@ -431,7 +431,7 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.displayDate.toDate()
 
-        if (message.isDraft) {
+        if (message.isDraft && !message.isScheduledMessage) {
             userAvatar.loadUserAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
                 text = context.getString(R.string.messageIsDraftOption)
@@ -485,7 +485,7 @@ class ThreadAdapter(
                     isExpandedMap[message.uid] = false
                     onExpandOrCollapseMessage(message, shouldTrack = true)
                 } else {
-                    if (message.isDraft) {
+                    if (message.isDraft && !message.isScheduledMessage) {
                         threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                     } else {
                         isExpandedMap[message.uid] = true
@@ -917,15 +917,15 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) {
         deleteDraftButton.apply {
-            isVisible = message.isDraft
+            isVisible = message.isDraft && !message.isScheduledMessage
             setOnClickListener { threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message) }
         }
         replyButton.apply {
-            isVisible = isExpanded && message.isScheduledDraft.not()
+            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
             setOnClickListener { threadAdapterCallbacks?.onReplyClicked?.invoke(message) }
         }
         menuButton.apply {
-            isVisible = isExpanded && message.isScheduledDraft.not()
+            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
             setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
 
