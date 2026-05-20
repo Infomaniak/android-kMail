@@ -857,7 +857,9 @@ class MainViewModel @Inject constructor(
         delay(300L)
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarSendCancelled))
-        }else{
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id ?: return@launch
+            refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
+        } else {
             snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
         }
     }
