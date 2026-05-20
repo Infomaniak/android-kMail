@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Vidarebefordrat meddelande</string>
     <string name="messageHideQuotedText">Dölj konversationen</string>
     <string name="messageIsDraftOption">Utkast</string>
+    <string name="messageIsSending">Skickar…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Detta meddelande visas i spam-mappen eftersom %s finns på listan över blockerade avsändare.</string>
     <string name="messageIsSpamShouldActivateFilter">Detta meddelande anses vara spam. För säkerhets skull rekommenderar vi dig att aktivera ditt spamfilter.</string>
     <string name="messageIsSpamShouldMoveToSpam">Detta meddelande anses vara spam. Vi rekommenderar dig att flytta det till mappen \"Spam\".</string>

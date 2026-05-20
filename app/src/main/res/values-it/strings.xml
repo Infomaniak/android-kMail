@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Messaggio inoltrato</string>
     <string name="messageHideQuotedText">Nascondi la conversazione</string>
     <string name="messageIsDraftOption">Bozza</string>
+    <string name="messageIsSending">Invio…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Questo messaggio appare nella cartella spam perché %s è nell’elenco dei mittenti bloccati.</string>
     <string name="messageIsSpamShouldActivateFilter">Questo messaggio è considerato spam. Per sicurezza, si consiglia di attivare il filtro antispam.</string>
     <string name="messageIsSpamShouldMoveToSpam">Questo messaggio è considerato spam. Si consiglia di spostarlo nella cartella \"Spam\".</string>

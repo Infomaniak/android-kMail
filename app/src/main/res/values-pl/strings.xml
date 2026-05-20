@@ -402,6 +402,7 @@
     <string name="messageForwardHeader">Przekazana wiadomość</string>
     <string name="messageHideQuotedText">Ukryj rozmowę</string>
     <string name="messageIsDraftOption">Wersja robocza</string>
+    <string name="messageIsSending">Wysyłanie…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Ta wiadomość pojawia się w folderze spam, ponieważ %s znajduje się na liście zablokowanych nadawców.</string>
     <string name="messageIsSpamShouldActivateFilter">Ta wiadomość jest uznawana za spam. W celu zapewnienia bezpieczeństwa zalecamy aktywację filtra antyspamowego.</string>
     <string name="messageIsSpamShouldMoveToSpam">Ta wiadomość jest uznawana za spam. Zalecamy przeniesienie jej do folderu \"Spam\".</string>

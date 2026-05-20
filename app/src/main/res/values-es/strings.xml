@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Mensaje reenviado</string>
     <string name="messageHideQuotedText">Ocultar la conversación</string>
     <string name="messageIsDraftOption">Borrador</string>
+    <string name="messageIsSending">Enviando…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Este mensaje aparece en la carpeta de spam porque %s está en la lista de remitentes bloqueados.</string>
     <string name="messageIsSpamShouldActivateFilter">Este mensaje se considera spam. Para mayor seguridad, le recomendamos que active su filtro antispam.</string>
     <string name="messageIsSpamShouldMoveToSpam">Este mensaje se considera spam. Le recomendamos que lo mueva a la carpeta \"Spam\".</string>

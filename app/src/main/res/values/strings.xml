@@ -390,6 +390,7 @@
     <string name="messageForwardHeader">Forwarded message</string>
     <string name="messageHideQuotedText">Hide the conversation</string>
     <string name="messageIsDraftOption">Draft</string>
+    <string name="messageIsSending">Sending…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">This message appears in the spam folder because %s is on the list of blocked senders.</string>
     <string name="messageIsSpamShouldActivateFilter">This message is considered to be spam. To be safe, we recommend you to activate your spam filter.</string>
     <string name="messageIsSpamShouldMoveToSpam">This message is considered to be spam. We recommend you to move it to the \"Spam\" folder.</string>

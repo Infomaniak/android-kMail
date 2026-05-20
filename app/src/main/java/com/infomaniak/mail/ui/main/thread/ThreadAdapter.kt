@@ -930,6 +930,9 @@ class ThreadAdapter(
             isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
             setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
+        sendingProgressText.apply {
+            isVisible = message.isScheduledMessage
+        }
 
         recipient.text = if (isExpanded) getAllRecipientsFormatted(message) else context.formatSubject(message.subject)
         recipientChevron.isVisible = isExpanded
