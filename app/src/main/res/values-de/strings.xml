@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Weitergeleitete Nachricht</string>
     <string name="messageHideQuotedText">Unterhaltung verbergen</string>
     <string name="messageIsDraftOption">Entwurf</string>
+    <string name="messageIsSending">Senden…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Diese Nachricht erscheint im Spam-Ordner, weil %s auf der Liste der blockierten Absender steht.</string>
     <string name="messageIsSpamShouldActivateFilter">Diese Nachricht wird als Spam betrachtet. Um sicher zu gehen, empfehlen wir Ihnen, Ihren Spam-Filter zu aktivieren.</string>
     <string name="messageIsSpamShouldMoveToSpam">Diese Nachricht wird als Spam betrachtet. Wir empfehlen Ihnen, sie in den Ordner \"Spam\" zu verschieben.</string>

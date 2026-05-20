@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Doorgestuurd bericht</string>
     <string name="messageHideQuotedText">Gesprek verbergen</string>
     <string name="messageIsDraftOption">Concept</string>
+    <string name="messageIsSending">Verzenden…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Dit bericht staat in de spammap omdat %s op de lijst met geblokkeerde afzenders staat.</string>
     <string name="messageIsSpamShouldActivateFilter">Dit bericht wordt als spam beschouwd. Voor uw veiligheid raden wij u aan uw spamfilter te activeren.</string>
     <string name="messageIsSpamShouldMoveToSpam">Dit bericht wordt als spam beschouwd. Wij raden u aan het naar de \"Spam\"-map te verplaatsen.</string>

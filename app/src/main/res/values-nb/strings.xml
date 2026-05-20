@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Videresendt melding</string>
     <string name="messageHideQuotedText">Skjul samtalen</string>
     <string name="messageIsDraftOption">Utkast</string>
+    <string name="messageIsSending">Sender…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Denne meldingen vises i spam-mappen fordi %s er på listen over blokkerte avsendere.</string>
     <string name="messageIsSpamShouldActivateFilter">Denne meldingen anses som spam. For sikkerhet anbefaler vi deg å aktivere spam-filteret.</string>
     <string name="messageIsSpamShouldMoveToSpam">Denne meldingen anses som spam. Vi anbefaler deg å flytte den til \"Spam\"-mappen.</string>

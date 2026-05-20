@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Välitetty viesti</string>
     <string name="messageHideQuotedText">Piilota keskustelu</string>
     <string name="messageIsDraftOption">Luonnos</string>
+    <string name="messageIsSending">Lähetetään…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Tämä viesti näkyy roskapostikansiossa, koska %s on estettyjen lähettäjien listalla.</string>
     <string name="messageIsSpamShouldActivateFilter">Tämä viesti katsotaan roskapostiksi. Turvallisuutesi vuoksi suosittelemme roskapostisuodattimen aktivointia.</string>
     <string name="messageIsSpamShouldMoveToSpam">Tämä viesti katsotaan roskapostiksi. Suosittelemme siirtämään sen \"Roskaposti\"-kansioon.</string>
