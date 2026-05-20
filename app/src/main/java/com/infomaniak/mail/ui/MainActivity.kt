@@ -354,6 +354,7 @@ class MainActivity : BaseActivity() {
                 }
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
+                    mainViewModel.refreshDraftFolderAfterDelay(localSettings.cancelDelay + 2)
                     showSentDraftSnackbar(cancelResourceUrl)
                 }
                 DraftAction.SCHEDULE -> {
