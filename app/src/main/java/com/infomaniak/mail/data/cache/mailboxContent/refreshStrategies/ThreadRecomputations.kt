@@ -103,7 +103,7 @@ object ThreadRecomputations {
             if (!message.isSeen) unseenMessagesCount++
             from += message.from
             to += message.to
-            if (message.isDraft) hasDrafts = true
+            if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
             if (message.isFavorite) isFavorite = true
             if (message.isAnswered) {
                 isAnswered = true
