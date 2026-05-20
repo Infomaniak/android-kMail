@@ -48,7 +48,7 @@ class CancelDelaySettingFragment : Fragment() {
         checkInitialValue()
 
         binding.radioGroup.onItemCheckedListener { _, value, _ ->
-            val seconds = value?.toInt() ?: throw NullPointerException("Radio button had no associated value")
+            val seconds = value?.toInt() ?: return@onItemCheckedListener
             localSettings.cancelDelay = seconds
         }
     }

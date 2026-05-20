@@ -199,7 +199,7 @@ class MessageController @Inject constructor(
     //endregion
 
     companion object {
-        private val isNotDraft = "${Message::isDraft.name} == false OR ${Message::isScheduledMessage.name} == true"
+        private val isNotDraft = "(${Message::isDraft.name} == false OR ${Message::isScheduledMessage.name} == true)"
         private val isNotScheduledMessage = "${Message::isScheduledMessage.name} == false"
 
         //region Queries
