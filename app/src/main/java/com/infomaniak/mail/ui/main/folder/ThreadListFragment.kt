@@ -92,6 +92,7 @@ import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.Emoj
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionBinding
@@ -137,7 +138,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
-    private val multiselectionViewModel: MultiselectionViewModel by viewModels()
+    private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
 
     override val substituteClassName: String = javaClass.name
@@ -215,6 +216,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             folderRoleUtils = folderRoleUtils,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
+            searchViewModel = null,
+            isFromSearch = false,
         )
 
         observeNetworkStatus()
@@ -375,17 +378,32 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     override fun directionToThreadActionsBottomSheetDialog(
         threadUid: String,
         shouldLoadDistantResources: Boolean,
-        shouldCloseMultiSelection: Boolean
+        shouldCloseMultiSelection: Boolean,
+        isFromSearch: Boolean,
     ): NavDirections {
         return ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
             threadUid,
             shouldLoadDistantResources,
-            shouldCloseMultiSelection
+            shouldCloseMultiSelection,
+            isFromSearch
         )
     }
 
-    override fun directionsToMultiSelectBottomSheetDialog(): NavDirections {
-        return ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
+    override fun directionsToMultiSelectBottomSheetDialog(isFromSearch: Boolean): NavDirections {
+        return ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog(isFromSearch)
+    }
+
+    override fun directionsToFolderPickerFragment(
+        threadsUids: Array<String>,
+        messagesUids: Array<String>?,
+        action: FolderPickerAction,
+        sourceFolderId: String?
+    ): NavDirections {
+        return ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+            threadsUids,
+            messagesUids,
+            FolderPickerAction.MOVE, sourceFolderId
+        )
     }
 
     private fun setupDensityDependentUi() = with(binding) {

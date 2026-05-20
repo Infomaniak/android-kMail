@@ -28,6 +28,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
@@ -51,6 +52,8 @@ import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.get
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getFavoriteIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
+import com.infomaniak.mail.ui.main.search.SearchFragmentDirections
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -60,6 +63,7 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -73,10 +77,12 @@ import com.infomaniak.core.common.R as RCore
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
+    private val navigationArgs: MultiSelectBottomSheetDialogArgs by navArgs()
     val mainViewModel: MainViewModel by activityViewModels()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -117,7 +123,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
         val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
-
         lifecycleScope.launch {
             val folderRole = folderRoleUtils.getThreadsActionFolderRole(threads)
             val messages = threads.flatMap { it.messages }
@@ -132,20 +137,17 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.snooze.setOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Snooze, threadsCount, isFromBottomSheet = true)
-            isMultiSelectOn = false
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(threadsUids))
         }
 
         binding.modifySnooze.setOnClickListener {
             trackMultiSelectActionEvent(MatomoName.ModifySnooze, threadsCount, isFromBottomSheet = true)
-            isMultiSelectOn = false
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify(threadsUids))
         }
 
         binding.cancelSnooze.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.CancelSnooze, threadsCount, isFromBottomSheet = true)
             lifecycleScope.launch { actionsViewModel.unsnoozeThreads(threads.toList(), mainViewModel.currentMailbox.value) }
-            isMultiSelectOn = false
         }
 
         binding.spam.setClosingOnClickListener {
@@ -211,8 +213,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 mailbox = currentMailbox,
                 shouldFavorite = shouldFavorite,
             )
-
-            isMultiSelectOn = false
         }
 
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
@@ -221,7 +221,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 messageUids = threads.flatMap { it.messages }.map { it.uid },
                 currentClassName = MultiSelectBottomSheetDialog::class.java.name,
             )
-            isMultiSelectOn = false
         }
     }
 
@@ -232,7 +231,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         folderRole: FolderRole?,
         messagesFolderRoles: List<FolderRole>
     ) {
-        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
+        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = false) { id: Int ->
             val currentMailbox = mainViewModel.currentMailbox.value ?: run {
                 SentryLog.e(TAG, getString(R.string.sentryErrorMailboxIsNull)) { scope ->
                     scope.setTag("context", "$TAG.setupMailAction")
@@ -254,6 +253,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         currentFolderId = currentFolderId,
                         mailbox = currentMailbox,
                     )
+                    multiselectionViewModel.isMultiSelectOn = false
                 }
                 R.id.actionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(
@@ -266,6 +266,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                             currentFolder = currentFolder,
                             mailbox = currentMailbox,
                         )
+                        multiselectionViewModel.isMultiSelectOn = false
                     }
                 }
                 R.id.actionDelete -> {
@@ -280,6 +281,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                             currentFolder = currentFolder,
                             mailbox = currentMailbox,
                         )
+                        multiselectionViewModel.isMultiSelectOn = false
                     }
                 }
             }
@@ -291,15 +293,31 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         threadsUids: List<String>,
         folderRole: FolderRole?
     ) {
-        val navController = findNavController()
         descriptionDialog.moveWithConfirmationPopup(
             folderRole = folderRole,
             count = threadsCount,
         ) {
             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
+            navigateToFolderPickerFragment(threadsUids)
+        }
+    }
+
+    private fun navigateToFolderPickerFragment(threadsUids: List<String>) {
+        val navController = findNavController()
+        if (navigationArgs.isFromSearch) {
+            navController.animatedNavigation(
+                directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
+                    threadsUids = threadsUids.toTypedArray(),
+                    messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray(),
+                    action = FolderPickerAction.MOVE,
+                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
+                )
+            )
+        } else {
             navController.animatedNavigation(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                     threadsUids = threadsUids.toTypedArray(),
+                    messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray(),
                     action = FolderPickerAction.MOVE,
                     sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
                 ),
@@ -344,7 +362,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {
         fun hasMixedSnoozeState(): Boolean {
-            val isFirstThreadSnoozed = threads.first().isSnoozed()
+            val isFirstThreadSnoozed = threads.firstOrNull()?.isSnoozed() ?: false
             return threads.any { it.isSnoozed() != isFirstThreadSnoozed }
         }
 

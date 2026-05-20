@@ -102,7 +102,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
-    private val multiselectionViewModel: MultiselectionViewModel by viewModels()
+    private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
 
     @Inject
     override lateinit var folderRoleUtils: FolderRoleUtils
@@ -133,17 +133,33 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     override fun directionToThreadActionsBottomSheetDialog(
         threadUid: String,
         shouldLoadDistantResources: Boolean,
-        shouldCloseMultiSelection: Boolean
+        shouldCloseMultiSelection: Boolean,
+        isFromSearch: Boolean,
     ): NavDirections {
         return SearchFragmentDirections.actionSearchFragmentToThreadActionsBottomSheetDialog(
             threadUid,
             shouldLoadDistantResources,
-            shouldCloseMultiSelection
+            shouldCloseMultiSelection,
+            isFromSearch,
         )
     }
 
-    override fun directionsToMultiSelectBottomSheetDialog(): NavDirections {
-        return SearchFragmentDirections.actionSearchFragmentToMultiSelectBottomSheetDialog()
+    override fun directionsToMultiSelectBottomSheetDialog(isFromSearch: Boolean): NavDirections {
+        return SearchFragmentDirections.actionSearchFragmentToMultiSelectBottomSheetDialog(isFromSearch)
+    }
+
+    override fun directionsToFolderPickerFragment(
+        threadsUids: Array<String>,
+        messagesUids: Array<String>?,
+        action: FolderPickerAction,
+        sourceFolderId: String?
+    ): NavDirections {
+        return SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
+            threadsUids,
+            messagesUids,
+            FolderPickerAction.MOVE,
+            sourceFolderId
+        )
     }
 
     @Inject
@@ -212,6 +228,8 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
             activity = (requireActivity() as MainActivity),
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
+            searchViewModel = searchViewModel,
+            isFromSearch = true,
         )
 
         setAllFoldersButtonListener()
@@ -370,8 +388,10 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
             multiselectionViewModel.isMultiSelectOn = false
         }
         multiselectToolbar.selectAll.setOnClickListener {
-            multiselectionViewModel.selectOrUnselectAll(mainViewModel.currentThreadsLive)
-            threadListAdapter.updateSelection()
+            lifecycleScope.launch {
+                multiselectionViewModel.selectOrUnselectAllSearchItems(searchViewModel.threadsSearchResults)
+                threadListAdapter.updateSelection()
+            }
         }
         mailRecyclerView.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: ThreadListItem.Content): Boolean {
@@ -404,7 +424,9 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
             }
         }
 
-        swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
+        swipeRefreshLayout.setOnRefreshListener {
+            searchViewModel.refreshSearch(withContacts = !multiselectionViewModel.isMultiSelectOn)
+        }
     }
 
     /**
@@ -586,19 +608,6 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         searchViewModel.visibilityMode.observe(viewLifecycleOwner, ::updateUi)
     }
 
-    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(multiselectionViewModel) {
-        if (isMultiSelectOn) {
-            val previousThreads = threadListAdapter.dataSet.filterIsInstance<ThreadListItem.Content>()
-            var shouldPublish = false
-            deletedIndices.forEach {
-                val thread = previousThreads.getOrElse(it) { return@forEach }.thread
-                val isRemoved = selectedThreads.remove(thread)
-                if (isRemoved) shouldPublish = true
-            }
-            if (shouldPublish) publishSelectedItems()
-        }
-    }
-
     private fun updateUi(mode: VisibilityMode) = with(binding) {
 
         fun displayRecentSearches() {
@@ -655,6 +664,11 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
 
     private fun observeMultiSelect() {
         multiselectionViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
+            if (isMultiSelectOn) {
+                searchViewModel.contactsResults.value = emptyList()
+            } else {
+                searchViewModel.refreshSearch(withContacts = true)
+            }
             val autoTransition = AutoTransition()
             autoTransition.duration = TOOLBAR_FADE_DURATION
             TransitionManager.beginDelayedTransition(binding.horizontalScrollViewFilters, autoTransition)

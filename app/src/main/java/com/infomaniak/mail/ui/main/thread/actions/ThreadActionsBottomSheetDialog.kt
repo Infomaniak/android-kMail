@@ -77,7 +77,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
-
     private var folderRole: FolderRole? = null
     private var messagesFolderRoles: List<FolderRole> = emptyList()
     private var isFromArchive: Boolean = false
@@ -215,6 +214,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     currentFolder = mainViewModel.currentFolder.value,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
+                multiselectionViewModel.isMultiSelectOn = false
             }
         }
 
@@ -225,6 +225,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
+            multiselectionViewModel.isMultiSelectOn = false
             twoPaneViewModel.closeThread()
         }
 
@@ -240,6 +241,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                     ).toBundle(),
                 )
+                multiselectionViewModel.isMultiSelectOn = false
             }
         }
 
@@ -270,6 +272,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 threadsUids = listOf(navigationArgs.threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
+            multiselectionViewModel.isMultiSelectOn = false
         }
 
         override fun onSpam() {
@@ -279,6 +282,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
+            multiselectionViewModel.isMultiSelectOn = false
         }
 
         override fun onPhishing() {

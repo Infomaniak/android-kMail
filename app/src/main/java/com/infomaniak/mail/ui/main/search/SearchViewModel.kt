@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.DUMMY_FOLDER_ID
 import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -89,10 +88,6 @@ class SearchViewModel @Inject constructor(
     private val dummyFolderId
         inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name) ?: DUMMY_FOLDER_ID
 
-    val selectedMessagesLiveData = MutableLiveData(mutableSetOf<Message>())
-    inline val selectedMessages
-        get() = selectedMessagesLiveData.value!!
-
     var filterFolder: Folder? = null
         private set
     var currentSearchQuery: String = ""
@@ -100,7 +95,7 @@ class SearchViewModel @Inject constructor(
 
     private var currentUiState: SearchUiState = SearchUiState.IDLE
 
-    private var currentFilters = mutableSetOf<ThreadFilter>()
+    var currentFilters = mutableSetOf<ThreadFilter>()
     var isAllFoldersSelected: Boolean = false
 
     private var lastExecutedFolder: Folder? = null
@@ -146,8 +141,8 @@ class SearchViewModel @Inject constructor(
         resetFolderFilter()
     }
 
-    fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
-        search()
+    fun refreshSearch(withContacts: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
+        search(withContacts = withContacts)
     }
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
@@ -335,6 +330,7 @@ class SearchViewModel @Inject constructor(
         filters: Set<ThreadFilter> = currentFilters,
         folder: Folder? = filterFolder,
         shouldGetNextPage: Boolean = false,
+        withContacts: Boolean = true,
     ) = withContext(ioCoroutineContext) {
         cancelSearch()
 
@@ -345,7 +341,7 @@ class SearchViewModel @Inject constructor(
             val showContacts = shouldShowContacts() &&
                     query.isNotBlank() &&
                     !query.contains("\"") &&
-                    !isLengthTooShort(query)
+                    !isLengthTooShort(query) && withContacts
 
             val contacts = if (showContacts) {
                 val searchQueryNoAccents = Normalizer.normalize(query, Normalizer.Form.NFD)

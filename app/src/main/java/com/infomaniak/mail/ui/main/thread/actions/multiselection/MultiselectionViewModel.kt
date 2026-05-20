@@ -25,6 +25,8 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.data.models.thread.Thread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.notifications.ResultsChange
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,6 +44,9 @@ class MultiselectionViewModel @Inject constructor(
     inline val selectedThreads
         get() = selectedThreadsLiveData.value!!
 
+    inline val selectedMessages
+        get() = selectedThreads.flatMap { thread -> thread.messages }
+
     fun isEverythingSelected(currentThreadCount: Int): Boolean {
         return selectedThreads.count() == currentThreadCount
     }
@@ -54,6 +59,19 @@ class MultiselectionViewModel @Inject constructor(
         } else {
             trackMultiSelectionEvent(MatomoName.All)
             currentThreadsLive.value?.list?.forEach { thread -> selectedThreads.add(thread) }
+        }
+
+        publishSelectedItems()
+    }
+
+    suspend fun selectOrUnselectAllSearchItems(searchResults: Flow<ResultsChange<Thread>>) {
+        val isEverythingSelected = isEverythingSelected(searchResults.first().list.count())
+        if (isEverythingSelected) {
+            trackMultiSelectionEvent(MatomoName.None)
+            selectedThreads.clear()
+        } else {
+            trackMultiSelectionEvent(MatomoName.All)
+            searchResults.first().list.forEach { thread -> selectedThreads.add(thread) }
         }
 
         publishSelectedItems()

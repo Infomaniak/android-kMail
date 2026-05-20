@@ -215,6 +215,10 @@
             android:name="shouldCloseMultiSelection"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="isFromSearch"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog
@@ -599,6 +603,10 @@
         <action
             android:id="@+id/action_multiSelectBottomSheetDialog_to_folderPickerFragment"
             app:destination="@id/folderPickerFragment" />
+        <argument
+            android:name="isFromSearch"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog
