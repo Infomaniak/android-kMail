@@ -1086,7 +1086,9 @@ class ThreadAdapter(
                     // check for anything that doesn't need to handle bind with precision using a custom payload
                     message.body?.value == oldMessage.message.body?.value &&
                             message.splitBody == oldMessage.message.splitBody &&
-                            message.shouldHideDivider == oldMessage.message.shouldHideDivider
+                            message.shouldHideDivider == oldMessage.message.shouldHideDivider &&
+                            message.isDraft == oldMessage.message.isDraft &&
+                            message.isScheduledMessage == oldMessage.message.isScheduledMessage
                 })
             }
         }
