@@ -332,7 +332,9 @@ class ThreadAdapter(
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) = with(threadAdapterState) {
-        if (isExpandedMap[message.uid] == null) {
+        val wasScheduledMessageNowDraft = isExpandedMap[message.uid] != null && message.isDraft && !message.isScheduledMessage
+
+        if (isExpandedMap[message.uid] == null || wasScheduledMessageNowDraft) {
             isExpandedMap[message.uid] = message.shouldBeExpanded(position, items.lastIndex)
         }
 
