@@ -141,7 +141,7 @@ class MailActionsManagerTest {
         coEvery { ApiRepository.sendDraft(any(), any(), any()) } coAnswers {
             ApiResponse(
                 result = ApiResponseStatus.SUCCESS,
-                data = SendDraftResult(scheduledMessageEtop = "2025-08-27T10:45:48+0200"),
+                data = SendDraftResult(scheduledMessageEtop = "2025-08-27T10:45:48+0200", cancelResourceUrl = null),
             )
         }
         coEvery { ApiRepository.createAttachments(any(), any(), any(), any()) } coAnswers {
