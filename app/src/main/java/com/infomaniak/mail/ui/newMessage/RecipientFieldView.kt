@@ -288,6 +288,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 updateCollapsedChipValues(isCollapsed = true)
             }
             contactPopupWindow.dismiss()
+            focusTextField()
         }
     }
 
