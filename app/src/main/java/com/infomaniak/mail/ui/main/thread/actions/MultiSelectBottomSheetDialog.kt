@@ -310,7 +310,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     threadsUids = threadsUids.toTypedArray(),
                     messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray(),
                     action = FolderPickerAction.MOVE,
-                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
+                    sourceFolderId = null,
+                    isFromSearch = true,
                 )
             )
         } else {
@@ -352,7 +353,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             setTitle(favoriteText)
         }
 
-        setSnoozeUi(threads)
+        if (!navigationArgs.isFromSearch) setSnoozeUi(threads)
         ThreadActionsBottomSheetDialog.setSpamUi(
             spam = binding.spam,
             isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM

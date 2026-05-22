@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
@@ -65,6 +66,7 @@ class FolderPickerFragment : Fragment() {
     private val searchViewModel: SearchViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
+    private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
 
     @Inject
     lateinit var createFolderDialog: CreateFolderDialog
@@ -173,7 +175,6 @@ class FolderPickerFragment : Fragment() {
             snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
             return@with
         }
-
         if (messagesUids != null) {
             actionsViewModel.moveMessagesTo(
                 destinationFolderId = folderId,
@@ -188,6 +189,10 @@ class FolderPickerFragment : Fragment() {
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mailbox,
             )
+        }
+        if (navigationArgs.isFromSearch) {
+            multiselectionViewModel.isMultiSelectOn = false
+            searchViewModel.refreshSearch()
         }
     }
 

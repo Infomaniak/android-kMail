@@ -48,6 +48,8 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
+import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
@@ -74,6 +76,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
@@ -113,8 +116,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setMarkAsReadUi(thread.isSeen)
                 setArchiveUi(isFromArchive)
                 setFavoriteUi(thread.isFavorite)
-                setSnoozeUi(thread.isSnoozed())
-                setReactionUi(canBeReactedTo = messageUidToReactTo != null)
+                if (!navigationArgs.isFromSearch) {
+                    setSnoozeUi(thread.isSnoozed())
+                    setReactionUi(canBeReactedTo = messageUidToReactTo != null)
+                }
                 setSpamUi(binding.spam, isFromSpam)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
@@ -122,6 +127,14 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         observePotentialBlockedUsers()
         observeReportPhishingResult()
+    }
+
+    override val substituteClassName: String by lazy {
+        if (navigationArgs.isFromSearch) {
+            SearchFragment::class.java.name
+        } else {
+            ThreadListFragment::class.java.name
+        }
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
@@ -214,7 +227,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     currentFolder = mainViewModel.currentFolder.value,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
-                multiselectionViewModel.isMultiSelectOn = false
+                if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
             }
         }
 
@@ -225,7 +238,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
-            multiselectionViewModel.isMultiSelectOn = false
+            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
             twoPaneViewModel.closeThread()
         }
 
@@ -238,10 +251,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     args = FolderPickerFragmentArgs(
                         threadsUids = arrayOf(navigationArgs.threadUid),
                         action = FolderPickerAction.MOVE,
-                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
+                        isFromSearch = navigationArgs.isFromSearch
                     ).toBundle(),
                 )
-                multiselectionViewModel.isMultiSelectOn = false
+                if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
             }
         }
 
@@ -272,7 +286,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 threadsUids = listOf(navigationArgs.threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
-            multiselectionViewModel.isMultiSelectOn = false
+            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onSpam() {
@@ -282,7 +296,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
-            multiselectionViewModel.isMultiSelectOn = false
+            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onPhishing() {
@@ -307,7 +321,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 },
             )
 
-            multiselectionViewModel.isMultiSelectOn = false
+            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onBlockSender() {
@@ -329,7 +343,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                 }
             }
-            multiselectionViewModel.isMultiSelectOn = false
+            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onPrint() {

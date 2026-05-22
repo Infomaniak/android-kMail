@@ -198,6 +198,10 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
+        <argument
+            android:name="isFromSearch"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog
@@ -300,6 +304,10 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="isFromSearch"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
 
     <fragment

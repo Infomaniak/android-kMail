@@ -30,7 +30,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.AccountUtils
@@ -45,6 +44,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     abstract val shouldCloseMultiSelection: Boolean
+    // Add this abstract property
+    protected abstract val substituteClassName: String
+
 
     private var onClickListener: OnActionClick = object : OnActionClick {
 
@@ -100,7 +102,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
         share.setClosingOnClickListener(shouldCloseMultiSelection) {
             if (mainViewModel.currentMailbox.value?.kSuite is KSuite.Perso.Free) {
-                openMyKSuiteUpgradeBottomSheet(MatomoName.ShareEmail.value, ThreadListFragment::class.java.name)
+                openMyKSuiteUpgradeBottomSheet(MatomoName.ShareEmail.value, substituteClassName)
             } else {
                 onClickListener.onShare()
             }

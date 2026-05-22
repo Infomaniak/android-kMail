@@ -39,8 +39,10 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
+import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -72,6 +74,15 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
 
     override val shouldCloseMultiSelection: Boolean = false
+
+    override val substituteClassName: String by lazy {
+        if (navigationArgs.isFromSearch) {
+            SearchFragment::class.java.name
+        } else {
+            ThreadListFragment::class.java.name
+        }
+    }
+
     private var isFromSpam: Boolean = false
 
     @Inject

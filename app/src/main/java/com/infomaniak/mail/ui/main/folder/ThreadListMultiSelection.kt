@@ -82,71 +82,10 @@ class ThreadListMultiSelection {
 
         if (isFromSearch && searchViewModel != null) {
             this.searchViewModel = searchViewModel
-            setupMessageMultiSelectionActions()
-        } else {
-            setupMultiSelectionActions()
         }
 
+        setupMultiSelectionActions()
         observerMultiSelection()
-    }
-
-    private fun setupMessageMultiSelectionActions() = with(multiselectionViewModel) {
-        host.multiSelectionBinding.quickActionBar.setOnItemClickListener { menuId ->
-            val selectedThreadsCount = selectedThreads.count()
-            val selectedThreadsUids = selectedThreads.map { it.uid }
-            val selectedMessagesUids = selectedMessages.map { it.uid }
-            val selectedMessagesCount = selectedMessagesUids.count()
-            val mailbox = mainViewModel.currentMailbox.value ?: return@setOnItemClickListener
-            val currentFolderId = mainViewModel.currentFolderId
-            val currentFolder = mainViewModel.currentFolder.value
-
-            when (menuId) {
-                R.id.quickActionUnread -> {
-                    trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedMessagesCount)
-                    actionsViewModel.toggleMessagesSeenStatus(selectedMessages, shouldMultiselectRead, currentFolderId, mailbox)
-                    val hasSeenFilter = searchViewModel.currentFilters.contains(Thread.ThreadFilter.UNSEEN)
-                            || searchViewModel.currentFilters.contains(Thread.ThreadFilter.SEEN)
-                    if (hasSeenFilter) searchViewModel.refreshSearch()
-                    isMultiSelectOn = false
-                }
-                R.id.quickActionArchive -> host.lifecycleScope.launch {
-                    trackMultiSelectActionEvent(MatomoName.Archive, selectedMessagesCount)
-                    actionsViewModel.archiveMessages(selectedMessages, currentFolder, mailbox)
-                    searchViewModel.refreshSearch()
-                    isMultiSelectOn = false
-                }
-                R.id.quickActionFavorite -> {
-                    trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
-                    actionsViewModel.toggleMessagesFavoriteStatus(selectedMessages, shouldMultiselectFavorite, mailbox)
-                    if (searchViewModel.currentFilters.contains(Thread.ThreadFilter.STARRED)) searchViewModel.refreshSearch()
-                    isMultiSelectOn = false
-                }
-                R.id.quickActionDelete -> host.lifecycleScope.launch {
-                    host.descriptionDialog.deleteWithConfirmationPopup(
-                        folderRoles = host.folderRoleUtils.getActionFolderRoles(selectedMessages),
-                        count = selectedThreads.count(),
-                    ) {
-                        trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
-                        actionsViewModel.deleteMessages(selectedMessages, currentFolder, mailbox)
-                        isMultiSelectOn = false
-                    }
-                }
-                R.id.quickActionMenu -> {
-                    trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
-                    val direction = if (selectedThreadsCount == 1) {
-                        host.directionToThreadActionsBottomSheetDialog(
-                            threadUid = selectedThreadsUids.single(),
-                            shouldLoadDistantResources = false,
-                            shouldCloseMultiSelection = false,
-                            isFromSearch = isFromSearch
-                        )
-                    } else {
-                        host.directionsToMultiSelectBottomSheetDialog(isFromSearch)
-                    }
-                    host.safeNavigation(direction)
-                }
-            }
-        }
     }
 
     private fun setupMultiSelectionActions() = with(multiselectionViewModel) {
@@ -207,7 +146,7 @@ class ThreadListMultiSelection {
                         host.directionToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),
                             shouldLoadDistantResources = false,
-                            shouldCloseMultiSelection = false,
+                            shouldCloseMultiSelection = true,
                             isFromSearch = isFromSearch,
                         )
                     } else {

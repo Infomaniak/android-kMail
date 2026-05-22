@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
@@ -92,6 +93,7 @@ import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.infomaniak.core.legacy.R as RCore
@@ -385,6 +387,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         }
         multiselectToolbar.cancel.setOnClickListener {
             trackMultiSelectionEvent(MatomoName.Cancel)
+            searchViewModel.refreshSearch(withContacts = true)
             multiselectionViewModel.isMultiSelectOn = false
         }
         multiselectToolbar.selectAll.setOnClickListener {
@@ -466,6 +469,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
                     threadUid = threadUid,
                     shouldLoadDistantResources = false,
                     shouldCloseMultiSelection = false,
+                    isFromSearch = true,
                 )
             }
 
@@ -650,7 +654,14 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
 
     private fun observeSearchResults() = viewLifecycleOwner.lifecycleScope.launch {
         searchViewModel.allSearchResults.collectLatest { searchResults ->
-            threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleOwner.lifecycleScope)
+            // Wait for any running swipe animation to finish before updating the list
+            if (threadListViewModel.isRecoveringFinished.value == false) {
+                threadListViewModel.isRecoveringFinished.asFlow().first { it }
+            }
+
+            binding.mailRecyclerView.postOnAnimation {
+                threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleOwner.lifecycleScope)
+            }
         }
     }
 
@@ -666,8 +677,6 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         multiselectionViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
             if (isMultiSelectOn) {
                 searchViewModel.contactsResults.value = emptyList()
-            } else {
-                searchViewModel.refreshSearch(withContacts = true)
             }
             val autoTransition = AutoTransition()
             autoTransition.duration = TOOLBAR_FADE_DURATION
