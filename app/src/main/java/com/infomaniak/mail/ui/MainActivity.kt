@@ -344,6 +344,7 @@ class MainActivity : BaseActivity() {
 
     private fun Data.displayCompletedDraftWorkerResults() {
         getString(DraftsActionsWorker.RESULT_DRAFT_ACTION_KEY)?.let { draftAction ->
+
             when (draftAction.toEnumOrThrow<DraftAction>()) {
                 DraftAction.SAVE -> {
                     val associatedMailboxUuid = getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)
@@ -352,10 +353,15 @@ class MainActivity : BaseActivity() {
                         showSavedDraftSnackbar(associatedMailboxUuid, remoteDraftUuid)
                     }
                 }
-                DraftAction.SEND, DraftAction.SEND_REACTION -> {
+                DraftAction.SEND -> {
                     mainViewModel.refreshDraftFolderAfterDelay(localSettings.cancelDelay + 2)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
-                    showSentDraftSnackbar(cancelResourceUrl)
+                    showSentDraftSnackbar(cancelResourceUrl, isReaction = false)
+                }
+                DraftAction.SEND_REACTION -> {
+                    mainViewModel.refreshDraftFolderAfterDelay(localSettings.cancelDelay + 2)
+                    val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
+                    showSentDraftSnackbar(cancelResourceUrl, isReaction = true)
                 }
                 DraftAction.SCHEDULE -> {
                     val scheduleDate = getString(DraftsActionsWorker.SCHEDULED_DRAFT_DATE_KEY)
@@ -393,7 +399,7 @@ class MainActivity : BaseActivity() {
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
-    private fun showSentDraftSnackbar(cancelResourceUrl: String?) {
+    private fun showSentDraftSnackbar(cancelResourceUrl: String?, isReaction: Boolean) {
         showSendingSnackbarTimer.cancel()
         if (cancelResourceUrl == null) {
             snackbarManager.setValue(getString(R.string.snackbarEmailSent))
@@ -401,7 +407,7 @@ class MainActivity : BaseActivity() {
             snackbarManager.setValue(
                 title = getString(R.string.snackbarEmailSent),
                 buttonTitle = RCore.string.buttonCancel,
-                customBehavior = { mainViewModel.unsendDraft(cancelResourceUrl) },
+                customBehavior = { mainViewModel.unsendDraft(cancelResourceUrl, isReaction) },
                 // Snackbar displays for 2 seconds less than actual cancel delay
                 // to ensure the user sees the snackbar disappear before the action is committed
                 length = max(0,(localSettings.cancelDelay - 2) * 1000))

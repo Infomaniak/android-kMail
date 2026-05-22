@@ -852,13 +852,26 @@ class MainViewModel @Inject constructor(
         showUnscheduledDraftSnackbar(apiResponse)
     }
 
-    fun unsendDraft(unsendDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
+
+    fun unsendDraft(unsendDraftUrl: String, isReaction: Boolean) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.unsendDraft(unsendDraftUrl)
         delay(300L)
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarSendCancelled))
             val draftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id ?: return@launch
-            refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(draftsFolderId)))
+            if (isReaction) {
+                val mailbox = currentMailbox.value!!
+                sharedUtils.refreshFolders(mailbox, ImpactedFolders(mutableSetOf(draftsFolderId)))
+                val messages = MessageController.getMessagesByFolderIdBlocking(draftsFolderId, mailboxContentRealm())
+                val emojiDraftsUids =
+                    messages.filter { it.body?.value?.startsWith(EMOJI_REACTION_PLACEHOLDER) == true }.map { it.uid }
+                if (emojiDraftsUids.isNotEmpty()) {
+                    ApiRepository.deleteMessages(mailbox.uuid, emojiDraftsUids, alsoMoveReactionMessages = true)
+                    sharedUtils.refreshFolders(mailbox, ImpactedFolders(mutableSetOf(draftsFolderId)))
+                }
+            } else {
+                refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(draftsFolderId)))
+            }
         } else {
             snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
         }
@@ -1506,6 +1519,7 @@ class MainViewModel @Inject constructor(
 
             action = Draft.DraftAction.SEND_REACTION
             emojiReaction = emoji
+            delay = localSettings.cancelDelay
         }
 
         draftController.upsertDraft(draft)
