@@ -49,9 +49,9 @@ abstract class BaseAlertDialog(activityContext: Context) : DefaultLifecycleObser
     }
 
     fun resetLoadingAndDismiss() = with(alertDialog) {
-        if (isShowing) {
-            positiveButton.hideProgressCatching(R.string.buttonCreate)
+        runCatching {
             negativeButton.isEnabled = true
+            positiveButton.hideProgressCatching(R.string.buttonCreate)
             setCancelable(true)
             dismiss()
         }
