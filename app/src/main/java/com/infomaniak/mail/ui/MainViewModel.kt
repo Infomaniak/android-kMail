@@ -129,6 +129,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
@@ -272,23 +273,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    val currentPermissionsLive = _currentMailboxObjectId.flatMapLatest {
-        it?.let(permissionsController::getPermissionsAsync) ?: emptyFlow()
-    }.asLiveData(ioCoroutineContext)
-
-    val canSendEmailsFlow: SharedFlow<Boolean> = _currentMailboxObjectId.flatMapLatest {
+    private var _currentPermissionFlow = _currentMailboxObjectId.flatMapLatest {
         it?.let(permissionsController::getPermissionsAsync) ?: flowOf(null)
-    }.map { permissions ->
+    }
+
+    val currentPermissionsLive = _currentPermissionFlow.filterNotNull().asLiveData(ioCoroutineContext)
+
+    val canSendEmailsFlow: StateFlow<Boolean> = _currentPermissionFlow.map { permissions ->
         permissions?.canSendEmails ?: true
-    }.shareIn(
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
-        replay = 1
+        initialValue = true
     )
-
-    val canSendEmails: Boolean
-        get() = currentPermissionsLive.value?.canSendEmails ?: true
-
     //endregion
 
     //region Current Folder

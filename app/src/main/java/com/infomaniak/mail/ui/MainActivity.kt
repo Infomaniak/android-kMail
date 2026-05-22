@@ -654,7 +654,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
-        if (!mainViewModel.canSendEmails) {
+        if (!mainViewModel.canSendEmailsFlow.value) {
             snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
         } else {
             val intent = Intent(this, NewMessageActivity::class.java)

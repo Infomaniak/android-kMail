@@ -579,7 +579,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
-        if (!mainViewModel.canSendEmails) {
+        if (!mainViewModel.canSendEmailsFlow.value) {
             disableByMenuId(R.id.quickActionReply)
             disableByMenuId(R.id.quickActionForward)
         }
