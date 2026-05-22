@@ -84,19 +84,10 @@ class BottomQuickActionBarView @JvmOverloads constructor(
         }
     }
 
-    fun disableByMenuId(@IdRes menuId: Int) {
+    fun setEnableByMenuId(@IdRes menuId: Int, enabled: Boolean) {
         for (index in 0 until menu.size) {
             if (menu[index].itemId == menuId) {
-                disable(index)
-                return
-            }
-        }
-    }
-
-    fun enableByMenuId(@IdRes menuId: Int) {
-        for (index in 0 until menu.size) {
-            if (menu[index].itemId == menuId) {
-                enable(index)
+                if (enabled) enable(index) else disable(index)
                 return
             }
         }

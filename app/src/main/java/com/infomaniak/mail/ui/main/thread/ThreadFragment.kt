@@ -537,13 +537,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun updateQuickActionBarSendingState(canSend: Boolean) = with(binding.quickActionBar) {
-        if (canSend) {
-            enableByMenuId(R.id.quickActionReply)
-            enableByMenuId(R.id.quickActionForward)
-        } else {
-            disableByMenuId(R.id.quickActionReply)
-            disableByMenuId(R.id.quickActionForward)
-        }
+        setEnableByMenuId(R.id.quickActionReply, enabled = canSend)
+        setEnableByMenuId(R.id.quickActionForward, enabled = canSend)
     }
 
     private fun observeThreadLive() {
@@ -560,28 +555,26 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun updateFavoriteIcon(isFavorite: Boolean) = with(binding.iconFavorite) {
-        val iconRes = if (isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star
+        setIconResource(if (isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
         val color = if (isFavorite) {
             context.getColor(R.color.favoriteYellow)
         } else {
             context.getAttributeColor(RAndroid.attr.colorPrimary)
         }
-
-        setIconResource(iconRes)
         iconTint = ColorStateList.valueOf(color)
     }
 
     private fun setupQuickActionBar(thread: Thread) = with(binding.quickActionBar) {
         val shouldDisplayScheduledDraftActions = thread.containsOnlyScheduledDrafts(
             mainViewModel.featureFlagsLive.value,
-            localSettings
+            localSettings,
         )
 
         init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
         if (!mainViewModel.canSendEmailsFlow.value) {
-            disableByMenuId(R.id.quickActionReply)
-            disableByMenuId(R.id.quickActionForward)
+            setEnableByMenuId(R.id.quickActionReply, enabled = false)
+            setEnableByMenuId(R.id.quickActionForward, enabled = false)
         }
     }
 

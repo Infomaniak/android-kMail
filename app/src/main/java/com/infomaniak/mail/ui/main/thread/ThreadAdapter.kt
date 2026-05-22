@@ -207,6 +207,7 @@ class ThreadAdapter(
             notifyItemRangeChanged(0, itemCount, NotifyType.UpdatePermissions)
         }
     }
+
     private fun MessageViewHolder.handleToggleLightModePayload(messageUid: String) = with(threadAdapterState) {
         isThemeTheSameMap[messageUid] = !isThemeTheSameMap[messageUid]!!
         toggleContentAndQuoteTheme(messageUid)
