@@ -845,6 +845,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
+                R.id.quickActionReply -> {
+                    trackThreadActionsEvent(MatomoName.Reply)
+                    threadViewModel.clickOnQuickActionBar(menuId)
+                }
+                R.id.quickActionForward -> {
+                    trackThreadActionsEvent(MatomoName.Forward)
+                    threadViewModel.clickOnQuickActionBar(menuId)
+                }
                 R.id.quickActionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(MatomoName.Archive, isFromArchive)
@@ -859,14 +867,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 }
                 R.id.quickActionMenu -> {
                     trackThreadActionsEvent(MatomoName.OpenBottomSheet)
-                    threadViewModel.clickOnQuickActionBar(menuId)
-                }
-                R.id.quickActionReply -> {
-                    trackThreadActionsEvent(MatomoName.Reply)
-                    threadViewModel.clickOnQuickActionBar(menuId)
-                }
-                R.id.quickActionForward -> {
-                    trackThreadActionsEvent(MatomoName.Forward)
                     threadViewModel.clickOnQuickActionBar(menuId)
                 }
             }
