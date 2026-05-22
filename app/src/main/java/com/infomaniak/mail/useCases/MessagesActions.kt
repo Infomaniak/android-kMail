@@ -45,7 +45,6 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
-import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import kotlinx.coroutines.coroutineScope
 import java.util.Date
@@ -508,7 +507,7 @@ class MessagesActions @Inject constructor(
     }
 
     fun getUndoData(
-        messagesMoved: List<Message>,
+        impactedFolders: ImpactedFolders,
         apiResponses: List<ApiResponse<MoveResult>>,
         destinationFolder: Folder,
     ): UndoData? {
@@ -517,11 +516,10 @@ class MessagesActions @Inject constructor(
             null
         } else {
             val undoDestinationId = destinationFolder.id
-            val foldersIds = messagesMoved.getFoldersIds(exception = undoDestinationId)
-            foldersIds += destinationFolder.id
+            impactedFolders += destinationFolder.id
             UndoData(
                 resources = undoResources,
-                foldersIds = foldersIds,
+                foldersIds = impactedFolders,
                 destinationFolderId = undoDestinationId,
             )
         }
