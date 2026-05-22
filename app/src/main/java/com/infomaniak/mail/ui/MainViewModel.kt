@@ -595,11 +595,11 @@ class MainViewModel @Inject constructor(
 
     fun showMoveSnackbar(
         threadsMovedCount: Int,
-        messagesMoved: List<Message>,
+        messagesMovedCount: Int,
+        impactedFolders: ImpactedFolders,
         apiResponses: List<ApiResponse<MoveResult>>,
         destinationFolder: Folder,
     ) {
-
         val destination = destinationFolder.getLocalizedName(appContext)
         val isSpam = destinationFolder.role == FolderRole.SPAM
 
@@ -611,7 +611,7 @@ class MainViewModel @Inject constructor(
                     appContext.getString(RCore.string.anErrorHasOccurred)
                 }
             }
-            threadsMovedCount > 0 || messagesMoved.count() > 1 -> getMoveThreadSnackbarTitle(
+            threadsMovedCount > 0 || messagesMovedCount > 1 -> getMoveThreadSnackbarTitle(
                 isSpam,
                 threadsMovedCount,
                 destination
@@ -619,7 +619,7 @@ class MainViewModel @Inject constructor(
             else -> getMoveMessageSnackbarTitle(isSpam, destination)
         }
 
-        val undoData = messagesActions.getUndoData(messagesMoved, apiResponses, destinationFolder)
+        val undoData = messagesActions.getUndoData(impactedFolders, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
 
@@ -748,7 +748,13 @@ class MainViewModel @Inject constructor(
                     currentFolderId = currentFolderId,
                     threadsUids = movedThreads,
                 )
-                showMoveSnackbar(movedThreads.count(), messages, apiResponses, destinationFolder)
+                showMoveSnackbar(
+                    movedThreads.count(),
+                    messages.count(),
+                    messages.getFoldersIds(),
+                    apiResponses,
+                    destinationFolder
+                )
                 isMovedToNewFolder.postValue(true)
             }
 

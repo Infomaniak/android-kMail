@@ -150,7 +150,13 @@ class ActionsViewModel @Inject constructor(
                     )
                 }
 
-                if (displaySnackbar) showMoveSnackbar(movedThreads, messages, apiResponses, destinationFolder)
+                if (displaySnackbar) showMoveSnackbar(
+                    movedThreads.count(),
+                    messages.count(),
+                    messages.getFoldersIds(exception = destinationFolder.id),
+                    apiResponses,
+                    destinationFolder
+                )
             }
 
             if (apiResponses.atLeastOneFailed()) {
@@ -245,16 +251,22 @@ class ActionsViewModel @Inject constructor(
             }
         }
 
-        showMoveSnackbar(result.movedThreads, result.messages, result.apiResponses, result.destinationFolder)
+        showMoveSnackbar(
+            result.movedThreads.count(),
+            result.messages.count(),
+            result.messages.getFoldersIds(exception = destinationFolderId),
+            result.apiResponses,
+            result.destinationFolder
+        )
     }
 
     private fun showMoveSnackbar(
-        threadsMoved: List<String>,
-        messagesMoved: List<Message>,
+        threadsMovedCount: Int,
+        messagesMovedCount: Int,
+        impactedFolders: ImpactedFolders,
         apiResponses: List<ApiResponse<MoveResult>>,
         destinationFolder: Folder,
     ) {
-
         val destination = destinationFolder.getLocalizedName(appContext)
         val snackbarTitle = when {
             apiResponses.allFailed() -> {
@@ -264,17 +276,17 @@ class ActionsViewModel @Inject constructor(
                     appContext.getString(RCore.string.anErrorHasOccurred)
                 }
             }
-            threadsMoved.count() > 0 || messagesMoved.count() > 1 -> {
+            threadsMovedCount > 0 || messagesMovedCount > 1 -> {
                 appContext.resources.getQuantityString(
                     R.plurals.snackbarThreadMoved,
-                    threadsMoved.count(),
+                    threadsMovedCount,
                     destination,
                 )
             }
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = messagesActions.getUndoData(messagesMoved, apiResponses, destinationFolder)
+        val undoData = messagesActions.getUndoData(impactedFolders, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
     //endregion
