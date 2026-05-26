@@ -179,7 +179,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         override fun onDelete() {
-            descriptionDialog.deleteWithConfirmationPopup(messagesFolderRoles, count = 1) {
+            descriptionDialog.deleteWithConfirmationPopup(
+                messagesFolderRoles,
+                currentFolderRole = mainViewModel.currentFolder.value?.role,
+                count = 1
+            ) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
                 actionsViewModel.deleteThreads(
                     threads = listOf(thread),

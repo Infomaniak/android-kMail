@@ -887,7 +887,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 }
                 R.id.quickActionDelete -> {
-                    descriptionDialog.deleteWithConfirmationPopup(messagesFolderRoles, count = 1) {
+                    descriptionDialog.deleteWithConfirmationPopup(
+                        messagesFolderRoles,
+                        currentFolderRole = mainViewModel.currentFolder.value?.role,
+                        count = 1
+                    ) {
                         trackThreadActionsEvent(MatomoName.Delete)
                         val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
                         actionsViewModel.deleteThreads(

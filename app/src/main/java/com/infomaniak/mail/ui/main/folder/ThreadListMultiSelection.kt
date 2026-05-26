@@ -111,7 +111,8 @@ class ThreadListMultiSelection {
                 R.id.quickActionDelete -> threadListFragment.lifecycleScope.launch {
                     val allMessages = selectedThreads.flatMap { it.messages }
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
-                        folderRoles = threadListFragment.folderRoleUtils.getActionFolderRoles(allMessages),
+                        messagesFolderRoles = threadListFragment.folderRoleUtils.getActionFolderRoles(allMessages),
+                        currentFolderRole = currentFolder.value?.role,
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)

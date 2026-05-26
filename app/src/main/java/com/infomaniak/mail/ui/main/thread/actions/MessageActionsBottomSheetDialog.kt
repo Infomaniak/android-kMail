@@ -165,7 +165,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                descriptionDialog.deleteWithConfirmationPopup(listOfNotNull(messageFolderRole), count = 1) {
+                descriptionDialog.deleteWithConfirmationPopup(
+                    listOfNotNull(messageFolderRole),
+                    currentFolderRole = mainViewModel.currentFolder.value?.role,
+                    count = 1
+                ) {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
                     actionsViewModel.deleteMessages(
                         messages = listOf(message),
