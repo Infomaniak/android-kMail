@@ -202,8 +202,8 @@ class ThreadAdapter(
     }.getOrDefault(Unit)
 
     fun updateEmailsPermission(canSend: Boolean) {
-        if (this.canSendEmails != canSend) {
-            this.canSendEmails = canSend
+        if (canSendEmails != canSend) {
+            canSendEmails = canSend
             notifyItemRangeChanged(0, itemCount, NotifyType.UpdatePermissions)
         }
     }

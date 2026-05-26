@@ -117,7 +117,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             }
         }
 
-        updateEmailActionsState(mainViewModel.canSendEmailsFlow.value)
         observeCanSendEmails()
     }
 

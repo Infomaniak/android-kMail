@@ -272,7 +272,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private var _currentPermissionFlow = _currentMailboxObjectId.flatMapLatest {
+    private val _currentPermissionFlow = _currentMailboxObjectId.flatMapLatest {
         it?.let(permissionsController::getPermissionsAsync) ?: flowOf(null)
     }
 

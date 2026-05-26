@@ -63,7 +63,6 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setupListeners()
 
-        if (!mainViewModel.canSendEmailsFlow.value) binding.writeMail.isEnabled = false
         observeCanSendEmails()
     }
 

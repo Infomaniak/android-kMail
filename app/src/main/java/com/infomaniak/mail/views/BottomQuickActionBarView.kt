@@ -31,6 +31,7 @@ import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.size
@@ -85,8 +86,8 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     }
 
     fun setEnableByMenuId(@IdRes menuId: Int, enabled: Boolean) {
-        for (index in 0 until menu.size) {
-            if (menu[index].itemId == menuId) {
+        menu.forEachIndexed { index, menuItem ->
+            if (menuItem.itemId == menuId) {
                 if (enabled) enable(index) else disable(index)
                 return
             }

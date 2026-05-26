@@ -37,6 +37,5 @@ class MailboxPermissions : EmbeddedRealmObject {
     @SerialName("can_send_emails")
     var canSendEmails: Boolean = true
 
-
     companion object
 }

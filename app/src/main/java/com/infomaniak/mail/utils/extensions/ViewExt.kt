@@ -35,33 +35,18 @@ fun View.bindSendingClickListener(
 ) {
     canSendEmailsFlow.observe(lifecycleOwner) { canSendEmails ->
         val buttonState = if (canSendEmails) SendingButtonState.Send else SendingButtonState.SendingBlocked
+        applyColor(buttonState)
 
-        this.setSendingClickListener(
-            buttonState = buttonState,
-            onActionBlocked = onActionBlocked,
-            onActionExecute = onActionExecute
-        )
-    }
-}
-
-fun View.setSendingClickListener(
-    buttonState: SendingButtonState,
-    onActionBlocked: () -> Unit,
-    onActionExecute: () -> Unit
-) {
-
-    this.applyColor(buttonState)
-
-    this.setOnClickListener {
-        when (buttonState) {
-            SendingButtonState.Send -> onActionExecute()
-            SendingButtonState.SendingBlocked -> onActionBlocked()
+        setOnClickListener {
+            when (buttonState) {
+                SendingButtonState.Send -> onActionExecute()
+                SendingButtonState.SendingBlocked -> onActionBlocked()
+            }
         }
     }
 }
 
-
-fun View.applyColor(buttonState: SendingButtonState) {
+private fun View.applyColor(buttonState: SendingButtonState) {
     val color = if (buttonState == SendingButtonState.SendingBlocked) {
         ContextCompat.getColor(context, R.color.disabledIconColor)
     } else {
@@ -70,7 +55,6 @@ fun View.applyColor(buttonState: SendingButtonState) {
 
     if (this is ExtendedFloatingActionButton) this.backgroundTintList = ColorStateList.valueOf(color)
 }
-
 
 enum class SendingButtonState {
     Send,

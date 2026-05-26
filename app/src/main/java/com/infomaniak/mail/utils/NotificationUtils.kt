@@ -343,8 +343,7 @@ class NotificationUtils @Inject constructor(
         addAction(archiveAction)
         addAction(deleteAction)
 
-        val canSendEmails = mailbox.permissions?.canSendEmails ?: true
-        if (canSendEmails) {
+        if (mailbox.permissions?.canSendEmails != false) {
             val replyAction = createActivityAction(
                 title = R.string.actionReply,
                 activity = LaunchActivity::class.java,

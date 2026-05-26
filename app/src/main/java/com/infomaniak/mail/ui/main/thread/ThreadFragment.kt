@@ -555,12 +555,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun updateFavoriteIcon(isFavorite: Boolean) = with(binding.iconFavorite) {
-        setIconResource(if (isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
-        val color = if (isFavorite) {
-            context.getColor(R.color.favoriteYellow)
+        val (iconRes, color) = if (isFavorite) {
+            R.drawable.ic_star_filled to context.getColor(R.color.favoriteYellow)
         } else {
-            context.getAttributeColor(RAndroid.attr.colorPrimary)
+            R.drawable.ic_star to context.getAttributeColor(RAndroid.attr.colorPrimary)
         }
+
+        setIconResource(iconRes)
         iconTint = ColorStateList.valueOf(color)
     }
 
