@@ -653,7 +653,7 @@ class MainActivity : BaseActivity() {
     fun navigateToNewMessageActivity(args: Bundle? = null) {
         lifecycleScope.launch {
             if (!mainViewModel.canSendEmailsFlow.first()) {
-                snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
+                snackbarManager.postValue(getString(R.string.snackbarAdminDisabledMessageSending))
             } else {
                 val intent = Intent(this@MainActivity, NewMessageActivity::class.java)
                 args?.let(intent::putExtras)
