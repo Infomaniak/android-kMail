@@ -328,12 +328,13 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
         val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
+        val isDraft = mainViewModel.currentFolderLive.value?.role == FolderRole.DRAFT
 
-        val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
+        val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE || isDraft
         val isLeftEnabled = isLeftSet && isMultiSelectClosed
         if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
 
-        val isRightSet = localSettings.swipeRight != SwipeAction.NONE
+        val isRightSet = localSettings.swipeRight != SwipeAction.NONE || isDraft
         val isRightEnabled = isRightSet && isMultiSelectClosed
         if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
     }
@@ -414,27 +415,37 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     }
 
     private fun updateDisabledSwipeActionsUi(featureFlags: FeatureFlagSet?, folderRole: FolderRole?) {
+        val isDraft = folderRole == FolderRole.DRAFT
         val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
         val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
 
-        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
-        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
+        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled, isDraft)
+        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled, isDraft)
+
     }
 
-    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) = with(binding.threadsList) {
-        fun SwipeAction.getIconRes(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
-        fun SwipeAction.getBackgroundColor(): Int {
-            return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
-        }
+    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean, isDraft: Boolean) =
+        with(binding.threadsList) {
+            fun SwipeAction.getIconRes(): Int? = if (isEnabled || isDraft) iconRes else R.drawable.ic_close_small
+            fun SwipeAction.getBackgroundColor(): Int {
+                return if (isEnabled || isDraft) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
+            }
 
-        if (swipeDirection == DirectionFlag.LEFT) {
-            behindSwipedItemIconDrawableId = localSettings.swipeLeft.getIconRes()
-            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor()
-        } else {
-            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.getIconRes()
-            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor()
+            val targetAction = when {
+                isDraft && swipeDirection == DirectionFlag.LEFT -> SwipeAction.DELETE
+                isDraft && swipeDirection == DirectionFlag.RIGHT -> SwipeAction.QUICKACTIONS_MENU
+                swipeDirection == DirectionFlag.LEFT -> localSettings.swipeLeft
+                else -> localSettings.swipeRight
+            }
+
+            if (swipeDirection == DirectionFlag.LEFT) {
+                behindSwipedItemIconDrawableId = targetAction.getIconRes()
+                behindSwipedItemBackgroundColor = targetAction.getBackgroundColor()
+            } else {
+                behindSwipedItemIconSecondaryDrawableId = targetAction.getIconRes()
+                behindSwipedItemBackgroundSecondaryColor = targetAction.getBackgroundColor()
+            }
         }
-    }
 
     private fun setupListeners() = with(binding) {
 
@@ -494,9 +505,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         threadsList.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: ThreadListItem.Content): Boolean {
 
-                val swipeAction = when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
-                    SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
+                val swipeAction = when {
+                    item.thread.folder.role == FolderRole.DRAFT && direction == SwipeDirection.RIGHT_TO_LEFT -> SwipeAction.DELETE
+                    item.thread.folder.role == FolderRole.DRAFT && direction == SwipeDirection.LEFT_TO_RIGHT -> SwipeAction.QUICKACTIONS_MENU
+                    direction == SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
+                    direction == SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
                     else -> error("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
