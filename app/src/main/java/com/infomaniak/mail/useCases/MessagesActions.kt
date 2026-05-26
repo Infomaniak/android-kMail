@@ -516,7 +516,7 @@ class MessagesActions @Inject constructor(
             null
         } else {
             val undoDestinationId = destinationFolder.id
-            impactedFolders += destinationFolder.id
+            impactedFolders.plusAssign(destinationFolder.id)
             UndoData(
                 resources = undoResources,
                 foldersIds = impactedFolders,
