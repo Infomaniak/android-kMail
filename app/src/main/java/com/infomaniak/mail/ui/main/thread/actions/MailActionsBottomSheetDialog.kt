@@ -172,10 +172,16 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         setTitle(favoriteText)
     }
 
-    fun setArchiveUi(isFromArchive: Boolean) = with(binding.archive) {
-        if (isFromArchive) {
-            setIconResource(R.drawable.ic_drawer_inbox)
-            setTitle(R.string.actionMoveToInbox)
+    fun setArchiveUi(isFromArchive: Boolean, isFromDraft: Boolean, isDraft: Boolean = false) = with(binding.archive) {
+        when {
+            isFromDraft || isDraft -> {
+                isVisible = false
+                return
+            }
+            isFromArchive -> {
+                setIconResource(R.drawable.ic_drawer_inbox)
+                setTitle(R.string.actionMoveToInbox)
+            }
         }
     }
 

@@ -70,6 +70,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     override val shouldCloseMultiSelection: Boolean = false
     private var isFromSpam: Boolean = false
+    private var isFromArchive: Boolean = false
+    private var isFromDraft: Boolean = false
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -94,9 +96,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             junkMessagesViewModel.threadsUids = listOf(threadUid)
             val folderRole = folderRoleUtils.getActionFolderRole(message)
             isFromSpam = folderRole == FolderRole.SPAM
+            isFromDraft = folderRole == FolderRole.DRAFT
+            isFromArchive = folderRole == FolderRole.ARCHIVE
 
             setMarkAsReadUi(message.isSeen)
-            setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
+            setArchiveUi(isFromArchive, isFromDraft, message.isDraft)
             setFavoriteUi(message.isFavorite)
             setReactionUi(message.isValidReactionTarget)
             setSpamUi(binding.spam, isFromSpam)

@@ -78,6 +78,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private var folderRole: FolderRole? = null
     private var isFromArchive: Boolean = false
     private var isFromSpam: Boolean = false
+    private var isFromDraft: Boolean = false
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -105,9 +106,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 folderRole = folderRoleUtils.getActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
                 isFromSpam = folderRole == FolderRole.SPAM
+                isFromDraft = folderRole == FolderRole.DRAFT
 
                 setMarkAsReadUi(thread.isSeen)
-                setArchiveUi(isFromArchive)
+                setArchiveUi(isFromArchive, isFromDraft)
                 setFavoriteUi(thread.isFavorite)
                 setSnoozeUi(thread.isSnoozed())
                 setReactionUi(canBeReactedTo = messageUidToReactTo != null)
