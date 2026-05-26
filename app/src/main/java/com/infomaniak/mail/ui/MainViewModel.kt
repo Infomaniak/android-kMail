@@ -282,7 +282,7 @@ class MainViewModel @Inject constructor(
         permissions?.canSendEmails ?: true
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.Eagerly,
         initialValue = true
     )
     //endregion
