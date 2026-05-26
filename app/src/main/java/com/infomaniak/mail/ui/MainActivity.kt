@@ -98,7 +98,6 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.SimpleDateFormat
@@ -651,14 +650,12 @@ class MainActivity : BaseActivity() {
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
-        lifecycleScope.launch {
-            if (!mainViewModel.canSendEmailsFlow.first()) {
-                snackbarManager.postValue(getString(R.string.snackbarAdminDisabledMessageSending))
-            } else {
-                val intent = Intent(this@MainActivity, NewMessageActivity::class.java)
-                args?.let(intent::putExtras)
-                newMessageActivityResultLauncher.launch(intent)
-            }
+        if (!mainViewModel.canSendEmailsFlow.value) {
+            snackbarManager.postValue(getString(R.string.snackbarAdminDisabledMessageSending))
+        } else {
+            val intent = Intent(this, NewMessageActivity::class.java)
+            args?.let(intent::putExtras)
+            newMessageActivityResultLauncher.launch(intent)
         }
     }
 

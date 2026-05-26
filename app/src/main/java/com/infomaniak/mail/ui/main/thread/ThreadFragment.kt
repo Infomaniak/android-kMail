@@ -135,7 +135,6 @@ import com.infomaniak.mail.workers.MailActionsManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.Date
@@ -574,11 +573,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
-        lifecycleScope.launch {
-            if (!mainViewModel.canSendEmailsFlow.first()) {
-                setEnableByMenuId(R.id.quickActionReply, enabled = false)
-                setEnableByMenuId(R.id.quickActionForward, enabled = false)
-            }
+        if (!mainViewModel.canSendEmailsFlow.value) {
+            setEnableByMenuId(R.id.quickActionReply, enabled = false)
+            setEnableByMenuId(R.id.quickActionForward, enabled = false)
         }
     }
 
