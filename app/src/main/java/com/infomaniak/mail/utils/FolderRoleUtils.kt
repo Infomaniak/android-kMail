@@ -43,7 +43,7 @@ class FolderRoleUtils @Inject constructor(
     suspend fun getActionFolderRoles(messages: List<Message>): List<FolderRole> {
         val folderRoles = when {
             messages.count() == 1 -> listOfNotNull(getActionFolderRole(messages.first()))
-            else -> messages.mapNotNull { message -> getActionFolderRole(message) }
+            else -> messages.mapNotNull { message -> message.folder.role ?: getActionFolderRole(message) }
         }
         return folderRoles
     }
