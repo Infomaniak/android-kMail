@@ -353,6 +353,7 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
+                    // Waits 2s after cancel delay to guarantee the send action is committed
                     mainViewModel.refreshDraftFolderAfterDelay(localSettings.cancelDelay + 2)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
                     showSentDraftSnackbar(cancelResourceUrl)
@@ -401,7 +402,7 @@ class MainActivity : BaseActivity() {
             snackbarManager.setValue(
                 title = getString(R.string.snackbarEmailSent),
                 buttonTitle = RCore.string.buttonCancel,
-                customBehavior = { mainViewModel.unsendDraft(cancelResourceUrl) },
+                customBehavior = { mainViewModel.unsendMessage(cancelResourceUrl) },
                 // Snackbar displays for 2 seconds less than actual cancel delay
                 // to ensure the user sees the snackbar disappear before the action is committed
                 length = max(0,(localSettings.cancelDelay - 2) * 1000))

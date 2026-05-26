@@ -322,8 +322,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.resource(unscheduleDraftUrl), DELETE)
     }
 
-    suspend fun unsendDraft(unsendDraftUrl: String): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.resource(unsendDraftUrl), PUT)
+    suspend fun unsendMessage(unsendMessageUrl: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.resource(unsendMessageUrl), PUT)
     }
 
     suspend fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {

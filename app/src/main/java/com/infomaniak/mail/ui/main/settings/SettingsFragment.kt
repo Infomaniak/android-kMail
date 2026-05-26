@@ -185,11 +185,10 @@ class SettingsFragment : Fragment() {
             settingsThreadMode.setSubtitle(threadMode.localisedNameRes)
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
             settingsAutomaticAdvance.setSubtitle(autoAdvanceMode.localisedNameRes)
-            val cancelDelayValue = cancelDelay
-            val cancelDelaySubtitle = if (cancelDelayValue == 0) {
+            val cancelDelaySubtitle = if (cancelDelay == 0) {
                 getString(R.string.settingsDisabled)
             } else {
-                getString(R.string.settingsDelaySeconds, cancelDelayValue)
+                getString(R.string.settingsDelaySeconds, cancelDelay)
             }
             settingsCancellationPeriod.setSubtitle(cancelDelaySubtitle)
             lifecycleScope.launch {

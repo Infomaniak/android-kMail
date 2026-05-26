@@ -852,13 +852,14 @@ class MainViewModel @Inject constructor(
         showUnscheduledDraftSnackbar(apiResponse)
     }
 
-    fun unsendDraft(unsendDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.unsendDraft(unsendDraftUrl)
-        delay(300L)
+    fun unsendMessage(unsendMessageUrl: String) = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.unsendMessage(unsendMessageUrl)
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarSendCancelled))
             val draftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id ?: return@launch
-            refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(draftsFolderId)))
+            currentMailbox.value?.let { mailbox ->
+                refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftsFolderId)))
+            }
         } else {
             snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
         }

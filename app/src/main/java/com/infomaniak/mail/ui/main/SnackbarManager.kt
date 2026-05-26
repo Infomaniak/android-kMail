@@ -101,7 +101,7 @@ class SnackbarManager @Inject constructor() {
         val undoData: UndoData?,
         @StringRes val buttonTitle: Int?,
         val customBehavior: (() -> Unit)?,
-        val length: Int = Snackbar.LENGTH_LONG,
+        val length: Int,
     )
 
     data class UndoData(
