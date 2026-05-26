@@ -77,7 +77,7 @@ class SharedUtils @Inject constructor(
                 realm = realm,
                 callbacks = if (folderId == currentFolderId && onDownloadStop != null) {
                     RefreshCallbacks(
-                        onStart = { downloadThreadsStatusManager.updateState(true) },
+                        onStart = { downloadThreadsStatusManager.start() },
                         onStop = { onDownloadStop(threadsUids) },
                     )
                 } else {
