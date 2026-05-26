@@ -119,7 +119,7 @@ class MessageController @Inject constructor(
     }
 
     fun getUnscheduledMessages(messages: List<Message>): List<Message> {
-        return messages.filter { message -> !message.isScheduledDraft }
+        return messages.filter { message -> !message.isScheduledMessage }
     }
 
     private suspend fun getMessagesFromThread(thread: Thread, query: String, includeDuplicates: Boolean): List<Message> {
