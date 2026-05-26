@@ -221,7 +221,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         permissionUtils.registerDownloadManagerPermission(fragment = this)
 
         observeLightThemeToggle()
-        observeCanSendEmails()
         observeThreadLive()
         observeMessagesLive()
         observeMessagesAreCollapsibles()
@@ -243,6 +242,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         observeReportDisplayProblemResult()
 
         observeMessageOfUserToBlock()
+
+        observeCanSendEmails()
     }
 
     private fun handleEdgeToEdge() = with(binding) {

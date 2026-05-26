@@ -62,12 +62,14 @@ class BottomQuickActionBarView @JvmOverloads constructor(
             val menuResId = menuRes
                 ?: runCatching { getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu) }.getOrNull()
                 ?: return@getAttributes
+            menu.clear()
             MenuInflater(context).inflate(menuResId, menu)
 
             buttons.forEachIndexed { index, button ->
                 if (index >= menu.size) {
                     button.isGone = true
                 } else {
+                    button.isGone = false
                     with(menu[index]) {
                         button.icon = icon
                         button.text = title
@@ -103,10 +105,12 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     }
 
     fun enable(index: Int) {
+        if (index !in buttons.indices) return
         buttons[index].isEnabled = true
     }
 
     fun disable(index: Int) {
+        if (index !in buttons.indices) return
         buttons[index].isEnabled = false
     }
 
