@@ -215,7 +215,8 @@ object PerformSwipeActionManager {
         val folderRoles =
             thread.messages.mapNotNull { message -> if (message.isSnoozed()) FolderRole.SNOOZED else message.folder.role }
         return descriptionDialog.deleteWithConfirmationPopup(
-            folderRoles = folderRoles,
+            messagesFolderRoles = folderRoles,
+            currentFolderRole = thread.folder.role,
             count = 1,
             displayLoader = false,
             onCancel = ::onCancel,

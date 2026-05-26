@@ -268,8 +268,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
-                        folderRoles = messagesFolderRoles,
+                        messagesFolderRoles = messagesFolderRoles,
                         count = threadsCount,
+                        currentFolderRole = currentFolder?.role
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
                         actionsViewModel.deleteThreads(

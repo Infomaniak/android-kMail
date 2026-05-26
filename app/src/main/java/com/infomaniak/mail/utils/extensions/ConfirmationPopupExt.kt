@@ -23,25 +23,28 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 
 fun DescriptionAlertDialog.deleteWithConfirmationPopup(
-    folderRoles: List<FolderRole>,
+    messagesFolderRoles: List<FolderRole>,
+    currentFolderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
     onCancel: (() -> Unit)? = null,
     callback: () -> Unit,
 ): Boolean {
     var isDialogShown = true
-    val isPermanentlyDeleteFolder = folderRoles.contains(FolderRole.SCHEDULED_DRAFTS) ||
-            folderRoles.contains(FolderRole.SPAM) || folderRoles.contains(FolderRole.TRASH)
+    val isDraftFolder = currentFolderRole == FolderRole.DRAFT
+    val isPermanentlyDeleteFolder = messagesFolderRoles.contains(FolderRole.SCHEDULED_DRAFTS) ||
+            messagesFolderRoles.contains(FolderRole.SPAM) || messagesFolderRoles.contains(FolderRole.TRASH) ||
+            (messagesFolderRoles.contains(FolderRole.DRAFT) && !isDraftFolder)
     when {
-        folderRoles.contains(FolderRole.SNOOZED) -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
+        messagesFolderRoles.contains(FolderRole.SNOOZED) -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
         isPermanentlyDeleteFolder -> showDeletePermanentlyDialog(
             count,
             displayLoader,
             callback,
-            folderRoles.contains(FolderRole.SCHEDULED_DRAFTS),
+            messagesFolderRoles.contains(FolderRole.SCHEDULED_DRAFTS),
             onCancel,
         )
-        folderRoles.contains(FolderRole.DRAFT) -> callback()
+        isDraftFolder -> callback()
         else -> {
             isDialogShown = false
             callback()
