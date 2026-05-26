@@ -783,12 +783,12 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onDownloadStart() {
-        downloadThreadsStatusManager.updateState(true)
+        downloadThreadsStatusManager.start()
     }
 
     private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        downloadThreadsStatusManager.updateState(false)
+        downloadThreadsStatusManager.stop()
     }
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {

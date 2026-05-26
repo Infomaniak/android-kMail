@@ -17,32 +17,23 @@
  */
 package com.infomaniak.mail.utils
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DownloadThreadsStatusManager @Inject constructor() {
-    /**
-     * A StateFlow that emits if the app is downloading threads.
-     */
-    private val _isDownloading = MutableStateFlow(false)
-    private val scope = CoroutineScope(Dispatchers.Default)
-    @OptIn(FlowPreview::class)
-    val isDownloading: StateFlow<Boolean> = _isDownloading
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.Lazily,
-            initialValue = false
-        )
 
-    fun updateState(isDownloading: Boolean) {
-        _isDownloading.value = isDownloading
+    private val _isDownloading = MutableStateFlow(false)
+    val isDownloading: StateFlow<Boolean> = _isDownloading.asStateFlow()
+
+    fun start() {
+        _isDownloading.value = true
+    }
+
+    fun stop() {
+        _isDownloading.value = false
     }
 }
