@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
@@ -115,6 +116,9 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     override fun safeNavigation(directions: NavDirections) {
         safelyNavigate(directions)
     }
+
+    override val multiSelectionLifecycleOwner: LifecycleOwner
+        get() = viewLifecycleOwner
 
     override fun disableSwipeDirection(direction: DirectionFlag) {
         binding.mailRecyclerView.disableSwipeDirection(direction)

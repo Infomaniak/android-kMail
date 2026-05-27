@@ -24,6 +24,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 
 interface MultiSelectionHost : LifecycleOwner {
+    val multiSelectionLifecycleOwner: LifecycleOwner
     val multiSelectionBinding: MultiSelectionBinding
     val folderRoleUtils: com.infomaniak.mail.utils.FolderRoleUtils
     val descriptionDialog: com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog

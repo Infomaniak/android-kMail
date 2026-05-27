@@ -159,7 +159,7 @@ class ThreadListMultiSelection {
     }
 
     private fun observerMultiSelection() = with(host) {
-        multiselectionViewModel.isMultiSelectOnLiveData.observe(host) { isMultiSelectOn ->
+        multiselectionViewModel.isMultiSelectOnLiveData.observe(multiSelectionLifecycleOwner) { isMultiSelectOn ->
             threadListAdapter.updateSelection()
             if (localSettings.threadDensity != ThreadDensity.LARGE) TransitionManager.beginDelayedTransition(host.multiSelectionBinding.threadsList)
             if (!isMultiSelectOn) multiselectionViewModel.selectedThreads.clear()
@@ -170,7 +170,7 @@ class ThreadListMultiSelection {
             displayMultiSelectActions(isMultiSelectOn)
         }
 
-        multiselectionViewModel.selectedThreadsLiveData.observe(host) { selectedThreads ->
+        multiselectionViewModel.selectedThreadsLiveData.observe(multiSelectionLifecycleOwner) { selectedThreads ->
             if (selectedThreads.isEmpty()) {
                 multiselectionViewModel.isMultiSelectOn = false
             } else {
