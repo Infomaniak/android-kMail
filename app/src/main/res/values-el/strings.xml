@@ -92,6 +92,7 @@
     <string name="aiReplacementDialogTitle">Να αντικατασταθεί το υπάρχον περιεχόμενο;</string>
     <string name="alertBlockedImagesDescription">Για την ασφάλειά σας, ορισμένα περιεχόμενα του μηνύματός σας έχουν μπλοκαριστεί.</string>
     <string name="alertBlockedImagesDisplayContent">Εμφάνιση περιεχομένου</string>
+    <string name="alertSenderNoReply">Προσοχή, ο αποστολέας αυτού του email φαίνεται να μην επιθυμεί απάντηση.</string>
     <string name="appSecurityDescription">Προστατέψτε την πρόσβαση στην εφαρμογή σας ενεργοποιώντας το κλείδωμα του τηλεφώνου σας.</string>
     <string name="archiveFolder">Αρχειοθετημένα</string>
     <string name="attachMailboxDescription1">Αν διαθέτετε ήδη διεύθυνση e-mail Infomaniak, συνδεθείτε τώρα</string>
@@ -107,8 +108,8 @@
         <item quantity="one">%d συνημμένο</item>
         <item quantity="other">%d συνημμένα</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Λείπει συνημμένο</string>
     <string name="attachmentsReminderDescription">Αναφέρατε συνημμένο, αλλά δεν προστέθηκε κανένα αρχείο. Να σταλεί ούτως ή άλλως;</string>
+    <string name="attachmentsReminderTitle">Λείπει συνημμένο</string>
     <string name="attendeesListTitle">Λίστα συμμετεχόντων (%d)</string>
     <string name="bccTitle">Κρυφή κοινοποίηση:</string>
     <string name="blockAnExpeditorTitle">Αποκλεισμός αποστολέα</string>

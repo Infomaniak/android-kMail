@@ -92,6 +92,7 @@
     <string name="aiReplacementDialogTitle">Erstatt eksisterende innhold?</string>
     <string name="alertBlockedImagesDescription">For din sikkerhet har vi blokkert visse innhold i meldingen din.</string>
     <string name="alertBlockedImagesDisplayContent">Vis innhold</string>
+    <string name="alertSenderNoReply">Obs, avsenderen av denne e-posten ser ikke ut til å ønske et svar.</string>
     <string name="appSecurityDescription">Beskytte tilgangen til appen ved å aktivere telefonlåsen.</string>
     <string name="archiveFolder">Arkiv</string>
     <string name="attachMailboxDescription1">Hvis du allerede har en Infomaniak e-postadresse, koble til nå</string>
@@ -107,8 +108,8 @@
         <item quantity="one">%d vedlegg</item>
         <item quantity="other">%d vedlegg</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Manglende vedlegg</string>
     <string name="attachmentsReminderDescription">Du nevnte et vedlegg, men ingen fil ble lagt til. Sende likevel?</string>
+    <string name="attachmentsReminderTitle">Manglende vedlegg</string>
     <string name="attendeesListTitle">Liste over deltakere (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Blokker en avsender</string>

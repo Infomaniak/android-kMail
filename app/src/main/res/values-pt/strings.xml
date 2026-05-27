@@ -92,6 +92,7 @@
     <string name="aiReplacementDialogTitle">Substituir o conteúdo já existente?</string>
     <string name="alertBlockedImagesDescription">Para sua segurança, determinados conteúdos foram bloqueados na sua mensagem.</string>
     <string name="alertBlockedImagesDisplayContent">Exibir conteúdo</string>
+    <string name="alertSenderNoReply">Atenção, o remetente deste e-mail parece não querer uma resposta.</string>
     <string name="appSecurityDescription">Proteja o acesso à sua aplicação ativando o bloqueio do seu telefone.</string>
     <string name="archiveFolder">Arquivado</string>
     <string name="attachMailboxDescription1">Se já tiver um endereço de e-mail Infomaniak, conecte-se agora</string>
@@ -107,8 +108,8 @@
         <item quantity="one">%d anexo</item>
         <item quantity="other">%d anexos</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Anexo em falta</string>
     <string name="attachmentsReminderDescription">Mencionou um anexo, mas nenhum ficheiro foi adicionado. Enviar mesmo assim?</string>
+    <string name="attachmentsReminderTitle">Anexo em falta</string>
     <string name="attendeesListTitle">Lista de participantes (%d)</string>
     <string name="bccTitle">Cco:</string>
     <string name="blockAnExpeditorTitle">Bloquear um remetente</string>

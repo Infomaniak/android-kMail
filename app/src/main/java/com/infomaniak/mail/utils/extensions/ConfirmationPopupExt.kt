@@ -128,3 +128,22 @@ fun DescriptionAlertDialog.archiveWithConfirmationPopup(
     }
     return isDialogShown
 }
+
+fun DescriptionAlertDialog.replyWithConfirmationPopup(
+    hasNoReplyRecipients: Boolean,
+    displayLoader: Boolean = false,
+    onCancel: (() -> Unit)? = null,
+    onPositiveButtonClicked: () -> Unit,
+) {
+    if (hasNoReplyRecipients) {
+        show(
+            title = binding.context.getString(R.string.actionReply),
+            description = binding.context.resources.getString(R.string.alertSenderNoReply),
+            displayLoader = displayLoader,
+            onPositiveButtonClicked = { onPositiveButtonClicked() },
+            onCancel = onCancel,
+        )
+    } else {
+        onPositiveButtonClicked()
+    }
+}

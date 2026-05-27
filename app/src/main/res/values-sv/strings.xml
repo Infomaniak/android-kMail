@@ -92,6 +92,7 @@
     <string name="aiReplacementDialogTitle">Ersätta befintligt innehåll?</string>
     <string name="alertBlockedImagesDescription">För din säkerhet har vi blockerat vissa innehåll i ditt meddelande.</string>
     <string name="alertBlockedImagesDisplayContent">Visa innehåll</string>
+    <string name="alertSenderNoReply">Observera att avsändaren av detta e-postmeddelande verkar inte vilja ha ett svar.</string>
     <string name="appSecurityDescription">Skydda åtkomsten till din app genom att aktivera din telefons lås.</string>
     <string name="archiveFolder">Arkiverade</string>
     <string name="attachMailboxDescription1">Om du redan har en Infomaniak e-postadress, anslut nu</string>
@@ -107,8 +108,8 @@
         <item quantity="one">%d bilaga</item>
         <item quantity="other">%d bilagor</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Saknad bilaga</string>
     <string name="attachmentsReminderDescription">Du nämnde en bilaga, men ingen fil har lagts till. Skicka ändå?</string>
+    <string name="attachmentsReminderTitle">Saknad bilaga</string>
     <string name="attendeesListTitle">Lista över deltagare (%d)</string>
     <string name="bccTitle">Dold kopia:</string>
     <string name="blockAnExpeditorTitle">Blockera en avsändare</string>

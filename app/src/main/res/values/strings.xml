@@ -96,6 +96,7 @@
     <string name="aiReplacementDialogTitle">Replace already existing content?</string>
     <string name="alertBlockedImagesDescription">For your safety certain contents have been blocked from your message.</string>
     <string name="alertBlockedImagesDisplayContent">Display content</string>
+    <string name="alertSenderNoReply">Please note: The sender of this email does not appear to want a response.</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
     <string name="attachMailboxDescription1">If you already have an Infomaniak email address, connect now</string>
@@ -111,8 +112,8 @@
         <item quantity="one">%d attachment</item>
         <item quantity="other">%d attachments</item>
     </plurals>
-    <string name="attachmentsReminderTitle">Missing attachment</string>
     <string name="attachmentsReminderDescription">You mentioned an attachment, but no file has been added. Send anyway?</string>
+    <string name="attachmentsReminderTitle">Missing attachment</string>
     <string name="attendeesListTitle">List of attendees (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Block a sender</string>

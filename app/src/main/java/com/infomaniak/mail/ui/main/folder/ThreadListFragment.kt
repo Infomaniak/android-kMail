@@ -264,7 +264,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
             // If we clicked on the "Reply" action of a Notification, we need to navigate to NewMessageActivity.
             safeNavigateToNewMessageActivity(
-                NewMessageActivityArgs(
+                args = NewMessageActivityArgs(
                     draftMode = navigationArgs.draftMode,
                     previousMessageUid = replyToMessageUid,
                     notificationId = navigationArgs.notificationId,

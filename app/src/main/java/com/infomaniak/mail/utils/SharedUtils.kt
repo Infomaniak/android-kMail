@@ -150,7 +150,15 @@ class SharedUtils @Inject constructor(
     private class SignatureException(message: String?, cause: Throwable) : Exception(message, cause)
 
     companion object {
+        private val noReplyMailRegex = listOf("no-reply", "noreply", "postmaster", "catchall").joinToString("|")
 
+        fun hasNoReplyRecipients(message: Message, isReplyAll: Boolean): Boolean {
+            val pattern = Regex(noReplyMailRegex, RegexOption.IGNORE_CASE)
+            val (toRecipients, ccRecipients) = message.getRecipientsForReplyTo(isReplyAll)
+            val allRecipients = toRecipients + ccRecipients
+            return allRecipients.any { recipient -> pattern.containsMatchIn(recipient.email) }
+        }
+        
         suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm, okHttpClient: OkHttpClient? = null): Int? {
             val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName, okHttpClient)
             return if (apiResponse.isSuccess()) {
