@@ -157,10 +157,11 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         sourceFolderId: String?
     ): NavDirections {
         return SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
-            threadsUids,
-            messagesUids,
-            FolderPickerAction.MOVE,
-            sourceFolderId
+            threadsUids = threadsUids,
+            messagesUids = messagesUids,
+            action = FolderPickerAction.MOVE,
+            sourceFolderId = sourceFolderId,
+            isFromSearch = true,
         )
     }
 
@@ -461,6 +462,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
                     threadsUids = arrayOf(threadUid),
                     action = FolderPickerAction.MOVE,
                     sourceFolderId = sourceFolderId,
+                    isFromSearch = true,
                 )
             }
 
