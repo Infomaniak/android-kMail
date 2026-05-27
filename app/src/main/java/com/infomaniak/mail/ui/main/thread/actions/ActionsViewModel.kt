@@ -328,7 +328,11 @@ class ActionsViewModel @Inject constructor(
             // If deleteMessages is empty we will do the auto advance after deleting permanently
             if (onlyPermanentlyDeleteMessages) calculateCurrentThreadPosition.postValue(Unit)
             handlePermanentlyDeleteMessages(
-                permanentlyDeleteMessages, mailbox, currentFolder, onlyPermanentlyDeleteMessages, messagesToDelete
+                permanentlyDeleteMessages = permanentlyDeleteMessages,
+                mailbox = mailbox,
+                currentFolder = currentFolder,
+                shouldAutoAdvanceAndRefresh = onlyPermanentlyDeleteMessages,
+                messagesToDelete = messagesToDelete
             )
         }
 
