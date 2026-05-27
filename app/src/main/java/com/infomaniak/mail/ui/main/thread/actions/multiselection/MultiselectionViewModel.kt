@@ -65,13 +65,14 @@ class MultiselectionViewModel @Inject constructor(
     }
 
     suspend fun selectOrUnselectAllSearchItems(searchResults: Flow<ResultsChange<Thread>>) {
-        val isEverythingSelected = isEverythingSelected(searchResults.first().list.count())
+        val results = searchResults.first().list
+        val isEverythingSelected = isEverythingSelected(results.count())
         if (isEverythingSelected) {
             trackMultiSelectionEvent(MatomoName.None)
             selectedThreads.clear()
         } else {
             trackMultiSelectionEvent(MatomoName.All)
-            searchResults.first().list.forEach { thread -> selectedThreads.add(thread) }
+            results.forEach { thread -> selectedThreads.add(thread) }
         }
 
         publishSelectedItems()
