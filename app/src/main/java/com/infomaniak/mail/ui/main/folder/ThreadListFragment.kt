@@ -400,9 +400,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         sourceFolderId: String?
     ): NavDirections {
         return ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-            threadsUids,
-            messagesUids,
-            FolderPickerAction.MOVE, sourceFolderId
+            threadsUids = threadsUids,
+            messagesUids = messagesUids,
+            action = action,
+            sourceFolderId = sourceFolderId,
         )
     }
 
