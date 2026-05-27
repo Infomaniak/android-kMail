@@ -370,7 +370,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         onPositiveButtonClicked = {
                             trackMessageActionsEvent(MatomoName.Reply)
                             replyTo(message)
-                        })
+                        }
+                    )
                 },
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
@@ -640,7 +641,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     val hasNoReplyRecipients = SharedUtils.hasNoReplyRecipients(lastMessageToReplyTo, isReplyAll = false)
                     descriptionDialog.replyWithConfirmationPopup(
                         hasNoReplyRecipients = hasNoReplyRecipients,
-                        onPositiveButtonClicked = { replyTo(lastMessageToReplyTo) })
+                        onPositiveButtonClicked = { replyTo(lastMessageToReplyTo) }
+                    )
                 }
                 R.id.quickActionForward -> {
                     twoPaneViewModel.navigateToNewMessage(

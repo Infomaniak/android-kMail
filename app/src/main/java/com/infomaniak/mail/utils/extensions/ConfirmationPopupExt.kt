@@ -134,20 +134,16 @@ fun DescriptionAlertDialog.replyWithConfirmationPopup(
     displayLoader: Boolean = false,
     onCancel: (() -> Unit)? = null,
     onPositiveButtonClicked: () -> Unit,
-): Boolean {
+) {
     if (hasNoReplyRecipients) {
         show(
             title = binding.context.getString(R.string.actionReply),
             description = binding.context.resources.getString(R.string.alertSenderNoReply),
             displayLoader = displayLoader,
-            onPositiveButtonClicked = {
-                onPositiveButtonClicked()
-            },
+            onPositiveButtonClicked = { onPositiveButtonClicked() },
             onCancel = onCancel,
         )
     } else {
         onPositiveButtonClicked()
     }
-
-    return hasNoReplyRecipients
 }
