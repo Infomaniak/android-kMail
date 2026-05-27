@@ -935,7 +935,7 @@ class ThreadAdapter(
     fun updateFailedMessages(uids: List<String>) {
         uids.forEach { uid ->
             val index = items.indexOfFirst { it is MessageUi && it.message.uid == uid }
-            notifyItemChanged(index, NotifyType.FailedMessage)
+            if (index != -1) notifyItemChanged(index, NotifyType.FailedMessage)
         }
     }
 
