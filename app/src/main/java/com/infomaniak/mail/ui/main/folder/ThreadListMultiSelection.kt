@@ -132,7 +132,7 @@ class ThreadListMultiSelection {
                     val allMessages = selectedThreads.flatMap { it.messages }
                     host.descriptionDialog.deleteWithConfirmationPopup(
                         messagesFolderRoles = host.folderRoleUtils.getActionFolderRoles(allMessages),
-                        currentFolderRole = currentFolder.value?.role,
+                        currentFolderRole = mainViewModel.currentFolder.value?.role,
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
