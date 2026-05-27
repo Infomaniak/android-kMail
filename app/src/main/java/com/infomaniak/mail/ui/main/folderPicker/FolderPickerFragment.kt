@@ -179,20 +179,20 @@ class FolderPickerFragment : Fragment() {
             actionsViewModel.moveMessagesTo(
                 destinationFolderId = folderId,
                 messagesUids = messagesUids.toList(),
-                currentFolderId = mainViewModel.currentFolderId,
+                currentFolderId = navigationArgs.sourceFolderId,
                 mailbox = mailbox,
             )
         } else {
             actionsViewModel.moveThreadsTo(
                 destinationFolderId = folderId,
                 threadsUids = threadsUids.toList(),
-                currentFolderId = mainViewModel.currentFolderId,
+                currentFolderId = navigationArgs.sourceFolderId,
                 mailbox = mailbox,
             )
         }
         if (navigationArgs.isFromSearch) {
             multiselectionViewModel.isMultiSelectOn = false
-            searchViewModel.refreshSearch()
+            searchViewModel.refreshSearch(withContacts = true)
         }
     }
 

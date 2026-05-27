@@ -255,7 +255,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         isFromSearch = navigationArgs.isFromSearch
                     ).toBundle(),
                 )
-                if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
             }
         }
 

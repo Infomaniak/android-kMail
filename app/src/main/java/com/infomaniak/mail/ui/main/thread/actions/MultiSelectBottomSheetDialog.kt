@@ -303,14 +303,17 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun navigateToFolderPickerFragment(threadsUids: List<String>) {
+        val messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray()
+        multiselectionViewModel.isMultiSelectOn = false
         val navController = findNavController()
+
         if (navigationArgs.isFromSearch) {
             navController.animatedNavigation(
                 directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
                     threadsUids = threadsUids.toTypedArray(),
-                    messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray(),
+                    messagesUids = messagesUids,
                     action = FolderPickerAction.MOVE,
-                    sourceFolderId = null,
+                    sourceFolderId = searchViewModel.filterFolder?.id,
                     isFromSearch = true,
                 )
             )
@@ -318,7 +321,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             navController.animatedNavigation(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                     threadsUids = threadsUids.toTypedArray(),
-                    messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray(),
+                    messagesUids = messagesUids,
                     action = FolderPickerAction.MOVE,
                     sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
                 ),

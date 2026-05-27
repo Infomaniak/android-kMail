@@ -44,7 +44,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     abstract val shouldCloseMultiSelection: Boolean
-    // Add this abstract property
     protected abstract val substituteClassName: String
 
 

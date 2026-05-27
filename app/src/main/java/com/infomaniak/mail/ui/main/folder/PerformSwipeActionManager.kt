@@ -286,7 +286,7 @@ object PerformSwipeActionManager {
                         directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
                             threadsUids = arrayOf(thread.uid),
                             action = FolderPickerAction.MOVE,
-                            sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+                            sourceFolderId = thread.folderId
                         ),
                     )
                 }
