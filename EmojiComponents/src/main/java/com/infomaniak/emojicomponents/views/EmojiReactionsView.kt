@@ -53,7 +53,11 @@ class EmojiReactionsView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val reactionsState = mutableStateListOf<Reaction>()
-    private var isAddReactionEnabled by mutableStateOf(true)
+    private var isViewEnabled by mutableStateOf(true)
+    private var isAddReactionEnabledForMessage by mutableStateOf(true)
+    private val isAddReactionEnabled: Boolean
+        get() = isViewEnabled && isAddReactionEnabledForMessage
+
 
     private var addReactionClickListener: (() -> Unit)? = null
     private var onEmojiClickListener: ((emoji: String) -> Unit)? = null
@@ -80,6 +84,11 @@ class EmojiReactionsView @JvmOverloads constructor(
         addView(composeView)
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        isViewEnabled = enabled
+    }
+
     private fun TypedArray.getDimensionOrNull(@StyleableRes index: Int): Float? {
         return if (hasValue(index)) getDimension(index, -1f) else null
     }
@@ -104,7 +113,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 
             EmojiReactions(
                 reactions = { reactionsState },
-                onEmojiClicked = { emoji -> onEmojiClickListener?.invoke(emoji) },
+                onEmojiClicked = { emoji -> if (isAddReactionEnabled) onEmojiClickListener?.invoke(emoji) },
                 shape = chipCornerRadius?.let { RoundedCornerShape(it) } ?: InputChipDefaults.shape,
                 addReactionIcon = addReactionIcon,
                 isAddReactionEnabled = { isAddReactionEnabled },
@@ -139,7 +148,7 @@ class EmojiReactionsView @JvmOverloads constructor(
     }
 
     fun setAddReactionEnabledState(isEnabled: Boolean) {
-        isAddReactionEnabled = isEnabled
+        isAddReactionEnabledForMessage = isEnabled
     }
 
     @Composable

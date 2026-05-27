@@ -237,7 +237,7 @@ private fun ContinueButton(
         modifier = modifier,
         title = stringResource(R.string.buttonContinue),
         onClick = { selectedMailbox?.let { selectedMailboxUi -> onContinueWithMailbox(selectedMailboxUi) } },
-        enabled = { uiState() is SelectMailboxViewModel.SelectedMailboxState },
+        enabled = { selectedMailbox?.mailboxUi?.canSendEmails == true },
         showIndeterminateProgress = { uiState() is DefaultScreen.FetchingNewMailbox },
     )
 }

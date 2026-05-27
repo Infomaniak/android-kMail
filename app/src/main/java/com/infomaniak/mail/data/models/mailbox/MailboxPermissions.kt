@@ -34,6 +34,8 @@ class MailboxPermissions : EmbeddedRealmObject {
     var canConfigureMailFolders: Boolean = false
     @SerialName("can_restore_emails")
     var canRestoreEmails: Boolean = false
+    @SerialName("can_send_emails")
+    var canSendEmails: Boolean = true
 
     companion object
 }

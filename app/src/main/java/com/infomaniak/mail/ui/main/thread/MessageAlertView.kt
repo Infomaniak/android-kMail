@@ -65,6 +65,12 @@ class MessageAlertView @JvmOverloads constructor(
         }
     }
 
+    override fun setEnabled(isEnabled: Boolean) = with(binding) {
+        super.setEnabled(isEnabled)
+        action1.isEnabled = isEnabled
+        action2.isEnabled = isEnabled
+    }
+
     fun setDescription(text: String) {
         binding.description.text = text
     }

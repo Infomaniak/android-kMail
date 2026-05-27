@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
@@ -61,6 +62,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         contactDetails.setCorrespondent(navigationArgs.recipient, bimi)
 
         setupListeners()
+
+        observeCanSendEmails()
     }
 
     private fun setupListeners() = with(binding) {
@@ -79,6 +82,12 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         copyAddress.setClosingOnClickListener {
             trackContactActionsEvent(MatomoName.CopyEmailAddress)
             copyRecipientEmailToClipboard(navigationArgs.recipient, snackbarManager)
+        }
+    }
+
+    private fun observeCanSendEmails() {
+        mainViewModel.canSendEmailsFlow.observe(viewLifecycleOwner) { canSend ->
+            binding.writeMail.isEnabled = canSend
         }
     }
 }

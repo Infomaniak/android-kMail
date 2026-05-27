@@ -93,6 +93,13 @@ class ActionItemView @JvmOverloads constructor(
         binding.root.setOnClickListener(onClickListener)
     }
 
+    override fun setEnabled(enabled: Boolean) = with(binding) {
+        super.setEnabled(enabled)
+        root.isEnabled = enabled
+        icon.isEnabled = enabled
+        title.isEnabled = enabled
+    }
+
     fun setIconResource(@DrawableRes iconResourceId: Int) = binding.icon.setImageResource(iconResourceId)
 
     private fun setIconTint(color: ColorStateList) {

@@ -128,12 +128,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -270,9 +272,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    val currentPermissionsLive = _currentMailboxObjectId.flatMapLatest {
-        it?.let(permissionsController::getPermissionsAsync) ?: emptyFlow()
-    }.asLiveData(ioCoroutineContext)
+    private val _currentPermissionFlow = _currentMailboxObjectId.flatMapLatest {
+        it?.let(permissionsController::getPermissionsAsync) ?: flowOf(null)
+    }
+
+    val currentPermissionsLive = _currentPermissionFlow.filterNotNull().asLiveData(ioCoroutineContext)
+
+    val canSendEmailsFlow: StateFlow<Boolean> = _currentPermissionFlow.map { permissions ->
+        permissions?.canSendEmails ?: true
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = true
+    )
     //endregion
 
     //region Current Folder
@@ -484,8 +496,8 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.accessId, mailbox.hostingId)) {
             if (isSuccess()) {
-                mailboxController.updateMailbox(mailbox.objectId) {
-                    it.permissions = data
+                mailboxController.updateMailbox(mailbox.objectId) { localMailbox ->
+                    localMailbox.permissions = data
                 }
             }
         }

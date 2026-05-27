@@ -107,6 +107,7 @@ import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.bindSendingClickListener
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
@@ -469,10 +470,17 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             isHandled
         }
 
-        newMessageFab.setOnClickListener {
-            trackNewMessageEvent(MatomoName.OpenFromFab)
-            safeNavigateToNewMessageActivity()
-        }
+        newMessageFab.bindSendingClickListener(
+            lifecycleOwner = viewLifecycleOwner,
+            canSendEmailsFlow = mainViewModel.canSendEmailsFlow,
+            onActionBlocked = {
+                snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
+            },
+            onActionExecute = {
+                trackNewMessageEvent(MatomoName.OpenFromFab)
+                safeNavigateToNewMessageActivity()
+            }
+        )
 
         threadsList.scrollListener = object : OnListScrollListener {
             override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
@@ -571,7 +579,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     private fun handleAccountSwipe(isSwipeDown: Boolean) = lifecycleScope.launch {
         val accounts = switchUserViewModel.accounts.first()
         if (accounts.isEmpty()) return@launch
-        
+
         val currentIndex = accounts.indexOfFirst { it.id == AccountUtils.currentUserId }
         if (currentIndex == -1) return@launch
 

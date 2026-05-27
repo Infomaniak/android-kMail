@@ -26,10 +26,12 @@ import android.view.WindowInsets
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.size
@@ -60,12 +62,14 @@ class BottomQuickActionBarView @JvmOverloads constructor(
             val menuResId = menuRes
                 ?: runCatching { getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu) }.getOrNull()
                 ?: return@getAttributes
+            menu.clear()
             MenuInflater(context).inflate(menuResId, menu)
 
             buttons.forEachIndexed { index, button ->
                 if (index >= menu.size) {
                     button.isGone = true
                 } else {
+                    button.isGone = false
                     with(menu[index]) {
                         button.icon = icon
                         button.text = title
@@ -83,6 +87,15 @@ class BottomQuickActionBarView @JvmOverloads constructor(
         }
     }
 
+    fun setEnableByMenuId(@IdRes menuId: Int, enabled: Boolean) {
+        menu.forEachIndexed { index, menuItem ->
+            if (menuItem.itemId == menuId) {
+                if (enabled) enable(index) else disable(index)
+                return
+            }
+        }
+    }
+
     fun changeIcon(index: Int, @DrawableRes icon: Int) {
         buttons[index].setIconResource(icon)
     }
@@ -92,10 +105,12 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     }
 
     fun enable(index: Int) {
+        if (index !in buttons.indices) return
         buttons[index].isEnabled = true
     }
 
     fun disable(index: Int) {
+        if (index !in buttons.indices) return
         buttons[index].isEnabled = false
     }
 

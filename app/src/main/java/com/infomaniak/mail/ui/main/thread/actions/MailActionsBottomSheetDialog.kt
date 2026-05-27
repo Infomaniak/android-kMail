@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -115,6 +116,21 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionDelete -> onClickListener.onDelete()
             }
         }
+
+        observeCanSendEmails()
+    }
+
+    private fun observeCanSendEmails() {
+        mainViewModel.canSendEmailsFlow.observe(viewLifecycleOwner) { canSend ->
+            updateEmailActionsState(canSend)
+        }
+    }
+
+    private fun updateEmailActionsState(canSendEmails: Boolean) = with(binding) {
+        listOf(R.id.actionReply, R.id.actionReplyAll, R.id.actionForward).forEach { id ->
+            if (canSendEmails) mainActions.enableByMenuId(id) else mainActions.disableByMenuId(id)
+        }
+        addReaction.isEnabled = canSendEmails
     }
 
     private fun setShareTrailingContent() {

@@ -234,6 +234,8 @@ class MainActivity : BaseActivity() {
         syncDiscoveryManager.init(::showSyncDiscovery)
 
         observeNotificationToRefresh()
+
+        handleAdminDisabledSendingSnackbarIfNeeded(intent)
     }
 
     private fun handleMenuDrawerEdgeToEdge() {
@@ -438,6 +440,18 @@ class MainActivity : BaseActivity() {
         notificationManagerCompat.cancel(GENERIC_NEW_MAILS_NOTIFICATION_ID)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleAdminDisabledSendingSnackbarIfNeeded(intent)
+    }
+
+    private fun handleAdminDisabledSendingSnackbarIfNeeded(intent: Intent) {
+        if (!intent.getBooleanExtra(EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR, false)) return
+        snackbarManager.setValue(getString(R.string.snackbarAdminDisabledMessageSending))
+        intent.removeExtra(EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR)
+        setIntent(intent)
+    }
+
     private fun handleOnBackPressed() = with(binding) {
 
         fun closeDrawer() {
@@ -636,9 +650,13 @@ class MainActivity : BaseActivity() {
     }
 
     fun navigateToNewMessageActivity(args: Bundle? = null) {
-        val intent = Intent(this, NewMessageActivity::class.java)
-        args?.let(intent::putExtras)
-        newMessageActivityResultLauncher.launch(intent)
+        if (!mainViewModel.canSendEmailsFlow.value) {
+            snackbarManager.postValue(getString(R.string.snackbarAdminDisabledMessageSending))
+        } else {
+            val intent = Intent(this, NewMessageActivity::class.java)
+            args?.let(intent::putExtras)
+            newMessageActivityResultLauncher.launch(intent)
+        }
     }
 
     fun navigateToSyncAutoConfigActivity() {
@@ -675,6 +693,7 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
+        const val EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR = "show_admin_disabled_sending_snackbar"
 
         private const val DEFAULT_APP_REVIEW_LAUNCHES = 50
         private const val MAX_APP_REVIEW_LAUNCHES = 500
