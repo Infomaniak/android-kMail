@@ -506,18 +506,12 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     }
 
     private fun selectCurrentFolder() {
-        val sourceFolder = mainViewModel.currentFolder.value
-        if (!searchViewModel.isAllFoldersSelected && searchViewModel.filterFolder == null && sourceFolder?.role != FolderRole.INBOX) {
-            searchViewModel.selectFolder(sourceFolder)
+        val currentFolder = mainViewModel.currentFolder.value
+        if (!searchViewModel.isAllFoldersSelected && searchViewModel.filterFolder == null && currentFolder?.role != FolderRole.INBOX) {
+            searchViewModel.selectFolder(currentFolder)
         }
-        updateAllFoldersButtonUi()
 
-        if (searchViewModel.filterFolder == null) {
-            val currentFolder = mainViewModel.currentFolder.value
-            if (currentFolder?.role != FolderRole.INBOX) {
-                searchViewModel.selectFolder(currentFolder)
-            }
-        }
+        updateAllFoldersButtonUi()
         trackSearchEvent(ThreadFilter.FOLDER.matomoName, true)
     }
 
