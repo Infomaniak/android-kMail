@@ -222,10 +222,12 @@ class ThreadListMultiSelection {
     }
 
     private fun updateSelectAllLabel() {
-        val currentThreadsSelected = mainViewModel.currentThreadsLive.value?.list?.count() ?: 0
-        val isEverythingSelected = multiselectionViewModel.isEverythingSelected(currentThreadsSelected)
-        val selectAllLabel =
-            if (isEverythingSelected) R.string.buttonUnselectAll else R.string.buttonSelectAll
+        val currentThreadCount = host.threadListAdapter.dataSet
+            .filterIsInstance<ThreadListItem.Content>()
+            .count()
+
+        val isEverythingSelected = multiselectionViewModel.isEverythingSelected(currentThreadCount)
+        val selectAllLabel = if (isEverythingSelected) R.string.buttonUnselectAll else R.string.buttonSelectAll
         host.multiSelectionBinding.multiselectToolbar.selectAll.setText(selectAllLabel)
     }
 
