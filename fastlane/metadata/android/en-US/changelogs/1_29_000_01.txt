@@ -1,0 +1,6 @@
+- Block all email sending actions when an administrator has put the mailbox as read-only
+- Add confirmation dialogs when replying to a no-reply address
+- Fix an animation crash in the message list
+- Ensure the cancel button is correctly enabled when confirmation dialogs are displayed for the second time
+- Improve performances on heavy mailboxes with a lot of activities
+- Fix crash when removing unknown recipient chip from a mailto
