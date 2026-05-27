@@ -1,0 +1,6 @@
+- Blocage des opérations d'envoi d'e-mails lorsqu'un administrateur a défini l'adresse en lecture seule
+- Ajout d'une alertede confirmation lors de la réponse à une adresse « no-reply »
+- Correction d'un crash lié à l'animation dans la liste des messages
+- Le bouton « Annuler » est maintenant correctement activé lors du deuxieme affichage des alertes de confirmation
+- Amélioration des performances sur les adresses avec une forte activité
+- Correction d'un crash lors de la suppression d'un destinataire inconnu dans un lien « mailto »
