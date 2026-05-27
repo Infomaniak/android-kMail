@@ -935,7 +935,7 @@ class ThreadAdapter(
     fun updateFailedMessages(uids: List<String>) {
         uids.forEach { uid ->
             val index = items.indexOfFirst { it is MessageUi && it.message.uid == uid }
-            notifyItemChanged(index, NotifyType.FailedMessage)
+            if (index != -1) notifyItemChanged(index, NotifyType.FailedMessage)
         }
     }
 
@@ -1103,7 +1103,7 @@ class ThreadAdapter(
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
     )
 
-    private enum class DisplayType(val layout: Int) {
+    enum class DisplayType(val layout: Int) {
         MAIL(R.layout.item_message),
         SUPER_COLLAPSED_BLOCK(R.layout.item_super_collapsed_block),
     }

@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -80,6 +81,9 @@ class PrintMailFragment : Fragment() {
                 onBodyWebViewFinishedLoading = { startPrintingView() },
             ),
         )
+
+        // Try to fix IllegalArgumentException occurring when a tmp detached view is recycled during its removing animation ends
+        (binding.messagesList.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     }
 
     private fun startPrintingView() {

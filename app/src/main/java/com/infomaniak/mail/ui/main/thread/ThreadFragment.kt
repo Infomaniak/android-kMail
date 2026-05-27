@@ -36,6 +36,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.work.Data
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
@@ -91,6 +92,7 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.DisplayType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
@@ -435,14 +437,19 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             ),
         )
 
-        binding.messagesList.addItemDecoration(
-            DividerItemDecorator(
-                divider = InsetDrawable(dividerDrawable(requireContext()), 0),
-                shouldIgnoreView = { view -> view.tag == UiUtils.IGNORE_DIVIDER_TAG },
-            ),
-        )
+        binding.messagesList.apply {
+            addItemDecoration(
+                DividerItemDecorator(
+                    divider = InsetDrawable(dividerDrawable(requireContext()), 0),
+                    shouldIgnoreView = { view -> view.tag == UiUtils.IGNORE_DIVIDER_TAG },
+                ),
+            )
+            recycledViewPool.setMaxRecycledViews(DisplayType.MAIL.layout, 0)
 
-        binding.messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
+            // Try to fix IllegalArgumentException occurring when a tmp detached view is recycled during its removing animation ends
+            (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
+        }
+
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
