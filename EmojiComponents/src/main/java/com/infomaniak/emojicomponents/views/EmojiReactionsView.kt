@@ -113,7 +113,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 
             EmojiReactions(
                 reactions = { reactionsState },
-                onEmojiClicked = { emoji -> onEmojiClickListener?.invoke(emoji) },
+                onEmojiClicked = { emoji -> if (isAddReactionEnabled) onEmojiClickListener?.invoke(emoji) },
                 shape = chipCornerRadius?.let { RoundedCornerShape(it) } ?: InputChipDefaults.shape,
                 addReactionIcon = addReactionIcon,
                 isAddReactionEnabled = { isAddReactionEnabled },
