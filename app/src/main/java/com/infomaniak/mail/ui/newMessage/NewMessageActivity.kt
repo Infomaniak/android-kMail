@@ -135,7 +135,7 @@ class NewMessageActivity : BaseActivity() {
     private fun handleDisabledSending() {
         Intent(this@NewMessageActivity, MainActivity::class.java).apply {
             putExtra(MainActivity.EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR, true)
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.also(::startActivity)
         finish()
     }
