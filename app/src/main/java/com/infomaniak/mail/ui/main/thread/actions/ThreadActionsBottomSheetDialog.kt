@@ -110,10 +110,14 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 setMarkAsReadUi(thread.isSeen)
                 setArchiveUi(isFromArchive, isFromDraft)
-                setFavoriteUi(thread.isFavorite)
+                setFavoriteUi(thread.isFavorite, isFromDraft)
                 setSnoozeUi(thread.isSnoozed())
                 setReactionUi(canBeReactedTo = messageUidToReactTo != null)
-                setSpamUi(binding.spam, isFromSpam)
+                setSpamUi(binding.spam, isFromSpam, isFromDraft)
+                setMainActionUi(isFromDraft)
+                setMoveUi(isFromDraft)
+                setMarkUnreadUi(isFromDraft)
+                setReportPhishingUi(isFromDraft)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
@@ -335,7 +339,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         const val TAG = "ThreadActionsBottomSheetDialog"
         const val OPEN_SNOOZE_BOTTOM_SHEET = "openSnoozeBottomSheet"
 
-        fun setSpamUi(spam: ActionItemView, isFromSpam: Boolean) {
+        fun setSpamUi(spam: ActionItemView, isFromSpam: Boolean, isFromDraft: Boolean) {
+            if (isFromDraft) {
+                spam.isVisible = false
+                return
+            }
+
             spam.apply {
                 val (text, icon) = if (isFromSpam) {
                     R.string.actionNonSpam to R.drawable.ic_non_spam

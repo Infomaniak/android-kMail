@@ -100,10 +100,14 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             isFromArchive = folderRole == FolderRole.ARCHIVE
 
             setMarkAsReadUi(message.isSeen)
-            setArchiveUi(isFromArchive, isFromDraft, message.isDraft)
-            setFavoriteUi(message.isFavorite)
+            setArchiveUi(isFromArchive, isFromDraft)
+            setFavoriteUi(message.isFavorite, isFromDraft)
             setReactionUi(message.isValidReactionTarget)
-            setSpamUi(binding.spam, isFromSpam)
+            setSpamUi(binding.spam, isFromSpam, isFromDraft)
+            setMainActionUi(isFromDraft)
+            setMoveUi(isFromDraft)
+            setMarkUnreadUi(isFromDraft)
+            setReportPhishingUi(isFromDraft)
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
