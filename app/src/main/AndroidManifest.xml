@@ -51,14 +51,14 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
-        android:fullBackupContent="false"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.Pink"
         android:usesCleartextTraffic="true"
-        tools:replace="android:usesCleartextTraffic,android:allowBackup"
+        tools:replace="android:usesCleartextTraffic,android:allowBackup,android:fullBackupContent"
         tools:targetApi="UPSIDE_DOWN_CAKE">
 
         <meta-data
