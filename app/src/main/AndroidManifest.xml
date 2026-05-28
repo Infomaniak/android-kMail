@@ -48,7 +48,7 @@
 
     <application
         android:name=".MainApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="false"
@@ -58,7 +58,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.Pink"
         android:usesCleartextTraffic="true"
-        tools:replace="android:usesCleartextTraffic"
+        tools:replace="android:usesCleartextTraffic,android:allowBackup"
         tools:targetApi="UPSIDE_DOWN_CAKE">
 
         <meta-data
