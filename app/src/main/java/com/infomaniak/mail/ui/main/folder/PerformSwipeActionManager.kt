@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
@@ -155,7 +154,7 @@ object PerformSwipeActionManager {
                     currentFolderId = thread.folderId,
                     mailbox = currentMailbox
                 )
-                host.mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
+                true
             }
 
             SwipeAction.SPAM -> {

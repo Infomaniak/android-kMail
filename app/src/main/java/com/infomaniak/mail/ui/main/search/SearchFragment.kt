@@ -311,7 +311,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 actionsViewModel.searchRefreshEvents.collect {
-                    searchViewModel.refreshSearch(withContacts = true)
+                    searchViewModel.refreshSearch(withContacts = !multiselectionViewModel.isMultiSelectOn)
                 }
             }
         }

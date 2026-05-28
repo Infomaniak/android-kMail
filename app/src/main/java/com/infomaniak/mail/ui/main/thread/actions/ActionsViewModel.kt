@@ -324,8 +324,6 @@ class ActionsViewModel @Inject constructor(
         currentFolderId: String?,
         mailbox: Mailbox,
     ) {
-        if (currentFolderId == null) return
-
         val permanentlyDeleteMessages = messagesToDelete.filter { message ->
             isPermanentDeleteFolder(role = folderRoleUtils.getActionFolderRole(message))
         }
@@ -337,7 +335,11 @@ class ActionsViewModel @Inject constructor(
             // If deleteMessages is empty we will do the auto advance after deleting permanently
             if (onlyPermanentlyDeleteMessages) calculateCurrentThreadPosition.postValue(Unit)
             handlePermanentlyDeleteMessages(
-                permanentlyDeleteMessages, mailbox, currentFolderId, onlyPermanentlyDeleteMessages, messagesToDelete
+                permanentlyDeleteMessages,
+                mailbox,
+                currentFolderId,
+                onlyPermanentlyDeleteMessages,
+                messagesToDelete
             )
         }
 
@@ -361,11 +363,10 @@ class ActionsViewModel @Inject constructor(
     private suspend fun handlePermanentlyDeleteMessages(
         permanentlyDeleteMessages: List<Message>,
         mailbox: Mailbox,
-        currentFolderId: String,
+        currentFolderId: String?,
         shouldAutoAdvanceAndRefresh: Boolean,
         messagesToDelete: List<Message>
     ) {
-        val currentFolder = folderController.getFolder(currentFolderId) ?: return
         val result = messagesActions.permanentlyDelete(
             messagesToDelete = permanentlyDeleteMessages,
             mailbox = mailbox,
@@ -385,7 +386,7 @@ class ActionsViewModel @Inject constructor(
                 refreshFoldersAsync(
                     mailbox = mailbox,
                     messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                    currentFolderId = currentFolder.id,
+                    currentFolderId = currentFolderId,
                     threadsUids = uidsToMove,
                 )
                 notifySearchRefresh()

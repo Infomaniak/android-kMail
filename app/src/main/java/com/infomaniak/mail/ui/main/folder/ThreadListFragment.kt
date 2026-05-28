@@ -667,7 +667,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                     threadsUids = arrayOf(threadUid),
                     action = FolderPickerAction.MOVE,
                     sourceFolderId = sourceFolderId,
-                    isFromSearch = true,
+                    isFromSearch = false,
                 )
             }
 
@@ -676,7 +676,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                     threadUid = threadUid,
                     shouldLoadDistantResources = false,
                     shouldCloseMultiSelection = false,
-                    isFromSearch = true,
+                    isFromSearch = false,
                 )
             }
 
