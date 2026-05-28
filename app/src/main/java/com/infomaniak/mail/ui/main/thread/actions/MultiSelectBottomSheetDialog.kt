@@ -122,15 +122,16 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         junkMessagesViewModel.threadsUids = threadsUids
 
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
-        val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
+
         lifecycleScope.launch {
             val folderRole = folderRoleUtils.getThreadsActionFolderRole(threads)
             val messages = threads.flatMap { it.messages }
             val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
+            val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE ||
+                    messagesFolderRoles.all { it == FolderRole.ARCHIVE }
             setupMainActions(threads, threadsUids, shouldRead, folderRole, messagesFolderRoles)
+            setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
         }
-
-        setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
 
         observeReportPhishingResult()
         observePotentialBlockedSenders()
