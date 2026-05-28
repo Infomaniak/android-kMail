@@ -22,7 +22,7 @@ import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -68,7 +68,6 @@ import com.infomaniak.core.common.utils.endOfTheWeek
 import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
 import com.infomaniak.core.common.utils.startOfTheDay
 import com.infomaniak.core.common.utils.startOfTheWeek
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.removeAccents
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
@@ -77,6 +76,7 @@ import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig

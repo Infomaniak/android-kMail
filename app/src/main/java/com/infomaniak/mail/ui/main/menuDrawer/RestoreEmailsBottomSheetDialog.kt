@@ -24,7 +24,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.core.common.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.core.common.utils.FORMAT_EVENT_DATE
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideProgressCatching
 import com.infomaniak.core.legacy.utils.initProgress
@@ -32,9 +34,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.showProgressCatching
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.core.common.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.core.common.utils.FORMAT_EVENT_DATE
-import com.infomaniak.core.common.utils.format
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
