@@ -1,0 +1,2 @@
+- Fix newly created accounts connection
+- Support keeping the account connected when switching to a new device
