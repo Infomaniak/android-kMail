@@ -865,10 +865,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun refreshDraftFolderAfterDelay(sendDelay: Int) = viewModelScope.launch(ioCoroutineContext) {
+    fun refreshFoldersAfterSendDelay(sendDelay: Int) = viewModelScope.launch(ioCoroutineContext) {
         delay(sendDelay * 1_000L)
-        val scheduledDraftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id ?: return@launch
-        refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
+        currentMailbox.value?.let { mailbox ->
+            refreshFoldersAsync(
+                mailbox,
+                ImpactedFolders(mutableSetOf(FolderRole.DRAFT, FolderRole.SENT)),
+                destinationFolderId = folderController.getFolder(FolderRole.SENT)?.id,
+            )
+        }
     }
 
     private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {

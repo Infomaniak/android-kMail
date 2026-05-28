@@ -354,7 +354,7 @@ class MainActivity : BaseActivity() {
                 }
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
                     // Waits 2s after cancel delay to guarantee the send action is committed
-                    mainViewModel.refreshDraftFolderAfterDelay(localSettings.cancelDelay + 2)
+                    mainViewModel.refreshFoldersAfterSendDelay(localSettings.cancelDelay + 2)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
                     showSentDraftSnackbar(cancelResourceUrl)
                 }
