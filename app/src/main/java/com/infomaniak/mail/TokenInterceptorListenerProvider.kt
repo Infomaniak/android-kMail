@@ -19,7 +19,7 @@ package com.infomaniak.mail
 
 import com.infomaniak.core.auth.TokenInterceptorListener
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.core.login.ApiToken
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.CoroutineScope
