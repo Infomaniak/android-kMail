@@ -192,7 +192,6 @@ class FolderPickerFragment : Fragment() {
         }
         if (navigationArgs.isFromSearch) {
             multiselectionViewModel.isMultiSelectOn = false
-            searchViewModel.refreshSearch(withContacts = true)
         }
     }
 

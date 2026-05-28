@@ -54,6 +54,8 @@ import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -88,6 +90,15 @@ class ActionsViewModel @Inject constructor(
 
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
+
+    //region refreshSearch
+    private val _searchRefreshEvents = Channel<Unit>(Channel.BUFFERED)
+    val searchRefreshEvents = _searchRefreshEvents.receiveAsFlow()
+
+    private suspend fun notifySearchRefresh() {
+        _searchRefreshEvents.send(Unit)
+    }
+    //endregion
 
     //region AutoAdvance
     fun updateCurrentThreadPosition(currentPosition: Int, currentUid: String) {
@@ -148,6 +159,7 @@ class ActionsViewModel @Inject constructor(
                         currentFolderId = currentFolderId,
                         threadsUids = movedThreads,
                     )
+                    notifySearchRefresh()
                 }
 
                 if (displaySnackbar) showMoveSnackbar(
@@ -250,6 +262,8 @@ class ActionsViewModel @Inject constructor(
                     threadController.updateIsLocallyMovedOutStatus(movedThreads, hasBeenMovedOut = false)
                 }
             }
+
+            notifySearchRefresh()
         }
 
         showMoveSnackbar(
@@ -380,6 +394,7 @@ class ActionsViewModel @Inject constructor(
                     currentFolderId = currentFolder.id,
                     threadsUids = uidsToMove,
                 )
+                notifySearchRefresh()
                 val numberOfImpactedThreads = uidsToMove.distinct().count()
                 showDeleteSnackbar(
                     apiResponses = apiResponses,
@@ -468,6 +483,7 @@ class ActionsViewModel @Inject constructor(
                 messagesFoldersIds = result.messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
             )
+            notifySearchRefresh()
         }
     }
 
@@ -484,9 +500,9 @@ class ActionsViewModel @Inject constructor(
                 messagesFoldersIds = messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
             )
+            notifySearchRefresh()
         }
     }
-
     //endregion
 
     //region Favorite
@@ -501,6 +517,7 @@ class ActionsViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = result.messages.getFoldersIds(),
             )
+            notifySearchRefresh()
         }
     }
 
@@ -515,6 +532,7 @@ class ActionsViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
             )
+            notifySearchRefresh()
         }
     }
     //endregion
@@ -542,6 +560,7 @@ class ActionsViewModel @Inject constructor(
             when (result) {
                 is MessagesActions.ApiCallResult.Success -> {
                     reportPhishingTrigger.postValue(Unit)
+                    notifySearchRefresh()
                     snackbarManager.postValue(appContext.getString(result.messageRes))
                 }
                 is MessagesActions.ApiCallResult.Error -> {
@@ -580,6 +599,7 @@ class ActionsViewModel @Inject constructor(
 
         if (result is MessagesActions.SnoozeResult.Success) {
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+            notifySearchRefresh()
         }
 
         val message = when (result) {
@@ -603,6 +623,7 @@ class ActionsViewModel @Inject constructor(
 
         if (result is BatchSnoozeResult.Success) {
             refreshFoldersAsync(mailbox, result.impactedFolders)
+            notifySearchRefresh()
         }
 
         val message = when (result) {
@@ -628,6 +649,7 @@ class ActionsViewModel @Inject constructor(
 
             if (result is BatchSnoozeResult.Success) {
                 refreshFoldersAsync(mailbox, result.impactedFolders)
+                notifySearchRefresh()
             }
 
             val message = when (result) {
@@ -665,6 +687,7 @@ class ActionsViewModel @Inject constructor(
             with(messagesActions.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
                     refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
+                    notifySearchRefresh()
                 } else {
                     snackbarManager.postValue(title = appContext.getString(translateError()))
                 }
@@ -687,6 +710,7 @@ class ActionsViewModel @Inject constructor(
             }
 
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
+            notifySearchRefresh()
             onSuccess()
         } else {
             snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
@@ -703,6 +727,7 @@ class ActionsViewModel @Inject constructor(
                 }
 
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolder.id)))
+                notifySearchRefresh()
             }
 
             showUnscheduledDraftSnackbar(apiResponse, openFolder)
@@ -739,6 +764,7 @@ class ActionsViewModel @Inject constructor(
                 }
 
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
+                notifySearchRefresh()
             }
 
             showDeletedDraftSnackbar(apiResponse)
@@ -762,6 +788,7 @@ class ActionsViewModel @Inject constructor(
                     messagesFoldersIds = foldersIds,
                     destinationFolderId = destinationFolderId,
                 )
+                notifySearchRefresh()
             }
         }
 

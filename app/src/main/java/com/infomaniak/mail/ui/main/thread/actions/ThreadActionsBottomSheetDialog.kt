@@ -35,7 +35,6 @@ import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -227,7 +226,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     currentFolder = mainViewModel.currentFolder.value,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
-                if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
             }
         }
 
@@ -238,12 +236,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
-            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
             twoPaneViewModel.closeThread()
         }
 
         override fun onMove() {
             val navController = findNavController()
+            val isFromSearch = navigationArgs.isFromSearch
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Move)
                 navController.animatedNavigation(
@@ -251,8 +249,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     args = FolderPickerFragmentArgs(
                         threadsUids = arrayOf(navigationArgs.threadUid),
                         action = FolderPickerAction.MOVE,
-                        sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
-                        isFromSearch = navigationArgs.isFromSearch
+                        sourceFolderId = thread.folderId,
+                        isFromSearch = isFromSearch
                     ).toBundle(),
                 )
             }
@@ -285,7 +283,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 threadsUids = listOf(navigationArgs.threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
-            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onSpam() {
@@ -295,7 +292,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 currentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
-            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onPhishing() {
@@ -319,8 +315,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     )
                 },
             )
-
-            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onBlockSender() {
@@ -342,7 +336,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                 }
             }
-            if (navigationArgs.isFromSearch) searchViewModel.refreshSearch(withContacts = true)
         }
 
         override fun onPrint() {

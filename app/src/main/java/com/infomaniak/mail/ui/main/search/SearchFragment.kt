@@ -33,9 +33,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -250,6 +252,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         observeSearchResults()
         observeHistory()
         observeMultiSelect()
+        observeSearchRefresh()
     }
 
     private fun handleEdgeToEdge(): Unit = with(binding) {
@@ -301,6 +304,16 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     override fun handleOnBackPressed() {
         if (!isOnlyRightShown()) searchViewModel.clearSearchState()
         super.handleOnBackPressed()
+    }
+
+    private fun observeSearchRefresh() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                actionsViewModel.searchRefreshEvents.collect {
+                    searchViewModel.refreshSearch(withContacts = true)
+                }
+            }
+        }
     }
 
     private fun updateSwipeActionsAccordingToSettings() {

@@ -930,22 +930,22 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
                         actionsViewModel.archiveThreads(
                             threads = listOf(thread),
-                            currentFolder = mainViewModel.currentFolder.value,
+                            currentFolder = thread.folder,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     }
                 }
                 R.id.quickActionDelete -> {
+                    val thread = threadViewModel.threadLive.value ?: return@setOnItemClickListener
                     descriptionDialog.deleteWithConfirmationPopup(
                         messagesFolderRoles,
-                        currentFolderRole = mainViewModel.currentFolder.value?.role,
+                        currentFolderRole = thread.folder.role,
                         count = 1
                     ) {
                         trackThreadActionsEvent(MatomoName.Delete)
-                        val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
                         actionsViewModel.deleteThreads(
                             threads = listOf(thread),
-                            currentFolder = mainViewModel.currentFolder.value,
+                            currentFolder = thread.folder,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
 

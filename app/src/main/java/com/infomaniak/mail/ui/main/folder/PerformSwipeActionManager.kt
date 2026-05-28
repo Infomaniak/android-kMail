@@ -27,7 +27,6 @@ import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
@@ -128,7 +127,7 @@ object PerformSwipeActionManager {
             ) {
                 host.actionsViewModel.archiveThreads(
                     listOf(thread),
-                    host.mainViewModel.currentFolder.value,
+                    thread.folder,
                     host.mainViewModel.currentMailbox.value!!
                 )
             }
@@ -151,7 +150,7 @@ object PerformSwipeActionManager {
                     if (isPermanentDeleteFolder) host.threadListAdapter.removeItem(position)
                     host.actionsViewModel.deleteThreads(
                         listOf(thread),
-                        host.mainViewModel.currentFolder.value,
+                        thread.folder,
                         host.mainViewModel.currentMailbox.value!!
                     )
                 },
@@ -173,7 +172,7 @@ object PerformSwipeActionManager {
                 navController.animatedNavigation(
                     directions = host.directionsToMove(
                         threadUid = thread.uid,
-                        sourceFolderId = host.mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
+                        sourceFolderId = thread.folderId,
                     )
                 )
             }
@@ -189,7 +188,7 @@ object PerformSwipeActionManager {
             host.actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(thread.uid),
                 shouldRead = !thread.isSeen,
-                currentFolderId = host.mainViewModel.currentFolderId,
+                currentFolderId = thread.folderId,
                 mailbox = host.mainViewModel.currentMailbox.value!!
             )
             host.mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
@@ -198,7 +197,7 @@ object PerformSwipeActionManager {
         SwipeAction.SPAM -> {
             host.actionsViewModel.toggleThreadsSpamStatus(
                 threads = setOf(thread),
-                currentFolderId = host.mainViewModel.currentFolderId,
+                currentFolderId = thread.folderId,
                 mailbox = host.mainViewModel.currentMailbox.value!!
             )
             false
@@ -348,7 +347,7 @@ object PerformSwipeActionManager {
         fun onSuccess() {
             actionsViewModel.archiveThreads(
                 threads = listOf(thread),
-                currentFolder = mainViewModel.currentFolder.value,
+                currentFolder = thread.folder,
                 mailbox = currentMailBox
             )
         }
@@ -380,7 +379,7 @@ object PerformSwipeActionManager {
             if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
             actionsViewModel.deleteThreads(
                 threads = listOf(thread),
-                currentFolder = mainViewModel.currentFolder.value,
+                currentFolder = thread.folder,
                 mailbox = currentMailBox
             )
         }
