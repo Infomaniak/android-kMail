@@ -127,7 +127,7 @@ object PerformSwipeActionManager {
             ) {
                 host.actionsViewModel.archiveThreads(
                     listOf(thread),
-                    thread.folder,
+                    thread.folderId,
                     host.mainViewModel.currentMailbox.value!!
                 )
             }
@@ -150,7 +150,7 @@ object PerformSwipeActionManager {
                     if (isPermanentDeleteFolder) host.threadListAdapter.removeItem(position)
                     host.actionsViewModel.deleteThreads(
                         listOf(thread),
-                        thread.folder,
+                        thread.folderId,
                         host.mainViewModel.currentMailbox.value!!
                     )
                 },
@@ -347,7 +347,7 @@ object PerformSwipeActionManager {
         fun onSuccess() {
             actionsViewModel.archiveThreads(
                 threads = listOf(thread),
-                currentFolder = thread.folder,
+                currentFolderId = thread.folderId,
                 mailbox = currentMailBox
             )
         }
@@ -379,7 +379,7 @@ object PerformSwipeActionManager {
             if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
             actionsViewModel.deleteThreads(
                 threads = listOf(thread),
-                currentFolder = thread.folder,
+                currentFolderId = thread.folderId,
                 mailbox = currentMailBox
             )
         }

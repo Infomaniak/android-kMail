@@ -195,7 +195,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
                     actionsViewModel.deleteMessages(
                         messages = listOf(message),
-                        currentFolder = mainViewModel.currentFolder.value,
+                        currentFolderId = mainViewModel.currentFolderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
@@ -208,7 +208,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
                     actionsViewModel.archiveMessages(
                         messages = listOf(message),
-                        currentFolder = mainViewModel.currentFolder.value,
+                        currentFolderId = mainViewModel.currentFolderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }

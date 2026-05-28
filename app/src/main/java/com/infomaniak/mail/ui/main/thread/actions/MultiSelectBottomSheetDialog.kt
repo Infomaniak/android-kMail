@@ -263,7 +263,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
                         actionsViewModel.archiveThreads(
                             threads = threads.toList(),
-                            currentFolder = currentFolder,
+                            currentFolderId = currentFolderId,
                             mailbox = currentMailbox,
                         )
                         multiselectionViewModel.isMultiSelectOn = false
@@ -278,7 +278,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
                         actionsViewModel.deleteThreads(
                             threads = threads.toList(),
-                            currentFolder = currentFolder,
+                            currentFolderId = currentFolderId,
                             mailbox = currentMailbox,
                         )
                         multiselectionViewModel.isMultiSelectOn = false

@@ -930,7 +930,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
                         actionsViewModel.archiveThreads(
                             threads = listOf(thread),
-                            currentFolder = thread.folder,
+                            currentFolderId = thread.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     }
@@ -945,7 +945,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         trackThreadActionsEvent(MatomoName.Delete)
                         actionsViewModel.deleteThreads(
                             threads = listOf(thread),
-                            currentFolder = thread.folder,
+                            currentFolderId = thread.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
 

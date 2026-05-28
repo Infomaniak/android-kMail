@@ -210,7 +210,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
                 actionsViewModel.deleteThreads(
                     threads = listOf(thread),
-                    currentFolder = mainViewModel.currentFolder.value,
+                    currentFolderId = mainViewModel.currentFolderId,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
@@ -223,7 +223,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
                 actionsViewModel.archiveThreads(
                     threads = listOf(thread),
-                    currentFolder = mainViewModel.currentFolder.value,
+                    currentFolderId = mainViewModel.currentFolderId,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
             }

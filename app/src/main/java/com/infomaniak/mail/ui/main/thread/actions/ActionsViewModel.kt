@@ -248,6 +248,7 @@ class ActionsViewModel @Inject constructor(
                 currentThread?.let { (_, uid) ->
                     if (movedThreads.isNotEmpty() && movedThreads.contains(uid)) tryToAutoAdvance.postValue(Unit)
                 }
+
                 refreshFoldersAsync(
                     mailbox = mailbox,
                     messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
@@ -309,28 +310,28 @@ class ActionsViewModel @Inject constructor(
     //region Delete
     fun deleteThreads(
         threads: List<Thread>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToDelete = messagesActions.getMessagesFromThreadsToDelete(threads)
-        handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
+        handleDeleteMessages(messagesToDelete, currentFolderId, mailbox)
     }
 
     fun deleteMessages(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToDelete = messagesActions.getMessagesToDelete(messages)
-        handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
+        handleDeleteMessages(messagesToDelete, currentFolderId, mailbox)
     }
 
     private suspend fun handleDeleteMessages(
         messagesToDelete: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) {
-        if (currentFolder == null) return
+        if (currentFolderId == null) return
 
         val permanentlyDeleteMessages = messagesToDelete.filter { message ->
             isPermanentDeleteFolder(role = folderRoleUtils.getActionFolderRole(message))
@@ -343,7 +344,7 @@ class ActionsViewModel @Inject constructor(
             // If deleteMessages is empty we will do the auto advance after deleting permanently
             if (onlyPermanentlyDeleteMessages) calculateCurrentThreadPosition.postValue(Unit)
             handlePermanentlyDeleteMessages(
-                permanentlyDeleteMessages, mailbox, currentFolder, onlyPermanentlyDeleteMessages, messagesToDelete
+                permanentlyDeleteMessages, mailbox, currentFolderId, onlyPermanentlyDeleteMessages, messagesToDelete
             )
         }
 
@@ -358,7 +359,7 @@ class ActionsViewModel @Inject constructor(
             moveMessagesTo(
                 destinationFolderId = destinationFolder.id,
                 messagesUids = deleteMessages.getUids(),
-                currentFolderId = currentFolder.id,
+                currentFolderId = currentFolderId,
                 mailbox = mailbox,
             )
         }
@@ -367,10 +368,11 @@ class ActionsViewModel @Inject constructor(
     private suspend fun handlePermanentlyDeleteMessages(
         permanentlyDeleteMessages: List<Message>,
         mailbox: Mailbox,
-        currentFolder: Folder,
+        currentFolderId: String,
         shouldAutoAdvanceAndRefresh: Boolean,
         messagesToDelete: List<Message>
     ) {
+        val currentFolder = folderController.getFolder(currentFolderId) ?: return
         val result = messagesActions.permanentlyDelete(
             messagesToDelete = permanentlyDeleteMessages,
             mailbox = mailbox,
@@ -438,25 +440,25 @@ class ActionsViewModel @Inject constructor(
     //region Archive
     fun archiveThreads(
         threads: List<Thread>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToMove = messagesActions.getMessagesFromThreadsToMove(threads)
-        handleArchiveMessages(messagesToMove, currentFolder, mailbox)
+        handleArchiveMessages(messagesToMove, currentFolderId, mailbox)
     }
 
     fun archiveMessages(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMove = messagesActions.getMessagesToMove(messages, currentFolder?.id)
-        handleArchiveMessages(messagesToMove, currentFolder, mailbox)
+        val messagesToMove = messagesActions.getMessagesToMove(messages, currentFolderId)
+        handleArchiveMessages(messagesToMove, currentFolderId, mailbox)
     }
 
     private suspend fun handleArchiveMessages(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) {
         if (messages.isEmpty()) return
@@ -465,7 +467,7 @@ class ActionsViewModel @Inject constructor(
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return
 
-        moveMessagesTo(destinationFolder.id, messages.getUids(), currentFolder?.id, mailbox)
+        moveMessagesTo(destinationFolder.id, messages.getUids(), currentFolderId, mailbox)
     }
 
     //region Seen
