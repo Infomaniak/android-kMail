@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2026 Infomaniak Network SA
+  ~ Copyright (C) 2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,20 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<data-extraction-rules>
-    <cloud-backup>
-        <include domain="sharedpref" path="." />
-        <include domain="file" path="datastore" />
-    </cloud-backup>
-
-    <device-transfer>
-        <include domain="sharedpref" path="." />
-        <include domain="file" path="datastore" />
-        <include domain="database" path="." />
-
-        <include domain="file" path="AppSettings.realm" />
-        <include domain="file" path="AppSettings.realm.lock" />
-        <include domain="file" path="AppSettings.realm.note" />
-        <include domain="file" path="AppSettings.realm.management" />
-    </device-transfer>
-</data-extraction-rules>
+<full-backup-content>
+    <include domain="sharedpref" path="." />
+    <include domain="file" path="datastore" />
+</full-backup-content>
