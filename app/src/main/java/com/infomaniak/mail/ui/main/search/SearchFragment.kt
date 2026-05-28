@@ -46,6 +46,7 @@ import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.showKeyboard
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
@@ -461,6 +462,13 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         position: Int,
         isPermanentDeleteFolder: Boolean,
     ): Boolean = with(PerformSwipeActionManager) {
+        val currentMailbox = mainViewModel.currentMailbox.value ?: run {
+            snackbarManager.setValue(getString(com.infomaniak.core.common.R.string.anErrorHasOccurred))
+            SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
+                scope.setTag("context", "PerformSwipeActionManager.performSwipeAction")
+            }
+            return true
+        }
 
         val host = object : PerformSwipeActionManager.SwipeActionHost {
             override val fragment: Fragment = this@SearchFragment
@@ -506,6 +514,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
             thread = thread,
             position = position,
             isPermanentDeleteFolder = isPermanentDeleteFolder,
+            currentMailbox = currentMailbox
         )
     }
 
