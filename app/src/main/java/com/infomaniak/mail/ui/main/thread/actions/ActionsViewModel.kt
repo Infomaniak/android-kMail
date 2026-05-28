@@ -534,7 +534,7 @@ class ActionsViewModel @Inject constructor(
     //region Phishing
     fun reportPhishing(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) {
         viewModelScope.launch(ioCoroutineContext) {
@@ -544,7 +544,7 @@ class ActionsViewModel @Inject constructor(
                 onReportSuccess = {
                     toggleMessagesSpamStatus(
                         messages = messages,
-                        currentFolderId = currentFolder?.id,
+                        currentFolderId = currentFolderId,
                         mailbox = mailbox,
                         displaySnackbar = false,
                     )

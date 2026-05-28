@@ -32,7 +32,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -195,7 +194,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
                     actionsViewModel.deleteMessages(
                         messages = listOf(message),
-                        currentFolderId = mainViewModel.currentFolderId,
+                        currentFolderId = message.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
@@ -208,7 +207,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
                     actionsViewModel.archiveMessages(
                         messages = listOf(message),
-                        currentFolderId = mainViewModel.currentFolderId,
+                        currentFolderId = message.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
@@ -218,7 +217,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen, message.isSeen)
                 actionsViewModel.toggleMessagesSeenStatus(
                     messages = listOf(message),
-                    currentFolderId = mainViewModel.currentFolderId,
+                    currentFolderId = message.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!,
                 )
                 twoPaneViewModel.closeThread()
@@ -234,7 +233,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                             action = FolderPickerAction.MOVE,
                             threadsUids = arrayOf(threadUid),
                             messagesUids = arrayOf(messageUid),
-                            sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
+                            sourceFolderId = message.folderId,
                         ).toBundle(),
                     )
                 }
@@ -263,7 +262,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = isFromSpam)
                 actionsViewModel.toggleMessagesSpamStatus(
                     messages = listOf(message),
-                    currentFolderId = mainViewModel.currentFolderId,
+                    currentFolderId = message.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!,
                 )
             }
@@ -276,7 +275,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     onPositiveButtonClicked = {
                         actionsViewModel.reportPhishing(
                             messages = listOf(message),
-                            currentFolder = mainViewModel.currentFolder.value,
+                            currentFolderId = message.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     },

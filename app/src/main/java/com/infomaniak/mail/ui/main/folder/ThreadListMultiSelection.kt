@@ -100,7 +100,7 @@ class ThreadListMultiSelection {
                     actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
-                        currentFolderId = mainViewModel.currentFolderId,
+                        currentFolderId = if (isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId,
                         mailbox = currentMailBox,
                     )
                     isMultiSelectOn = false
@@ -113,7 +113,7 @@ class ThreadListMultiSelection {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
                         actionsViewModel.archiveThreads(
                             threads = selectedThreads.toList(),
-                            currentFolderId = mainViewModel.currentFolderId,
+                            currentFolderId = if (isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId,
                             mailbox = currentMailBox,
                         )
                         isMultiSelectOn = false
@@ -138,7 +138,7 @@ class ThreadListMultiSelection {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
                         actionsViewModel.deleteThreads(
                             selectedThreads.toList(),
-                            mainViewModel.currentFolderId,
+                            if (isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId,
                             currentMailBox
                         )
                         isMultiSelectOn = false

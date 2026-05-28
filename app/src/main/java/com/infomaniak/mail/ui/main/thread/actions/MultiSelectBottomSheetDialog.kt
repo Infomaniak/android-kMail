@@ -177,7 +177,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 onPositiveButtonClicked = {
                     actionsViewModel.reportPhishing(
                         messages = messages,
-                        currentFolder = mainViewModel.currentFolder.value,
+                        currentFolderId = mainViewModel.currentFolderId,
                         mailbox = currentMailbox,
                     )
                 },

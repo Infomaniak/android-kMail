@@ -208,7 +208,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
                 actionsViewModel.deleteThreads(
                     threads = listOf(thread),
-                    currentFolderId = mainViewModel.currentFolderId,
+                    currentFolderId = thread.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
@@ -221,7 +221,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
                 actionsViewModel.archiveThreads(
                     threads = listOf(thread),
-                    currentFolderId = mainViewModel.currentFolderId,
+                    currentFolderId = thread.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
@@ -231,7 +231,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
             actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
-                currentFolderId = mainViewModel.currentFolderId,
+                currentFolderId = thread.folderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
             twoPaneViewModel.closeThread()
@@ -308,7 +308,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 onPositiveButtonClicked = {
                     actionsViewModel.reportPhishing(
                         messages = junkMessages,
-                        currentFolder = mainViewModel.currentFolder.value,
+                        currentFolderId = thread.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 },
