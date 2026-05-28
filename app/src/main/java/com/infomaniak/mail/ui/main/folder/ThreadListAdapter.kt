@@ -612,34 +612,23 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun Thread.updateDynamicIcons() {
+        if (folderRole == FolderRole.DRAFT) return
         val featureFlags = callbacks?.getFeatureFlags?.invoke()
 
         (recyclerView as DragDropSwipeRecyclerView).apply {
-            if (folderRole == FolderRole.DRAFT) {
-                getSwipeActionUiData(SwipeAction.DELETE)?.let { (colorRes, iconRes) ->
+            if (localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)) {
+                getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
                     behindSwipedItemBackgroundColor = context.getColor(colorRes)
                     behindSwipedItemIconDrawableId = iconRes
-                }
-                getSwipeActionUiData(SwipeAction.QUICKACTIONS_MENU)?.let { (colorRes, iconRes) ->
-                    behindSwipedItemBackgroundColor = context.getColor(colorRes)
-                    behindSwipedItemIconDrawableId = iconRes
-                }
-            }else{
-                if (localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)) {
-                    getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
-                        behindSwipedItemBackgroundColor = context.getColor(colorRes)
-                        behindSwipedItemIconDrawableId = iconRes
-                    }
-                }
-
-                if (localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)) {
-                    getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
-                        behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
-                        behindSwipedItemIconSecondaryDrawableId = iconRes
-                    }
                 }
             }
 
+            if (localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)) {
+                getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
+                    behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
+                    behindSwipedItemIconSecondaryDrawableId = iconRes
+                }
+            }
         }
     }
 
