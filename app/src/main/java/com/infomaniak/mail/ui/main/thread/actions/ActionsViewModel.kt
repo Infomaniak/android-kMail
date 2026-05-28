@@ -213,8 +213,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messages = messageController.getMessages(messagesUids)
-        val messagesToMove = messagesActions.getMessagesToMove(messages, currentFolderId)
-        handleMessagesMove(destinationFolderId, messagesToMove, currentFolderId, mailbox)
+        handleMessagesMove(destinationFolderId, messages, currentFolderId, mailbox)
     }
 
     private suspend fun handleMessagesMove(
@@ -224,12 +223,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) {
         val destinationFolder = folderController.getFolder(destinationFolderId)
-        if (currentFolderId == null || destinationFolder == null) {
-            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-            return
-        }
-
-        val currentFolder = folderController.getFolder(currentFolderId) ?: run {
+        if (destinationFolder == null) {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return
         }
@@ -237,7 +231,6 @@ class ActionsViewModel @Inject constructor(
         calculateCurrentThreadPosition.postValue(Unit)
 
         val result = messagesActions.moveMessagesTo(
-            currentFolder = currentFolder,
             destinationFolder = destinationFolder,
             mailbox = mailbox,
             messages = messages,
@@ -377,7 +370,6 @@ class ActionsViewModel @Inject constructor(
             messagesToDelete = permanentlyDeleteMessages,
             mailbox = mailbox,
             onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
-            currentFolder = currentFolder,
         ) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return
