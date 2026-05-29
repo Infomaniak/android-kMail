@@ -155,7 +155,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         return SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
             threadsUids = threadsUids,
             messagesUids = messagesUids,
-            action = FolderPickerAction.MOVE,
+            action = action,
             sourceFolderId = sourceFolderId,
             isFromSearch = true,
         )
