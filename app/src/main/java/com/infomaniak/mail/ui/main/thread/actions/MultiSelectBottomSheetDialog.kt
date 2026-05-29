@@ -79,7 +79,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
     private val navigationArgs: MultiSelectBottomSheetDialogArgs by navArgs()
-    val mainViewModel: MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()

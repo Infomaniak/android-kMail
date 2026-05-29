@@ -43,7 +43,7 @@ interface MultiSelectionHost : LifecycleOwner {
         threadsUids: Array<String>,
         messagesUids: Array<String>? = null,
         action: FolderPickerAction = FolderPickerAction.MOVE,
-        sourceFolderId: String? = null
+        sourceFolderId: String? = null,
     ): NavDirections
 
     fun directionsToMultiSelectBottomSheetDialog(isFromSearch: Boolean): NavDirections

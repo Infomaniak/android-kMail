@@ -241,7 +241,6 @@ class ActionsViewModel @Inject constructor(
                 currentThread?.let { (_, uid) ->
                     if (movedThreads.isNotEmpty() && movedThreads.contains(uid)) tryToAutoAdvance.postValue(Unit)
                 }
-
                 refreshFoldersAsync(
                     mailbox = mailbox,
                     messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
@@ -339,7 +338,7 @@ class ActionsViewModel @Inject constructor(
                 mailbox,
                 currentFolderId,
                 onlyPermanentlyDeleteMessages,
-                messagesToDelete
+                messagesToDelete,
             )
         }
 
