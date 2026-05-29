@@ -94,6 +94,7 @@ class ThreadListMultiSelection {
             val selectedThreadsUids = selectedThreads.map { it.uid }
             val selectedThreadsCount = selectedThreadsUids.count()
             val currentMailBox = mainViewModel.currentMailbox.value ?: return@setOnItemClickListener
+            val currentFolderId = if (isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId
 
             when (menuId) {
                 R.id.quickActionUnread -> {
@@ -101,7 +102,7 @@ class ThreadListMultiSelection {
                     actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = selectedThreadsUids,
                         shouldRead = shouldMultiselectRead,
-                        currentFolderId = if (isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId,
+                        currentFolderId = currentFolderId,
                         mailbox = currentMailBox,
                     )
                     isMultiSelectOn = false
@@ -114,7 +115,7 @@ class ThreadListMultiSelection {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
                         actionsViewModel.archiveThreads(
                             threads = selectedThreads.toList(),
-                            currentFolderId = if (isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId,
+                            currentFolderId = currentFolderId,
                             mailbox = currentMailBox,
                         )
                         isMultiSelectOn = false
@@ -139,7 +140,7 @@ class ThreadListMultiSelection {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
                         actionsViewModel.deleteThreads(
                             selectedThreads.toList(),
-                            if (isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId,
+                            currentFolderId,
                             currentMailBox
                         )
                         isMultiSelectOn = false
