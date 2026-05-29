@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -161,51 +162,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             isMultiSelectOn = false
         }
 
-        binding.phishing.setOnClickListener {
-            trackMultiSelectActionEvent(MatomoName.SignalPhishing, threadsCount, isFromBottomSheet = true)
-            val messages = junkMessagesViewModel.junkMessages.value ?: emptyList()
+        binding.phishing.setOnClickListener { handlePhishing(threadsCount, currentMailbox) }
 
-            if (messages.isEmpty()) {
-                //An error will be shown to the user in the reportPhishing function
-                //This should never happen, that's why we add a SentryLog.
-                SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
-            }
-
-            descriptionDialog.show(
-                title = getString(R.string.reportPhishingTitle),
-                description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
-                onPositiveButtonClicked = {
-                    actionsViewModel.reportPhishing(
-                        messages = messages,
-                        currentFolderId = mainViewModel.currentFolderId,
-                        mailbox = currentMailbox,
-                    )
-                },
-            )
-            isMultiSelectOn = false
-        }
-
-        binding.blockSender.setClosingOnClickListener {
-            trackMultiSelectActionEvent(MatomoName.BlockUser, threadsCount, isFromBottomSheet = true)
-            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
-            if (potentialUsersToBlock == null) {
-                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-                SentryLog.e(TAG, getString(R.string.sentryErrorPotentialUsersToBlockNull))
-                return@setClosingOnClickListener
-            }
-
-            if (potentialUsersToBlock.count() > 1) {
-                safelyNavigate(
-                    resId = R.id.userToBlockBottomSheetDialog,
-                    substituteClassName = ThreadListFragment::class.java.name,
-                )
-            } else {
-                potentialUsersToBlock.values.firstOrNull()?.let { message ->
-                    junkMessagesViewModel.messageOfUserToBlock.value = message
-                }
-            }
-            isMultiSelectOn = false
-        }
+        binding.blockSender.setClosingOnClickListener { handleBlockSender(threadsCount) }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
@@ -223,6 +182,55 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 currentClassName = MultiSelectBottomSheetDialog::class.java.name,
             )
         }
+    }
+
+    private fun handlePhishing(
+        threadsCount: Int,
+        currentMailbox: Mailbox
+    ) {
+        trackMultiSelectActionEvent(MatomoName.SignalPhishing, threadsCount, isFromBottomSheet = true)
+        val messages = junkMessagesViewModel.junkMessages.value ?: emptyList()
+
+        if (messages.isEmpty()) {
+            //An error will be shown to the user in the reportPhishing function
+            //This should never happen, that's why we add a SentryLog.
+            SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
+        }
+
+        descriptionDialog.show(
+            title = getString(R.string.reportPhishingTitle),
+            description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
+            onPositiveButtonClicked = {
+                actionsViewModel.reportPhishing(
+                    messages = messages,
+                    currentFolderId = mainViewModel.currentFolderId,
+                    mailbox = currentMailbox,
+                )
+            },
+        )
+        multiselectionViewModel.isMultiSelectOn = false
+    }
+
+    private fun handleBlockSender(threadsCount: Int) {
+        trackMultiSelectActionEvent(MatomoName.BlockUser, threadsCount, isFromBottomSheet = true)
+        val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
+        if (potentialUsersToBlock == null) {
+            snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+            SentryLog.e(TAG, getString(R.string.sentryErrorPotentialUsersToBlockNull))
+            return
+        }
+
+        if (potentialUsersToBlock.count() > 1) {
+            safelyNavigate(
+                resId = R.id.userToBlockBottomSheetDialog,
+                substituteClassName = ThreadListFragment::class.java.name,
+            )
+        } else {
+            potentialUsersToBlock.values.firstOrNull()?.let { message ->
+                junkMessagesViewModel.messageOfUserToBlock.value = message
+            }
+        }
+        multiselectionViewModel.isMultiSelectOn = false
     }
 
     private fun setupMainActions(

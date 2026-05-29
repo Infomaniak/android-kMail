@@ -216,7 +216,9 @@ class SearchViewModel @Inject constructor(
         filter.unselect()
     }
 
-    private fun shouldShowContacts(): Boolean {
+    private fun shouldShowContacts(withContacts: Boolean): Boolean {
+        if (!withContacts) return false
+        
         val hasQuery = currentSearchQuery.isNotBlank()
         val hasNoFilters = currentFilters.isEmpty()
         val notValidated = currentUiState != SearchUiState.VALIDATED
@@ -338,10 +340,10 @@ class SearchViewModel @Inject constructor(
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
 
-            val showContacts = shouldShowContacts() &&
+            val showContacts = shouldShowContacts(withContacts) &&
                     query.isNotBlank() &&
                     !query.contains("\"") &&
-                    !isLengthTooShort(query) && withContacts
+                    !isLengthTooShort(query)
 
             val contacts = if (showContacts) {
                 val searchQueryNoAccents = Normalizer.normalize(query, Normalizer.Form.NFD)
