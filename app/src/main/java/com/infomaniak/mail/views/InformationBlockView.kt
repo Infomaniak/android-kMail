@@ -157,7 +157,7 @@ class InformationBlockView @JvmOverloads constructor(
     }
 
     fun setMarginBottom(marginBottomPx: Int) {
-        binding.linearLayoutContainer.updateLayoutParams<MarginLayoutParams> {
+        binding.constraintLayoutContainer.updateLayoutParams<MarginLayoutParams> {
             bottomMargin = marginBottomPx
         }
         requestLayout()
