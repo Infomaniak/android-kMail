@@ -158,7 +158,6 @@ class ActionsViewModel @Inject constructor(
                         currentFolderId = currentFolderId,
                         threadsUids = movedThreads,
                     )
-                    notifySearchRefresh()
                 }
 
                 if (displaySnackbar) showMoveSnackbar(
@@ -175,6 +174,8 @@ class ActionsViewModel @Inject constructor(
                     threadController.updateIsLocallyMovedOutStatus(threadsUids = movedThreads, hasBeenMovedOut = false)
                 }
             }
+
+            notifySearchRefresh()
         }
     }
 
