@@ -218,7 +218,7 @@ class SearchViewModel @Inject constructor(
 
     private fun shouldShowContacts(withContacts: Boolean): Boolean {
         if (!withContacts) return false
-        
+
         val hasQuery = currentSearchQuery.isNotBlank()
         val hasNoFilters = currentFilters.isEmpty()
         val notValidated = currentUiState != SearchUiState.VALIDATED
