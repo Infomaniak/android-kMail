@@ -35,9 +35,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
-import com.infomaniak.core.legacy.utils.setMargins
-import com.infomaniak.core.legacy.utils.setPagination
 import com.infomaniak.core.legacy.utils.showKeyboard
+import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener

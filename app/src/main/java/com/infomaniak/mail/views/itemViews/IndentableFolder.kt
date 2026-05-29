@@ -18,7 +18,7 @@
 package com.infomaniak.mail.views.itemViews
 
 import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 import com.infomaniak.core.legacy.R as RCore

@@ -43,9 +43,9 @@ import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel.Compani
 import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent

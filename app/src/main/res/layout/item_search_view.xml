@@ -23,7 +23,7 @@
     app:cardBackgroundColor="@color/searchBarBackgroundColor"
     app:cardCornerRadius="20dp">
 
-    <com.infomaniak.core.legacy.views.EndIconTextInputLayout
+    <com.infomaniak.core.ui.view.layout.EndIconTextInputLayout
         android:id="@+id/searchInputLayout"
         style="@style/SearchTextInputLayoutStyle"
         android:layout_width="match_parent"
@@ -37,6 +37,6 @@
             android:backgroundTint="@android:color/transparent"
             android:drawablePadding="@dimen/marginStandardSmall"
             android:hint="@string/searchFieldPlaceholder" />
-    </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
+    </com.infomaniak.core.ui.view.layout.EndIconTextInputLayout>
 
 </com.google.android.material.card.MaterialCardView>
