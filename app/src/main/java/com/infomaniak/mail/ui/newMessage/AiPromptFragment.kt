@@ -30,9 +30,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.core.legacy.utils.setMargins
-import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.core.legacy.utils.showKeyboard
+import com.infomaniak.core.ui.view.extension.setMargins
+import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.core.ui.view.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings

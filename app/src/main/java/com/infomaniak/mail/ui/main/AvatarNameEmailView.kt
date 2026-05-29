@@ -28,10 +28,9 @@ import androidx.annotation.ColorInt
 import androidx.core.text.toSpannable
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.core.view.marginStart
 import androidx.core.view.updateLayoutParams
 import com.infomaniak.core.legacy.utils.getAttributes
-import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.addressBook.AddressBook

@@ -52,9 +52,9 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.utils.safeNavigate
-import com.infomaniak.core.legacy.utils.setMargins
-import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.ui.view.extension.setMargins
+import com.infomaniak.core.ui.view.extension.setPaddingRelative
 import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag

@@ -26,7 +26,7 @@ import androidx.annotation.StyleRes
 import coil3.load
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.legacy.utils.getAttributes
-import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.databinding.ViewAttachmentDetailsBinding

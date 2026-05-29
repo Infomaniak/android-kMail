@@ -49,8 +49,8 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.core.legacy.utils.FilePicker
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
-import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
 import com.infomaniak.lib.richhtmleditor.StatusCommand.CREATE_LINK
