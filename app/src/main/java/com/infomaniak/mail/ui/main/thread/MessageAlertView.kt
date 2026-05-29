@@ -29,8 +29,8 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.getAttributes
-import com.infomaniak.core.legacy.utils.hideProgressCatching
-import com.infomaniak.core.legacy.utils.showProgressCatching
+import com.infomaniak.core.ui.view.extension.hideProgressCatching
+import com.infomaniak.core.ui.view.extension.showProgressCatching
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMessageAlertBinding
 
