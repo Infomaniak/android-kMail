@@ -41,7 +41,7 @@ import com.google.android.material.card.MaterialCardView
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.ui.view.extension.setMarginsRelative
-import com.infomaniak.core.ui.view.toPx
+import com.infomaniak.core.ui.view.utils.toPx
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.mail.MainApplication

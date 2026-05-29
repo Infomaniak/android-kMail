@@ -23,7 +23,7 @@ import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.core.ui.view.toDp
+import com.infomaniak.core.ui.view.utils.toDp
 import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
