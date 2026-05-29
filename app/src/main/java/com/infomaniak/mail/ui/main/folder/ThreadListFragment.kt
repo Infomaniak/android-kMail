@@ -122,6 +122,7 @@ import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
+import com.infomaniak.mail.utils.extensions.updateSwipeActionsUi
 import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -482,26 +483,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     }
 
     private fun updateDisabledSwipeActionsUi(featureFlags: FeatureFlagSet?, folderRole: FolderRole?) {
-        val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
-        val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
-
-        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
-        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
-    }
-
-    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) = with(binding.threadsList) {
-        fun SwipeAction.getIconRes(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
-        fun SwipeAction.getBackgroundColor(): Int {
-            return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
-        }
-
-        if (swipeDirection == DirectionFlag.LEFT) {
-            behindSwipedItemIconDrawableId = localSettings.swipeLeft.getIconRes()
-            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor()
-        } else {
-            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.getIconRes()
-            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor()
-        }
+        binding.threadsList.updateSwipeActionsUi(localSettings, featureFlags, folderRole)
     }
 
     private fun setupListeners() = with(binding) {

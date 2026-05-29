@@ -96,6 +96,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
@@ -422,6 +423,43 @@ fun DragDropSwipeRecyclerView.updateSwipeAvailability(
 
     val isRightEnabled = localSettings.swipeRight != SwipeAction.NONE && !isMultiSelectOn
     if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
+}
+
+fun DragDropSwipeRecyclerView.updateSwipeActionEnabledUi(
+    swipeAction: SwipeAction,
+    swipeDirection: DirectionFlag,
+    isEnabled: Boolean,
+) {
+    fun SwipeAction.iconResOrDisabled(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
+    fun SwipeAction.backgroundColorOrDisabled(): Int =
+        if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
+
+    if (swipeDirection == DirectionFlag.LEFT) {
+        behindSwipedItemIconDrawableId = swipeAction.iconResOrDisabled()
+        behindSwipedItemBackgroundColor = swipeAction.backgroundColorOrDisabled()
+    } else if (swipeDirection == DirectionFlag.RIGHT) {
+        behindSwipedItemIconSecondaryDrawableId = swipeAction.iconResOrDisabled()
+        behindSwipedItemBackgroundSecondaryColor = swipeAction.backgroundColorOrDisabled()
+    }
+}
+
+fun DragDropSwipeRecyclerView.updateSwipeActionsUi(
+    localSettings: LocalSettings,
+    featureFlags: Mailbox.FeatureFlagSet?,
+    folderRole: FolderRole?
+) {
+    apply {
+        updateSwipeActionEnabledUi(
+            swipeAction = localSettings.swipeLeft,
+            swipeDirection = DirectionFlag.LEFT,
+            isEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings),
+        )
+        updateSwipeActionEnabledUi(
+            swipeAction = localSettings.swipeRight,
+            swipeDirection = DirectionFlag.RIGHT,
+            isEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings),
+        )
+    }
 }
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {

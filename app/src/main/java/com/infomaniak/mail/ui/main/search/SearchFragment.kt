@@ -93,6 +93,7 @@ import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
+import com.infomaniak.mail.utils.extensions.updateSwipeActionsUi
 import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -152,7 +153,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         threadsUids: Array<String>,
         messagesUids: Array<String>?,
         action: FolderPickerAction,
-        sourceFolderId: String?
+        sourceFolderId: String?,
     ): NavDirections {
         return SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
             threadsUids = threadsUids,
@@ -319,26 +320,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     }
 
     private fun updateDisabledSwipeActionsUi(featureFlags: FeatureFlagSet?, folderRole: FolderRole?) {
-        val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
-        val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
-
-        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
-        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
-    }
-
-    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) = with(binding.mailRecyclerView) {
-        fun SwipeAction.getIconRes(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
-        fun SwipeAction.getBackgroundColor(): Int {
-            return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
-        }
-
-        if (swipeDirection == DirectionFlag.LEFT) {
-            behindSwipedItemIconDrawableId = localSettings.swipeLeft.getIconRes()
-            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor()
-        } else {
-            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.getIconRes()
-            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor()
-        }
+        binding.mailRecyclerView.updateSwipeActionsUi(localSettings, featureFlags, folderRole)
     }
 
     private fun setupAdapter() {
