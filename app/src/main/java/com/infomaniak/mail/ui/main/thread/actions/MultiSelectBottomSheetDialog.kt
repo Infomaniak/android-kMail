@@ -53,6 +53,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.get
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getFavoriteIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
+import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.search.SearchFragmentDirections
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
@@ -219,11 +220,16 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             SentryLog.e(TAG, getString(R.string.sentryErrorPotentialUsersToBlockNull))
             return
         }
-
+        val substituteClassName = if (navigationArgs.isFromSearch) {
+            SearchFragment::class.java.name
+        } else {
+            ThreadListFragment::class.java.name
+        }
+        
         if (potentialUsersToBlock.count() > 1) {
             safelyNavigate(
                 resId = R.id.userToBlockBottomSheetDialog,
-                substituteClassName = ThreadListFragment::class.java.name,
+                substituteClassName = substituteClassName,
             )
         } else {
             potentialUsersToBlock.values.firstOrNull()?.let { message ->
