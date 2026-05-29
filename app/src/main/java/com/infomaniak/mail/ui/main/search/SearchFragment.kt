@@ -303,6 +303,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 actionsViewModel.searchRefreshEvents.collect {
+                    showRefreshLayout()
                     searchViewModel.refreshSearch(withContacts = !multiselectionViewModel.isMultiSelectOn)
                 }
             }
@@ -393,7 +394,6 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         }
         multiselectToolbar.cancel.setOnClickListener {
             trackMultiSelectionEvent(MatomoName.Cancel)
-            searchViewModel.refreshSearch(withContacts = true)
             multiselectionViewModel.isMultiSelectOn = false
         }
         multiselectToolbar.selectAll.setOnClickListener {
@@ -645,10 +645,16 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     }
 
     private fun observeMultiSelect() {
+        var wasMultiSelectOn = false
         multiselectionViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
-            if (isMultiSelectOn) searchViewModel.contactsResults.value = emptyList()
-            val autoTransition = AutoTransition()
-            autoTransition.duration = TOOLBAR_FADE_DURATION
+            if (isMultiSelectOn) {
+                searchViewModel.contactsResults.value = emptyList()
+            } else if (wasMultiSelectOn) {
+                showRefreshLayout()
+                searchViewModel.refreshSearch(withContacts = true)
+            }
+            wasMultiSelectOn = isMultiSelectOn
+            val autoTransition = AutoTransition().setDuration(TOOLBAR_FADE_DURATION)
             TransitionManager.beginDelayedTransition(binding.horizontalScrollViewFilters, autoTransition)
             binding.horizontalScrollViewFilters.isGone = isMultiSelectOn
         }
