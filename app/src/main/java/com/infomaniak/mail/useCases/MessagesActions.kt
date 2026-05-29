@@ -146,10 +146,7 @@ class MessagesActions @Inject constructor(
         threadsUids: List<String>,
         messagesUids: List<String>? = null,
         mailbox: Mailbox,
-        currentFolderId: String?,
     ): MoveMessagesResult? {
-        if (currentFolderId == null) return null
-
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return null
         var messagesToMove: List<Message>
         if (messagesUids != null) {
@@ -167,11 +164,8 @@ class MessagesActions @Inject constructor(
     // Spam Region
     suspend fun toggleMessagesSpamStatus(
         messages: List<Message>,
-        currentFolderId: String?,
         mailbox: Mailbox,
     ): MoveMessagesResult? {
-        if (currentFolderId == null) return null
-
         val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
         val destinationFolderRole = if (messagesFolderRoles.contains(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null

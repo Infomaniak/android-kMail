@@ -731,7 +731,6 @@ class MainViewModel @Inject constructor(
             threadsUids = threadsUids,
             messagesUids = messagesUids,
             mailbox = mailbox,
-            currentFolderId = currentFolderId,
         ) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return@launch

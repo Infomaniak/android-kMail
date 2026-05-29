@@ -81,7 +81,6 @@ import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionB
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
-import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets

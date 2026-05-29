@@ -198,13 +198,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
         }
 
+        val currentFolderId = if (navigationArgs.isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId
         descriptionDialog.show(
             title = getString(R.string.reportPhishingTitle),
             description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
             onPositiveButtonClicked = {
                 actionsViewModel.reportPhishing(
                     messages = messages,
-                    currentFolderId = mainViewModel.currentFolderId,
+                    currentFolderId = currentFolderId,
                     mailbox = currentMailbox,
                 )
             },
@@ -225,7 +226,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         } else {
             ThreadListFragment::class.java.name
         }
-        
+
         if (potentialUsersToBlock.count() > 1) {
             safelyNavigate(
                 resId = R.id.userToBlockBottomSheetDialog,

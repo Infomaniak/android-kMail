@@ -142,7 +142,6 @@ class ActionsViewModel @Inject constructor(
     ) {
         val result = messagesActions.toggleMessagesSpamStatus(
             messages = messages,
-            currentFolderId = currentFolderId,
             mailbox = mailbox,
         ) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
