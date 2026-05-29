@@ -22,6 +22,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.notifications.ResultsChange
@@ -33,18 +34,18 @@ import javax.inject.Inject
 class MultiselectionViewModel @Inject constructor(
     application: Application,
 ) : AndroidViewModel(application) {
+    private val _selectedThreads = mutableSetOf<Thread>()
     val isMultiSelectOnLiveData = MutableLiveData(false)
-    inline var isMultiSelectOn
-        get() = isMultiSelectOnLiveData.value!!
+    var isMultiSelectOn: Boolean
+        get() = isMultiSelectOnLiveData.value ?: false
         set(value) {
             isMultiSelectOnLiveData.value = value
         }
+    val selectedThreadsLiveData = MutableLiveData(_selectedThreads)
+    val selectedThreads: MutableSet<Thread>
+        get() = _selectedThreads
 
-    val selectedThreadsLiveData = MutableLiveData(mutableSetOf<Thread>())
-    inline val selectedThreads
-        get() = selectedThreadsLiveData.value!!
-
-    inline val selectedMessages
+    val selectedMessages: List<Message>
         get() = selectedThreads.flatMap { thread -> thread.messages }
 
     fun isEverythingSelected(currentThreadCount: Int): Boolean {
@@ -79,6 +80,6 @@ class MultiselectionViewModel @Inject constructor(
     }
 
     fun publishSelectedItems() {
-        selectedThreadsLiveData.value = selectedThreads
+        selectedThreadsLiveData.value = _selectedThreads
     }
 }
