@@ -95,7 +95,7 @@ class ActionsViewModel @Inject constructor(
     private val _searchRefreshEvents = Channel<Unit>(Channel.CONFLATED)
     val searchRefreshEvents = _searchRefreshEvents.receiveAsFlow()
 
-    private fun notifySearchRefresh() {
+    fun notifySearchRefresh() {
         _searchRefreshEvents.trySend(Unit)
     }
     //endregion

@@ -266,8 +266,10 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     override fun onResume() {
         super.onResume()
         updateSwipeActionsAccordingToSettings()
+        // If the user opens the reply dialog and comes backs to search, the refresh layout doesn't hide. That's why we need
+        // to call hideRefreshLayout here. 
+        hideRefreshLayout()
     }
-
 
     override fun onStop() {
         searchViewModel.cancelSearch()
@@ -667,6 +669,10 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
+    }
+
+    private fun hideRefreshLayout() {
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     enum class VisibilityMode {
