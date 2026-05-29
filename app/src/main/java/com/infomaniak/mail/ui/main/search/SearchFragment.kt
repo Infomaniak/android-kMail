@@ -458,7 +458,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
                     threadsUids = arrayOf(threadUid),
                     action = FolderPickerAction.MOVE,
                     sourceFolderId = sourceFolderId,
-                    isFromSearch = false,
+                    isFromSearch = true,
                 )
             },
             directionsToQuickActions = { threadUid ->
@@ -466,7 +466,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
                     threadUid = threadUid,
                     shouldLoadDistantResources = false,
                     shouldCloseMultiSelection = false,
-                    isFromSearch = false,
+                    isFromSearch = true,
                 )
             },
             navigateToSnoozeBottomSheet = { snoozeScheduleType, snoozeEndDate ->
