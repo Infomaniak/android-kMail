@@ -173,7 +173,8 @@
                             <com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
                                 android:id="@+id/threadsList"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
                                 android:clipToPadding="false"
                                 android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                                 app:behind_swiped_item_icon_margin="@dimen/marginStandard"
