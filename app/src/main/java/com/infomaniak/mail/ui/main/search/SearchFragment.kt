@@ -29,7 +29,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -71,6 +70,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
 import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager
+import com.infomaniak.mail.ui.main.folder.SwipeActionHostFactory
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
@@ -78,7 +78,6 @@ import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionBinding
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
@@ -94,8 +93,8 @@ import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
+import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -127,16 +126,8 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         binding.mailRecyclerView.disableSwipeDirection(direction)
     }
 
-    override fun unlockSwipeActionsIfSet() = with(binding.mailRecyclerView) {
-        val isMultiSelectClosed = multiselectionViewModel.isMultiSelectOn.not()
-
-        val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
-        val isLeftEnabled = isLeftSet && isMultiSelectClosed
-        if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
-
-        val isRightSet = localSettings.swipeRight != SwipeAction.NONE
-        val isRightEnabled = isRightSet && isMultiSelectClosed
-        if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
+    override fun unlockSwipeActionsIfSet() {
+        binding.mailRecyclerView.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
     }
 
     override fun directionToThreadActionsBottomSheetDialog(
@@ -470,52 +461,38 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
             return true
         }
 
-        val host = object : PerformSwipeActionManager.SwipeActionHost {
-            override val fragment: Fragment = this@SearchFragment
-            override val mainViewModel = this@SearchFragment.mainViewModel
-            override val actionsViewModel = this@SearchFragment.actionsViewModel
-            override val localSettings = this@SearchFragment.localSettings
-            override val threadListAdapter = this@SearchFragment.threadListAdapter
-            override val descriptionDialog = this@SearchFragment.descriptionDialog
-
-            override fun showSwipeActionIncompatible() {
+        val host = SwipeActionHostFactory.create(
+            fragment = this@SearchFragment,
+            mainViewModel = mainViewModel,
+            actionsViewModel = actionsViewModel,
+            localSettings = localSettings,
+            threadListAdapter = threadListAdapter,
+            descriptionDialog = descriptionDialog,
+            showSwipeActionIncompatible = {
                 snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
-            }
-
-            override fun directionsToMove(threadUid: String, sourceFolderId: String): NavDirections {
-                return SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
+            },
+            directionsToMove = { threadUid, sourceFolderId ->
+                SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
                     threadsUids = arrayOf(threadUid),
                     action = FolderPickerAction.MOVE,
                     sourceFolderId = sourceFolderId,
-                    isFromSearch = true,
+                    isFromSearch = false,
                 )
-            }
-
-            override fun directionsToQuickActions(threadUid: String): NavDirections {
-                return SearchFragmentDirections.actionSearchFragmentToThreadActionsBottomSheetDialog(
+            },
+            directionsToQuickActions = { threadUid ->
+                SearchFragmentDirections.actionSearchFragmentToThreadActionsBottomSheetDialog(
                     threadUid = threadUid,
                     shouldLoadDistantResources = false,
                     shouldCloseMultiSelection = false,
-                    isFromSearch = true,
+                    isFromSearch = false,
                 )
-            }
-
-            override fun navigateToSnoozeBottomSheet(
-                snoozeScheduleType: SnoozeScheduleType?,
-                snoozeEndDate: RealmInstant?,
-            ) {
-                this@SearchFragment.navigateToSnoozeBottomSheet(snoozeScheduleType, snoozeEndDate)
-            }
-        }
-
-        return performSwipeAction(
-            host = host,
-            swipeAction = swipeAction,
-            thread = thread,
-            position = position,
-            isPermanentDeleteFolder = isPermanentDeleteFolder,
-            currentMailbox = currentMailbox
+            },
+            navigateToSnoozeBottomSheet = { snoozeScheduleType, snoozeEndDate ->
+                navigateToSnoozeBottomSheet(snoozeScheduleType, snoozeEndDate)
+            },
         )
+
+        performSwipeAction(host, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
     }
 
     private fun setAllFoldersButtonListener() {

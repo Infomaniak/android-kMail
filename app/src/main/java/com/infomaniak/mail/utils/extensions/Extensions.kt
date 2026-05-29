@@ -78,9 +78,11 @@ import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
@@ -88,6 +90,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SnoozeState
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -408,6 +411,17 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
     )
 
     if (threadDensity == ThreadDensity.NORMAL) addItemDecoration(DateSeparatorItemDecoration())
+}
+
+fun DragDropSwipeRecyclerView.updateSwipeAvailability(
+    localSettings: LocalSettings,
+    isMultiSelectOn: Boolean,
+) {
+    val isLeftEnabled = localSettings.swipeLeft != SwipeAction.NONE && !isMultiSelectOn
+    if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+
+    val isRightEnabled = localSettings.swipeRight != SwipeAction.NONE && !isMultiSelectOn
+    if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
 }
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {

@@ -80,7 +80,8 @@ class ThreadListMultiSelection {
         this.localSettings = localSettings
         this.isFromSearch = isFromSearch
 
-        if (isFromSearch && searchViewModel != null) {
+        if (isFromSearch) {
+            requireNotNull(searchViewModel) { "searchViewModel is required when isFromSearch is true" }
             this.searchViewModel = searchViewModel
         }
 

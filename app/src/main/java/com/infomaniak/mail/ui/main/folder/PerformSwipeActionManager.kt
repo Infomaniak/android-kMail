@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import androidx.fragment.app.Fragment
-import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.matomo.Matomo.TrackerAction
@@ -31,36 +29,15 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
-import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAnimatedNavOptions
 import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
-import io.realm.kotlin.types.RealmInstant
 
 object PerformSwipeActionManager {
-
-    interface SwipeActionHost {
-        val fragment: Fragment
-        val mainViewModel: MainViewModel
-        val actionsViewModel: ActionsViewModel
-        val localSettings: LocalSettings
-        val threadListAdapter: ThreadListAdapter
-        val descriptionDialog: DescriptionAlertDialog
-
-        fun showSwipeActionIncompatible()
-
-        fun directionsToMove(threadUid: String, sourceFolderId: String): NavDirections
-        fun directionsToQuickActions(threadUid: String): NavDirections
-
-        fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?, snoozeEndDate: RealmInstant?)
-    }
-
     /**
      * The boolean return value is used to know if we should keep the Thread in
      * the RecyclerView (true), or remove it when the swipe is done (false).
