@@ -92,11 +92,11 @@ class ActionsViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
 
     //region refreshSearch
-    private val _searchRefreshEvents = Channel<Unit>(Channel.BUFFERED)
+    private val _searchRefreshEvents = Channel<Unit>(Channel.CONFLATED)
     val searchRefreshEvents = _searchRefreshEvents.receiveAsFlow()
 
-    private suspend fun notifySearchRefresh() {
-        _searchRefreshEvents.send(Unit)
+    private fun notifySearchRefresh() {
+        _searchRefreshEvents.trySend(Unit)
     }
     //endregion
 
