@@ -393,6 +393,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun observeSearchResults() = viewLifecycleOwner.lifecycleScope.launch {
         searchViewModel.allSearchResults.collectLatest { searchResults ->
+            if (searchResults.isEmpty()) updateUi(VisibilityMode.NO_RESULTS)
             threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleOwner.lifecycleScope)
         }
     }
