@@ -22,7 +22,7 @@ interface MultiSelectionBinding {
     val multiselectToolbar: com.infomaniak.mail.databinding.ViewMultiselectionInfoToolbarBinding
     val toolbarLayout: android.view.View
     val toolbar: android.view.View
-    val threadsList: android.view.ViewGroup
+    val threadsList: com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
     val newMessageFab: android.view.View?
     val unreadCountChip: android.view.View?
 }
