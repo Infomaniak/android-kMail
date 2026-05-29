@@ -267,7 +267,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         super.onResume()
         updateSwipeActionsAccordingToSettings()
         // If the user opens the reply dialog and comes backs to search, the refresh layout doesn't hide. That's why we need
-        // to call hideRefreshLayout here. 
+        // to call hideRefreshLayout here.
         hideRefreshLayout()
     }
 
@@ -332,7 +332,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         // Manually update disabled ui in case LocalSettings have changed when coming back from settings
         updateDisabledSwipeActionsUi(
             featureFlags = mainViewModel.featureFlagsLive.value,
-            folderRole = mainViewModel.currentFolderLive.value?.role,
+            folderRole = searchViewModel.filterFolder?.role ?: mainViewModel.currentFolderLive.value?.role,
         )
     }
 
