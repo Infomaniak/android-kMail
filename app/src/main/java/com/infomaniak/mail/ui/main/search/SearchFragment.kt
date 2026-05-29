@@ -42,6 +42,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.showKeyboard
@@ -80,6 +81,7 @@ import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionB
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
+import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -90,6 +92,7 @@ import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
+import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.updateSwipeActionsUi
 import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
 import dagger.hilt.android.AndroidEntryPoint
@@ -243,6 +246,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         observeHistory()
         observeMultiSelect()
         observeSearchRefresh()
+        observeShareUrlResult()
     }
 
     private fun handleEdgeToEdge(): Unit = with(binding) {
@@ -304,6 +308,20 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
                 }
             }
         }
+    }
+
+    private fun observeShareUrlResult() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.shareThreadUrlResult.collect { url ->
+                    if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
+                }
+            }
+        }
+    }
+
+    private fun showErrorShareUrl() {
+        showSnackbar(title = if (mainViewModel.hasNetwork) RCore.string.anErrorHasOccurred else RCore.string.noConnection)
     }
 
     private fun updateSwipeActionsAccordingToSettings() {
