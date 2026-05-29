@@ -48,8 +48,6 @@ import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
@@ -72,9 +70,9 @@ import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
 import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager
 import com.infomaniak.mail.ui.main.folder.SwipeActionHostFactory
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
-import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
+import com.infomaniak.mail.ui.main.folder.ThreadSwipeListenerFactory
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -83,7 +81,6 @@ import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionH
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.Shortcuts
-import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
@@ -388,36 +385,12 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
                 threadListAdapter.updateSelection()
             }
         }
-        mailRecyclerView.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
-            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: ThreadListItem.Content): Boolean {
-
-                val swipeAction = when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
-                    SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
-                    else -> error("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
-                }
-
-                val isPermanentDeleteFolder = isPermanentDeleteFolder(item.thread.folder.role)
-
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.thread, position, isPermanentDeleteFolder)
-
-                threadListAdapter.apply {
-                    blockOtherSwipes()
-
-                    if (swipeAction == SwipeAction.DELETE && isPermanentDeleteFolder) {
-                        Unit // The swiped Thread stay swiped all the way
-                    } else {
-                        notifyItemChanged(position) // Animate the swiped Thread back to its original position
-                    }
-                }
-
-                threadListViewModel.isRecoveringFinished.value = false
-
-                // The return value of this callback is used to determine if the
-                // swiped item should be kept or deleted from the adapter's list.
-                return shouldKeepItem
-            }
-        }
+        mailRecyclerView.swipeListener = ThreadSwipeListenerFactory.create(
+            localSettings = localSettings,
+            threadListAdapter = threadListAdapter,
+            onRecoveringStarted = { threadListViewModel.isRecoveringFinished.value = false },
+            performSwipeActionOnThread = ::performSwipeActionOnThread,
+        )
 
         swipeRefreshLayout.setOnRefreshListener {
             searchViewModel.refreshSearch(withContacts = !multiselectionViewModel.isMultiSelectOn)
@@ -656,9 +629,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
 
     private fun observeMultiSelect() {
         multiselectionViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
-            if (isMultiSelectOn) {
-                searchViewModel.contactsResults.value = emptyList()
-            }
+            if (isMultiSelectOn) searchViewModel.contactsResults.value = emptyList()
             val autoTransition = AutoTransition()
             autoTransition.duration = TOOLBAR_FADE_DURATION
             TransitionManager.beginDelayedTransition(binding.horizontalScrollViewFilters, autoTransition)

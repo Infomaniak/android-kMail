@@ -61,8 +61,6 @@ import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
@@ -109,7 +107,6 @@ import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChange
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -541,36 +538,12 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             }
         }
 
-        threadsList.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
-            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: ThreadListItem.Content): Boolean {
-
-                val swipeAction = when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
-                    SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
-                    else -> error("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
-                }
-
-                val isPermanentDeleteFolder = isPermanentDeleteFolder(item.thread.folder.role)
-
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.thread, position, isPermanentDeleteFolder)
-
-                threadListAdapter.apply {
-                    blockOtherSwipes()
-
-                    if (swipeAction == SwipeAction.DELETE && isPermanentDeleteFolder) {
-                        Unit // The swiped Thread stay swiped all the way
-                    } else {
-                        notifyItemChanged(position) // Animate the swiped Thread back to its original position
-                    }
-                }
-
-                threadListViewModel.isRecoveringFinished.value = false
-
-                // The return value of this callback is used to determine if the
-                // swiped item should be kept or deleted from the adapter's list.
-                return shouldKeepItem
-            }
-        }
+        threadsList.swipeListener = ThreadSwipeListenerFactory.create(
+            localSettings = localSettings,
+            threadListAdapter = threadListAdapter,
+            onRecoveringStarted = { threadListViewModel.isRecoveringFinished.value = false },
+            performSwipeActionOnThread = ::performSwipeActionOnThread,
+        )
     }
 
     private fun setupGestureDetector(context: Context) =
