@@ -129,7 +129,7 @@ object PerformSwipeActionManager {
                     threadsUids = listOf(thread.uid),
                     shouldRead = !thread.isSeen,
                     currentFolderId = thread.folderId,
-                    mailbox = currentMailbox
+                    mailbox = currentMailbox,
                 )
                 true
             }
@@ -138,7 +138,7 @@ object PerformSwipeActionManager {
                 host.actionsViewModel.toggleThreadsSpamStatus(
                     threads = setOf(thread),
                     currentFolderId = thread.folderId,
-                    mailbox = currentMailbox
+                    mailbox = currentMailbox,
                 )
                 false
             }
@@ -162,7 +162,7 @@ object PerformSwipeActionManager {
         thread: Thread,
         position: Int,
         folderRole: FolderRole?,
-        currentMailBox: Mailbox
+        currentMailBox: Mailbox,
     ): Boolean {
         fun onCancel() {
             // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
@@ -176,7 +176,7 @@ object PerformSwipeActionManager {
             host.actionsViewModel.archiveThreads(
                 threads = listOf(thread),
                 currentFolderId = thread.folderId,
-                mailbox = currentMailBox
+                mailbox = currentMailBox,
             )
         }
 
@@ -185,7 +185,7 @@ object PerformSwipeActionManager {
             count = 1,
             displayLoader = false,
             onCancel = ::onCancel,
-            onPositiveButtonClicked = ::onSuccess
+            onPositiveButtonClicked = ::onSuccess,
         )
     }
 
@@ -194,7 +194,7 @@ object PerformSwipeActionManager {
         thread: Thread,
         position: Int,
         isPermanentDeleteFolder: Boolean,
-        currentMailBox: Mailbox
+        currentMailBox: Mailbox,
     ): Boolean {
         fun onCancel() {
             // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
@@ -209,7 +209,7 @@ object PerformSwipeActionManager {
             host.actionsViewModel.deleteThreads(
                 threads = listOf(thread),
                 currentFolderId = thread.folderId,
-                mailbox = currentMailBox
+                mailbox = currentMailBox,
             )
         }
 
