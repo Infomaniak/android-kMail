@@ -186,10 +186,10 @@ class ThreadListMultiSelection {
     private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(host.multiSelectionBinding) {
         val autoTransition = AutoTransition()
         autoTransition.duration = TOOLBAR_FADE_DURATION
-        TransitionManager.beginDelayedTransition(multiselectToolbar.toolbar, autoTransition)
+        TransitionManager.beginDelayedTransition(multiselectToolbar.multiselectionInfoToolbar, autoTransition)
 
         toolbar.isGone = isMultiSelectOn
-        multiselectToolbar.toolbar.isVisible = isMultiSelectOn
+        multiselectToolbar.multiselectionInfoToolbar.isVisible = isMultiSelectOn
     }
 
     private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(host) {

@@ -170,7 +170,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         get() = object : MultiSelectionBinding {
             override val quickActionBar get() = binding.quickActionBar
             override val multiselectToolbar get() = binding.multiselectToolbar
-            override val toolbarLayout get() = binding.multiselectToolbar.toolbar
+            override val toolbarLayout get() = binding.multiselectToolbar.multiselectionInfoToolbar
             override val toolbar get() = binding.toolbar
             override val threadsList get() = binding.mailRecyclerView
             override val newMessageFab get() = null
