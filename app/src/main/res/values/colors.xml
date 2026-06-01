@@ -219,6 +219,11 @@
     <color name="encryptionTextButtonColor">@color/sovereignBlue600</color>
     <color name="encryptionSnackbarActionColor">@color/sovereignBlue300</color>
 
+    <color name="encryptionColorPrimary">@color/sovereignBlue600</color>
+    <color name="encryptionOnColorPrimary">@color/white</color>
+    <color name="encryptionPrimaryContainer">@color/sovereignBlue100</color>
+    <color name="encryptionOnPrimaryContainer">@color/sovereignBlue900</color>
+
     <color name="partialEncryptionTagColor">@color/favoriteYellow</color>
     <color name="validEncryptionTagColor">@color/greenSuccess</color>
     <color name="onEncryptionTagColor">@color/orca</color>

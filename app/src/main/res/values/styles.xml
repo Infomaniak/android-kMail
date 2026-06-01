@@ -215,7 +215,7 @@
     </style>
 
     <style name="TextButtonEncryptionAlert" parent="TextButtonAlerts">
-        <item name="android:textColor">@color/encryptionTextButtonColor</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
     <style name="IconButtonSmall" parent="Widget.Material3.Button.TextButton">
@@ -567,16 +567,24 @@
     <!-- Encryption -->
 
     <style name="EncryptionMessageAlertView" parent="BasicMessageAlertView">
-        <item name="android:background">@color/encryptionBackgroundColor</item>
-        <item name="android:textColor">@color/encryptionTextColor</item>
-        <item name="tint">@color/encryptionIconColor</item>
-        <item name="materialButtonStyle">@style/TextButtonEncryptionAlert</item>
+        <item name="android:background">?attr/colorPrimaryContainer</item>
+        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+        <item name="tint">?attr/colorPrimary</item>
     </style>
 
     <style name="TextButtonPrimary.EncryptionButton">
-        <item name="iconTint">@color/encryption_on_primary_color</item>
-        <item name="android:textColor">@color/encryption_on_primary_color</item>
-        <item name="backgroundTint">@color/encryption_primary_color</item>
+        <item name="iconTint">?attr/colorOnPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+    </style>
+
+    <style name="EncryptionPrimaryColorTheme">
+        <item name="colorControlActivated">@color/encryptionColorPrimary</item>
+        <item name="colorOnPrimary">@color/encryptionOnColorPrimary</item>
+        <item name="colorPrimary">@color/encryptionColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/encryptionPrimaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/encryptionOnPrimaryContainer</item>
+        <item name="colorControlNormal">@color/encryptionOnPrimaryContainer</item>
     </style>
 
     <!-- Other -->
