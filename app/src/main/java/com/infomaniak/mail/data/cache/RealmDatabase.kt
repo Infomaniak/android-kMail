@@ -174,7 +174,11 @@ object RealmDatabase {
 
     //region Delete Realm
     fun deleteMailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) {
-        Realm.deleteRealm(RealmConfig.mailboxContent(userId, mailboxId))
+        try {
+            Realm.deleteRealm(RealmConfig.mailboxContent(userId, mailboxId))
+        } catch (e: IllegalStateException) {
+            Sentry.captureException(e)
+        }
     }
 
     fun removeUserData(context: Context, userId: Int) {
