@@ -626,14 +626,17 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     }
 
     private fun observeSearchResults() = viewLifecycleOwner.lifecycleScope.launch {
+        val viewLifecycleScope = viewLifecycleOwner.lifecycleScope
         searchViewModel.allSearchResults.collectLatest { searchResults ->
             // Wait for any running swipe animation to finish before updating the list
             if (threadListViewModel.isRecoveringFinished.value == false) {
                 threadListViewModel.isRecoveringFinished.asFlow().first { it }
             }
 
-            binding.mailRecyclerView.postOnAnimation {
-                threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleOwner.lifecycleScope)
+            _binding?.mailRecyclerView?.postOnAnimation {
+                if (_binding != null) {
+                    threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleScope)
+                }
             }
         }
     }
