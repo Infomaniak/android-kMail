@@ -297,7 +297,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onSummary() {
-                trackBottomSheetThreadActionsEvent(MatomoName.Summary)
+                trackBottomSheetThreadActionsEvent(MatomoName.Summarize)
                 setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, message.uid)
             }
 

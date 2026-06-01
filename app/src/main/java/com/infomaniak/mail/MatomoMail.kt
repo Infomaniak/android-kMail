@@ -321,7 +321,7 @@ object MatomoMail : Matomo {
         SpamFolder("spamFolder"),
         SpamSwipe("spamSwipe"),
         StrikeThrough("strikeThrough"),
-        Summary("summary"),
+        Summarize("summarize"),
         Translate("translate"),
         Switch("switch"),
         SwitchAccount("switchAccount"),
