@@ -441,6 +441,7 @@
                 android:id="@+id/encryptionAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:theme="@style/EncryptionPrimaryColorTheme"
                 android:visibility="gone"
                 app:icon="@drawable/ic_lock_filled_big"
                 app:style="encryption"

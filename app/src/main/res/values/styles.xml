@@ -573,9 +573,7 @@
     </style>
 
     <style name="TextButtonPrimary.EncryptionButton">
-        <item name="iconTint">?attr/colorOnPrimary</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="materialButtonStyle">@style/TextButtonEncryptionAlert</item>
     </style>
 
     <style name="EncryptionPrimaryColorTheme">
