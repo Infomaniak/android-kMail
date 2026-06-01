@@ -99,6 +99,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
 import java.util.Date
+import kotlin.context
 import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
@@ -546,7 +547,6 @@ class ThreadAdapter(
         aiAction: AiAction,
         targetView: InformationBlockView
     ) {
-        val ctx = targetView.context
         with(targetView) {
             when (state) {
                 is AiProcessState.Loading -> {
@@ -555,16 +555,16 @@ class ThreadAdapter(
                     } else {
                         R.string.euriaTranslateMessage
                     }
-                    title = ctx.getString(titleRes)
+                    title = context.getString(titleRes)
                     setAnimation(R.raw.euria)
                 }
                 is AiProcessState.Success -> {
                     if (aiAction == AiAction.SUMMARY) {
-                        title = ctx.getString(R.string.messageSummary)
+                        title = context.getString(R.string.messageSummary)
                         description = state.content
                         isButtonVisible = false
                     } else {
-                        title = ctx.getString(R.string.genericMessageTranslated)
+                        title = context.getString(R.string.genericMessageTranslated)
                         isButtonVisible = true
                         isButtonEnabled = true
                         hideButtonProgress(R.string.buttonShowOriginal)
@@ -584,19 +584,18 @@ class ThreadAdapter(
         aiAction: AiAction,
         targetView: InformationBlockView
     ) {
-        val ctx = targetView.context
         with(targetView) {
             val errorMessageRes = if (aiAction == AiAction.SUMMARY) {
                 R.string.messageSummaryErrorRetry
             } else {
                 R.string.messageTranslateErrorRetry
             }
-            title = ctx.getString(errorMessageRes)
+            title = context.getString(errorMessageRes)
             setIconRes(R.drawable.ic_warning)
             isButtonEnabled = false
 
             if (state.isLoaderVisible) {
-                showButtonProgress(ctx.getColor(R.color.primaryTextColor))
+                showButtonProgress(context.getColor(R.color.primaryTextColor))
             } else {
                 hideButtonProgress(R.string.aiButtonRetry)
             }
@@ -608,7 +607,6 @@ class ThreadAdapter(
         aiAction: AiAction,
         targetView: InformationBlockView
     ) {
-        val ctx = targetView.context
         with(targetView) {
             setIconRes(R.drawable.ic_warning)
 
@@ -618,7 +616,7 @@ class ThreadAdapter(
                 } else {
                     R.string.messageTranslateErrorRetry
                 }
-                title = ctx.getString(errorMessageRes)
+                title = this.context.getString(errorMessageRes)
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
 
@@ -631,7 +629,7 @@ class ThreadAdapter(
                     state.targetSameAsSource -> R.string.translationTargetSameAsSource
                     else -> R.string.messageTranslateError
                 }
-                title = ctx.getString(errorMessageRes)
+                title = context.getString(errorMessageRes)
                 isButtonVisible = false
             }
         }
