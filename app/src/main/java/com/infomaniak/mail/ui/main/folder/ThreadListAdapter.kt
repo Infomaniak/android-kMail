@@ -612,7 +612,6 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun Thread.updateDynamicIcons() {
-        if (folderRole == FolderRole.DRAFT) return
         val featureFlags = callbacks?.getFeatureFlags?.invoke()
 
         (recyclerView as DragDropSwipeRecyclerView).apply {

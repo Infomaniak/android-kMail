@@ -167,16 +167,13 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     fun setFavoriteUi(isFavorite: Boolean, isFromDraft: Boolean) = with(binding.favorite) {
-        if (isFromDraft) {
-            isVisible = false
-        } else {
-            isVisible = true
+        isVisible = !isFromDraft
+        if (!isFromDraft) {
             val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
             setIconResource(favoriteIconRes)
             setTitle(favoriteText)
         }
     }
-
 
     fun setMainActionUi(isFromDraft: Boolean) {
         binding.mainActions.isVisible = !isFromDraft
@@ -196,14 +193,12 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     fun setArchiveUi(isFromArchive: Boolean, isFromDraft: Boolean) = with(binding.archive) {
         isVisible = !isFromDraft
-        if (isVisible) {
-            if (isFromArchive) {
-                setIconResource(R.drawable.ic_drawer_inbox)
-                setTitle(R.string.actionMoveToInbox)
-            } else {
-                setIconResource(R.drawable.ic_archive_folder)
-                setTitle(R.string.actionArchive)
-            }
+        if (isFromArchive) {
+            setIconResource(R.drawable.ic_drawer_inbox)
+            setTitle(R.string.actionMoveToInbox)
+        } else {
+            setIconResource(R.drawable.ic_archive_folder)
+            setTitle(R.string.actionArchive)
         }
     }
 

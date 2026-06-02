@@ -326,17 +326,38 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         _binding = null
     }
 
-    private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
-        val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
+    private fun isAllowedToSwipeInDraft(swipeDirection: DirectionFlag): Boolean {
+        val allowedSwipeActionsForDraft = listOf(
+            SwipeAction.DELETE,
+            SwipeAction.QUICKACTIONS_MENU,
+            SwipeAction.READ_UNREAD,
+            SwipeAction.FAVORITE
+        )
         val isDraft = mainViewModel.currentFolderLive.value?.role == FolderRole.DRAFT
+        return if (swipeDirection == DirectionFlag.LEFT) {
+            isDraft && localSettings.swipeLeft in allowedSwipeActionsForDraft
+        } else {
+            isDraft && localSettings.swipeRight in allowedSwipeActionsForDraft
+        }
+    }
 
-        val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE || isDraft
-        val isLeftEnabled = isLeftSet && isMultiSelectClosed
-        if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+    private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
+        val isMultiSelectClosed = !mainViewModel.isMultiSelectOn
+        val isInDraft = mainViewModel.currentFolderLive.value?.role == FolderRole.DRAFT
 
-        val isRightSet = localSettings.swipeRight != SwipeAction.NONE || isDraft
-        val isRightEnabled = isRightSet && isMultiSelectClosed
-        if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
+        fun updateSwipeDirection(direction: DirectionFlag, action: SwipeAction) {
+            val isActionSet = action != SwipeAction.NONE
+            val isAllowedByCurrentFolder = !isInDraft || isAllowedToSwipeInDraft(direction)
+
+            if (isMultiSelectClosed && isActionSet && isAllowedByCurrentFolder) {
+                enableSwipeDirection(direction)
+            } else {
+                disableSwipeDirection(direction)
+            }
+        }
+
+        updateSwipeDirection(DirectionFlag.LEFT, localSettings.swipeLeft)
+        updateSwipeDirection(DirectionFlag.RIGHT, localSettings.swipeRight)
     }
 
     private fun setupDensityDependentUi() = with(binding) {
@@ -426,24 +447,32 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean, isDraft: Boolean) =
         with(binding.threadsList) {
-            fun SwipeAction.getIconRes(): Int? = if (isEnabled || isDraft) iconRes else R.drawable.ic_close_small
-            fun SwipeAction.getBackgroundColor(): Int {
-                return if (isEnabled || isDraft) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
+            val isEnabledOrDraft = isEnabled || isDraft
+            fun SwipeAction.resolveIconRes(): Int? = if (isEnabledOrDraft) iconRes else R.drawable.ic_close_small
+
+            fun SwipeAction.resolveBackgroundColor(): Int {
+                return if (isEnabledOrDraft) {
+                    getBackgroundColor(context)
+                } else {
+                    SwipeAction.NONE.getBackgroundColor(context)
+                }
             }
 
-            val targetAction = when {
-                isDraft && swipeDirection == DirectionFlag.LEFT -> SwipeAction.DELETE
-                isDraft && swipeDirection == DirectionFlag.RIGHT -> SwipeAction.QUICKACTIONS_MENU
-                swipeDirection == DirectionFlag.LEFT -> localSettings.swipeLeft
-                else -> localSettings.swipeRight
-            }
+            val action = if (swipeDirection == DirectionFlag.LEFT) localSettings.swipeLeft else localSettings.swipeRight
+
+            val isActionSet = action != SwipeAction.NONE
+            val isMultiSelectClosed = !mainViewModel.isMultiSelectOn
+            val isAllowedByCurrentFolder = !isDraft || isAllowedToSwipeInDraft(swipeDirection)
+
+            val shouldEnableSwipe = isActionSet && isMultiSelectClosed && isAllowedByCurrentFolder
+            if (shouldEnableSwipe) enableSwipeDirection(swipeDirection) else disableSwipeDirection(swipeDirection)
 
             if (swipeDirection == DirectionFlag.LEFT) {
-                behindSwipedItemIconDrawableId = targetAction.getIconRes()
-                behindSwipedItemBackgroundColor = targetAction.getBackgroundColor()
+                behindSwipedItemIconDrawableId = action.resolveIconRes()
+                behindSwipedItemBackgroundColor = action.resolveBackgroundColor()
             } else {
-                behindSwipedItemIconSecondaryDrawableId = targetAction.getIconRes()
-                behindSwipedItemBackgroundSecondaryColor = targetAction.getBackgroundColor()
+                behindSwipedItemIconSecondaryDrawableId = action.resolveIconRes()
+                behindSwipedItemBackgroundSecondaryColor = action.resolveBackgroundColor()
             }
         }
 
@@ -505,11 +534,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         threadsList.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: ThreadListItem.Content): Boolean {
 
-                val swipeAction = when {
-                    item.thread.folder.role == FolderRole.DRAFT && direction == SwipeDirection.RIGHT_TO_LEFT -> SwipeAction.DELETE
-                    item.thread.folder.role == FolderRole.DRAFT && direction == SwipeDirection.LEFT_TO_RIGHT -> SwipeAction.QUICKACTIONS_MENU
-                    direction == SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
-                    direction == SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
+                val swipeAction = when (direction) {
+                    SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
+                    SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
                     else -> error("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
