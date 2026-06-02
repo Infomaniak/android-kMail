@@ -603,6 +603,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun setupStorageBanner() = with(localSettings) {
         mainViewModel.storageBannerStatus.observeNotNull(viewLifecycleOwner) { storageBannerStatus ->
+            if (localSettings.hasClosedStorageBanner) return@observeNotNull
+            
             binding.storageBanner.apply {
                 storageLevel = storageBannerStatus
                 setupListener(

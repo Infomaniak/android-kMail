@@ -114,7 +114,7 @@ class KSuiteStorageBanner @JvmOverloads constructor(
                 is KSuite.Perso -> Full.Perso
                 KSuite.StarterPack -> Full.StarterPack
                 is KSuite.Pro -> Full.Pro
-                else -> Full.Pro // Should not happened but Fallback
+                else -> Full.Pro // Should not happen but Fallback
             }
         }
     }
