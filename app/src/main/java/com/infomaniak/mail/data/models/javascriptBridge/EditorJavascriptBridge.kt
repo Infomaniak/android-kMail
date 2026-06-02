@@ -23,6 +23,7 @@ import org.json.JSONArray
 
 class EditorJavascriptBridge(
     private val onInlineImagesDeleted: (List<String>) -> Unit,
+    private val onMentionQueryChanged: ((String) -> Unit),
 ) {
     @JavascriptInterface
     fun onInlineImagesDeleted(cidJson: String) {
@@ -34,6 +35,11 @@ class EditorJavascriptBridge(
 
         val cids = (0 until jsonArray.length()).map { jsonArray.getString(it) }
         onInlineImagesDeleted(cids)
+    }
+
+    @JavascriptInterface
+    fun onMentionQueryChanged(query: String) {
+        onMentionQueryChanged(query)
     }
 
     companion object {
