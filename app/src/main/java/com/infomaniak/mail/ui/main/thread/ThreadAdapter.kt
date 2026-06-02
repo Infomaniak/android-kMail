@@ -104,7 +104,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
 import java.util.Date
-import kotlin.context
 import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
@@ -627,7 +626,7 @@ class ThreadAdapter(
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
 
-                if (state.isRetry && !state.wasLoaderShown) {
+                if (state.isRetryAttempt && !state.wasLoaderShown) {
                     threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessageRes)
                 }
             } else {

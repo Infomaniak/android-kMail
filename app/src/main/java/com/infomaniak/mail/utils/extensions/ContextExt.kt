@@ -30,8 +30,7 @@ fun Context.getCurrentLanguageCode(): String {
         resources.configuration.locales[0]?.language
     }
 
-    val cleanCode = languageCode?.lowercase()?.take(2) ?: defaultLanguage
+    val cleanCode = languageCode?.take(2)?.lowercase() ?: defaultLanguage
 
     return cleanCode
 }
-

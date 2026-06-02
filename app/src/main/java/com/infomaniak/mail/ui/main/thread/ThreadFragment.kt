@@ -1070,17 +1070,17 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun doAiAction(messageUid: String, aiAction: AiAction) {
-        val isRetry = getStateMap(aiAction)[messageUid] is AiProcessState.Error
+        val isRetryAttempt = getStateMap(aiAction)[messageUid] is AiProcessState.Error
 
         cancelRetryTimer(messageUid, aiAction)
 
-        val initialState = if (isRetry) AiProcessState.Retrying(isLoaderVisible = false) else AiProcessState.Loading
+        val initialState = if (isRetryAttempt) AiProcessState.Retrying(isLoaderVisible = false) else AiProcessState.Loading
         updateAiProcessState(messageUid, aiAction, initialState)
 
-        startRetryTimerIfNeeded(messageUid, aiAction, isRetry)
+        startRetryTimerIfNeeded(messageUid, aiAction, isRetryAttempt)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            processAiApiCall(messageUid, aiAction, isRetry)
+            processAiApiCall(messageUid, aiAction, isRetryAttempt)
         }
     }
 
@@ -1186,13 +1186,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun mapApiResultToState(
         result: ApiResponse<String>?,
-        isRetry: Boolean,
+        isRetryAttempt: Boolean,
         wasLoaderShown: Boolean
     ): AiProcessState {
         if (result == null) {
             return AiProcessState.Error(
                 canRetry = true,
-                isRetry = isRetry,
+                isRetryAttempt = isRetryAttempt,
                 wasLoaderShown = wasLoaderShown,
                 targetSameAsSource = false,
             )
@@ -1205,7 +1205,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         val targetSameAsSource = result.error?.code == ErrorCode.TRANSLATION_TARGET_SAME_AS_SOURCE
         return AiProcessState.Error(
             canRetry = canRetry,
-            isRetry = isRetry,
+            isRetryAttempt = isRetryAttempt,
             wasLoaderShown = wasLoaderShown,
             targetSameAsSource = targetSameAsSource,
         )
@@ -1229,8 +1229,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         timersMap.remove(messageUid)
     }
 
-    private fun startRetryTimerIfNeeded(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
-        if (!isRetry) return
+    private fun startRetryTimerIfNeeded(messageUid: String, aiAction: AiAction, isRetryAttempt: Boolean) {
+        if (!isRetryAttempt) return
 
         val timer = UtilsLegacy.createRefreshTimer {
             val state = getStateMap(aiAction)[messageUid]
