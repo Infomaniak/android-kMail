@@ -271,34 +271,34 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean, isFromArchive: Boolean, threads: Set<Thread>) {
-        val isFromDraft = mainViewModel.currentFolder.value?.role == FolderRole.DRAFT
-        if (isFromDraft) {
-            with(binding) {
-                mainActions.isVisible = false
-                phishing.isVisible = false
-                favorite.isVisible = false
-            }
-        } else {
-            val (readIcon, readText) = getReadIconAndShortText(shouldRead)
-            binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
+        with(binding) {
+            val isFromDraft = mainViewModel.currentFolder.value?.role == FolderRole.DRAFT
+            if (isFromDraft) {
+                    mainActions.isVisible = false
+                    phishing.isVisible = false
+                    favorite.isVisible = false
+            } else {
+                val (readIcon, readText) = getReadIconAndShortText(shouldRead)
+                mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
 
-            val (archiveIcon, archiveText) = getArchiveIconAndShortText(isFromArchive)
-            binding.mainActions.setAction(R.id.actionArchive, archiveIcon, archiveText)
+                val (archiveIcon, archiveText) = getArchiveIconAndShortText(isFromArchive)
+                mainActions.setAction(R.id.actionArchive, archiveIcon, archiveText)
 
-            val (favoriteIcon, favoriteText) = getFavoriteIconAndShortText(shouldFavorite)
-            binding.favorite.apply {
-                setIconResource(favoriteIcon)
-                setTitle(favoriteText)
+                val (favoriteIcon, favoriteText) = getFavoriteIconAndShortText(shouldFavorite)
+                favorite.apply {
+                    setIconResource(favoriteIcon)
+                    setTitle(favoriteText)
+                }
             }
+
+            setSnoozeUi(threads)
+            ThreadActionsBottomSheetDialog.setSpamUi(
+                spam = spam,
+                isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM,
+                isFromDraft = isFromDraft,
+            )
+            hideFirstActionItemDivider()
         }
-
-        setSnoozeUi(threads)
-        ThreadActionsBottomSheetDialog.setSpamUi(
-            spam = binding.spam,
-            isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM,
-            isFromDraft = isFromDraft,
-        )
-        hideFirstActionItemDivider()
     }
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {

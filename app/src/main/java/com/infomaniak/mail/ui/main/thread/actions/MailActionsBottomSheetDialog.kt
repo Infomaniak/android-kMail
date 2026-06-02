@@ -167,38 +167,42 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     fun setFavoriteUi(isFavorite: Boolean, isFromDraft: Boolean) = with(binding.favorite) {
-        when {
-            isFromDraft -> isVisible = false
-            else -> {
-                val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
-                setIconResource(favoriteIconRes)
-                setTitle(favoriteText)
-            }
+        if (isFromDraft) {
+            isVisible = false
+        } else {
+            isVisible = true
+            val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
+            setIconResource(favoriteIconRes)
+            setTitle(favoriteText)
         }
     }
 
+
     fun setMainActionUi(isFromDraft: Boolean) {
-        if (isFromDraft) binding.mainActions.isVisible = false
+        binding.mainActions.isVisible = !isFromDraft
     }
 
     fun setMoveUi(isFromDraft: Boolean) {
-        if (isFromDraft) binding.move.isVisible = false
+        binding.move.isVisible = !isFromDraft
     }
 
     fun setMarkUnreadUi(isFromDraft: Boolean) {
-        if (isFromDraft) binding.markAsReadUnread.isVisible = false
+        binding.markAsReadUnread.isVisible = !isFromDraft
     }
 
     fun setReportPhishingUi(isFromDraft: Boolean) {
-        if (isFromDraft) binding.phishing.isVisible = false
+        binding.phishing.isVisible = !isFromDraft
     }
 
     fun setArchiveUi(isFromArchive: Boolean, isFromDraft: Boolean) = with(binding.archive) {
-        when {
-            isFromDraft -> isVisible = false
-            isFromArchive -> {
+        isVisible = !isFromDraft
+        if (isVisible) {
+            if (isFromArchive) {
                 setIconResource(R.drawable.ic_drawer_inbox)
                 setTitle(R.string.actionMoveToInbox)
+            } else {
+                setIconResource(R.drawable.ic_archive_folder)
+                setTitle(R.string.actionArchive)
             }
         }
     }
