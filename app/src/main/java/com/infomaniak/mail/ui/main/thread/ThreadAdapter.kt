@@ -63,7 +63,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.AiAction
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.AiAction
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
@@ -479,7 +479,7 @@ class ThreadAdapter(
         AiAction.TRANSLATE -> threadAdapterState.aiTranslateStateMap[messageUid]
     }
 
-    private fun MessageViewHolder.bindAiAction(message: Message, aiAction: ThreadFragment.AiAction? = null) {
+    private fun MessageViewHolder.bindAiAction(message: Message, aiAction: AiAction? = null) {
         if (aiAction == null) {
             bindAiAction(message, AiAction.SUMMARY)
             bindAiAction(message, AiAction.TRANSLATE)
