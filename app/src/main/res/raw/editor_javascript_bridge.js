@@ -18,3 +18,7 @@
  function onInlineImagesDeleted(cids) {
      globalThis.kmail.onInlineImagesDeleted(cids);
  }
+
+ function onMentionQueryChanged(query) {
+    globalThis.kmail.onMentionQueryChanged(query);
+ }
