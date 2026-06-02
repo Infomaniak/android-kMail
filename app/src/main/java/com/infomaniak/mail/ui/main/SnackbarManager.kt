@@ -59,7 +59,7 @@ class SnackbarManager @Inject constructor() {
                 anchor = getAnchor?.invoke(),
                 actionButtonTitle = buttonTitle,
                 onActionClicked = safeAction,
-                length = length
+                length = length,
             )
         }
     }

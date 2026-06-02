@@ -405,7 +405,8 @@ class MainActivity : BaseActivity() {
                 customBehavior = { mainViewModel.unsendMessage(cancelResourceUrl) },
                 // Snackbar displays for 2 seconds less than actual cancel delay
                 // to ensure the user sees the snackbar disappear before the action is committed
-                length = max(0,(localSettings.cancelDelay - 2) * 1000))
+                length = max(0, (localSettings.cancelDelay - 2) * 1000)
+            )
         }
     }
 
@@ -417,7 +418,7 @@ class MainActivity : BaseActivity() {
 
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
-            buttonTitle = RCoreLegacy.string.buttonCancel,
+            buttonTitle = RCore.string.buttonCancel,
             customBehavior = { mainViewModel.unscheduleDraft(unscheduleDraftUrl) },
         )
     }
@@ -616,8 +617,8 @@ class MainActivity : BaseActivity() {
             reviewDialogTitleStyle = R.style.DialogReviewStyleTextAppearance,
             reviewAlertDialogData = ReviewAlertDialogData(
                 title = getString(R.string.reviewAlertTitle),
-                positiveText = getString(RCoreLegacy.string.buttonYes),
-                negativeText = getString(RCoreLegacy.string.buttonNo),
+                positiveText = getString(RCore.string.buttonYes),
+                negativeText = getString(RCore.string.buttonNo),
                 onPositiveButtonClicked = { userChoice = ReviewAlertDialog.DialogAction.Positive },
                 onNegativeButtonClicked = { userChoice = ReviewAlertDialog.DialogAction.Negative },
                 onDismiss = { continuation.resume(userChoice) }

@@ -857,6 +857,7 @@ class MainViewModel @Inject constructor(
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarSendCancelled))
             val draftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id ?: return@launch
+            
             currentMailbox.value?.let { mailbox ->
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftsFolderId)))
             }
