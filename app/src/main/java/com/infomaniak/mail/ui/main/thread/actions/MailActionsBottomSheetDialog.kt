@@ -187,14 +187,14 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
-    fun setTranslateUi(isEnabled: Boolean) = with(binding.translate) {
-        this.isEnabled = isEnabled
-        isVisible = true
+    fun setTranslateUi(isEnabled: Boolean) {
+        binding.translate.isEnabled = isEnabled
+        binding.translate.isVisible = true
     }
 
-    fun setSummaryUi(isEnabled: Boolean) = with(binding.summary) {
-        this.isEnabled = isEnabled
-        isVisible = true
+    fun setSummaryUi(isEnabled: Boolean) {
+        binding.summary.isEnabled = isEnabled
+        binding.summary.isVisible = true
     }
 
     interface OnActionClick {
