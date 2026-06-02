@@ -410,6 +410,17 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             disableDragDirection(DirectionFlag.LEFT)
             addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
         }
+
+        binding.threadsList.addOnItemTouchListener(
+            SwipeToSelectTouchListener(
+                recyclerView = binding.threadsList,
+                multiSelection = object : MultiSelectionListener<Thread> {
+                    override var isEnabled by mainViewModel::isMultiSelectOn
+                    override val selectedItems by mainViewModel::selectedThreads
+                    override val publishSelectedItems = mainViewModel::publishSelectedItems
+                },
+            )
+        )
     }
 
     private fun updateDisabledSwipeActionsUi(featureFlags: FeatureFlagSet?, folderRole: FolderRole?) {

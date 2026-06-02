@@ -181,6 +181,10 @@ class ThreadListAdapter @Inject constructor(
             .takeIf { position -> position != -1 }
     }
 
+    fun getThreadAt(position: Int): Thread? {
+        return (dataSet.getOrNull(position) as? ThreadListItem.Content)?.thread
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadListViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
