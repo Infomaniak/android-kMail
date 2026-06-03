@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:title="@string/sendOptions"
+    tools:context=".ui.bottomSheetDialogs.SendOptionsBottomSheetDialog">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/divider"
+        android:dividerPadding="@dimen/marginStandardMedium"
+        android:orientation="vertical"
+        android:showDividers="middle">
+
+        <com.infomaniak.mail.ui.main.settings.ItemSettingView
+            android:id="@+id/reminderIfNoAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_alarm_clock"
+            app:iconColor="?attr/colorPrimary"
+            app:itemAction="toggle"
+            app:subtitle="@string/explanationActionCallIfNoResponse"
+            app:title="@string/actionCallIfNoResponse" />
+
+        <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+            android:id="@+id/optionsDelays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/hours24"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:value="24"
+                tools:text="24 hours" />
+
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/days3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:value="72"
+                tools:text="3 days" />
+
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/days7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:value="168"
+                tools:text="7 days" />
+
+        </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+
+        <com.infomaniak.mail.ui.main.settings.ItemSettingView
+            android:id="@+id/customDelayReminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:itemAction="chevron"
+            app:title="@string/buttonCustomSchedule"
+            tools:visibility="visible" />
+
+        <com.infomaniak.mail.ui.main.settings.ItemSettingView
+            android:id="@+id/scheduleSending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_schedule_send"
+            app:iconColor="?attr/colorPrimary"
+            app:itemAction="toggle"
+            app:title="@string/scheduleSendingTitle" />
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/lastScheduleOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:icon="@drawable/ic_last_schedule_selected"
+            app:title="@string/lastSelectedSchedule"
+            app:visibleDivider="false"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/scheduleOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/customScheduleOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:icon="@drawable/ic_pen"
+            app:iconTint="?attr/colorPrimary"
+            app:title="@string/buttonCustomSchedule"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+</com.infomaniak.mail.views.BottomSheetScaffoldingView>

@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Lesebekreftelse er sendt til avsenderen.</string>
     <string name="actionArchive">Arkiver</string>
     <string name="actionBlockSender">Blokker avsender</string>
+    <string name="actionCallIfNoResponse">Ring meg tilbake hvis det ikke er svar</string>
     <string name="actionCancelSnooze">Avbryt utsettelse</string>
     <string name="actionDelete">Slett</string>
     <string name="actionEditMenu">Rediger meny</string>
@@ -240,6 +241,7 @@
     <string name="createFolderName">Navn på mappen</string>
     <string name="datePickerTitle">Velg dato og tid</string>
     <string name="dateTitle">Dato:</string>
+    <string name="daysBeforeSendingReminder">%d dager</string>
     <string name="deleteAccountWarning">Sletting av kontoen din vil være endelig. Du vil ikke kunne reaktivere kontoen din.</string>
     <string name="deleteFolderDialogDescription">Innholdet i mappen %s vil bli permanent slettet uten å gå via papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slett mappe</string>
@@ -345,6 +347,7 @@
     <string name="errorUserAlreadySynchronized">Bruker er allerede synkronisert</string>
     <string name="euriaTranslateMessage">Euria oversetter meldingen din…</string>
     <string name="expeditorAuthenticationDescription">Avsenderens opprinnelse har blitt autentisert.</string>
+    <string name="explanationActionCallIfNoResponse">Mottakere i organisasjonen din vil se at det forventes et svar.</string>
     <string name="externalDialogConfirmButton">Jeg forstår</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Avsenderen %s er ikke en del av organisasjonen din eller kontaktene dine. Vær forsiktig hvis du deler sensitiv informasjon.</item>
@@ -368,6 +371,7 @@
     <string name="genericMessageTranslated">Melding oversatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services kreves</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <string name="hoursBeforeSendingReminder">%d timer</string>
     <string name="inboxFolder">Innboks</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagringsplass er nesten full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagringsplass er full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
@@ -509,6 +513,7 @@
     <string name="selectTimeDialogTitle">Velg tid</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send bekreftelsen</string>
+    <string name="sendOptions">Sendevalg</string>
     <string name="sentFolder">Sendte meldinger</string>
     <string name="settingsAccentColor">Aksentfarge</string>
     <string name="settingsAccentColorDescription">Velg aksentfargen for applikasjonen</string>

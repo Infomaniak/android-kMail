@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Μια απόδειξη ανάγνωσης στάλθηκε στον αποστολέα.</string>
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
+    <string name="actionCallIfNoResponse">Κάλεσέ με πίσω αν δεν υπάρχει απάντηση</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
     <string name="actionDelete">Διαγραφή</string>
     <string name="actionEditMenu">Επεξεργασία μενού</string>
@@ -240,6 +241,7 @@
     <string name="createFolderName">Όνομα φακέλου</string>
     <string name="datePickerTitle">Επιλέξτε ημερομηνία και ώρα</string>
     <string name="dateTitle">Ημερομηνία:</string>
+    <string name="daysBeforeSendingReminder">%d ημέρες</string>
     <string name="deleteAccountWarning">Η διαγραφή του λογαριασμού σας θα είναι οριστική. Δεν θα μπορείτε να τον επανενεργοποιήσετε.</string>
     <string name="deleteFolderDialogDescription">Το περιεχόμενο του φακέλου %s θα διαγραφεί οριστικά χωρίς να μεταφερθεί στον κάδο απορριμμάτων.</string>
     <string name="deleteFolderDialogTitle">Διαγραφή φακέλου</string>
@@ -345,6 +347,7 @@
     <string name="errorUserAlreadySynchronized">Ο χρήστης είναι ήδη συγχρονισμένος</string>
     <string name="euriaTranslateMessage">Η Euria μεταφράζει το μήνυμά σας…</string>
     <string name="expeditorAuthenticationDescription">Η προέλευση του αποστολέα έχει επαληθευτεί.</string>
+    <string name="explanationActionCallIfNoResponse">Οι παραλήπτες στον οργανισμό σας θα δουν ότι αναμένεται μια απάντηση.</string>
     <string name="externalDialogConfirmButton">Το κατάλαβα</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Ο αποστολέας %s δεν ανήκει στον οργανισμό σας ή στις επαφές σας. Προσέξτε αν μοιράζεστε ευαίσθητες πληροφορίες.</item>
@@ -368,6 +371,7 @@
     <string name="genericMessageTranslated">Μήνυμα μεταφρασμένο</string>
     <string name="googlePlayServicesAreRequired">Απαιτούνται οι Υπηρεσίες Google Play</string>
     <string name="groupContactsTitle">Ομάδα: %s</string>
+    <string name="hoursBeforeSendingReminder">%d ώρες</string>
     <string name="inboxFolder">Εισερχόμενα</string>
     <string name="kSuiteProQuotasAlertDescription">Ο χώρος αποθήκευσης του Mail σας είναι σχεδόν πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Ο χώρος αποθήκευσης του Mail σας είναι πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
@@ -509,6 +513,7 @@
     <string name="selectTimeDialogTitle">Επιλέξτε ώρα</string>
     <string name="send">Αποστολή</string>
     <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>
+    <string name="sendOptions">Επιλογές αποστολής</string>
     <string name="sentFolder">Απεσταλμένα μηνύματα</string>
     <string name="settingsAccentColor">Χρώμα έμφασης</string>
     <string name="settingsAccentColorDescription">Επιλέξτε το χρώμα έμφασης για την εφαρμογή</string>
