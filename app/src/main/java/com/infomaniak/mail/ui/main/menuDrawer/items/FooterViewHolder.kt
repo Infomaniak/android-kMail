@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.extensions.getText
 import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 

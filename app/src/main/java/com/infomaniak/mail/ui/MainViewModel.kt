@@ -60,11 +60,17 @@ import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.MoveResult
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.action
+import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
+import com.infomaniak.mail.data.models.extensions.getLocalizedName
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -72,8 +78,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
-import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -235,7 +240,7 @@ class MainViewModel @Inject constructor(
             .map { it.list }
             .removeRolesThatHideWhenEmpty()
             .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
-    }.catch {}
+    }.catch { it.printStackTrace() }
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
@@ -243,7 +248,7 @@ class MainViewModel @Inject constructor(
             .map { it.list }
             .keepTopLevelFolders()
             .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
-    }.catch {}
+    }.catch { it.printStackTrace() }
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
         DisplayedFolders(default, custom)
@@ -1511,7 +1516,7 @@ class MainViewModel @Inject constructor(
 
             mimeType = Utils.TEXT_HTML
 
-            action = Draft.DraftAction.SEND_REACTION
+            action = DraftAction.SEND_REACTION
             emojiReaction = emoji
         }
 

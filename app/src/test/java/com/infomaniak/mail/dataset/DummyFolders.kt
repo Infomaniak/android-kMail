@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(InternalModelProperties::class)
+
 package com.infomaniak.mail.dataset
 
 import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.dataset.DummyThreads.threadDraft
 import com.infomaniak.mail.dataset.DummyThreads.threadInbox
 import com.infomaniak.mail.dataset.DummyThreads.threadSearchInbox

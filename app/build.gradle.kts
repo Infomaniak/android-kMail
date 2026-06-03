@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 /**
@@ -11,7 +12,6 @@ plugins {
     alias(core.plugins.kotlin.serialization)
     alias(core.plugins.ksp)
     alias(core.plugins.navigation.safeargs)
-    alias(libs.plugins.realm.kotlin)
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.parcelize)
     alias(core.plugins.sentry.plugin)
@@ -89,10 +89,6 @@ android {
         targetCompatibility = javaVersion
     }
 
-    kotlinOptions {
-        jvmTarget = javaVersion.majorVersion
-    }
-
     buildFeatures {
         buildConfig = true
         viewBinding = true
@@ -115,6 +111,7 @@ android {
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xjspecify-annotations=strict")
+        jvmTarget = JvmTarget.valueOf("JVM_${javaVersion.name.substringAfter("VERSION_")}")
     }
 }
 
@@ -191,6 +188,7 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.materialthemefromxml)
     implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.view)
+    implementation(libs.realm.models)
 
     implementation(project(":Core:Legacy"))
     implementation(project(":Core:Legacy:Confetti"))
@@ -199,7 +197,6 @@ dependencies {
 
     implementation(libs.rich.html.editor)
 
-    implementation(libs.realm.kotlin.base)
     implementation(libs.junit.ktx)
 
     "standardImplementation"(core.infomaniak.core.notifications.registration)

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.extensions.state
 import com.infomaniak.mail.databinding.ViewAttendanceAvatarBinding
 import com.infomaniak.mail.utils.extensions.getColorOrNull
 import com.infomaniak.mail.utils.extensions.getTransparentColor

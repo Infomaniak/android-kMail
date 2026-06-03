@@ -70,6 +70,7 @@ import com.infomaniak.core.common.utils.startOfTheDay
 import com.infomaniak.core.common.utils.startOfTheWeek
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.removeAccents
+import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
 import com.infomaniak.core.network.api.ApiController
 import com.infomaniak.core.network.models.ApiResponse
@@ -78,7 +79,6 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
@@ -86,12 +86,14 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.extensions.getLocalizedName
+import com.infomaniak.mail.data.models.extensions.isMe
 import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
@@ -120,7 +122,6 @@ import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
-import io.realm.kotlin.types.RealmInstant
 import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
@@ -152,13 +153,6 @@ fun String?.getStartAndEndOfPlusEmail(): Pair<String, String> {
 }
 
 //region Date
-fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
-
-fun Date.toRealmInstant(): RealmInstant {
-    val seconds = time / 1_000L
-    val nanoseconds = (time - seconds * 1_000L).toInt()
-    return RealmInstant.from(seconds, nanoseconds)
-}
 
 fun Date.isSmallerThanDays(daysAgo: Int): Boolean {
     val lastDay = Calendar.getInstance().apply {

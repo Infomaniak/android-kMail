@@ -22,6 +22,8 @@ import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.network.INFOMANIAK_API_V1
 import com.infomaniak.mail.MAIL_API
 import com.infomaniak.mail.utils.Utils
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import java.net.URLEncoder
 import java.util.Date
 
@@ -30,6 +32,11 @@ object ApiRoutes {
     //region API V1
     fun getCredentialsPassword(): String {
         return "$INFOMANIAK_API_V1/profile/password"
+    }
+
+    suspend fun a () {
+        flowOf(0).first()
+        flowOf(0).first { true }
     }
 
     private fun mailboxV1(mailboxHostingId: Int, mailboxName: String): String {

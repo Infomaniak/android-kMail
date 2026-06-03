@@ -25,6 +25,9 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachable
+import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
+import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm

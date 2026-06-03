@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024-2025 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
-import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import com.infomaniak.mail.data.models.message.SplitBody
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

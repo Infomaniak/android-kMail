@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2025 Infomaniak Network SA
+  ~ Copyright (C) 2022-2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -570,7 +570,7 @@
             app:argType="string" />
         <argument
             android:name="attachmentType"
-            app:argType="com.infomaniak.mail.data.models.Attachable$AttachmentType" />
+            app:argType="com.infomaniak.mail.data.models.AttachmentType" />
         <argument
             android:name="intentType"
             app:argType="com.infomaniak.mail.utils.extensions.AttachmentExt$AttachmentIntentType" />

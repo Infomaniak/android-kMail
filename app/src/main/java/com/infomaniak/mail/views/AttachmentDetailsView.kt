@@ -29,6 +29,7 @@ import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
+import com.infomaniak.mail.data.models.extensions.getFileTypeFromMimeType
 import com.infomaniak.mail.databinding.ViewAttachmentDetailsBinding
 import com.infomaniak.core.legacy.R as RCore
 

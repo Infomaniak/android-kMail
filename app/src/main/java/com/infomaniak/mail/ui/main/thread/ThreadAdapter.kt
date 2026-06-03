@@ -53,10 +53,15 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
+import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.Attendee
-import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.extensions.calendarAttachment
+import com.infomaniak.mail.data.models.extensions.displayedName
+import com.infomaniak.mail.data.models.extensions.isInSpamFolder
+import com.infomaniak.mail.data.models.extensions.isMe
+import com.infomaniak.mail.data.models.extensions.isReplyAuthorized
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message

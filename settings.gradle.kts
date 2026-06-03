@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        mavenLocal()
     }
     includeBuild("Core/build-logic")
 }
@@ -13,6 +14,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
+        mavenLocal()
     }
     versionCatalogs {
         create("core") {
@@ -26,6 +28,9 @@ plugins {
 }
 
 rootProject.name = "Infomaniak Mail"
+
+includeBuild("OldKotlin")
+
 include(
     ":app",
     ":Core:Legacy",

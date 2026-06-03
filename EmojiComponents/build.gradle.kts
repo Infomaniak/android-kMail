@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.library")
     alias(core.plugins.kotlin.android)
@@ -25,10 +27,6 @@ android {
         compose = true
     }
 
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-    }
-
     flavorDimensions += "distribution"
 
     productFlavors {
@@ -36,6 +34,8 @@ android {
         create("fdroid") {}
     }
 }
+
+kotlin.compilerOptions.jvmTarget = JvmTarget.valueOf("JVM_${javaVersion.name.substringAfter("VERSION_")}")
 
 dependencies {
     implementation(core.infomaniak.core.avatar)
@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.compose.ui.android)
 
     implementation(core.androidx.core.ktx)
+    api(libs.emoji.reaction.models)
 
     implementation(platform(core.compose.bom))
     implementation(core.compose.runtime)

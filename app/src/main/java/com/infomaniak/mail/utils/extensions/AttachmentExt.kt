@@ -31,6 +31,13 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.extensions.backupLocalData
+import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getFileTypeFromMimeType
+import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
+import com.infomaniak.mail.data.models.extensions.hasUsableCache
+import com.infomaniak.mail.data.models.extensions.isInlineCachedFile
+import com.infomaniak.mail.data.models.extensions.safeMimeType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
