@@ -326,8 +326,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         _binding = null
     }
 
-    private fun isAllowedToSwipe(swipeDirection: DirectionFlag, folderRole: FolderRole?): Boolean {
-        if (folderRole != FolderRole.DRAFT) return true
+    private fun isAllowedToSwipe(swipeDirection: DirectionFlag): Boolean {
+        if (mainViewModel.currentFolderLive.value?.role != FolderRole.DRAFT) return true
 
         val action = if (swipeDirection == DirectionFlag.LEFT) {
             localSettings.swipeLeft
@@ -350,9 +350,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
         fun updateSwipeDirection(direction: DirectionFlag, action: SwipeAction) {
             val isActionSet = action != SwipeAction.NONE
-            val folderRole = mainViewModel.currentFolderLive.value?.role
 
-            if (isMultiSelectClosed && isActionSet && isAllowedToSwipe(direction, folderRole)) {
+            if (isMultiSelectClosed && isActionSet && isAllowedToSwipe(direction)) {
                 enableSwipeDirection(direction)
             } else {
                 disableSwipeDirection(direction)
@@ -442,22 +441,22 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
         val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
 
-        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled, folderRole)
-        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled, folderRole)
+        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
+        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
 
     }
 
-    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean, folderRole: FolderRole?) {
+    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) {
         val action = if (swipeDirection == DirectionFlag.LEFT) localSettings.swipeLeft else localSettings.swipeRight
-        updateSwipeEnableState(swipeDirection, folderRole, action)
-        updateSwipeVisuals(swipeDirection, isEnabled, folderRole, action)
+        updateSwipeEnableState(swipeDirection, action)
+        updateSwipeVisuals(swipeDirection, isEnabled, action)
     }
 
-    private fun updateSwipeEnableState(swipeDirection: DirectionFlag, folderRole: FolderRole?, action: SwipeAction) {
+    private fun updateSwipeEnableState(swipeDirection: DirectionFlag, action: SwipeAction) {
         val isActionSet = action != SwipeAction.NONE
         val isMultiSelectClosed = !mainViewModel.isMultiSelectOn
 
-        val shouldEnableSwipe = isActionSet && isMultiSelectClosed && isAllowedToSwipe(swipeDirection, folderRole)
+        val shouldEnableSwipe = isActionSet && isMultiSelectClosed && isAllowedToSwipe(swipeDirection)
 
         with(binding.threadsList) {
             if (shouldEnableSwipe) {
@@ -468,7 +467,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         }
     }
 
-    private fun updateSwipeVisuals(swipeDirection: DirectionFlag, isEnabled: Boolean, folderRole: FolderRole?, action: SwipeAction) {
+    private fun updateSwipeVisuals(swipeDirection: DirectionFlag, isEnabled: Boolean, action: SwipeAction) {
         with(binding.threadsList) {
             val resolvedIconRes = if (isEnabled) action.iconRes else R.drawable.ic_close_small
             val resolvedBackgroundColor = if (isEnabled) {
