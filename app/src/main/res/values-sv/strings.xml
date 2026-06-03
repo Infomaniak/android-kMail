@@ -21,6 +21,7 @@
     <string name="accentColorSystemTitle">Systemfärg</string>
     <string name="actionArchive">Arkivera</string>
     <string name="actionBlockSender">Blockera avsändare</string>
+    <string name="actionCallIfNoResponse">Ring tillbaka till mig om det inte finns något svar</string>
     <string name="actionCancelSnooze">Avbryt vänteläge</string>
     <string name="actionDelete">Ta bort</string>
     <string name="actionEditMenu">Redigera meny</string>
@@ -232,6 +233,7 @@
     <string name="createFolderName">Mappens namn</string>
     <string name="datePickerTitle">Välj datum och tid</string>
     <string name="dateTitle">Datum:</string>
+    <string name="daysBeforeSendingReminder">%d dagar</string>
     <string name="deleteAccountWarning">Raderingen av ditt konto blir slutgiltig. Du kommer inte att kunna återaktivera ditt konto.</string>
     <string name="deleteFolderDialogDescription">Innehållet i mappen %s kommer att raderas permanent utan att gå via papperskorgen.</string>
     <string name="deleteFolderDialogTitle">Ta bort mapp</string>
@@ -336,6 +338,7 @@
     <string name="errorUnableToFlushFolder">Mappen kan inte tömmas</string>
     <string name="errorUserAlreadySynchronized">Användaren är redan synkroniserad</string>
     <string name="expeditorAuthenticationDescription">Avsändarens ursprung har autentiserats.</string>
+    <string name="explanationActionCallIfNoResponse">Mottagare inom din organisation kommer att se att ett svar förväntas.</string>
     <string name="externalDialogConfirmButton">Jag förstår</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Avsändaren %s är inte en del av din organisation eller dina kontakter. Var försiktig om du delar känslig information.</item>
@@ -358,6 +361,7 @@
     <string name="fromTitle">Från:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services krävs</string>
     <string name="groupContactsTitle">Grupp: %s</string>
+    <string name="hoursBeforeSendingReminder">%d timmar</string>
     <string name="inboxFolder">Inkorg</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagring är nästan full. Uppgradera till obegränsad lagring och lås upp nya funktioner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagring är full. Uppgradera till obegränsad lagring och lås upp nya funktioner.</string>
@@ -487,6 +491,7 @@
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Välj tid</string>
     <string name="send">Skicka</string>
+    <string name="sendOptions">Skicka-alternativ</string>
     <string name="sentFolder">Skickade meddelanden</string>
     <string name="settingsAccentColor">Accentfärg</string>
     <string name="settingsAccentColorDescription">Välj accentfärg för applikationen</string>

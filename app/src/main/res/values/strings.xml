@@ -25,6 +25,7 @@
     <string name="accentColorSystemTitle">System colour</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
+    <string name="actionCallIfNoResponse">Call me back if there is no answer</string>
     <string name="actionCancelSnooze">Cancel snooze</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
@@ -236,6 +237,7 @@
     <string name="createFolderName">Name of the folder</string>
     <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
+    <string name="daysBeforeSendingReminder">%d days</string>
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
     <string name="deleteFolderDialogDescription">The contents of the folder %s will be permanently deleted without going through the trash.</string>
     <string name="deleteFolderDialogTitle">Delete folder</string>
@@ -340,6 +342,7 @@
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
     <string name="errorUserAlreadySynchronized">User is already synchronized</string>
     <string name="expeditorAuthenticationDescription">The sender’s origin has been authenticated.</string>
+    <string name="explanationActionCallIfNoResponse">Recipients within your organization will see that a response is expected.</string>
     <string name="externalDialogConfirmButton">I understand</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">The sender %s is not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>
@@ -362,6 +365,7 @@
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="groupContactsTitle">Group: %s</string>
+    <string name="hoursBeforeSendingReminder">%d hours</string>
     <string name="inboxFolder">Inbox</string>
     <string name="kSuiteProQuotasAlertDescription">Your Mail storage space is almost full. Upgrade to unlimited storage and unlock new features.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Your Mail storage space is full. Upgrade to unlimited storage and unlock new features.</string>
@@ -491,6 +495,7 @@
     <string name="selectSignatureNone">No signature</string>
     <string name="selectTimeDialogTitle">Select time</string>
     <string name="send">Send</string>
+    <string name="sendOptions">Send options</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent colour</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>

@@ -21,6 +21,7 @@
     <string name="accentColorSystemTitle">Järjestelmän väri</string>
     <string name="actionArchive">Arkistoi</string>
     <string name="actionBlockSender">Estä lähettäjä</string>
+    <string name="actionCallIfNoResponse">Soita minulle takaisin, jos vastausta ei tule</string>
     <string name="actionCancelSnooze">Peruuta torkku</string>
     <string name="actionDelete">Poista</string>
     <string name="actionEditMenu">Muokkaa valikkoa</string>
@@ -232,6 +233,7 @@
     <string name="createFolderName">Kansion nimi</string>
     <string name="datePickerTitle">Valitse päivämäärä ja aika</string>
     <string name="dateTitle">Päivämäärä:</string>
+    <string name="daysBeforeSendingReminder">%d päivää</string>
     <string name="deleteAccountWarning">Tilisi poistaminen on lopullista. Et voi enää aktivoida tiliäsi uudelleen.</string>
     <string name="deleteFolderDialogDescription">Kansion %s sisältö poistetaan pysyvästi ilman siirtämistä roskakoriin.</string>
     <string name="deleteFolderDialogTitle">Poista kansio</string>
@@ -336,6 +338,7 @@
     <string name="errorUnableToFlushFolder">Kansiota ei voi tyhjentää</string>
     <string name="errorUserAlreadySynchronized">Käyttäjä on jo synkronoitu</string>
     <string name="expeditorAuthenticationDescription">Lähettäjän alkuperä on vahvistettu.</string>
+    <string name="explanationActionCallIfNoResponse">Organisaatiosi vastaanottajat näkevät, että vastausta odotetaan.</string>
     <string name="externalDialogConfirmButton">Ymmärrän</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Lähettäjä %s ei ole organisaatiosi tai yhteystietojesi jäsen. Ole varovainen, jos jaat arkaluonteista tietoa.</item>
@@ -358,6 +361,7 @@
     <string name="fromTitle">Lähettäjä:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services vaaditaan</string>
     <string name="groupContactsTitle">Ryhmä: %s</string>
+    <string name="hoursBeforeSendingReminder">%d tuntia</string>
     <string name="inboxFolder">Saapuneet</string>
     <string name="kSuiteProQuotasAlertDescription">Mail-tallennustilasi on melkein täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Mail-tallennustilasi on täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
@@ -487,6 +491,7 @@
     <string name="selectSignatureNone">Ei allekirjoitusta</string>
     <string name="selectTimeDialogTitle">Valitse aika</string>
     <string name="send">Lähetä</string>
+    <string name="sendOptions">Lähetysvalinnat</string>
     <string name="sentFolder">Lähetetyt viestit</string>
     <string name="settingsAccentColor">Korostusväri</string>
     <string name="settingsAccentColorDescription">Valitse sovelluksen korostusväri</string>

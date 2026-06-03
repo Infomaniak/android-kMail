@@ -21,6 +21,7 @@
     <string name="accentColorSystemTitle">Colore del sistema</string>
     <string name="actionArchive">Archivia</string>
     <string name="actionBlockSender">Blocca mittente</string>
+    <string name="actionCallIfNoResponse">Richiamarmi se non c’è risposta</string>
     <string name="actionCancelSnooze">Annulla il posticipo</string>
     <string name="actionDelete">Cestina</string>
     <string name="actionEditMenu">Menu Modifica</string>
@@ -232,6 +233,7 @@
     <string name="createFolderName">Nome della cartella</string>
     <string name="datePickerTitle">Scegli una data e un’ora</string>
     <string name="dateTitle">Data:</string>
+    <string name="daysBeforeSendingReminder">%d giorni</string>
     <string name="deleteAccountWarning">La cancellazione dell’account sarà definitiva. Non sarà possibile riattivare l’account.</string>
     <string name="deleteFolderDialogDescription">Il contenuto della cartella %s verrà eliminato definitivamente senza passare per il cestino.</string>
     <string name="deleteFolderDialogTitle">Eliminare la cartella</string>
@@ -336,6 +338,7 @@
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
     <string name="errorUserAlreadySynchronized">L’utente è già sincronizzato</string>
     <string name="expeditorAuthenticationDescription">L’origine del mittente è stata autenticata.</string>
+    <string name="explanationActionCallIfNoResponse">I destinatari della tua organizzazione vedranno che una risposta è attesa.</string>
     <string name="externalDialogConfirmButton">Capisco</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Il mittente %s non fa parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>
@@ -358,6 +361,7 @@
     <string name="fromTitle">Da:</string>
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="groupContactsTitle">Gruppo: %s</string>
+    <string name="hoursBeforeSendingReminder">%d ore</string>
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="kSuiteProQuotasAlertDescription">Lo spazio di archiviazione della posta è quasi esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Lo spazio di archiviazione della posta è esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>
@@ -487,6 +491,7 @@
     <string name="selectSignatureNone">Nessuna firma</string>
     <string name="selectTimeDialogTitle">Selezionare l’ora</string>
     <string name="send">Invia</string>
+    <string name="sendOptions">Opzioni di invio</string>
     <string name="sentFolder">Messaggi inviati</string>
     <string name="settingsAccentColor">Colore d’accento</string>
     <string name="settingsAccentColorDescription">Scegliere il colore d’accento per l’applicazione</string>
