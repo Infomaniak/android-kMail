@@ -326,30 +326,33 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         _binding = null
     }
 
-    private fun isAllowedToSwipeInDraft(swipeDirection: DirectionFlag): Boolean {
+    private fun isAllowedToSwipe(swipeDirection: DirectionFlag, folderRole: FolderRole?): Boolean {
+        if (folderRole != FolderRole.DRAFT) return true
+
+        val action = if (swipeDirection == DirectionFlag.LEFT) {
+            localSettings.swipeLeft
+        } else {
+            localSettings.swipeRight
+        }
+
         val allowedSwipeActionsForDraft = listOf(
             SwipeAction.DELETE,
             SwipeAction.QUICKACTIONS_MENU,
             SwipeAction.READ_UNREAD,
             SwipeAction.FAVORITE
         )
-        val isDraft = mainViewModel.currentFolderLive.value?.role == FolderRole.DRAFT
-        return if (swipeDirection == DirectionFlag.LEFT) {
-            isDraft && localSettings.swipeLeft in allowedSwipeActionsForDraft
-        } else {
-            isDraft && localSettings.swipeRight in allowedSwipeActionsForDraft
-        }
+
+        return action in allowedSwipeActionsForDraft
     }
 
     private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
         val isMultiSelectClosed = !mainViewModel.isMultiSelectOn
-        val isInDraft = mainViewModel.currentFolderLive.value?.role == FolderRole.DRAFT
 
         fun updateSwipeDirection(direction: DirectionFlag, action: SwipeAction) {
             val isActionSet = action != SwipeAction.NONE
-            val isAllowedByCurrentFolder = !isInDraft || isAllowedToSwipeInDraft(direction)
+            val folderRole = mainViewModel.currentFolderLive.value?.role
 
-            if (isMultiSelectClosed && isActionSet && isAllowedByCurrentFolder) {
+            if (isMultiSelectClosed && isActionSet && isAllowedToSwipe(direction, folderRole)) {
                 enableSwipeDirection(direction)
             } else {
                 disableSwipeDirection(direction)
