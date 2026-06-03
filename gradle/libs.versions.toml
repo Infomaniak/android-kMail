@@ -1,5 +1,4 @@
 [versions]
-androidGradlePlugin = "8.13.1"
 compose = "1.10.0"
 desugarJDK = "2.1.5"
 dotsindicator = "5.1.0"
@@ -20,7 +19,6 @@ lifecycleProcess = "2.10.0"
 mockk = "1.14.6"
 orchestrator = "1.6.1"
 playServices = "18.9.0"
-realmKotlin = "3.2.10-SNAPSHOT"
 richHtmlEditor = "1.1.0"
 uiautomator = "2.3.0"
 uiTestJunit4 = "1.10.0"
@@ -42,7 +40,6 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
-realm-kotlin-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realmKotlin" }
 realm-models = { module = "com.infomaniak.mail:realm-models", version.ref = "oldKotlinModules" }
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
@@ -57,4 +54,3 @@ ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", versi
 
 [plugins]
 google-services = { id = "com.google.gms.google-services" }
-realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }
