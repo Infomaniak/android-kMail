@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Een leesbewijs is naar de afzender verzonden.</string>
     <string name="actionArchive">Archiveren</string>
     <string name="actionBlockSender">Afzender blokkeren</string>
+    <string name="actionCallIfNoResponse">Me terugbellen als er geen antwoord is</string>
     <string name="actionCancelSnooze">Snooze annuleren</string>
     <string name="actionDelete">Verwijderen</string>
     <string name="actionEditMenu">Menu bewerken</string>
@@ -239,6 +240,7 @@
     <string name="createFolderName">Naam van de map</string>
     <string name="datePickerTitle">Kies een datum en tijd</string>
     <string name="dateTitle">Datum:</string>
+    <string name="daysBeforeSendingReminder">%d dagen</string>
     <string name="deleteAccountWarning">Het verwijderen van uw account is definitief. U kunt uw account niet opnieuw activeren.</string>
     <string name="deleteFolderDialogDescription">De inhoud van de map %s wordt definitief verwijderd zonder via de prullenbak te gaan.</string>
     <string name="deleteFolderDialogTitle">Map verwijderen</string>
@@ -344,6 +346,7 @@
     <string name="errorUserAlreadySynchronized">Gebruiker is al gesynchroniseerd</string>
     <string name="euriaTranslateMessage">Euria vertaalt uw bericht…</string>
     <string name="expeditorAuthenticationDescription">De herkomst van deze afzender is geauthenticeerd.</string>
+    <string name="explanationActionCallIfNoResponse">Ontvangers binnen je organisatie zullen zien dat er een reactie wordt verwacht.</string>
     <string name="externalDialogConfirmButton">Ik begrijp het</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">De afzender %s maakt geen deel uit van uw organisatie of uw contacten. Wees voorzichtig als u gevoelige informatie deelt.</item>
@@ -367,6 +370,7 @@
     <string name="genericMessageTranslated">Bericht vertaald</string>
     <string name="googlePlayServicesAreRequired">Google Play Services zijn vereist</string>
     <string name="groupContactsTitle">Groep: %s</string>
+    <string name="hoursBeforeSendingReminder">%d uur</string>
     <string name="inboxFolder">Inbox</string>
     <string name="kSuiteProQuotasAlertDescription">Uw Mail-opslagruimte is bijna vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Uw Mail-opslagruimte is vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>
@@ -510,6 +514,7 @@
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
     <string name="send">Verzenden</string>
     <string name="sendConfirmationAction">De bevestiging verzenden</string>
+    <string name="sendOptions">Verzendopties</string>
     <string name="sentFolder">Verzonden berichten</string>
     <string name="settingsAccentColor">Accentkleur</string>
     <string name="settingsAccentColorDescription">Kies de accentkleur voor de applicatie</string>

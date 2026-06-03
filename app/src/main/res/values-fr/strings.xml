@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Une confirmation de lecture a été envoyée à l’expéditeur.</string>
     <string name="actionArchive">Archiver</string>
     <string name="actionBlockSender">Bloquer l’expéditeur</string>
+    <string name="actionCallIfNoResponse">Me rappeler si pas de réponse</string>
     <string name="actionCancelSnooze">Annuler la mise en attente</string>
     <string name="actionDelete">Supprimer</string>
     <string name="actionEditMenu">Modifier le menu</string>
@@ -239,6 +240,7 @@
     <string name="createFolderName">Nom du dossier</string>
     <string name="datePickerTitle">Choisir une date et une heure</string>
     <string name="dateTitle">Date :</string>
+    <string name="daysBeforeSendingReminder">%d jours</string>
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
     <string name="deleteFolderDialogDescription">Le contenu du dossier %s sera définitivement supprimé sans passer par la corbeille.</string>
     <string name="deleteFolderDialogTitle">Supprimer le dossier</string>
@@ -344,6 +346,7 @@
     <string name="errorUserAlreadySynchronized">L’utilisateur est déjà synchronisé</string>
     <string name="euriaTranslateMessage">Euria traduit votre message…</string>
     <string name="expeditorAuthenticationDescription">La provenance de cet expéditeur a été authentifiée.</string>
+    <string name="explanationActionCallIfNoResponse">Les destinataires de votre organisation verront qu’une réponse est attendue.</string>
     <string name="externalDialogConfirmButton">J’ai compris</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">L’expéditeur %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
@@ -367,6 +370,7 @@
     <string name="genericMessageTranslated">Message traduit</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="groupContactsTitle">Groupe : %s</string>
+    <string name="hoursBeforeSendingReminder">%d days</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="kSuiteProQuotasAlertDescription">L’espace de stockage de votre Mail est bientôt plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
     <string name="kSuiteProQuotasAlertFullDescription">L’espace de stockage de votre Mail est plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
@@ -510,6 +514,7 @@
     <string name="selectTimeDialogTitle">Sélectionner l’heure</string>
     <string name="send">Envoyer</string>
     <string name="sendConfirmationAction">Envoyer la confirmation</string>
+    <string name="sendOptions">Options d’envoi</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
     <string name="settingsAccentColorDescription">Choisissez la couleur d’accentuation de l’application</string>

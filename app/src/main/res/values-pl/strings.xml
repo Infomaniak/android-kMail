@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Potwierdzenie przeczytania zostało wysłane do nadawcy.</string>
     <string name="actionArchive">Archiwizuj</string>
     <string name="actionBlockSender">Zablokuj nadawcę</string>
+    <string name="actionCallIfNoResponse">Oddzwoń do mnie, jeśli nie ma odpowiedzi</string>
     <string name="actionCancelSnooze">Anuluj uśpienie</string>
     <string name="actionDelete">Usuń</string>
     <string name="actionEditMenu">Edytuj menu</string>
@@ -245,6 +246,7 @@
     <string name="createFolderName">Nazwa folderu</string>
     <string name="datePickerTitle">Wybierz datę i godzinę</string>
     <string name="dateTitle">Data:</string>
+    <string name="daysBeforeSendingReminder">%d dni</string>
     <string name="deleteAccountWarning">Usunięcie konta będzie ostateczne. Nie będziesz mógł/ mogła ponownie aktywować konta.</string>
     <string name="deleteFolderDialogDescription">Zawartość folderu %s zostanie trwale usunięta bez przenoszenia do kosza.</string>
     <string name="deleteFolderDialogTitle">Usuń folder</string>
@@ -352,6 +354,7 @@
     <string name="errorUserAlreadySynchronized">Użytkownik jest już zsynchronizowany</string>
     <string name="euriaTranslateMessage">Euria tłumaczy twoją wiadomość…</string>
     <string name="expeditorAuthenticationDescription">Pochodzenie tego nadawcy zostało uwierzytelnione.</string>
+    <string name="explanationActionCallIfNoResponse">Odbiorcy w Twojej organizacji zobaczą, że oczekuje się odpowiedzi.</string>
     <string name="externalDialogConfirmButton">Rozumiem</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Nadawca %s nie jest częścią Twojej organizacji ani Twoich kontaktów. Zachowaj ostrożność, jeśli udostępniasz poufne informacje.</item>
@@ -381,6 +384,7 @@
     <string name="genericMessageTranslated">Wiadomość przetłumaczona</string>
     <string name="googlePlayServicesAreRequired">Wymagane są Usługi Google Play</string>
     <string name="groupContactsTitle">Grupa: %s</string>
+    <string name="hoursBeforeSendingReminder">%d godzin</string>
     <string name="inboxFolder">Skrzynka odbiorcza</string>
     <string name="kSuiteProQuotasAlertDescription">Miejsce do przechowywania Twojej poczty jest prawie pełne. Przejdź na nieograniczoną przestrzeń i odblokuj nowe funkcje.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Miejsce do przechowywania Twojej poczty jest pełne. Przejdź na nieograniczoną przestrzeń i odblokuj nowe funkcje.</string>
@@ -536,6 +540,7 @@
     <string name="selectTimeDialogTitle">Wybierz godzinę</string>
     <string name="send">Wyślij</string>
     <string name="sendConfirmationAction">Wyślij potwierdzenie</string>
+    <string name="sendOptions">Opcje wysyłania</string>
     <string name="sentFolder">Wysłane wiadomości</string>
     <string name="settingsAccentColor">Kolor akcentu</string>
     <string name="settingsAccentColorDescription">Wybierz kolor akcentu dla aplikacji</string>

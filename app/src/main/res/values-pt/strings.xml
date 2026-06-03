@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Um recibo de leitura foi enviado ao remetente.</string>
     <string name="actionArchive">Arquivar</string>
     <string name="actionBlockSender">Bloquear remetente</string>
+    <string name="actionCallIfNoResponse">Ligar-me de volta se não houver resposta</string>
     <string name="actionCancelSnooze">Cancelar lembrete</string>
     <string name="actionDelete">Eliminar</string>
     <string name="actionEditMenu">Editar menu</string>
@@ -239,6 +240,7 @@
     <string name="createFolderName">Nome da pasta</string>
     <string name="datePickerTitle">Escolher uma data e hora</string>
     <string name="dateTitle">Data:</string>
+    <string name="daysBeforeSendingReminder">%d dias</string>
     <string name="deleteAccountWarning">A eliminação da sua conta será definitiva. Não poderá reativar a sua conta.</string>
     <string name="deleteFolderDialogDescription">O conteúdo da pasta %s será eliminado permanentemente sem passar pelo lixo.</string>
     <string name="deleteFolderDialogTitle">Eliminar pasta</string>
@@ -344,6 +346,7 @@
     <string name="errorUserAlreadySynchronized">O utilizador já está sincronizado</string>
     <string name="euriaTranslateMessage">Euria traduz a sua mensagem…</string>
     <string name="expeditorAuthenticationDescription">A origem deste remetente foi autenticada.</string>
+    <string name="explanationActionCallIfNoResponse">Os destinatários da tua organização verão que se espera uma resposta.</string>
     <string name="externalDialogConfirmButton">Compreendo</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">O remetente %s não faz parte da sua organização nem dos seus contactos. Seja prudente se partilhar informações sensíveis.</item>
@@ -367,6 +370,7 @@
     <string name="genericMessageTranslated">Mensagem traduzida</string>
     <string name="googlePlayServicesAreRequired">Os Google Play Services são necessários</string>
     <string name="groupContactsTitle">Grupo: %s</string>
+    <string name="hoursBeforeSendingReminder">%d horas</string>
     <string name="inboxFolder">Caixa de entrada</string>
     <string name="kSuiteProQuotasAlertDescription">O espaço de armazenamento do seu Mail está quase cheio. Atualize para armazenamento ilimitado e desbloqueie novas funcionalidades.</string>
     <string name="kSuiteProQuotasAlertFullDescription">O espaço de armazenamento do seu Mail está cheio. Atualize para armazenamento ilimitado e desbloqueie novas funcionalidades.</string>
@@ -510,6 +514,7 @@
     <string name="selectTimeDialogTitle">Selecionar hora</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar a confirmação</string>
+    <string name="sendOptions">Opções de envio</string>
     <string name="sentFolder">Mensagens enviadas</string>
     <string name="settingsAccentColor">Cor de destaque</string>
     <string name="settingsAccentColorDescription">Escolha a cor de destaque da aplicação</string>
