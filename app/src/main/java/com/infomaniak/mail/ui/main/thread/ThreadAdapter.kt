@@ -619,7 +619,7 @@ class ThreadAdapter(
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
 
-                if (state.isRetryAttempt && !state.wasLoaderShown) {
+                if (state.asAlreadyRetried && !state.wasLoaderShown) {
                     threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessageRes)
                 }
             } else {

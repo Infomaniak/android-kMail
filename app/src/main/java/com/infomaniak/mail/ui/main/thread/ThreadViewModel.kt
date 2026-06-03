@@ -481,16 +481,16 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun doAiAction(messageUid: String, aiAction: AiAction) {
-        val isRetryAttempt = getStateMap(aiAction)[messageUid] is AiProcessState.Error
+        val isRetrying = getStateMap(aiAction)[messageUid] is AiProcessState.Error
 
         cancelRetryTimer(messageUid, aiAction)
 
-        val initialState = if (isRetryAttempt) AiProcessState.Retrying(isLoaderVisible = false) else AiProcessState.Loading
+        val initialState = if (isRetrying) AiProcessState.Retrying(isLoaderVisible = false) else AiProcessState.Loading
         updateAiProcessState(messageUid, aiAction, initialState)
 
-        startRetryTimerIfNeeded(messageUid, aiAction, isRetryAttempt)
+        startRetryTimerIfNeeded(messageUid, aiAction, isRetrying)
 
-        viewModelScope.launch { processAiApiCall(messageUid, aiAction, isRetryAttempt) }
+        viewModelScope.launch { processAiApiCall(messageUid, aiAction, isRetrying) }
     }
 
     fun dismissAiAction(messageUid: String, aiAction: AiAction) {
@@ -510,7 +510,7 @@ class ThreadViewModel @Inject constructor(
         updateAiProcessState(messageUid, aiAction, AiProcessState.Dismissed, bodyUpdate)
     }
 
-    private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
+    private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetrying: Boolean) {
         val languageCode = appContext.getCurrentLanguageCode()
 
         val result = when (aiAction) {
@@ -525,7 +525,7 @@ class ThreadViewModel @Inject constructor(
 
         val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
 
-        val finalState = mapApiResultToState(result, isRetry, wasLoaderShown)
+        val finalState = mapApiResultToState(result, isRetrying, wasLoaderShown)
 
         var bodyUpdate = AiBodyUpdate.NONE
         if (finalState is AiProcessState.Success) {
@@ -564,13 +564,13 @@ class ThreadViewModel @Inject constructor(
 
     private fun mapApiResultToState(
         result: ApiResponse<String>?,
-        isRetryAttempt: Boolean,
+        isRetrying: Boolean,
         wasLoaderShown: Boolean,
     ): AiProcessState {
         if (result == null) {
             return AiProcessState.Error(
                 canRetry = true,
-                isRetryAttempt = isRetryAttempt,
+                asAlreadyRetried = isRetrying,
                 wasLoaderShown = wasLoaderShown,
                 targetSameAsSource = false,
             )
@@ -583,7 +583,7 @@ class ThreadViewModel @Inject constructor(
         val targetSameAsSource = result.error?.code == ErrorCode.TRANSLATION_TARGET_SAME_AS_SOURCE
         return AiProcessState.Error(
             canRetry = canRetry,
-            isRetryAttempt = isRetryAttempt,
+            asAlreadyRetried = isRetrying,
             wasLoaderShown = wasLoaderShown,
             targetSameAsSource = targetSameAsSource,
         )
@@ -615,8 +615,8 @@ class ThreadViewModel @Inject constructor(
         timersMap.remove(messageUid)
     }
 
-    private fun startRetryTimerIfNeeded(messageUid: String, aiAction: AiAction, isRetryAttempt: Boolean) {
-        if (!isRetryAttempt) return
+    private fun startRetryTimerIfNeeded(messageUid: String, aiAction: AiAction, isRetrying: Boolean) {
+        if (!isRetrying) return
 
         val timer = UtilsLegacy.createRefreshTimer {
             val state = getStateMap(aiAction)[messageUid]
@@ -625,8 +625,7 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        getTimerMap(aiAction)[messageUid] = timer
-        timer.start()
+        getTimerMap(aiAction)[messageUid] = timer.also { it.start() }
     }
 
     private fun cancelAllAiRetryTimers() {
