@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models.calendar
 
-import com.infomaniak.core.common.extensions.enumValueOfOrNull
+import com.infomaniak.mail.internal.enumValueOfOrNull
 import com.infomaniak.mail.data.api.CalendarRealmInstantSerializer
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.realmListOf

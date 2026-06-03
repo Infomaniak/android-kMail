@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.models.calendar
 
-import com.infomaniak.core.common.extensions.enumValueOfOrNull
+import com.infomaniak.mail.internal.enumValueOfOrNull
 import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.data.models.calendar.CalendarEvent.CalendarEventStatus
 import io.realm.kotlin.types.EmbeddedRealmObject

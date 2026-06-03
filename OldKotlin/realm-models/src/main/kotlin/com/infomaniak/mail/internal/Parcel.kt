@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.core.common.extensions
+package com.infomaniak.mail.internal
 
-internal inline fun <reified T : Enum<T>> enumValueOfOrNull(value: String?): T? {
-    return value?.let { runCatching { enumValueOf<T>(it.uppercase()) }.getOrNull() }
+import android.os.Parcel
+
+internal fun Parcel.customWriteBoolean(value: Boolean) {
+    writeInt(if (value) 1 else 0)
 }
 
-internal inline fun <reified T : Enum<T>> String.toEnumOrThrow(): T {
-    return enumValueOf(uppercase())
-}
+internal fun Parcel.customReadBoolean(): Boolean = readInt() != 0

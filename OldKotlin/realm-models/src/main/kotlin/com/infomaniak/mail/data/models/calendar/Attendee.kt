@@ -20,8 +20,8 @@
 package com.infomaniak.mail.data.models.calendar
 
 import android.os.Parcel
-import com.infomaniak.core.common.extensions.customReadBoolean
-import com.infomaniak.core.common.extensions.customWriteBoolean
+import com.infomaniak.mail.internal.customReadBoolean
+import com.infomaniak.mail.internal.customWriteBoolean
 import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import io.realm.kotlin.types.EmbeddedRealmObject

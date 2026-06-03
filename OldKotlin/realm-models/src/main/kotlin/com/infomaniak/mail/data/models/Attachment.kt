@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models
 
-import com.infomaniak.core.common.extensions.enumValueOfOrNull
+import com.infomaniak.mail.internal.enumValueOfOrNull
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

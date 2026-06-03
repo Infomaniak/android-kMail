@@ -19,8 +19,8 @@ package com.infomaniak.mail.data.models
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.infomaniak.core.common.extensions.customReadBoolean
-import com.infomaniak.core.common.extensions.customWriteBoolean
+import com.infomaniak.mail.internal.customReadBoolean
+import com.infomaniak.mail.internal.customWriteBoolean
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize

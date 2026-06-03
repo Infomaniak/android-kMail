@@ -20,7 +20,7 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.core.common.extensions.enumValueOfOrNull
+import com.infomaniak.mail.internal.enumValueOfOrNull
 import com.infomaniak.core.common.utils.mailApiEnum
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer

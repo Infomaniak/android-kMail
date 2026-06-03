@@ -21,7 +21,7 @@
 package com.infomaniak.mail.data.models
 
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.core.common.extensions.enumValueOfOrNull
+import com.infomaniak.mail.internal.enumValueOfOrNull
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.query.Sort
