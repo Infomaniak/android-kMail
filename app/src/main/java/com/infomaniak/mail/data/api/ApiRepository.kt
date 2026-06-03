@@ -497,12 +497,11 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    suspend fun aiSummary(languageCode: String, content: String): ApiResponse<String> {
-        // TODO: Adapt aiSummary to accept an additional messageUid parameter once the backend supports it
+    suspend fun aiSummary(languageCode: String, mailboxUuid: String, msgUid: String): ApiResponse<String> {
         return callApi(
             url = ApiRoutes.aiSummary(),
             method = POST,
-            body = mapOf("destination_language" to languageCode, "content" to content),
+            body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }

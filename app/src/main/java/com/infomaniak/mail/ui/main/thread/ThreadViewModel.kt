@@ -511,11 +511,10 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetry: Boolean) {
-        val content = getMessageContent(messageUid)
         val languageCode = appContext.getCurrentLanguageCode()
 
         val result = when (aiAction) {
-            AiAction.SUMMARY -> ApiRepository.aiSummary(languageCode, content)
+            AiAction.SUMMARY -> ApiRepository.aiSummary(languageCode, mailbox().uuid, messageUid)
             AiAction.TRANSLATE -> ApiRepository.aiTranslate(languageCode, mailbox().uuid, messageUid)
         }
 
@@ -561,11 +560,6 @@ class ThreadViewModel @Inject constructor(
 
     private fun handleSummarySuccess(messageUid: String, summaryContent: String?) {
         if (summaryContent != null) saveSummary(messageUid, summaryContent)
-    }
-
-    private suspend fun getMessageContent(messageUid: String): String {
-        val message = messageController.getMessage(messageUid)
-        return message?.body?.value ?: message?.splitBody?.content ?: ""
     }
 
     private fun mapApiResultToState(
