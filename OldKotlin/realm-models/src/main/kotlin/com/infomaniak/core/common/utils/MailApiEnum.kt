@@ -21,13 +21,13 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
 
-inline fun <reified T> mailEpiEnumValueOfOrNull(value: String?): T? where T : Enum<T>, T : MailApiEnum {
+inline fun <reified T> mailApiEnumValueOfOrNull(value: String?): T? where T : Enum<T>, T : MailApiEnum {
     return value?.let { runCatching { enumValues<T>().firstOrNull { it.apiValue == value } }.getOrNull() }
 }
 
 inline fun <reified T> mailApiEnum(backingFieldProperty: KMutableProperty0<String?>): ReadWriteProperty<Any?, T?> where T : Enum<T>, T : MailApiEnum {
     return object : ReadWriteProperty<Any?, T?> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): T? = mailEpiEnumValueOfOrNull<T>(backingFieldProperty.get())
+        override fun getValue(thisRef: Any?, property: KProperty<*>): T? = mailApiEnumValueOfOrNull<T>(backingFieldProperty.get())
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) = backingFieldProperty.set(value?.apiValue)
     }
 }
