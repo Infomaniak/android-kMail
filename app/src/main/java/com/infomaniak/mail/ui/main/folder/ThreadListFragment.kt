@@ -113,6 +113,7 @@ import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
+import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -603,6 +604,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun setupStorageBanner() = with(localSettings) {
         mainViewModel.storageBannerStatus.observeNotNull(viewLifecycleOwner) { storageBannerStatus ->
+            val isWarningStorage = storageBannerStatus is KSuiteStorageBanner.StorageLevel.Warning
+            if (localSettings.hasClosedStorageBanner && isWarningStorage) return@observeNotNull
+
             binding.storageBanner.apply {
                 storageLevel = storageBannerStatus
                 setupListener(

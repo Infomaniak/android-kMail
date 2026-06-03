@@ -86,7 +86,8 @@ class LocalSettings private constructor(context: Context) : SharedValues {
 
     fun resetStorageBannerAppLaunches() {
         hasClosedStorageBanner = true
-        storageBannerDisplayAppLaunches = 0
+        // if put to 0, the banner appears after a background/foreground transition even if the user just closed it
+        storageBannerDisplayAppLaunches = 1
     }
 
     enum class EmailForwarding(@StringRes val localisedNameRes: Int) {
