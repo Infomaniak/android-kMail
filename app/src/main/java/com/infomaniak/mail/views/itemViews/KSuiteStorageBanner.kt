@@ -67,20 +67,20 @@ class KSuiteStorageBanner @JvmOverloads constructor(
 
     sealed interface StorageLevel {
 
-        data object Normal : StorageLevelData(
+        data object Normal : StorageLevel, StorageLevelData(
             iconColorRes = ResourcesCompat.ID_NULL,
             titleRes = ResourcesCompat.ID_NULL,
             descriptionRes = ResourcesCompat.ID_NULL,
         )
 
         sealed interface Warning : StorageLevel {
-            data object Perso : StorageLevelData(
+            data object Perso : Warning, StorageLevelData(
                 iconColorRes = R.color.orangeWarning,
                 titleRes = R.string.myKSuiteQuotasAlertTitle,
                 descriptionRes = R.string.myKSuiteQuotasAlertDescription,
             )
 
-            data object Pro : StorageLevelData(
+            data object Pro : Warning, StorageLevelData(
                 iconColorRes = R.color.orangeWarning,
                 titleRes = R.string.myKSuiteQuotasAlertTitle,
                 descriptionRes = R.string.kSuiteProQuotasAlertDescription,
@@ -88,19 +88,19 @@ class KSuiteStorageBanner @JvmOverloads constructor(
         }
 
         sealed interface Full : StorageLevel {
-            data object Perso : StorageLevelData(
+            data object Perso : Full, StorageLevelData(
                 iconColorRes = R.color.redDestructiveAction,
                 titleRes = R.string.myKSuiteQuotasAlertFullTitle,
                 descriptionRes = R.string.myKSuiteQuotasAlertFullDescription,
             )
 
-            data object Pro : StorageLevelData(
+            data object Pro : Full, StorageLevelData(
                 iconColorRes = R.color.redDestructiveAction,
                 titleRes = R.string.kSuiteProQuotasAlertFullTitle,
                 descriptionRes = R.string.kSuiteProQuotasAlertFullDescription,
             )
 
-            data object StarterPack : StorageLevelData(
+            data object StarterPack : Full, StorageLevelData(
                 iconColorRes = R.color.redDestructiveAction,
                 titleRes = R.string.mailPremiumUpgradeTitle,
                 descriptionRes = R.string.mailPremiumUpgradeDescription
