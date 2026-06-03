@@ -3,7 +3,6 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-        mavenLocal()
     }
     includeBuild("Core/build-logic")
 }
@@ -14,7 +13,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
-        mavenLocal()
     }
     versionCatalogs {
         create("core") {
