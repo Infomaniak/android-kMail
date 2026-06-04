@@ -263,3 +263,24 @@ dependencies {
     // Debug
     if (enableLeakCanary) debugImplementation(libs.leakcanary.android)
 }
+
+val realmVersion = oldKotlinCatalog.versions.realmKotlin.get()
+
+//NOTE: The snippet below is copied from the Realm Gradle Plugin.
+// We are not using it directly in this module because we don't want its incompatible compiler plugin.
+project.configurations.all {
+    val conf: Configuration = this
+    // Ensure that android unit tests uses the Realm JVM variant rather than Android.
+    // This is a bit britle. See https://github.com/realm/realm-kotlin/issues/1404 for
+    // a potential improvement.
+    if (conf.name.endsWith("UnitTestRuntimeClasspath")) {
+        conf.resolutionStrategy.dependencySubstitution {
+            substitute(module("com.infomaniak.realm.kotlin:library-base:$realmVersion")).using(
+                module("com.infomaniak.realm.kotlin:library-base-jvm:$realmVersion")
+            )
+            substitute(module("com.infomaniak.realm.kotlin:cinterop:$realmVersion")).using(
+                module("com.infomaniak.realm.kotlin:cinterop-jvm:$realmVersion")
+            )
+        }
+    }
+}

@@ -18,6 +18,9 @@ dependencyResolutionManagement {
         create("core") {
             from(files("Core/gradle/core.versions.toml"))
         }
+        create("oldKotlinCatalog") {
+            from(files("OldKotlin/gradle/libs.versions.toml"))
+        }
     }
 }
 
