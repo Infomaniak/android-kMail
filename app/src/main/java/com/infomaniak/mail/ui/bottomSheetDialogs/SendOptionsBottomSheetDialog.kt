@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024-2026 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
-import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.BottomSheetSendOptionsBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
@@ -30,9 +39,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ScheduleSendBottomSheetDialog @Inject constructor() : ScheduleOptionsBottomSheet() {
+class SendOptionsBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottomSheet() {
 
-    private val navigationArgs: ScheduleSendBottomSheetDialogArgs by navArgs()
+    private var binding: BottomSheetSendOptionsBinding by safeBinding()
+
+    private val navigationArgs: SendOptionsBottomSheetDialogArgs by navArgs()
 
     override val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
 
@@ -41,7 +52,48 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ScheduleOptionsBotto
     override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
     override val currentlyScheduledEpochMillis: Long? by lazy { navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L } }
 
-    override val titleRes: Int = R.string.scheduleSendingTitle
+    override val lastScheduleOption get() = binding.lastScheduleOption
+    override val scheduleOptionsContainer get() = binding.scheduleOptions
+    override val customScheduleOption get() = binding.customScheduleOption
+
+    // Whether a "last selected schedule" option is relevant. Stored to restore it when the schedule section is revealed.
+    private var hasLastScheduleOption = false
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return BottomSheetSendOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupScheduleOptions()
+        hasLastScheduleOption = lastScheduleOption.isVisible
+
+        setReminderOptionsVisible(isVisible = false)
+        setScheduleOptionsVisible(isVisible = false)
+
+        setupToggles()
+    }
+
+    private fun setupToggles() = with(binding) {
+        reminderIfNoAnswer.setOnClickListener { setReminderOptionsVisible(isVisible = reminderIfNoAnswer.isChecked) }
+        scheduleSending.setOnClickListener { setScheduleOptionsVisible(isVisible = scheduleSending.isChecked) }
+
+        customDelayReminder.setOnClickListener {
+            // TODO: Open the custom reminder delay picker once the reminder feature is implemented.
+        }
+    }
+
+    private fun setReminderOptionsVisible(isVisible: Boolean) = with(binding) {
+        optionsDelays.isVisible = isVisible
+        customDelayReminder.isVisible = isVisible
+    }
+
+    private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
+        lastScheduleOption.isVisible = isVisible && hasLastScheduleOption
+        scheduleOptions.isVisible = isVisible
+        customScheduleOption.isVisible = isVisible
+    }
 
     override fun onLastScheduleOptionClicked() {
         if (lastSelectedEpoch != null) {
@@ -68,9 +120,6 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ScheduleOptionsBotto
             }
         }
     }
-
-    companion object {
-        const val SCHEDULE_DRAFT_RESULT = "schedule_draft_result"
-        const val OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER = "open_schedule_draft_date_and_time_picker"
-    }
 }
+
+
