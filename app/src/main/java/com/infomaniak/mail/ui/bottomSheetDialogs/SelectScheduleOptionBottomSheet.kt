@@ -17,26 +17,20 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.common.utils.getNextMonday
 import com.infomaniak.core.common.utils.getTimeAtHour
 import com.infomaniak.core.common.utils.isAtLeastXMinutesInTheFuture
 import com.infomaniak.core.common.utils.isWeekend
 import com.infomaniak.core.common.utils.tomorrow
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN_SELECTABLE_DATE_MINUTES
 import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Afternoon
 import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Evening
@@ -60,28 +54,19 @@ import kotlin.time.Duration.Companion.minutes
 
 abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
-    private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
+    protected abstract val lastScheduleOption: ActionItemView
+    protected abstract val scheduleOptionsContainer: LinearLayout
+    protected abstract val customScheduleOption: ActionItemView
 
     abstract val lastSelectedEpoch: Long?
     abstract val currentlyScheduledEpochMillis: Long?
     abstract val currentKSuite: KSuite?
 
-    @get:StringRes
-    abstract val titleRes: Int
-
     abstract fun onLastScheduleOptionClicked()
     abstract fun onScheduleOptionClicked(dateItem: ScheduleOption)
     abstract fun onCustomScheduleOptionClicked()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return BottomSheetScheduleOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
-        super.onViewCreated(view, savedInstanceState)
-
-        title.text = getString(titleRes)
-
+    protected fun setupScheduleOptions() {
         computeLastScheduleOption()
 
         setLastScheduleOptionClickListener()
@@ -89,7 +74,7 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
         setCustomScheduleOptionClickListener()
 
         val shouldDisplayDivider = lastScheduleOption.isVisible
-        (scheduleOptions.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
+        (scheduleOptionsContainer.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
 
         customScheduleOption.trailingContent = when (currentKSuite) {
             KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
@@ -98,37 +83,38 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
         }
     }
 
-    private fun computeLastScheduleOption() = with(binding) {
+    private fun computeLastScheduleOption() {
         val lastSelectedDate = lastSelectedEpoch?.let { Date(it) }
 
         if (lastSelectedDate?.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES) == true && lastSelectedDate.isNotAlreadySelected()) {
             lastScheduleOption.isVisible = true
-            lastScheduleOption.setDescription(context.dayOfWeekDateWithoutYear(date = lastSelectedDate))
+            lastScheduleOption.setDescription(requireContext().dayOfWeekDateWithoutYear(date = lastSelectedDate))
         }
     }
 
     private fun setLastScheduleOptionClickListener() {
-        binding.lastScheduleOption.setOnClickListener { onLastScheduleOptionClicked() }
+        lastScheduleOption.setOnClickListener { onLastScheduleOptionClicked() }
     }
 
     private fun createCommonScheduleOptions() {
         val currentTime = Date()
         WeekPeriod.getCurrent().scheduleOptions.forEach { scheduleOption ->
             if (scheduleOption.canBeDisplayedAt(currentTime) && scheduleOption.isNotAlreadySelected()) {
-                binding.scheduleOptions.addView(createScheduleOptionItem(scheduleOption))
+                scheduleOptionsContainer.addView(createScheduleOptionItem(scheduleOption))
             }
         }
     }
 
-    private fun createScheduleOptionItem(scheduleOption: ScheduleOption): ActionItemView = ActionItemView(binding.context).apply {
-        setTitle(scheduleOption.titleRes)
-        setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
-        setIconResource(scheduleOption.iconRes)
-        setOnClickListener { onScheduleOptionClicked(scheduleOption) }
-    }
+    private fun createScheduleOptionItem(scheduleOption: ScheduleOption): ActionItemView =
+        ActionItemView(requireContext()).apply {
+            setTitle(scheduleOption.titleRes)
+            setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
+            setIconResource(scheduleOption.iconRes)
+            setOnClickListener { onScheduleOptionClicked(scheduleOption) }
+        }
 
     private fun setCustomScheduleOptionClickListener() {
-        binding.customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
+        customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
     }
 
     private fun Date.isNotAlreadySelected(): Boolean {

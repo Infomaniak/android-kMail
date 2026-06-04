@@ -30,7 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottomSheet() {
+class SnoozeBottomSheetDialog @Inject constructor() : ScheduleOptionsBottomSheet() {
 
     private val navigationArgs: SnoozeBottomSheetDialogArgs by navArgs()
 
