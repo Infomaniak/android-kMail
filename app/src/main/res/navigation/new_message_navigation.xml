@@ -103,10 +103,10 @@
     </dialog>
 
     <dialog
-        android:id="@+id/scheduleSendBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog"
-        android:label="ScheduleSendBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_schedule_options">
+        android:id="@+id/sendOptionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SendOptionsBottomSheetDialog"
+        android:label="SendOptionsBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_send_options">
         <argument
             android:name="lastSelectedScheduleEpochMillis"
             android:defaultValue="0L"
