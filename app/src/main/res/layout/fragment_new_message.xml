@@ -643,13 +643,13 @@
                             tools:visibility="visible" />
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/scheduleButton"
+                            android:id="@+id/sendOptionsButton"
                             style="@style/IconButton"
                             android:layout_width="@dimen/newMessageToolbarItemWidth"
                             android:layout_height="match_parent"
-                            android:contentDescription="@string/scheduleSendingTitle"
+                            android:contentDescription="@string/sendOptions"
                             android:visibility="gone"
-                            app:icon="@drawable/ic_schedule_send"
+                            app:icon="@drawable/ic_param_dots"
                             tools:visibility="visible" />
 
                         <com.google.android.material.button.MaterialButton

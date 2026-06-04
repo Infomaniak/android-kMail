@@ -834,7 +834,7 @@ class NewMessageFragment : Fragment() {
     private fun observeScheduledDraftsFeatureFlagUpdates() {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
-            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+            binding.sendOptionsButton.isVisible = isScheduledDraftsEnabled
 
             val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
 
@@ -920,11 +920,11 @@ class NewMessageFragment : Fragment() {
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleButton.isEnabled = it
+            sendOptionsButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener {
+        sendOptionsButton.setOnClickListener {
             if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
                     snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
