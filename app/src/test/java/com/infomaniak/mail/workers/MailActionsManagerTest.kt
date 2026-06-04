@@ -99,7 +99,7 @@ class MailActionsManagerTest {
             every { file.exists() } answers { true }
 
             val mockedAttachment = spyk(getAttachment())
-            mockkStatic("com.infomaniak.mail.data.models.extensions.ModelsExtensionsKt")
+            mockkStatic("com.infomaniak.mail.data.models.extensions.AttachmentExtensionsKt")
             every { mockedAttachment.getUploadLocalFile() } answers { file }
 
             mockkObject(AccountUtils)
