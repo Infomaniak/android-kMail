@@ -580,7 +580,7 @@ class NewMessageViewModel @Inject constructor(
     private suspend fun Draft.initLiveData(signatures: List<Signature>) {
         val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
 
-        encryptionPassword.postValue(encryptionKey)
+        encryptionKey?.let { encryptionPassword.postValue(it) }
 
         fromLiveData.postValue(
             UiFrom(
