@@ -98,6 +98,13 @@ class ItemSettingView @JvmOverloads constructor(
         }
     }
 
+    fun removeSubtitle(){
+        binding.subtitle.apply {
+            text = null
+            isGone = true
+        }
+    }
+
     fun setSubtitle(subtitle: String) {
         binding.subtitle.apply {
             text = subtitle
