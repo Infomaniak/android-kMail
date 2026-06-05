@@ -80,9 +80,9 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
-import com.infomaniak.mail.ui.bottomSheetDialogs.SendOptionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.DraftSendOptionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -815,7 +815,7 @@ class NewMessageFragment : Fragment() {
         val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
             resId = R.id.sendOptionsBottomSheetDialog,
-            args = SendOptionsBottomSheetDialogArgs(
+            args = DraftSendOptionsBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,

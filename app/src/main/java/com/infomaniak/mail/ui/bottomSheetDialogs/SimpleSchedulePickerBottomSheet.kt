@@ -22,11 +22,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
+import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 
 
-abstract class ScheduleOptionsBottomSheet : SelectScheduleOptionBottomSheet() {
+abstract class SimpleSchedulePickerBottomSheet : BaseSchedulePickerBottomSheet() {
 
     private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
 
@@ -46,5 +50,30 @@ abstract class ScheduleOptionsBottomSheet : SelectScheduleOptionBottomSheet() {
 
         binding.title.text = getString(titleRes)
         setupScheduleOptions()
+    }
+
+    override fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
+        return ActionItemView(requireContext()).apply {
+            setTitle(scheduleOption.titleRes)
+            setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
+            setIconResource(scheduleOption.iconRes)
+            setOnClickListener { onScheduleOptionClicked(scheduleOption) }
+        }
+    }
+
+    override fun bindLastScheduleOptionDescription(description: String) {
+        binding.lastScheduleOption.setDescription(description)
+    }
+
+    override fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) {
+        (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
+    }
+
+    override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+        binding.customScheduleOption.trailingContent = when (kSuite) {
+            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+            else -> TrailingContent.Chevron
+        }
     }
 }

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntRange
@@ -45,18 +46,16 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.NextMondayMornin
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.ThisAfternoon
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.ThisEvening
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.TomorrowMorning
-import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import java.util.Calendar
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 
-abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
+abstract class BaseSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
-    protected abstract val lastScheduleOption: ActionItemView
+    protected abstract val lastScheduleOption: View
     protected abstract val scheduleOptionsContainer: LinearLayout
-    protected abstract val customScheduleOption: ActionItemView
+    protected abstract val customScheduleOption: View
 
     abstract val lastSelectedEpoch: Long?
     abstract val currentlyScheduledEpochMillis: Long?
@@ -66,6 +65,11 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
     abstract fun onScheduleOptionClicked(dateItem: ScheduleOption)
     abstract fun onCustomScheduleOptionClicked()
 
+    protected abstract fun createScheduleOptionItem(scheduleOption: ScheduleOption): View
+    protected abstract fun bindLastScheduleOptionDescription(description: String)
+    protected abstract fun setupCustomScheduleOptionTrailing(kSuite: KSuite?)
+    protected open fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) = Unit
+
     protected fun setupScheduleOptions() {
         computeLastScheduleOption()
 
@@ -74,13 +78,9 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
         setCustomScheduleOptionClickListener()
 
         val shouldDisplayDivider = lastScheduleOption.isVisible
-        (scheduleOptionsContainer.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
+        scheduleOptionsContainer.children.firstOrNull()?.let { setupFirstScheduleOptionDivider(it, shouldDisplayDivider) }
 
-        customScheduleOption.trailingContent = when (currentKSuite) {
-            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
-            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
-            else -> TrailingContent.Chevron
-        }
+        setupCustomScheduleOptionTrailing(currentKSuite)
     }
 
     private fun computeLastScheduleOption() {
@@ -88,7 +88,7 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
         if (lastSelectedDate?.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES) == true && lastSelectedDate.isNotAlreadySelected()) {
             lastScheduleOption.isVisible = true
-            lastScheduleOption.setDescription(requireContext().dayOfWeekDateWithoutYear(date = lastSelectedDate))
+            bindLastScheduleOptionDescription(requireContext().dayOfWeekDateWithoutYear(date = lastSelectedDate))
         }
     }
 
@@ -96,7 +96,7 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
         lastScheduleOption.setOnClickListener { onLastScheduleOptionClicked() }
     }
 
-    private fun createCommonScheduleOptions() {
+    protected open fun createCommonScheduleOptions() {
         val currentTime = Date()
         WeekPeriod.getCurrent().scheduleOptions.forEach { scheduleOption ->
             if (scheduleOption.canBeDisplayedAt(currentTime) && scheduleOption.isNotAlreadySelected()) {
@@ -105,13 +105,6 @@ abstract class SelectScheduleOptionBottomSheet : EdgeToEdgeBottomSheetDialog() {
         }
     }
 
-    private fun createScheduleOptionItem(scheduleOption: ScheduleOption): ActionItemView =
-        ActionItemView(requireContext()).apply {
-            setTitle(scheduleOption.titleRes)
-            setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
-            setIconResource(scheduleOption.iconRes)
-            setOnClickListener { onScheduleOptionClicked(scheduleOption) }
-        }
 
     private fun setCustomScheduleOptionClickListener() {
         customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
