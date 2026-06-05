@@ -23,6 +23,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.ksuite.data.KSuite
@@ -36,6 +37,7 @@ import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
+import com.infomaniak.mail.utils.extensions.applyContentPaddingStart
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
@@ -102,6 +104,9 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
             binding.customScheduleOption.removeSubtitle()
             Log.i("elouan", "selected schedule epoch: $selectedScheduleEpoch")
         }
+
+        val paddingStartValue = resources.getDimensionPixelSize(R.dimen.emptyStatePadding)
+        (scheduleOptions.children + customScheduleOption).forEach { view -> view.applyContentPaddingStart(paddingStartValue) }
     }
 
     private fun setupReminderOptions() = with(binding) {
@@ -109,15 +114,16 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         days3.setText(getString(R.string.daysBeforeSendingReminder, 3))
         days7.setText(getString(R.string.daysBeforeSendingReminder, 7))
 
+        val paddingStartValue = resources.getDimensionPixelSize(R.dimen.emptyStatePadding)
+        (optionsDelays.children + customDelayReminder).forEach { view -> view.applyContentPaddingStart(paddingStartValue) }
+
         optionsDelays.onItemCheckedListener { _, value, _ ->
             selectedReminderEpoch = value?.toLongOrNull()
             binding.customDelayReminder.setCheckMark(displayCheckMark = false)
             binding.customDelayReminder.removeSubtitle()
         }
 
-        customDelayReminder.setOnClickListener {
-            onCustomDelayReminderClicked()
-        }
+        customDelayReminder.setOnClickListener { onCustomDelayReminderClicked() }
     }
 
     override fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
@@ -129,9 +135,7 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         }
     }
 
-    override fun bindLastScheduleOptionDescription(description: String) {
-        binding.lastScheduleOption.setDescription(description)
-    }
+    override fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
 
     override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) = Unit // TODO: add myksuite+ chip if needed
 
