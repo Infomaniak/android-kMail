@@ -32,7 +32,9 @@ import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
+import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
@@ -65,6 +67,7 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     private var hasLastScheduleOption = false
 
     private var selectedScheduleEpoch: Long? = null
+    private var selectedReminderEpoch: Long? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetSendOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -96,6 +99,7 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         scheduleOptions.onItemCheckedListener { _, value, _ ->
             selectedScheduleEpoch = value?.toLongOrNull()
             binding.customScheduleOption.setCheckMark(displayCheckMark = false)
+            binding.customScheduleOption.removeSubtitle()
             Log.i("elouan", "selected schedule epoch: $selectedScheduleEpoch")
         }
     }
@@ -106,11 +110,13 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         days7.setText(getString(R.string.daysBeforeSendingReminder, 7))
 
         optionsDelays.onItemCheckedListener { _, value, _ ->
-            Log.i("elouan", "clic on : ${value} hours")
+            selectedReminderEpoch = value?.toLongOrNull()
+            binding.customDelayReminder.setCheckMark(displayCheckMark = false)
+            binding.customDelayReminder.removeSubtitle()
         }
 
         customDelayReminder.setOnClickListener {
-            Log.i("elouan", "clic on custom delay reminder")
+            onCustomDelayReminderClicked()
         }
     }
 
@@ -142,18 +148,21 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
 
     override fun onLastScheduleOptionClicked() = Unit
 
-    override fun onScheduleOptionClicked(dateItem: ScheduleOption) {
-        Log.i("elouan", "onScheduleOptionClicked test: ${dateItem.titleRes}")
-    }
+    override fun onScheduleOptionClicked(dateItem: ScheduleOption) = Unit
 
-    override fun onCustomScheduleOptionClicked() {
+    override fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
+
+    private fun onCustomDelayReminderClicked() = executeIfAuthorized { showCustomDelayReminderDatePicker() }
+
+    private fun executeIfAuthorized(onAuthorized: () -> Unit) {
         val kSuite = currentKSuite
         val matomoName = MatomoName.ScheduledCustomDate.value
+
         when (kSuite) {
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
             KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
-            else -> showCustomScheduleDatePicker()
+            else -> onAuthorized()
         }
     }
 
@@ -162,12 +171,30 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
             onDateSelected = { timestamp ->
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
                 selectedScheduleEpoch = timestamp
-                binding.customScheduleOption.setSubtitle(requireContext().dayOfWeekDateWithoutYear(date = Date(timestamp)))
-                binding.customScheduleOption.setCheckMark(displayCheckMark = true)
-                binding.scheduleOptions.clearCheck()
+                applyCustomDateSelectionUi(timestamp, binding.customScheduleOption, binding.scheduleOptions)
             },
         )
     }
+
+    private fun showCustomDelayReminderDatePicker() {
+        dateAndTimeScheduleDialog.show(
+            onDateSelected = { timestamp ->
+                trackScheduleSendEvent(MatomoName.CustomReminder)
+                selectedReminderEpoch = timestamp
+                applyCustomDateSelectionUi(timestamp, binding.customDelayReminder, binding.optionsDelays)
+            },
+        )
+    }
+
+    private fun applyCustomDateSelectionUi(
+        timestamp: Long,
+        optionView: ItemSettingView,
+        groupView: SettingRadioGroupView
+    ) {
+        val formattedDate = requireContext().dayOfWeekDateWithoutYear(date = Date(timestamp))
+
+        optionView.setSubtitle(formattedDate)
+        optionView.setCheckMark(displayCheckMark = true)
+        groupView.clearCheck()
+    }
 }
-
-
