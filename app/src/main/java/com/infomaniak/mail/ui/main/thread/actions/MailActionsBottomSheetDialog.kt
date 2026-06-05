@@ -33,7 +33,6 @@ import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
-import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import kotlinx.coroutines.runBlocking
