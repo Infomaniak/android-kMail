@@ -89,29 +89,29 @@
             app:itemAction="toggle"
             app:title="@string/scheduleSendingTitle" />
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/lastScheduleOption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:icon="@drawable/ic_last_schedule_selected"
-            app:title="@string/lastSelectedSchedule"
-            app:visibleDivider="false"
-            tools:visibility="visible" />
-
-        <LinearLayout
+        <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
             android:id="@+id/scheduleOptions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:visibility="gone"
+            tools:visibility="visible">
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/lastScheduleOption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:text="@string/lastSelectedSchedule"
+                tools:visibility="visible" />
+
+        </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+
+        <com.infomaniak.mail.ui.main.settings.ItemSettingView
             android:id="@+id/customScheduleOption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:icon="@drawable/ic_pen"
-            app:iconTint="?attr/colorPrimary"
+            app:itemAction="chevron"
             app:title="@string/buttonCustomSchedule"
             tools:visibility="visible" />
 
