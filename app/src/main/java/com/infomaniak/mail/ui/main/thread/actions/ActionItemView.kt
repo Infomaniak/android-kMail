@@ -29,8 +29,6 @@ import androidx.annotation.StyleableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.core.ksuite.ksuitepro.views.EvolveChipView
-import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuitePlusChipView
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.core.ui.view.extension.setPaddingRelative
@@ -46,8 +44,7 @@ class ActionItemView @JvmOverloads constructor(
 
     private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val kSuitePersoChipView by lazy { MyKSuitePlusChipView(context) }
-    private val kSuiteProChipView by lazy { EvolveChipView(context) }
+    private val kSuiteChipManager by lazy { KSuiteChipManager(binding.trailingContentLayout) }
 
     var trailingContent = TrailingContent.None
         set(value) {
@@ -121,8 +118,7 @@ class ActionItemView @JvmOverloads constructor(
 
     private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
         trailingContentLayout.isVisible = true
-        trailingContentLayout.removeView(kSuitePersoChipView)
-        trailingContentLayout.removeView(kSuiteProChipView)
+        kSuiteChipManager.displayChipFor(trailingContent)
 
         when (trailingContent) {
             TrailingContent.None -> trailingContentLayout.isGone = true
@@ -134,31 +130,13 @@ class ActionItemView @JvmOverloads constructor(
                 description.isVisible = true
                 actionIcon.isGone = true
             }
-            TrailingContent.KSuitePersoChip -> {
-                // ComposeView are not compatible with view without lifecycles (ex: PopupWindow in RecipientFieldView).
-                // This is causing a crash so to avoid that, we have to programmatically
-                // add the Compose view only where it's needed.
-                trailingContentLayout.addView(kSuitePersoChipView)
-
-                actionIcon.isGone = true
-                description.isGone = true
-            }
-            TrailingContent.KSuiteProChip -> {
-                // ComposeView are not compatible with view without lifecycles (ex: PopupWindow in RecipientFieldView).
-                // This is causing a crash so to avoid that, we have to programmatically
-                // add the Compose view only where it's needed.
-                trailingContentLayout.addView(kSuiteProChipView)
-
+            TrailingContent.KSuitePersoChip, TrailingContent.KSuiteProChip -> {
                 actionIcon.isGone = true
                 description.isGone = true
             }
         }
     }
 
-    /** Keep the entries order, it's used by the attribute (or change also the attributes order in attrs.xml) */
-    enum class TrailingContent {
-        None, Chevron, Description, KSuitePersoChip, KSuiteProChip,
-    }
 
     private fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {
         return getDimensionPixelSize(index, NOT_SET).takeIf { it != NOT_SET }
