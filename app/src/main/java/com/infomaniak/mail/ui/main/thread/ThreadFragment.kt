@@ -83,9 +83,9 @@ import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.PhoneContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForSnoozeDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialogArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -1033,7 +1033,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         val mailbox = mainViewModel.currentMailbox.value ?: return
         safeNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
-            args = ScheduleSendBottomSheetDialogArgs(
+            args = RescheduleDraftBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
                 currentKSuite = mailbox.kSuite,

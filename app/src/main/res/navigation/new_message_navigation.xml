@@ -104,7 +104,7 @@
 
     <dialog
         android:id="@+id/sendOptionsBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SendOptionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.DraftSendOptionsBottomSheetDialog"
         android:label="SendOptionsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_send_options">
         <argument
