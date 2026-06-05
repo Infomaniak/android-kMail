@@ -36,6 +36,7 @@ import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDia
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.applyContentPaddingStart
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
@@ -114,6 +115,8 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         days3.setText(getString(R.string.daysBeforeSendingReminder, 3))
         days7.setText(getString(R.string.daysBeforeSendingReminder, 7))
 
+        customDelayReminder.trailingContent = trailingContentFor(currentKSuite)
+
         val paddingStartValue = resources.getDimensionPixelSize(R.dimen.emptyStatePadding)
         (optionsDelays.children + customDelayReminder).forEach { view -> view.applyContentPaddingStart(paddingStartValue) }
 
@@ -137,7 +140,16 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
 
     override fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
 
-    override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) = Unit // TODO: add myksuite+ chip if needed
+    override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+        binding.customScheduleOption.trailingContent = trailingContentFor(kSuite)
+    }
+
+    private fun trailingContentFor(kSuite: KSuite?): TrailingContent = when (kSuite) {
+        KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+        KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+        else -> TrailingContent.Chevron
+    }
+
 
     private fun setReminderOptionsVisible(isVisible: Boolean) = with(binding) {
         optionsDelays.isVisible = isVisible
