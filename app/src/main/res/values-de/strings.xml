@@ -219,6 +219,7 @@
     <string name="contentDescriptionIconForward">Weitergeleitet</string>
     <string name="contentDescriptionIconMention">Du wurdest erwähnt.</string>
     <string name="contentDescriptionIconNewMail">Neu</string>
+    <string name="contentDescriptionIconReminder">Ist eine Erinnerung</string>
     <string name="contentDescriptionIconReply">Antwort</string>
     <string name="contentDescriptionIconStorage">Speicherstatus</string>
     <string name="contentDescriptionOpenMailActions">Mail-Aktionen öffnen</string>

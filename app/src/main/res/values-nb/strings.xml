@@ -219,6 +219,7 @@
     <string name="contentDescriptionIconForward">Videresendt</string>
     <string name="contentDescriptionIconMention">Du har blitt nevnt.</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
+    <string name="contentDescriptionIconReminder">Er en påminnelse</string>
     <string name="contentDescriptionIconReply">Svar</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>
     <string name="contentDescriptionOpenMailActions">Åpne e-posthandlinger</string>

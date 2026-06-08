@@ -223,6 +223,7 @@
     <string name="contentDescriptionIconForward">Forwarded</string>
     <string name="contentDescriptionIconMention">You have been mentioned.</string>
     <string name="contentDescriptionIconNewMail">New</string>
+    <string name="contentDescriptionIconReminder">Is reminder</string>
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>

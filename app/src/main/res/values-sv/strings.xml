@@ -219,6 +219,7 @@
     <string name="contentDescriptionIconForward">Vidarebefordrad</string>
     <string name="contentDescriptionIconMention">Du har blivit omnämnd.</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
+    <string name="contentDescriptionIconReminder">Är en påminnelse</string>
     <string name="contentDescriptionIconReply">Svara</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>
     <string name="contentDescriptionOpenMailActions">Öppna e-poståtgärder</string>

@@ -315,8 +315,25 @@
                     android:src="@drawable/ic_at"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
-                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintEnd_toStartOf="@id/iconReminder"
                     app:layout_constraintStart_toEndOf="@id/folderNameCompactMode"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    app:tint="?attr/colorPrimary"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/iconReminder"
+                    android:layout_width="@dimen/standardIconSize"
+                    android:padding="4dp"
+                    android:layout_height="@dimen/standardIconSize"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionIconReminder"
+                    android:src="@drawable/ic_alarm_clock"
+                    android:background="@drawable/bg_reminder_icon"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintStart_toEndOf="@id/iconMention"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
                     app:tint="?attr/colorPrimary"
                     tools:visibility="visible" />
@@ -331,7 +348,7 @@
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toStartOf="@id/iconCalendar"
-                    app:layout_constraintStart_toEndOf="@id/iconMention"
+                    app:layout_constraintStart_toEndOf="@id/iconReminder"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
                     app:tint="@color/iconColorPrimaryText"
                     tools:visibility="visible" />

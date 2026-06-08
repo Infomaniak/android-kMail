@@ -219,6 +219,7 @@
     <string name="contentDescriptionIconForward">Transféré</string>
     <string name="contentDescriptionIconMention">Vous avez été mentionné.</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
+    <string name="contentDescriptionIconReminder">Est un rappel</string>
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
