@@ -22,8 +22,8 @@ import com.infomaniak.core.sentry.SentryLog
 import org.json.JSONArray
 
 class EditorJavascriptBridge(
-    private val onInlineImagesDeleted: (List<String>) -> Unit,
-    private val onMentionQueryChanged: ((String) -> Unit),
+    private val onInlineImagesDeletedCallback: (List<String>) -> Unit,
+    private val onMentionQueryChangedCallback: (String) -> Unit,
 ) {
     @JavascriptInterface
     fun onInlineImagesDeleted(cidJson: String) {
@@ -34,12 +34,12 @@ class EditorJavascriptBridge(
         }.getOrNull() ?: return
 
         val cids = (0 until jsonArray.length()).map { jsonArray.getString(it) }
-        onInlineImagesDeleted(cids)
+        onInlineImagesDeletedCallback(cids)
     }
 
     @JavascriptInterface
     fun onMentionQueryChanged(query: String) {
-        onMentionQueryChanged(query)
+        onMentionQueryChangedCallback(query)
     }
 
     companion object {

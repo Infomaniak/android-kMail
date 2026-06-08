@@ -244,6 +244,8 @@ class NewMessageViewModel @Inject constructor(
     private val _isPlaceHolderVisible = MutableStateFlow(false)
     val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
 
+    val mentionQueryLiveData = MutableLiveData("")
+
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
@@ -1179,6 +1181,10 @@ class NewMessageViewModel @Inject constructor(
         val attachmentsData = attachmentsLiveData.value ?: return
         val newAttachments = attachmentsData.filter { attachment -> !cidsToDelete.contains(attachment.contentId) }
         attachmentsLiveData.postValue(newAttachments)
+    }
+
+    fun updateMentionQuery(query: String) {
+        mentionQueryLiveData.postValue(query)
     }
 
     enum class ImportationResult {

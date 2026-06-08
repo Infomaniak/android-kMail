@@ -22,6 +22,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
@@ -34,6 +35,7 @@ import android.widget.PopupWindow
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.ViewCompat
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -49,6 +51,7 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.core.legacy.utils.FilePicker
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
+import com.infomaniak.core.legacy.views.DividerItemDecorator
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
@@ -69,6 +72,10 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
@@ -99,14 +106,17 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getTagsObserverScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
@@ -151,10 +161,12 @@ class NewMessageFragment : Fragment() {
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
+    private val tagsObserverScript by lazy { requireContext().getTagsObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
+    private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -170,6 +182,15 @@ class NewMessageFragment : Fragment() {
     private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
+    private val mentionContactAdapter by lazy {
+        ContactAdapter(
+            usedEmails = mutableSetOf(),
+            onContactClicked = ::onMentionContactClicked,
+            onAddUnrecognizedContact = {},
+            snackbarManager = snackbarManager,
+            getAddressBookWithGroup = newMessageViewModel::getAddressBookWithName,
+        )
+    }
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
 
     @Inject
@@ -438,6 +459,7 @@ class NewMessageFragment : Fragment() {
         })
 
         initEditorUi()
+        setupMentionAutocomplete()
         setupShowQuotesButton()
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -454,7 +476,10 @@ class NewMessageFragment : Fragment() {
 
     private fun initEditorUi() = with(binding) {
         editorWebView.settings.setupNewMessageWebViewSettings()
-        editorWebView.initEditorWebviewBridge(onInlineImagesDeleted = newMessageViewModel::deleteInlineAttachments)
+        editorWebView.initEditorWebviewBridge(
+            onInlineImagesDeleted = newMessageViewModel::deleteInlineAttachments,
+            onMentionQueryChanged = newMessageViewModel::updateMentionQuery,
+        )
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
         setEditorScript()
@@ -475,6 +500,7 @@ class NewMessageFragment : Fragment() {
         addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
+        addScript(tagsObserverScript)
 
         val formattedAiContentScript = setAiContentScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
@@ -502,6 +528,25 @@ class NewMessageFragment : Fragment() {
                 setPlaceholderVisibility(isVisible = false)
             }
         }
+    }
+
+    private fun onMentionContactClicked(contact: ContactAutocompletable) {
+        val merged = when (contact) {
+            is MergedContact -> contact
+            is ContactGroup -> newMessageViewModel.getMergedContactFromContactGroup(contact).firstOrNull()
+            is AddressBook -> newMessageViewModel.getMergedContactFromAddressBook(contact).firstOrNull()
+            else -> null
+        } ?: return
+
+        // Replace @query with a mention anchor carrying both display name and mail address.
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.editorWebView.executeJsMethodWhenEditorIsSetup(
+                JsExecutableMethod("insertMention", merged.email, merged.name),
+            )
+        }
+
+        binding.mentionAutoComplete.isVisible = false
+        newMessageViewModel.updateMentionQuery("")
     }
 
     private fun setToolbarEnabledStatus(isEnabled: Boolean) {
@@ -767,6 +812,37 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
             binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+        }
+    }
+
+    private fun setupMentionAutocomplete() = with(binding) {
+        val margin = resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
+        val divider = DividerItemDecorator(InsetDrawable(UiUtils.dividerDrawable(requireContext()), margin, 0, margin, 0))
+
+        mentionAutoComplete.adapter = mentionContactAdapter
+        mentionAutoComplete.addItemDecoration(divider)
+
+        // Keep panel right above IME if needed
+        ViewCompat.setOnApplyWindowInsetsListener(mentionAutoComplete) { view, insets ->
+            view.updatePadding(bottom = insets.ime().bottom)
+            insets
+        }
+
+        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (contacts, _) ->
+            mentionContactAdapter.updateContacts(contacts.filterIsInstance<MergedContact>())
+            mentionContactAdapter.updateContacts(contacts)
+        }
+
+        // Query comes from updateMentionQuery(...)
+        newMessageViewModel.mentionQueryLiveData.observe(viewLifecycleOwner) { query ->
+            if (query.isBlank()) {
+                mentionAutoComplete.isVisible = false
+                mentionContactAdapter.clear()
+                return@observe
+            }
+
+            mentionContactAdapter.searchContacts(query)
+            mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
         }
     }
 
