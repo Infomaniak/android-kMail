@@ -26,7 +26,6 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -144,7 +143,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -301,6 +302,7 @@ class NewMessageFragment : Fragment() {
         }
 
         observeScheduledDraftsFeatureFlagUpdates()
+        observeScheduleAndReminder()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -349,11 +351,6 @@ class NewMessageFragment : Fragment() {
         fromLoader.isVisible = isShimmering
         subjectLoader.isVisible = isShimmering
         bodyLoader.isVisible = isShimmering
-
-        scheduleAlert.isGone = isShimmering
-        reminderAlert.isGone = isShimmering
-        divider6.isGone = isShimmering
-        divider7.isGone = isShimmering
 
         toField.setShimmerVisibility(isShimmering)
         ccField.setShimmerVisibility(isShimmering)
@@ -460,21 +457,19 @@ class NewMessageFragment : Fragment() {
         )
 
         scheduleAlert.onAction1 {
-            // todo: Action reschedule
-            Log.i("elouan", "scheduleAlert onAction1 clicked, should reschedule the draft")
+            navigateToScheduleSendBottomSheet()
         }
         scheduleAlert.onAction2 {
-            // todo: Modify draft
-            Log.i("elouan", "scheduleAlert onAction2 clicked, should navigate to the draft modification screen")
+            // todo: check if it's ok
+            newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+            newMessageViewModel.setScheduleDate(null)
         }
 
         reminderAlert.onAction1 {
-            // todo: Action modify reminder
-            Log.i("elouan", "reminderAlert onAction1 clicked, should navigate to the reminder modification screen")
+            navigateToScheduleSendBottomSheet()
         }
         reminderAlert.onAction2 {
-            // todo: Action disable reminder
-            Log.i("elouan", "reminderAlert onAction2 clicked, should disable the reminder")
+            newMessageViewModel.reminderConfig.value = ReminderConfig.None
         }
 
         recipientFieldsManager.setupAutoCompletionFields()
@@ -502,30 +497,44 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun updateScheduleAndReminderAlerts(draft: Draft?) = with(binding) {
-        if (draft == null) return@with
-
-        if (draft.scheduleDate != null) {
-            scheduleAlert.apply {
-                setDescription(getString(R.string.scheduledEmailHeader, draft.scheduleDate))
-                isVisible = true
+    private fun observeScheduleAndReminder() {
+        newMessageViewModel.scheduleConfig.observe(viewLifecycleOwner) { config ->
+            when (config) {
+                is ScheduleConfig.Scheduled -> {
+                    binding.scheduleAlert.apply {
+                        setDescription(getString(R.string.scheduledEmailHeader, "TODO"))
+                        isVisible = true
+                    }
+                    binding.divider6.isVisible = true
+                }
+                ScheduleConfig.None -> {
+                    binding.scheduleAlert.isVisible = false
+                    binding.divider6.isVisible = false
+                }
             }
-            divider6.isVisible = true
-        } else {
-            scheduleAlert.isVisible = false
-            divider6.isVisible = false
         }
 
-        val reminderDate = draft.reminderDate
-        if (reminderDate != null) {
-            reminderAlert.apply {
-                setDescription(getString(R.string.callIfNoResponseHeaderTitle, reminderDate))
-                isVisible = true
+        newMessageViewModel.reminderConfig.observe(viewLifecycleOwner) { config ->
+            when (config) {
+                is ReminderConfig.Preset -> {
+                    binding.reminderAlert.apply {
+                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, "TODO"))
+                        isVisible = true
+                    }
+                    binding.divider7.isVisible = true
+                }
+                is ReminderConfig.Custom -> {
+                    binding.reminderAlert.apply {
+                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, "TODO"))
+                        isVisible = true
+                    }
+                    binding.divider7.isVisible = true
+                }
+                ReminderConfig.None -> {
+                    binding.reminderAlert.isVisible = false
+                    binding.divider7.isVisible = false
+                }
             }
-            divider7.isVisible = true
-        } else {
-            reminderAlert.isVisible = false
-            divider7.isVisible = false
         }
     }
 
@@ -772,8 +781,6 @@ class NewMessageFragment : Fragment() {
             setupFromField(signatures)
             editorManager.setupEditorFormatActions()
             editorManager.setupEditorFormatActionsToggle()
-
-            updateScheduleAndReminderAlerts(draft)
         }
     }
 
@@ -987,7 +994,7 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() }
+        sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() } // TODO: include SendOptionsConfig
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {

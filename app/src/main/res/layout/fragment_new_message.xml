@@ -280,15 +280,14 @@
                         android:id="@+id/scheduleAlert"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:action1="@string/buttonReschedule"
                         app:action2="@string/buttonModify"
                         app:icon="@drawable/ic_schedule_send"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider5"
-                        tools:description="Cet e-mail sera envoyé à cette date : mercredi 30 juillet 2024 à 09:00"
-                        tools:visibility="visible" />
+                        tools:description="Cet e-mail sera envoyé à cette date : mercredi 30 juillet 2024 à 09:00" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/divider6"
@@ -296,6 +295,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
                         android:layout_marginTop="@dimen/marginStandardVerySmall"
+                        android:visibility="gone"
                         app:dividerColor="@color/dividerColor"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -305,15 +305,14 @@
                         android:id="@+id/reminderAlert"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:action1="@string/buttonModify"
                         app:action2="@string/settingsDisabled"
                         app:icon="@drawable/ic_alarm_clock"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider6"
-                        tools:description="Me rappeler si pas de réponse : mercredi 30 juillet 2024 à 09:00"
-                        tools:visibility="visible" />
+                        tools:description="Me rappeler si pas de réponse : mercredi 30 juillet 2024 à 09:00" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/divider7"
