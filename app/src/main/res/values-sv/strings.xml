@@ -179,6 +179,7 @@
     <string name="calendarAllDayLong">Hela dagen</string>
     <string name="calendarNotInvited">Du är inte inbjuden</string>
     <string name="calendarOrganizerName">%s (Arrangör)</string>
+    <string name="callIfNoResponseHeaderTitle">Påminn mig om det inte finns något svar: %s</string>
     <string name="ccTitle">Kopia:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>

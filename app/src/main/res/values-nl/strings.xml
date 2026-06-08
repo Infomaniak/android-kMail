@@ -179,6 +179,7 @@
     <string name="calendarAllDayLong">De hele dag</string>
     <string name="calendarNotInvited">U bent niet uitgenodigd</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>
+    <string name="callIfNoResponseHeaderTitle">Herinner me eraan als er geen antwoord is: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Binnenkort…</string>
     <string name="commercialFolder">Promoties</string>

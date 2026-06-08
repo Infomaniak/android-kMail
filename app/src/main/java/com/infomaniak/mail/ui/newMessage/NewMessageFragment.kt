@@ -26,6 +26,7 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -324,6 +325,11 @@ class NewMessageFragment : Fragment() {
         subjectLoader.isVisible = isShimmering
         bodyLoader.isVisible = isShimmering
 
+        scheduleAlert.isGone = isShimmering
+        reminderAlert.isGone = isShimmering
+        divider6.isGone = isShimmering
+        divider7.isGone = isShimmering
+
         toField.setShimmerVisibility(isShimmering)
         ccField.setShimmerVisibility(isShimmering)
         bccField.setShimmerVisibility(isShimmering)
@@ -428,6 +434,24 @@ class NewMessageFragment : Fragment() {
             },
         )
 
+        scheduleAlert.onAction1 {
+            // todo: Action reschedule
+            Log.i("elouan", "scheduleAlert onAction1 clicked, should reschedule the draft")
+        }
+        scheduleAlert.onAction2 {
+            // todo: Modify draft
+            Log.i("elouan", "scheduleAlert onAction2 clicked, should navigate to the draft modification screen")
+        }
+
+        reminderAlert.onAction1 {
+            // todo: Action modify reminder
+            Log.i("elouan", "reminderAlert onAction1 clicked, should navigate to the reminder modification screen")
+        }
+        reminderAlert.onAction2 {
+            // todo: Action disable reminder
+            Log.i("elouan", "reminderAlert onAction2 clicked, should disable the reminder")
+        }
+
         recipientFieldsManager.setupAutoCompletionFields()
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
@@ -449,6 +473,33 @@ class NewMessageFragment : Fragment() {
         scrim.setOnClickListener {
             scrim.isClickable = false
             aiManager.closeAiPrompt()
+        }
+    }
+
+    private fun updateScheduleAndReminderAlerts(draft: Draft?) = with(binding) {
+        if (draft == null) return@with
+
+        if (draft.scheduleDate != null) {
+            scheduleAlert.apply {
+                setDescription(getString(R.string.scheduledEmailHeader, draft.scheduleDate))
+                isVisible = true
+            }
+            divider6.isVisible = true
+        } else {
+            scheduleAlert.isVisible = false
+            divider6.isVisible = false
+        }
+
+        val reminderDate = draft.reminderDate
+        if (reminderDate != null) {
+            reminderAlert.apply {
+                setDescription(getString(R.string.callIfNoResponseHeaderTitle, reminderDate))
+                isVisible = true
+            }
+            divider7.isVisible = true
+        } else {
+            reminderAlert.isVisible = false
+            divider7.isVisible = false
         }
     }
 
@@ -653,6 +704,8 @@ class NewMessageFragment : Fragment() {
             setupFromField(signatures)
             editorManager.setupEditorFormatActions()
             editorManager.setupEditorFormatActionsToggle()
+
+            updateScheduleAndReminderAlerts(draft)
         }
     }
 
