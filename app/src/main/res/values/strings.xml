@@ -222,6 +222,7 @@
     <string name="contentDescriptionIconFolderSelected">Folder selected</string>
     <string name="contentDescriptionIconForward">Forwarded</string>
     <string name="contentDescriptionIconNewMail">New</string>
+    <string name="contentDescriptionIconReminder">Is reminder</string>
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>

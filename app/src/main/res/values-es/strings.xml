@@ -218,6 +218,7 @@
     <string name="contentDescriptionIconFolderSelected">Carpeta seleccionada</string>
     <string name="contentDescriptionIconForward">Reenviado</string>
     <string name="contentDescriptionIconNewMail">Nuevo</string>
+    <string name="contentDescriptionIconReminder">Es un recordatorio</string>
     <string name="contentDescriptionIconReply">Respuesta</string>
     <string name="contentDescriptionIconStorage">Estado de almacenamiento</string>
     <string name="contentDescriptionOpenMailActions">Acciones de mensajes abiertos</string>
