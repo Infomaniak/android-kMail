@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models.extensions
 
-import com.infomaniak.core.common.utils.enumValueOfOrNull
+import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.network.api.ApiController
 import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.data.models.draft.Draft
@@ -32,7 +32,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 
 var Draft.action
-    get() = enumValueOfOrNull<DraftAction>(_action)
+    get() = Utils.enumValueOfOrNull<DraftAction>(_action)
     set(value) {
         _action = value?.apiCallValue
     }
