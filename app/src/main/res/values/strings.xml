@@ -183,6 +183,7 @@
     <string name="calendarAllDayLong">All day long</string>
     <string name="calendarNotInvited">You are not invited</string>
     <string name="calendarOrganizerName">%s (Organizer)</string>
+    <string name="callIfNoResponseHeaderTitle">Remind me if there is no answer: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
