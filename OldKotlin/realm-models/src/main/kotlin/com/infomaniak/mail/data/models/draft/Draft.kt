@@ -114,6 +114,8 @@ class Draft : RealmObject {
             delay = null
             field = value
         }
+
+    var reminderDate: String? = "Tomorrow"
     //endregion
 
     //region Local data (Transient)

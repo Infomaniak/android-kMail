@@ -173,6 +173,7 @@
     <string name="calendarAllDayLong">Όλη την ημέρα</string>
     <string name="calendarNotInvited">Δεν είστε προσκεκλημένος</string>
     <string name="calendarOrganizerName">%s (Διοργανωτής)</string>
+    <string name="callIfNoResponseHeaderTitle">Θύμισέ μου αν δεν υπάρξει απάντηση: %s</string>
     <string name="ccTitle">Κοινοποίηση:</string>
     <string name="comingSoon">Έρχεται σύντομα…</string>
     <string name="commercialFolder">Προσφορές</string>
