@@ -279,8 +279,8 @@ fun WebView.initDisplayWebViewClientAndBridge(
     }
 }
 
-fun WebView.initEditorWebviewBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
-    val editorJsBridge = EditorJavascriptBridge(onInlineImagesDeleted)
+fun WebView.initEditorWebviewBridge(onInlineImagesDeleted: (List<String>) -> Unit, onMentionQueryChanged: (String) -> Unit) {
+    val editorJsBridge = EditorJavascriptBridge(onInlineImagesDeleted, onMentionQueryChanged)
     addJavascriptInterface(editorJsBridge, "kmail")
 }
 
