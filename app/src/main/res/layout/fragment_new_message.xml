@@ -650,6 +650,7 @@
                             android:contentDescription="@string/sendOptions"
                             android:visibility="gone"
                             app:icon="@drawable/ic_param_dots"
+                            app:iconTint="@color/icon_button_disabled"
                             tools:visibility="visible" />
 
                         <com.google.android.material.button.MaterialButton
