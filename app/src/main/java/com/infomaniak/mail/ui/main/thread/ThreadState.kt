@@ -74,7 +74,7 @@ sealed class AiProcessState {
     data class Success(val content: String = "") : AiProcessState()
     data class Error(
         val canRetry: Boolean,
-        val asAlreadyRetried: Boolean = false,
+        val hasAlreadyRetried: Boolean = false,
         val wasLoaderShown: Boolean = false,
         val targetSameAsSource: Boolean = false
     ) : AiProcessState()

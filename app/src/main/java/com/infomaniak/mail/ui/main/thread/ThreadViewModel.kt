@@ -570,7 +570,7 @@ class ThreadViewModel @Inject constructor(
         if (result == null) {
             return AiProcessState.Error(
                 canRetry = true,
-                asAlreadyRetried = isRetrying,
+                hasAlreadyRetried = isRetrying,
                 wasLoaderShown = wasLoaderShown,
                 targetSameAsSource = false,
             )
@@ -583,7 +583,7 @@ class ThreadViewModel @Inject constructor(
         val targetSameAsSource = result.error?.code == ErrorCode.TRANSLATION_TARGET_SAME_AS_SOURCE
         return AiProcessState.Error(
             canRetry = canRetry,
-            asAlreadyRetried = isRetrying,
+            hasAlreadyRetried = isRetrying,
             wasLoaderShown = wasLoaderShown,
             targetSameAsSource = targetSameAsSource,
         )
