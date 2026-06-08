@@ -397,6 +397,17 @@
             app:layout_constraintTop_toBottomOf="@id/messageDetails">
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/reminderAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/buttonModify"
+                app:action2="@string/settingsDisabled"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Me rappeler si pas de réponse : mercredi 30 juillet 2024 à 09:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/scheduleAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
