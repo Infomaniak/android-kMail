@@ -203,7 +203,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     private fun configureSentry() {
         this.configureSentry(
             isDebug = BuildConfig.DEBUG,
-            isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
+            isSentryTrackingEnabled = { localSettings.isSentryTrackingEnabled },
             isFilteredException = { exception: Throwable? ->
                 when {
                     exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> true
