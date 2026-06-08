@@ -245,6 +245,9 @@ class NewMessageViewModel @Inject constructor(
     private val _isPlaceHolderVisible = MutableStateFlow(false)
     val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
 
+    val scheduleConfig: MutableLiveData<ScheduleConfig> = MutableLiveData(ScheduleConfig.None)
+    val reminderConfig: MutableLiveData<ReminderConfig> = MutableLiveData(ReminderConfig.None)
+
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
@@ -392,6 +395,10 @@ class NewMessageViewModel @Inject constructor(
     private fun initEditorElementsVisibility(body: String) {
         setPlaceholderVisibility(isVisible = body.isHtmlBlank())
         if (initialSanitizedQuote != null) setQuotesButtonVisibility(isVisible = true)
+    }
+
+    fun disabledReminder() {
+        reminderConfig.value = ReminderConfig.None
     }
 
     private suspend fun getExistingDraft(localUuid: String?): Draft? {
