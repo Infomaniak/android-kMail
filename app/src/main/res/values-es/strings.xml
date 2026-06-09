@@ -504,7 +504,7 @@
     <string name="settingsAutoAdvancePreviousThreadTitle">Conversación anterior</string>
     <string name="settingsAutoAdvanceTitle">Avance automático</string>
     <string name="settingsCancellationPeriodDescription">Tiene la posibilidad de cancelar el envío de su correo electrónico hasta 30 segundos</string>
-    <string name="settingsCancellationPeriodTitle">Enviar plazo de anulación</string>
+    <string name="settingsCancellationPeriodTitle">Plazo de anulación del envío</string>
     <string name="settingsDefault">Por defecto</string>
     <string name="settingsDelaySeconds">%d segundos</string>
     <string name="settingsDensityOptionCompact">Compacto</string>

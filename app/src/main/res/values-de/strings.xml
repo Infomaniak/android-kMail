@@ -504,7 +504,7 @@
     <string name="settingsAutoAdvancePreviousThreadTitle">Voriges Thema</string>
     <string name="settingsAutoAdvanceTitle">Autovorschuss</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
-    <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>
+    <string name="settingsCancellationPeriodTitle">Sendeverzögerung</string>
     <string name="settingsDefault">Standard</string>
     <string name="settingsDelaySeconds">%d Sekunden</string>
     <string name="settingsDensityOptionCompact">Kompakt</string>
