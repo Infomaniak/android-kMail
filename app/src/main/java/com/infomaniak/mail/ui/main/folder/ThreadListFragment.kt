@@ -443,7 +443,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
         setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
         setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
-
     }
 
     private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) {

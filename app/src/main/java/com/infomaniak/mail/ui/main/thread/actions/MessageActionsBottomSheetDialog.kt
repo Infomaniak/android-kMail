@@ -134,7 +134,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam, isFromDraft)
         }
     }
 

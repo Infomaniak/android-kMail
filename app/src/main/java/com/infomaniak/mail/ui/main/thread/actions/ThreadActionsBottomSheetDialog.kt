@@ -136,7 +136,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private fun observePotentialBlockedUsers() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam, isFromDraft)
         }
     }
 
@@ -358,8 +358,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
         }
 
-        fun setBlockUserUi(blockSender: ActionItemView, potentialUsersToBlock: Map<Recipient, Message>, isFromSpam: Boolean) {
-            blockSender.isGone = potentialUsersToBlock.count() == 0 || isFromSpam
+        fun setBlockUserUi(
+            blockSender: ActionItemView,
+            potentialUsersToBlock: Map<Recipient, Message>,
+            isFromSpam: Boolean,
+            isFromDraft: Boolean = false
+        ) {
+            blockSender.isGone = potentialUsersToBlock.count() == 0 || isFromSpam || isFromDraft
         }
     }
 }

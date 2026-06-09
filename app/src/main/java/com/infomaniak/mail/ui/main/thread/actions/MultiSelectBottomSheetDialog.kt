@@ -265,7 +265,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
             val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+            val isFromDraft = mainViewModel.currentFolder.value?.role == FolderRole.DRAFT
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam, isFromDraft)
             hideFirstActionItemDivider()
         }
     }
