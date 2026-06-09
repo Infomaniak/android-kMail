@@ -94,11 +94,13 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.DisplayType
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.NotifyType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.AiAction
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.AiBodyUpdate
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
+import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
+import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiBodyUpdate
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
@@ -204,6 +206,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val aiActionsViewModel: AiActionsViewModel by viewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -452,10 +455,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
                     }
                 },
-                onAiBannerRetry = { messageUid, aiAction -> threadViewModel.doAiAction(messageUid, aiAction) },
+                onAiBannerRetry = { messageUid, aiAction -> aiActionsViewModel.doAiAction(messageUid, aiAction) },
                 showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage)) },
-                onAiBannerClose = { messageUid, aiAction -> threadViewModel.dismissAiAction(messageUid, aiAction) },
-                onShowOriginal = { messageUid -> threadViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
+                onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
+                onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
             ),
         )
 
@@ -825,11 +828,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET) { messageUid: String ->
-            threadViewModel.doAiAction(messageUid, AiAction.SUMMARY)
+            aiActionsViewModel.doAiAction(messageUid, AiAction.SUMMARY)
         }
 
         getBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET) { messageUid: String ->
-            threadViewModel.doAiAction(messageUid, AiAction.TRANSLATE)
+            aiActionsViewModel.doAiAction(messageUid, AiAction.TRANSLATE)
         }
     }
 
@@ -1044,7 +1047,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun observeAiStateUpdates() {
-        threadViewModel.aiStateUpdates.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
+        aiActionsViewModel.aiStateUpdates.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
             when (bodyUpdate) {
                 AiBodyUpdate.SHOW_TRANSLATED -> reloadMessageInAdapter(messageUid)
                 AiBodyUpdate.SHOW_ORIGINAL -> showOriginalMessage(messageUid)
@@ -1059,8 +1062,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         if (index < 0) return
 
         val notifyType = when (aiAction) {
-            AiAction.SUMMARY -> ThreadAdapter.NotifyType.AiSummaryStateChanged
-            AiAction.TRANSLATE -> ThreadAdapter.NotifyType.AiTranslateStateChanged
+            AiAction.SUMMARY -> NotifyType.AiSummaryStateChanged
+            AiAction.TRANSLATE -> NotifyType.AiTranslateStateChanged
         }
         threadAdapter.notifyItemChanged(index, notifyType)
     }
