@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Weitergeleitete Nachricht</string>
     <string name="messageHideQuotedText">Unterhaltung verbergen</string>
     <string name="messageIsDraftOption">Entwurf</string>
+    <string name="messageIsSending">Senden…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Diese Nachricht erscheint im Spam-Ordner, weil %s auf der Liste der blockierten Absender steht.</string>
     <string name="messageIsSpamShouldActivateFilter">Diese Nachricht wird als Spam betrachtet. Um sicher zu gehen, empfehlen wir Ihnen, Ihren Spam-Filter zu aktivieren.</string>
     <string name="messageIsSpamShouldMoveToSpam">Diese Nachricht wird als Spam betrachtet. Wir empfehlen Ihnen, sie in den Ordner \"Spam\" zu verschieben.</string>
@@ -503,7 +504,7 @@
     <string name="settingsAutoAdvancePreviousThreadTitle">Voriges Thema</string>
     <string name="settingsAutoAdvanceTitle">Autovorschuss</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
-    <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>
+    <string name="settingsCancellationPeriodTitle">Sendeverzögerung</string>
     <string name="settingsDefault">Standard</string>
     <string name="settingsDelaySeconds">%d Sekunden</string>
     <string name="settingsDensityOptionCompact">Kompakt</string>
@@ -591,6 +592,7 @@
     <string name="snackbarSaveInDraft">Ihre Nachricht wurde als Entwurf gespeichert.</string>
     <string name="snackbarScheduleSaved">Die Nachricht wird am %s verschickt</string>
     <string name="snackbarScheduling">Die Nachricht wird geplant</string>
+    <string name="snackbarSendCancelled">Senden abgebrochen</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Absender erfolgreich auf die schwarze Liste gesetzt</item>
         <item quantity="other">Erfolgreich auf die schwarze Liste gesetzte Absender</item>

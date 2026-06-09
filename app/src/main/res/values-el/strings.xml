@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Προωθημένο μήνυμα</string>
     <string name="messageHideQuotedText">Απόκρυψη συνομιλίας</string>
     <string name="messageIsDraftOption">Πρόχειρο</string>
+    <string name="messageIsSending">Αποστολή…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Αυτό το μήνυμα εμφανίζεται στον φάκελο ανεπιθύμητης αλληλογραφίας επειδή ο %s βρίσκεται στη λίστα αποκλεισμένων αποστολέων.</string>
     <string name="messageIsSpamShouldActivateFilter">Αυτό το μήνυμα θεωρείται ανεπιθύμητο. Για ασφάλεια, σας συνιστούμε να ενεργοποιήσετε το φίλτρο ανεπιθύμητης αλληλογραφίας σας.</string>
     <string name="messageIsSpamShouldMoveToSpam">Αυτό το μήνυμα θεωρείται ανεπιθύμητο. Σας συνιστούμε να το μετακινήσετε στο φάκελο \"Spam\".</string>
@@ -591,6 +592,7 @@
     <string name="snackbarSaveInDraft">Το μήνυμα αποθηκεύτηκε στα πρόχειρα.</string>
     <string name="snackbarScheduleSaved">Το μήνυμα θα σταλεί στις %s</string>
     <string name="snackbarScheduling">Το μήνυμα προγραμματίζεται</string>
+    <string name="snackbarSendCancelled">Αποστολή ακυρώθηκε</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Ο αποστολέας προστέθηκε επιτυχώς στη μαύρη λίστα</item>
         <item quantity="other">Οι αποστολείς προστέθηκαν επιτυχώς στη μαύρη λίστα</item>

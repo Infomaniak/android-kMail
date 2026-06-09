@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Vidarebefordrat meddelande</string>
     <string name="messageHideQuotedText">Dölj konversationen</string>
     <string name="messageIsDraftOption">Utkast</string>
+    <string name="messageIsSending">Skickar…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Detta meddelande visas i spam-mappen eftersom %s finns på listan över blockerade avsändare.</string>
     <string name="messageIsSpamShouldActivateFilter">Detta meddelande anses vara spam. För säkerhets skull rekommenderar vi dig att aktivera ditt spamfilter.</string>
     <string name="messageIsSpamShouldMoveToSpam">Detta meddelande anses vara spam. Vi rekommenderar dig att flytta det till mappen \"Spam\".</string>
@@ -591,6 +592,7 @@
     <string name="snackbarSaveInDraft">Ditt meddelande har sparats i utkast.</string>
     <string name="snackbarScheduleSaved">Meddelandet kommer att skickas %s</string>
     <string name="snackbarScheduling">Meddelandet schemaläggs</string>
+    <string name="snackbarSendCancelled">Sändning avbruten</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Avsändaren har lagts till i svartlistan</item>
         <item quantity="other">Avsändarna har lagts till i svartlistan</item>

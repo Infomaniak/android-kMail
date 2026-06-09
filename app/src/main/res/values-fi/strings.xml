@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Välitetty viesti</string>
     <string name="messageHideQuotedText">Piilota keskustelu</string>
     <string name="messageIsDraftOption">Luonnos</string>
+    <string name="messageIsSending">Lähetetään…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Tämä viesti näkyy roskapostikansiossa, koska %s on estettyjen lähettäjien listalla.</string>
     <string name="messageIsSpamShouldActivateFilter">Tämä viesti katsotaan roskapostiksi. Turvallisuutesi vuoksi suosittelemme roskapostisuodattimen aktivointia.</string>
     <string name="messageIsSpamShouldMoveToSpam">Tämä viesti katsotaan roskapostiksi. Suosittelemme siirtämään sen \"Roskaposti\"-kansioon.</string>
@@ -591,6 +592,7 @@
     <string name="snackbarSaveInDraft">Viestisi on tallennettu luonnoksiin.</string>
     <string name="snackbarScheduleSaved">Viesti lähetetään %s</string>
     <string name="snackbarScheduling">Viestiä ajastetaan</string>
+    <string name="snackbarSendCancelled">Lähetys peruttu</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Lähettäjä lisätty mustalle listalle onnistuneesti</item>
         <item quantity="other">Lähettäjät lisätty mustalle listalle onnistuneesti</item>

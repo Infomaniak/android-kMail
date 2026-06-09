@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Mensaje reenviado</string>
     <string name="messageHideQuotedText">Ocultar la conversación</string>
     <string name="messageIsDraftOption">Borrador</string>
+    <string name="messageIsSending">Enviando…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Este mensaje aparece en la carpeta de spam porque %s está en la lista de remitentes bloqueados.</string>
     <string name="messageIsSpamShouldActivateFilter">Este mensaje se considera spam. Para mayor seguridad, le recomendamos que active su filtro antispam.</string>
     <string name="messageIsSpamShouldMoveToSpam">Este mensaje se considera spam. Le recomendamos que lo mueva a la carpeta \"Spam\".</string>
@@ -503,7 +504,7 @@
     <string name="settingsAutoAdvancePreviousThreadTitle">Conversación anterior</string>
     <string name="settingsAutoAdvanceTitle">Avance automático</string>
     <string name="settingsCancellationPeriodDescription">Tiene la posibilidad de cancelar el envío de su correo electrónico hasta 30 segundos</string>
-    <string name="settingsCancellationPeriodTitle">Enviar plazo de anulación</string>
+    <string name="settingsCancellationPeriodTitle">Plazo de anulación del envío</string>
     <string name="settingsDefault">Por defecto</string>
     <string name="settingsDelaySeconds">%d segundos</string>
     <string name="settingsDensityOptionCompact">Compacto</string>
@@ -591,6 +592,7 @@
     <string name="snackbarSaveInDraft">Su mensaje se ha guardado en borradores.</string>
     <string name="snackbarScheduleSaved">El mensaje será enviado el %s</string>
     <string name="snackbarScheduling">El mensaje está siendo programado</string>
+    <string name="snackbarSendCancelled">Envío cancelado</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Remitente incluido en la lista negra</item>
         <item quantity="other">Remitentes incluidos con éxito en la lista negra</item>

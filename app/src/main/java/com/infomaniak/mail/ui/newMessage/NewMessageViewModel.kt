@@ -51,6 +51,7 @@ import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -158,6 +159,7 @@ class NewMessageViewModel @Inject constructor(
     private val sharedUtils: SharedUtils,
     private val signatureUtils: SignatureUtils,
     private val snackbarManager: SnackbarManager,
+    private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -1004,6 +1006,8 @@ class NewMessageViewModel @Inject constructor(
         to = toLiveData.valueOrEmpty().toRealmList()
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
+
+        if (draftAction == DraftAction.SEND) delay = localSettings.cancelDelay
 
         updateDraftAttachmentsWithLiveData(
             uiAttachments = attachmentsLiveData.valueOrEmpty(),

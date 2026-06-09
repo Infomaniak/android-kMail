@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Videresendt besked</string>
     <string name="messageHideQuotedText">Skjul samtalen</string>
     <string name="messageIsDraftOption">Kladde</string>
+    <string name="messageIsSending">Sender…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Denne besked vises i spam-mappen, fordi %s er på listen over blokerede afsendere.</string>
     <string name="messageIsSpamShouldActivateFilter">Denne besked betragtes som spam. Af sikkerhedsmæssige årsager anbefaler vi dig at aktivere dit spamfilter.</string>
     <string name="messageIsSpamShouldMoveToSpam">Denne besked betragtes som spam. Vi anbefaler dig at flytte den til \"Spam\"-mappen.</string>
@@ -591,6 +592,7 @@
     <string name="snackbarSaveInDraft">Din besked er blevet gemt i kladder.</string>
     <string name="snackbarScheduleSaved">Beskeden vil blive sendt den %s</string>
     <string name="snackbarScheduling">Beskeden planlægges</string>
+    <string name="snackbarSendCancelled">Afsendelse annulleret</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Afsender succesfuldt sortlistet</item>
         <item quantity="other">Afsendere succesfuldt sortlistet</item>

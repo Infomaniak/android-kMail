@@ -402,6 +402,7 @@
     <string name="messageForwardHeader">Przekazana wiadomość</string>
     <string name="messageHideQuotedText">Ukryj rozmowę</string>
     <string name="messageIsDraftOption">Wersja robocza</string>
+    <string name="messageIsSending">Wysyłanie…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Ta wiadomość pojawia się w folderze spam, ponieważ %s znajduje się na liście zablokowanych nadawców.</string>
     <string name="messageIsSpamShouldActivateFilter">Ta wiadomość jest uznawana za spam. W celu zapewnienia bezpieczeństwa zalecamy aktywację filtra antyspamowego.</string>
     <string name="messageIsSpamShouldMoveToSpam">Ta wiadomość jest uznawana za spam. Zalecamy przeniesienie jej do folderu \"Spam\".</string>
@@ -615,6 +616,7 @@
     <string name="snackbarSaveInDraft">Twoja wiadomość została zapisana w wersjach roboczych.</string>
     <string name="snackbarScheduleSaved">Wiadomość zostanie wysłana %s</string>
     <string name="snackbarScheduling">Wiadomość jest planowana</string>
+    <string name="snackbarSendCancelled">Wysyłanie anulowane</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Nadawca pomyślnie dodany do czarnej listy</item>
         <item quantity="few">Nadawcy pomyślnie dodani do czarnej listy</item>

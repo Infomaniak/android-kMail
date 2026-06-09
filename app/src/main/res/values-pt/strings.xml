@@ -386,6 +386,7 @@
     <string name="messageForwardHeader">Mensagem reencaminhada</string>
     <string name="messageHideQuotedText">Ocultar a conversa</string>
     <string name="messageIsDraftOption">Rascunho</string>
+    <string name="messageIsSending">A enviar…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Esta mensagem aparece na pasta spam porque %s está na lista de remetentes bloqueados.</string>
     <string name="messageIsSpamShouldActivateFilter">Esta mensagem é considerada spam. Por segurança, recomendamos que ative o filtro anti-spam.</string>
     <string name="messageIsSpamShouldMoveToSpam">Esta mensagem é considerada spam. Recomendamos que a mova para a pasta \"Spam\".</string>
@@ -591,6 +592,7 @@
     <string name="snackbarSaveInDraft">A sua mensagem foi guardada nos rascunhos.</string>
     <string name="snackbarScheduleSaved">A mensagem será enviada em %s</string>
     <string name="snackbarScheduling">A programar a mensagem</string>
+    <string name="snackbarSendCancelled">Envio cancelado</string>
     <plurals name="snackbarSenderBlacklisted" tools:ignore="ImpliedQuantity">
         <item quantity="one">Remetente colocado na lista negra com sucesso</item>
         <item quantity="other">Remetentes colocados na lista negra com sucesso</item>

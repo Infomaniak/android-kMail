@@ -309,6 +309,9 @@
             android:id="@+id/action_settings_to_autoAdvanceSettings"
             app:destination="@id/autoAdvanceFragment" />
         <action
+            android:id="@+id/action_settings_to_cancelDelaySetting"
+            app:destination="@id/cancelDelaySettingFragment" />
+        <action
             android:id="@+id/action_settings_to_threadListDensitySetting"
             app:destination="@id/threadListDensitySettingFragment" />
         <action
