@@ -73,6 +73,7 @@ import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.submitListAndAwaitCommit
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -336,6 +337,7 @@ class MenuDrawerFragment : Fragment() {
             .asFlow()
             .map(menuDrawerAdapter::formatList)
             .flowOn(Dispatchers.IO)
+            .conflate()
             .onEach { newList ->
                 val mustClearListFirst = Utils.runCatchingRealm {
                     val firstFolderUiModelInPreviousList = menuDrawerAdapter.currentList.firstOrNull {
