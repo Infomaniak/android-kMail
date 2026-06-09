@@ -25,7 +25,7 @@
     <string name="accentColorSystemTitle">System colour</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
-    <string name="actionCallIfNoResponse">Call me back if there is no answer</string>
+    <string name="actionCallIfNoResponse">Remind me if there is no answer</string>
     <string name="actionCancelSnooze">Cancel snooze</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
@@ -137,6 +137,7 @@
     <string name="buttonCopyPassword">Copy password</string>
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateFolder">Add a folder</string>
+    <string name="buttonCustomReminder">Custom reminder</string>
     <string name="buttonCustomSchedule">Custom schedule</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>

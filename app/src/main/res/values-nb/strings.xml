@@ -21,7 +21,7 @@
     <string name="accentColorSystemTitle">Systemfarge</string>
     <string name="actionArchive">Arkiver</string>
     <string name="actionBlockSender">Blokker avsender</string>
-    <string name="actionCallIfNoResponse">Ring meg tilbake hvis det ikke er svar</string>
+    <string name="actionCallIfNoResponse">Minn meg på det hvis det ikke kommer svar</string>
     <string name="actionCancelSnooze">Avbryt utsettelse</string>
     <string name="actionDelete">Slett</string>
     <string name="actionEditMenu">Rediger meny</string>
@@ -133,6 +133,7 @@
     <string name="buttonCopyPassword">Kopier passord</string>
     <string name="buttonCreate">Opprett</string>
     <string name="buttonCreateFolder">Legg til mappe</string>
+    <string name="buttonCustomReminder">Egendefinert påminnelse</string>
     <string name="buttonCustomSchedule">Egendefinert timeplan</string>
     <string name="buttonDownload">Last ned</string>
     <string name="buttonDownloadAll">Last ned alle</string>

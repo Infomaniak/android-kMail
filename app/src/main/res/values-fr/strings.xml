@@ -133,6 +133,7 @@
     <string name="buttonCopyPassword">Copier le mot de passe</string>
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
+    <string name="buttonCustomReminder">Délais personnalisé</string>
     <string name="buttonCustomSchedule">Horaire personnalisé</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
@@ -363,7 +364,7 @@
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="groupContactsTitle">Groupe : %s</string>
-    <string name="hoursBeforeSendingReminder">%d days</string>
+    <string name="hoursBeforeSendingReminder">%d heures</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="kSuiteProQuotasAlertDescription">L’espace de stockage de votre Mail est bientôt plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
     <string name="kSuiteProQuotasAlertFullDescription">L’espace de stockage de votre Mail est plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>

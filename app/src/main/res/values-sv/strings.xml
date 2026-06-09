@@ -21,7 +21,7 @@
     <string name="accentColorSystemTitle">Systemfärg</string>
     <string name="actionArchive">Arkivera</string>
     <string name="actionBlockSender">Blockera avsändare</string>
-    <string name="actionCallIfNoResponse">Ring tillbaka till mig om det inte finns något svar</string>
+    <string name="actionCallIfNoResponse">Påminn mig om det inte finns något svar</string>
     <string name="actionCancelSnooze">Avbryt vänteläge</string>
     <string name="actionDelete">Ta bort</string>
     <string name="actionEditMenu">Redigera meny</string>
@@ -133,6 +133,7 @@
     <string name="buttonCopyPassword">Kopiera lösenord</string>
     <string name="buttonCreate">Skapa</string>
     <string name="buttonCreateFolder">Lägg till en mapp</string>
+    <string name="buttonCustomReminder">Anpassad påminnelse</string>
     <string name="buttonCustomSchedule">Anpassat schema</string>
     <string name="buttonDownload">Ladda ner</string>
     <string name="buttonDownloadAll">Ladda ner alla</string>

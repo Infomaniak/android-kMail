@@ -21,7 +21,7 @@
     <string name="accentColorSystemTitle">Kolor systemowy</string>
     <string name="actionArchive">Archiwizuj</string>
     <string name="actionBlockSender">Zablokuj nadawcę</string>
-    <string name="actionCallIfNoResponse">Oddzwoń do mnie, jeśli nie ma odpowiedzi</string>
+    <string name="actionCallIfNoResponse">Przypomnij mi, jeśli nie ma odpowiedzi</string>
     <string name="actionCancelSnooze">Anuluj uśpienie</string>
     <string name="actionDelete">Usuń</string>
     <string name="actionEditMenu">Edytuj menu</string>
@@ -139,6 +139,7 @@
     <string name="buttonCopyPassword">Kopiuj hasło</string>
     <string name="buttonCreate">Utwórz</string>
     <string name="buttonCreateFolder">Dodaj folder</string>
+    <string name="buttonCustomReminder">Niestandardowe przypomnienie</string>
     <string name="buttonCustomSchedule">Niestandardowy harmonogram</string>
     <string name="buttonDownload">Pobierz</string>
     <string name="buttonDownloadAll">Pobierz wszystko</string>

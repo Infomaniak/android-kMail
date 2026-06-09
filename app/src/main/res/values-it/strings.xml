@@ -21,7 +21,7 @@
     <string name="accentColorSystemTitle">Colore del sistema</string>
     <string name="actionArchive">Archivia</string>
     <string name="actionBlockSender">Blocca mittente</string>
-    <string name="actionCallIfNoResponse">Richiamarmi se non c’è risposta</string>
+    <string name="actionCallIfNoResponse">Ricordami se non c’è risposta</string>
     <string name="actionCancelSnooze">Annulla il posticipo</string>
     <string name="actionDelete">Cestina</string>
     <string name="actionEditMenu">Menu Modifica</string>
@@ -133,6 +133,7 @@
     <string name="buttonCopyPassword">Copia la password</string>
     <string name="buttonCreate">Crea</string>
     <string name="buttonCreateFolder">Aggiungi una cartella</string>
+    <string name="buttonCustomReminder">Promemoria personalizzato</string>
     <string name="buttonCustomSchedule">Programma personalizzato</string>
     <string name="buttonDownload">Scarica</string>
     <string name="buttonDownloadAll">Scarica tutti</string>
