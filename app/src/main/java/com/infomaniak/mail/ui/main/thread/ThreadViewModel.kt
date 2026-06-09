@@ -20,7 +20,6 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import android.os.CountDownTimer
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
@@ -32,7 +31,6 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
-import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.emojicomponents.data.ReactionDetail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -67,7 +65,6 @@ import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -78,7 +75,6 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.getCurrentLanguageCode
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
@@ -118,7 +114,6 @@ import kotlinx.parcelize.Parcelize
 import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
-import com.infomaniak.core.legacy.utils.Utils as UtilsLegacy
 
 /* Please note that, for the moment, the logic that uses this list assumes that the items are necessarily messages.
 If this were to change, it would be necessary to verify the types of the elements. */
@@ -131,6 +126,7 @@ class ThreadViewModel @Inject constructor(
     private val avatarMergedContactData: AvatarMergedContactData,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
+    val threadState: ThreadState,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
@@ -159,7 +155,6 @@ class ThreadViewModel @Inject constructor(
 
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
-    val threadState = ThreadState()
 
     @DoNotReadDirectly
     private val _threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
@@ -227,11 +222,6 @@ class ThreadViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
-
-    private val aiSummaryRetryTimers = mutableMapOf<String, CountDownTimer>()
-    private val aiTranslateRetryTimers = mutableMapOf<String, CountDownTimer>()
-
-    val aiStateUpdates = SingleLiveEvent<AiStateUpdate>()
 
     val failedMessagesUids = SingleLiveEvent<List<String>>()
     val deletedMessagesUids = mutableSetOf<String>()
@@ -388,7 +378,7 @@ class ThreadViewModel @Inject constructor(
         messages: List<Message>,
         block: SuperCollapsedBlock?,
         computeBehavior: (Int, String) -> MessageBehavior,
-    ): Pair<MutableList<Any>, MutableList<Message>> = with(threadState) {
+    ): Pair<MutableList<Any>, MutableList<Message>> {
 
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
@@ -456,190 +446,6 @@ class ThreadViewModel @Inject constructor(
             threadState.cachedTranslatedSplitBodies[messageUid] = MessageBodyUtils.splitContentAndQuote(translatedBody)
         }
         return threadState.cachedTranslatedSplitBodies[messageUid]
-    }
-
-    private suspend fun updateLocalMessageBody(messageUid: String, updateAction: (Message?) -> Unit) {
-        mailboxContentRealm().write {
-            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
-                updateAction(localMessage)
-            }
-        }
-    }
-
-    fun saveTranslation(messageUid: String, translatedHtml: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = translatedHtml }
-    }
-
-    fun saveSummary(messageUid: String, summaryText: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.summary = summaryText }
-    }
-
-    fun removeSummary(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.summary = null }
-    }
-
-    fun removeTranslation(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = null }
-        threadState.cachedTranslatedSplitBodies.remove(messageUid)
-    }
-
-    fun doAiAction(messageUid: String, aiAction: AiAction) {
-        val isRetrying = getStateMap(aiAction)[messageUid] is AiProcessState.Error
-
-        cancelRetryTimer(messageUid, aiAction)
-
-        val initialState = if (isRetrying) AiProcessState.Retrying(isLoaderVisible = false) else AiProcessState.Loading
-        updateAiProcessState(messageUid, aiAction, initialState)
-
-        startRetryTimerIfNeeded(messageUid, aiAction, isRetrying)
-
-        viewModelScope.launch { processAiApiCall(messageUid, aiAction, isRetrying) }
-    }
-
-    fun dismissAiAction(messageUid: String, aiAction: AiAction) {
-        cancelRetryTimer(messageUid, aiAction)
-
-        val bodyUpdate = when (aiAction) {
-            AiAction.SUMMARY -> {
-                removeSummary(messageUid)
-                AiBodyUpdate.NONE
-            }
-            AiAction.TRANSLATE -> {
-                removeTranslation(messageUid)
-                AiBodyUpdate.SHOW_ORIGINAL
-            }
-        }
-
-        updateAiProcessState(messageUid, aiAction, AiProcessState.Dismissed, bodyUpdate)
-    }
-
-    private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetrying: Boolean) {
-        val languageCode = appContext.getCurrentLanguageCode()
-
-        val result = when (aiAction) {
-            AiAction.SUMMARY -> ApiRepository.aiSummary(languageCode, mailbox().uuid, messageUid)
-            AiAction.TRANSLATE -> ApiRepository.aiTranslate(languageCode, mailbox().uuid, messageUid)
-        }
-
-        cancelRetryTimer(messageUid, aiAction)
-
-        val currentState = getStateMap(aiAction)[messageUid]
-        if (currentState is AiProcessState.Dismissed) return
-
-        val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
-
-        val finalState = mapApiResultToState(result, isRetrying, wasLoaderShown)
-
-        var bodyUpdate = AiBodyUpdate.NONE
-        if (finalState is AiProcessState.Success) {
-            when (aiAction) {
-                AiAction.TRANSLATE -> {
-                    handleTranslateSuccess(messageUid, result.data)
-                    bodyUpdate = AiBodyUpdate.SHOW_TRANSLATED
-                }
-                AiAction.SUMMARY -> handleSummarySuccess(messageUid, result.data)
-            }
-        }
-        updateAiProcessState(messageUid, aiAction, finalState, bodyUpdate)
-    }
-
-    private suspend fun handleTranslateSuccess(messageUid: String, data: String?) {
-        val translatedHtml = data ?: ""
-        saveTranslation(messageUid, translatedHtml)
-
-        val message = messageController.getMessage(messageUid)
-        val bodyType = message?.body?.type ?: Utils.TEXT_HTML
-
-        val translatedBody = Body().apply {
-            value = translatedHtml
-            type = bodyType
-        }
-
-        val translatedSplitBody = MessageBodyUtils.splitContentAndQuote(translatedBody)
-        threadState.cachedTranslatedSplitBodies[messageUid] = translatedSplitBody
-
-        message?.splitBody = translatedSplitBody
-    }
-
-    private fun handleSummarySuccess(messageUid: String, summaryContent: String?) {
-        if (summaryContent != null) saveSummary(messageUid, summaryContent)
-    }
-
-    private fun mapApiResultToState(
-        result: ApiResponse<String>?,
-        isRetrying: Boolean,
-        wasLoaderShown: Boolean,
-    ): AiProcessState {
-        if (result == null) {
-            return AiProcessState.Error(
-                canRetry = true,
-                hasAlreadyRetried = isRetrying,
-                wasLoaderShown = wasLoaderShown,
-                targetSameAsSource = false,
-            )
-        }
-        if (result.result == ApiResponseStatus.SUCCESS) {
-            return AiProcessState.Success(result.data ?: "")
-        }
-
-        val canRetry = result.error?.code == ErrorCode.TRANSLATION_API_NOT_AVAILABLE
-        val targetSameAsSource = result.error?.code == ErrorCode.TRANSLATION_TARGET_SAME_AS_SOURCE
-        return AiProcessState.Error(
-            canRetry = canRetry,
-            hasAlreadyRetried = isRetrying,
-            wasLoaderShown = wasLoaderShown,
-            targetSameAsSource = targetSameAsSource,
-        )
-    }
-
-    private fun updateAiProcessState(
-        messageUid: String,
-        aiAction: AiAction,
-        newState: AiProcessState,
-        bodyUpdate: AiBodyUpdate = AiBodyUpdate.NONE,
-    ) {
-        getStateMap(aiAction)[messageUid] = newState
-        aiStateUpdates.postValue(AiStateUpdate(messageUid, aiAction, bodyUpdate))
-    }
-
-    private fun getStateMap(action: AiAction) = when (action) {
-        AiAction.SUMMARY -> threadState.aiSummaryStateMap
-        AiAction.TRANSLATE -> threadState.aiTranslateStateMap
-    }
-
-    private fun getTimerMap(action: AiAction) = when (action) {
-        AiAction.SUMMARY -> aiSummaryRetryTimers
-        AiAction.TRANSLATE -> aiTranslateRetryTimers
-    }
-
-    private fun cancelRetryTimer(messageUid: String, aiAction: AiAction) {
-        val timersMap = getTimerMap(aiAction)
-        timersMap[messageUid]?.cancel()
-        timersMap.remove(messageUid)
-    }
-
-    private fun startRetryTimerIfNeeded(messageUid: String, aiAction: AiAction, isRetrying: Boolean) {
-        if (!isRetrying) return
-
-        val timer = UtilsLegacy.createRefreshTimer {
-            val state = getStateMap(aiAction)[messageUid]
-            if (state is AiProcessState.Retrying) {
-                updateAiProcessState(messageUid, aiAction, AiProcessState.Retrying(isLoaderVisible = true))
-            }
-        }
-
-        getTimerMap(aiAction)[messageUid] = timer.also { it.start() }
-    }
-
-    private fun cancelAllAiRetryTimers() {
-        (aiSummaryRetryTimers.values + aiTranslateRetryTimers.values).forEach { it.cancel() }
-        aiSummaryRetryTimers.clear()
-        aiTranslateRetryTimers.clear()
-    }
-
-    override fun onCleared() {
-        cancelAllAiRetryTimers()
-        super.onCleared()
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
@@ -965,23 +771,6 @@ class ThreadViewModel @Inject constructor(
 
     private enum class MessageBehavior {
         DISPLAYED, COLLAPSED, FIRST_AFTER_BLOCK,
-    }
-
-    enum class AiAction {
-        SUMMARY,
-        TRANSLATE,
-    }
-
-    data class AiStateUpdate(
-        val messageUid: String,
-        val aiAction: AiAction,
-        val bodyUpdate: AiBodyUpdate,
-    )
-
-    enum class AiBodyUpdate {
-        NONE,
-        SHOW_TRANSLATED,
-        SHOW_ORIGINAL,
     }
 
     sealed class SnoozeScheduleType(@StringRes val positiveButtonResId: Int) : Parcelable {
