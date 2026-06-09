@@ -70,6 +70,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     override val shouldCloseMultiSelection: Boolean = false
     private var isFromSpam: Boolean = false
+    private var isFromArchive: Boolean = false
+    private var isFromDraft: Boolean = false
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -94,12 +96,18 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             junkMessagesViewModel.threadsUids = listOf(threadUid)
             val folderRole = folderRoleUtils.getActionFolderRole(message)
             isFromSpam = folderRole == FolderRole.SPAM
+            isFromDraft = folderRole == FolderRole.DRAFT
+            isFromArchive = folderRole == FolderRole.ARCHIVE
 
             setMarkAsReadUi(message.isSeen)
-            setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
-            setFavoriteUi(message.isFavorite)
+            setArchiveUi(isFromArchive, isFromDraft)
+            setFavoriteUi(message.isFavorite, isFromDraft)
             setReactionUi(message.isValidReactionTarget)
-            setSpamUi(binding.spam, isFromSpam)
+            setSpamUi(binding.spam, isFromSpam, isFromDraft)
+            setMainActionUi(isFromDraft)
+            setMoveUi(isFromDraft)
+            setMarkUnreadUi(isFromDraft)
+            setReportPhishingUi(isFromDraft)
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
@@ -126,7 +134,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam, isFromDraft)
         }
     }
 

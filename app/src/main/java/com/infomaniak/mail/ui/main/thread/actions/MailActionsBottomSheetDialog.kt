@@ -166,16 +166,39 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         setTitle(readTextRes)
     }
 
-    fun setFavoriteUi(isFavorite: Boolean) = with(binding.favorite) {
-        val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
-        setIconResource(favoriteIconRes)
-        setTitle(favoriteText)
+    fun setFavoriteUi(isFavorite: Boolean, isFromDraft: Boolean) = with(binding.favorite) {
+        isVisible = !isFromDraft
+        if (!isFromDraft) {
+            val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
+            setIconResource(favoriteIconRes)
+            setTitle(favoriteText)
+        }
     }
 
-    fun setArchiveUi(isFromArchive: Boolean) = with(binding.archive) {
+    fun setMainActionUi(isFromDraft: Boolean) {
+        binding.mainActions.isVisible = !isFromDraft
+    }
+
+    fun setMoveUi(isFromDraft: Boolean) {
+        binding.move.isVisible = !isFromDraft
+    }
+
+    fun setMarkUnreadUi(isFromDraft: Boolean) {
+        binding.markAsReadUnread.isVisible = !isFromDraft
+    }
+
+    fun setReportPhishingUi(isFromDraft: Boolean) {
+        binding.phishing.isVisible = !isFromDraft
+    }
+
+    fun setArchiveUi(isFromArchive: Boolean, isFromDraft: Boolean) = with(binding.archive) {
+        isVisible = !isFromDraft
         if (isFromArchive) {
             setIconResource(R.drawable.ic_drawer_inbox)
             setTitle(R.string.actionMoveToInbox)
+        } else {
+            setIconResource(R.drawable.ic_archive_folder)
+            setTitle(R.string.actionArchive)
         }
     }
 

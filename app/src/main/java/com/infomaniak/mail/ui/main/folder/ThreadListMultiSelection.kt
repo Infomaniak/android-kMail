@@ -201,9 +201,11 @@ class ThreadListMultiSelection {
 
             val isSelectionEmpty = selectedThreads.isEmpty()
             threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
-                val isFromArchive = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
+                val actionFolderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads)
+                val isArchiveOrDraft = actionFolderRole == FolderRole.ARCHIVE || actionFolderRole == FolderRole.DRAFT
+
                 for (index in 0 until getButtonCount()) {
-                    val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
+                    val shouldDisable = isSelectionEmpty || (isArchiveOrDraft && index == ARCHIVE_INDEX)
                     if (shouldDisable) disable(index) else enable(index)
                 }
             }
