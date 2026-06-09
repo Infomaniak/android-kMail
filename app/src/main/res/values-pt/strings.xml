@@ -331,6 +331,8 @@
     <string name="errorNewFolderNameTooLong">O nome da pasta não deve exceder 255 caracteres</string>
     <string name="errorRefusedRecipients">O servidor está a recusar todos os destinatários</string>
     <string name="errorRefusedSender">O servidor está a recusar o remetente</string>
+    <string name="errorReminderDelayTooShort">O lembrete deve ser definido com pelo menos %d hora de antecedência</string>
+    <string name="errorReminderTooCloseToSchedule">O lembrete deve ser definido pelo menos %d hora após o envio programado.</string>
     <string name="errorScheduleDelayTooShort">Não pode programar um e-mail em menos de %d minutos</string>
     <string name="errorScheduledSnoozeDelayTooShort">O tempo mínimo para adiar um e-mail é de %d minutos</string>
     <string name="errorSendLimitExceeded">Limite de envio atingido</string>

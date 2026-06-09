@@ -331,6 +331,8 @@
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>
     <string name="errorRefusedSender">Il server respinge il mittente</string>
+    <string name="errorReminderDelayTooShort">Il promemoria deve essere impostato con almeno %d ora di preavviso</string>
+    <string name="errorReminderTooCloseToSchedule">Il promemoria deve essere impostato almeno %d ora dopo l’invio programmato.</string>
     <string name="errorScheduleDelayTooShort">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</string>
     <string name="errorScheduledSnoozeDelayTooShort">Il tempo minimo per posticipare un’email è di %d minuti</string>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>

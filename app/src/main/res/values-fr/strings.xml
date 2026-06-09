@@ -331,6 +331,8 @@
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
     <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>
+    <string name="errorReminderDelayTooShort">Le rappel doit être fixé au moins %d heure dans le futur</string>
+    <string name="errorReminderTooCloseToSchedule">Le rappel doit être fixé au moins %d heure après l’envoi programmé.</string>
     <string name="errorScheduleDelayTooShort">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</string>
     <string name="errorScheduledSnoozeDelayTooShort">Le délai minimum pour mettre un e-mail en attente est de %d minutes</string>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>

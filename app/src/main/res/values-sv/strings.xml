@@ -331,6 +331,8 @@
     <string name="errorNewFolderNameTooLong">Mappnamnet får inte överstiga 255 tecken</string>
     <string name="errorRefusedRecipients">Servern vägrar alla mottagare</string>
     <string name="errorRefusedSender">Servern vägrar avsändaren</string>
+    <string name="errorReminderDelayTooShort">Påminnelsen måste vara minst %d timme fram i tiden</string>
+    <string name="errorReminderTooCloseToSchedule">Påminnelsen måste vara minst %d timme efter den schemalagda sändningstiden.</string>
     <string name="errorScheduleDelayTooShort">Du kan inte schemalägga ett e-postmeddelande mindre än %d minuter framåt i tiden</string>
     <string name="errorScheduledSnoozeDelayTooShort">Minimitiden för att sätta ett e-postmeddelande i vänteläge är %d minuter</string>
     <string name="errorSendLimitExceeded">Sändningsgränsen nådd</string>
