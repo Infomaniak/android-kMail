@@ -20,10 +20,10 @@ package com.infomaniak.mail.utils.extensions
 import io.realm.kotlin.types.RealmInstant
 import java.util.Date
 
-fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
+fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000_000L)
 
 fun Date.toRealmInstant(): RealmInstant {
     val seconds = time / 1_000L
-    val nanoseconds = (time - seconds * 1_000L).toInt()
+    val nanoseconds = (time - seconds * 1_000_000L).toInt()
     return RealmInstant.from(seconds, nanoseconds)
 }
