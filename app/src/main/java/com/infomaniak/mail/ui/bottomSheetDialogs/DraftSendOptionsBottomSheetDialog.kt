@@ -37,10 +37,10 @@ import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
+import com.infomaniak.mail.ui.newMessage.DelayHours
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.ui.newMessage.ReminderConfig
 import com.infomaniak.mail.ui.newMessage.ScheduleConfig
-import com.infomaniak.mail.ui.newMessage.DelayHours
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.applyContentPaddingStart
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
@@ -100,11 +100,15 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
 
     private fun setupToggles() = with(binding) {
         reminderIfNoAnswer.setOnClickListener {
-            if (!reminderIfNoAnswer.isChecked) newMessageViewModel.reminderConfig.value = ReminderConfig.None
+            if (!reminderIfNoAnswer.isChecked) {
+                removeReminderOptionsSelection()
+            }
             setReminderOptionsVisible(isVisible = reminderIfNoAnswer.isChecked)
         }
         scheduleSending.setOnClickListener {
-            if (!scheduleSending.isChecked) newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+            if (!scheduleSending.isChecked) {
+                removeScheduleOptionsSelection()
+            }
             setScheduleOptionsVisible(isVisible = scheduleSending.isChecked)
         }
     }
@@ -186,6 +190,20 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     private fun setReminderOptionsVisible(isVisible: Boolean) = with(binding) {
         optionsDelays.isVisible = isVisible
         customDelayReminder.isVisible = isVisible
+    }
+
+    private fun removeReminderOptionsSelection() = with(binding) {
+        optionsDelays.clearCheck()
+        customDelayReminder.setCheckMark(displayCheckMark = false)
+        customDelayReminder.removeSubtitle()
+        newMessageViewModel.reminderConfig.value = ReminderConfig.None
+    }
+
+    private fun removeScheduleOptionsSelection() = with(binding) {
+        scheduleOptions.clearCheck()
+        customScheduleOption.setCheckMark(displayCheckMark = false)
+        customScheduleOption.removeSubtitle()
+        newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
     }
 
     private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
@@ -290,6 +308,7 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
                 if (scheduleEpoch != null && timestamp <= scheduleEpoch) {
                     newMessageViewModel.reminderConfig.value = ReminderConfig.Preset(DelayHours.HOURS_24)
                     binding.optionsDelays.check(R.id.hours24)
+                    binding.customDelayReminder.setCheckMark(displayCheckMark = false)
                 } else {
                     newMessageViewModel.reminderConfig.value = ReminderConfig.Custom(timestamp)
                     applyCustomDateSelectionUi(timestamp, binding.customDelayReminder, binding.optionsDelays)
