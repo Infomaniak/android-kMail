@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Um recibo de leitura foi enviado ao remetente.</string>
     <string name="actionArchive">Arquivar</string>
     <string name="actionBlockSender">Bloquear remetente</string>
-    <string name="actionCallIfNoResponse">Ligar-me de volta se não houver resposta</string>
+    <string name="actionCallIfNoResponse">Lembra-me se não houver resposta</string>
     <string name="actionCancelSnooze">Cancelar lembrete</string>
     <string name="actionDelete">Eliminar</string>
     <string name="actionEditMenu">Editar menu</string>
@@ -137,6 +137,7 @@
     <string name="buttonCopyPassword">Copiar palavra-passe</string>
     <string name="buttonCreate">Criar</string>
     <string name="buttonCreateFolder">Adicionar uma pasta</string>
+    <string name="buttonCustomReminder">Lembrete personalizado</string>
     <string name="buttonCustomSchedule">Programação personalizada</string>
     <string name="buttonDownload">Transferir</string>
     <string name="buttonDownloadAll">Transferir tudo</string>

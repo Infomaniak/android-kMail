@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Es wurde eine Lesebestätigung an den Absender gesendet.</string>
     <string name="actionArchive">Archiv</string>
     <string name="actionBlockSender">Absender blockieren</string>
-    <string name="actionCallIfNoResponse">Bei keiner Antwort zurückrufen</string>
+    <string name="actionCallIfNoResponse">Erinnere mich, wenn es keine Antwort gibt</string>
     <string name="actionCancelSnooze">Schlummern abbrechen</string>
     <string name="actionDelete">Löschen</string>
     <string name="actionEditMenu">Menü Bearbeiten</string>
@@ -137,6 +137,7 @@
     <string name="buttonCopyPassword">Passwort kopieren</string>
     <string name="buttonCreate">Erstellen</string>
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
+    <string name="buttonCustomReminder">Benutzerdefinierte Erinnerung</string>
     <string name="buttonCustomSchedule">Benutzerdefinierter Zeitplan</string>
     <string name="buttonDownload">Herunterladen</string>
     <string name="buttonDownloadAll">Alle herunterladen</string>

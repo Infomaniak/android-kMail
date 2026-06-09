@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">En kvittering for læsning er blevet sendt til afsenderen.</string>
     <string name="actionArchive">Arkivér</string>
     <string name="actionBlockSender">Bloker afsender</string>
-    <string name="actionCallIfNoResponse">Ring mig tilbage hvis der ikke er svar</string>
+    <string name="actionCallIfNoResponse">Mind mig om det, hvis der ikke er svar</string>
     <string name="actionCancelSnooze">Annuller udsættelse</string>
     <string name="actionDelete">Slet</string>
     <string name="actionEditMenu">Rediger menu</string>
@@ -137,6 +137,7 @@
     <string name="buttonCopyPassword">Kopiér adgangskode</string>
     <string name="buttonCreate">Opret</string>
     <string name="buttonCreateFolder">Tilføj en mappe</string>
+    <string name="buttonCustomReminder">Brugerdefineret påmindelse</string>
     <string name="buttonCustomSchedule">Tilpasset tidsplan</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download alle</string>

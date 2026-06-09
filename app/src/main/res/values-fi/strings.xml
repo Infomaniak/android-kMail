@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Vastaanottokuittaus on lähetetty lähettäjälle.</string>
     <string name="actionArchive">Arkistoi</string>
     <string name="actionBlockSender">Estä lähettäjä</string>
-    <string name="actionCallIfNoResponse">Soita minulle takaisin, jos vastausta ei tule</string>
+    <string name="actionCallIfNoResponse">Muistuta minua, jos vastausta ei tule</string>
     <string name="actionCancelSnooze">Peruuta torkku</string>
     <string name="actionDelete">Poista</string>
     <string name="actionEditMenu">Muokkaa valikkoa</string>
@@ -137,6 +137,7 @@
     <string name="buttonCopyPassword">Kopioi salasana</string>
     <string name="buttonCreate">Luo</string>
     <string name="buttonCreateFolder">Lisää kansio</string>
+    <string name="buttonCustomReminder">Mukautettu muistutus</string>
     <string name="buttonCustomSchedule">Mukautettu aikataulu</string>
     <string name="buttonDownload">Lataa</string>
     <string name="buttonDownloadAll">Lataa kaikki</string>
