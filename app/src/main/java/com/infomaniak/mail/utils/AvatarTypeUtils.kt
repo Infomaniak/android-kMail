@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.extensions.initials
+import com.infomaniak.mail.data.models.extensions.shouldDisplayUserAvatar
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 object AvatarTypeUtils {

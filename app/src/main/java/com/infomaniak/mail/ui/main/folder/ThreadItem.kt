@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.thread.Thread
 
@@ -25,7 +25,7 @@ sealed interface ThreadListItem {
     data class Content(val thread: Thread) : ThreadListItem
     data class SectionTitle(val title: String) : ThreadListItem
     data class ContactItem(val contact: MergedContact) : ThreadListItem
-    data class FlushFolderButton(val folderRole: Folder.FolderRole) : ThreadListItem
+    data class FlushFolderButton(val folderRole: FolderRole) : ThreadListItem
     data object LoadMore : ThreadListItem
     data object Spacer : ThreadListItem
 }

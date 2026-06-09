@@ -69,8 +69,14 @@ import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.action
+import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
+import com.infomaniak.mail.data.models.extensions.getDefaultSignatureWithFallback
+import com.infomaniak.mail.data.models.extensions.getDummySignature
+import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
+import com.infomaniak.mail.data.models.extensions.setUploadStatus
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
@@ -574,7 +580,7 @@ class NewMessageViewModel @Inject constructor(
     private suspend fun Draft.initLiveData(signatures: List<Signature>) {
         val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
 
-        encryptionPassword.postValue(encryptionKey)
+        encryptionKey?.let { encryptionPassword.postValue(it) }
 
         fromLiveData.postValue(
             UiFrom(

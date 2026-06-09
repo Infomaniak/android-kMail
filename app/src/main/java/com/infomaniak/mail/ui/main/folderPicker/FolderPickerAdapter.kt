@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderUi
+import com.infomaniak.mail.data.models.extensions.folderIconRes
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAdapter.MoveFolderViewHolder
@@ -126,7 +127,7 @@ class FolderPickerAdapter @Inject constructor() : ListAdapter<FolderPickerItem, 
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<FolderPickerItem>() {
         override fun areItemsTheSame(oldItem: FolderPickerItem, newItem: FolderPickerItem) = runCatchingRealm {
-            return when (oldItem) {
+            when (oldItem) {
                 is FolderPickerItem.Divider if newItem is FolderPickerItem.Divider -> true // Dividers don't have any content, so always true.
                 is FolderPickerItem.Folder if newItem is FolderPickerItem.Folder && oldItem.folderUi.folder.id == newItem.folderUi.folder.id -> true
                 else -> false

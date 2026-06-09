@@ -21,6 +21,7 @@ import android.content.Context
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.SplitBody
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.ui.newMessage.BodyContentPayload
 import com.infomaniak.mail.ui.newMessage.BodyContentType
@@ -225,17 +226,6 @@ object MessageBodyUtils {
      */
     private fun anyCssClassContaining(cssClass: String) = "[class*=$cssClass]"
     //endregion
-
-    data class SplitBody(
-        val content: String,
-        val quote: String? = null,
-    ) {
-        override fun equals(other: Any?): Boolean {
-            return other === this || (other is SplitBody && other.content == content && other.quote == quote)
-        }
-
-        override fun hashCode(): Int = 31 * content.hashCode() + quote.hashCode()
-    }
 
     data class BodyData(val body: BodyContentPayload, val signature: Element?, val quote: Element?)
 }

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.library")
     id("kotlin-android")
@@ -20,16 +22,14 @@ android {
         targetCompatibility = javaVersion
     }
 
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-    }
-
     flavorDimensions += "distribution"
     productFlavors {
         create("standard")
         create("fdroid")
     }
 }
+
+kotlin.compilerOptions.jvmTarget = JvmTarget.valueOf("JVM_${javaVersion.name.substringAfter("VERSION_")}")
 
 dependencies {
     api(libs.jsoup)

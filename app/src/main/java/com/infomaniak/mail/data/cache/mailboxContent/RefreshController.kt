@@ -32,7 +32,12 @@ import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshSt
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.extensions.messagesBlocking
+import com.infomaniak.mail.data.models.extensions.refreshStrategy
+import com.infomaniak.mail.data.models.extensions.updateFlags
+import com.infomaniak.mail.data.models.extensions.updateSnoozeFlags
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
@@ -41,7 +46,6 @@ import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.isSnoozeMalformed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SentryDebug
@@ -244,7 +248,7 @@ class RefreshController @Inject constructor(
             folder.unreadCountLocal = 0
             folder.oldMessagesUidsToFetch.clear()
             folder.newMessagesUidsToFetch.clear()
-            folder.remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
+            folder.remainingOldMessagesToFetch = Folder.NUMBER_OF_OLD_MESSAGES_TO_FETCH
         }
     }
 

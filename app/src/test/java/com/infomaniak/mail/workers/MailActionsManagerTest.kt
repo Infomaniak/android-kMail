@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,10 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.DraftAction
 import com.infomaniak.mail.data.models.draft.SendDraftResult
+import com.infomaniak.mail.data.models.extensions.action
+import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.dataset.DummyMailboxContent
 import com.infomaniak.mail.utils.AccountUtils
@@ -97,6 +99,7 @@ class MailActionsManagerTest {
             every { file.exists() } answers { true }
 
             val mockedAttachment = spyk(getAttachment())
+            mockkStatic("com.infomaniak.mail.data.models.extensions.AttachmentExtensionsKt")
             every { mockedAttachment.getUploadLocalFile() } answers { file }
 
             mockkObject(AccountUtils)

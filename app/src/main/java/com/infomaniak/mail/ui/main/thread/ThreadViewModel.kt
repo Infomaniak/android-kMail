@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,9 +43,12 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
+import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
+import com.infomaniak.mail.data.models.extensions.calendarAttachment
+import com.infomaniak.mail.data.models.extensions.folder
+import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.EmojiReactionState

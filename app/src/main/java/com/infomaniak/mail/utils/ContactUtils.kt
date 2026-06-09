@@ -23,10 +23,12 @@ import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.provider.ContactsContract.CommonDataKinds.Email
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.legacy.utils.hasPermissions
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
@@ -100,7 +102,12 @@ object ContactUtils {
             apiContact.emails.forEach { email ->
                 Recipient.createValidRecipientOrNull(email = email, name = apiContact.name)?.let { key ->
                     phoneMergedContacts[key]?.updatePhoneContactWithApiContact(apiContact) ?: run {
-                        phoneMergedContacts[key] = MergedContact(email, apiContact, comesFromApi = true)
+                        phoneMergedContacts[key] = MergedContact(
+                            email = email,
+                            apiContact = apiContact,
+                            comesFromApi = true,
+                            avatarUrl = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
+                        )
                     }
                 }
             }

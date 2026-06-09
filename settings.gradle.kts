@@ -18,6 +18,9 @@ dependencyResolutionManagement {
         create("core") {
             from(files("Core/gradle/core.versions.toml"))
         }
+        create("oldKotlinCatalog") {
+            from(files("OldKotlin/gradle/libs.versions.toml"))
+        }
     }
 }
 
@@ -26,6 +29,9 @@ plugins {
 }
 
 rootProject.name = "Infomaniak Mail"
+
+includeBuild("OldKotlin")
+
 include(
     ":app",
     ":Core:Legacy",

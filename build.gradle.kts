@@ -20,7 +20,6 @@ plugins {
     alias(core.plugins.android.application) apply false
     alias(core.plugins.android.library) apply false
     alias(core.plugins.dagger.hilt) apply false
-    alias(libs.plugins.realm.kotlin) apply false
 }
 
 tasks.register("clean", Delete::class) { delete(rootProject.layout.buildDirectory) }

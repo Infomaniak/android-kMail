@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,14 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
+import com.infomaniak.mail.data.models.extensions.getFormattedPreview
+import com.infomaniak.mail.data.models.extensions.notificationsIsDisabled
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.extensions.displayedName
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import com.infomaniak.mail.utils.NotificationUtils.Companion.EXTRA_MESSAGE_UID
@@ -45,7 +48,6 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
