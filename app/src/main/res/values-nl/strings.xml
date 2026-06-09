@@ -338,6 +338,8 @@
     <string name="errorNewFolderNameTooLong">De mapnaam mag niet meer dan 255 tekens bevatten</string>
     <string name="errorRefusedRecipients">De server weigert alle ontvangers</string>
     <string name="errorRefusedSender">De server weigert de afzender</string>
+    <string name="errorReminderDelayTooShort">De herinnering moet minstens %d uur vooruit staan</string>
+    <string name="errorReminderTooCloseToSchedule">De herinnering moet minstens %d uur na de geplande verzendtijd worden ingesteld.</string>
     <string name="errorScheduleDelayTooShort">U kunt geen e-mail plannen over minder dan %d minuten</string>
     <string name="errorScheduledSnoozeDelayTooShort">De minimale tijd om een e-mail te snoozen is %d minuten</string>
     <string name="errorSendLimitExceeded">Verzendlimiet bereikt</string>

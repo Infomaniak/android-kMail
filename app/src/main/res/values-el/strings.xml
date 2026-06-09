@@ -338,6 +338,8 @@
     <string name="errorNewFolderNameTooLong">Το όνομα φακέλου δεν πρέπει να υπερβαίνει τους 255 χαρακτήρες</string>
     <string name="errorRefusedRecipients">Ο διακομιστής απορρίπτει όλους τους παραλήπτες</string>
     <string name="errorRefusedSender">Ο διακομιστής απορρίπτει τον αποστολέα</string>
+    <string name="errorReminderDelayTooShort">Η υπενθύμιση πρέπει να είναι τουλάχιστον %d ώρα στο μέλλον</string>
+    <string name="errorReminderTooCloseToSchedule">Η υπενθύμιση πρέπει να οριστεί τουλάχιστον %d ώρα μετά την προγραμματισμένη αποστολή.</string>
     <string name="errorScheduleDelayTooShort">Δεν μπορείτε να προγραμματίσετε email σε λιγότερο από %d λεπτά</string>
     <string name="errorScheduledSnoozeDelayTooShort">Ο ελάχιστος χρόνος αναμονής για email είναι %d λεπτά</string>
     <string name="errorSendLimitExceeded">Έχει επιτευχθεί το όριο αποστολής</string>

@@ -62,6 +62,8 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
 
     private var onDateSelected: ((Long) -> Unit)? = null
     private var onAbort: (() -> Unit)? = null
+    protected var scheduleDate: Date? = null
+    protected var isForReminder: Boolean = false
 
     private lateinit var selectedDate: Date
 
@@ -78,7 +80,15 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
         onAbort = null
     }
 
-    fun show(positiveButtonResId: Int? = null, onDateSelected: (Long) -> Unit, onAbort: (() -> Unit)? = null) {
+    fun show(
+        positiveButtonResId: Int? = null,
+        scheduleDateMillis: Long? = null,
+        isForReminder: Boolean = false,
+        onDateSelected: (Long) -> Unit,
+        onAbort: (() -> Unit)? = null,
+    ) {
+        scheduleDate = scheduleDateMillis?.let { Date(it) }
+        this.isForReminder = isForReminder
         showDialogWithBasicInfo(positiveButtonResId)
         setupListeners(onDateSelected, onAbort)
     }
@@ -86,7 +96,19 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     private fun showDialogWithBasicInfo(positiveButtonResId: Int?) {
         alertDialog.show()
 
-        selectDate(Date().roundUpToNextTenMinutes())
+        val initialDate = when {
+            scheduleDate != null -> Calendar.getInstance().apply {
+                time = scheduleDate!!
+                add(Calendar.HOUR_OF_DAY, 1)
+            }.time.roundUpToNextTenMinutes()
+            isForReminder -> Calendar.getInstance().apply {
+                time = Date()
+                add(Calendar.HOUR_OF_DAY, 1)
+            }.time.roundUpToNextTenMinutes()
+            else -> Date().roundUpToNextTenMinutes()
+        }
+
+        selectDate(initialDate)
         positiveButton.setText(positiveButtonResId ?: defaultPositiveButtonResId)
     }
 
@@ -133,11 +155,20 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     }
 
     private fun updateErrorMessage(date: Date) {
-        val isValid = date.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES)
+        val minMinutes = if (isForReminder) MIN_SELECTABLE_REMINDER_HOURS * 60 else MIN_SELECTABLE_DATE_MINUTES
+        val isDateValid = date.isAtLeastXMinutesInTheFuture(minMinutes)
+        val isAfterSchedule = scheduleDate?.let { date.time - it.time >= ONE_HOUR_IN_MILLIS } ?: true
 
-        if (isValid.not()) binding.errorMessage.text = getErrorText(date)
-        binding.errorMessage.isVisible = isValid.not()
-        positiveButton.isEnabled = isValid
+        val errorMessage = when {
+            isDateValid.not() -> if (isForReminder) getReminderTooShortErrorMessage() else getErrorText(date)
+            isAfterSchedule.not() -> getTooCloseToScheduleErrorMessage()
+            else -> null
+        }
+
+        val hasError = errorMessage != null
+        if (hasError) binding.errorMessage.text = errorMessage
+        binding.errorMessage.isVisible = hasError
+        positiveButton.isEnabled = !hasError
     }
 
     private fun getErrorText(date: Date): String = if (date.isInTheFuture()) {
@@ -175,7 +206,13 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
         datePicker.show(super.activity.supportFragmentManager, null)
     }
 
+    protected open fun getTooCloseToScheduleErrorMessage(): String? = null
+
+    protected open fun getReminderTooShortErrorMessage(): String? = null
+
     companion object {
         const val MIN_SELECTABLE_DATE_MINUTES = 5
+        const val MIN_SELECTABLE_REMINDER_HOURS = 1
+        private const val ONE_HOUR_IN_MILLIS = 3_600_000L // 60 * 60 * 1000
     }
 }

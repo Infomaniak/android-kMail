@@ -338,6 +338,8 @@
     <string name="errorNewFolderNameTooLong">Mappenavnet må ikke overstige 255 tegn</string>
     <string name="errorRefusedRecipients">Serveren nekter alle mottakere</string>
     <string name="errorRefusedSender">Serveren nekter avsenderen</string>
+    <string name="errorReminderDelayTooShort">Påminnelsen må være minst %d time frem i tid</string>
+    <string name="errorReminderTooCloseToSchedule">Påminnelsen må være minst %d time etter den planlagte avsendelsestiden.</string>
     <string name="errorScheduleDelayTooShort">Du kan ikke planlegge en e-post på mindre enn %d minutter</string>
     <string name="errorScheduledSnoozeDelayTooShort">Minimumstid for å utsette en e-post er %d minutter</string>
     <string name="errorSendLimitExceeded">Sendegrense nådd</string>

@@ -342,6 +342,8 @@
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
     <string name="errorRefusedSender">The server is refusing the sender</string>
+    <string name="errorReminderDelayTooShort">The reminder must be at least %d hour in the future</string>
+    <string name="errorReminderTooCloseToSchedule">The reminder must be at least %d hour after the scheduled send time.</string>
     <string name="errorScheduleDelayTooShort">You can’t schedule an email less than %d minutes in the future</string>
     <string name="errorScheduledSnoozeDelayTooShort">The minimum time to snooze an email is %d minutes</string>
     <string name="errorSendLimitExceeded">Sending limit reached</string>

@@ -338,6 +338,8 @@
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>
     <string name="errorRefusedRecipients">El servidor rechaza todos los destinatarios</string>
     <string name="errorRefusedSender">El servidor rechaza el remitente</string>
+    <string name="errorReminderDelayTooShort">El recordatorio debe fijarse con al menos %d hora de antelación</string>
+    <string name="errorReminderTooCloseToSchedule">El recordatorio debe fijarse al menos %d hora después del envío programado.</string>
     <string name="errorScheduleDelayTooShort">No puedes programar un correo electrónico para dentro de menos de %d minutos</string>
     <string name="errorScheduledSnoozeDelayTooShort">El tiempo mínimo para aplazar un correo electrónico es de %d minutos</string>
     <string name="errorSendLimitExceeded">Límite de envío alcanzado</string>

@@ -338,6 +338,8 @@
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein</string>
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>
+    <string name="errorReminderDelayTooShort">Die Erinnerung muss mindestens %d Stunde in der Zukunft liegen</string>
+    <string name="errorReminderTooCloseToSchedule">Die Erinnerung muss mindestens %d Stunde nach dem geplanten Versandzeitpunkt liegen.</string>
     <string name="errorScheduleDelayTooShort">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</string>
     <string name="errorScheduledSnoozeDelayTooShort">Die Mindestzeit zum Schlummern einer E-Mail beträgt %d Minuten</string>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
