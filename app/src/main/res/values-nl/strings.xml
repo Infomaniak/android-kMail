@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Een leesbewijs is naar de afzender verzonden.</string>
     <string name="actionArchive">Archiveren</string>
     <string name="actionBlockSender">Afzender blokkeren</string>
-    <string name="actionCallIfNoResponse">Me terugbellen als er geen antwoord is</string>
+    <string name="actionCallIfNoResponse">Herinner me eraan als er geen antwoord is</string>
     <string name="actionCancelSnooze">Snooze annuleren</string>
     <string name="actionDelete">Verwijderen</string>
     <string name="actionEditMenu">Menu bewerken</string>
@@ -137,6 +137,7 @@
     <string name="buttonCopyPassword">Wachtwoord kopiëren</string>
     <string name="buttonCreate">Maken</string>
     <string name="buttonCreateFolder">Een map toevoegen</string>
+    <string name="buttonCustomReminder">Aangepaste herinnering</string>
     <string name="buttonCustomSchedule">Aangepast schema</string>
     <string name="buttonDownload">Downloaden</string>
     <string name="buttonDownloadAll">Alles downloaden</string>

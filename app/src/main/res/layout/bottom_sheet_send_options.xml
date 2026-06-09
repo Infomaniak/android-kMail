@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:itemAction="chevron"
-            app:title="@string/buttonCustomSchedule"
+            app:title="@string/buttonCustomReminder"
             tools:visibility="visible" />
 
         <com.infomaniak.mail.ui.main.settings.ItemSettingView

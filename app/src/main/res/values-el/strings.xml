@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Μια απόδειξη ανάγνωσης στάλθηκε στον αποστολέα.</string>
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
-    <string name="actionCallIfNoResponse">Κάλεσέ με πίσω αν δεν υπάρχει απάντηση</string>
+    <string name="actionCallIfNoResponse">Θύμισέ μου αν δεν υπάρξει απάντηση</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
     <string name="actionDelete">Διαγραφή</string>
     <string name="actionEditMenu">Επεξεργασία μενού</string>
@@ -137,6 +137,7 @@
     <string name="buttonCopyPassword">Αντιγραφή κωδικού πρόσβασης</string>
     <string name="buttonCreate">Δημιουργία</string>
     <string name="buttonCreateFolder">Προσθήκη φακέλου</string>
+    <string name="buttonCustomReminder">Προσαρμοσμένη υπενθύμιση</string>
     <string name="buttonCustomSchedule">Προσαρμοσμένο πρόγραμμα</string>
     <string name="buttonDownload">Λήψη</string>
     <string name="buttonDownloadAll">Λήψη όλων</string>
