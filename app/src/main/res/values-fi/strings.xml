@@ -339,6 +339,8 @@
     <string name="errorNewFolderNameTooLong">Kansion nimi ei saa ylittää 255 merkkiä</string>
     <string name="errorRefusedRecipients">Palvelin hylkää kaikki vastaanottajat</string>
     <string name="errorRefusedSender">Palvelin hylkää lähettäjän</string>
+    <string name="errorReminderDelayTooShort">Muistutuksen on oltava vähintään %d tunti tulevaisuudessa</string>
+    <string name="errorReminderTooCloseToSchedule">Muistutuksen on oltava vähintään %d tuntia ajoitetun lähetysajan jälkeen.</string>
     <string name="errorScheduleDelayTooShort">Et voi ajastaa sähköpostia vähemmän kuin %d minuutin päähän</string>
     <string name="errorScheduledSnoozeDelayTooShort">Sähköpostin torkkuajan vähimmäisaika on %d minuuttia</string>
     <string name="errorSendLimitExceeded">Lähetysraja saavutettu</string>

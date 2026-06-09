@@ -301,10 +301,12 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     }
 
     private fun showCustomDelayReminderDatePicker() {
+        val scheduleEpoch = (newMessageViewModel.scheduleConfig.value as? ScheduleConfig.Scheduled)?.epochMillis
         dateAndTimeScheduleDialog.show(
+            scheduleDateMillis = scheduleEpoch,
+            isForReminder = true,
             onDateSelected = { timestamp ->
                 trackScheduleSendEvent(MatomoName.CustomReminder)
-                val scheduleEpoch = (newMessageViewModel.scheduleConfig.value as? ScheduleConfig.Scheduled)?.epochMillis
                 if (scheduleEpoch != null && timestamp <= scheduleEpoch) {
                     newMessageViewModel.reminderConfig.value = ReminderConfig.Preset(DelayHours.HOURS_24)
                     binding.optionsDelays.check(R.id.hours24)

@@ -347,6 +347,8 @@
     <string name="errorNewFolderNameTooLong">Nazwa folderu nie może przekraczać 255 znaków</string>
     <string name="errorRefusedRecipients">Serwer odrzuca wszystkich odbiorców</string>
     <string name="errorRefusedSender">Serwer odrzuca nadawcę</string>
+    <string name="errorReminderDelayTooShort">Przypomnienie musi być ustawione na co najmniej %d godzinę w przyszłości</string>
+    <string name="errorReminderTooCloseToSchedule">Przypomnienie musi być ustawione co najmniej %d godzinę po zaplanowanym czasie wysyłki.</string>
     <string name="errorScheduleDelayTooShort">Nie możesz zaplanować wiadomości e-mail na mniej niż %d minut w przyszłości</string>
     <string name="errorScheduledSnoozeDelayTooShort">Minimalny czas uśpienia wiadomości e-mail to %d minut</string>
     <string name="errorSendLimitExceeded">Osiągnięto limit wysyłania</string>
