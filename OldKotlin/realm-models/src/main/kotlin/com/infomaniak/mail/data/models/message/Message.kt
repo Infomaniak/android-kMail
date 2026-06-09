@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2026 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.mail.internal.enumValueOfOrNull
 import com.infomaniak.core.common.utils.mailApiEnum
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
@@ -29,9 +28,10 @@ import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferFile
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.internal.enumValueOfOrNull
 import com.infomaniak.mail.internal.replaceContent
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.backlinks

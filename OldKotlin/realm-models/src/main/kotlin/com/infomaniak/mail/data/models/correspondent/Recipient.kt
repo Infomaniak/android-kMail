@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2026 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
+import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.internal.customReadBoolean
 import com.infomaniak.mail.internal.customWriteBoolean
-import com.infomaniak.mail.data.models.InternalModelProperties
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.parcelize.Parceler
