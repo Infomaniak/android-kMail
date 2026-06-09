@@ -59,6 +59,7 @@ app/src/androidTest/            # Espresso UI tests
 - **Repository**: Data access via controllers (`ThreadController`, `DraftController`)
 - **DI**: Use Hilt `@Inject` constructor
 - **Database**: Models extend `RealmObject` or `EmbeddedRealmObject`
+- **Realm migrations:** When adding, removing, renaming, or type-changing a persisted property, increment the matching schema version constant (`USER_INFO_SCHEMA_VERSION`, `MAILBOX_INFO_SCHEMA_VERSION`, or `MAILBOX_CONTENT_SCHEMA_VERSION`) in `RealmDatabase.kt`, and update the corresponding migration block in `MailboxContentMigration.kt`, `MailboxInfoMigration.kt`, or `RealmMigrations.kt` when existing data needs migration.
 - **SOLID/KISS**: Keep classes focused; prefer multiple smaller classes over one large class
 
 ### Commands
