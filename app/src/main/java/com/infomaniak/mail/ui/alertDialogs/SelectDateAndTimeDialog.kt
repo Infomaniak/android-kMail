@@ -26,7 +26,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH_YEAR
 import com.infomaniak.core.common.utils.day
 import com.infomaniak.core.common.utils.format
@@ -39,8 +38,11 @@ import com.infomaniak.core.common.utils.roundUpToNextTenMinutes
 import com.infomaniak.core.common.utils.setHour
 import com.infomaniak.core.common.utils.setMinute
 import com.infomaniak.core.common.utils.year
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
+import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_DATE_MINUTES
+import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_REMINDER_HOURS
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import java.util.Calendar
 import java.util.Date
@@ -211,8 +213,6 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     protected open fun getReminderTooShortErrorMessage(): String? = null
 
     companion object {
-        const val MIN_SELECTABLE_DATE_MINUTES = 5
-        const val MIN_SELECTABLE_REMINDER_HOURS = 1
         private const val ONE_HOUR_IN_MILLIS = 3_600_000L // 60 * 60 * 1000
     }
 }

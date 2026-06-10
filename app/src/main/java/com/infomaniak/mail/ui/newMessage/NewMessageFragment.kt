@@ -135,10 +135,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -209,6 +208,9 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
+
+    private val isScheduled: Boolean
+        get() = newMessageViewModel.scheduleConfig.value is ScheduleConfig.Scheduled
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -868,7 +870,25 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() } // TODO: include SendOptionsConfig
+        sendButton.setOnClickListener {
+            if (!checkMailboxStorage(mailbox)) return@setOnClickListener
+
+            val scheduleConfig = newMessageViewModel.scheduleConfig.value
+            val isSendingScheduled = if (scheduleConfig is ScheduleConfig.Scheduled) {
+                if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds > System.currentTimeMillis()) {
+                    newMessageViewModel.setScheduleDate(Date(scheduleConfig.epochMillis))
+                    true
+                } else {
+                    newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+                    newMessageViewModel.resetScheduledDate()
+                    false
+                }
+            } else {
+                false
+            }
+
+            tryToSendEmail(isSendingScheduled)
+        }
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
@@ -956,7 +976,6 @@ class NewMessageFragment : Fragment() {
         trackConfirmEvent = MatomoName.SendWithoutAttachmentConfirm,
         isScheduled = isScheduled,
     )
-
 
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
 
