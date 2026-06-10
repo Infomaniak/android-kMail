@@ -32,7 +32,6 @@ import com.infomaniak.core.common.utils.tomorrow
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN_SELECTABLE_DATE_MINUTES
 import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Afternoon
 import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Evening
 import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Morning
@@ -46,6 +45,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.NextMondayMornin
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.ThisAfternoon
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.ThisEvening
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.TomorrowMorning
+import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_DATE_MINUTES
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import java.util.Calendar
 import java.util.Date

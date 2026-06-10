@@ -25,6 +25,8 @@ import com.google.android.material.datepicker.DateValidatorPointForward
 import com.infomaniak.core.common.utils.addYears
 import com.infomaniak.core.common.utils.startOfTheDay
 import com.infomaniak.mail.R
+import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_DATE_MINUTES
+import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_REMINDER_HOURS
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import java.util.Date

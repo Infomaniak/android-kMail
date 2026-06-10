@@ -28,3 +28,6 @@ sealed class ReminderConfig {
 }
 
 enum class DelayHours(val hours: Int) { HOURS_24(24), DAYS_3(72), DAYS_7(168) }
+
+const val MIN_SELECTABLE_DATE_MINUTES = 5
+const val MIN_SELECTABLE_REMINDER_HOURS = 1
