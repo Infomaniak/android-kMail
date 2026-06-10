@@ -35,6 +35,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -131,7 +132,7 @@ import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
-class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectionHost {
+class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectionHost, SwipeActionHost {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -153,9 +154,32 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private var isFirstTimeRefreshingThreads = true
+    override val fragment: Fragment
+        get() = this@ThreadListFragment
 
     @Inject
     override lateinit var descriptionDialog: DescriptionAlertDialog
+    override fun showSwipeActionIncompatible() {
+        snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
+    }
+
+    override fun directionsToMove(threadUid: String, sourceFolderId: String): NavDirections {
+        return ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
+            threadsUids = arrayOf(threadUid),
+            action = FolderPickerAction.MOVE,
+            sourceFolderId = sourceFolderId,
+            isFromSearch = false,
+        )
+    }
+
+    override fun directionsToQuickActions(threadUid: String): NavDirections {
+        return ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+            threadUid = threadUid,
+            shouldLoadDistantResources = false,
+            shouldCloseMultiSelection = false,
+            isFromSearch = false,
+        )
+    }
 
     @Inject
     override lateinit var folderRoleUtils: FolderRoleUtils
@@ -595,38 +619,8 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             }
             return true
         }
-        val host = SwipeActionHostFactory.create(
-            fragment = this@ThreadListFragment,
-            mainViewModel = mainViewModel,
-            actionsViewModel = actionsViewModel,
-            localSettings = localSettings,
-            threadListAdapter = threadListAdapter,
-            descriptionDialog = descriptionDialog,
-            showSwipeActionIncompatible = {
-                snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
-            },
-            directionsToMove = { threadUid, sourceFolderId ->
-                ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-                    threadsUids = arrayOf(threadUid),
-                    action = FolderPickerAction.MOVE,
-                    sourceFolderId = sourceFolderId,
-                    isFromSearch = false,
-                )
-            },
-            directionsToQuickActions = { threadUid ->
-                ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                    threadUid = threadUid,
-                    shouldLoadDistantResources = false,
-                    shouldCloseMultiSelection = false,
-                    isFromSearch = false,
-                )
-            },
-            navigateToSnoozeBottomSheet = { snoozeScheduleType, snoozeEndDate ->
-                navigateToSnoozeBottomSheet(snoozeScheduleType, snoozeEndDate)
-            },
-        )
 
-        performSwipeAction(host, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
+        performSwipeAction(this@ThreadListFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
     }
 
     private fun extendCollapseFab(scrollDirection: ScrollDirection) = with(binding) {

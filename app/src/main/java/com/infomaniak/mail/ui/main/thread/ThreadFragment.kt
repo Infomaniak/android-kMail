@@ -680,6 +680,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                            isFromSearch = parentFragment is SearchFragment
                         ).toBundle(),
                     )
                 }

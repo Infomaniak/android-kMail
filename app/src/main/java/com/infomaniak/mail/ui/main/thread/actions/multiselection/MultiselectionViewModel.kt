@@ -34,7 +34,9 @@ import javax.inject.Inject
 class MultiselectionViewModel @Inject constructor(
     application: Application,
 ) : AndroidViewModel(application) {
+
     private val _selectedThreads = mutableSetOf<Thread>()
+    
     val isMultiSelectOnLiveData = MutableLiveData(false)
     var isMultiSelectOn: Boolean
         get() = isMultiSelectOnLiveData.value ?: false

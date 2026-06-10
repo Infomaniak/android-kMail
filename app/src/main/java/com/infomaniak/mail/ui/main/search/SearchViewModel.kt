@@ -141,8 +141,8 @@ class SearchViewModel @Inject constructor(
         resetFolderFilter()
     }
 
-    fun refreshSearch(withContacts: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
-        search(withContacts = withContacts)
+    fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
+        search()
     }
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
@@ -216,9 +216,7 @@ class SearchViewModel @Inject constructor(
         filter.unselect()
     }
 
-    private fun shouldShowContacts(withContacts: Boolean): Boolean {
-        if (!withContacts) return false
-
+    private fun shouldShowContacts(): Boolean {
         val hasQuery = currentSearchQuery.isNotBlank()
         val hasNoFilters = currentFilters.isEmpty()
         val notValidated = currentUiState != SearchUiState.VALIDATED
@@ -332,7 +330,6 @@ class SearchViewModel @Inject constructor(
         filters: Set<ThreadFilter> = currentFilters,
         folder: Folder? = filterFolder,
         shouldGetNextPage: Boolean = false,
-        withContacts: Boolean = true,
     ) = withContext(ioCoroutineContext) {
         cancelSearch()
 
@@ -340,7 +337,7 @@ class SearchViewModel @Inject constructor(
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
 
-            val showContacts = shouldShowContacts(withContacts) &&
+            val showContacts = shouldShowContacts() &&
                     query.isNotBlank() &&
                     !query.contains("\"") &&
                     !isLengthTooShort(query)

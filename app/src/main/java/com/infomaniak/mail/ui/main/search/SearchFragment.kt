@@ -29,6 +29,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -69,7 +70,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
 import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager
-import com.infomaniak.mail.ui.main.folder.SwipeActionHostFactory
+import com.infomaniak.mail.ui.main.folder.SwipeActionHost
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
@@ -102,7 +103,7 @@ import javax.inject.Inject
 import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
-class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
+class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -111,9 +112,32 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
 
     @Inject
     override lateinit var folderRoleUtils: FolderRoleUtils
+    override val fragment: Fragment
+        get() = this@SearchFragment
 
     @Inject
     override lateinit var descriptionDialog: DescriptionAlertDialog
+    override fun showSwipeActionIncompatible() {
+        snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
+    }
+
+    override fun directionsToMove(threadUid: String, sourceFolderId: String): NavDirections {
+        return SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
+            threadsUids = arrayOf(threadUid),
+            action = FolderPickerAction.MOVE,
+            sourceFolderId = sourceFolderId,
+            isFromSearch = true,
+        )
+    }
+
+    override fun directionsToQuickActions(threadUid: String): NavDirections {
+        return SearchFragmentDirections.actionSearchFragmentToThreadActionsBottomSheetDialog(
+            threadUid = threadUid,
+            shouldLoadDistantResources = false,
+            shouldCloseMultiSelection = false,
+            isFromSearch = true,
+        )
+    }
 
     override fun safeNavigation(directions: NavDirections) {
         safelyNavigate(directions)
@@ -306,7 +330,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 actionsViewModel.searchRefreshEvents.collect {
                     showRefreshLayout()
-                    searchViewModel.refreshSearch(withContacts = !multiselectionViewModel.isMultiSelectOn)
+                    searchViewModel.refreshSearch()
                 }
             }
         }
@@ -412,7 +436,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
         )
 
         swipeRefreshLayout.setOnRefreshListener {
-            searchViewModel.refreshSearch(withContacts = !multiselectionViewModel.isMultiSelectOn)
+            searchViewModel.refreshSearch()
         }
     }
 
@@ -435,38 +459,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
             return true
         }
 
-        val host = SwipeActionHostFactory.create(
-            fragment = this@SearchFragment,
-            mainViewModel = mainViewModel,
-            actionsViewModel = actionsViewModel,
-            localSettings = localSettings,
-            threadListAdapter = threadListAdapter,
-            descriptionDialog = descriptionDialog,
-            showSwipeActionIncompatible = {
-                snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
-            },
-            directionsToMove = { threadUid, sourceFolderId ->
-                SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
-                    threadsUids = arrayOf(threadUid),
-                    action = FolderPickerAction.MOVE,
-                    sourceFolderId = sourceFolderId,
-                    isFromSearch = true,
-                )
-            },
-            directionsToQuickActions = { threadUid ->
-                SearchFragmentDirections.actionSearchFragmentToThreadActionsBottomSheetDialog(
-                    threadUid = threadUid,
-                    shouldLoadDistantResources = false,
-                    shouldCloseMultiSelection = false,
-                    isFromSearch = true,
-                )
-            },
-            navigateToSnoozeBottomSheet = { snoozeScheduleType, snoozeEndDate ->
-                navigateToSnoozeBottomSheet(snoozeScheduleType, snoozeEndDate)
-            },
-        )
-
-        performSwipeAction(host, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
+        performSwipeAction(this@SearchFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
     }
 
     private fun setAllFoldersButtonListener() {
@@ -650,18 +643,13 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost {
     }
 
     private fun observeMultiSelect() {
-        var wasMultiSelectOn = false
         multiselectionViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
-            if (isMultiSelectOn) {
-                searchViewModel.contactsResults.value = emptyList()
-            } else if (wasMultiSelectOn) {
-                showRefreshLayout()
-                searchViewModel.refreshSearch(withContacts = true)
-            }
-            wasMultiSelectOn = isMultiSelectOn
             val autoTransition = AutoTransition().setDuration(TOOLBAR_FADE_DURATION)
             TransitionManager.beginDelayedTransition(binding.horizontalScrollViewFilters, autoTransition)
             binding.horizontalScrollViewFilters.isGone = isMultiSelectOn
+
+            // Update contact items so they aren't clickable/focusable while multiselect is on
+            threadListAdapter.updateContactsMultiSelectState()
         }
     }
 

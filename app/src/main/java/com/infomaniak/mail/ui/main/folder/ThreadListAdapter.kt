@@ -202,11 +202,16 @@ class ThreadListAdapter @Inject constructor(
             return@runCatchingRealm
         }
 
-        if (payload == NotificationType.SELECTED_STATE && holder.itemViewType == DisplayType.THREAD.layout) {
-            val binding = holder.binding as CardviewThreadItemBinding
-            val thread = (dataSet[position] as ThreadListItem.Content).thread
-            binding.updateSelectedUi(thread)
+        when (payload) {
+            NotificationType.SELECTED_STATE -> {
+                if (holder.itemViewType == DisplayType.THREAD.layout) {
+                    val binding = holder.binding as CardviewThreadItemBinding
+                    val thread = (dataSet[position] as ThreadListItem.Content).thread
+                    binding.updateSelectedUi(thread)
+                }
+            }
         }
+
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(
@@ -601,10 +606,35 @@ class ThreadListAdapter @Inject constructor(
         contactDetails.setAvatarMarginStart(0)
         contactDetails.removeBackground()
 
-        contactWithSpace.setOnClickListener {
-            trackSearchEvent(MatomoName.SelectContact)
-            callbacks?.onContactClicked?.invoke(contact)
+        updateContactInteractivity(contact)
+    }
+
+    private fun ItemContactSearchBinding.updateContactInteractivity(contact: MergedContact) {
+        val isMultiSelectOn = multiSelection?.isEnabled == true
+
+        contactWithSpace.apply {
+            isClickable = !isMultiSelectOn
+            isFocusable = !isMultiSelectOn
+
+            setBackgroundResource(if (isMultiSelectOn) 0 else selectableItemBackgroundRes)
+
+            setOnClickListener(
+                if (isMultiSelectOn) {
+                    null
+                } else {
+                    {
+                        trackSearchEvent(MatomoName.SelectContact)
+                        callbacks?.onContactClicked?.invoke(contact)
+                    }
+                }
+            )
         }
+    }
+
+    private val selectableItemBackgroundRes: Int by lazy {
+        val outValue = android.util.TypedValue()
+        context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+        outValue.resourceId
     }
 
     override fun onSwipeStarted(item: ThreadListItem, viewHolder: ThreadListViewHolder) {
@@ -739,6 +769,13 @@ class ThreadListAdapter @Inject constructor(
                 refreshSelectedPositionIfPossible()
             }
         }
+    }
+
+    fun updateContactsMultiSelectState() {
+        val first = dataSet.indexOfFirst { it is ThreadListItem.ContactItem }
+        if (first == -1) return
+        val last = dataSet.indexOfLast { it is ThreadListItem.ContactItem }
+        notifyItemRangeChanged(first, last - first + 1)
     }
 
     private fun checkShouldUpdateOpenedThreadPosition(currentUid: String): Boolean {
