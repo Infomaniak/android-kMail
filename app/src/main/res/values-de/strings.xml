@@ -597,6 +597,8 @@
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>
     <string name="snackbarPasswordCopied">Passwort kopiert</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer in die Zwischenablage kopiert</string>
+    <string name="snackbarReminder">Die Erinnerung wird erstellt</string>
+    <string name="snackbarReminderSaved">Die Erinnerung ist für den %s eingestellt</string>
     <string name="snackbarReportPhishingConfirmation">Erfolgreich gemeldet</string>
     <string name="snackbarRestorationLaunched">Starten der Wiederherstellung</string>
     <string name="snackbarSaveInDraft">Ihre Nachricht wurde als Entwurf gespeichert.</string>

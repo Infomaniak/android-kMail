@@ -597,6 +597,8 @@
     <string name="snackbarMoveCancelled">Flytting avbrutt</string>
     <string name="snackbarPasswordCopied">Passord kopiert</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopiert til utklippstavlen</string>
+    <string name="snackbarReminder">Påminnelsen opprettes</string>
+    <string name="snackbarReminderSaved">Påminnelsen er satt til %s</string>
     <string name="snackbarReportPhishingConfirmation">Rapportert</string>
     <string name="snackbarRestorationLaunched">Starter gjenoppretting</string>
     <string name="snackbarSaveInDraft">Meldingen din er lagret i utkast.</string>

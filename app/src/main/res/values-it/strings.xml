@@ -597,6 +597,8 @@
     <string name="snackbarMoveCancelled">Spostamento annullato</string>
     <string name="snackbarPasswordCopied">Password copiata</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero copiato negli appunti</string>
+    <string name="snackbarReminder">Il promemoria è in fase di creazione</string>
+    <string name="snackbarReminderSaved">Il promemoria è impostato per il %s</string>
     <string name="snackbarReportPhishingConfirmation">Segnalato con successo</string>
     <string name="snackbarRestorationLaunched">Avvio del restauro</string>
     <string name="snackbarSaveInDraft">Il tuo messaggio è stato salvato nelle bozze.</string>

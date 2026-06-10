@@ -857,6 +857,10 @@ class MainViewModel @Inject constructor(
         showUnscheduledDraftSnackbar(apiResponse)
     }
 
+    fun disabledReminder(){
+        // TODO
+    }
+
     fun unsendMessage(unsendMessageUrl: String) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.unsendMessage(unsendMessageUrl)
         if (apiResponse.isSuccess()) {
