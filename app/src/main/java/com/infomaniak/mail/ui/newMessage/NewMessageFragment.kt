@@ -44,6 +44,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.extensions.isNightModeEnabled
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
@@ -433,20 +435,17 @@ class NewMessageFragment : Fragment() {
             },
         )
 
-        scheduleAlert.onAction1 {
-            navigateToScheduleSendBottomSheet()
-        }
-        scheduleAlert.onAction2 {
-            // todo: check if it's ok
-            newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
-            newMessageViewModel.setScheduleDate(null)
+        scheduleAlert.apply {
+            onAction1 { navigateToScheduleSendBottomSheet() }
+            onAction2 {
+                newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+                newMessageViewModel.setScheduleDate(null)
+            }
         }
 
-        reminderAlert.onAction1 {
-            navigateToScheduleSendBottomSheet()
-        }
-        reminderAlert.onAction2 {
-            newMessageViewModel.reminderConfig.value = ReminderConfig.None
+        reminderAlert.apply {
+            onAction1 { navigateToScheduleSendBottomSheet() }
+            onAction2 { newMessageViewModel.reminderConfig.value = ReminderConfig.None }
         }
 
         recipientFieldsManager.setupAutoCompletionFields()
@@ -477,8 +476,9 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.scheduleConfig.observe(viewLifecycleOwner) { config ->
             when (config) {
                 is ScheduleConfig.Scheduled -> {
+                    val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
                     binding.scheduleAlert.apply {
-                        setDescription(getString(R.string.scheduledEmailHeader, "TODO"))
+                        setDescription(getString(R.string.scheduledEmailHeader, date))
                         isVisible = true
                     }
                     binding.divider6.isVisible = true
@@ -493,15 +493,22 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.reminderConfig.observe(viewLifecycleOwner) { config ->
             when (config) {
                 is ReminderConfig.Preset -> {
+                    val hours = config.delayHours.hours
+                    val dateText = if (hours % NB_HOURS_IN_DAY == 0 && hours > NB_HOURS_IN_DAY) {
+                        getString(R.string.daysBeforeSendingReminder, hours / NB_HOURS_IN_DAY)
+                    } else {
+                        getString(R.string.hoursBeforeSendingReminder, hours)
+                    }
                     binding.reminderAlert.apply {
-                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, "TODO"))
+                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, dateText))
                         isVisible = true
                     }
                     binding.divider7.isVisible = true
                 }
                 is ReminderConfig.Custom -> {
+                    val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
                     binding.reminderAlert.apply {
-                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, "TODO"))
+                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, date))
                         isVisible = true
                     }
                     binding.divider7.isVisible = true
@@ -1012,5 +1019,9 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
+
+    companion object {
+        private const val NB_HOURS_IN_DAY = 24
+    }
 
 }
