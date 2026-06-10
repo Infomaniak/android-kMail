@@ -320,7 +320,7 @@ class ThreadListAdapter @Inject constructor(
             iconMention.isVisible = hasUnseenMentions
             iconCalendar.isGone = true // TODO: See with API when we should display this icon
             iconFavorite.isVisible = isFavorite
-            iconReminder.isVisible = isReminder
+            iconReminder.isVisible = isReminder && !isSeen
 
             val messagesCount = getDisplayedMessages(callbacks?.getFeatureFlags?.invoke(), localSettings).count()
             threadCountText.text = "$messagesCount"
