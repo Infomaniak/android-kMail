@@ -24,6 +24,6 @@ fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSeco
 
 fun Date.toRealmInstant(): RealmInstant {
     val seconds = time / 1_000L
-    val nanoseconds = (time - seconds * 1_000_000L).toInt()
+    val nanoseconds = ((time - seconds * 1_000L) * 1_000_000L).toInt()
     return RealmInstant.from(seconds, nanoseconds)
 }
