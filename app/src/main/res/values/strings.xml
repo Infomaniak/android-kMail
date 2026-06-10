@@ -627,6 +627,8 @@
     <string name="snackbarMoveCancelled">Move cancelled</string>
     <string name="snackbarPasswordCopied">Password copied</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Number copied to clipboard</string>
+    <string name="snackbarReminder">The reminder is being created</string>
+    <string name="snackbarReminderSaved">The reminder is set for %s</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
     <string name="snackbarRestorationLaunched">Launching the restoration</string>
     <string name="snackbarSaveInDraft">Your message has been saved in drafts.</string>

@@ -623,6 +623,8 @@
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
     <string name="snackbarPasswordCopied">Mot de passe copié</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numéro copié dans le presse-papiers</string>
+    <string name="snackbarReminder">Le rappel est en cours de création</string>
+    <string name="snackbarReminderSaved">Le rappel est programmé pour le %s</string>
     <string name="snackbarReportPhishingConfirmation">Signalement effectué avec succès</string>
     <string name="snackbarRestorationLaunched">Lancement de la restauration</string>
     <string name="snackbarSaveInDraft">Votre message a été sauvegardé dans les brouillons.</string>

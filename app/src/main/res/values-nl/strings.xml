@@ -623,6 +623,8 @@
     <string name="snackbarMoveCancelled">Verplaatsing geannuleerd</string>
     <string name="snackbarPasswordCopied">Wachtwoord gekopieerd</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer gekopieerd naar het klembord</string>
+    <string name="snackbarReminder">De herinnering wordt aangemaakt</string>
+    <string name="snackbarReminderSaved">De herinnering is ingesteld voor %s</string>
     <string name="snackbarReportPhishingConfirmation">Succesvol gemeld</string>
     <string name="snackbarRestorationLaunched">Het herstel starten</string>
     <string name="snackbarSaveInDraft">Uw bericht is opgeslagen in concepten.</string>

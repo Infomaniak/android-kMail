@@ -623,6 +623,8 @@
     <string name="snackbarMoveCancelled">Siirto peruutettu</string>
     <string name="snackbarPasswordCopied">Salasana kopioitu</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero kopioitu leikepöydälle</string>
+    <string name="snackbarReminder">Muistutusta luodaan</string>
+    <string name="snackbarReminderSaved">Muistutus on asetettu ajalle %s</string>
     <string name="snackbarReportPhishingConfirmation">Ilmoitus tehty onnistuneesti</string>
     <string name="snackbarRestorationLaunched">Restaurointi käynnistetty</string>
     <string name="snackbarSaveInDraft">Viestisi on tallennettu luonnoksiin.</string>

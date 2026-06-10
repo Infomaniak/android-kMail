@@ -376,6 +376,15 @@ class MainActivity : BaseActivity() {
                         )
                     }
                 }
+                DraftAction.REMINDER -> {
+                    val reminderDate = getString(DraftsActionsWorker.REMINDER_DRAFT_DATE_KEY)
+                    if (reminderDate != null) {
+                        val dateFormat = SimpleDateFormat(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR, Locale.getDefault())
+                        showReminderDraftSnackbar(
+                            reminderDate = dateFormat.parse(reminderDate)!!,
+                        )
+                    }
+                }
             }
         }
     }
@@ -435,6 +444,18 @@ class MainActivity : BaseActivity() {
                     openFolder = mainViewModel::openFolder,
                 )
             },
+        )
+    }
+
+    private fun showReminderDraftSnackbar(reminderDate: Date) {
+        showSendingSnackbarTimer.cancel()
+
+        val dateString = formatDayOfWeekAdaptiveYear(reminderDate)
+
+        snackbarManager.setValue(
+            title = String.format(getString(R.string.snackbarReminderSaved), dateString),
+            buttonTitle = R.string.settingsDisabled,
+            customBehavior = { mainViewModel.disabledReminder() },
         )
     }
 

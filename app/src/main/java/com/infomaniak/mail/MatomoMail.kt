@@ -292,6 +292,7 @@ object MatomoMail : Matomo {
         SaveInkDrive("saveInkDrive"),
         SaveToKDrive("saveToKDrive"),
         ScheduleDraft("scheduleDraft"),
+        ReminderDraft("reminderDraft"),
         ScheduledCustomDate("scheduledCustomDate"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
         SeeAllAttendees("seeAllAttendees"),
