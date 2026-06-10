@@ -166,6 +166,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val RESULT_USER_ID_KEY = "resultUserIdKey"
         const val SCHEDULED_DRAFT_DATE_KEY = "scheduledDraftDateKey"
         const val UNSCHEDULE_DRAFT_URL_KEY = "unscheduleDraftUrlKey"
+        const val REMINDER_DRAFT_DATE_KEY = "reminderDraftDateKey"
         const val CANCEL_RESOURCE_URL_KEY = "cancelResourceUrlKey"
         const val IS_SUCCESS = "isSuccess"
 

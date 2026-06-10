@@ -624,6 +624,8 @@
     <string name="snackbarMoveCancelled">Movimento cancelado</string>
     <string name="snackbarPasswordCopied">Palavra-passe copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado</string>
+    <string name="snackbarReminder">O lembrete está a ser criado</string>
+    <string name="snackbarReminderSaved">O lembrete está agendado para %s</string>
     <string name="snackbarReportPhishingConfirmation">Reporte efetuado com sucesso</string>
     <string name="snackbarRestorationLaunched">A iniciar a restauração</string>
     <string name="snackbarSaveInDraft">A sua mensagem foi guardada nos rascunhos.</string>

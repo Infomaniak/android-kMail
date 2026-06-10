@@ -624,6 +624,8 @@
     <string name="snackbarMoveCancelled">Η μετακίνηση ακυρώθηκε</string>
     <string name="snackbarPasswordCopied">Ο κωδικός αντιγράφηκε</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Ο αριθμός αντιγράφηκε στο πρόχειρο</string>
+    <string name="snackbarReminder">Η υπενθύμιση δημιουργείται</string>
+    <string name="snackbarReminderSaved">Η υπενθύμιση έχει οριστεί για %s</string>
     <string name="snackbarReportPhishingConfirmation">Η αναφορά ολοκληρώθηκε με επιτυχία</string>
     <string name="snackbarRestorationLaunched">Εκκίνηση επαναφοράς</string>
     <string name="snackbarSaveInDraft">Το μήνυμα αποθηκεύτηκε στα πρόχειρα.</string>

@@ -624,6 +624,8 @@
     <string name="snackbarMoveCancelled">Flytt avbruten</string>
     <string name="snackbarPasswordCopied">Lösenord kopierat</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopierat till urklipp</string>
+    <string name="snackbarReminder">Påminnelsen skapas</string>
+    <string name="snackbarReminderSaved">Påminnelsen är inställd för %s</string>
     <string name="snackbarReportPhishingConfirmation">Rapportering genomförd</string>
     <string name="snackbarRestorationLaunched">Återställning startas</string>
     <string name="snackbarSaveInDraft">Ditt meddelande har sparats i utkast.</string>
