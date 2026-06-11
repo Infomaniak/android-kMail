@@ -119,7 +119,7 @@ val isRelease = gradle.startParameter.taskNames.any { it.contains("release", ign
 
 val envProperties = rootProject.file("env.properties")
     .takeIf { it.exists() }
-    ?.let { file -> Properties().also { file.inputStream().use(it::load) } }
+    ?.let { file -> Properties().also { props -> file.reader().use(props::load) } }
 
 val sentryAuthToken = envProperties?.getProperty("sentryAuthToken")
     .takeUnless { it.isNullOrBlank() }
