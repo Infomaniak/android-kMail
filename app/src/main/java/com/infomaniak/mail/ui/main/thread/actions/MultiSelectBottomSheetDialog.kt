@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -173,6 +174,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 threadsUids = threadsUids,
                 mailbox = currentMailbox,
                 shouldFavorite = shouldFavorite,
+                shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.STARRED)
             )
         }
 
@@ -268,6 +270,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         shouldRead = shouldRead,
                         currentFolderId = currentFolderId,
                         mailbox = currentMailbox,
+                        shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(
+                            ThreadFilter.UNSEEN
+                        ),
                     )
                     multiselectionViewModel.isMultiSelectOn = false
                 }

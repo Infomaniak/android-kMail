@@ -93,6 +93,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.DisplayType
@@ -207,6 +208,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
 
@@ -904,6 +906,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!,
+                shouldRefreshSearch = searchViewModel.currentFilters.contains(Thread.ThreadFilter.STARRED),
             )
         }
 

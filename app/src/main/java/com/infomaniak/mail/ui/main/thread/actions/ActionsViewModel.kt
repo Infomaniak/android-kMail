@@ -468,6 +468,7 @@ class ActionsViewModel @Inject constructor(
         shouldRead: Boolean = true,
         currentFolderId: String?,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         val result = messagesActions.toggleThreadsSeenStatus(threadsUids, shouldRead, mailbox)
@@ -477,7 +478,7 @@ class ActionsViewModel @Inject constructor(
                 messagesFoldersIds = result.messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
             )
-            notifySearchRefresh()
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
 
@@ -486,6 +487,7 @@ class ActionsViewModel @Inject constructor(
         shouldRead: Boolean = true,
         currentFolderId: String?,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActions.toggleMessagesSeenStatus(messages, shouldRead, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
@@ -494,7 +496,7 @@ class ActionsViewModel @Inject constructor(
                 messagesFoldersIds = messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
             )
-            notifySearchRefresh()
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
     //endregion
@@ -504,6 +506,7 @@ class ActionsViewModel @Inject constructor(
         threadsUids: List<String>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActions.toggleThreadsFavorite(threadsUids, shouldFavorite, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
@@ -511,7 +514,7 @@ class ActionsViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = result.messages.getFoldersIds(),
             )
-            notifySearchRefresh()
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
 
@@ -519,6 +522,7 @@ class ActionsViewModel @Inject constructor(
         messages: List<Message>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActions.toggleMessagesFavorite(messages, shouldFavorite, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
@@ -526,7 +530,7 @@ class ActionsViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
             )
-            notifySearchRefresh()
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
     //endregion

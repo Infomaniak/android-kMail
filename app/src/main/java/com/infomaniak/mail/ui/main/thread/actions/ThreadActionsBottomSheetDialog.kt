@@ -41,6 +41,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -48,6 +49,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
@@ -72,6 +74,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
@@ -229,10 +232,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onReadUnread() {
             trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
+            val shouldRefreshSearch =
+                searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(ThreadFilter.UNSEEN)
             actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
                 currentFolderId = thread.folderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
+                shouldRefreshSearch = shouldRefreshSearch
             )
             twoPaneViewModel.closeThread()
         }
@@ -280,6 +286,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!,
+                shouldRefreshSearch = if (navigationArgs.isFromSearch) {
+                    searchViewModel.currentFilters.contains(ThreadFilter.STARRED)
+                } else {
+                    false
+                }
             )
         }
 

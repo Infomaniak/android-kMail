@@ -35,6 +35,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -42,6 +43,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
@@ -68,6 +70,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
@@ -219,6 +222,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     messages = listOf(message),
                     currentFolderId = message.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!,
+                    shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(
+                        ThreadFilter.UNSEEN
+                    )
                 )
                 twoPaneViewModel.closeThread()
             }
@@ -254,7 +260,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Favorite, message.isFavorite)
                 actionsViewModel.toggleMessagesFavoriteStatus(
                     messages = listOf(message),
-                    mailbox = mainViewModel.currentMailbox.value!!
+                    mailbox = mainViewModel.currentMailbox.value!!,
+                    shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.STARRED)
                 )
             }
 

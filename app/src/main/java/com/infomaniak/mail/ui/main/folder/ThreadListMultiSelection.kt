@@ -68,7 +68,7 @@ class ThreadListMultiSelection {
         unlockSwipeActionsIfSet: () -> Unit,
         localSettings: LocalSettings,
         isFromSearch: Boolean,
-        searchViewModel: SearchViewModel?,
+        searchViewModel: SearchViewModel,
     ) {
         this.mainViewModel = mainViewModel
         this.multiselectionViewModel = multiselectionViewModel
@@ -79,11 +79,7 @@ class ThreadListMultiSelection {
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
         this.localSettings = localSettings
         this.isFromSearch = isFromSearch
-
-        if (isFromSearch) {
-            requireNotNull(searchViewModel) { "searchViewModel is required when isFromSearch is true" }
-            this.searchViewModel = searchViewModel
-        }
+        this.searchViewModel = searchViewModel
 
         setupMultiSelectionActions()
         observerMultiSelection()
@@ -104,6 +100,8 @@ class ThreadListMultiSelection {
                         shouldRead = shouldMultiselectRead,
                         currentFolderId = currentFolderId,
                         mailbox = currentMailBox,
+                        shouldRefreshSearch = searchViewModel.currentFilters.contains(Thread.ThreadFilter.SEEN) ||
+                                searchViewModel.currentFilters.contains(Thread.ThreadFilter.UNSEEN)
                     )
                     isMultiSelectOn = false
                 }
@@ -127,6 +125,7 @@ class ThreadListMultiSelection {
                         threadsUids = selectedThreadsUids,
                         mailbox = currentMailBox,
                         shouldFavorite = shouldMultiselectFavorite,
+                        shouldRefreshSearch = searchViewModel.currentFilters.contains(Thread.ThreadFilter.STARRED)
                     )
                     isMultiSelectOn = false
                 }
