@@ -95,8 +95,9 @@ class SearchViewModel @Inject constructor(
 
     private var currentUiState: SearchUiState = SearchUiState.IDLE
 
-    var currentFilters = mutableSetOf<ThreadFilter>()
-        private set
+    private var _currentFilters = mutableSetOf<ThreadFilter>()
+    val currentFilters: Set<ThreadFilter>
+        get() = _currentFilters
     var isAllFoldersSelected: Boolean = false
 
     private var lastExecutedFolder: Folder? = null
@@ -131,7 +132,7 @@ class SearchViewModel @Inject constructor(
     fun executePendingSearch() = viewModelScope.launch(ioCoroutineContext) {
         val hasPendingSearch = (lastExecutedSearchQuery != currentSearchQuery)
                 || (lastExecutedFolder != filterFolder)
-                || (lastExecutedFilters != currentFilters)
+                || (lastExecutedFilters != _currentFilters)
 
         if (hasPendingSearch) search()
     }
@@ -179,18 +180,18 @@ class SearchViewModel @Inject constructor(
     }
 
     fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
-        currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
+        _currentFilters.removeAll(setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
         val newState = when {
-            currentFilters.isEmpty() && currentSearchQuery.isNotBlank() -> SearchUiState.TYPING
-            currentFilters.isEmpty() -> SearchUiState.IDLE
+            _currentFilters.isEmpty() && currentSearchQuery.isNotBlank() -> SearchUiState.TYPING
+            _currentFilters.isEmpty() -> SearchUiState.IDLE
             else -> SearchUiState.FILTERING
         }
         currentUiState = newState
-        search(filters = currentFilters)
+        search(filters = _currentFilters)
     }
 
     fun unselectAllChipFilters() {
-        currentFilters.removeAll(ThreadFilter.entries)
+        _currentFilters.removeAll(ThreadFilter.entries)
     }
 
     fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
@@ -199,7 +200,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private suspend fun enableFilter(filter: ThreadFilter) {
-        if (currentFilters.contains(filter)) return
+        if (_currentFilters.contains(filter)) return
 
         currentUiState = SearchUiState.FILTERING
         contactsResults.value = emptyList()
@@ -210,7 +211,7 @@ class SearchViewModel @Inject constructor(
     private suspend fun disableFilter(filter: ThreadFilter) {
         contactsResults.value = emptyList()
 
-        val isGoingToEmpty = currentFilters.size == 1 && currentFilters.contains(filter)
+        val isGoingToEmpty = _currentFilters.size == 1 && _currentFilters.contains(filter)
         if (isGoingToEmpty) {
             currentUiState = if (currentSearchQuery.isNotBlank()) SearchUiState.TYPING else SearchUiState.IDLE
         }
@@ -219,7 +220,7 @@ class SearchViewModel @Inject constructor(
 
     private fun shouldShowContacts(): Boolean {
         val hasQuery = currentSearchQuery.isNotBlank()
-        val hasNoFilters = currentFilters.isEmpty()
+        val hasNoFilters = _currentFilters.isEmpty()
         val notValidated = currentUiState != SearchUiState.VALIDATED
 
         return currentUiState == SearchUiState.TYPING && hasQuery && hasNoFilters && notValidated
@@ -301,11 +302,11 @@ class SearchViewModel @Inject constructor(
     }
 
     private suspend fun ThreadFilter.select() {
-        search(filters = searchUtils.selectFilter(filter = this, currentFilters).also { currentFilters = it })
+        search(filters = searchUtils.selectFilter(filter = this, _currentFilters).also { _currentFilters = it })
     }
 
     private suspend fun ThreadFilter.unselect() {
-        search(filters = currentFilters.apply { remove(this@unselect) }.also { currentFilters = it })
+        search(filters = _currentFilters.apply { remove(this@unselect) }.also { _currentFilters = it })
     }
 
     private fun resetPaginationData() {
@@ -328,7 +329,7 @@ class SearchViewModel @Inject constructor(
     private suspend fun search(
         query: String = currentSearchQuery,
         saveInHistory: Boolean = false,
-        filters: Set<ThreadFilter> = currentFilters,
+        filters: Set<ThreadFilter> = _currentFilters,
         folder: Folder? = filterFolder,
         shouldGetNextPage: Boolean = false,
     ) = withContext(ioCoroutineContext) {

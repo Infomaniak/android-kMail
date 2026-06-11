@@ -36,7 +36,7 @@ class MultiselectionViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val _selectedThreads = mutableSetOf<Thread>()
-    
+
     val isMultiSelectOnLiveData = MutableLiveData(false)
     var isMultiSelectOn: Boolean
         get() = isMultiSelectOnLiveData.value ?: false
@@ -51,7 +51,7 @@ class MultiselectionViewModel @Inject constructor(
         get() = selectedThreads.flatMap { thread -> thread.messages }
 
     fun isEverythingSelected(currentThreadCount: Int): Boolean {
-        return selectedThreads.count() == currentThreadCount
+        return selectedThreads.size == currentThreadCount
     }
 
     fun selectOrUnselectAll(currentThreadsLive: MutableLiveData<ResultsChange<Thread>>) {
