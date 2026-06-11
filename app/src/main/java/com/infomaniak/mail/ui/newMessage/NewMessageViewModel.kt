@@ -433,7 +433,7 @@ class NewMessageViewModel @Inject constructor(
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
-            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
+            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD, DraftMode.FOLLOW_UP -> {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
@@ -448,6 +448,13 @@ class NewMessageViewModel @Inject constructor(
                         }
                     }
             }
+        }
+
+        if (draftMode == DraftMode.FOLLOW_UP) {
+            initialBody = BodyContentPayload(
+                appContext.getString(R.string.reminderFollowUpPlaceholderText),
+                BodyContentType.TEXT_PLAIN_WITH_HTML
+            )
         }
 
         val signature: Signature

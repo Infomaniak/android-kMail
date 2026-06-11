@@ -40,6 +40,7 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH
 import com.infomaniak.core.common.utils.FormatData
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.common.utils.formatWithLocal
@@ -560,6 +561,7 @@ class ThreadAdapter(
         }
 
         bindUnsubscribe(messageUi)
+        bindEndReminder(message)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -620,6 +622,49 @@ class ThreadAdapter(
         scheduleAlert.onAction2 {
             trackMessageBannerEvent(MatomoName.ModifySchedule)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
+        }
+    }
+
+    private fun formatNamesList(context: Context, names: List<String>): String {
+        return when (names.size) {
+            0 -> ""
+            1 -> names[0]
+            2 -> "${names[0]} ${context.getString(R.string.linkingWord)} ${names[1]}"
+            else -> {
+                val allButLast = names.dropLast(1).joinToString(", ")
+                "$allButLast ${context.getString(R.string.linkingWord)} ${names.last()}"
+            }
+        }
+    }
+
+    private fun ItemMessageBinding.bindEndReminder(message: Message) {
+        val senderNames = message.allRecipients.map { it.name }
+        val formatNamesList = formatNamesList(context, senderNames)
+
+        endReminderAlert.setDescription(
+            context.getString(
+                R.string.reminderNoResponseHeaderTitle,
+                formatNamesList,
+                message.displayDate.toDate().format(FORMAT_DATE_DAY_MONTH), // TODO: Use real reminder date
+            ),
+        )
+
+        alertsGroup.isVisible = true
+        endReminderAlert.isVisible = true
+
+        message.draftResource?.let { draftResource ->
+            endReminderAlert.onAction1 {
+                trackMessageBannerEvent(MatomoName.ReprogramReminder)
+                threadAdapterCallbacks?.onRescheduleClicked?.invoke( // TODO: Create a specific callback for rescheduling reminders
+                    draftResource,
+                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
+                )
+            }
+        }
+
+        endReminderAlert.onAction2 {
+            trackMessageBannerEvent(MatomoName.FollowUp)
+            threadAdapterCallbacks?.onFollowUpClicked?.invoke(message)
         }
     }
 
@@ -1111,6 +1156,7 @@ class ThreadAdapter(
         var onAttachmentOptionsClicked: ((attachment: Attachable) -> Unit)? = null,
         var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
         var onReplyClicked: ((Message) -> Unit)? = null,
+        var onFollowUpClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
         var onSuperCollapsedBlockClicked: (() -> Unit)? = null,

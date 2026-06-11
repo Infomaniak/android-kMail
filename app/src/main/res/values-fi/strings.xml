@@ -467,6 +467,9 @@
     <string name="readMore">Lue lisää</string>
     <string name="recentSearchesTitle">Viimeisimmät haut</string>
     <string name="refreshTokenError">Sinut on kirjattu ulos</string>
+    <string name="reminderFollowUpButton">Seuraa</string>
+    <string name="reminderFollowUpPlaceholderText">Hei,\nOnko mahdollista saada palautetta tästä aiheesta?\nKiitos etukäteen.</string>
+    <string name="reminderNoResponseHeaderTitle">Muistutus: ei vastausta %1$s:ltä tähän sähköpostiin lähtien %2$s</string>
     <string name="renameFolder">Nimeä kansio uudelleen</string>
     <string name="reportDisplayProblemDescription">Suostutko jakamaan tietojasi kehittäjiemme kanssa, jotta he voivat auttaa sinua ongelmassasi?</string>
     <string name="reportDisplayProblemTitle">Ilmoita näyttöongelmasta</string>

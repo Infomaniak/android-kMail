@@ -467,6 +467,9 @@
     <string name="readMore">Læs mere</string>
     <string name="recentSearchesTitle">Seneste søgninger</string>
     <string name="refreshTokenError">Du er blevet afbrudt</string>
+    <string name="reminderFollowUpButton">Følg op</string>
+    <string name="reminderFollowUpPlaceholderText">Hej,\nEr det muligt at få feedback om dette emne?\nPå forhånd tak.</string>
+    <string name="reminderNoResponseHeaderTitle">Påmindelse: intet svar fra %1$s på denne e-mail siden %2$s</string>
     <string name="renameFolder">Omdøb mappen</string>
     <string name="reportDisplayProblemDescription">Er du enig i at dele dine data med vores udviklere, så de kan hjælpe dig med dit problem?</string>
     <string name="reportDisplayProblemTitle">Rapportér et visningsproblem</string>

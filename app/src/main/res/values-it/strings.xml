@@ -467,6 +467,9 @@
     <string name="readMore">Per saperne di più</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
     <string name="refreshTokenError">Sei stato disconnesso</string>
+    <string name="reminderFollowUpButton">Sollecita</string>
+    <string name="reminderFollowUpPlaceholderText">Ciao,\nÈ possibile avere un feedback su questo argomento?\nGrazie in anticipo.</string>
+    <string name="reminderNoResponseHeaderTitle">Promemoria: nessuna risposta da %1$s a questa email dal %2$s</string>
     <string name="renameFolder">Rinominare la cartella</string>
     <string name="reportDisplayProblemDescription">Accetti di condividere i tuoi dati con i nostri sviluppatori in modo che possano aiutarvi a risolvere il vostro problema?</string>
     <string name="reportDisplayProblemTitle">Segnala un problema di visualizzazione</string>
