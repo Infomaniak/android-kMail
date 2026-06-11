@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import io.realm.kotlin.types.RealmInstant
@@ -29,6 +30,7 @@ interface SwipeActionHost {
     val fragment: Fragment
     val mainViewModel: MainViewModel
     val actionsViewModel: ActionsViewModel
+    val searchViewModel: SearchViewModel
     val localSettings: LocalSettings
     val threadListAdapter: ThreadListAdapter
     val descriptionDialog: DescriptionAlertDialog

@@ -138,7 +138,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
     private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
-    private val searchViewModel: SearchViewModel by activityViewModels()
+    override val searchViewModel: SearchViewModel by activityViewModels()
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
 
     override val substituteClassName: String = javaClass.name

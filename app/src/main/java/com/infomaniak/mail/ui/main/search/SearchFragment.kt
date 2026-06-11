@@ -140,7 +140,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
             override val unreadCountChip get() = null
         }
 
-    private val searchViewModel: SearchViewModel by activityViewModels()
+    override val searchViewModel: SearchViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     override val substituteClassName: String = javaClass.name

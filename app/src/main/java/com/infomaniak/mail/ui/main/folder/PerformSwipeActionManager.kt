@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
@@ -103,7 +104,8 @@ object PerformSwipeActionManager {
                 host.actionsViewModel.toggleThreadsFavoriteStatus(
                     threadsUids = listOf(thread.uid),
                     shouldFavorite = !thread.isFavorite,
-                    mailbox = currentMailbox
+                    mailbox = currentMailbox,
+                    shouldRefreshSearch = host.searchViewModel.currentFilters.contains(ThreadFilter.STARRED)
                 )
                 true
             }
@@ -136,6 +138,8 @@ object PerformSwipeActionManager {
                     shouldRead = !thread.isSeen,
                     currentFolderId = thread.folderId,
                     mailbox = currentMailbox,
+                    shouldRefreshSearch = host.searchViewModel.currentFilters.contains(ThreadFilter.UNSEEN) ||
+                            host.searchViewModel.currentFilters.contains(ThreadFilter.SEEN)
                 )
                 true
             }

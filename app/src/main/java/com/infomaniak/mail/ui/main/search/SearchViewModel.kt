@@ -96,6 +96,7 @@ class SearchViewModel @Inject constructor(
     private var currentUiState: SearchUiState = SearchUiState.IDLE
 
     var currentFilters = mutableSetOf<ThreadFilter>()
+        private set
     var isAllFoldersSelected: Boolean = false
 
     private var lastExecutedFolder: Folder? = null
