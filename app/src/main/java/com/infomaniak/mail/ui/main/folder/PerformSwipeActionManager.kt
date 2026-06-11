@@ -29,9 +29,9 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
-import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAnimatedNavOptions
@@ -107,13 +107,11 @@ object PerformSwipeActionManager {
             }
 
             SwipeAction.MOVE -> {
-                val navController = host.fragment.findNavController()
                 host.descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
-                    navController.animatedNavigation(
-                        directions = host.directionsToMove(
-                            threadUid = thread.uid,
-                            sourceFolderId = thread.folderId,
-                        )
+                    host.navigateToMove(
+                        threadUid = thread.uid,
+                        sourceFolderId = thread.folderId,
+                        isFromSearch = host is SearchFragment
                     )
                 }
                 true

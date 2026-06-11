@@ -18,11 +18,8 @@
 package com.infomaniak.mail.ui.main.thread.actions.multiselection
 
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavDirections
-import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
-import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.utils.FolderRoleUtils
 
 interface MultiSelectionHost : LifecycleOwner {
@@ -31,23 +28,15 @@ interface MultiSelectionHost : LifecycleOwner {
     val folderRoleUtils: FolderRoleUtils
     val descriptionDialog: DescriptionAlertDialog
     val threadListAdapter: ThreadListAdapter
-    
-    fun safeNavigation(directions: NavDirections)
-    fun disableSwipeDirection(direction: DirectionFlag)
+
     fun unlockSwipeActionsIfSet()
-    fun directionToThreadActionsBottomSheetDialog(
+
+    fun navigateToThreadActionsBottomSheetDialog(
         threadUid: String,
         shouldLoadDistantResources: Boolean,
         shouldCloseMultiSelection: Boolean,
         isFromSearch: Boolean,
-    ): NavDirections
+    )
 
-    fun directionsToFolderPickerFragment(
-        threadsUids: Array<String>,
-        messagesUids: Array<String>? = null,
-        action: FolderPickerAction = FolderPickerAction.MOVE,
-        sourceFolderId: String? = null,
-    ): NavDirections
-
-    fun directionsToMultiSelectBottomSheetDialog(isFromSearch: Boolean): NavDirections
+    fun navigateToMultiSelectBottomSheetDialog(isFromSearch: Boolean)
 }

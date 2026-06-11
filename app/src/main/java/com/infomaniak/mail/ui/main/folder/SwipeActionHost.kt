@@ -35,8 +35,7 @@ interface SwipeActionHost {
     val descriptionDialog: DescriptionAlertDialog
 
     fun showSwipeActionIncompatible()
-
-    fun directionsToMove(threadUid: String, sourceFolderId: String): NavDirections
+    fun navigateToMove(threadUid: String, sourceFolderId: String, isFromSearch: Boolean)
     fun directionsToQuickActions(threadUid: String): NavDirections
 
     fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?, snoozeEndDate: RealmInstant?)

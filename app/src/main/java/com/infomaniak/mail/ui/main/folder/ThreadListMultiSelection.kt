@@ -143,17 +143,16 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionMenu -> {
                     trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
-                    val direction = if (selectedThreadsCount == 1) {
-                        host.directionToThreadActionsBottomSheetDialog(
+                    if (selectedThreadsCount == 1) {
+                        host.navigateToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),
                             shouldLoadDistantResources = false,
                             shouldCloseMultiSelection = true,
                             isFromSearch = isFromSearch,
                         )
                     } else {
-                        host.directionsToMultiSelectBottomSheetDialog(isFromSearch)
+                        host.navigateToMultiSelectBottomSheetDialog(isFromSearch)
                     }
-                    host.safeNavigation(direction)
                 }
             }
         }
