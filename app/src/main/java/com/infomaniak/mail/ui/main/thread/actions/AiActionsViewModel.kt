@@ -92,7 +92,7 @@ class AiActionsViewModel @Inject constructor(
     }
 
     fun doAiAction(messageUid: String, aiAction: AiAction) {
-        val isRetrying = getStateMap(aiAction)[messageUid] is AiProcessState.Error
+        val isRetrying = (getStateMap(aiAction)[messageUid] as? AiProcessState.Error)?.canRetry == true
 
         cancelRetryTimer(messageUid, aiAction)
 
