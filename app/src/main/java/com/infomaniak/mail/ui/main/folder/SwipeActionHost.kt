@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.folder
 
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavDirections
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -35,8 +34,5 @@ interface SwipeActionHost {
     val descriptionDialog: DescriptionAlertDialog
 
     fun showSwipeActionIncompatible()
-    fun navigateToMove(threadUid: String, sourceFolderId: String, isFromSearch: Boolean)
-    fun directionsToQuickActions(threadUid: String): NavDirections
-
     fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?, snoozeEndDate: RealmInstant?)
 }

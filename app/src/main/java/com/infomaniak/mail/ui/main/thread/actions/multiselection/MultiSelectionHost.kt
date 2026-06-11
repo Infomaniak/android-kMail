@@ -30,13 +30,4 @@ interface MultiSelectionHost : LifecycleOwner {
     val threadListAdapter: ThreadListAdapter
 
     fun unlockSwipeActionsIfSet()
-
-    fun navigateToThreadActionsBottomSheetDialog(
-        threadUid: String,
-        shouldLoadDistantResources: Boolean,
-        shouldCloseMultiSelection: Boolean,
-        isFromSearch: Boolean,
-    )
-
-    fun navigateToMultiSelectBottomSheetDialog(isFromSearch: Boolean)
 }

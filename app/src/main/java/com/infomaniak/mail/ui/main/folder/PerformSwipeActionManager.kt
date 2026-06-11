@@ -29,9 +29,11 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAnimatedNavOptions
@@ -108,17 +110,23 @@ object PerformSwipeActionManager {
 
             SwipeAction.MOVE -> {
                 host.descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
-                    host.navigateToMove(
-                        threadUid = thread.uid,
-                        sourceFolderId = thread.folderId,
-                        isFromSearch = host is SearchFragment
+                    host.fragment.safelyNavigate(
+                        R.id.folderPickerFragment,
+                        args = FolderPickerFragmentArgs(
+                            threadsUids = arrayOf(thread.uid),
+                            sourceFolderId = thread.folderId,
+                            isFromSearch = host is SearchFragment
+                        ).toBundle()
                     )
                 }
                 true
             }
 
             SwipeAction.QUICKACTIONS_MENU -> {
-                host.fragment.safelyNavigate(host.directionsToQuickActions(thread.uid))
+                host.fragment.safelyNavigate(
+                    R.id.threadActionsBottomSheetDialog,
+                    ThreadActionsBottomSheetDialogArgs(threadUid = thread.uid, shouldLoadDistantResources = false).toBundle()
+                )
                 true
             }
 

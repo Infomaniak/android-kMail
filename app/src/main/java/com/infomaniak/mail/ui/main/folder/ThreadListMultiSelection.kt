@@ -22,6 +22,7 @@ import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
@@ -32,8 +33,11 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
@@ -143,15 +147,24 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionMenu -> {
                     trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
+                    val fragment = if (isFromSearch) host as SearchFragment else host as ThreadListFragment
                     if (selectedThreadsCount == 1) {
-                        host.navigateToThreadActionsBottomSheetDialog(
-                            threadUid = selectedThreadsUids.single(),
-                            shouldLoadDistantResources = false,
-                            shouldCloseMultiSelection = true,
-                            isFromSearch = isFromSearch,
+                        fragment.safelyNavigate(
+                            R.id.threadActionsBottomSheetDialog,
+                            ThreadActionsBottomSheetDialogArgs(
+                                threadUid = selectedThreadsUids.single(),
+                                shouldLoadDistantResources = false,
+                                shouldCloseMultiSelection = true,
+                                isFromSearch = isFromSearch
+                            ).toBundle()
                         )
                     } else {
-                        host.navigateToMultiSelectBottomSheetDialog(isFromSearch)
+                        fragment.safelyNavigate(
+                            R.id.multiSelectBottomSheetDialog,
+                            MultiSelectBottomSheetDialogArgs(
+                                isFromSearch = isFromSearch
+                            ).toBundle()
+                        )
                     }
                 }
             }

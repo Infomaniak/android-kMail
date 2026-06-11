@@ -43,8 +43,6 @@ import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavDirections
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -92,13 +90,9 @@ import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.Emoj
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
-import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
-import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
-import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionBinding
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
@@ -114,7 +108,6 @@ import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
-import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -167,28 +160,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     override lateinit var descriptionDialog: DescriptionAlertDialog
     override fun showSwipeActionIncompatible() {
         snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
-    }
-
-    override fun navigateToMove(threadUid: String, sourceFolderId: String, isFromSearch: Boolean) {
-        val navController = findNavController()
-        return navController.animatedNavigation(
-            resId = R.id.folderPickerFragment,
-            args = FolderPickerFragmentArgs(
-                threadsUids = arrayOf(threadUid),
-                action = FolderPickerAction.MOVE,
-                sourceFolderId = sourceFolderId,
-                isFromSearch = isFromSearch
-            ).toBundle(),
-        )
-    }
-
-    override fun directionsToQuickActions(threadUid: String): NavDirections {
-        return ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-            threadUid = threadUid,
-            shouldLoadDistantResources = false,
-            shouldCloseMultiSelection = false,
-            isFromSearch = false,
-        )
     }
 
     @Inject
@@ -394,34 +365,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
     override fun unlockSwipeActionsIfSet() {
         binding.threadsList.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
-    }
-
-    override fun navigateToThreadActionsBottomSheetDialog(
-        threadUid: String,
-        shouldLoadDistantResources: Boolean,
-        shouldCloseMultiSelection: Boolean,
-        isFromSearch: Boolean,
-    ) {
-        val navController = findNavController()
-        return navController.animatedNavigation(
-            resId = R.id.threadActionsBottomSheetDialog,
-            args = ThreadActionsBottomSheetDialogArgs(
-                threadUid = threadUid,
-                shouldLoadDistantResources = shouldLoadDistantResources,
-                shouldCloseMultiSelection = shouldCloseMultiSelection,
-                isFromSearch = isFromSearch
-            ).toBundle(),
-        )
-    }
-
-    override fun navigateToMultiSelectBottomSheetDialog(isFromSearch: Boolean) {
-        val navController = findNavController()
-        return navController.animatedNavigation(
-            resId = R.id.multiSelectBottomSheetDialog,
-            args = MultiSelectBottomSheetDialogArgs(
-                isFromSearch = isFromSearch
-            ).toBundle(),
-        )
     }
 
     private fun setupDensityDependentUi() = with(binding) {
