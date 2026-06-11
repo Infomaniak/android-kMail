@@ -84,7 +84,7 @@ abstract class TwoPaneFragment : Fragment() {
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
-    fun isOnlyLeftShown(): Boolean = isPhone() && !twoPaneViewModel.isThreadOpen
+    fun isThreadOpen(): Boolean = twoPaneViewModel.isThreadOpen
     fun isOnlyRightShown(): Boolean = isPhone() && twoPaneViewModel.isThreadOpen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
