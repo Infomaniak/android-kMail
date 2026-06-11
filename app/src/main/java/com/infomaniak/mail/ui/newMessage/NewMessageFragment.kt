@@ -501,6 +501,7 @@ class NewMessageFragment : Fragment() {
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
         addScript(tagsObserverScript)
+        addScript(insertMentionScript)
 
         val formattedAiContentScript = setAiContentScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
