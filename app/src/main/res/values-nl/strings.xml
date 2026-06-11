@@ -484,6 +484,9 @@
     <string name="readMore">Meer informatie</string>
     <string name="recentSearchesTitle">Recente zoekopdrachten</string>
     <string name="refreshTokenError">U bent uitgelogd</string>
+    <string name="reminderFollowUpButton">Opvolgen</string>
+    <string name="reminderFollowUpPlaceholderText">Hallo,\nIs het mogelijk om feedback te krijgen over dit onderwerp?\nBij voorbaat dank.</string>
+    <string name="reminderNoResponseHeaderTitle">Herinnering: geen reactie van %1$s op deze e-mail sinds %2$s</string>
     <string name="renameFolder">De map hernoemen</string>
     <string name="reportDisplayProblemDescription">Gaat u akkoord om uw gegevens te delen met onze ontwikkelaars zodat zij u kunnen helpen met uw probleem?</string>
     <string name="reportDisplayProblemTitle">Een weergaveprobleem melden</string>

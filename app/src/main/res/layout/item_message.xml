@@ -408,6 +408,17 @@
                 tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/endReminderAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/buttonModify"
+                app:action2="@string/reminderFollowUpButton"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Rappel : aucune réponse de Laura à cet e-mail depuis le 16 mai."
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/scheduleAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

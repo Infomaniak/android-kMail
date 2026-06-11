@@ -484,6 +484,9 @@
     <string name="readMore">Διαβάστε περισσότερα</string>
     <string name="recentSearchesTitle">Πρόσφατες αναζητήσεις</string>
     <string name="refreshTokenError">Έχετε αποσυνδεθεί</string>
+    <string name="reminderFollowUpButton">Παρακολούθηση</string>
+    <string name="reminderFollowUpPlaceholderText">Γεια σας,\nΕίναι δυνατόν να λάβετε κάποια ανατροφοδότηση για αυτό το θέμα;\nΣας ευχαριστώ εκ των προτέρων.</string>
+    <string name="reminderNoResponseHeaderTitle">Υπενθύμιση: καμία απάντηση από %1$s σε αυτό το email από τις %2$s</string>
     <string name="renameFolder">Μετονομασία φακέλου</string>
     <string name="reportDisplayProblemDescription">Συμφωνείτε να μοιραστείτε τα δεδομένα σας με τους προγραμματιστές μας ώστε να σας βοηθήσουν με το πρόβλημά σας;</string>
     <string name="reportDisplayProblemTitle">Αναφορά προβλήματος εμφάνισης</string>

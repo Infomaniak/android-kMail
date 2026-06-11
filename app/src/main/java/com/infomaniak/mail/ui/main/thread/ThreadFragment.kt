@@ -23,6 +23,7 @@ import android.graphics.drawable.InsetDrawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -403,6 +404,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         }
                     )
                 },
+                onFollowUpClicked = ::followUpDraft,
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
                 onSuperCollapsedBlockClicked = ::expandSuperCollapsedBlock,
@@ -1242,6 +1244,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         actionsViewModel.draftResource = draftResource
         threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
         navigateToScheduleSendBottomSheet()
+    }
+
+    private fun followUpDraft(message: Message) {
+        twoPaneViewModel.navigateToNewMessage(
+            draftMode = DraftMode.FOLLOW_UP,
+            previousMessageUid = message.uid,
+            shouldLoadDistantResources = true,
+        )
     }
 
     private fun navigateToScheduleSendBottomSheet() {

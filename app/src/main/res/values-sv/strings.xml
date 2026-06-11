@@ -484,6 +484,9 @@
     <string name="readMore">Läs mer</string>
     <string name="recentSearchesTitle">Senaste sökningar</string>
     <string name="refreshTokenError">Du har kopplats bort</string>
+    <string name="reminderFollowUpButton">Uppföljning</string>
+    <string name="reminderFollowUpPlaceholderText">Hej,\nÄr det möjligt att få feedback om detta ämne?\nTack på förhand.</string>
+    <string name="reminderNoResponseHeaderTitle">Påminnelse: inget svar från %1$s på detta e-postmeddelande sedan %2$s</string>
     <string name="renameFolder">Byt namn på mappen</string>
     <string name="reportDisplayProblemDescription">Samtycker du till att dela dina data med våra utvecklare så att de kan hjälpa dig med ditt problem?</string>
     <string name="reportDisplayProblemTitle">Rapportera ett visningsproblem</string>
