@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/EncryptionPrimaryColorTheme"
     app:useDefaultLayout="false"
     tools:context=".ui.main.thread.calendar.AttendeesBottomSheetDialog"
     tools:title="@string/encryptedRecipientRequiringPasswordTitle">

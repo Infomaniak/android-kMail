@@ -102,6 +102,11 @@
     <color name="encryptionOnButtonColor">@color/sovereignBlue950</color>
     <color name="encryptionTextButtonColor">@color/sovereignBlue200</color>
 
+    <color name="encryptionColorPrimary">@color/sovereignBlue300</color>
+    <color name="encryptionOnColorPrimary">@color/sovereignBlue950</color>
+    <color name="encryptionPrimaryContainer">@color/sovereignBlue900</color>
+    <color name="encryptionOnPrimaryContainer">@color/sovereignBlue200</color>
+
     <!-- Thread -->
     <color name="folderTagTextColor">@color/shark</color>
     <color name="folderTagBackground">@color/orca</color>
