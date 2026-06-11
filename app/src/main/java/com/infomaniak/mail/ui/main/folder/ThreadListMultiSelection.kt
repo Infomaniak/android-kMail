@@ -146,28 +146,30 @@ class ThreadListMultiSelection {
                     }
                 }
                 R.id.quickActionMenu -> {
-                    trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
-                    val fragment = if (isFromSearch) host as SearchFragment else host as ThreadListFragment
-                    if (selectedThreadsCount == 1) {
-                        fragment.safelyNavigate(
-                            R.id.threadActionsBottomSheetDialog,
-                            ThreadActionsBottomSheetDialogArgs(
-                                threadUid = selectedThreadsUids.single(),
-                                shouldLoadDistantResources = false,
-                                shouldCloseMultiSelection = true,
-                                isFromSearch = isFromSearch
-                            ).toBundle()
-                        )
-                    } else {
-                        fragment.safelyNavigate(
-                            R.id.multiSelectBottomSheetDialog,
-                            MultiSelectBottomSheetDialogArgs(
-                                isFromSearch = isFromSearch
-                            ).toBundle()
-                        )
-                    }
+                    handleNavigationToQuickActionMenu(selectedThreadsCount, selectedThreadsUids)
                 }
             }
+        }
+    }
+
+    private fun handleNavigationToQuickActionMenu(selectedThreadsCount: Int, selectedThreadsUids: List<String>) {
+        trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
+        val fragment = if (isFromSearch) host as SearchFragment else host as ThreadListFragment
+        if (selectedThreadsCount == 1) {
+            fragment.safelyNavigate(
+                R.id.threadActionsBottomSheetDialog,
+                ThreadActionsBottomSheetDialogArgs(
+                    threadUid = selectedThreadsUids.single(),
+                    shouldLoadDistantResources = false,
+                    shouldCloseMultiSelection = true,
+                    isFromSearch = isFromSearch
+                ).toBundle()
+            )
+        } else {
+            fragment.safelyNavigate(
+                R.id.multiSelectBottomSheetDialog,
+                MultiSelectBottomSheetDialogArgs(isFromSearch = isFromSearch).toBundle()
+            )
         }
     }
 
