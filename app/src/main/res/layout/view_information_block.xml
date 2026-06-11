@@ -24,29 +24,33 @@
     app:cardBackgroundColor="@color/informationBlockBackground"
     app:cardCornerRadius="4dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/marginStandardMedium"
-        android:orientation="horizontal">
+        android:layout_marginTop="@dimen/marginStandardMedium">
 
         <FrameLayout
+            android:id="@+id/iconContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/alternativeMargin">
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            app:layout_constraintBottom_toBottomOf="@id/informationTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/informationTitle">
 
             <TextView
                 android:id="@+id/icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
+                android:layout_gravity="center_vertical"
                 tools:drawableStartCompat="@drawable/ic_warning" />
 
             <FrameLayout
                 android:id="@+id/iconAi"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:visibility="gone">
 
@@ -58,54 +62,69 @@
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true" />
             </FrameLayout>
-
         </FrameLayout>
-
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:divider="@drawable/spacer_standard_medium"
-            android:orientation="vertical"
-            android:showDividers="middle">
-
-            <TextView
-                android:id="@+id/informationTitle"
-                style="@style/BodyMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:text="@string/aiErrorTooManyRequests"
-                tools:visibility="visible" />
-
-            <TextView
-                android:id="@+id/informationDescription"
-                style="@style/Body"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:text="@string/aiErrorTooManyRequests"
-                tools:visibility="visible" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/informationButton"
-                style="@style/TextButtonSecondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:text="@string/buttonLogInDifferentAccount"
-                tools:visibility="visible" />
-
-        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/closeButton"
             style="@style/IconButtonSmall"
-            android:layout_marginStart="@dimen/alternativeMargin"
-            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="4dp"
             app:icon="@drawable/ic_close_small"
+            app:layout_constraintBottom_toBottomOf="@id/informationTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/informationTitle"
             tools:visibility="visible" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/informationTitle"
+            style="@style/BodyMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/alternativeMargin"
+            android:layout_marginEnd="@dimen/alternativeMargin"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/informationDescription"
+            app:layout_constraintEnd_toStartOf="@id/closeButton"
+            app:layout_constraintStart_toEndOf="@id/iconContainer"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/aiErrorTooManyRequests"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/informationDescription"
+            style="@style/Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/informationButton"
+            app:layout_constraintEnd_toEndOf="@id/informationTitle"
+            app:layout_constraintStart_toStartOf="@id/informationTitle"
+            app:layout_constraintTop_toBottomOf="@id/informationTitle"
+            tools:text="@string/aiErrorTooManyRequests"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/informationButton"
+            style="@style/TextButtonSecondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:translationX="-12dp"
+            android:minWidth="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/informationTitle"
+            app:layout_constraintTop_toBottomOf="@id/informationDescription"
+            tools:text="@string/buttonLogInDifferentAccount"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

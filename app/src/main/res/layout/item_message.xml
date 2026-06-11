@@ -458,23 +458,31 @@
             app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider" />
 
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/aiBannerContainer"
             android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:divider="@drawable/spacer_standard_medium"
+            android:showDividers="middle"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin">
 
-            <include
-                android:id="@+id/blockInformationView"
-                layout="@layout/view_information_block"
+            <com.infomaniak.mail.views.InformationBlockView
+                android:id="@+id/blockInformationViewSummary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"/>
 
-        </FrameLayout>
+            <com.infomaniak.mail.views.InformationBlockView
+                android:id="@+id/blockInformationViewTranslate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
         <Space
             android:id="@+id/aiBannerContainerBottomMargin"

@@ -159,11 +159,13 @@
     <string name="buttonSelectAll">Όλα</string>
     <string name="buttonSendWithDifferentAddress">Αποστολή με διαφορετική διεύθυνση</string>
     <string name="buttonShare">Κοινοποίηση</string>
+    <string name="buttonShowOriginal">Εμφάνιση αρχικού μηνύματος</string>
     <string name="buttonStart">Έναρξη</string>
     <string name="buttonStartSync">Έναρξη συγχρονισμού</string>
     <string name="buttonStrikeThrough">Διακριτή διαγραφή</string>
     <string name="buttonTextOptionsClose">Κλείσιμο μορφοποίησης κειμένου</string>
     <string name="buttonTextOptionsOpen">Άνοιγμα μορφοποίησης κειμένου</string>
+    <string name="buttonTranslate">Μεταφράστε</string>
     <string name="buttonTry">Δοκιμή</string>
     <string name="buttonUnderline">Υπογράμμιση</string>
     <string name="buttonUnorderedList">Μη ταξινομημένη λίστα</string>
@@ -338,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Δεν ήταν δυνατή η δημιουργία του φακέλου</string>
     <string name="errorUnableToFlushFolder">Δεν είναι δυνατή η εκκαθάριση του φακέλου</string>
     <string name="errorUserAlreadySynchronized">Ο χρήστης είναι ήδη συγχρονισμένος</string>
+    <string name="euriaTranslateMessage">Η Euria μεταφράζει το μήνυμά σας…</string>
     <string name="expeditorAuthenticationDescription">Η προέλευση του αποστολέα έχει επαληθευτεί.</string>
     <string name="externalDialogConfirmButton">Το κατάλαβα</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -359,6 +362,7 @@
         <item quantity="other">%d αρχεία στάλθηκαν μέσω SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Από:</string>
+    <string name="genericMessageTranslated">Μήνυμα μεταφρασμένο</string>
     <string name="googlePlayServicesAreRequired">Απαιτούνται οι Υπηρεσίες Google Play</string>
     <string name="groupContactsTitle">Ομάδα: %s</string>
     <string name="inboxFolder">Εισερχόμενα</string>
@@ -398,6 +402,9 @@
     <string name="messageSummaryError">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα.</string>
     <string name="messageSummaryErrorRetry">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
     <string name="messageSummaryLoading">Σύνοψη του μηνύματος…</string>
+    <string name="messageTranslateError">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα.</string>
+    <string name="messageTranslateErrorRetry">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
+    <string name="messageTranslatedTitle">Μεταφράστηκε σε %s</string>
     <string name="mondayAfternoon">Δευτέρα απόγευμα</string>
     <string name="mondayMorning">Δευτέρα πρωί</string>
     <string name="moveInSpamButton">Μετακίνηση στα Spam</string>
@@ -687,6 +694,7 @@
         <item quantity="one">%d διεύθυνση δεν μπόρεσε να προστεθεί επειδή έχετε φτάσει στο όριο των παραληπτών</item>
         <item quantity="other">%d διευθύνσεις δεν μπόρεσαν να προστεθούν επειδή έχετε φτάσει στο όριο των παραληπτών</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Αυτό το μήνυμα είναι ήδη στη γλώσσα σας</string>
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>

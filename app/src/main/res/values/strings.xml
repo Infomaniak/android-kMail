@@ -163,11 +163,13 @@
     <string name="buttonSelectAll">All</string>
     <string name="buttonSendWithDifferentAddress">Send with a different address</string>
     <string name="buttonShare">Share</string>
+    <string name="buttonShowOriginal">Show original message</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synchronization</string>
     <string name="buttonStrikeThrough">Strike through</string>
     <string name="buttonTextOptionsClose">Close text formatting</string>
     <string name="buttonTextOptionsOpen">Open text formatting</string>
+    <string name="buttonTranslate">Translate</string>
     <string name="buttonTry">Try</string>
     <string name="buttonUnderline">Underline</string>
     <string name="buttonUnorderedList">Unordered list</string>
@@ -342,6 +344,7 @@
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
     <string name="errorUserAlreadySynchronized">User is already synchronized</string>
+    <string name="euriaTranslateMessage">Euria translates your message…</string>
     <string name="expeditorAuthenticationDescription">The sender’s origin has been authenticated.</string>
     <string name="externalDialogConfirmButton">I understand</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -363,6 +366,7 @@
         <item quantity="other">%d files sent by SwissTransfer</item>
     </plurals>
     <string name="fromTitle">From:</string>
+    <string name="genericMessageTranslated">Message translated</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="groupContactsTitle">Group: %s</string>
     <string name="inboxFolder">Inbox</string>
@@ -402,6 +406,9 @@
     <string name="messageSummaryError">Euria could not summarize this message.</string>
     <string name="messageSummaryErrorRetry">Euria could not summarize this message. Please try again.</string>
     <string name="messageSummaryLoading">Message summary…</string>
+    <string name="messageTranslateError">Euria could not translate this message.</string>
+    <string name="messageTranslateErrorRetry">Euria could not translate this message. Please try again.</string>
+    <string name="messageTranslatedTitle">Translated in %s</string>
     <string name="mondayAfternoon">Monday afternoon</string>
     <string name="mondayMorning">Monday morning</string>
     <string name="moveInSpamButton">Move in Spam</string>
@@ -691,6 +698,7 @@
         <item quantity="one">%d address could not be added because you have reached the recipient limit</item>
         <item quantity="other">%d addresses could not be added because you have reached the recipient limit</item>
     </plurals>
+    <string name="translationTargetSameAsSource">This message is already in your language</string>
     <string name="trashFolder">Trash</string>
     <string name="unblockButton">Unblock</string>
     <string name="unknownDialogTitleExpeditor">Unknown expeditor</string>

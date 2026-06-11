@@ -27,6 +27,7 @@ interface ThreadAdapterState {
     val isExpandedMap: MutableMap<String, Boolean>
     val isThemeTheSameMap: MutableMap<String, Boolean>
     val aiSummaryStateMap: MutableMap<String, AiProcessState>
+    val aiTranslateStateMap: MutableMap<String, AiProcessState>
     val verticalScroll: Int?
     val isCalendarEventExpandedMap: MutableMap<String, Boolean>
 }
@@ -39,9 +40,11 @@ class ThreadState {
     val hasSuperCollapsedBlockBeenClicked: StateFlow<Boolean> = _hasSuperCollapsedBlockBeenClicked.asStateFlow()
     var verticalScroll: Int? = null
     val aiSummaryStateMap: MutableMap<String, AiProcessState> = mutableMapOf()
+    val aiTranslateStateMap: MutableMap<String, AiProcessState> = mutableMapOf()
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
     val cachedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
+    val cachedTranslatedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
     var isFirstOpening: Boolean = true
     var superCollapsedBlock: SuperCollapsedBlock? = null
 
@@ -53,9 +56,11 @@ class ThreadState {
         isCalendarEventExpandedMap.clear()
         treatedMessagesForCalendarEvent.clear()
         cachedSplitBodies.clear()
+        cachedTranslatedSplitBodies.clear()
         isFirstOpening = true
         superCollapsedBlock = null
         aiSummaryStateMap.clear()
+        aiTranslateStateMap.clear()
     }
 
     fun clickSuperCollapsedBlock() {
@@ -66,6 +71,12 @@ class ThreadState {
 sealed class AiProcessState {
     data object Loading : AiProcessState()
     data class Retrying(val isLoaderVisible: Boolean = false) : AiProcessState()
-    data class Success(val content: String) : AiProcessState()
-    data class Error(val canRetry: Boolean, val isRetry: Boolean = true, val wasLoaderShown: Boolean = false) : AiProcessState()
+    data class Success(val content: String = "") : AiProcessState()
+    data class Error(
+        val canRetry: Boolean,
+        val isRetry: Boolean = true,
+        val wasLoaderShown: Boolean = false,
+        val targetSameAsSource: Boolean = false
+    ) : AiProcessState()
+    data object Dismissed : AiProcessState()
 }
