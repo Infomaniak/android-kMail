@@ -120,10 +120,10 @@ typealias MessagesWithoutHeavyData = List<Message>
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
+    val threadState: ThreadState,
     private val avatarMergedContactData: AvatarMergedContactData,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
-    val threadState: ThreadState,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,

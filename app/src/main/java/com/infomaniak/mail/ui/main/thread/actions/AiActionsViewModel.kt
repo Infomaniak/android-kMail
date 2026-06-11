@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AiProcessState
 import com.infomaniak.mail.ui.main.thread.ThreadState
 import com.infomaniak.mail.utils.AccountUtils
@@ -49,11 +50,13 @@ import kotlinx.coroutines.launch
 import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
+import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsLegacy
 
 @HiltViewModel
 class AiActionsViewModel @Inject constructor(
     application: Application,
+    private val snackbarManager: SnackbarManager,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
@@ -79,21 +82,13 @@ class AiActionsViewModel @Inject constructor(
         }
     }
 
-    fun saveTranslation(messageUid: String, translatedHtml: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = translatedHtml }
-    }
-
-    fun saveSummary(messageUid: String, summaryText: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun updateSummary(messageUid: String, summaryText: String? = null) = viewModelScope.launch(ioCoroutineContext) {
         updateLocalMessageBody(messageUid) { it?.body?.summary = summaryText }
     }
 
-    fun removeSummary(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.summary = null }
-    }
-
-    fun removeTranslation(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = null }
-        threadState.cachedTranslatedSplitBodies.remove(messageUid)
+    fun updateTranslation(messageUid: String, translatedHtml: String? = null) = viewModelScope.launch(ioCoroutineContext) {
+        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = translatedHtml }
+        if (translatedHtml == null) threadState.cachedTranslatedSplitBodies.remove(messageUid)
     }
 
     fun doAiAction(messageUid: String, aiAction: AiAction) {
@@ -114,11 +109,11 @@ class AiActionsViewModel @Inject constructor(
 
         val bodyUpdate = when (aiAction) {
             AiAction.SUMMARY -> {
-                removeSummary(messageUid)
+                updateSummary(messageUid)
                 AiBodyUpdate.NONE
             }
             AiAction.TRANSLATE -> {
-                removeTranslation(messageUid)
+                updateTranslation(messageUid)
                 AiBodyUpdate.SHOW_ORIGINAL
             }
         }
@@ -127,10 +122,13 @@ class AiActionsViewModel @Inject constructor(
     }
 
     private suspend fun processAiApiCall(messageUid: String, aiAction: AiAction, isRetrying: Boolean) {
-        val mailbox = mailbox() ?: return
+        val mailbox = mailbox() ?: run {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return
+        }
 
         val languageCode = appContext.getCurrentLanguageCode()
-        val result = when (aiAction) {
+        val apiResponse = when (aiAction) {
             AiAction.SUMMARY -> ApiRepository.aiSummary(languageCode, mailbox.uuid, messageUid)
             AiAction.TRANSLATE -> ApiRepository.aiTranslate(languageCode, mailbox.uuid, messageUid)
         }
@@ -142,16 +140,16 @@ class AiActionsViewModel @Inject constructor(
 
         val wasLoaderShown = currentState is AiProcessState.Retrying && currentState.isLoaderVisible
 
-        val finalState = mapApiResultToState(result, isRetrying, wasLoaderShown)
+        val finalState = mapApiResponseToState(apiResponse, isRetrying, wasLoaderShown)
 
         var bodyUpdate = AiBodyUpdate.NONE
         if (finalState is AiProcessState.Success) {
             when (aiAction) {
                 AiAction.TRANSLATE -> {
-                    handleTranslateSuccess(messageUid, result.data)
+                    handleTranslateSuccess(messageUid, apiResponse.data)
                     bodyUpdate = AiBodyUpdate.SHOW_TRANSLATED
                 }
-                AiAction.SUMMARY -> handleSummarySuccess(messageUid, result.data)
+                AiAction.SUMMARY -> handleSummarySuccess(messageUid, apiResponse.data)
             }
         }
         updateAiProcessState(messageUid, aiAction, finalState, bodyUpdate)
@@ -159,7 +157,7 @@ class AiActionsViewModel @Inject constructor(
 
     private suspend fun handleTranslateSuccess(messageUid: String, data: String?) {
         val translatedHtml = data ?: ""
-        saveTranslation(messageUid, translatedHtml)
+        updateTranslation(messageUid, translatedHtml)
 
         val message = messageController.getMessage(messageUid)
         val bodyType = message?.body?.type ?: Utils.TEXT_HTML
@@ -176,34 +174,31 @@ class AiActionsViewModel @Inject constructor(
     }
 
     private fun handleSummarySuccess(messageUid: String, summaryContent: String?) {
-        if (summaryContent != null) saveSummary(messageUid, summaryContent)
+        if (summaryContent != null) updateSummary(messageUid, summaryContent)
     }
 
-    private fun mapApiResultToState(
-        result: ApiResponse<String>?,
+    private fun mapApiResponseToState(
+        apiResponse: ApiResponse<String>?,
         isRetrying: Boolean,
         wasLoaderShown: Boolean,
     ): AiProcessState {
-        if (result == null) {
-            return AiProcessState.Error(
+        return when {
+            apiResponse == null -> AiProcessState.Error(
                 canRetry = true,
                 hasAlreadyRetried = isRetrying,
                 wasLoaderShown = wasLoaderShown,
                 targetSameAsSource = false,
             )
+            apiResponse.result == ApiResponseStatus.SUCCESS -> AiProcessState.Success(apiResponse.data ?: "")
+            else -> {
+                AiProcessState.Error(
+                    canRetry = apiResponse.error?.code == ErrorCode.TRANSLATION_API_NOT_AVAILABLE,
+                    hasAlreadyRetried = isRetrying,
+                    wasLoaderShown = wasLoaderShown,
+                    targetSameAsSource = apiResponse.error?.code == ErrorCode.TRANSLATION_TARGET_SAME_AS_SOURCE,
+                )
+            }
         }
-        if (result.result == ApiResponseStatus.SUCCESS) {
-            return AiProcessState.Success(result.data ?: "")
-        }
-
-        val canRetry = result.error?.code == ErrorCode.TRANSLATION_API_NOT_AVAILABLE
-        val targetSameAsSource = result.error?.code == ErrorCode.TRANSLATION_TARGET_SAME_AS_SOURCE
-        return AiProcessState.Error(
-            canRetry = canRetry,
-            hasAlreadyRetried = isRetrying,
-            wasLoaderShown = wasLoaderShown,
-            targetSameAsSource = targetSameAsSource,
-        )
     }
 
     private fun updateAiProcessState(
@@ -256,16 +251,16 @@ class AiActionsViewModel @Inject constructor(
         super.onCleared()
     }
 
-    enum class AiAction {
-        SUMMARY,
-        TRANSLATE,
-    }
-
     data class AiStateUpdate(
         val messageUid: String,
         val aiAction: AiAction,
         val bodyUpdate: AiBodyUpdate,
     )
+
+    enum class AiAction {
+        SUMMARY,
+        TRANSLATE,
+    }
 
     enum class AiBodyUpdate {
         NONE,
