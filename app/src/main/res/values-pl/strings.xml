@@ -507,6 +507,9 @@
     <string name="readMore">Czytaj więcej</string>
     <string name="recentSearchesTitle">Ostatnie wyszukiwania</string>
     <string name="refreshTokenError">Zostałeś/aś rozłączony/a</string>
+    <string name="reminderFollowUpButton">Przypomnij</string>
+    <string name="reminderFollowUpPlaceholderText">Cześć,\nCzy możliwe jest uzyskanie informacji zwrotnej na ten temat?\nZ góry dziękuję.</string>
+    <string name="reminderNoResponseHeaderTitle">Przypomnienie: brak odpowiedzi od %1$s na ten e-mail od %2$s</string>
     <string name="renameFolder">Zmień nazwę folderu</string>
     <string name="reportDisplayProblemDescription">Czy wyrażasz zgodę na udostępnienie swoich danych naszym deweloperom, aby mogli Ci pomóc w rozwiązaniu problemu?</string>
     <string name="reportDisplayProblemTitle">Zgłoś problem z wyświetlaniem</string>

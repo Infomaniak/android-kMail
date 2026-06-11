@@ -485,6 +485,9 @@
     <string name="readMore">Saber mais</string>
     <string name="recentSearchesTitle">Pesquisas recentes</string>
     <string name="refreshTokenError">Foi desligado</string>
+    <string name="reminderFollowUpButton">Relançar</string>
+    <string name="reminderFollowUpPlaceholderText">Olá,\nÉ possível obter algum feedback sobre este assunto?\nObrigado desde já.</string>
+    <string name="reminderNoResponseHeaderTitle">Lembrete: nenhuma resposta de %1$s a este email desde %2$s</string>
     <string name="renameFolder">Renomear pasta</string>
     <string name="reportDisplayProblemDescription">Aceita partilhar os seus dados com os nossos programadores para que o ajudem com o seu problema?</string>
     <string name="reportDisplayProblemTitle">Reportar um problema de exibição</string>
