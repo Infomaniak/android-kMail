@@ -57,6 +57,7 @@ class Thread : RealmObject, Snoozable {
     var hasDrafts: Boolean = false
     @SerialName("flagged")
     var isFavorite: Boolean = false
+    var isReminder: Boolean = true // TODO: This is currently always true because the API doesn't return this information for threads
     @SerialName("answered")
     var isAnswered: Boolean = false
     @SerialName("forwarded")
