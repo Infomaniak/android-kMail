@@ -158,9 +158,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
     @Inject
     override lateinit var descriptionDialog: DescriptionAlertDialog
-    override fun showSwipeActionIncompatible() {
-        snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
-    }
 
     @Inject
     override lateinit var folderRoleUtils: FolderRoleUtils

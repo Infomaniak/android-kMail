@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -55,7 +55,7 @@ object PerformSwipeActionManager {
     ): Boolean {
         val folderRole = thread.folder.role
         if (!swipeAction.canDisplay(folderRole, host.mainViewModel.featureFlagsLive.value, host.localSettings)) {
-            host.showSwipeActionIncompatible()
+            host.fragment.showSnackbar(R.string.snackbarSwipeActionIncompatible)
             return true
         }
 
@@ -87,8 +87,7 @@ object PerformSwipeActionManager {
         return when (swipeAction) {
             SwipeAction.TUTORIAL -> {
                 host.localSettings.setDefaultSwipeActions()
-                host.fragment.findNavController()
-                    .navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
+                host.fragment.safelyNavigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
                 true
             }
 
@@ -159,7 +158,8 @@ object PerformSwipeActionManager {
                 } else {
                     SnoozeScheduleType.Snooze(thread.uid)
                 }
-                host.navigateToSnoozeBottomSheet(snoozeScheduleType, thread.snoozeEndDate)
+
+                (host.fragment as TwoPaneFragment).navigateToSnoozeBottomSheet(snoozeScheduleType, thread.snoozeEndDate)
                 true
             }
 

@@ -115,9 +115,6 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
 
     @Inject
     override lateinit var descriptionDialog: DescriptionAlertDialog
-    override fun showSwipeActionIncompatible() {
-        snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
-    }
 
     override val multiSelectionLifecycleOwner: LifecycleOwner
         get() = viewLifecycleOwner
@@ -391,7 +388,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
         isPermanentDeleteFolder: Boolean,
     ): Boolean = with(PerformSwipeActionManager) {
         val currentMailbox = mainViewModel.currentMailbox.value ?: run {
-            snackbarManager.setValue(getString(com.infomaniak.core.common.R.string.anErrorHasOccurred))
+            snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
             SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
                 scope.setTag("context", "PerformSwipeActionManager.performSwipeAction")
             }
