@@ -19,9 +19,11 @@ package com.infomaniak.mail.ui.main.thread
 
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 interface ThreadAdapterState {
     val isExpandedMap: MutableMap<String, Boolean>
@@ -32,7 +34,8 @@ interface ThreadAdapterState {
     val isCalendarEventExpandedMap: MutableMap<String, Boolean>
 }
 
-class ThreadState {
+@ActivityRetainedScoped
+class ThreadState @Inject constructor() {
 
     val isExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val isThemeTheSameMap: MutableMap<String, Boolean> = mutableMapOf()
@@ -74,9 +77,10 @@ sealed class AiProcessState {
     data class Success(val content: String = "") : AiProcessState()
     data class Error(
         val canRetry: Boolean,
-        val isRetry: Boolean = true,
+        val hasAlreadyRetried: Boolean = false,
         val wasLoaderShown: Boolean = false,
         val targetSameAsSource: Boolean = false
     ) : AiProcessState()
+
     data object Dismissed : AiProcessState()
 }

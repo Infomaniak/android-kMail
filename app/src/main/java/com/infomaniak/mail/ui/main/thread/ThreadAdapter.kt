@@ -63,7 +63,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.AiAction
+import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
@@ -99,7 +99,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
 import java.util.Date
-import kotlin.context
 import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
@@ -480,7 +479,7 @@ class ThreadAdapter(
         AiAction.TRANSLATE -> threadAdapterState.aiTranslateStateMap[messageUid]
     }
 
-    private fun MessageViewHolder.bindAiAction(message: Message, aiAction: ThreadFragment.AiAction? = null) {
+    private fun MessageViewHolder.bindAiAction(message: Message, aiAction: AiAction? = null) {
         if (aiAction == null) {
             bindAiAction(message, AiAction.SUMMARY)
             bindAiAction(message, AiAction.TRANSLATE)
@@ -620,7 +619,7 @@ class ThreadAdapter(
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
 
-                if (state.isRetry && !state.wasLoaderShown) {
+                if (state.hasAlreadyRetried && !state.wasLoaderShown) {
                     threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessageRes)
                 }
             } else {

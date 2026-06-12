@@ -93,13 +93,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
@@ -120,6 +123,7 @@ typealias MessagesWithoutHeavyData = List<Message>
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
+    val threadState: ThreadState,
     private val avatarMergedContactData: AvatarMergedContactData,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
@@ -151,7 +155,6 @@ class ThreadViewModel @Inject constructor(
 
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
-    val threadState = ThreadState()
 
     @DoNotReadDirectly
     private val _threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
@@ -240,7 +243,14 @@ class ThreadViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            threadFlow.filterNotNull().collect { thread ->
+            threadOpeningModeFlow
+                .mapNotNull { it.threadUid }
+                .distinctUntilChanged()
+                .onEach { _ ->
+                    threadState.reset()
+                }.launchIn(viewModelScope)
+
+            threadFlow.filterNotNull().onEach { thread ->
                 val featureFlags = featureFlagsFlow.first()
 
                 // These 2 will always be empty or not all together at the same time.
@@ -257,7 +267,7 @@ class ThreadViewModel @Inject constructor(
                     sendMatomoAboutThreadMessagesCount(thread, featureFlags)
                     if (thread.isSeen.not()) markThreadAsSeen(thread)
                 }
-            }
+            }.launchIn(viewModelScope)
         }
     }
 
@@ -375,7 +385,7 @@ class ThreadViewModel @Inject constructor(
         messages: List<Message>,
         block: SuperCollapsedBlock?,
         computeBehavior: (Int, String) -> MessageBehavior,
-    ): Pair<MutableList<Any>, MutableList<Message>> = with(threadState) {
+    ): Pair<MutableList<Any>, MutableList<Message>> {
 
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
@@ -443,31 +453,6 @@ class ThreadViewModel @Inject constructor(
             threadState.cachedTranslatedSplitBodies[messageUid] = MessageBodyUtils.splitContentAndQuote(translatedBody)
         }
         return threadState.cachedTranslatedSplitBodies[messageUid]
-    }
-
-    private suspend fun updateLocalMessageBody(messageUid: String, updateAction: (Message?) -> Unit) {
-        mailboxContentRealm().write {
-            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
-                updateAction(localMessage)
-            }
-        }
-    }
-
-    fun saveTranslation(messageUid: String, translatedHtml: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = translatedHtml }
-    }
-
-    fun saveSummary(messageUid: String, summaryText: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.summary = summaryText }
-    }
-
-    fun removeSummary(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.summary = null }
-    }
-
-    fun removeTranslation(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        updateLocalMessageBody(messageUid) { it?.body?.translatedValue = null }
-        threadState.cachedTranslatedSplitBodies.remove(messageUid)
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {

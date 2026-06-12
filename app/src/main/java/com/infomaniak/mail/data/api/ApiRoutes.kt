@@ -272,7 +272,7 @@ object ApiRoutes {
     }
 
     fun aiSummary(): String {
-        return "$MAIL_API/api/resume"
+        return "$MAIL_API/api/summarize"
     }
 
     fun aiTranslate(): String {
