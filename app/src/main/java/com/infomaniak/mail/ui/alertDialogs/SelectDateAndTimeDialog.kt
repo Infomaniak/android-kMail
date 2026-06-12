@@ -213,6 +213,6 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     protected open fun getReminderTooShortErrorMessage(): String? = null
 
     companion object {
-        private const val ONE_HOUR_IN_MILLIS = 3_600_000L // 60 * 60 * 1000
+        const val ONE_HOUR_IN_MILLIS = 3_600_000L
     }
 }
