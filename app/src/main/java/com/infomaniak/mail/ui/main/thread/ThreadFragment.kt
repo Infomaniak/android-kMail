@@ -87,6 +87,7 @@ import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.PhoneContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForSnoozeDialog
+import com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialog.Companion.REMINDER_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialogArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
@@ -868,6 +869,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox)
         }
 
+        getBackNavigationResult(REMINDER_RESULT) { selectedScheduleEpoch: Long ->
+            mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch)) // TODO: adapt it to a real reminder api call when it will be available
+        }
+
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
             navigateToSnoozeBottomSheet(snoozeScheduleType)
         }
@@ -1281,6 +1286,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             args = ReminderBottomSheetDialogArgs(
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
+                currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
             ).toBundle(),
         )
     }
