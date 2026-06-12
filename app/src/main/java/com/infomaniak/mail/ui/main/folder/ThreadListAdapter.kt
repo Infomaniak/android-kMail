@@ -196,22 +196,31 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-        val payload = payloads.firstOrNull()
-        if (payload !is NotificationType) {
+        if (payloads.isEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
             return@runCatchingRealm
         }
 
-        when (payload) {
-            NotificationType.SELECTED_STATE -> {
-                if (holder.itemViewType == DisplayType.THREAD.layout) {
-                    val binding = holder.binding as CardviewThreadItemBinding
-                    val thread = (dataSet[position] as ThreadListItem.Content).thread
-                    binding.updateSelectedUi(thread)
+        payloads.forEach { payload ->
+            if (payload !is NotificationType) return@forEach
+
+            when (payload) {
+                NotificationType.SELECTED_STATE -> {
+                    if (holder.itemViewType == DisplayType.THREAD.layout) {
+                        val binding = holder.binding as CardviewThreadItemBinding
+                        val thread = (dataSet[position] as ThreadListItem.Content).thread
+                        binding.updateSelectedUi(thread)
+                    }
+                }
+                NotificationType.UPDATE_CONTACT_INTERACTIVITY -> {
+                    if (holder.itemViewType == DisplayType.CONTACT_ITEM.layout) {
+                        val binding = holder.binding as ItemContactSearchBinding
+                        val contact = (dataSet[position] as ThreadListItem.ContactItem).contact
+                        binding.updateContactInteractivity(contact)
+                    }
                 }
             }
         }
-
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(
@@ -610,31 +619,14 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun ItemContactSearchBinding.updateContactInteractivity(contact: MergedContact) {
-        val isMultiSelectOn = multiSelection?.isEnabled == true
-
         contactWithSpace.apply {
-            isClickable = !isMultiSelectOn
-            isFocusable = !isMultiSelectOn
+            isEnabled = multiSelection?.isEnabled == false
 
-            setBackgroundResource(if (isMultiSelectOn) 0 else selectableItemBackgroundRes)
-
-            setOnClickListener(
-                if (isMultiSelectOn) {
-                    null
-                } else {
-                    {
-                        trackSearchEvent(MatomoName.SelectContact)
-                        callbacks?.onContactClicked?.invoke(contact)
-                    }
-                }
-            )
+            setOnClickListener {
+                trackSearchEvent(MatomoName.SelectContact)
+                callbacks?.onContactClicked?.invoke(contact)
+            }
         }
-    }
-
-    private val selectableItemBackgroundRes: Int by lazy {
-        val outValue = android.util.TypedValue()
-        context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
-        outValue.resourceId
     }
 
     override fun onSwipeStarted(item: ThreadListItem, viewHolder: ThreadListViewHolder) {
@@ -772,10 +764,16 @@ class ThreadListAdapter @Inject constructor(
     }
 
     fun updateContactsMultiSelectState() {
-        val first = dataSet.indexOfFirst { it is ThreadListItem.ContactItem }
-        if (first == -1) return
-        val last = dataSet.indexOfLast { it is ThreadListItem.ContactItem }
-        notifyItemRangeChanged(first, last - first + 1)
+        val hasContacts = dataSet.any { it is ThreadListItem.ContactItem }
+        if (!hasContacts) {
+            return
+        }
+
+        dataSet.forEachIndexed { index, item ->
+            if (item is ThreadListItem.ContactItem) {
+                notifyItemChanged(index, NotificationType.UPDATE_CONTACT_INTERACTIVITY)
+            }
+        }
     }
 
     private fun checkShouldUpdateOpenedThreadPosition(currentUid: String): Boolean {
@@ -881,6 +879,7 @@ class ThreadListAdapter @Inject constructor(
 
     enum class NotificationType {
         SELECTED_STATE,
+        UPDATE_CONTACT_INTERACTIVITY,
     }
 
     private data class SwipeActionUiData(@ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?)
