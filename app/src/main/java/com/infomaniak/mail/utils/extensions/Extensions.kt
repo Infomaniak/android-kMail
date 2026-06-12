@@ -431,8 +431,9 @@ fun DragDropSwipeRecyclerView.updateSwipeActionEnabledUi(
     isEnabled: Boolean,
 ) {
     fun SwipeAction.iconResOrDisabled(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
-    fun SwipeAction.backgroundColorOrDisabled(): Int =
-        if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
+    fun SwipeAction.backgroundColorOrDisabled(): Int {
+        return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
+    }
 
     if (swipeDirection == DirectionFlag.LEFT) {
         behindSwipedItemIconDrawableId = swipeAction.iconResOrDisabled()

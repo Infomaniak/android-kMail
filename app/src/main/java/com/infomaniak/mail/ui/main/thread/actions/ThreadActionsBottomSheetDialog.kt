@@ -80,6 +80,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
+    
     private var folderRole: FolderRole? = null
     private var messagesFolderRoles: List<FolderRole> = emptyList()
     private var isFromArchive: Boolean = false

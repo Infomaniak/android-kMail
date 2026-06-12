@@ -44,9 +44,9 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetDetailedContactBinding by safeBinding()
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
-    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { DetailedContactBottomSheetDialog::class.java.name }
 

@@ -235,8 +235,7 @@ object PerformSwipeActionManager {
             callback = ::onHandleDelete,
         )
     }
-
-
+    
     private fun LocalSettings.setDefaultSwipeActions() {
         if (swipeRight == SwipeAction.TUTORIAL) swipeRight = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_RIGHT
         if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_LEFT

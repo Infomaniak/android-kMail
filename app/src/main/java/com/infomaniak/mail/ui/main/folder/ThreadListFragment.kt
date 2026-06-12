@@ -175,8 +175,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     @Inject
     lateinit var titleDialog: TitleAlertDialog
 
-    override val fragment: Fragment
-        get() = this@ThreadListFragment
+    override val fragment: Fragment get() = this
 
     override val multiSelectionLifecycleOwner: LifecycleOwner
         get() = viewLifecycleOwner
