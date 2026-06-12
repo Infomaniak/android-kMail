@@ -29,6 +29,7 @@ import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetReminderOptionsBinding
+import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.Companion.NB_HOURS_IN_DAY
@@ -46,7 +47,13 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     private var binding: BottomSheetReminderOptionsBinding by safeBinding()
     private val navigationArgs: ReminderBottomSheetDialogArgs by navArgs()
 
+    @Inject
+    lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
+
     private val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
+    private val currentlyScheduledEpochMillis: Long? by lazy {
+        navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetReminderOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -54,6 +61,8 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
         binding.title.text = getString(R.string.reminderBottomSheetTitle)
         createPresetOptions()
@@ -99,13 +108,24 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
             KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
-            else -> setBackNavigationResult(OPEN_REMINDER_DATE_AND_TIME_PICKER, true)
+            else -> showCustomDelayReminderDatePicker()
         }
+    }
+
+    private fun showCustomDelayReminderDatePicker() {
+        dateAndTimeScheduleDialog.show(
+            positiveButtonResId = R.string.buttonModify,
+            scheduleDateMillis = currentlyScheduledEpochMillis,
+            isForReminder = true,
+            onDateSelected = { timestamp ->
+                setBackNavigationResult(REMINDER_RESULT, timestamp)
+                dismiss()
+            },
+        )
     }
 
     companion object {
         const val REMINDER_RESULT = "reminder_result"
-        const val OPEN_REMINDER_DATE_AND_TIME_PICKER = "open_reminder_date_and_time_picker"
     }
 
     private enum class ReminderPreset(@StringRes val titleRes: Int, val hours: Int) {

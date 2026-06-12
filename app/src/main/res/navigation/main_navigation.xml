@@ -279,6 +279,10 @@
         <argument
             android:name="isAdmin"
             app:argType="boolean" />
+        <argument
+            android:name="currentlyScheduledEpochMillis"
+            android:defaultValue="0L"
+            app:argType="long" />
     </dialog>
 
     <fragment
