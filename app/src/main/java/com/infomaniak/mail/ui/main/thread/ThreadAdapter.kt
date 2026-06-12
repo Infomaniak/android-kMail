@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH
 import com.infomaniak.core.common.utils.FormatData
@@ -561,6 +562,7 @@ class ThreadAdapter(
         }
 
         bindUnsubscribe(messageUi)
+        bindRequestResponseAlert(message)
         bindEndReminder(message)
         bindSpam(message)
 
@@ -637,9 +639,27 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindEndReminder(message: Message) {
-        val senderNames = message.allRecipients.map { it.name }
+    private fun ItemMessageBinding.bindRequestResponseAlert(message: Message) {
+        val senderNames = message.from.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, senderNames)
+        topReminderAlertGroup.isVisible = true
+        requestResponseAlert.apply {
+            isVisible = true
+            setActionsVisibility(isVisible = false)
+            setDescription(
+                context.resources.getQuantityString(
+                    R.plurals.reminderBeforeHeaderTitle,
+                    message.from.size,
+                    formatNamesList,
+                    message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME) // TODO: Use real reminder date
+                )
+            ) // TODO: change dynamically when the reminder expires
+        }
+    }
+
+    private fun ItemMessageBinding.bindEndReminder(message: Message) {
+        val recipientsNames = message.allRecipients.map { it.name.ifBlank { it.email } }
+        val formatNamesList = formatNamesList(context, recipientsNames)
 
         endReminderAlert.setDescription(
             context.getString(
@@ -655,7 +675,8 @@ class ThreadAdapter(
         message.draftResource?.let { draftResource ->
             endReminderAlert.onAction1 {
                 trackMessageBannerEvent(MatomoName.ReprogramReminder)
-                threadAdapterCallbacks?.onReminderClicked?.invoke( // TODO: Create a specific callback for rescheduling reminders
+                threadAdapterCallbacks?.onReminderClicked?.invoke(
+                    // TODO: Create a specific callback for rescheduling reminders
                     draftResource,
                     message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
                 )

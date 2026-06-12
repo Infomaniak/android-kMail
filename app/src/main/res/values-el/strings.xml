@@ -467,6 +467,14 @@
     <string name="readMore">Διαβάστε περισσότερα</string>
     <string name="recentSearchesTitle">Πρόσφατες αναζητήσεις</string>
     <string name="refreshTokenError">Έχετε αποσυνδεθεί</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s περιμένει απάντηση από %2$s</item>
+        <item quantity="other">%1$s περιμένουν απάντηση από %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s περιμένει απάντηση έως %2$s</item>
+        <item quantity="other">%1$s περιμένουν απάντηση έως %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Αναβολή υπενθύμισης</string>
     <string name="reminderFollowUpButton">Παρακολούθηση</string>
     <string name="reminderFollowUpPlaceholderText">Γεια σας,\nΕίναι δυνατόν να λάβετε κάποια ανατροφοδότηση για αυτό το θέμα;\nΣας ευχαριστώ εκ των προτέρων.</string>

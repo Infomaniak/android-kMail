@@ -467,6 +467,14 @@
     <string name="readMore">Seguir leyendo</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
     <string name="refreshTokenError">Ha sido desconectado</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s espera una respuesta desde %2$s</item>
+        <item quantity="other">%1$s esperan una respuesta desde %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s espera una respuesta antes de %2$s</item>
+        <item quantity="other">%1$s esperan una respuesta antes de %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Posponer el recordatorio</string>
     <string name="reminderFollowUpButton">Relanzar</string>
     <string name="reminderFollowUpPlaceholderText">Hola,\n¿Es posible obtener algún comentario sobre este tema?\nGracias de antemano.</string>

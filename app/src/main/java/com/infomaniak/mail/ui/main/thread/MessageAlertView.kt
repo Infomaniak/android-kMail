@@ -25,7 +25,9 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.getAttributes
@@ -33,6 +35,7 @@ import com.infomaniak.core.ui.view.extension.hideProgressCatching
 import com.infomaniak.core.ui.view.extension.showProgressCatching
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMessageAlertBinding
+import com.infomaniak.core.ui.view.R as RCore
 
 class MessageAlertView @JvmOverloads constructor(
     context: Context,
@@ -115,6 +118,11 @@ class MessageAlertView @JvmOverloads constructor(
 
     fun setActionsVisibility(isVisible: Boolean) {
         binding.actionsLayout.isVisible = isVisible
+        if (!isVisible) {
+            binding.description.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                goneBottomMargin = resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium)
+            }
+        }
     }
 
     private fun TypedArray.inflateBindingWithCustomStyle(context: Context) {
