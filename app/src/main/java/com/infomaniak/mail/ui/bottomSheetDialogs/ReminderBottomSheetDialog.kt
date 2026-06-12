@@ -29,6 +29,7 @@ import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetReminderOptionsBinding
+import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
@@ -80,7 +81,7 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
 
                 setTitle(dateText)
                 removeIcon()
-                setDescription(context.dayOfWeekDateWithoutYear(date = Date(preset.epochMillis())))
+                setDescription(context.dayOfWeekDateWithoutYear(date = Date(preset.epochMillis(currentlyScheduledEpochMillis))))
                 setOnClickListener { onPresetSelected(preset) }
             }
             binding.reminderOptions.addView(itemView)
@@ -98,7 +99,7 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     }
 
     private fun onPresetSelected(preset: ReminderPreset) {
-        setBackNavigationResult(REMINDER_RESULT, preset.epochMillis())
+        setBackNavigationResult(REMINDER_RESULT, preset.epochMillis(currentlyScheduledEpochMillis))
     }
 
     private fun onCustomReminderClicked() {
@@ -133,6 +134,9 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
         DAYS_3(R.string.daysBeforeSendingReminder, 72),
         DAYS_7(R.string.daysBeforeSendingReminder, 168);
 
-        fun epochMillis(): Long = System.currentTimeMillis() + hours * 3_600_000L
+        fun epochMillis(scheduledEpochMillis: Long? = null): Long {
+            val base = scheduledEpochMillis ?: System.currentTimeMillis()
+            return base + hours * ONE_HOUR_IN_MILLIS
+        }
     }
 }
