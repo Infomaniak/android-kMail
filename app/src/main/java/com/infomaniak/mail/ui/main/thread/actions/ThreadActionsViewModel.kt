@@ -52,7 +52,8 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
+    private val threadUid: String = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)
+        ?: throw IllegalArgumentException("threadUid is required")
 
     private val threadMessageToExecuteAction: Flow<ThreadMessageInteraction.Action> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }

@@ -51,7 +51,7 @@ class EncryptionActionsBottomSheet : ActionsBottomSheetDialog() {
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
-    override val mainViewModel = null
+    override val multiselectionViewModel = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager

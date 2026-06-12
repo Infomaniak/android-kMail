@@ -54,6 +54,8 @@ import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -88,6 +90,15 @@ class ActionsViewModel @Inject constructor(
 
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
+
+    //region refreshSearch
+    private val _searchRefreshEvents = Channel<Unit>(Channel.CONFLATED)
+    val searchRefreshEvents = _searchRefreshEvents.receiveAsFlow()
+
+    fun notifySearchRefresh() {
+        _searchRefreshEvents.trySend(Unit)
+    }
+    //endregion
 
     //region AutoAdvance
     fun updateCurrentThreadPosition(currentPosition: Int, currentUid: String) {
@@ -131,7 +142,6 @@ class ActionsViewModel @Inject constructor(
     ) {
         val result = messagesActions.toggleMessagesSpamStatus(
             messages = messages,
-            currentFolderId = currentFolderId,
             mailbox = mailbox,
         ) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
@@ -164,6 +174,8 @@ class ActionsViewModel @Inject constructor(
                     threadController.updateIsLocallyMovedOutStatus(threadsUids = movedThreads, hasBeenMovedOut = false)
                 }
             }
+
+            notifySearchRefresh()
         }
     }
 
@@ -211,12 +223,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
     ) {
         val destinationFolder = folderController.getFolder(destinationFolderId)
-        if (currentFolderId == null || destinationFolder == null) {
-            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-            return
-        }
-
-        val currentFolder = folderController.getFolder(currentFolderId) ?: run {
+        if (destinationFolder == null) {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return
         }
@@ -224,7 +231,6 @@ class ActionsViewModel @Inject constructor(
         calculateCurrentThreadPosition.postValue(Unit)
 
         val result = messagesActions.moveMessagesTo(
-            currentFolder = currentFolder,
             destinationFolder = destinationFolder,
             mailbox = mailbox,
             messages = messages,
@@ -249,6 +255,8 @@ class ActionsViewModel @Inject constructor(
                     threadController.updateIsLocallyMovedOutStatus(movedThreads, hasBeenMovedOut = false)
                 }
             }
+
+            notifySearchRefresh()
         }
 
         showMoveSnackbar(
@@ -294,29 +302,27 @@ class ActionsViewModel @Inject constructor(
     //region Delete
     fun deleteThreads(
         threads: List<Thread>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToDelete = messagesActions.getMessagesFromThreadsToDelete(threads)
-        handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
+        handleDeleteMessages(messagesToDelete, currentFolderId, mailbox)
     }
 
     fun deleteMessages(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToDelete = messagesActions.getMessagesToDelete(messages)
-        handleDeleteMessages(messagesToDelete, currentFolder, mailbox)
+        handleDeleteMessages(messagesToDelete, currentFolderId, mailbox)
     }
 
     private suspend fun handleDeleteMessages(
         messagesToDelete: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) {
-        if (currentFolder == null) return
-
         val permanentlyDeleteMessages = messagesToDelete.filter { message ->
             isPermanentDeleteFolder(role = folderRoleUtils.getActionFolderRole(message))
         }
@@ -328,11 +334,11 @@ class ActionsViewModel @Inject constructor(
             // If deleteMessages is empty we will do the auto advance after deleting permanently
             if (onlyPermanentlyDeleteMessages) calculateCurrentThreadPosition.postValue(Unit)
             handlePermanentlyDeleteMessages(
-                permanentlyDeleteMessages = permanentlyDeleteMessages,
-                mailbox = mailbox,
-                currentFolder = currentFolder,
-                shouldAutoAdvanceAndRefresh = onlyPermanentlyDeleteMessages,
-                messagesToDelete = messagesToDelete
+                permanentlyDeleteMessages,
+                mailbox,
+                currentFolderId,
+                onlyPermanentlyDeleteMessages,
+                messagesToDelete,
             )
         }
 
@@ -347,7 +353,7 @@ class ActionsViewModel @Inject constructor(
             moveMessagesTo(
                 destinationFolderId = destinationFolder.id,
                 messagesUids = deleteMessages.getUids(),
-                currentFolderId = currentFolder.id,
+                currentFolderId = currentFolderId,
                 mailbox = mailbox,
             )
         }
@@ -356,7 +362,7 @@ class ActionsViewModel @Inject constructor(
     private suspend fun handlePermanentlyDeleteMessages(
         permanentlyDeleteMessages: List<Message>,
         mailbox: Mailbox,
-        currentFolder: Folder,
+        currentFolderId: String?,
         shouldAutoAdvanceAndRefresh: Boolean,
         messagesToDelete: List<Message>
     ) {
@@ -364,7 +370,6 @@ class ActionsViewModel @Inject constructor(
             messagesToDelete = permanentlyDeleteMessages,
             mailbox = mailbox,
             onApiFinished = { activityDialogLoaderResetTrigger.postValue(Unit) },
-            currentFolder = currentFolder,
         ) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return
@@ -380,9 +385,10 @@ class ActionsViewModel @Inject constructor(
                 refreshFoldersAsync(
                     mailbox = mailbox,
                     messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                    currentFolderId = currentFolder.id,
+                    currentFolderId = currentFolderId,
                     threadsUids = uidsToMove,
                 )
+                notifySearchRefresh()
                 val numberOfImpactedThreads = uidsToMove.distinct().count()
                 showDeleteSnackbar(
                     apiResponses = apiResponses,
@@ -426,33 +432,34 @@ class ActionsViewModel @Inject constructor(
     //region Archive
     fun archiveThreads(
         threads: List<Thread>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val messagesToMove = messagesActions.getMessagesFromThreadsToMove(threads)
-        handleArchiveMessages(messagesToMove, currentFolder, mailbox)
+        handleArchiveMessages(messagesToMove, currentFolderId, mailbox)
     }
 
     fun archiveMessages(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        handleArchiveMessages(messages, currentFolder, mailbox)
+        val messagesToMove = messagesActions.getMessagesToMove(messages, currentFolderId)
+        handleArchiveMessages(messagesToMove, currentFolderId, mailbox)
     }
 
     private suspend fun handleArchiveMessages(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) {
         if (messages.isEmpty()) return
         val roles = folderRoleUtils.getActionFolderRoles(messages)
-        val isFromArchive = roles.contains(FolderRole.ARCHIVE)
+        val isFromArchive = roles.all { it == FolderRole.ARCHIVE }
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return
 
-        moveMessagesTo(destinationFolder.id, messages.getUids(), currentFolder?.id, mailbox)
+        moveMessagesTo(destinationFolder.id, messages.getUids(), currentFolderId, mailbox)
     }
 
     //region Seen
@@ -461,6 +468,7 @@ class ActionsViewModel @Inject constructor(
         shouldRead: Boolean = true,
         currentFolderId: String?,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         val result = messagesActions.toggleThreadsSeenStatus(threadsUids, shouldRead, mailbox)
@@ -470,6 +478,7 @@ class ActionsViewModel @Inject constructor(
                 messagesFoldersIds = result.messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
             )
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
 
@@ -478,6 +487,7 @@ class ActionsViewModel @Inject constructor(
         shouldRead: Boolean = true,
         currentFolderId: String?,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActions.toggleMessagesSeenStatus(messages, shouldRead, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
@@ -486,9 +496,9 @@ class ActionsViewModel @Inject constructor(
                 messagesFoldersIds = messages.getFoldersIds(),
                 currentFolderId = currentFolderId,
             )
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
-
     //endregion
 
     //region Favorite
@@ -496,6 +506,7 @@ class ActionsViewModel @Inject constructor(
         threadsUids: List<String>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActions.toggleThreadsFavorite(threadsUids, shouldFavorite, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
@@ -503,6 +514,7 @@ class ActionsViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = result.messages.getFoldersIds(),
             )
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
 
@@ -510,6 +522,7 @@ class ActionsViewModel @Inject constructor(
         messages: List<Message>,
         shouldFavorite: Boolean = true,
         mailbox: Mailbox,
+        shouldRefreshSearch: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val result = messagesActions.toggleMessagesFavorite(messages, shouldFavorite, mailbox)
         if (result.apiResponses.atLeastOneSucceeded()) {
@@ -517,6 +530,7 @@ class ActionsViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
             )
+            if (shouldRefreshSearch) notifySearchRefresh()
         }
     }
     //endregion
@@ -524,7 +538,7 @@ class ActionsViewModel @Inject constructor(
     //region Phishing
     fun reportPhishing(
         messages: List<Message>,
-        currentFolder: Folder?,
+        currentFolderId: String?,
         mailbox: Mailbox,
     ) {
         viewModelScope.launch(ioCoroutineContext) {
@@ -534,7 +548,7 @@ class ActionsViewModel @Inject constructor(
                 onReportSuccess = {
                     toggleMessagesSpamStatus(
                         messages = messages,
-                        currentFolderId = currentFolder?.id,
+                        currentFolderId = currentFolderId,
                         mailbox = mailbox,
                         displaySnackbar = false,
                     )
@@ -544,6 +558,7 @@ class ActionsViewModel @Inject constructor(
             when (result) {
                 is MessagesActions.ApiCallResult.Success -> {
                     reportPhishingTrigger.postValue(Unit)
+                    notifySearchRefresh()
                     snackbarManager.postValue(appContext.getString(result.messageRes))
                 }
                 is MessagesActions.ApiCallResult.Error -> {
@@ -582,6 +597,7 @@ class ActionsViewModel @Inject constructor(
 
         if (result is MessagesActions.SnoozeResult.Success) {
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+            notifySearchRefresh()
         }
 
         val message = when (result) {
@@ -605,6 +621,7 @@ class ActionsViewModel @Inject constructor(
 
         if (result is BatchSnoozeResult.Success) {
             refreshFoldersAsync(mailbox, result.impactedFolders)
+            notifySearchRefresh()
         }
 
         val message = when (result) {
@@ -630,6 +647,7 @@ class ActionsViewModel @Inject constructor(
 
             if (result is BatchSnoozeResult.Success) {
                 refreshFoldersAsync(mailbox, result.impactedFolders)
+                notifySearchRefresh()
             }
 
             val message = when (result) {
@@ -667,6 +685,7 @@ class ActionsViewModel @Inject constructor(
             with(messagesActions.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
                     refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
+                    notifySearchRefresh()
                 } else {
                     snackbarManager.postValue(title = appContext.getString(translateError()))
                 }
@@ -689,6 +708,7 @@ class ActionsViewModel @Inject constructor(
             }
 
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
+            notifySearchRefresh()
             onSuccess()
         } else {
             snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
@@ -705,6 +725,7 @@ class ActionsViewModel @Inject constructor(
                 }
 
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolder.id)))
+                notifySearchRefresh()
             }
 
             showUnscheduledDraftSnackbar(apiResponse, openFolder)
@@ -741,6 +762,7 @@ class ActionsViewModel @Inject constructor(
                 }
 
                 refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolder.id)))
+                notifySearchRefresh()
             }
 
             showDeletedDraftSnackbar(apiResponse)
@@ -764,6 +786,7 @@ class ActionsViewModel @Inject constructor(
                     messagesFoldersIds = foldersIds,
                     destinationFolderId = destinationFolderId,
                 )
+                notifySearchRefresh()
             }
         }
 

@@ -92,6 +92,8 @@ import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
 import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
+import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.DisplayType
@@ -206,6 +208,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
 
@@ -679,6 +682,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                            isFromSearch = parentFragment is SearchFragment
                         ).toBundle(),
                     )
                 }
@@ -902,6 +906,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             actionsViewModel.toggleThreadsFavoriteStatus(
                 threadsUids = listOf(threadUid),
                 mailbox = mainViewModel.currentMailbox.value!!,
+                shouldRefreshSearch = searchViewModel.currentFilters.contains(Thread.ThreadFilter.STARRED),
             )
         }
 
@@ -929,22 +934,22 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
                         actionsViewModel.archiveThreads(
                             threads = listOf(thread),
-                            currentFolder = mainViewModel.currentFolder.value,
+                            currentFolderId = thread.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     }
                 }
                 R.id.quickActionDelete -> {
+                    val thread = threadViewModel.threadLive.value ?: return@setOnItemClickListener
                     descriptionDialog.deleteWithConfirmationPopup(
                         messagesFolderRoles,
-                        currentFolderRole = mainViewModel.currentFolder.value?.role,
+                        currentFolderRole = thread.folder.role,
                         count = 1
                     ) {
                         trackThreadActionsEvent(MatomoName.Delete)
-                        val thread = threadViewModel.threadLive.value ?: return@deleteWithConfirmationPopup
                         actionsViewModel.deleteThreads(
                             threads = listOf(thread),
-                            currentFolder = mainViewModel.currentFolder.value,
+                            currentFolderId = thread.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
 
@@ -1027,6 +1032,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadViewModel.threadState.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
+                isFromSearch = parentFragment is SearchFragment
             ).toBundle(),
         )
     }
