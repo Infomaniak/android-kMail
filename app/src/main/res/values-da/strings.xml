@@ -484,6 +484,7 @@
     <string name="readMore">Læs mere</string>
     <string name="recentSearchesTitle">Seneste søgninger</string>
     <string name="refreshTokenError">Du er blevet afbrudt</string>
+    <string name="reminderBottomSheetTitle">Udskyd påmindelsen</string>
     <string name="reminderFollowUpButton">Følg op</string>
     <string name="reminderFollowUpPlaceholderText">Hej,\nEr det muligt at få feedback om dette emne?\nPå forhånd tak.</string>
     <string name="reminderNoResponseHeaderTitle">Påmindelse: intet svar fra %1$s på denne e-mail siden %2$s</string>

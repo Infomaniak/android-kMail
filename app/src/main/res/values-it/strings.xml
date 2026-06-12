@@ -484,6 +484,7 @@
     <string name="readMore">Per saperne di più</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
     <string name="refreshTokenError">Sei stato disconnesso</string>
+    <string name="reminderBottomSheetTitle">Posticipa promemoria</string>
     <string name="reminderFollowUpButton">Sollecita</string>
     <string name="reminderFollowUpPlaceholderText">Ciao,\nÈ possibile avere un feedback su questo argomento?\nGrazie in anticipo.</string>
     <string name="reminderNoResponseHeaderTitle">Promemoria: nessuna risposta da %1$s a questa email dal %2$s</string>

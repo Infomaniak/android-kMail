@@ -484,6 +484,7 @@
     <string name="readMore">Saber mais</string>
     <string name="recentSearchesTitle">Pesquisas recentes</string>
     <string name="refreshTokenError">Foi desligado</string>
+    <string name="reminderBottomSheetTitle">Adiar o lembrete</string>
     <string name="reminderFollowUpButton">Relançar</string>
     <string name="reminderFollowUpPlaceholderText">Olá,\nÉ possível obter algum feedback sobre este assunto?\nObrigado desde já.</string>
     <string name="reminderNoResponseHeaderTitle">Lembrete: nenhuma resposta de %1$s a este email desde %2$s</string>

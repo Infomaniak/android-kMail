@@ -484,6 +484,7 @@
     <string name="readMore">Διαβάστε περισσότερα</string>
     <string name="recentSearchesTitle">Πρόσφατες αναζητήσεις</string>
     <string name="refreshTokenError">Έχετε αποσυνδεθεί</string>
+    <string name="reminderBottomSheetTitle">Αναβολή υπενθύμισης</string>
     <string name="reminderFollowUpButton">Παρακολούθηση</string>
     <string name="reminderFollowUpPlaceholderText">Γεια σας,\nΕίναι δυνατόν να λάβετε κάποια ανατροφοδότηση για αυτό το θέμα;\nΣας ευχαριστώ εκ των προτέρων.</string>
     <string name="reminderNoResponseHeaderTitle">Υπενθύμιση: καμία απάντηση από %1$s σε αυτό το email από τις %2$s</string>
