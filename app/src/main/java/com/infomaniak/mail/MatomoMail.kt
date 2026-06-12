@@ -294,6 +294,7 @@ object MatomoMail : Matomo {
         ScheduleDraft("scheduleDraft"),
         ReminderDraft("reminderDraft"),
         ScheduledCustomDate("scheduledCustomDate"),
+        ReminderCustomDate("reminderCustomDate"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
         SeeAllAttendees("seeAllAttendees"),
         SelectAvatar("selectAvatar"),

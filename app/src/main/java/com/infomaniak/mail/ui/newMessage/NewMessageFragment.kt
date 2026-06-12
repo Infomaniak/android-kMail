@@ -1022,7 +1022,7 @@ class NewMessageFragment : Fragment() {
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
     companion object {
-        private const val NB_HOURS_IN_DAY = 24
+        const val NB_HOURS_IN_DAY = 24
     }
 
 }

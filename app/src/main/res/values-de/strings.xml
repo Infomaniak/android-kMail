@@ -485,6 +485,7 @@
     <string name="readMore">Mehr erfahren</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden abgemeldet</string>
+    <string name="reminderBottomSheetTitle">Erinnerung verschieben</string>
     <string name="reminderFollowUpButton">Nachfassen</string>
     <string name="reminderFollowUpPlaceholderText">Hallo,\nIst es möglich, ein Feedback zu diesem Thema zu erhalten?\nVielen Dank im Voraus.</string>
     <string name="reminderNoResponseHeaderTitle">Erinnerung: keine Antwort von %1$s auf diese E-Mail seit dem %2$s</string>

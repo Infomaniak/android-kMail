@@ -485,6 +485,7 @@
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté</string>
+    <string name="reminderBottomSheetTitle">Reporter le rappel</string>
     <string name="reminderFollowUpButton">Relancer</string>
     <string name="reminderFollowUpPlaceholderText">Bonjour,\nEst-il possible d’avoir un retour sur ce sujet ?\nMerci d’avance.</string>
     <string name="reminderNoResponseHeaderTitle">Rappel : aucune réponse de %1$s à cet e-mail depuis le %2$s</string>

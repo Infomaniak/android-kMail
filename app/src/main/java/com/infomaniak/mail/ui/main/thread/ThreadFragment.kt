@@ -23,7 +23,6 @@ import android.graphics.drawable.InsetDrawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -86,6 +85,7 @@ import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.PhoneContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForSnoozeDialog
+import com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialogArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialogArgs
@@ -453,6 +453,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 },
                 onRescheduleClicked = ::rescheduleDraft,
+                onReminderClicked = ::reminderDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
                 onAddReaction = {
@@ -1232,6 +1233,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         navigateToScheduleSendBottomSheet()
     }
 
+    private fun reminderDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
+        mainViewModel.draftResource = draftResource
+        threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
+        navigateToReminderBottomSheet()
+    }
+
     private fun followUpDraft(message: Message) {
         twoPaneViewModel.navigateToNewMessage(
             draftMode = DraftMode.FOLLOW_UP,
@@ -1247,6 +1254,17 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             args = RescheduleDraftBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
+            ).toBundle(),
+        )
+    }
+
+    private fun navigateToReminderBottomSheet() {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
+        safeNavigate(
+            resId = R.id.reminderBottomSheetDialog,
+            args = ReminderBottomSheetDialogArgs(
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
             ).toBundle(),

@@ -485,6 +485,7 @@
     <string name="readMore">Meer informatie</string>
     <string name="recentSearchesTitle">Recente zoekopdrachten</string>
     <string name="refreshTokenError">U bent uitgelogd</string>
+    <string name="reminderBottomSheetTitle">Herinnering uitstellen</string>
     <string name="reminderFollowUpButton">Opvolgen</string>
     <string name="reminderFollowUpPlaceholderText">Hallo,\nIs het mogelijk om feedback te krijgen over dit onderwerp?\nBij voorbaat dank.</string>
     <string name="reminderNoResponseHeaderTitle">Herinnering: geen reactie van %1$s op deze e-mail sinds %2$s</string>

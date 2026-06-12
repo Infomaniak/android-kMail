@@ -489,6 +489,7 @@
     <string name="readMore">Read more</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>
+    <string name="reminderBottomSheetTitle">Snooze the reminder</string>
     <string name="reminderFollowUpButton">Follow up</string>
     <string name="reminderFollowUpPlaceholderText">Hello,\nIs it possible to get some feedback on this subject?\nThank you in advance.</string>
     <string name="reminderNoResponseHeaderTitle">Reminder: no response from %1$s to this email since %2$s</string>
