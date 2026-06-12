@@ -138,32 +138,24 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
     private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
-    override val searchViewModel: SearchViewModel by activityViewModels()
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
-
-    override val substituteClassName: String = javaClass.name
-
     private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
+    private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
-
-    private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
-
     private var isFirstTimeRefreshingThreads = true
-    override val fragment: Fragment
-        get() = this@ThreadListFragment
+
+    override val searchViewModel: SearchViewModel by activityViewModels()
+    override val substituteClassName: String = javaClass.name
 
     @Inject
     override lateinit var descriptionDialog: DescriptionAlertDialog
 
     @Inject
     override lateinit var folderRoleUtils: FolderRoleUtils
-
-    override val multiSelectionLifecycleOwner: LifecycleOwner
-        get() = viewLifecycleOwner
 
     @Inject
     lateinit var downloadThreadsStatusManager: DownloadThreadsStatusManager
@@ -182,6 +174,24 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
     @Inject
     lateinit var titleDialog: TitleAlertDialog
+
+    override val fragment: Fragment
+        get() = this@ThreadListFragment
+
+    override val multiSelectionLifecycleOwner: LifecycleOwner
+        get() = viewLifecycleOwner
+
+
+    override val multiSelectionBinding: MultiSelectionBinding
+        get() = object : MultiSelectionBinding {
+            override val quickActionBar get() = binding.quickActionBar
+            override val multiselectToolbar get() = binding.multiselectToolbar
+            override val toolbarLayout get() = binding.toolbarLayout
+            override val toolbar get() = binding.toolbar
+            override val threadsList get() = binding.threadsList
+            override val newMessageFab get() = binding.newMessageFab
+            override val unreadCountChip get() = binding.unreadCountChip
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -251,17 +261,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     override fun doAfterFolderChanged() {
         navigateFromNotificationToThread()
     }
-
-    override val multiSelectionBinding: MultiSelectionBinding
-        get() = object : MultiSelectionBinding {
-            override val quickActionBar get() = binding.quickActionBar
-            override val multiselectToolbar get() = binding.multiselectToolbar
-            override val toolbarLayout get() = binding.toolbarLayout
-            override val toolbar get() = binding.toolbar
-            override val threadsList get() = binding.threadsList
-            override val newMessageFab get() = binding.newMessageFab
-            override val unreadCountChip get() = binding.unreadCountChip
-        }
 
     private fun handleEdgeToEdge() = with(binding) {
         // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
