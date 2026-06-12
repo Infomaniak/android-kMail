@@ -485,6 +485,14 @@
     <string name="readMore">Les mer</string>
     <string name="recentSearchesTitle">Nylige søk</string>
     <string name="refreshTokenError">Du har blitt koblet fra</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s har ventet på svar siden %2$s</item>
+        <item quantity="other">%1$s har ventet på svar siden %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s avventer svar innen %2$s</item>
+        <item quantity="other">%1$s avventer svar innen %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Utsett påminnelse</string>
     <string name="reminderFollowUpButton">Følg opp</string>
     <string name="reminderFollowUpPlaceholderText">Hei,\nEr det mulig å få tilbakemelding om dette emnet?\nPå forhånd takk.</string>

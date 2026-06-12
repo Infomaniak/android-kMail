@@ -489,6 +489,14 @@
     <string name="readMore">Read more</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s is awaiting a reply since %2$s</item>
+        <item quantity="other">%1$s are awaiting a reply since %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s is awaiting a reply by %2$s</item>
+        <item quantity="other">%1$s are awaiting a reply by %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Snooze the reminder</string>
     <string name="reminderFollowUpButton">Follow up</string>
     <string name="reminderFollowUpPlaceholderText">Hello,\nIs it possible to get some feedback on this subject?\nThank you in advance.</string>

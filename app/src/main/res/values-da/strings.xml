@@ -485,6 +485,14 @@
     <string name="readMore">Læs mere</string>
     <string name="recentSearchesTitle">Seneste søgninger</string>
     <string name="refreshTokenError">Du er blevet afbrudt</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s har ventet på svar siden %2$s</item>
+        <item quantity="other">%1$s har ventet på svar siden %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s afventer et svar senest %2$s</item>
+        <item quantity="other">%1$s afventer et svar senest %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Udskyd påmindelsen</string>
     <string name="reminderFollowUpButton">Følg op</string>
     <string name="reminderFollowUpPlaceholderText">Hej,\nEr det muligt at få feedback om dette emne?\nPå forhånd tak.</string>

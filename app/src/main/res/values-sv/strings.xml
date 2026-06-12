@@ -485,6 +485,14 @@
     <string name="readMore">Läs mer</string>
     <string name="recentSearchesTitle">Senaste sökningar</string>
     <string name="refreshTokenError">Du har kopplats bort</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s väntar på svar sedan %2$s</item>
+        <item quantity="other">%1$s väntar på svar sedan %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s väntar på svar senast %2$s</item>
+        <item quantity="other">%1$s väntar på svar senast %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Skjut upp påminnelsen</string>
     <string name="reminderFollowUpButton">Uppföljning</string>
     <string name="reminderFollowUpPlaceholderText">Hej,\nÄr det möjligt att få feedback om detta ämne?\nTack på förhand.</string>

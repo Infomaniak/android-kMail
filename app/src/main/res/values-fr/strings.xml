@@ -485,6 +485,14 @@
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s attend une réponse depuis %2$s</item>
+        <item quantity="other">%1$s attendent une réponse depuis %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s attend une réponse avant le %2$s</item>
+        <item quantity="other">%1$s attendent une réponse avant le %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Reporter le rappel</string>
     <string name="reminderFollowUpButton">Relancer</string>
     <string name="reminderFollowUpPlaceholderText">Bonjour,\nEst-il possible d’avoir un retour sur ce sujet ?\nMerci d’avance.</string>
