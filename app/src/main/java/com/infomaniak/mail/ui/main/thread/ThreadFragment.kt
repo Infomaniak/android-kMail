@@ -870,7 +870,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(REMINDER_RESULT) { selectedScheduleEpoch: Long ->
-            mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch)) // TODO: adapt it to a real reminder api call when it will be available
+            val mailbox = mainViewModel.currentMailbox.value
+            if (mailbox == null) {
+                snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+                return@getBackNavigationResult
+            }
+            actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox) // TODO: adapt it to a real reminder api call when it will be available
         }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
@@ -1253,7 +1258,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun reminderDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
-        mainViewModel.draftResource = draftResource
+        actionsViewModel.draftResource = draftResource
         threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
         navigateToReminderBottomSheet()
     }

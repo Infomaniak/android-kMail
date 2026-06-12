@@ -484,6 +484,14 @@
     <string name="readMore">Lue lisää</string>
     <string name="recentSearchesTitle">Viimeisimmät haut</string>
     <string name="refreshTokenError">Sinut on kirjattu ulos</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s on odottanut vastausta %2$s lähtien</item>
+        <item quantity="other">%1$s ovat odottaneet vastausta %2$s lähtien</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s odottaa vastausta %2$s mennessä</item>
+        <item quantity="other">%1$s odottavat vastausta %2$s mennessä</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Lykkää muistutusta</string>
     <string name="reminderFollowUpButton">Seuraa</string>
     <string name="reminderFollowUpPlaceholderText">Hei,\nOnko mahdollista saada palautetta tästä aiheesta?\nKiitos etukäteen.</string>

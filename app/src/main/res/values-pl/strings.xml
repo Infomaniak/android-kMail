@@ -506,6 +506,18 @@
     <string name="readMore">Czytaj więcej</string>
     <string name="recentSearchesTitle">Ostatnie wyszukiwania</string>
     <string name="refreshTokenError">Zostałeś/aś rozłączony/a</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s czeka na odpowiedź od %2$s</item>
+        <item quantity="few">%1$s czekają na odpowiedź od %2$s</item>
+        <item quantity="many">%1$s czeka na odpowiedź od %2$s</item>
+        <item quantity="other">%1$s czeka na odpowiedź od %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s czeka na odpowiedź do %2$s</item>
+        <item quantity="few">%1$s czekają na odpowiedź do %2$s</item>
+        <item quantity="many">%1$s czeka na odpowiedź do %2$s</item>
+        <item quantity="other">%1$s czekają na odpowiedź do %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Odłóż przypomnienie</string>
     <string name="reminderFollowUpButton">Przypomnij</string>
     <string name="reminderFollowUpPlaceholderText">Cześć,\nCzy możliwe jest uzyskanie informacji zwrotnej na ten temat?\nZ góry dziękuję.</string>

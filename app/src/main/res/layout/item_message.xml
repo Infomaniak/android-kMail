@@ -22,6 +22,35 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:id="@+id/topReminderAlertGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/AlertDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.infomaniak.mail.ui.main.thread.MessageAlertView
+            android:id="@+id/requestResponseAlert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:icon="@drawable/ic_alarm_clock"
+            tools:description="Laura attend une réponse avant le jeudi 17 mai à 12:00"
+            tools:visibility="visible" />
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/AlertDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/messageHeader"
         style="@style/CardViewMail"

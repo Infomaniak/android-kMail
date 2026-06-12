@@ -484,6 +484,14 @@
     <string name="readMore">Mehr erfahren</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden abgemeldet</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s wartet seit %2$s auf eine Antwort</item>
+        <item quantity="other">%1$s warten seit %2$s auf eine Antwort</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s erwartet eine Antwort bis %2$s</item>
+        <item quantity="other">%1$s erwarten eine Antwort bis %2$s</item>
+    </plurals>
     <string name="reminderBottomSheetTitle">Erinnerung verschieben</string>
     <string name="reminderFollowUpButton">Nachfassen</string>
     <string name="reminderFollowUpPlaceholderText">Hallo,\nIst es möglich, ein Feedback zu diesem Thema zu erhalten?\nVielen Dank im Voraus.</string>
