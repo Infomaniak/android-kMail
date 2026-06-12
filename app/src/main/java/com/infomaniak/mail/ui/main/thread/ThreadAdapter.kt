@@ -655,7 +655,7 @@ class ThreadAdapter(
         message.draftResource?.let { draftResource ->
             endReminderAlert.onAction1 {
                 trackMessageBannerEvent(MatomoName.ReprogramReminder)
-                threadAdapterCallbacks?.onRescheduleClicked?.invoke( // TODO: Create a specific callback for rescheduling reminders
+                threadAdapterCallbacks?.onReminderClicked?.invoke( // TODO: Create a specific callback for rescheduling reminders
                     draftResource,
                     message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
                 )
@@ -1170,6 +1170,7 @@ class ThreadAdapter(
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
+        var onReminderClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
         var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
         var onAddReaction: ((Message) -> Unit)? = null,
