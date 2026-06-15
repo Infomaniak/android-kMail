@@ -304,6 +304,8 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true
 
+                            localMessage.body?.let { localBody -> remoteMessage.body?.keepLocalValues(localBody) }
+
                             MessageController.upsertMessageBlocking(remoteMessage, realm = this)
                         }
                     } else {
