@@ -179,14 +179,14 @@ class FolderPickerFragment : Fragment() {
             actionsViewModel.moveMessagesTo(
                 destinationFolderId = folderId,
                 messagesUids = messagesUids.toList(),
-                currentFolderId = navigationArgs.sourceFolderId,
+                parentFolderId = navigationArgs.sourceFolderId,
                 mailbox = mailbox,
             )
         } else {
             actionsViewModel.moveThreadsTo(
                 destinationFolderId = folderId,
                 threadsUids = threadsUids.toList(),
-                currentFolderId = navigationArgs.sourceFolderId,
+                parentFolderId = navigationArgs.sourceFolderId,
                 mailbox = mailbox,
             )
         }

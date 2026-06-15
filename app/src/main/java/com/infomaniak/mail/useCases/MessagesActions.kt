@@ -434,13 +434,13 @@ class MessagesActions @Inject constructor(
     suspend fun snoozeThreads(
         date: Date,
         threadUids: List<String>,
-        currentFolderId: String?,
+        parentFolderId: String?,
         mailbox: Mailbox,
     ): SnoozeResult {
         val threads = threadUids.mapNotNull { threadController.getThread(it) }
         val messageUids = threads.mapNotNull { thread ->
             thread.getDisplayedMessages(mailbox.featureFlags, localSettings)
-                .lastOrNull { it.folderId == currentFolderId }?.uid
+                .lastOrNull { it.folderId == parentFolderId }?.uid
         }
 
         val responses = ApiRepository.snoozeMessages(mailbox.uuid, messageUids, date)

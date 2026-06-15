@@ -80,7 +80,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
-    
+
     private var folderRole: FolderRole? = null
     private var messagesFolderRoles: List<FolderRole> = emptyList()
     private var isFromArchive: Boolean = false
@@ -212,7 +212,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
                 actionsViewModel.deleteThreads(
                     threads = listOf(thread),
-                    currentFolderId = thread.folderId,
+                    parentFolderId = thread.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
@@ -225,7 +225,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
                 actionsViewModel.archiveThreads(
                     threads = listOf(thread),
-                    currentFolderId = thread.folderId,
+                    parentFolderId = thread.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!
                 )
             }
@@ -237,7 +237,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(ThreadFilter.UNSEEN)
             actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
-                currentFolderId = thread.folderId,
+                parentFolderId = thread.folderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
                 shouldRefreshSearch = shouldRefreshSearch
             )
@@ -299,7 +299,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = isFromSpam)
             actionsViewModel.toggleThreadsSpamStatus(
                 threads = setOf(thread),
-                currentFolderId = mainViewModel.currentFolderId,
+                parentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
         }
@@ -320,7 +320,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 onPositiveButtonClicked = {
                     actionsViewModel.reportPhishing(
                         messages = junkMessages,
-                        currentFolderId = thread.folderId,
+                        parentFolderId = thread.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 },

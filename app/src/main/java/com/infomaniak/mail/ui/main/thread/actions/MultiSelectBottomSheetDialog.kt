@@ -268,7 +268,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     actionsViewModel.toggleThreadsSeenStatus(
                         threadsUids = threadsUids,
                         shouldRead = shouldRead,
-                        currentFolderId = currentFolderId,
+                        parentFolderId = currentFolderId,
                         mailbox = currentMailbox,
                         shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(
                             ThreadFilter.UNSEEN
@@ -284,7 +284,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
                         actionsViewModel.archiveThreads(
                             threads = threads.toList(),
-                            currentFolderId = currentFolderId,
+                            parentFolderId = currentFolderId,
                             mailbox = currentMailbox,
                         )
                         multiselectionViewModel.isMultiSelectOn = false
@@ -299,7 +299,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
                         actionsViewModel.deleteThreads(
                             threads = threads.toList(),
-                            currentFolderId = currentFolderId,
+                            parentFolderId = currentFolderId,
                             mailbox = currentMailbox,
                         )
                         multiselectionViewModel.isMultiSelectOn = false

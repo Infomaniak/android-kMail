@@ -395,7 +395,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 moveMessageToSpam = { messageUid ->
                     actionsViewModel.moveToSpamFolder(
                         messagesUid = listOf(messageUid),
-                        currentFolderId = mainViewModel.currentFolderId,
+                        parentFolderId = mainViewModel.currentFolderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 },
@@ -873,7 +873,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             val isSuccess = actionsViewModel.snoozeThreads(
                 date = Date(timestamp),
                 threadUids = threadUids,
-                currentFolderId = mainViewModel.currentFolderId,
+                parentFolderId = mainViewModel.currentFolderId,
                 mailbox = mainViewModel.currentMailbox.value!!,
             )
             if (isSuccess) twoPaneViewModel.closeThread()
@@ -934,7 +934,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         val thread = threadViewModel.threadLive.value ?: return@archiveWithConfirmationPopup
                         actionsViewModel.archiveThreads(
                             threads = listOf(thread),
-                            currentFolderId = thread.folderId,
+                            parentFolderId = thread.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     }
@@ -949,7 +949,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         trackThreadActionsEvent(MatomoName.Delete)
                         actionsViewModel.deleteThreads(
                             threads = listOf(thread),
-                            currentFolderId = thread.folderId,
+                            parentFolderId = thread.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
 

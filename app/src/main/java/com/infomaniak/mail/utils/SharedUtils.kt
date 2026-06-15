@@ -59,7 +59,7 @@ class SharedUtils @Inject constructor(
         mailbox: Mailbox,
         messagesFoldersIds: ImpactedFolders,
         destinationFolderId: String? = null,
-        currentFolderId: String? = null,
+        parentFolderId: String,
         threadsUids: List<String> = emptyList(),
         onDownloadStop: ((List<String>) -> Unit)? = null,
     ) {
@@ -75,7 +75,7 @@ class SharedUtils @Inject constructor(
                 mailbox = mailbox,
                 folderId = folderId,
                 realm = realm,
-                callbacks = if (folderId == currentFolderId && onDownloadStop != null) {
+                callbacks = if (folderId == parentFolderId && onDownloadStop != null) {
                     RefreshCallbacks(
                         onStart = { downloadThreadsStatusManager.start() },
                         onStop = { onDownloadStop(threadsUids) },
@@ -108,7 +108,7 @@ class SharedUtils @Inject constructor(
             val allRecipients = toRecipients + ccRecipients
             return allRecipients.any { recipient -> pattern.containsMatchIn(recipient.email) }
         }
-        
+
         suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm, okHttpClient: OkHttpClient? = null): Int? {
             val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName, okHttpClient)
             return if (apiResponse.isSuccess()) {

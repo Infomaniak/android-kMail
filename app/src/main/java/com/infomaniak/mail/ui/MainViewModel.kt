@@ -738,13 +738,16 @@ class MainViewModel @Inject constructor(
 
         with(result) {
             if (apiResponses.atLeastOneSucceeded()) {
-                refreshFoldersAsync(
-                    mailbox = currentMailbox.value!!,
-                    messagesFoldersIds = messages.getFoldersIds(),
-                    destinationFolderId = newFolderId,
-                    currentFolderId = currentFolderId,
-                    threadsUids = movedThreads,
-                )
+                currentFolderId?.let {
+                    refreshFoldersAsync(
+                        mailbox = currentMailbox.value!!,
+                        messagesFoldersIds = messages.getFoldersIds(),
+                        destinationFolderId = newFolderId,
+                        currentFolderId = it,
+                        threadsUids = movedThreads,
+                    )
+                }
+                
                 showMoveSnackbar(
                     movedThreads.count(),
                     messages.count(),
@@ -766,14 +769,14 @@ class MainViewModel @Inject constructor(
         mailbox: Mailbox,
         messagesFoldersIds: ImpactedFolders,
         destinationFolderId: String? = null,
-        currentFolderId: String? = null,
+        currentFolderId: String,
         threadsUids: List<String> = emptyList(),
     ) = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.refreshFolders(
             mailbox = mailbox,
             messagesFoldersIds = messagesFoldersIds,
             destinationFolderId = destinationFolderId,
-            currentFolderId = currentFolderId,
+            parentFolderId = currentFolderId,
             threadsUids = threadsUids,
             onDownloadStop = { threadsUids -> onDownloadStop(threadsUids) }
         )

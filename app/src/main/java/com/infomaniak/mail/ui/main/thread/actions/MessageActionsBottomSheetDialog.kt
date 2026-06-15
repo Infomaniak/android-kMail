@@ -197,7 +197,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
                     actionsViewModel.deleteMessages(
                         messages = listOf(message),
-                        currentFolderId = message.folderId,
+                        parentFolderId = message.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
@@ -210,7 +210,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
                     actionsViewModel.archiveMessages(
                         messages = listOf(message),
-                        currentFolderId = message.folderId,
+                        parentFolderId = message.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
@@ -220,7 +220,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen, message.isSeen)
                 actionsViewModel.toggleMessagesSeenStatus(
                     messages = listOf(message),
-                    currentFolderId = message.folderId,
+                    parentFolderId = message.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!,
                     shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(
                         ThreadFilter.UNSEEN
@@ -269,7 +269,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = isFromSpam)
                 actionsViewModel.toggleMessagesSpamStatus(
                     messages = listOf(message),
-                    currentFolderId = message.folderId,
+                    parentFolderId = message.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!,
                 )
             }
@@ -282,7 +282,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     onPositiveButtonClicked = {
                         actionsViewModel.reportPhishing(
                             messages = listOf(message),
-                            currentFolderId = message.folderId,
+                            parentFolderId = message.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     },

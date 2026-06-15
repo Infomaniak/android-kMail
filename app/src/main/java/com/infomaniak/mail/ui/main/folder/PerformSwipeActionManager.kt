@@ -135,7 +135,7 @@ object PerformSwipeActionManager {
                 host.actionsViewModel.toggleThreadsSeenStatus(
                     threadsUids = listOf(thread.uid),
                     shouldRead = !thread.isSeen,
-                    currentFolderId = thread.folderId,
+                    parentFolderId = thread.folderId,
                     mailbox = currentMailbox,
                     shouldRefreshSearch = host.searchViewModel.currentFilters.contains(ThreadFilter.UNSEEN) ||
                             host.searchViewModel.currentFilters.contains(ThreadFilter.SEEN)
@@ -146,7 +146,7 @@ object PerformSwipeActionManager {
             SwipeAction.SPAM -> {
                 host.actionsViewModel.toggleThreadsSpamStatus(
                     threads = setOf(thread),
-                    currentFolderId = thread.folderId,
+                    parentFolderId = thread.folderId,
                     mailbox = currentMailbox,
                 )
                 false
@@ -185,7 +185,7 @@ object PerformSwipeActionManager {
         fun onSuccess() {
             host.actionsViewModel.archiveThreads(
                 threads = listOf(thread),
-                currentFolderId = thread.folderId,
+                parentFolderId = thread.folderId,
                 mailbox = currentMailBox,
             )
         }
@@ -218,7 +218,7 @@ object PerformSwipeActionManager {
             if (isPermanentDeleteFolder) host.threadListAdapter.removeItem(position)
             host.actionsViewModel.deleteThreads(
                 threads = listOf(thread),
-                currentFolderId = thread.folderId,
+                parentFolderId = thread.folderId,
                 mailbox = currentMailBox,
             )
         }
@@ -235,7 +235,7 @@ object PerformSwipeActionManager {
             callback = ::onHandleDelete,
         )
     }
-    
+
     private fun LocalSettings.setDefaultSwipeActions() {
         if (swipeRight == SwipeAction.TUTORIAL) swipeRight = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_RIGHT
         if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_LEFT
