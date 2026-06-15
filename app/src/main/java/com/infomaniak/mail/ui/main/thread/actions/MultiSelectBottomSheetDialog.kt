@@ -48,14 +48,13 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
-import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getArchiveIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getFavoriteIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
-import com.infomaniak.mail.ui.main.search.SearchFragmentDirections
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
@@ -158,7 +157,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
             actionsViewModel.toggleThreadsSpamStatus(
                 threads = threads,
-                currentFolderId = mainViewModel.currentFolderId,
+                parentFolderId = mainViewModel.currentFolderId,
                 mailbox = currentMailbox,
             )
             isMultiSelectOn = false
@@ -207,7 +206,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             onPositiveButtonClicked = {
                 actionsViewModel.reportPhishing(
                     messages = messages,
-                    currentFolderId = currentFolderId,
+                    parentFolderId = currentFolderId,
                     mailbox = currentMailbox,
                 )
             },
