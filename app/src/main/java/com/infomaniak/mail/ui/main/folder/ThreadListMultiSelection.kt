@@ -213,7 +213,7 @@ class ThreadListMultiSelection {
                 disableSwipeDirection(DirectionFlag.RIGHT)
             }
         } else {
-            unlockSwipeActionsIfSet()
+            multiSelectionBinding.threadsList.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
         }
     }
 

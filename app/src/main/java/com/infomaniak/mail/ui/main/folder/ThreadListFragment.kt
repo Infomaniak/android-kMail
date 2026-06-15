@@ -358,7 +358,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         _binding = null
     }
 
-    override fun unlockSwipeActionsIfSet() {
+    fun unlockSwipeActionsIfSet() {
         binding.threadsList.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
     }
 

@@ -28,6 +28,4 @@ interface MultiSelectionHost : LifecycleOwner {
     val folderRoleUtils: FolderRoleUtils
     val descriptionDialog: DescriptionAlertDialog
     val threadListAdapter: ThreadListAdapter
-
-    fun unlockSwipeActionsIfSet()
 }
