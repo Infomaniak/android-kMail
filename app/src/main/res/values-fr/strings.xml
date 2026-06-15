@@ -216,6 +216,7 @@
     <string name="contentDescriptionIconFavorite">Est favori</string>
     <string name="contentDescriptionIconFolderSelected">Dossier sélectionné</string>
     <string name="contentDescriptionIconForward">Transféré</string>
+    <string name="contentDescriptionIconMention">Vous avez été mentionné.</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
