@@ -87,6 +87,8 @@ class Thread : RealmObject, Snoozable {
     var isFromSearch: Boolean = false
     @Transient
     var hasAttachable: Boolean = false
+    @Transient
+    var hasMentions: Boolean = false
     // Has been moved (archived, spammed, deleted, moved) but API call hasn't been done yet.
     // It's only used to locally filter the Threads' list.
     @Transient

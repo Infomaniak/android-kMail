@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesId
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.computeReactionsPerMessageId
 import com.infomaniak.mail.data.models.thread.overrideWith
+import com.infomaniak.mail.utils.AccountUtils.currentMailboxEmail
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
@@ -81,6 +82,7 @@ object ThreadRecomputations {
         isAnswered = false
         isForwarded = false
         hasAttachable = false
+        hasMentions = false
         numberOfScheduledDrafts = 0
         snoozeState = null
         snoozeEndDate = null
@@ -114,6 +116,7 @@ object ThreadRecomputations {
                 isAnswered = false
             }
             if (message.hasAttachable) hasAttachable = true
+            if (currentMailboxEmail != null && message.mentions.any { it == currentMailboxEmail }) hasMentions = true
             if (message.isScheduledDraft) numberOfScheduledDrafts++
 
             updateSnoozeStatesBasedOn(message)
