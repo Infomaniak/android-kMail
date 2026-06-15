@@ -317,6 +317,7 @@ class ThreadListAdapter @Inject constructor(
             iconForward.isVisible = isIconForwardVisible
 
             iconAttachment.isVisible = hasAttachable
+            iconMention.isVisible = hasMentions && !isSeen
             iconCalendar.isGone = true // TODO: See with API when we should display this icon
             iconFavorite.isVisible = isFavorite
 

@@ -1,0 +1,27 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="#BC0055"
+        android:fillType="evenOdd"
+        android:pathData="M4.513,0.738C6.111,-0.01 7.915,-0.196 9.632,0.21C11.349,0.615 12.88,1.588 13.974,2.971C15.069,4.355 15.665,6.068 15.665,7.832V9.332C15.665,9.951 15.419,10.545 14.982,10.982C14.544,11.42 13.951,11.665 13.332,11.665C12.713,11.665 12.12,11.42 11.682,10.982C11.378,10.678 11.167,10.299 11.066,9.889C11.05,9.913 11.036,9.938 11.019,9.962C10.598,10.592 9.999,11.084 9.299,11.374C8.598,11.664 7.827,11.74 7.084,11.592C6.34,11.444 5.658,11.079 5.122,10.543C4.586,10.007 4.22,9.324 4.072,8.581C3.924,7.837 4,7.066 4.29,6.366C4.58,5.665 5.072,5.066 5.702,4.645C6.333,4.224 7.074,3.999 7.832,3.999C8.849,3.999 9.823,4.403 10.542,5.122C11.261,5.841 11.665,6.815 11.665,7.832V9.332C11.665,9.774 11.841,10.198 12.154,10.511C12.466,10.823 12.89,10.999 13.332,10.999C13.774,10.999 14.198,10.823 14.51,10.511C14.823,10.198 14.999,9.774 14.999,9.332V7.832C14.998,6.218 14.453,4.651 13.452,3.385C12.45,2.12 11.05,1.229 9.479,0.858C7.908,0.487 6.258,0.658 4.796,1.342C3.334,2.026 2.145,3.184 1.423,4.628C0.701,6.072 0.488,7.717 0.818,9.297C1.148,10.877 2.002,12.3 3.241,13.334C4.48,14.368 6.033,14.954 7.646,14.996C9.26,15.038 10.841,14.534 12.132,13.566C12.279,13.455 12.488,13.485 12.599,13.632C12.709,13.779 12.679,13.988 12.532,14.099C11.12,15.157 9.393,15.708 7.629,15.663C5.865,15.617 4.168,14.977 2.814,13.846C1.459,12.716 0.526,11.161 0.165,9.433C-0.195,7.706 0.038,5.908 0.827,4.33C1.616,2.752 2.915,1.486 4.513,0.738ZM7.832,4.666C7.206,4.666 6.594,4.852 6.073,5.2C5.552,5.548 5.146,6.042 4.906,6.621C4.667,7.2 4.604,7.836 4.726,8.45C4.848,9.065 5.15,9.629 5.593,10.071C6.036,10.514 6.6,10.816 7.214,10.939C7.828,11.061 8.465,10.998 9.044,10.758C9.622,10.519 10.117,10.112 10.465,9.592C10.813,9.071 10.999,8.459 10.999,7.833C10.999,6.993 10.665,6.187 10.071,5.594C9.477,5 8.672,4.666 7.832,4.666Z" />
+</vector>
