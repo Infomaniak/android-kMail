@@ -994,12 +994,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun isAiProcessActive(isDoneInBody: Boolean?, state: AiProcessState?): Boolean {
-        return when (state) {
-            is AiProcessState.Loading, is AiProcessState.Success -> true
-            is AiProcessState.Dismissed -> false
-            else -> isDoneInBody == true
-        }
+    private fun isAiProcessActive(isDoneInBody: Boolean?, state: AiProcessState?): Boolean = when (state) {
+        is AiProcessState.Loading, is AiProcessState.Success -> true
+        is AiProcessState.Dismissed -> false
+        else -> isDoneInBody == true
     }
 
     private fun scrollToFirstUnseenMessage() = with(threadViewModel) {
@@ -1070,7 +1068,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 aiState.translateStateMap[messageUid]
             }
 
-            if (processState is AiProcessState.Error && processState.canRetry && processState.hasAlreadyRetried && !processState.wasLoaderShown) {
+            if (processState is AiProcessState.Error && processState.canRetry &&
+                processState.hasAlreadyRetried &&
+                !processState.wasLoaderShown
+            ) {
                 val errorMessage = if (aiAction == AiAction.SUMMARY) {
                     R.string.messageSummaryError
                 } else {

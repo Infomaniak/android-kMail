@@ -484,7 +484,7 @@ class ThreadAdapter(
         bindRecipientDetails(message, messageDate)
     }
 
-    private fun getStateMap(aiAction: AiAction, messageUid: String) = when (aiAction) {
+    private fun getAiStateMap(aiAction: AiAction, messageUid: String) = when (aiAction) {
         AiAction.SUMMARY -> aiState.summaryStateMap[messageUid]
         AiAction.TRANSLATE -> aiState.translateStateMap[messageUid]
     }
@@ -502,9 +502,9 @@ class ThreadAdapter(
             binding.blockInformationViewTranslate
         }
 
-        val state = getStateMap(aiAction, message.uid)
+        val aiState = getAiStateMap(aiAction, message.uid)
 
-        val effectiveState = setupBaseVisibility(state, aiAction, targetView, message)
+        val effectiveState = setupBaseVisibility(aiState, aiAction, targetView, message)
         handleProcessState(effectiveState, aiAction, targetView)
         setupListeners(message, aiAction, targetView)
     }
@@ -651,8 +651,8 @@ class ThreadAdapter(
             }
 
             setOnActionClicked {
-                val state = getStateMap(aiAction, message.uid)
-                val isSuccess = state is AiProcessState.Success || (state == null && message.body?.isTranslated == true)
+                val aiState = getAiStateMap(aiAction, message.uid)
+                val isSuccess = aiState is AiProcessState.Success || (aiState == null && message.body?.isTranslated == true)
                 if (isSuccess && aiAction == AiAction.TRANSLATE) {
                     threadAdapterCallbacks?.onShowOriginal?.invoke(message.uid)
                 } else {
