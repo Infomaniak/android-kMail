@@ -45,6 +45,7 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
+import com.infomaniak.mail.utils.extensions.getThreadsUids
 import com.infomaniak.mail.utils.extensions.getUids
 import kotlinx.coroutines.coroutineScope
 import java.util.Date
@@ -363,6 +364,10 @@ class MessagesActions @Inject constructor(
     private suspend fun updateFavoriteStatus(messagesUids: List<String>, isFavorite: Boolean) {
         mailboxContentRealm().write {
             MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
+            messagesUids.forEach { uid ->
+                val message = MessageController.getMessageBlocking(uid, realm = this) ?: return@forEach
+                ThreadController.updateFavoriteStatus(message.threads.getThreadsUids(), isFavorite, realm = this)
+            }
         }
     }
     // End Region
