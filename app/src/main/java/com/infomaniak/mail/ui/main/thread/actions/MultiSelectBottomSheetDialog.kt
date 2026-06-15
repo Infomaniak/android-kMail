@@ -326,28 +326,22 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun navigateToFolderPickerFragment(threadsUids: List<String>) {
         val messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray()
         multiselectionViewModel.isMultiSelectOn = false
-        val navController = findNavController()
-
-        if (navigationArgs.isFromSearch) {
-            navController.animatedNavigation(
-                directions = SearchFragmentDirections.actionSearchFragmentToFolderPickerFragment(
-                    threadsUids = threadsUids.toTypedArray(),
-                    messagesUids = messagesUids,
-                    action = FolderPickerAction.MOVE,
-                    sourceFolderId = searchViewModel.filterFolder?.id,
-                    isFromSearch = true,
-                )
-            )
+        val sourceFolderId = if (navigationArgs.isFromSearch) {
+            searchViewModel.filterFolder?.id
         } else {
-            navController.animatedNavigation(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-                    threadsUids = threadsUids.toTypedArray(),
-                    messagesUids = messagesUids,
-                    action = FolderPickerAction.MOVE,
-                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
-                ),
-            )
+            mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
         }
+
+        animatedNavigation(
+            resId = R.id.folderPickerFragment,
+            args = FolderPickerFragmentArgs(
+                threadsUids = threadsUids.toTypedArray(),
+                messagesUids = messagesUids,
+                action = FolderPickerAction.MOVE,
+                sourceFolderId = sourceFolderId,
+                isFromSearch = navigationArgs.isFromSearch,
+            ).toBundle()
+        )
     }
 
     private fun observeReportPhishingResult() {
