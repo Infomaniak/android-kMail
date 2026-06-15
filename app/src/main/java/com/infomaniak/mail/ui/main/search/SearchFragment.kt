@@ -33,14 +33,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
@@ -67,7 +66,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
-import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager
+import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager.performSwipeAction
 import com.infomaniak.mail.ui.main.folder.SwipeActionHost
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
@@ -107,41 +106,8 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
-
-    @Inject
-    override lateinit var folderRoleUtils: FolderRoleUtils
-    override val fragment: Fragment
-        get() = this@SearchFragment
-
-    @Inject
-    override lateinit var descriptionDialog: DescriptionAlertDialog
-
-    override val multiSelectionLifecycleOwner: LifecycleOwner
-        get() = viewLifecycleOwner
-
-    fun unlockSwipeActionsIfSet() {
-        binding.mailRecyclerView.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
-    }
-
-    @Inject
-    lateinit var snackbarManager: SnackbarManager
-
-    override val multiSelectionBinding: MultiSelectionBinding
-        get() = object : MultiSelectionBinding {
-            override val quickActionBar get() = binding.quickActionBar
-            override val multiselectToolbar get() = binding.multiselectToolbar
-            override val toolbarLayout get() = binding.multiselectToolbar.multiselectionInfoToolbar
-            override val toolbar get() = binding.toolbar
-            override val threadsList get() = binding.mailRecyclerView
-            override val newMessageFab get() = null
-            override val unreadCountChip get() = null
-        }
-
-    override val searchViewModel: SearchViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
-    override val substituteClassName: String = javaClass.name
-    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
     private val recentSearchAdapter by lazy {
         RecentSearchAdapter(
             searchQueries = localSettings.recentSearches.toMutableList(),
@@ -161,6 +127,37 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
             },
         )
     }
+    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
+
+    override val multiSelectionBinding: MultiSelectionBinding
+        get() = object : MultiSelectionBinding {
+            override val quickActionBar get() = binding.quickActionBar
+            override val multiselectToolbar get() = binding.multiselectToolbar
+            override val toolbarLayout get() = binding.multiselectToolbar.multiselectionInfoToolbar
+            override val toolbar get() = binding.toolbar
+            override val threadsList get() = binding.mailRecyclerView
+            override val newMessageFab get() = null
+            override val unreadCountChip get() = null
+        }
+
+    override val searchViewModel: SearchViewModel by activityViewModels()
+
+    override val substituteClassName: String = javaClass.name
+
+    override val multiSelectionLifecycleOwner: LifecycleOwner
+        get() = viewLifecycleOwner
+
+    override val fragment: Fragment
+        get() = this@SearchFragment
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    override lateinit var folderRoleUtils: FolderRoleUtils
+
+    @Inject
+    override lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSearchBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -194,34 +191,6 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
         observeMultiSelect()
         observeSearchRefresh()
         observeShareUrlResult()
-    }
-
-    private fun initializeMultiselection() {
-        ThreadListMultiSelection(
-            mainViewModel = mainViewModel,
-            multiselectionViewModel = multiselectionViewModel,
-            actionsViewModel = actionsViewModel,
-            mainActivity = requireActivity() as MainActivity,
-            host = this,
-            localSettings = localSettings,
-            isFromSearch = true,
-            searchViewModel = searchViewModel,
-        )
-    }
-
-    private fun handleEdgeToEdge(): Unit = with(binding) {
-        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
-            appBar.applyStatusBarInsets(insets)
-            chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
-            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
-
-            val recyclerViewPaddingBottom = resources.getDimensionPixelSize(RCore.dimen.recyclerViewPaddingBottom)
-            mailRecyclerView.updatePaddingRelative(bottom = recyclerViewPaddingBottom + insets.safeArea().bottom)
-
-            with(insets.safeArea()) {
-                recentSearchesRecyclerView.updatePaddingRelative(bottom = bottom)
-            }
-        }
     }
 
     override fun onResume() {
@@ -262,24 +231,48 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
         super.handleOnBackPressed()
     }
 
-    private fun observeSearchRefresh() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                actionsViewModel.searchRefreshEvents.collect {
-                    showRefreshLayout()
-                    searchViewModel.refreshSearch()
-                }
+    fun unlockSwipeActionsIfSet() {
+        binding.mailRecyclerView.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
+    }
+
+    private fun initializeMultiselection() {
+        ThreadListMultiSelection(
+            mainViewModel = mainViewModel,
+            multiselectionViewModel = multiselectionViewModel,
+            actionsViewModel = actionsViewModel,
+            mainActivity = requireActivity() as MainActivity,
+            host = this,
+            localSettings = localSettings,
+            isFromSearch = true,
+            searchViewModel = searchViewModel,
+        )
+    }
+
+    private fun handleEdgeToEdge(): Unit = with(binding) {
+        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
+            appBar.applyStatusBarInsets(insets)
+            chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
+            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
+
+            val recyclerViewPaddingBottom = resources.getDimensionPixelSize(RCore.dimen.recyclerViewPaddingBottom)
+            mailRecyclerView.updatePaddingRelative(bottom = recyclerViewPaddingBottom + insets.safeArea().bottom)
+
+            with(insets.safeArea()) {
+                recentSearchesRecyclerView.updatePaddingRelative(bottom = bottom)
             }
         }
     }
 
+    private fun observeSearchRefresh() {
+        actionsViewModel.searchRefreshEvents.observe(viewLifecycleOwner) {
+            showRefreshLayout()
+            searchViewModel.refreshSearch()
+        }
+    }
+
     private fun observeShareUrlResult() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainViewModel.shareThreadUrlResult.collect { url ->
-                    if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
-                }
-            }
+        mainViewModel.shareThreadUrlResult.observe(viewLifecycleOwner) { url ->
+            if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
         }
     }
 
@@ -381,13 +374,12 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
      * The boolean return value is used to know if we should keep the Thread in
      * the RecyclerView (true), or remove it when the swipe is done (false).
      */
-
     private fun performSwipeActionOnThread(
         swipeAction: SwipeAction,
         thread: Thread,
         position: Int,
         isPermanentDeleteFolder: Boolean,
-    ): Boolean = with(PerformSwipeActionManager) {
+    ): Boolean {
         val currentMailbox = mainViewModel.currentMailbox.value ?: run {
             snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
             SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
@@ -396,7 +388,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
             return true
         }
 
-        performSwipeAction(this@SearchFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
+        return performSwipeAction(this@SearchFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
     }
 
     private fun setAllFoldersButtonListener() {
@@ -559,9 +551,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
         val viewLifecycleScope = viewLifecycleOwner.lifecycleScope
         searchViewModel.allSearchResults.collectLatest { searchResults ->
             // Wait for any running swipe animation to finish before updating the list
-            if (threadListViewModel.isRecoveringFinished.value == false) {
-                threadListViewModel.isRecoveringFinished.asFlow().first { it }
-            }
+            threadListViewModel.isRecoveringFinished.asFlow().first { it }
 
             _binding?.mailRecyclerView?.postOnAnimation {
                 if (_binding != null) {

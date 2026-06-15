@@ -175,6 +175,7 @@ class FolderPickerFragment : Fragment() {
             snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
             return@with
         }
+
         if (messagesUids != null) {
             actionsViewModel.moveMessagesTo(
                 destinationFolderId = folderId,
@@ -190,9 +191,8 @@ class FolderPickerFragment : Fragment() {
                 mailbox = mailbox,
             )
         }
-        if (navigationArgs.isFromSearch) {
-            multiselectionViewModel.isMultiSelectOn = false
-        }
+        
+        if (navigationArgs.isFromSearch) multiselectionViewModel.isMultiSelectOn = false
     }
 
     private fun setupSearchBar() = with(binding) {

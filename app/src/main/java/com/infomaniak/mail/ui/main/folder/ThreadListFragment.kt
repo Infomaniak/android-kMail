@@ -60,6 +60,8 @@ import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
+import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
+import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
@@ -89,6 +91,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
+import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager.performSwipeAction
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -106,6 +109,7 @@ import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChange
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -548,16 +552,16 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         thread: Thread,
         position: Int,
         isPermanentDeleteFolder: Boolean,
-    ): Boolean = with(PerformSwipeActionManager) {
+    ): Boolean {
         val currentMailbox = mainViewModel.currentMailbox.value ?: run {
-            snackbarManager.setValue(getString(com.infomaniak.core.common.R.string.anErrorHasOccurred))
+            snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
             SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
                 scope.setTag("context", "PerformSwipeActionManager.performSwipeAction")
             }
             return true
         }
 
-        performSwipeAction(this@ThreadListFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
+        return performSwipeAction(this@ThreadListFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
     }
 
     private fun extendCollapseFab(scrollDirection: ScrollDirection) = with(binding) {
