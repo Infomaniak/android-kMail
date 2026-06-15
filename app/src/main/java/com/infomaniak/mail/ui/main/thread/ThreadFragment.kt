@@ -1090,7 +1090,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
     }
 
-
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
         mainViewModel.draftResource = draftResource
         threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
@@ -1218,7 +1217,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         PREVIOUS_CHRONOLOGICAL_THREAD,
         NEXT_CHRONOLOGICAL_THREAD,
     }
-
 
     companion object {
         private val TAG = ThreadFragment::class.java.simpleName

@@ -493,7 +493,6 @@ class ThreadAdapter(
             return
         }
 
-
         val targetView = if (aiAction == AiAction.SUMMARY) {
             binding.blockInformationViewSummary
         } else {
