@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.R.id.message
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -628,10 +627,6 @@ class ThreadAdapter(
                 title = this.context.getString(errorMessageRes)
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
-
-                if (state.hasAlreadyRetried && !state.wasLoaderShown) {
-                    threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessageRes)
-                }
             } else {
                 val errorMessageRes = when {
                     aiAction == AiAction.SUMMARY -> R.string.messageSummaryError
@@ -1323,7 +1318,6 @@ class ThreadAdapter(
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
         var onAiBannerRetry: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
-        var showSnackbarRetry: ((errorMessage: Int) -> Unit)? = null,
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
     )

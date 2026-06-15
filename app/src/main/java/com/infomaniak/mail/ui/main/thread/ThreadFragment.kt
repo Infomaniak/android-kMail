@@ -459,7 +459,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 },
                 onAiBannerRetry = { messageUid, aiAction -> aiActionsViewModel.doAiAction(messageUid, aiAction) },
-                showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage)) },
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
             ),
@@ -1062,7 +1061,23 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeAiStateUpdates() {
         aiActionsViewModel.aiStateUpdates.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
-            threadAdapter.aiState = aiActionsViewModel.aiState.value
+            val aiState = aiActionsViewModel.aiState.value
+            threadAdapter.aiState = aiState
+
+            val processState = if (aiAction == AiAction.SUMMARY) {
+                aiState.summaryStateMap[messageUid]
+            } else {
+                aiState.translateStateMap[messageUid]
+            }
+
+            if (processState is AiProcessState.Error && processState.canRetry && processState.hasAlreadyRetried && !processState.wasLoaderShown) {
+                val errorMessage = if (aiAction == AiAction.SUMMARY) {
+                    R.string.messageSummaryError
+                } else {
+                    R.string.messageTranslateError
+                }
+                snackbarManager.setValue(getString(errorMessage))
+            }
 
             when (bodyUpdate) {
                 AiBodyUpdate.SHOW_TRANSLATED -> reloadMessageInAdapter(messageUid)
