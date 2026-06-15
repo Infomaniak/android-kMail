@@ -119,7 +119,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
     override val multiSelectionLifecycleOwner: LifecycleOwner
         get() = viewLifecycleOwner
 
-    override fun unlockSwipeActionsIfSet() {
+    fun unlockSwipeActionsIfSet() {
         binding.mailRecyclerView.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
     }
 
@@ -142,7 +142,6 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
 
     override val substituteClassName: String = javaClass.name
     private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
-    private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
     private val recentSearchAdapter by lazy {
         RecentSearchAdapter(
             searchQueries = localSettings.recentSearches.toMutableList(),
@@ -180,18 +179,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
         setupAdapter()
         setupListeners()
 
-        threadListMultiSelection.initMultiSelection(
-            mainViewModel = mainViewModel,
-            actionsViewModel = actionsViewModel,
-            multiselectionViewModel = multiselectionViewModel,
-            host = this,
-            folderRoleUtils = folderRoleUtils,
-            activity = (requireActivity() as MainActivity),
-            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
-            localSettings = localSettings,
-            searchViewModel = searchViewModel,
-            isFromSearch = true,
-        )
+        initializeMultiselection()
 
         setAllFoldersButtonListener()
         setAttachmentsUi()
@@ -206,6 +194,19 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
         observeMultiSelect()
         observeSearchRefresh()
         observeShareUrlResult()
+    }
+
+    private fun initializeMultiselection() {
+        ThreadListMultiSelection(
+            mainViewModel = mainViewModel,
+            multiselectionViewModel = multiselectionViewModel,
+            actionsViewModel = actionsViewModel,
+            mainActivity = requireActivity() as MainActivity,
+            host = this,
+            localSettings = localSettings,
+            isFromSearch = true,
+            searchViewModel = searchViewModel,
+        )
     }
 
     private fun handleEdgeToEdge(): Unit = with(binding) {

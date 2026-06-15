@@ -40,51 +40,27 @@ import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialogAr
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
-import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
 import kotlinx.coroutines.launch
 
-class ThreadListMultiSelection {
+class ThreadListMultiSelection(
+    private val mainViewModel: MainViewModel,
+    private val multiselectionViewModel: MultiselectionViewModel,
+    private val actionsViewModel: ActionsViewModel,
+    private val mainActivity: MainActivity,
+    private val host: MultiSelectionHost,
+    private val localSettings: LocalSettings,
+    private val isFromSearch: Boolean,
+    private val searchViewModel: SearchViewModel,
+) {
 
-    lateinit var mainViewModel: MainViewModel
-    lateinit var multiselectionViewModel: MultiselectionViewModel
-    lateinit var actionsViewModel: ActionsViewModel
-    lateinit var searchViewModel: SearchViewModel
-
-    lateinit var mainActivity: MainActivity
-    private lateinit var host: MultiSelectionHost
-    private lateinit var folderRoleUtils: FolderRoleUtils
-    private var isFromSearch: Boolean = false
-    lateinit var unlockSwipeActionsIfSet: () -> Unit
-    lateinit var localSettings: LocalSettings
     private var shouldMultiselectRead: Boolean = false
     private var shouldMultiselectFavorite: Boolean = true
 
-    fun initMultiSelection(
-        mainViewModel: MainViewModel,
-        multiselectionViewModel: MultiselectionViewModel,
-        actionsViewModel: ActionsViewModel,
-        activity: MainActivity,
-        host: MultiSelectionHost,
-        folderRoleUtils: FolderRoleUtils,
-        unlockSwipeActionsIfSet: () -> Unit,
-        localSettings: LocalSettings,
-        isFromSearch: Boolean,
-        searchViewModel: SearchViewModel,
-    ) {
-        this.mainViewModel = mainViewModel
-        this.multiselectionViewModel = multiselectionViewModel
-        this.actionsViewModel = actionsViewModel
-        this.mainActivity = activity
-        this.host = host
-        this.folderRoleUtils = folderRoleUtils
-        this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
-        this.localSettings = localSettings
-        this.isFromSearch = isFromSearch
-        this.searchViewModel = searchViewModel
-
+    init {
         setupMultiSelectionActions()
         observerMultiSelection()
     }

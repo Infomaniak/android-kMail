@@ -141,7 +141,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
     private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
 
-    private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
     private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private var lastUpdatedDate: Date? = null
@@ -213,18 +212,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         setupUnreadCountChip()
         setupStorageBanner()
 
-        threadListMultiSelection.initMultiSelection(
-            mainViewModel = mainViewModel,
-            actionsViewModel = actionsViewModel,
-            multiselectionViewModel = multiselectionViewModel,
-            activity = (requireActivity() as MainActivity),
-            host = this,
-            folderRoleUtils = folderRoleUtils,
-            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
-            localSettings = localSettings,
-            searchViewModel = searchViewModel,
-            isFromSearch = false,
-        )
+        initializeMultiselection()
 
         observeNetworkStatus()
         observeCurrentThreads()
@@ -242,6 +230,19 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         observeShareUrlResult()
         observePickedEmoji()
     }.getOrDefault(Unit)
+
+    private fun initializeMultiselection() {
+        ThreadListMultiSelection(
+            mainViewModel = mainViewModel,
+            multiselectionViewModel = multiselectionViewModel,
+            actionsViewModel = actionsViewModel,
+            mainActivity = requireActivity() as MainActivity,
+            host = this,
+            localSettings = localSettings,
+            isFromSearch = false,
+            searchViewModel = searchViewModel,
+        )
+    }
 
     override fun getLeftPane(): View? = _binding?.threadsConstraintLayout
 
