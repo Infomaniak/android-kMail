@@ -216,6 +216,7 @@
     <string name="contentDescriptionIconFavorite">Es favorito</string>
     <string name="contentDescriptionIconFolderSelected">Carpeta seleccionada</string>
     <string name="contentDescriptionIconForward">Reenviado</string>
+    <string name="contentDescriptionIconMention">Has sido mencionado.</string>
     <string name="contentDescriptionIconNewMail">Nuevo</string>
     <string name="contentDescriptionIconReply">Respuesta</string>
     <string name="contentDescriptionIconStorage">Estado de almacenamiento</string>
