@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.data.models.message.SplitBody
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +28,6 @@ import javax.inject.Inject
 interface ThreadAdapterState {
     val isExpandedMap: MutableMap<String, Boolean>
     val isThemeTheSameMap: MutableMap<String, Boolean>
-    val aiSummaryStateMap: MutableMap<String, AiProcessState>
-    val aiTranslateStateMap: MutableMap<String, AiProcessState>
     val verticalScroll: Int?
     val isCalendarEventExpandedMap: MutableMap<String, Boolean>
 }
@@ -42,8 +40,6 @@ class ThreadState @Inject constructor() {
     private val _hasSuperCollapsedBlockBeenClicked: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val hasSuperCollapsedBlockBeenClicked: StateFlow<Boolean> = _hasSuperCollapsedBlockBeenClicked.asStateFlow()
     var verticalScroll: Int? = null
-    val aiSummaryStateMap: MutableMap<String, AiProcessState> = mutableMapOf()
-    val aiTranslateStateMap: MutableMap<String, AiProcessState> = mutableMapOf()
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
     val cachedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
@@ -62,8 +58,6 @@ class ThreadState @Inject constructor() {
         cachedTranslatedSplitBodies.clear()
         isFirstOpening = true
         superCollapsedBlock = null
-        aiSummaryStateMap.clear()
-        aiTranslateStateMap.clear()
     }
 
     fun clickSuperCollapsedBlock() {

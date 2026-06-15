@@ -158,7 +158,6 @@ class ThreadViewModel @Inject constructor(
 
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
-
     @DoNotReadDirectly
     private val _threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
     @OptIn(DoNotReadDirectly::class)
@@ -425,25 +424,11 @@ class ThreadViewModel @Inject constructor(
 
         if (bodyObj.isTranslated) {
             message.splitBody = loadTranslatedSplitBody(message.uid, bodyObj)
-
-            if (threadState.aiTranslateStateMap[message.uid] == null) {
-                threadState.aiTranslateStateMap[message.uid] = AiProcessState.Success()
-            }
         } else {
             message.splitBody = threadState.cachedSplitBodies[message.uid]
         }
 
-        insertSummaryIfExists(bodyObj, message)
-
         return@withContext message
-    }
-
-    private fun insertSummaryIfExists(bodyObj: Body, message: Message) {
-        bodyObj.summary?.let { summaryText ->
-            if (threadState.aiSummaryStateMap[message.uid] == null) {
-                threadState.aiSummaryStateMap[message.uid] = AiProcessState.Success(content = summaryText)
-            }
-        }
     }
 
     private suspend fun loadTranslatedSplitBody(messageUid: String, bodyObj: Body): SplitBody? {

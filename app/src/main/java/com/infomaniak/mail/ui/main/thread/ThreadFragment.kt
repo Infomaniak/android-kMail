@@ -302,6 +302,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     fun resetThreadState() {
         threadViewModel.threadState.reset()
+        aiActionsViewModel.reset()
     }
 
     private fun setupUi() = with(binding) {
@@ -360,8 +361,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
-                override val aiSummaryStateMap by threadState::aiSummaryStateMap
-                override val aiTranslateStateMap by threadState::aiTranslateStateMap
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
@@ -466,6 +465,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             ),
         )
 
+        threadAdapter.aiState = aiActionsViewModel.aiState.value
+
         binding.messagesList.apply {
             addItemDecoration(
                 DividerItemDecorator(
@@ -536,6 +537,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeThreadOpening() {
         twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
+            aiActionsViewModel.reset()
             displayThreadView()
             threadViewModel.updateCurrentThreadUid(threadViewModel.AllMessages(threadUid))
         }
@@ -977,8 +979,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
-        val translateState = threadViewModel.threadState.aiTranslateStateMap[uid]
-        val summaryState = threadViewModel.threadState.aiSummaryStateMap[uid]
+        val translateState = aiActionsViewModel.aiState.value.translateStateMap[uid]
+        val summaryState = aiActionsViewModel.aiState.value.summaryStateMap[uid]
 
         safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
@@ -987,10 +989,18 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadViewModel.threadState.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
-                isAlreadyTranslated = translateState is AiProcessState.Success || translateState is AiProcessState.Loading,
-                isAlreadySummarized = summaryState is AiProcessState.Success || summaryState is AiProcessState.Loading,
+                isAlreadyTranslated = isAiProcessActive(body?.isTranslated, translateState),
+                isAlreadySummarized = isAiProcessActive(body?.hasSummary, summaryState),
             ).toBundle(),
         )
+    }
+
+    private fun isAiProcessActive(isDoneInBody: Boolean?, state: AiProcessState?): Boolean {
+        return when (state) {
+            is AiProcessState.Loading, is AiProcessState.Success -> true
+            is AiProcessState.Dismissed -> false
+            else -> isDoneInBody == true
+        }
     }
 
     private fun scrollToFirstUnseenMessage() = with(threadViewModel) {
@@ -1052,6 +1062,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeAiStateUpdates() {
         aiActionsViewModel.aiStateUpdates.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
+            threadAdapter.aiState = aiActionsViewModel.aiState.value
+
             when (bodyUpdate) {
                 AiBodyUpdate.SHOW_TRANSLATED -> reloadMessageInAdapter(messageUid)
                 AiBodyUpdate.SHOW_ORIGINAL -> showOriginalMessage(messageUid)

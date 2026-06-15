@@ -46,6 +46,10 @@ import com.infomaniak.mail.utils.extensions.getCurrentLanguageCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
@@ -72,6 +76,9 @@ class AiActionsViewModel @Inject constructor(
     private val aiSummaryRetryTimers = mutableMapOf<String, CountDownTimer>()
     private val aiTranslateRetryTimers = mutableMapOf<String, CountDownTimer>()
 
+    private val _aiState = MutableStateFlow(AiState())
+    val aiState: StateFlow<AiState> = _aiState.asStateFlow()
+
     val aiStateUpdates = SingleLiveEvent<AiStateUpdate>()
 
     private suspend fun updateLocalMessageBody(messageUid: String, updateAction: (Message?) -> Unit) {
@@ -80,6 +87,10 @@ class AiActionsViewModel @Inject constructor(
                 updateAction(localMessage)
             }
         }
+    }
+
+    fun reset() {
+        _aiState.value = AiState()
     }
 
     fun updateSummary(messageUid: String, summaryText: String? = null) = viewModelScope.launch(ioCoroutineContext) {
@@ -207,15 +218,18 @@ class AiActionsViewModel @Inject constructor(
         newState: AiProcessState,
         bodyUpdate: AiBodyUpdate = AiBodyUpdate.NONE,
     ) {
-        viewModelScope.launch {
-            getStateMap(aiAction)[messageUid] = newState
-            aiStateUpdates.postValue(AiStateUpdate(messageUid, aiAction, bodyUpdate))
+        _aiState.update { currentState ->
+            when (aiAction) {
+                AiAction.SUMMARY -> currentState.copy(summaryStateMap = currentState.summaryStateMap + (messageUid to newState))
+                AiAction.TRANSLATE -> currentState.copy(translateStateMap = currentState.translateStateMap + (messageUid to newState))
+            }
         }
+        aiStateUpdates.postValue(AiStateUpdate(messageUid, aiAction, bodyUpdate))
     }
 
     private fun getStateMap(action: AiAction) = when (action) {
-        AiAction.SUMMARY -> threadState.aiSummaryStateMap
-        AiAction.TRANSLATE -> threadState.aiTranslateStateMap
+        AiAction.SUMMARY -> _aiState.value.summaryStateMap
+        AiAction.TRANSLATE -> _aiState.value.translateStateMap
     }
 
     private fun getTimerMap(action: AiAction) = when (action) {
@@ -270,3 +284,8 @@ class AiActionsViewModel @Inject constructor(
         SHOW_ORIGINAL,
     }
 }
+
+data class AiState(
+    val summaryStateMap: Map<String, AiProcessState> = emptyMap(),
+    val translateStateMap: Map<String, AiProcessState> = emptyMap(),
+)

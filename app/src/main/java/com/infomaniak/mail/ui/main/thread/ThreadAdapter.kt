@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.R.id.message
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -69,6 +70,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
+import com.infomaniak.mail.ui.main.thread.actions.AiState
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
@@ -116,6 +118,8 @@ class ThreadAdapter(
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
+
+    var aiState: AiState = AiState()
 
     inline val items: List<Any> get() = currentList
 
@@ -482,8 +486,8 @@ class ThreadAdapter(
     }
 
     private fun getStateMap(aiAction: AiAction, messageUid: String) = when (aiAction) {
-        AiAction.SUMMARY -> threadAdapterState.aiSummaryStateMap[messageUid]
-        AiAction.TRANSLATE -> threadAdapterState.aiTranslateStateMap[messageUid]
+        AiAction.SUMMARY -> aiState.summaryStateMap[messageUid]
+        AiAction.TRANSLATE -> aiState.translateStateMap[messageUid]
     }
 
     private fun MessageViewHolder.bindAiAction(message: Message, aiAction: AiAction? = null) {
@@ -503,7 +507,7 @@ class ThreadAdapter(
 
         val effectiveState = setupBaseVisibility(state, aiAction, targetView, message)
         handleProcessState(effectiveState, aiAction, targetView)
-        setupListeners(message.uid, aiAction, targetView)
+        setupListeners(message, aiAction, targetView)
     }
 
     private fun setupBaseVisibility(
@@ -640,19 +644,24 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.setupListeners(messageUid: String, aiAction: AiAction, targetView: InformationBlockView) {
+    private fun setupListeners(
+        message: Message,
+        aiAction: AiAction,
+        targetView: InformationBlockView,
+    ) {
         with(targetView) {
             setOnCloseListener {
-                threadAdapterCallbacks?.onAiBannerClose?.invoke(messageUid, aiAction)
+                threadAdapterCallbacks?.onAiBannerClose?.invoke(message.uid, aiAction)
                 isVisible = false
             }
 
             setOnActionClicked {
-                val state = getStateMap(aiAction, messageUid)
-                if (state is AiProcessState.Success && aiAction == AiAction.TRANSLATE) {
-                    threadAdapterCallbacks?.onShowOriginal?.invoke(messageUid)
+                val state = getStateMap(aiAction, message.uid)
+                val isSuccess = state is AiProcessState.Success || (state == null && message.body?.isTranslated == true)
+                if (isSuccess && aiAction == AiAction.TRANSLATE) {
+                    threadAdapterCallbacks?.onShowOriginal?.invoke(message.uid)
                 } else {
-                    threadAdapterCallbacks?.onAiBannerRetry?.invoke(messageUid, aiAction)
+                    threadAdapterCallbacks?.onAiBannerRetry?.invoke(message.uid, aiAction)
                 }
             }
         }
