@@ -461,10 +461,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerRetry = { messageUid, aiAction -> aiActionsViewModel.doAiAction(messageUid, aiAction) },
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
+                getAiState = { aiActionsViewModel.aiState.value },
             ),
         )
-
-        threadAdapter.aiState = aiActionsViewModel.aiState.value
 
         binding.messagesList.apply {
             addItemDecoration(
@@ -1060,7 +1059,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun observeAiStateUpdates() {
         aiActionsViewModel.aiStateUpdates.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
             val aiState = aiActionsViewModel.aiState.value
-            threadAdapter.aiState = aiState
 
             val processState = if (aiAction == AiAction.SUMMARY) {
                 aiState.summaryStateMap[messageUid]

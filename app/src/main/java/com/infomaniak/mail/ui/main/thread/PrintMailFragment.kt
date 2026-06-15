@@ -33,6 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
+import com.infomaniak.mail.ui.main.thread.actions.AiState
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -79,6 +80,7 @@ class PrintMailFragment : Fragment() {
             areMessagesCollapsibles = { threadViewModel.messagesAreCollapsiblesFlow.value },
             threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onBodyWebViewFinishedLoading = { startPrintingView() },
+                getAiState = { AiState() },
             ),
         )
 

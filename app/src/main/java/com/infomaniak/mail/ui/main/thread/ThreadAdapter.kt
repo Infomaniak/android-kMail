@@ -118,8 +118,6 @@ class ThreadAdapter(
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
 
-    var aiState: AiState = AiState()
-
     inline val items: List<Any> get() = currentList
 
     //region Auto-scroll at Thread opening
@@ -485,8 +483,8 @@ class ThreadAdapter(
     }
 
     private fun getAiStateMap(aiAction: AiAction, messageUid: String) = when (aiAction) {
-        AiAction.SUMMARY -> aiState.summaryStateMap[messageUid]
-        AiAction.TRANSLATE -> aiState.translateStateMap[messageUid]
+        AiAction.SUMMARY -> threadAdapterCallbacks?.getAiState?.invoke()?.summaryStateMap[messageUid]
+        AiAction.TRANSLATE -> threadAdapterCallbacks?.getAiState?.invoke()?.translateStateMap[messageUid]
     }
 
     private fun MessageViewHolder.bindAiAction(message: Message, aiAction: AiAction? = null) {
@@ -1320,6 +1318,7 @@ class ThreadAdapter(
         var onAiBannerRetry: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
+        var getAiState: (() -> AiState)? = null,
     )
 
     enum class DisplayType(val layout: Int) {
