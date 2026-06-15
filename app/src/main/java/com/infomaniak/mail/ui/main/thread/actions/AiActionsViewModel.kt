@@ -207,8 +207,10 @@ class AiActionsViewModel @Inject constructor(
         newState: AiProcessState,
         bodyUpdate: AiBodyUpdate = AiBodyUpdate.NONE,
     ) {
-        getStateMap(aiAction)[messageUid] = newState
-        aiStateUpdates.postValue(AiStateUpdate(messageUid, aiAction, bodyUpdate))
+        viewModelScope.launch {
+            getStateMap(aiAction)[messageUid] = newState
+            aiStateUpdates.postValue(AiStateUpdate(messageUid, aiAction, bodyUpdate))
+        }
     }
 
     private fun getStateMap(action: AiAction) = when (action) {
