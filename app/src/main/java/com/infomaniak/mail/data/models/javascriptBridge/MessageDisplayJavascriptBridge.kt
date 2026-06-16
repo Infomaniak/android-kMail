@@ -17,12 +17,18 @@
  */
 package com.infomaniak.mail.data.models.javascriptBridge
 
+import android.os.Handler
+import android.os.Looper
 import android.webkit.JavascriptInterface
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.extensions.isEmail
 
 class MessageDisplayJavascriptBridge(
     private val onWebViewFinishedLoading: () -> Unit,
+    private val onMentionContactClicked: ((String, String?) -> Unit)? = null,
 ) {
+
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     @JavascriptInterface
     fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
@@ -43,7 +49,15 @@ class MessageDisplayJavascriptBridge(
 
     @JavascriptInterface
     fun webviewFinishedLoading() {
-        onWebViewFinishedLoading()
+        mainHandler.post(onWebViewFinishedLoading)
+    }
+
+    @JavascriptInterface
+    fun openMentionContact(email: String, displayName: String?) {
+        if (email.isBlank() || email.length > MAX_MENTION_EMAIL_LENGTH || !email.isEmail()) return
+        if (displayName != null && displayName.length > MAX_MENTION_DISPLAY_NAME_LENGTH) return
+
+        mainHandler.post { onMentionContactClicked?.invoke(email, displayName) }
     }
 
     private fun fixStackTraceLineNumber(errorStack: String, scriptFirstLine: String): String {
@@ -55,5 +69,10 @@ class MessageDisplayJavascriptBridge(
             correctErrorStack = correctErrorStack.replace(match.groupValues[0], "about:blank:$newLineNumber:")
         }
         return correctErrorStack
+    }
+
+    private companion object {
+        const val MAX_MENTION_EMAIL_LENGTH = 254
+        const val MAX_MENTION_DISPLAY_NAME_LENGTH = 256
     }
 }

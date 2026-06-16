@@ -1088,6 +1088,9 @@ class ThreadAdapter(
             navigateToNewMessageActivity = threadAdapterCallbacks?.navigateToNewMessageActivity,
             onPageFinished = { onExpandedMessageLoaded(message.uid) },
             onWebViewFinishedLoading = { threadAdapterCallbacks?.onBodyWebViewFinishedLoading?.invoke() },
+            onMentionContactClicked = { email, displayName ->
+                threadAdapterCallbacks?.onMentionContactClicked?.invoke(email, displayName)
+            },
         )
 
         // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
@@ -1363,6 +1366,7 @@ class ThreadAdapter(
     data class ThreadAdapterCallbacks(
         var onBodyWebViewFinishedLoading: (() -> Unit)? = null,
         var onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)? = null,
+        var onMentionContactClicked: ((email: String, displayName: String?) -> Unit)? = null,
         var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
         var onDraftClicked: ((message: Message) -> Unit)? = null,
         var onAttachmentClicked: ((attachment: Attachable) -> Unit)? = null,
@@ -1450,6 +1454,7 @@ class ThreadAdapter(
             navigateToNewMessageActivity: ((Uri) -> Unit)?,
             onPageFinished: () -> Unit,
             onWebViewFinishedLoading: () -> Unit,
+            onMentionContactClicked: ((email: String, displayName: String?) -> Unit)? = null,
         ) {
 
             fun promptUserForDistantImages() {
@@ -1465,6 +1470,7 @@ class ThreadAdapter(
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
                     onPageFinished = onPageFinished,
                     onWebViewFinishedLoading = onWebViewFinishedLoading,
+                    onMentionContactClicked = onMentionContactClicked,
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initDisplayWebViewClientAndBridge(
                     attachments = message.attachments,
@@ -1473,6 +1479,7 @@ class ThreadAdapter(
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
                     onWebViewFinishedLoading = onWebViewFinishedLoading,
+                    onMentionContactClicked = onMentionContactClicked,
                 )
             }
         }
