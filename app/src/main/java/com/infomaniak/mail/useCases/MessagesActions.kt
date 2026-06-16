@@ -364,10 +364,11 @@ class MessagesActions @Inject constructor(
     private suspend fun updateFavoriteStatus(messagesUids: List<String>, isFavorite: Boolean) {
         mailboxContentRealm().write {
             MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
-            messagesUids.forEach { uid ->
-                val message = MessageController.getMessageBlocking(uid, realm = this) ?: return@forEach
-                ThreadController.updateFavoriteStatus(message.threads.getThreadsUids(), isFavorite, realm = this)
-            }
+            val threadUids = messagesUids
+                .flatMap { uid -> MessageController.getMessageBlocking(uid, realm = this)?.threads?.getThreadsUids().orEmpty() }
+                .distinct()
+
+            ThreadController.updateFavoriteStatus(threadUids, isFavorite, realm = this)
         }
     }
     // End Region
