@@ -654,7 +654,7 @@
             android:layout_height="wrap_content"
             android:background="@color/newMessageBackgroundColor"
             android:clipToPadding="false"
-            android:maxHeight="308dp"
+            android:elevation="3dp"
             android:paddingBottom="@dimen/marginStandardVerySmall"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
