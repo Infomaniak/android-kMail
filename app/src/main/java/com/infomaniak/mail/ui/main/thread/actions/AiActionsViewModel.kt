@@ -76,10 +76,10 @@ class AiActionsViewModel @Inject constructor(
     private val aiSummaryRetryTimers = mutableMapOf<String, CountDownTimer>()
     private val aiTranslateRetryTimers = mutableMapOf<String, CountDownTimer>()
 
-    private val _aiState = MutableStateFlow(AiState())
-    val aiState: StateFlow<AiState> = _aiState.asStateFlow()
+    private val _aiStateMap = MutableStateFlow(AiStateMap())
+    val aiStateMap: StateFlow<AiStateMap> = _aiStateMap.asStateFlow()
 
-    val aiStateUpdates = SingleLiveEvent<AiStateUpdate>()
+    val aiActionEvents = SingleLiveEvent<AiActionEvent>()
 
     private suspend fun updateLocalMessageBody(messageUid: String, updateAction: (Message?) -> Unit) {
         mailboxContentRealm().write {
@@ -90,7 +90,7 @@ class AiActionsViewModel @Inject constructor(
     }
 
     fun reset() {
-        _aiState.value = AiState()
+        _aiStateMap.value = AiStateMap()
     }
 
     fun updateSummary(messageUid: String, summaryText: String? = null) = viewModelScope.launch(ioCoroutineContext) {
@@ -218,18 +218,18 @@ class AiActionsViewModel @Inject constructor(
         newState: AiProcessState,
         bodyUpdate: AiBodyUpdate = AiBodyUpdate.NONE,
     ) {
-        _aiState.update { currentState ->
+        _aiStateMap.update { currentState ->
             when (aiAction) {
                 AiAction.SUMMARY -> currentState.copy(summaryStateMap = currentState.summaryStateMap + (messageUid to newState))
                 AiAction.TRANSLATE -> currentState.copy(translateStateMap = currentState.translateStateMap + (messageUid to newState))
             }
         }
-        aiStateUpdates.postValue(AiStateUpdate(messageUid, aiAction, bodyUpdate))
+        aiActionEvents.postValue(AiActionEvent(messageUid, aiAction, bodyUpdate))
     }
 
     private fun getStateMap(action: AiAction) = when (action) {
-        AiAction.SUMMARY -> _aiState.value.summaryStateMap
-        AiAction.TRANSLATE -> _aiState.value.translateStateMap
+        AiAction.SUMMARY -> _aiStateMap.value.summaryStateMap
+        AiAction.TRANSLATE -> _aiStateMap.value.translateStateMap
     }
 
     private fun getTimerMap(action: AiAction) = when (action) {
@@ -267,7 +267,7 @@ class AiActionsViewModel @Inject constructor(
         super.onCleared()
     }
 
-    data class AiStateUpdate(
+    data class AiActionEvent(
         val messageUid: String,
         val aiAction: AiAction,
         val bodyUpdate: AiBodyUpdate,
@@ -285,7 +285,7 @@ class AiActionsViewModel @Inject constructor(
     }
 }
 
-data class AiState(
+data class AiStateMap(
     val summaryStateMap: Map<String, AiProcessState> = emptyMap(),
     val translateStateMap: Map<String, AiProcessState> = emptyMap(),
 )

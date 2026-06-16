@@ -69,7 +69,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
-import com.infomaniak.mail.ui.main.thread.actions.AiState
+import com.infomaniak.mail.ui.main.thread.actions.AiStateMap
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
@@ -1318,7 +1318,7 @@ class ThreadAdapter(
         var onAiBannerRetry: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
-        var getAiState: (() -> AiState)? = null,
+        var getAiState: (() -> AiStateMap)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

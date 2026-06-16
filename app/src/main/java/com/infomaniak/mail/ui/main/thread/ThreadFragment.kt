@@ -256,7 +256,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         observeCanSendEmails()
 
-        observeAiStateUpdates()
+        observeAiActionEvents()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -461,7 +461,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerRetry = { messageUid, aiAction -> aiActionsViewModel.doAiAction(messageUid, aiAction) },
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
-                getAiState = { aiActionsViewModel.aiState.value },
+                getAiState = { aiActionsViewModel.aiStateMap.value },
             ),
         )
 
@@ -977,8 +977,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
-        val translateState = aiActionsViewModel.aiState.value.translateStateMap[uid]
-        val summaryState = aiActionsViewModel.aiState.value.summaryStateMap[uid]
+        val translateState = aiActionsViewModel.aiStateMap.value.translateStateMap[uid]
+        val summaryState = aiActionsViewModel.aiStateMap.value.summaryStateMap[uid]
 
         safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
@@ -1056,9 +1056,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun observeAiStateUpdates() {
-        aiActionsViewModel.aiStateUpdates.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
-            val aiState = aiActionsViewModel.aiState.value
+    private fun observeAiActionEvents() {
+        aiActionsViewModel.aiActionEvents.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
+            val aiState = aiActionsViewModel.aiStateMap.value
 
             val processState = if (aiAction == AiAction.SUMMARY) {
                 aiState.summaryStateMap[messageUid]
