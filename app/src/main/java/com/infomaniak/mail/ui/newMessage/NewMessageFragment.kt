@@ -51,6 +51,7 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.core.legacy.utils.FilePicker
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
+import com.infomaniak.core.legacy.utils.toPx
 import com.infomaniak.core.legacy.views.DividerItemDecorator
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.core.ui.view.extension.setMargins
@@ -192,7 +193,7 @@ class NewMessageFragment : Fragment() {
             onContactClicked = ::onMentionContactClicked,
             onAddUnrecognizedContact = {},
             snackbarManager = snackbarManager,
-            getAddressBookWithGroup = newMessageViewModel::getAddressBookWithName,
+            getAddressBookWithGroup = null,
         )
     }
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
@@ -852,7 +853,6 @@ class NewMessageFragment : Fragment() {
 
         newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (contacts, _) ->
             mentionContactAdapter.updateContacts(contacts.filterIsInstance<MergedContact>())
-            mentionContactAdapter.updateContacts(contacts)
         }
 
         // Query comes from updateMentionQuery(...)
@@ -862,7 +862,10 @@ class NewMessageFragment : Fragment() {
                 mentionContactAdapter.clear()
                 return@observe
             }
-
+            val rowsToShow = minOf(mentionContactAdapter.itemCount, 5)
+            mentionAutoComplete.layoutParams = mentionAutoComplete.layoutParams.apply {
+                height = rowsToShow * 56.toPx() // 56dp is the height of one row
+            }
             mentionContactAdapter.searchContacts(query)
             mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
         }
