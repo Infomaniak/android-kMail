@@ -1,7 +1,5 @@
-a {
-  %s {
+%s {
     --mail-content-mention-text-color: var(--kmail-primary-color);
     --mail-content-mention-background-color: var(--kmail-primary-container-color);
     --mail-content-mention-font-weight: 500;
-  }
 }

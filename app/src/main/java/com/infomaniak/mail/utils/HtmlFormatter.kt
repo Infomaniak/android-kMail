@@ -229,13 +229,7 @@ class HtmlFormatter(private val html: String) {
         fun Context.getMentionsStyle(aliases: List<String>): String {
             if (aliases.isEmpty()) return ""
             val selectors = aliases.joinToString(", ") { "a[data-ik-mention-ref='$it']" }
-            return """
-                $selectors {
-                    --mail-content-mention-text-color: var(--kmail-primary-color);
-                    --mail-content-mention-background-color: var(--kmail-primary-container-color);
-                    --mail-content-mention-font-weight: 500;
-                }
-            """.trimIndent()
+            return loadMentionsStyleTemplate().format(selectors)
         }
 
         fun Context.getCustomEditorStyle(): String = loadCss(
@@ -243,7 +237,7 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
 
-        fun Context.getMentionsStyle(): String = loadCss(
+        private fun Context.loadMentionsStyleTemplate(): String = loadCss(
             R.raw.mentions_style,
             listOf(
                 PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),

@@ -505,11 +505,8 @@ class NewMessageFragment : Fragment() {
     private fun addMentionsStyle() {
         viewLifecycleOwner.lifecycleScope.launch {
             val selfEmails = newMessageViewModel.currentMailbox().aliases
-            val selectors = selfEmails.joinToString(",\n") { email ->
-                "&[data-ik-mention-ref='$email']"
-            }
-            val formatMentionsStyle = context?.getMentionsStyle()?.format(selectors)
-            if (formatMentionsStyle != null) {
+            val formatMentionsStyle = context?.getMentionsStyle(selfEmails)
+            if (!formatMentionsStyle.isNullOrBlank()) {
                 binding.editorWebView.addCss(formatMentionsStyle)
             }
         }
