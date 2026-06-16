@@ -116,6 +116,7 @@ class ThreadAdapter(
     private val isSpamFilterActivated: () -> Boolean = { false },
     private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
+    private val aliases: () -> List<String> = { emptyList() },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
@@ -422,7 +423,7 @@ class ThreadAdapter(
         return if (isForPrinting) {
             webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, (items.first() as MessageUi).message))
         } else {
-            webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark)
+            webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark, aliases())
         }
     }
 

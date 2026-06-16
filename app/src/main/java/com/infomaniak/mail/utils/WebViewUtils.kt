@@ -31,6 +31,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
@@ -47,6 +48,7 @@ class WebViewUtils(context: Context) {
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
     private val messageDisplayStyle by lazy { context.getMessageDisplayStyle() }
+    private val dynamicMentionsStyle by lazy { { aliases: List<String> -> context.getMentionsStyle(aliases) } }
     private val printMailStyle by lazy { context.getPrintMailStyle() }
 
     private val resizeScript by lazy { context.getResizeScript() }
@@ -66,16 +68,18 @@ class WebViewUtils(context: Context) {
     fun processHtmlForDisplay(
         html: String,
         isDisplayedInDarkMode: Boolean,
+        aliases: List<String>,
     ): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
+        addCommonDisplayContent(isDisplayedInDarkMode, aliases)
         return@with inject()
     }
 
-    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean) {
+    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, aliases: List<String> = emptyList()) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
         registerCss(messageDisplayStyle)
+        if (aliases.isNotEmpty()) registerCss(dynamicMentionsStyle(aliases))
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
