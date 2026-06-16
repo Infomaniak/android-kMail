@@ -28,3 +28,7 @@ a:link, a:visited, a:hover, a:active {
 pre {
     font-family: 'Helvetica';
 }
+
+a[data-ik-mention-ref] {
+    text-decoration: none;
+}
