@@ -273,6 +273,10 @@ class HtmlFormatter(private val html: String) {
             return loadScript(R.raw.message_display_javascript_bridge)
         }
 
+        fun Context.getMentionClickObserverScript(): String {
+            return loadScript(R.raw.mention_click_observer)
+        }
+
         fun Context.getEditorJsBridgeScript(): String {
             return loadScript(R.raw.editor_javascript_bridge)
         }

@@ -259,9 +259,13 @@ fun WebView.initDisplayWebViewClientAndBridge(
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
     onPageFinished: (() -> Unit)? = null,
     onWebViewFinishedLoading: () -> Unit,
+    onMentionContactClicked: ((String, String?) -> Unit)? = null,
 ): MessageDisplayWebViewClient {
 
-    WebViewUtils.initMessageDisplayJavascriptBridge(onWebViewFinishedLoading)
+    WebViewUtils.initMessageDisplayJavascriptBridge(
+        onWebViewFinishedLoading = onWebViewFinishedLoading,
+        onMentionContactClicked = onMentionContactClicked
+    )
     addJavascriptInterface(WebViewUtils.messageDisplayJsBridge, "kmail")
 
     val cidDictionary = attachments.toCidDictionary()

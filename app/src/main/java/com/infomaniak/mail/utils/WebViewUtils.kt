@@ -31,6 +31,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionClickObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
@@ -53,6 +54,7 @@ class WebViewUtils(context: Context) {
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
+    private val mentionClickObserverScript by lazy { context.getMentionClickObserverScript() }
     private val messageDisplayJsBridgeScript by lazy { context.getMessageDisplayJavascriptBridge() }
 
     fun processHtmlForPrint(
@@ -83,6 +85,7 @@ class WebViewUtils(context: Context) {
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
+        registerScript(mentionClickObserverScript)
         registerScript(messageDisplayJsBridgeScript)
         registerBodyEncapsulation()
         registerBreakLongWords()
@@ -94,8 +97,14 @@ class WebViewUtils(context: Context) {
         lateinit var messageDisplayJsBridge: MessageDisplayJavascriptBridge // TODO: Avoid excessive memory consumption with injection
         lateinit var editorJsBridge: EditorJavascriptBridge
 
-        fun initMessageDisplayJavascriptBridge(onWebViewFinishedLoading: () -> Unit) {
-            messageDisplayJsBridge = MessageDisplayJavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
+        fun initMessageDisplayJavascriptBridge(
+            onWebViewFinishedLoading: () -> Unit,
+            onMentionContactClicked: ((String, String?) -> Unit)? = null,
+        ) {
+            messageDisplayJsBridge = MessageDisplayJavascriptBridge(
+                onWebViewFinishedLoading = onWebViewFinishedLoading,
+                onMentionContactClicked = onMentionContactClicked,
+            )
         }
 
         private fun WebSettings.setupCommonWebViewSettings() {
