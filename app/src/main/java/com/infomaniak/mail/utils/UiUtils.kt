@@ -43,6 +43,7 @@ object UiUtils {
     const val FULLY_SLID = 1.0f
     const val IGNORE_DIVIDER_TAG = "ignoreDividerTag"
     const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
+    const val PRIMARY_CONTAINER_COLOR_CODE = "--kmail-primary-container-color"
 
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 

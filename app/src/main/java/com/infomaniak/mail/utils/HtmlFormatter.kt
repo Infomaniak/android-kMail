@@ -24,6 +24,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
@@ -31,6 +32,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import androidx.appcompat.R as RAndroid
+import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
 
@@ -218,8 +220,23 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getCustomStyle(): String = loadCss(
             R.raw.style,
-            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary)),
+            listOf(
+                PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
+                PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+            ),
         )
+
+        fun Context.getMentionsStyle(aliases: List<String>): String {
+            if (aliases.isEmpty()) return ""
+            val selectors = aliases.joinToString(", ") { "a[data-ik-mention-ref='$it']" }
+            return """
+                $selectors {
+                    --mail-content-mention-text-color: var(--kmail-primary-color);
+                    --mail-content-mention-background-color: var(--kmail-primary-container-color);
+                    --mail-content-mention-font-weight: 500;
+                }
+            """.trimIndent()
+        }
 
         fun Context.getCustomEditorStyle(): String = loadCss(
             R.raw.editor_style,
