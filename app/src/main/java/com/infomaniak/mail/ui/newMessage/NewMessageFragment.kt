@@ -76,9 +76,11 @@ import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
@@ -93,6 +95,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogAr
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
+import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.TO
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
@@ -107,6 +110,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getTagsObserverScript
@@ -494,6 +498,8 @@ class NewMessageFragment : Fragment() {
         if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
+        val formatMentionsStyle = context.getMentionsStyle().format(AccountUtils.currentMailboxEmail)
+        addCss(formatMentionsStyle)
     }
 
     private fun setEditorScript() = with(binding.editorWebView) {
@@ -544,7 +550,11 @@ class NewMessageFragment : Fragment() {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(
                 JsExecutableMethod("insertMention", merged.email, merged.name),
             )
+            Recipient.createValidRecipientOrNull(email = merged.email, name = merged.name)?.let { recipient ->
+                newMessageViewModel.addRecipientToField(recipient, TO)
+            }
         }
+
 
         binding.mentionAutoComplete.isVisible = false
         newMessageViewModel.updateMentionQuery("")
@@ -718,7 +728,6 @@ class NewMessageFragment : Fragment() {
 
         toLiveData.observe(viewLifecycleOwner) {
             if (shouldInitToField) {
-                shouldInitToField = false
                 binding.toField.initRecipients(it.recipients, it.otherFieldsAreEmpty)
             }
             updateIsSendingAllowed(

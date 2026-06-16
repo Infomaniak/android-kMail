@@ -36,12 +36,29 @@ const extractMentionQuery = (textBeforeCaret) => {
     return validMentionCharsRegex.test(query) ? query : null;
 }
 
+const isInsideMentionLink = () => {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return false;
+
+  const range = selection.getRangeAt(0);
+  const node = range.startContainer.nodeType === Node.ELEMENT_NODE
+    ? range.startContainer
+    : range.startContainer.parentElement;
+
+  return !!node?.closest("a[data-ik-mention-ref]");
+};
+
 const resetMentionQuery = () => {
     lastSentValue = null;
     onMentionQueryChanged("");
 }
 
 const notifyIfChanged = () => {
+    if (isInsideMentionLink()) {
+      resetMentionQuery();
+      return;
+    }
+
     const textBeforeCaret = getTextBeforeCaret();
     const query = extractMentionQuery(textBeforeCaret);
 
