@@ -243,6 +243,11 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
 
+        fun Context.getMentionsStyle(): String = loadCss(
+            R.raw.mentions_style,
+            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
+        )
+
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
         fun Context.getResizeScript(): String = loadScript(
