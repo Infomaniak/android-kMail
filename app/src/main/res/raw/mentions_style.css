@@ -1,26 +1,7 @@
 a {
-  &:hover {
-    --mail-content-mention-background-color: #e0e0e0;
-  }
-
-  &:active {
-    --mail-content-mention-background-color: #9f9f9f;
-  }
-
-  &[data-ik-mention-ref='%1$s'],
-  &[data-ik-mention-ref='%1$s'] {
-    --mail-content-mention-text-color: #5f142f;
-    --mail-content-mention-background-color: #ffc9df;
+  %s {
+    --mail-content-mention-text-color: var(--kmail-primary-color);
+    --mail-content-mention-background-color: var(--kmail-primary-container-color);
     --mail-content-mention-font-weight: 500;
-
-    &:hover {
-      --mail-content-mention-text-color: #5f142f;
-      --mail-content-mention-background-color: #ff9dc4;
-    }
-
-    &:active {
-      --mail-content-mention-text-color: #5f142f;
-      --mail-content-mention-background-color: #f86aa1;
-    }
   }
 }

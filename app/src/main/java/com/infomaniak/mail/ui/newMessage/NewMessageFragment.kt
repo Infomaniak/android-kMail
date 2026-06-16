@@ -498,8 +498,20 @@ class NewMessageFragment : Fragment() {
         if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
-        val formatMentionsStyle = context.getMentionsStyle().format(AccountUtils.currentMailboxEmail)
-        addCss(formatMentionsStyle)
+        addMentionsStyle()
+    }
+
+    private fun addMentionsStyle() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val selfEmails = newMessageViewModel.currentMailbox().aliases
+            val selectors = selfEmails.joinToString(",\n") { email ->
+                "&[data-ik-mention-ref='$email']"
+            }
+            val formatMentionsStyle = context?.getMentionsStyle()?.format(selectors)
+            if (formatMentionsStyle != null) {
+                binding.editorWebView.addCss(formatMentionsStyle)
+            }
+        }
     }
 
     private fun setEditorScript() = with(binding.editorWebView) {
