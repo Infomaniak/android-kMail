@@ -1073,10 +1073,6 @@ class NewMessageViewModel @Inject constructor(
         doc.removeEmptyElements(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         doc.removeEmptyElements(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
 
-        // Remove the `data-not-clickable` attribute and pointer events style from mentions,
-        // so they are clickable in the email sent.
-        doc.makeMentionsClickable()
-
         // If there are style tags inside the body of the editor JSoup will add them to the head tag automatically. So we always
         // need to send the whole doc.html() to not lose any style. Style can end up inside the <body> of the editor when
         // loading a draft.body that contains a whole <html><head><style>...</style></head><body>...</body></html>.
@@ -1086,21 +1082,6 @@ class NewMessageViewModel @Inject constructor(
     private fun Document.removeEmptyElements(className: String) {
         val elements = getElementsByClass(className)
         elements.forEach { if (it.text().isEmpty()) it.remove() }
-    }
-
-    private fun Document.makeMentionsClickable() {
-        select("a[data-ik-mention-ref]").forEach { anchor ->
-            anchor.removeAttr("data-not-clickable")
-
-            val cleanedStyle = anchor
-                .attr("style")
-                .split(";")
-                .map(String::trim)
-                .filter { it.isNotEmpty() && !it.startsWith("pointer-events", ignoreCase = true) }
-                .joinToString("; ")
-
-            anchor.attr("style", "$cleanedStyle;")
-        }
     }
 
     private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>, step: String) {
