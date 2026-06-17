@@ -86,12 +86,11 @@ function insertMention(userMail, userName) {
     anchor.setAttribute("data-ik-mention-ref", userMail);
     anchor.setAttribute("href", `mailto:${userMail}`);
     anchor.setAttribute("contenteditable", "false");
-    anchor.setAttribute("data-not-clickable", "true");
     anchor.setAttribute(
         "style",
         "padding: 0 4px; border-radius: 100px; color: var(--mail-content-mention-text-color, #333); " +
             "background-color: var(--mail-content-mention-background-color, #f1f1f1); " +
-            "font-weight: var(--mail-content-mention-font-weight, inherit);" + "pointer-events: none;"
+            "font-weight: var(--mail-content-mention-font-weight, inherit);"
     );
     anchor.textContent = `@${userName}`;
 

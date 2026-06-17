@@ -11,3 +11,7 @@ body {
     margin: 0;
     padding: 0 16px 0;
 }
+
+a[data-ik-mention-ref] {
+    pointer-events: none;
+}
