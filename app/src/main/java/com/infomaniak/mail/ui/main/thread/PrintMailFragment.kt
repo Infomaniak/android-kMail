@@ -73,8 +73,6 @@ class PrintMailFragment : Fragment() {
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
-                override val aiSummaryStateMap by threadState::aiSummaryStateMap
-                override val aiTranslateStateMap by threadState::aiTranslateStateMap
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },

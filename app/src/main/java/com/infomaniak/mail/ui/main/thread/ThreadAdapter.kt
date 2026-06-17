@@ -69,6 +69,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
+import com.infomaniak.mail.ui.main.thread.actions.AiStateMap
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
@@ -481,9 +482,9 @@ class ThreadAdapter(
         bindRecipientDetails(message, messageDate)
     }
 
-    private fun getStateMap(aiAction: AiAction, messageUid: String) = when (aiAction) {
-        AiAction.SUMMARY -> threadAdapterState.aiSummaryStateMap[messageUid]
-        AiAction.TRANSLATE -> threadAdapterState.aiTranslateStateMap[messageUid]
+    private fun getAiStateMap(aiAction: AiAction, messageUid: String) = when (aiAction) {
+        AiAction.SUMMARY -> threadAdapterCallbacks?.getAiState?.invoke()?.summaryStateMap[messageUid]
+        AiAction.TRANSLATE -> threadAdapterCallbacks?.getAiState?.invoke()?.translateStateMap[messageUid]
     }
 
     private fun MessageViewHolder.bindAiAction(message: Message, aiAction: AiAction? = null) {
@@ -493,27 +494,26 @@ class ThreadAdapter(
             return
         }
 
-
         val targetView = if (aiAction == AiAction.SUMMARY) {
             binding.blockInformationViewSummary
         } else {
             binding.blockInformationViewTranslate
         }
 
-        val state = getStateMap(aiAction, message.uid)
+        val aiProcessState = getAiStateMap(aiAction, message.uid)
 
-        val effectiveState = setupBaseVisibility(state, aiAction, targetView, message)
+        val effectiveState = setupBaseVisibility(aiProcessState, aiAction, targetView, message)
         handleProcessState(effectiveState, aiAction, targetView)
-        setupListeners(message.uid, aiAction, targetView)
+        setupListeners(message, aiAction, targetView)
     }
 
     private fun setupBaseVisibility(
-        state: AiProcessState?,
+        aiProcessState: AiProcessState?,
         aiAction: AiAction,
         targetView: InformationBlockView,
         message: Message
     ): AiProcessState? {
-        if (state is AiProcessState.Dismissed) {
+        if (aiProcessState is AiProcessState.Dismissed) {
             targetView.isVisible = false
             return null
         }
@@ -521,13 +521,13 @@ class ThreadAdapter(
         val hasSavedState = (aiAction == AiAction.TRANSLATE && message.body?.isTranslated == true) ||
                 (aiAction == AiAction.SUMMARY && message.body?.hasSummary == true)
 
-        if ((state == null && !hasSavedState)) {
+        if ((aiProcessState == null && !hasSavedState)) {
             targetView.isVisible = false
             return null
         }
 
         val effectiveState =
-            state ?: AiProcessState.Success(if (aiAction == AiAction.SUMMARY) message.body?.summary ?: "" else "")
+            aiProcessState ?: AiProcessState.Success(if (aiAction == AiAction.SUMMARY) message.body?.summary ?: "" else "")
 
         with(targetView) {
             isVisible = true
@@ -625,10 +625,6 @@ class ThreadAdapter(
                 title = this.context.getString(errorMessageRes)
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
-
-                if (state.hasAlreadyRetried && !state.wasLoaderShown) {
-                    threadAdapterCallbacks?.showSnackbarRetry?.invoke(errorMessageRes)
-                }
             } else {
                 val errorMessageRes = when {
                     aiAction == AiAction.SUMMARY -> R.string.messageSummaryError
@@ -641,19 +637,24 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.setupListeners(messageUid: String, aiAction: AiAction, targetView: InformationBlockView) {
+    private fun setupListeners(
+        message: Message,
+        aiAction: AiAction,
+        targetView: InformationBlockView,
+    ) {
         with(targetView) {
             setOnCloseListener {
-                threadAdapterCallbacks?.onAiBannerClose?.invoke(messageUid, aiAction)
+                threadAdapterCallbacks?.onAiBannerClose?.invoke(message.uid, aiAction)
                 isVisible = false
             }
 
             setOnActionClicked {
-                val state = getStateMap(aiAction, messageUid)
-                if (state is AiProcessState.Success && aiAction == AiAction.TRANSLATE) {
-                    threadAdapterCallbacks?.onShowOriginal?.invoke(messageUid)
+                val aiProcessState = getAiStateMap(aiAction, message.uid)
+                val isSuccess = aiProcessState is AiProcessState.Success || (aiProcessState == null && message.body?.isTranslated == true)
+                if (isSuccess && aiAction == AiAction.TRANSLATE) {
+                    threadAdapterCallbacks?.onShowOriginal?.invoke(message.uid)
                 } else {
-                    threadAdapterCallbacks?.onAiBannerRetry?.invoke(messageUid, aiAction)
+                    threadAdapterCallbacks?.onAiBannerRetry?.invoke(message.uid, aiAction)
                 }
             }
         }
@@ -1315,9 +1316,9 @@ class ThreadAdapter(
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
         var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
         var onAiBannerRetry: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
-        var showSnackbarRetry: ((errorMessage: Int) -> Unit)? = null,
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
+        var getAiState: (() -> AiStateMap)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

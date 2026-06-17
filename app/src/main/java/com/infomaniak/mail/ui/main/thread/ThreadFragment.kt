@@ -256,7 +256,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         observeCanSendEmails()
 
-        observeAiStateUpdates()
+        observeAiActionEvents()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -302,6 +302,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     fun resetThreadState() {
         threadViewModel.threadState.reset()
+        aiActionsViewModel.reset()
     }
 
     private fun setupUi() = with(binding) {
@@ -360,8 +361,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
-                override val aiSummaryStateMap by threadState::aiSummaryStateMap
-                override val aiTranslateStateMap by threadState::aiTranslateStateMap
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
@@ -460,9 +459,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 },
                 onAiBannerRetry = { messageUid, aiAction -> aiActionsViewModel.doAiAction(messageUid, aiAction) },
-                showSnackbarRetry = { errorMessage -> snackbarManager.setValue(getString(errorMessage)) },
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
+                getAiState = { aiActionsViewModel.aiStateMap.value },
             ),
         )
 
@@ -536,6 +535,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeThreadOpening() {
         twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
+            aiActionsViewModel.reset()
             displayThreadView()
             threadViewModel.updateCurrentThreadUid(threadViewModel.AllMessages(threadUid))
         }
@@ -977,8 +977,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
-        val translateState = threadViewModel.threadState.aiTranslateStateMap[uid]
-        val summaryState = threadViewModel.threadState.aiSummaryStateMap[uid]
+        val translateState = aiActionsViewModel.aiStateMap.value.translateStateMap[uid]
+        val summaryState = aiActionsViewModel.aiStateMap.value.summaryStateMap[uid]
 
         safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
@@ -987,10 +987,16 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadViewModel.threadState.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
-                isAlreadyTranslated = translateState is AiProcessState.Success || translateState is AiProcessState.Loading,
-                isAlreadySummarized = summaryState is AiProcessState.Success || summaryState is AiProcessState.Loading,
+                isAlreadyTranslated = !canStartAiProcess(isDoneInBody = body?.isTranslated, state = translateState),
+                isAlreadySummarized = !canStartAiProcess(isDoneInBody = body?.hasSummary, state = summaryState),
             ).toBundle(),
         )
+    }
+
+    private fun canStartAiProcess(isDoneInBody: Boolean?, state: AiProcessState?): Boolean = when (state) {
+        is AiProcessState.Loading, is AiProcessState.Success, is AiProcessState.Retrying -> false
+        is AiProcessState.Dismissed -> true
+        else -> isDoneInBody != true
     }
 
     private fun scrollToFirstUnseenMessage() = with(threadViewModel) {
@@ -1050,8 +1056,29 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun observeAiStateUpdates() {
-        aiActionsViewModel.aiStateUpdates.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
+    private fun observeAiActionEvents() {
+        aiActionsViewModel.aiActionEvents.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
+            val aiState = aiActionsViewModel.aiStateMap.value
+
+            val processState = if (aiAction == AiAction.SUMMARY) {
+                aiState.summaryStateMap[messageUid]
+            } else {
+                aiState.translateStateMap[messageUid]
+            }
+
+            if (processState is AiProcessState.Error &&
+                processState.canRetry &&
+                processState.hasAlreadyRetried &&
+                !processState.wasLoaderShown
+            ) {
+                val errorMessage = if (aiAction == AiAction.SUMMARY) {
+                    R.string.messageSummaryError
+                } else {
+                    R.string.messageTranslateError
+                }
+                snackbarManager.setValue(getString(errorMessage))
+            }
+
             when (bodyUpdate) {
                 AiBodyUpdate.SHOW_TRANSLATED -> reloadMessageInAdapter(messageUid)
                 AiBodyUpdate.SHOW_ORIGINAL -> showOriginalMessage(messageUid)
@@ -1089,7 +1116,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             threadAdapter.notifyItemChanged(index)
         }
     }
-
 
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
         mainViewModel.draftResource = draftResource
@@ -1218,7 +1244,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         PREVIOUS_CHRONOLOGICAL_THREAD,
         NEXT_CHRONOLOGICAL_THREAD,
     }
-
 
     companion object {
         private val TAG = ThreadFragment::class.java.simpleName
