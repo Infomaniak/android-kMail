@@ -987,16 +987,16 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadViewModel.threadState.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
-                isAlreadyTranslated = isAiProcessActive(body?.isTranslated, translateState),
-                isAlreadySummarized = isAiProcessActive(body?.hasSummary, summaryState),
+                isAlreadyTranslated = !canStartAiProcess(isDoneInBody = body?.isTranslated, state = translateState),
+                isAlreadySummarized = !canStartAiProcess(isDoneInBody = body?.hasSummary, state = summaryState),
             ).toBundle(),
         )
     }
 
-    private fun isAiProcessActive(isDoneInBody: Boolean?, state: AiProcessState?): Boolean = when (state) {
-        is AiProcessState.Loading, is AiProcessState.Success -> true
-        is AiProcessState.Dismissed -> false
-        else -> isDoneInBody == true
+    private fun canStartAiProcess(isDoneInBody: Boolean?, state: AiProcessState?): Boolean = when (state) {
+        is AiProcessState.Loading, is AiProcessState.Success, is AiProcessState.Retrying -> false
+        is AiProcessState.Dismissed -> true
+        else -> isDoneInBody != true
     }
 
     private fun scrollToFirstUnseenMessage() = with(threadViewModel) {
@@ -1066,7 +1066,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 aiState.translateStateMap[messageUid]
             }
 
-            if (processState is AiProcessState.Error && processState.canRetry &&
+            if (processState is AiProcessState.Error &&
+                processState.canRetry &&
                 processState.hasAlreadyRetried &&
                 !processState.wasLoaderShown
             ) {

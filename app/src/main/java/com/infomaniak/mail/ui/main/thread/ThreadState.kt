@@ -75,6 +75,5 @@ sealed class AiProcessState {
         val wasLoaderShown: Boolean = false,
         val targetSameAsSource: Boolean = false
     ) : AiProcessState()
-
     data object Dismissed : AiProcessState()
 }
