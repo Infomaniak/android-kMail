@@ -23,6 +23,7 @@ import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.MessageBodyUtils.MENTION_ATTR
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
@@ -228,7 +229,7 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getMentionsStyle(aliases: List<String>): String {
             if (aliases.isEmpty()) return ""
-            val selectors = aliases.joinToString(", ") { "a[data-ik-mention-ref='$it']" }
+            val selectors = aliases.joinToString(", ") { "a[$MENTION_ATTR='$it']" }
             return loadMentionsStyleTemplate().format(selectors)
         }
 
@@ -256,6 +257,7 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getDeletedInlineImagesObserverScript(): String = loadScript(R.raw.deleted_inline_images_observer)
         fun Context.getTagsObserverScript(): String = loadScript(R.raw.editor_mentions_detector)
+        fun Context.getMentionDeletionObserverScript(): String = loadScript(R.raw.mention_deletion_observer)
 
         fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
 

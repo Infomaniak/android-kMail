@@ -31,4 +31,7 @@ pre {
 
 a[data-ik-mention-ref] {
     text-decoration: none;
+    display: inline-block;
+    margin: 2px 0px;
+    white-space: nowrap;
 }

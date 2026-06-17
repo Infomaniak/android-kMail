@@ -24,6 +24,7 @@ import org.json.JSONArray
 class EditorJavascriptBridge(
     private val onInlineImagesDeletedCallback: (List<String>) -> Unit,
     private val onMentionQueryChangedCallback: (String) -> Unit,
+    private val onMentionsDeletedCallback: (List<String>) -> Unit,
 ) {
     @JavascriptInterface
     fun onInlineImagesDeleted(cidJson: String) {
@@ -40,6 +41,20 @@ class EditorJavascriptBridge(
     @JavascriptInterface
     fun onMentionQueryChanged(query: String) {
         onMentionQueryChangedCallback(query)
+    }
+
+    @JavascriptInterface
+    fun onMentionsDeleted(refsJson: String) {
+        val jsonArray = runCatching {
+            JSONArray(refsJson)
+        }.onFailure {
+            SentryLog.e(TAG, "Failed to parse mention refs", it)
+        }.getOrNull() ?: return
+
+        val refs = (0 until jsonArray.length())
+            .map { jsonArray.optString(it, null) }
+            .filter { it != null && it.isNotBlank() }
+        onMentionsDeletedCallback(refs)
     }
 
     companion object {
