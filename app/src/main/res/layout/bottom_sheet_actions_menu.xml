@@ -57,25 +57,6 @@
             app:visibleDivider="false"
             tools:visibility="visible" />
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/summary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:icon="@drawable/ic_paragraph_shorten"
-            app:title="@string/actionSummarize"
-            app:visibleDivider="false"
-            tools:visibility="visible" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/translate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:icon="@drawable/ic_translate"
-            app:title="@string/buttonTranslate"
-            app:visibleDivider="false"
-            tools:visibility="visible" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/addReaction"

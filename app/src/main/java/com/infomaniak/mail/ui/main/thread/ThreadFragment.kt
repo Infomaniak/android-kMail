@@ -106,6 +106,7 @@ import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiBodyUpdate
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.AskEuriaBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
@@ -827,6 +828,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             )
         }
 
+        getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
+            navigateToAskEuriaBottomSheet(messageUid)
+        }
+
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
@@ -977,9 +982,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
-        val translateState = aiActionsViewModel.aiStateMap.value.translateStateMap[uid]
-        val summaryState = aiActionsViewModel.aiStateMap.value.summaryStateMap[uid]
-
         safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
             args = MessageActionsBottomSheetDialogArgs(
@@ -987,8 +989,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadViewModel.threadState.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
-                isAlreadyTranslated = !canStartAiProcess(isDoneInBody = body?.isTranslated, state = translateState),
-                isAlreadySummarized = !canStartAiProcess(isDoneInBody = body?.hasSummary, state = summaryState),
             ).toBundle(),
         )
     }
@@ -1115,6 +1115,26 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         if (index >= 0) {
             threadAdapter.notifyItemChanged(index)
         }
+    }
+
+    private fun navigateToAskEuriaBottomSheet(messageUid: String) {
+        val message = threadAdapter.currentList
+            .filterIsInstance<MessageUi>()
+            .firstOrNull { it.message.uid == messageUid }
+            ?.message ?: return
+
+        val aiState = aiActionsViewModel.aiStateMap.value
+        val isAlreadyTranslated = !canStartAiProcess(message.body?.isTranslated, aiState.translateStateMap[messageUid])
+        val isAlreadySummarized = !canStartAiProcess(message.body?.hasSummary, aiState.summaryStateMap[messageUid])
+
+        safeNavigate(
+            resId = R.id.askEuriaBottomSheetDialog,
+            args = AskEuriaBottomSheetDialogArgs(
+                messageUid = messageUid,
+                isAlreadyTranslated = isAlreadyTranslated,
+                isAlreadySummarized = isAlreadySummarized,
+            ).toBundle(),
+        )
     }
 
     private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
@@ -1254,6 +1274,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
+        const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
         const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"
 

@@ -191,6 +191,16 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/askEuriaBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.AskEuriaBottomSheetDialog"
+        android:label="AskEuriaBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_ask_euria_actions">
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
         <argument
             android:name="isAlreadyTranslated"
             android:defaultValue="false"
