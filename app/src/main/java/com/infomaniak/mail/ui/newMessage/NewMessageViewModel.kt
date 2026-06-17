@@ -97,6 +97,9 @@ import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.MENTION_ATTR
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
@@ -139,6 +142,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -246,6 +250,9 @@ class NewMessageViewModel @Inject constructor(
     val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
 
     val mentionQueryLiveData = MutableLiveData("")
+
+    private val _currentMentions = MutableStateFlow<Set<String>>(emptySet())
+    val currentMentions: StateFlow<Set<String>> = _currentMentions.asStateFlow()
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -1025,6 +1032,7 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
+        mentions = currentMentions.value.toRealmList()
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -1062,8 +1070,8 @@ class NewMessageViewModel @Inject constructor(
 
         // If the user deleted the quotes' text, remove the quotes' div so user doesn't write in it
         // (the text could get hidden later with the show quotes button).
-        doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        doc.removeEmptyElements(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        doc.removeEmptyElements(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
 
         // Remove the `data-not-clickable` attribute and pointer events style from mentions,
         // so they are clickable in the email sent.
@@ -1206,6 +1214,14 @@ class NewMessageViewModel @Inject constructor(
 
     fun updateMentionQuery(query: String) {
         mentionQueryLiveData.postValue(query)
+    }
+
+    fun addMention(email: String) {
+        _currentMentions.update { it + email }
+    }
+
+    fun removeMentions(emails: List<String>) {
+        _currentMentions.update { it - emails.toSet() }
     }
 
     enum class ImportationResult {

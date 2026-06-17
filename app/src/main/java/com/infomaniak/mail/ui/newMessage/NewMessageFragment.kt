@@ -111,6 +111,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
@@ -167,6 +168,7 @@ class NewMessageFragment : Fragment() {
     private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
     private val tagsObserverScript by lazy { requireContext().getTagsObserverScript() }
+    private val mentionDeletionObserverScript by lazy { requireContext().getMentionDeletionObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
@@ -484,6 +486,7 @@ class NewMessageFragment : Fragment() {
         editorWebView.initEditorWebviewBridge(
             onInlineImagesDeleted = newMessageViewModel::deleteInlineAttachments,
             onMentionQueryChanged = newMessageViewModel::updateMentionQuery,
+            onMentionsDeleted = newMessageViewModel::removeMentions,
         )
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
@@ -517,6 +520,7 @@ class NewMessageFragment : Fragment() {
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
         addScript(tagsObserverScript)
+        addScript(mentionDeletionObserverScript)
         addScript(insertMentionScript)
 
         val formattedAiContentScript = setAiContentScript.format(
@@ -565,6 +569,7 @@ class NewMessageFragment : Fragment() {
             }
         }
 
+        newMessageViewModel.addMention(merged.email)
 
         binding.mentionAutoComplete.isVisible = false
         newMessageViewModel.updateMentionQuery("")
