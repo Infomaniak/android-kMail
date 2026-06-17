@@ -196,6 +196,7 @@ class NewMessageFragment : Fragment() {
             onAddUnrecognizedContact = {},
             snackbarManager = snackbarManager,
             getAddressBookWithGroup = null,
+            shouldDisplayAddUnrecognizedRecipient = false,
         )
     }
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
@@ -865,14 +866,10 @@ class NewMessageFragment : Fragment() {
             if (query.isBlank()) {
                 mentionAutoComplete.isVisible = false
                 mentionContactAdapter.clear()
-                return@observe
+            } else {
+                mentionContactAdapter.searchContacts(query)
+                mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
             }
-            val rowsToShow = minOf(mentionContactAdapter.itemCount, 5)
-            mentionAutoComplete.layoutParams = mentionAutoComplete.layoutParams.apply {
-                height = rowsToShow * 56.toPx() // 56dp is the height of one row
-            }
-            mentionContactAdapter.searchContacts(query)
-            mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
         }
     }
 

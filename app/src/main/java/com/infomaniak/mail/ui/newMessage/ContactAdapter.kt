@@ -48,13 +48,14 @@ class ContactAdapter(
     private val onContactClicked: (item: ContactAutocompletable) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
     private val snackbarManager: SnackbarManager,
-    private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?
+    private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?,
+    private val shouldDisplayAddUnrecognizedRecipient: Boolean = true,
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<ContactAutocompletable> = emptyList()
     private var matchedContacts = listOf<MatchedContact>()
 
-    private var displayAddUnknownContactButton = true
+    private var displayAddUnknownContactButton = shouldDisplayAddUnrecognizedRecipient
     private var searchQuery = ""
 
     init {
@@ -154,7 +155,7 @@ class ContactAdapter(
         }
     }
 
-    override fun getItemCount(): Int = matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
+    override fun getItemCount(): Int = minOf(matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0, 5)
 
     override fun getItemId(position: Int): Long {
         // To check that each contactautocomplatable has a different id, even if the types are different,
@@ -202,7 +203,7 @@ class ContactAdapter(
         val searchTerm = constraint.standardize()
 
         val finalUserList = mutableListOf<MatchedContact>()
-        displayAddUnknownContactButton = true
+        displayAddUnknownContactButton = shouldDisplayAddUnrecognizedRecipient
         for (contact in allContacts) {
             val matchedContact = getMatchedContact(
                 contact = contact,
