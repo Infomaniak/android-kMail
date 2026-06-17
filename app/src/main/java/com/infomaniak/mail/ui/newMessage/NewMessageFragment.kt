@@ -520,8 +520,8 @@ class NewMessageFragment : Fragment() {
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
         addScript(tagsObserverScript)
-        addScript(mentionDeletionObserverScript)
         addScript(insertMentionScript)
+        addScript(mentionDeletionObserverScript)
 
         val formattedAiContentScript = setAiContentScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
@@ -564,8 +564,11 @@ class NewMessageFragment : Fragment() {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(
                 JsExecutableMethod("insertMention", merged.email, merged.name),
             )
-            Recipient.createValidRecipientOrNull(email = merged.email, name = merged.name)?.let { recipient ->
-                newMessageViewModel.addRecipientToField(recipient, TO)
+            val recipients = newMessageViewModel.toLiveData.value?.recipients ?: emptyList()
+            if (recipients.none { recipient -> recipient.email == merged.email }) {
+                Recipient.createValidRecipientOrNull(email = merged.email, name = merged.name)?.let { recipient ->
+                    newMessageViewModel.addRecipientToField(recipient, TO)
+                }
             }
         }
 
