@@ -16,10 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Replace the incomplete mention (@query) with a mention anchor.
- * Example output: <a data-ik-mention-ref="user@ik.me" href="mailto:user@ik.me">User name</a>
- */
 function insertMention(userMail, userName) {
     if (!userMail || !userName) return;
 
@@ -29,22 +25,41 @@ function insertMention(userMail, userName) {
     const caretRange = selection.getRangeAt(0);
     if (!caretRange.collapsed) return;
 
-    const mentionQueryRegex = /(?:^|\s)@([A-Za-z0-9._+-]*(?:@[A-Za-z0-9.-]*)?)$/;
     const editor = getEditor();
 
+    const getBlockParent = (node) => {
+        const blockTags = new Set(["DIV", "P", "H1", "H2", "H3", "H4", "H5", "H6", "LI", "BLOCKQUOTE", "TD", "TR"]);
+        let current = node;
+        while (current && current !== editor && current.nodeType !== Node.DOCUMENT_NODE) {
+            if (current.nodeType === Node.ELEMENT_NODE && blockTags.has(current.tagName.toUpperCase())) {
+                return current;
+            }
+            current = current.parentNode;
+        }
+        return editor;
+    };
+
+    const block = getBlockParent(caretRange.startContainer);
+
     const preRange = caretRange.cloneRange();
-    preRange.selectNodeContents(editor);
+    try {
+        preRange.setStart(block, 0);
+    } catch (e) {
+        preRange.selectNodeContents(editor);
+    }
     preRange.setEnd(caretRange.endContainer, caretRange.endOffset);
+
     const textBeforeCaret = preRange.toString();
 
-    const mentionMatch = textBeforeCaret.match(mentionQueryRegex);
-    if (!mentionMatch) return;
+    const extractRegex = /@([^@\s]*)$/;
+    const match = textBeforeCaret.match(extractRegex);
+    if (!match) return;
 
-    const deleteCount = mentionMatch[1].length + 1; // +1 for '@'
+    const deleteCount = match[0].length;
     const mentionStartOffset = textBeforeCaret.length - deleteCount;
 
     const getDomPositionForTextOffset = (targetOffset) => {
-        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
         let traversed = 0;
         let currentNode = walker.nextNode();
         let lastNode = null;
@@ -52,6 +67,7 @@ function insertMention(userMail, userName) {
         while (currentNode) {
             lastNode = currentNode;
             const currentLength = currentNode.textContent.length;
+
             if (traversed + currentLength >= targetOffset) {
                 return {
                     node: currentNode,
@@ -70,8 +86,8 @@ function insertMention(userMail, userName) {
         }
 
         return {
-            node: editor,
-            offset: editor.childNodes.length,
+            node: block,
+            offset: 0,
         };
     };
 
@@ -98,6 +114,7 @@ function insertMention(userMail, userName) {
     replaceRange.insertNode(trailingSpace);
     replaceRange.insertNode(anchor);
 
+    // We replace the cursor after the space of the mention
     const newCaretRange = document.createRange();
     newCaretRange.setStartAfter(trailingSpace);
     newCaretRange.collapse(true);
