@@ -69,9 +69,9 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
         listOf(ReminderPreset.HOURS_24, ReminderPreset.DAYS_3, ReminderPreset.DAYS_7).forEach { preset ->
             val itemView = ActionItemView(requireContext()).apply {
                 val dateText = if (preset.hours % HOURS_IN_A_DAY == 0 && preset.hours > HOURS_IN_A_DAY) {
-                    getString(R.string.daysBeforeSendingReminder, preset.hours / HOURS_IN_A_DAY)
+                    resources.getQuantityString(R.plurals.daysBeforeSendingReminder, preset.hours / HOURS_IN_A_DAY, preset.hours / HOURS_IN_A_DAY)
                 } else {
-                    getString(R.string.hoursBeforeSendingReminder, preset.hours)
+                    resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, preset.hours, preset.hours)
                 }
 
                 setTitle(dateText)
@@ -121,9 +121,9 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     }
 
     private enum class ReminderPreset(@StringRes val titleRes: Int, val hours: Int) {
-        HOURS_24(R.string.hoursBeforeSendingReminder, HOURS_IN_A_DAY),
-        DAYS_3(R.string.daysBeforeSendingReminder, 3 * HOURS_IN_A_DAY),
-        DAYS_7(R.string.daysBeforeSendingReminder, 7 * HOURS_IN_A_DAY);
+        HOURS_24(R.plurals.hoursBeforeSendingReminder, HOURS_IN_A_DAY),
+        DAYS_3(R.plurals.daysBeforeSendingReminder, 3 * HOURS_IN_A_DAY),
+        DAYS_7(R.plurals.daysBeforeSendingReminder, 7 * HOURS_IN_A_DAY);
 
         val delayMillis: Long get() = hours * ONE_HOUR_IN_MILLIS
     }

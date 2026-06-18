@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Vastaanottokuittaus on lähetetty lähettäjälle.</string>
     <string name="actionArchive">Arkistoi</string>
     <string name="actionBlockSender">Estä lähettäjä</string>
-    <string name="actionCallIfNoResponse">Muistuta minua, jos vastausta ei tule</string>
+    <string name="actionCallIfNoResponse">Muistuta minua, jos vastausta ei tule lähettämisen jälkeen</string>
     <string name="actionCancelSnooze">Peruuta torkku</string>
     <string name="actionDelete">Poista</string>
     <string name="actionEditMenu">Muokkaa valikkoa</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Koko päivä</string>
     <string name="calendarNotInvited">Et ole kutsuttu</string>
     <string name="calendarOrganizerName">%s (Järjestäjä)</string>
-    <string name="callIfNoResponseHeaderTitle">Muistuta minua, jos vastausta ei tule: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Muistuta minua, jos vastausta ei tule lähettämisen jälkeen: %s</string>
     <string name="ccTitle">Kopio:</string>
     <string name="comingSoon">Tulossa pian…</string>
     <string name="commercialFolder">Tarjoukset</string>
@@ -243,7 +243,10 @@
     <string name="createFolderName">Kansion nimi</string>
     <string name="datePickerTitle">Valitse päivämäärä ja aika</string>
     <string name="dateTitle">Päivämäärä:</string>
-    <string name="daysBeforeSendingReminder">%d päivää</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
     <string name="deleteAccountWarning">Tilisi poistaminen on lopullista. Et voi enää aktivoida tiliäsi uudelleen.</string>
     <string name="deleteFolderDialogDescription">Kansion %s sisältö poistetaan pysyvästi ilman siirtämistä roskakoriin.</string>
     <string name="deleteFolderDialogTitle">Poista kansio</string>
@@ -374,7 +377,10 @@
     <string name="genericMessageTranslated">Viesti käännetty</string>
     <string name="googlePlayServicesAreRequired">Google Play Services vaaditaan</string>
     <string name="groupContactsTitle">Ryhmä: %s</string>
-    <string name="hoursBeforeSendingReminder">%d tuntia</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d tunti</item>
+        <item quantity="other">%d tuntia</item>
+    </plurals>
     <string name="inboxFolder">Saapuneet</string>
     <string name="kSuiteProQuotasAlertDescription">Mail-tallennustilasi on melkein täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Mail-tallennustilasi on täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
@@ -735,13 +741,20 @@
     <string name="translationTargetSameAsSource">Tämä viesti on jo omalla kielelläsi</string>
     <string name="trashFolder">Roskakori</string>
     <string name="unblockButton">Poista esto</string>
-    <string name="unitDays">Päivää</string>
-    <string name="unitHours">Tunnit</string>
+    <plurals name="unitDays">
+        <item quantity="one">Päivä</item>
+        <item quantity="other">Päivää</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Tunti</item>
+        <item quantity="other">Tuntia</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Tuntematon lähettäjä</string>
     <string name="unknownDialogTitleRecipient">Tuntematon vastaanottaja</string>
     <string name="unknownRecipientTitle">(tuntematon)</string>
     <string name="unknownTag">Tuntematon</string>
     <string name="unsubscribeButtonTitle">Peruuta tilaus</string>
+    <string name="urgencyReminderDescription">Saat ilmoituksen, jos vastaanottajasi ei ole vastannut valittuun päivämäärään mennessä.</string>
     <string name="urlEntryTitle">Luo hyperlinkki</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

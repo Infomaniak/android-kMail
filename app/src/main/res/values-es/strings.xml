@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Se ha enviado una confirmación de lectura al remitente.</string>
     <string name="actionArchive">Archivar</string>
     <string name="actionBlockSender">Bloquear remitente</string>
-    <string name="actionCallIfNoResponse">Recordarme si no hay respuesta</string>
+    <string name="actionCallIfNoResponse">Recordarme si no hay respuesta después de enviar</string>
     <string name="actionCancelSnooze">Cancelar el aplazamiento</string>
     <string name="actionDelete">Borrar</string>
     <string name="actionEditMenu">Menú Edición</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Todo el día</string>
     <string name="calendarNotInvited">No estás invitado</string>
     <string name="calendarOrganizerName">%s (Organizador)</string>
-    <string name="callIfNoResponseHeaderTitle">Recordarme si no hay respuesta: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Recordarme si no hay respuesta después de enviar: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Próximamente…</string>
     <string name="commercialFolder">Promociones</string>
@@ -243,7 +243,10 @@
     <string name="createFolderName">Nombre de la carpeta</string>
     <string name="datePickerTitle">Elige una fecha y hora</string>
     <string name="dateTitle">Fecha:</string>
-    <string name="daysBeforeSendingReminder">%d días</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
     <string name="deleteAccountWarning">La eliminación de su cuenta será definitiva. No podrá reactivar su cuenta.</string>
     <string name="deleteFolderDialogDescription">El contenido de la carpeta %s se borrará definitivamente sin pasar por la papelera.</string>
     <string name="deleteFolderDialogTitle">Eliminar la carpeta</string>
@@ -374,7 +377,10 @@
     <string name="genericMessageTranslated">Mensaje traducido</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="groupContactsTitle">Grupo: %s</string>
-    <string name="hoursBeforeSendingReminder">%d horas</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
     <string name="inboxFolder">Bandeja de entrada</string>
     <string name="kSuiteProQuotasAlertDescription">Tu espacio de almacenamiento de Mail está casi lleno. Modifica tu oferta para conseguir almacenamiento ilimitado y desbloquear nuevas funciones.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Tu espacio de almacenamiento de Mail está lleno. Modifica tu oferta para conseguir almacenamiento ilimitado y desbloquear nuevas funciones.</string>
@@ -735,13 +741,20 @@
     <string name="translationTargetSameAsSource">Este mensaje ya está en su idioma</string>
     <string name="trashFolder">Papelera</string>
     <string name="unblockButton">Desbloquear</string>
-    <string name="unitDays">Días</string>
-    <string name="unitHours">Horas</string>
+    <plurals name="unitDays">
+        <item quantity="one">Día</item>
+        <item quantity="other">Días</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Hora</item>
+        <item quantity="other">Horas</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Expedidor desconocido</string>
     <string name="unknownDialogTitleRecipient">Destinatario desconocido</string>
     <string name="unknownRecipientTitle">(desconocido)</string>
     <string name="unknownTag">Desconocido</string>
     <string name="unsubscribeButtonTitle">Cancelar suscripción</string>
+    <string name="urgencyReminderDescription">Recibe una notificación si tu destinatario no ha respondido antes de la fecha elegida.</string>
     <string name="urlEntryTitle">Crear un hiperenlace</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/f0daec0a-6950-4891-a064-7d040bdce127/</string>

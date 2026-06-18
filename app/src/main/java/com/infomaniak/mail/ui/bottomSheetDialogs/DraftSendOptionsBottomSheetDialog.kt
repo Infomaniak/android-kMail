@@ -136,9 +136,9 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     }
 
     private fun setupReminderOptions() = with(binding) {
-        hours24.setText(getString(R.string.hoursBeforeSendingReminder, HOURS_24.hours))
-        days3.setText(getString(R.string.daysBeforeSendingReminder, DAYS_3.hours / HOURS_IN_A_DAY))
-        days7.setText(getString(R.string.daysBeforeSendingReminder, DAYS_7.hours / HOURS_IN_A_DAY))
+        hours24.setText(resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, HOURS_24.hours, HOURS_24.hours))
+        days3.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, DAYS_3.hours / HOURS_IN_A_DAY, DAYS_3.hours / HOURS_IN_A_DAY))
+        days7.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, DAYS_7.hours / HOURS_IN_A_DAY, DAYS_7.hours / HOURS_IN_A_DAY))
 
         customDelayReminder.trailingContent = trailingContentFor(currentKSuite)
 

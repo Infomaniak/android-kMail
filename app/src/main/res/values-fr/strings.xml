@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Une confirmation de lecture a été envoyée à l’expéditeur.</string>
     <string name="actionArchive">Archiver</string>
     <string name="actionBlockSender">Bloquer l’expéditeur</string>
-    <string name="actionCallIfNoResponse">Me rappeler si pas de réponse</string>
+    <string name="actionCallIfNoResponse">Me rappeler si pas de réponse après envoi</string>
     <string name="actionCancelSnooze">Annuler la mise en attente</string>
     <string name="actionDelete">Supprimer</string>
     <string name="actionEditMenu">Modifier le menu</string>
@@ -137,7 +137,7 @@
     <string name="buttonCopyPassword">Copier le mot de passe</string>
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
-    <string name="buttonCustomReminder">Délais personnalisé</string>
+    <string name="buttonCustomReminder">Délai personnalisé</string>
     <string name="buttonCustomSchedule">Horaire personnalisé</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Toute la journée</string>
     <string name="calendarNotInvited">Vous ne faites pas partie des invités</string>
     <string name="calendarOrganizerName">%s (Organisateur)</string>
-    <string name="callIfNoResponseHeaderTitle">Me rappeler si pas de réponse : %s</string>
+    <string name="callIfNoResponseHeaderTitle">Me rappeler si pas de réponse après envoi : %s</string>
     <string name="ccTitle">Cc :</string>
     <string name="comingSoon">À venir…</string>
     <string name="commercialFolder">Promotions</string>
@@ -243,7 +243,10 @@
     <string name="createFolderName">Nom du dossier</string>
     <string name="datePickerTitle">Choisir une date et une heure</string>
     <string name="dateTitle">Date :</string>
-    <string name="daysBeforeSendingReminder">%d jours</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d jour</item>
+        <item quantity="other">%d jours</item>
+    </plurals>
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
     <string name="deleteFolderDialogDescription">Le contenu du dossier %s sera définitivement supprimé sans passer par la corbeille.</string>
     <string name="deleteFolderDialogTitle">Supprimer le dossier</string>
@@ -374,7 +377,10 @@
     <string name="genericMessageTranslated">Message traduit</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="groupContactsTitle">Groupe : %s</string>
-    <string name="hoursBeforeSendingReminder">%d heures</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d heure</item>
+        <item quantity="other">%d heures</item>
+    </plurals>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="kSuiteProQuotasAlertDescription">L’espace de stockage de votre Mail est bientôt plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
     <string name="kSuiteProQuotasAlertFullDescription">L’espace de stockage de votre Mail est plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
@@ -735,13 +741,20 @@
     <string name="translationTargetSameAsSource">Ce message est déjà dans votre langue</string>
     <string name="trashFolder">Corbeille</string>
     <string name="unblockButton">Débloquer</string>
-    <string name="unitDays">Jours</string>
-    <string name="unitHours">Heures</string>
+    <plurals name="unitDays">
+        <item quantity="one">Jour</item>
+        <item quantity="other">Jours</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Heure</item>
+        <item quantity="other">Heures</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Expéditeur inconnu</string>
     <string name="unknownDialogTitleRecipient">Destinataire inconnu</string>
     <string name="unknownRecipientTitle">(inconnu)</string>
     <string name="unknownTag">Inconnu</string>
     <string name="unsubscribeButtonTitle">Se désabonner</string>
+    <string name="urgencyReminderDescription">Soyez notifié si votre destinataire n’a pas répondu à une date souhaitée.</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>

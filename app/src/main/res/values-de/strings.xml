@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Es wurde eine Lesebestätigung an den Absender gesendet.</string>
     <string name="actionArchive">Archiv</string>
     <string name="actionBlockSender">Absender blockieren</string>
-    <string name="actionCallIfNoResponse">Erinnere mich, wenn es keine Antwort gibt</string>
+    <string name="actionCallIfNoResponse">Erinnern, wenn nach dem Senden keine Antwort kommt</string>
     <string name="actionCancelSnooze">Schlummern abbrechen</string>
     <string name="actionDelete">Löschen</string>
     <string name="actionEditMenu">Menü Bearbeiten</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Gesamter Tag</string>
     <string name="calendarNotInvited">Sie zählen nicht zu den eingeladenen Personen</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>
-    <string name="callIfNoResponseHeaderTitle">Erinnere mich, wenn es keine Antwort gibt: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Mich erinnern, wenn nach dem Senden keine Antwort erfolgt: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Demnächst…</string>
     <string name="commercialFolder">Werbeaktionen</string>
@@ -243,7 +243,10 @@
     <string name="createFolderName">Name des Ordners</string>
     <string name="datePickerTitle">Wählen Sie ein Datum und eine Uhrzeit</string>
     <string name="dateTitle">Datum:</string>
-    <string name="daysBeforeSendingReminder">%d Tage</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
+    </plurals>
     <string name="deleteAccountWarning">Die Löschung Ihres Kontos ist endgültig. Sie werden nicht in der Lage sein, Ihr Konto zu reaktivieren.</string>
     <string name="deleteFolderDialogDescription">Der Inhalt des Ordners %s wird dauerhaft gelöscht, ohne den Papierkorb zu durchlaufen.</string>
     <string name="deleteFolderDialogTitle">Löschen Sie den Ordner</string>
@@ -374,7 +377,10 @@
     <string name="genericMessageTranslated">Nachricht übersetzt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
-    <string name="hoursBeforeSendingReminder">%d Stunden</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d Stunde</item>
+        <item quantity="other">%d Stunden</item>
+    </plurals>
     <string name="inboxFolder">Posteingang</string>
     <string name="kSuiteProQuotasAlertDescription">Der Speicherplatz in Ihrer Mail ist bald voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Der Speicherplatz in Ihrer Mail ist voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>
@@ -735,13 +741,20 @@
     <string name="translationTargetSameAsSource">Diese Nachricht ist bereits in Ihrer Sprache</string>
     <string name="trashFolder">Papierkorb</string>
     <string name="unblockButton">Entsperren</string>
-    <string name="unitDays">Tage</string>
-    <string name="unitHours">Stunden</string>
+    <plurals name="unitDays">
+        <item quantity="one">Tag</item>
+        <item quantity="other">Tage</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Stunde</item>
+        <item quantity="other">Stunden</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Unbekannter Spediteur</string>
     <string name="unknownDialogTitleRecipient">Unbekannter Empfänger</string>
     <string name="unknownRecipientTitle">(unbekannt)</string>
     <string name="unknownTag">Unbekannt</string>
     <string name="unsubscribeButtonTitle">Abbestellen</string>
+    <string name="urgencyReminderDescription">Benachrichtigung erhalten, wenn Ihr Empfänger bis zum gewählten Datum nicht geantwortet hat.</string>
     <string name="urlEntryTitle">Einen Hyperlink erstellen</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/8f405fa0-e5b0-49e7-85d8-477b64ea48f7/</string>

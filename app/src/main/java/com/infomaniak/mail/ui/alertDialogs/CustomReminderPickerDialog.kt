@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogCustomReminderPickerBinding
@@ -67,15 +66,20 @@ class CustomReminderPickerDialog @Inject constructor(
         numberPicker.maxValue = timeUnits[0].maxValue
         numberPicker.wrapSelectorWheel = true
 
-        val displayedUnits = timeUnits.map { activityContext.getString(it.titleRes) }.toTypedArray()
-
         unitPicker.minValue = 0
-        unitPicker.maxValue = displayedUnits.size - 1
-        unitPicker.displayedValues = displayedUnits
+        unitPicker.maxValue = timeUnits.size - 1
         unitPicker.wrapSelectorWheel = false
+
+        updateUnitLabels(numberPicker.value)
     }
 
     private fun setupListeners() = with(binding) {
+        numberPicker.setOnValueChangedListener { _, oldVal, newVal ->
+            if ((oldVal == 1 && newVal > 1) || (oldVal > 1 && newVal == 1)) {
+                updateUnitLabels(newVal)
+            }
+        }
+
         unitPicker.setOnValueChangedListener { _, _, newUnitIndex ->
             val selectedUnit = timeUnits[newUnitIndex]
             numberPicker.maxValue = selectedUnit.maxValue
@@ -87,6 +91,14 @@ class CustomReminderPickerDialog @Inject constructor(
         }
 
         negativeButton.setOnClickListener { alertDialog.cancel() }
+    }
+
+    private fun updateUnitLabels(currentNumber: Int) {
+        val displayedUnits = timeUnits.map {
+            activityContext.resources.getQuantityString(it.titleRes, currentNumber)
+        }.toTypedArray()
+
+        binding.unitPicker.displayedValues = displayedUnits
     }
 
     private fun getDelayMillis(): Long {
@@ -107,8 +119,8 @@ class CustomReminderPickerDialog @Inject constructor(
             val maxValue: Int,
             val multiplierInMillis: Long
         ) {
-            HOURS(R.string.unitHours, MAX_HOURS, ONE_HOUR_IN_MILLIS),
-            DAYS(R.string.unitDays, MAX_DAYS, DAY_IN_MILLIS)
+            HOURS(R.plurals.unitHours, MAX_HOURS, ONE_HOUR_IN_MILLIS),
+            DAYS(R.plurals.unitDays, MAX_DAYS, DAY_IN_MILLIS)
         }
     }
 }

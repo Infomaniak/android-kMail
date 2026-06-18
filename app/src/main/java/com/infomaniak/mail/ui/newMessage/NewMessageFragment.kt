@@ -497,9 +497,9 @@ class NewMessageFragment : Fragment() {
                 is ReminderConfig.Preset -> {
                     val hours = config.delayHours.hours
                     val dateText = if (hours % HOURS_IN_A_DAY == 0 && hours > HOURS_IN_A_DAY) {
-                        getString(R.string.daysBeforeSendingReminder, hours / HOURS_IN_A_DAY)
+                        resources.getQuantityString(R.plurals.daysBeforeSendingReminder, hours / HOURS_IN_A_DAY, hours / HOURS_IN_A_DAY)
                     } else {
-                        getString(R.string.hoursBeforeSendingReminder, hours)
+                        resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, hours, hours)
                     }
                     binding.reminderAlert.apply {
                         setDescription(getString(R.string.callIfNoResponseHeaderTitle, dateText))
