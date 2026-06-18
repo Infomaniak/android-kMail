@@ -122,3 +122,34 @@ function insertMention(userMail, userName) {
     selection.removeAllRanges();
     selection.addRange(newCaretRange);
 }
+
+function observeEditorMentionClicks() {
+    if (document.kmailEditorMentionClickObserved) return;
+    document.kmailEditorMentionClickObserved = true;
+
+    const closestMention = (node) =>
+        node instanceof Element ? node.closest("a[data-ik-mention-ref]") : null;
+
+    // Tapping a mention must not blur the editor, otherwise the Android keyboard (IME) closes.
+    // Preventing the default on the pointer-down event stops the WebView from moving the
+    // focus/caret onto the non-editable mention, keeping the editor focused and the IME open.
+    const keepEditorFocused = (event) => {
+        if (closestMention(event.target)) event.preventDefault();
+    };
+    document.addEventListener("mousedown", keepEditorFocused, true);
+    document.addEventListener("touchstart", keepEditorFocused, { capture: true, passive: false });
+
+    // Never navigate to the mailto link when a mention is tapped.
+    document.addEventListener(
+        "click",
+        (event) => {
+            if (closestMention(event.target)) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        },
+        true
+    );
+}
+
+observeEditorMentionClicks();

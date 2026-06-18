@@ -13,5 +13,7 @@ body {
 }
 
 a[data-ik-mention-ref] {
-    pointer-events: none;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
 }
