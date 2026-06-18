@@ -339,7 +339,6 @@
     <string name="errorRefusedRecipients">Ο διακομιστής απορρίπτει όλους τους παραλήπτες</string>
     <string name="errorRefusedSender">Ο διακομιστής απορρίπτει τον αποστολέα</string>
     <string name="errorReminderDelayTooShort">Η υπενθύμιση πρέπει να είναι τουλάχιστον %d ώρα στο μέλλον</string>
-    <string name="errorReminderTooCloseToSchedule">Η υπενθύμιση πρέπει να οριστεί τουλάχιστον %d ώρα μετά την προγραμματισμένη αποστολή.</string>
     <string name="errorScheduleDelayTooShort">Δεν μπορείτε να προγραμματίσετε email σε λιγότερο από %d λεπτά</string>
     <string name="errorScheduledSnoozeDelayTooShort">Ο ελάχιστος χρόνος αναμονής για email είναι %d λεπτά</string>
     <string name="errorSendLimitExceeded">Έχει επιτευχθεί το όριο αποστολής</string>
@@ -736,6 +735,8 @@
     <string name="translationTargetSameAsSource">Αυτό το μήνυμα είναι ήδη στη γλώσσα σας</string>
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
+    <string name="unitDays">Ημέρες</string>
+    <string name="unitHours">Ώρες</string>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>
     <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>

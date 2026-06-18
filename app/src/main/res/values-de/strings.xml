@@ -339,7 +339,6 @@
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>
     <string name="errorReminderDelayTooShort">Die Erinnerung muss mindestens %d Stunde in der Zukunft liegen</string>
-    <string name="errorReminderTooCloseToSchedule">Die Erinnerung muss mindestens %d Stunde nach dem geplanten Versandzeitpunkt liegen.</string>
     <string name="errorScheduleDelayTooShort">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</string>
     <string name="errorScheduledSnoozeDelayTooShort">Die Mindestzeit zum Schlummern einer E-Mail beträgt %d Minuten</string>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
@@ -736,6 +735,8 @@
     <string name="translationTargetSameAsSource">Diese Nachricht ist bereits in Ihrer Sprache</string>
     <string name="trashFolder">Papierkorb</string>
     <string name="unblockButton">Entsperren</string>
+    <string name="unitDays">Tage</string>
+    <string name="unitHours">Stunden</string>
     <string name="unknownDialogTitleExpeditor">Unbekannter Spediteur</string>
     <string name="unknownDialogTitleRecipient">Unbekannter Empfänger</string>
     <string name="unknownRecipientTitle">(unbekannt)</string>

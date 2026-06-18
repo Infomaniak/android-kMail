@@ -339,7 +339,6 @@
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
     <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>
     <string name="errorReminderDelayTooShort">Le rappel doit être fixé au moins %d heure dans le futur</string>
-    <string name="errorReminderTooCloseToSchedule">Le rappel doit être fixé au moins %d heure après l’envoi programmé.</string>
     <string name="errorScheduleDelayTooShort">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</string>
     <string name="errorScheduledSnoozeDelayTooShort">Le délai minimum pour mettre un e-mail en attente est de %d minutes</string>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>
@@ -736,6 +735,8 @@
     <string name="translationTargetSameAsSource">Ce message est déjà dans votre langue</string>
     <string name="trashFolder">Corbeille</string>
     <string name="unblockButton">Débloquer</string>
+    <string name="unitDays">Jours</string>
+    <string name="unitHours">Heures</string>
     <string name="unknownDialogTitleExpeditor">Expéditeur inconnu</string>
     <string name="unknownDialogTitleRecipient">Destinataire inconnu</string>
     <string name="unknownRecipientTitle">(inconnu)</string>

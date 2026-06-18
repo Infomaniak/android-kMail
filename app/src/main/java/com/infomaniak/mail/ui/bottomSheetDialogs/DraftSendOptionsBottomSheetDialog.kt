@@ -32,16 +32,21 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetSendOptionsBinding
+import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
-import com.infomaniak.mail.ui.newMessage.DelayHours
+import com.infomaniak.mail.ui.newMessage.DelayHours.DAYS_3
+import com.infomaniak.mail.ui.newMessage.DelayHours.DAYS_7
+import com.infomaniak.mail.ui.newMessage.DelayHours.HOURS_24
+import com.infomaniak.mail.ui.newMessage.HOURS_IN_A_DAY
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.ui.newMessage.ReminderConfig
 import com.infomaniak.mail.ui.newMessage.ScheduleConfig
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
+import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
 import com.infomaniak.mail.utils.extensions.applyContentPaddingStart
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
@@ -60,6 +65,9 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
 
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
+
+    @Inject
+    lateinit var customReminderPickerDialog: CustomReminderPickerDialog
 
     override val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
 
@@ -83,6 +91,7 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         super.onViewCreated(view, savedInstanceState)
 
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
         setupScheduleOptions()
         hasLastScheduleOption = lastScheduleOption.isVisible
@@ -113,24 +122,11 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         }
     }
 
-    private fun validateReminderAgainstSchedule() {
-        val schedule = (newMessageViewModel.scheduleConfig.value as? ScheduleConfig.Scheduled)?.epochMillis ?: return
-        val reminder = newMessageViewModel.reminderConfig.value
-
-        if (reminder is ReminderConfig.Custom && reminder.epochMillis <= schedule) {
-            newMessageViewModel.reminderConfig.value = ReminderConfig.Preset(DelayHours.HOURS_24)
-            binding.customDelayReminder.removeSubtitle()
-            binding.customDelayReminder.setCheckMark(displayCheckMark = false)
-            binding.optionsDelays.check(R.id.hours24)
-        }
-    }
-
     private fun setupScheduleSelection() = with(binding) {
         scheduleOptions.onItemCheckedListener { _, value, _ ->
             val epoch = value?.toLongOrNull()
             newMessageViewModel.scheduleConfig.value =
                 if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None
-            validateReminderAgainstSchedule()
             binding.customScheduleOption.setCheckMark(displayCheckMark = false)
             binding.customScheduleOption.removeSubtitle()
         }
@@ -140,9 +136,9 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     }
 
     private fun setupReminderOptions() = with(binding) {
-        hours24.setText(getString(R.string.hoursBeforeSendingReminder, 24))
-        days3.setText(getString(R.string.daysBeforeSendingReminder, 3))
-        days7.setText(getString(R.string.daysBeforeSendingReminder, 7))
+        hours24.setText(getString(R.string.hoursBeforeSendingReminder, HOURS_24.hours))
+        days3.setText(getString(R.string.daysBeforeSendingReminder, DAYS_3.hours / HOURS_IN_A_DAY))
+        days7.setText(getString(R.string.daysBeforeSendingReminder, DAYS_7.hours / HOURS_IN_A_DAY))
 
         customDelayReminder.trailingContent = trailingContentFor(currentKSuite)
 
@@ -152,9 +148,9 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         optionsDelays.onItemCheckedListener { _, value, _ ->
             val hours = value?.toIntOrNull()
             val delay = when (hours) {
-                24 -> DelayHours.HOURS_24
-                72 -> DelayHours.DAYS_3
-                168 -> DelayHours.DAYS_7
+                HOURS_24.hours -> HOURS_24
+                DAYS_3.hours -> DAYS_3
+                DAYS_7.hours -> DAYS_7
                 else -> null
             }
             newMessageViewModel.reminderConfig.value = delay?.let { ReminderConfig.Preset(it) } ?: ReminderConfig.None
@@ -253,18 +249,17 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
 
         when (savedReminder) {
             is ReminderConfig.Custom -> {
-                customDelayReminder.setSubtitle(requireContext().dayOfWeekDateWithoutYear(Date(savedReminder.epochMillis)))
+                customDelayReminder.setSubtitle(requireContext().formatDelayText(savedReminder.delayMillis))
                 customDelayReminder.setCheckMark(displayCheckMark = true)
             }
             is ReminderConfig.Preset -> {
                 val targetId = when (savedReminder.delayHours) {
-                    DelayHours.HOURS_24 -> R.id.hours24
-                    DelayHours.DAYS_3 -> R.id.days3
-                    DelayHours.DAYS_7 -> R.id.days7
+                    HOURS_24 -> R.id.hours24
+                    DAYS_3 -> R.id.days3
+                    DAYS_7 -> R.id.days7
                 }
                 optionsDelays.check(targetId)
             }
-            is ReminderConfig.None -> Unit
             else -> Unit
         }
     }
@@ -295,26 +290,18 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
                 newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(timestamp)
                 applyCustomDateSelectionUi(timestamp, binding.customScheduleOption, binding.scheduleOptions)
-                validateReminderAgainstSchedule()
             },
         )
     }
 
     private fun showCustomDelayReminderDatePicker() {
-        val scheduleEpoch = (newMessageViewModel.scheduleConfig.value as? ScheduleConfig.Scheduled)?.epochMillis
-        dateAndTimeScheduleDialog.show(
-            scheduleDateMillis = scheduleEpoch,
-            isForReminder = true,
-            onDateSelected = { timestamp ->
+        customReminderPickerDialog.show(
+            onDelaySelected = { delayMillis ->
                 trackScheduleSendEvent(MatomoName.CustomReminder)
-                if (scheduleEpoch != null && timestamp <= scheduleEpoch) {
-                    newMessageViewModel.reminderConfig.value = ReminderConfig.Preset(DelayHours.HOURS_24)
-                    binding.optionsDelays.check(R.id.hours24)
-                    binding.customDelayReminder.setCheckMark(displayCheckMark = false)
-                } else {
-                    newMessageViewModel.reminderConfig.value = ReminderConfig.Custom(timestamp)
-                    applyCustomDateSelectionUi(timestamp, binding.customDelayReminder, binding.optionsDelays)
-                }
+                newMessageViewModel.reminderConfig.value = ReminderConfig.Custom(delayMillis)
+                binding.customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMillis))
+                binding.customDelayReminder.setCheckMark(displayCheckMark = true)
+                binding.optionsDelays.clearCheck()
             },
         )
     }
