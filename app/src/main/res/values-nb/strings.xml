@@ -387,6 +387,8 @@
     <string name="manageSignatures">Administrer signaturer</string>
     <string name="menuDrawerAdvancedActions">Avanserte handlinger</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s brukt</string>
+    <string name="messageAlreadySummarized">Meldingen er allerede oppsummert</string>
+    <string name="messageAlreadyTranslated">Meldingen er allerede oversatt</string>
     <string name="messageComesFromDiscussionList">Denne meldingen kommer fra en diskusjonsliste.</string>
     <string name="messageDetailsDateAt">%1$s kl. %2$s</string>
     <string name="messageDetailsYesterday">I går</string>

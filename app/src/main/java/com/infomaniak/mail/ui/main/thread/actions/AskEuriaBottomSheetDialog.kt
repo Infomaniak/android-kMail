@@ -28,6 +28,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
 
@@ -44,17 +45,14 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.summary.isEnabled = !isAlreadySummarized
-        binding.translate.isEnabled = !isAlreadyTranslated
-
         binding.summary.setOnClickListener {
             trackBottomSheetThreadActionsEvent(MatomoName.Summarize)
-            setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, messageUid)
+            setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, isAlreadySummarized))
         }
 
         binding.translate.setOnClickListener {
             trackBottomSheetThreadActionsEvent(MatomoName.Translate)
-            setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, messageUid)
+            setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, AiActionNavigationResult(messageUid, isAlreadyTranslated))
         }
     }
 }

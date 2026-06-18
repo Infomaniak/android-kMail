@@ -387,6 +387,8 @@
     <string name="manageSignatures">Mijn handtekeningen beheren</string>
     <string name="menuDrawerAdvancedActions">Geavanceerde acties</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s gebruikt</string>
+    <string name="messageAlreadySummarized">Het bericht is al samengevat</string>
+    <string name="messageAlreadyTranslated">Het bericht is al vertaald</string>
     <string name="messageComesFromDiscussionList">Dit bericht komt van een discussielijst.</string>
     <string name="messageDetailsDateAt">%1$s om %2$s</string>
     <string name="messageDetailsYesterday">Gisteren</string>

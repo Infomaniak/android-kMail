@@ -105,8 +105,8 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiBodyUpdate
-import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.AskEuriaBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
@@ -836,12 +836,20 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
 
-        getBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET) { messageUid: String ->
-            aiActionsViewModel.doAiAction(messageUid, AiAction.SUMMARY)
+        getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_SUMMARY_BOTTOM_SHEET) { (messageUid, isAlreadySummarized) ->
+            if (isAlreadySummarized) {
+                snackbarManager.setValue(getString(R.string.messageAlreadySummarized))
+            } else {
+                aiActionsViewModel.doAiAction(messageUid, AiAction.SUMMARY)
+            }
         }
 
-        getBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET) { messageUid: String ->
-            aiActionsViewModel.doAiAction(messageUid, AiAction.TRANSLATE)
+        getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_TRANSLATE_BOTTOM_SHEET) { (messageUid, isAlreadyTranslated) ->
+            if (isAlreadyTranslated) {
+                snackbarManager.setValue(getString(R.string.messageAlreadyTranslated))
+            } else {
+                aiActionsViewModel.doAiAction(messageUid, AiAction.TRANSLATE)
+            }
         }
     }
 

@@ -323,6 +323,7 @@ object MatomoMail : Matomo {
         StrikeThrough("strikeThrough"),
         Summarize("summarize"),
         Translate("translate"),
+        AskEuria("askEuria"),
         Switch("switch"),
         SwitchAccount("switchAccount"),
         SwitchColor("switchColor"),

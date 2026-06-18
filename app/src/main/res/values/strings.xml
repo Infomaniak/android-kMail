@@ -391,6 +391,8 @@
     <string name="manageSignatures">Manage my signatures</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
+    <string name="messageAlreadySummarized">The message is already summarized</string>
+    <string name="messageAlreadyTranslated">The message is already translated</string>
     <string name="messageComesFromDiscussionList">This message comes from a discussion list.</string>
     <string name="messageDetailsDateAt">%1$s at %2$s</string>
     <string name="messageDetailsYesterday">Yesterday</string>
