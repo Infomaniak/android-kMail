@@ -27,7 +27,7 @@
     <string name="acknowledgementMessageSent">A read receipt has been sent to the sender.</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
-    <string name="actionCallIfNoResponse">Remind me if there is no answer</string>
+    <string name="actionCallIfNoResponse">Remind me if there is no response after sending</string>
     <string name="actionCancelSnooze">Cancel snooze</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
@@ -184,7 +184,7 @@
     <string name="calendarAllDayLong">All day long</string>
     <string name="calendarNotInvited">You are not invited</string>
     <string name="calendarOrganizerName">%s (Organizer)</string>
-    <string name="callIfNoResponseHeaderTitle">Remind me if there is no answer: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Remind me if there is no response after sending: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
@@ -248,7 +248,10 @@
     <string name="createFolderName">Name of the folder</string>
     <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
-    <string name="daysBeforeSendingReminder">%d days</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
     <string name="deleteFolderDialogDescription">The contents of the folder %s will be permanently deleted without going through the trash.</string>
     <string name="deleteFolderDialogTitle">Delete folder</string>
@@ -379,7 +382,10 @@
     <string name="genericMessageTranslated">Message translated</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="groupContactsTitle">Group: %s</string>
-    <string name="hoursBeforeSendingReminder">%d hours</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
     <string name="inboxFolder">Inbox</string>
     <string name="kSuiteProQuotasAlertDescription">Your Mail storage space is almost full. Upgrade to unlimited storage and unlock new features.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Your Mail storage space is full. Upgrade to unlimited storage and unlock new features.</string>
@@ -495,7 +501,7 @@
         <item quantity="one">%1$s is awaiting a reply by %2$s</item>
         <item quantity="other">%1$s are awaiting a reply by %2$s</item>
     </plurals>
-    <string name="reminderBottomSheetTitle">Snooze the reminder</string>
+    <string name="reminderBottomSheetTitle">Delay the reminder</string>
     <string name="reminderFollowUpButton">Follow up</string>
     <string name="reminderFollowUpPlaceholderText">Hello,\nIs it possible to get some feedback on this subject?\nThank you in advance.</string>
     <string name="reminderNoResponseHeaderTitle">Reminder: no response from %1$s to this email since %2$s</string>
@@ -739,13 +745,20 @@
     <string name="trashFolder">Trash</string>
     <string name="tryAgain">Please try again.</string>
     <string name="unblockButton">Unblock</string>
-    <string name="unitDays">Days</string>
-    <string name="unitHours">Hours</string>
+    <plurals name="unitDays">
+        <item quantity="one">Day</item>
+        <item quantity="other">Days</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Hour</item>
+        <item quantity="other">Hours</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Unknown expeditor</string>
     <string name="unknownDialogTitleRecipient">Unknown recipient</string>
     <string name="unknownRecipientTitle">(unknown)</string>
     <string name="unknownTag">Unknown</string>
     <string name="unsubscribeButtonTitle">Unsubscribe</string>
+    <string name="urgencyReminderDescription">Get notified if your recipient hasn’t replied by a chosen date.</string>
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

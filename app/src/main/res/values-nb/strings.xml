@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Lesebekreftelse er sendt til avsenderen.</string>
     <string name="actionArchive">Arkiver</string>
     <string name="actionBlockSender">Blokker avsender</string>
-    <string name="actionCallIfNoResponse">Minn meg på det hvis det ikke kommer svar</string>
+    <string name="actionCallIfNoResponse">Påminn meg hvis det ikke kommer svar etter sending</string>
     <string name="actionCancelSnooze">Avbryt utsettelse</string>
     <string name="actionDelete">Slett</string>
     <string name="actionEditMenu">Rediger meny</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Hele dagen</string>
     <string name="calendarNotInvited">Du er ikke invitert</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>
-    <string name="callIfNoResponseHeaderTitle">Minn meg på det hvis det ikke kommer svar: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Påminn meg hvis det ikke kommer svar etter sending: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
@@ -244,7 +244,10 @@
     <string name="createFolderName">Navn på mappen</string>
     <string name="datePickerTitle">Velg dato og tid</string>
     <string name="dateTitle">Dato:</string>
-    <string name="daysBeforeSendingReminder">%d dager</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dager</item>
+    </plurals>
     <string name="deleteAccountWarning">Sletting av kontoen din vil være endelig. Du vil ikke kunne reaktivere kontoen din.</string>
     <string name="deleteFolderDialogDescription">Innholdet i mappen %s vil bli permanent slettet uten å gå via papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slett mappe</string>
@@ -375,7 +378,10 @@
     <string name="genericMessageTranslated">Melding oversatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services kreves</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
-    <string name="hoursBeforeSendingReminder">%d timer</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
     <string name="inboxFolder">Innboks</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagringsplass er nesten full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagringsplass er full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
@@ -491,7 +497,7 @@
         <item quantity="one">%1$s avventer svar innen %2$s</item>
         <item quantity="other">%1$s avventer svar innen %2$s</item>
     </plurals>
-    <string name="reminderBottomSheetTitle">Utsett påminnelse</string>
+    <string name="reminderBottomSheetTitle">Utsett påminnelsen</string>
     <string name="reminderFollowUpButton">Følg opp</string>
     <string name="reminderFollowUpPlaceholderText">Hei,\nEr det mulig å få tilbakemelding om dette emnet?\nPå forhånd takk.</string>
     <string name="reminderNoResponseHeaderTitle">Påminnelse: ingen respons fra %1$s på denne e-posten siden %2$s</string>
@@ -735,13 +741,20 @@
     <string name="trashFolder">Papirkurv</string>
     <string name="tryAgain">Vennligst prøv igjen.</string>
     <string name="unblockButton">Opphev blokkering</string>
-    <string name="unitDays">Dager</string>
-    <string name="unitHours">Timer</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dager</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Time</item>
+        <item quantity="other">Timer</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Ukjent avsender</string>
     <string name="unknownDialogTitleRecipient">Ukjent mottaker</string>
     <string name="unknownRecipientTitle">(ukjent)</string>
     <string name="unknownTag">Ukjent</string>
     <string name="unsubscribeButtonTitle">Meld av</string>
+    <string name="urgencyReminderDescription">Få beskjed hvis mottakeren din ikke har svart innen en valgt dato.</string>
     <string name="urlEntryTitle">Opprett en hyperlenke</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

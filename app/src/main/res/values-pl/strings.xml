@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Potwierdzenie przeczytania zostało wysłane do nadawcy.</string>
     <string name="actionArchive">Archiwizuj</string>
     <string name="actionBlockSender">Zablokuj nadawcę</string>
-    <string name="actionCallIfNoResponse">Przypomnij mi, jeśli nie ma odpowiedzi</string>
+    <string name="actionCallIfNoResponse">Przypomnij mi, jeśli nie będzie odpowiedzi po wysłaniu</string>
     <string name="actionCancelSnooze">Anuluj uśpienie</string>
     <string name="actionDelete">Usuń</string>
     <string name="actionEditMenu">Edytuj menu</string>
@@ -186,7 +186,7 @@
     <string name="calendarAllDayLong">Cały dzień</string>
     <string name="calendarNotInvited">Nie jesteś zaproszony</string>
     <string name="calendarOrganizerName">%s (Organizator)</string>
-    <string name="callIfNoResponseHeaderTitle">Przypomnij mi, jeśli nie ma odpowiedzi: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Przypomnij mi, jeśli nie będzie odpowiedzi po wysłaniu: %s</string>
     <string name="ccTitle">DW:</string>
     <string name="comingSoon">Wkrótce…</string>
     <string name="commercialFolder">Promocje</string>
@@ -250,7 +250,10 @@
     <string name="createFolderName">Nazwa folderu</string>
     <string name="datePickerTitle">Wybierz datę i godzinę</string>
     <string name="dateTitle">Data:</string>
-    <string name="daysBeforeSendingReminder">%d dni</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dzień</item>
+        <item quantity="few">%d dni</item>
+    </plurals>
     <string name="deleteAccountWarning">Usunięcie konta będzie ostateczne. Nie będziesz mógł/ mogła ponownie aktywować konta.</string>
     <string name="deleteFolderDialogDescription">Zawartość folderu %s zostanie trwale usunięta bez przenoszenia do kosza.</string>
     <string name="deleteFolderDialogTitle">Usuń folder</string>
@@ -389,7 +392,10 @@
     <string name="genericMessageTranslated">Wiadomość przetłumaczona</string>
     <string name="googlePlayServicesAreRequired">Wymagane są Usługi Google Play</string>
     <string name="groupContactsTitle">Grupa: %s</string>
-    <string name="hoursBeforeSendingReminder">%d godzin</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d godzina</item>
+        <item quantity="few">%d godziny</item>
+    </plurals>
     <string name="inboxFolder">Skrzynka odbiorcza</string>
     <string name="kSuiteProQuotasAlertDescription">Miejsce do przechowywania Twojej poczty jest prawie pełne. Przejdź na nieograniczoną przestrzeń i odblokuj nowe funkcje.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Miejsce do przechowywania Twojej poczty jest pełne. Przejdź na nieograniczoną przestrzeń i odblokuj nowe funkcje.</string>
@@ -517,7 +523,7 @@
         <item quantity="many">%1$s czeka na odpowiedź do %2$s</item>
         <item quantity="other">%1$s czekają na odpowiedź do %2$s</item>
     </plurals>
-    <string name="reminderBottomSheetTitle">Odłóż przypomnienie</string>
+    <string name="reminderBottomSheetTitle">Opóźnij przypomnienie</string>
     <string name="reminderFollowUpButton">Przypomnij</string>
     <string name="reminderFollowUpPlaceholderText">Cześć,\nCzy możliwe jest uzyskanie informacji zwrotnej na ten temat?\nZ góry dziękuję.</string>
     <string name="reminderNoResponseHeaderTitle">Przypomnienie: brak odpowiedzi od %1$s na ten e-mail od %2$s</string>
@@ -793,13 +799,20 @@
     <string name="trashFolder">Kosz</string>
     <string name="tryAgain">Spróbuj ponownie.</string>
     <string name="unblockButton">Odblokuj</string>
-    <string name="unitDays">Dni</string>
-    <string name="unitHours">Godziny</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dzień</item>
+        <item quantity="few">Dni</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Godzina</item>
+        <item quantity="few">Godziny</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Nieznany nadawca</string>
     <string name="unknownDialogTitleRecipient">Nieznany odbiorca</string>
     <string name="unknownRecipientTitle">(nieznany)</string>
     <string name="unknownTag">Nieznane</string>
     <string name="unsubscribeButtonTitle">Wypisz się</string>
+    <string name="urgencyReminderDescription">Otrzymaj powiadomienie, jeśli twój odbiorca nie odpowie do wybranej daty.</string>
     <string name="urlEntryTitle">Utwórz hiperłącze</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Μια απόδειξη ανάγνωσης στάλθηκε στον αποστολέα.</string>
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
-    <string name="actionCallIfNoResponse">Θύμισέ μου αν δεν υπάρξει απάντηση</string>
+    <string name="actionCallIfNoResponse">Υπενθύμισέ μου αν δεν υπάρξει απάντηση μετά την αποστολή</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
     <string name="actionDelete">Διαγραφή</string>
     <string name="actionEditMenu">Επεξεργασία μενού</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Όλη την ημέρα</string>
     <string name="calendarNotInvited">Δεν είστε προσκεκλημένος</string>
     <string name="calendarOrganizerName">%s (Διοργανωτής)</string>
-    <string name="callIfNoResponseHeaderTitle">Θύμισέ μου αν δεν υπάρξει απάντηση: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Υπενθύμισέ μου αν δεν υπάρξει απάντηση μετά την αποστολή: %s</string>
     <string name="ccTitle">Κοινοποίηση:</string>
     <string name="comingSoon">Έρχεται σύντομα…</string>
     <string name="commercialFolder">Προσφορές</string>
@@ -244,7 +244,10 @@
     <string name="createFolderName">Όνομα φακέλου</string>
     <string name="datePickerTitle">Επιλέξτε ημερομηνία και ώρα</string>
     <string name="dateTitle">Ημερομηνία:</string>
-    <string name="daysBeforeSendingReminder">%d ημέρες</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d μέρα</item>
+        <item quantity="other">%d μέρες</item>
+    </plurals>
     <string name="deleteAccountWarning">Η διαγραφή του λογαριασμού σας θα είναι οριστική. Δεν θα μπορείτε να τον επανενεργοποιήσετε.</string>
     <string name="deleteFolderDialogDescription">Το περιεχόμενο του φακέλου %s θα διαγραφεί οριστικά χωρίς να μεταφερθεί στον κάδο απορριμμάτων.</string>
     <string name="deleteFolderDialogTitle">Διαγραφή φακέλου</string>
@@ -375,7 +378,10 @@
     <string name="genericMessageTranslated">Μήνυμα μεταφρασμένο</string>
     <string name="googlePlayServicesAreRequired">Απαιτούνται οι Υπηρεσίες Google Play</string>
     <string name="groupContactsTitle">Ομάδα: %s</string>
-    <string name="hoursBeforeSendingReminder">%d ώρες</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d ώρα</item>
+        <item quantity="other">%d ώρες</item>
+    </plurals>
     <string name="inboxFolder">Εισερχόμενα</string>
     <string name="kSuiteProQuotasAlertDescription">Ο χώρος αποθήκευσης του Mail σας είναι σχεδόν πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Ο χώρος αποθήκευσης του Mail σας είναι πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
@@ -491,7 +497,7 @@
         <item quantity="one">%1$s περιμένει απάντηση έως %2$s</item>
         <item quantity="other">%1$s περιμένουν απάντηση έως %2$s</item>
     </plurals>
-    <string name="reminderBottomSheetTitle">Αναβολή υπενθύμισης</string>
+    <string name="reminderBottomSheetTitle">Αναβολή της υπενθύμισης</string>
     <string name="reminderFollowUpButton">Παρακολούθηση</string>
     <string name="reminderFollowUpPlaceholderText">Γεια σας,\nΕίναι δυνατόν να λάβετε κάποια ανατροφοδότηση για αυτό το θέμα;\nΣας ευχαριστώ εκ των προτέρων.</string>
     <string name="reminderNoResponseHeaderTitle">Υπενθύμιση: καμία απάντηση από %1$s σε αυτό το email από τις %2$s</string>
@@ -735,13 +741,20 @@
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="tryAgain">Παρακαλώ, δοκιμάστε ξανά.</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
-    <string name="unitDays">Ημέρες</string>
-    <string name="unitHours">Ώρες</string>
+    <plurals name="unitDays">
+        <item quantity="one">Ημέρα</item>
+        <item quantity="other">Ημέρες</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Ώρα</item>
+        <item quantity="other">Ώρες</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>
     <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>
     <string name="unknownTag">Άγνωστο</string>
     <string name="unsubscribeButtonTitle">Κατάργηση εγγραφής</string>
+    <string name="urgencyReminderDescription">Ενημερωθείτε εάν ο παραλήπτης σας δεν έχει απαντήσει μέχρι μια επιλεγμένη ημερομηνία.</string>
     <string name="urlEntryTitle">Δημιουργία υπερσύνδεσμου</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

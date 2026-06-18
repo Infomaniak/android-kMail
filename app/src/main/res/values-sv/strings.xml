@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Ett läskvitto har skickats till avsändaren.</string>
     <string name="actionArchive">Arkivera</string>
     <string name="actionBlockSender">Blockera avsändare</string>
-    <string name="actionCallIfNoResponse">Påminn mig om det inte finns något svar</string>
+    <string name="actionCallIfNoResponse">Påminn mig om jag inte får svar efter att ha skickat</string>
     <string name="actionCancelSnooze">Avbryt vänteläge</string>
     <string name="actionDelete">Ta bort</string>
     <string name="actionEditMenu">Redigera meny</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Hela dagen</string>
     <string name="calendarNotInvited">Du är inte inbjuden</string>
     <string name="calendarOrganizerName">%s (Arrangör)</string>
-    <string name="callIfNoResponseHeaderTitle">Påminn mig om det inte finns något svar: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Påminn mig om det inte kommer svar efter sändning: %s</string>
     <string name="ccTitle">Kopia:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
@@ -244,7 +244,10 @@
     <string name="createFolderName">Mappens namn</string>
     <string name="datePickerTitle">Välj datum och tid</string>
     <string name="dateTitle">Datum:</string>
-    <string name="daysBeforeSendingReminder">%d dagar</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dagar</item>
+    </plurals>
     <string name="deleteAccountWarning">Raderingen av ditt konto blir slutgiltig. Du kommer inte att kunna återaktivera ditt konto.</string>
     <string name="deleteFolderDialogDescription">Innehållet i mappen %s kommer att raderas permanent utan att gå via papperskorgen.</string>
     <string name="deleteFolderDialogTitle">Ta bort mapp</string>
@@ -375,7 +378,10 @@
     <string name="genericMessageTranslated">Meddelande översatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services krävs</string>
     <string name="groupContactsTitle">Grupp: %s</string>
-    <string name="hoursBeforeSendingReminder">%d timmar</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d timme</item>
+        <item quantity="other">%d timmar</item>
+    </plurals>
     <string name="inboxFolder">Inkorg</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagring är nästan full. Uppgradera till obegränsad lagring och lås upp nya funktioner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagring är full. Uppgradera till obegränsad lagring och lås upp nya funktioner.</string>
@@ -735,13 +741,20 @@
     <string name="trashFolder">Papperskorg</string>
     <string name="tryAgain">Försök igen.</string>
     <string name="unblockButton">Avblockera</string>
-    <string name="unitDays">Dagar</string>
-    <string name="unitHours">Timmar</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dagar</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Timme</item>
+        <item quantity="other">Timmar</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Okänd avsändare</string>
     <string name="unknownDialogTitleRecipient">Okänd mottagare</string>
     <string name="unknownRecipientTitle">(okänd)</string>
     <string name="unknownTag">Okänd</string>
     <string name="unsubscribeButtonTitle">Avregistrera</string>
+    <string name="urgencyReminderDescription">Få en notis om din mottagare inte har svarat senast på ett valt datum.</string>
     <string name="urlEntryTitle">Skapa en hyperlänk</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

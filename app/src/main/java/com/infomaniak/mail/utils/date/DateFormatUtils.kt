@@ -56,9 +56,9 @@ object DateFormatUtils {
         val hours = delayMillis / ONE_HOUR_IN_MILLIS
         val days = delayMillis / DAY_IN_MILLIS
         return if (delayMillis % DAY_IN_MILLIS == 0L) {
-            getString(R.string.daysBeforeSendingReminder, days.toInt())
+            resources.getQuantityString(R.plurals.daysBeforeSendingReminder, days.toInt(), days.toInt())
         } else {
-            getString(R.string.hoursBeforeSendingReminder, hours.toInt())
+            resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, hours.toInt(), hours.toInt())
         }
     }
 

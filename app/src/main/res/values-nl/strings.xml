@@ -23,7 +23,7 @@
     <string name="acknowledgementMessageSent">Een leesbewijs is naar de afzender verzonden.</string>
     <string name="actionArchive">Archiveren</string>
     <string name="actionBlockSender">Afzender blokkeren</string>
-    <string name="actionCallIfNoResponse">Herinner me eraan als er geen antwoord is</string>
+    <string name="actionCallIfNoResponse">Herinner me eraan als er geen reactie komt na het verzenden</string>
     <string name="actionCancelSnooze">Snooze annuleren</string>
     <string name="actionDelete">Verwijderen</string>
     <string name="actionEditMenu">Menu bewerken</string>
@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">De hele dag</string>
     <string name="calendarNotInvited">U bent niet uitgenodigd</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>
-    <string name="callIfNoResponseHeaderTitle">Herinner me eraan als er geen antwoord is: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Herinner me als er geen reactie is na het verzenden: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Binnenkort…</string>
     <string name="commercialFolder">Promoties</string>
@@ -244,7 +244,10 @@
     <string name="createFolderName">Naam van de map</string>
     <string name="datePickerTitle">Kies een datum en tijd</string>
     <string name="dateTitle">Datum:</string>
-    <string name="daysBeforeSendingReminder">%d dagen</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dagen</item>
+    </plurals>
     <string name="deleteAccountWarning">Het verwijderen van uw account is definitief. U kunt uw account niet opnieuw activeren.</string>
     <string name="deleteFolderDialogDescription">De inhoud van de map %s wordt definitief verwijderd zonder via de prullenbak te gaan.</string>
     <string name="deleteFolderDialogTitle">Map verwijderen</string>
@@ -375,7 +378,10 @@
     <string name="genericMessageTranslated">Bericht vertaald</string>
     <string name="googlePlayServicesAreRequired">Google Play Services zijn vereist</string>
     <string name="groupContactsTitle">Groep: %s</string>
-    <string name="hoursBeforeSendingReminder">%d uur</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d uur</item>
+        <item quantity="other">%d uur</item>
+    </plurals>
     <string name="inboxFolder">Inbox</string>
     <string name="kSuiteProQuotasAlertDescription">Uw Mail-opslagruimte is bijna vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Uw Mail-opslagruimte is vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>
@@ -735,13 +741,20 @@
     <string name="trashFolder">Prullenbak</string>
     <string name="tryAgain">Probeer het opnieuw.</string>
     <string name="unblockButton">Deblokkeren</string>
-    <string name="unitDays">Dagen</string>
-    <string name="unitHours">Uren</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dagen</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Uur</item>
+        <item quantity="other">Uur</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Onbekende afzender</string>
     <string name="unknownDialogTitleRecipient">Onbekende ontvanger</string>
     <string name="unknownRecipientTitle">(onbekend)</string>
     <string name="unknownTag">Onbekend</string>
     <string name="unsubscribeButtonTitle">Afmelden</string>
+    <string name="urgencyReminderDescription">Krijg een melding als je ontvanger niet heeft geantwoord vóór een gekozen datum.</string>
     <string name="urlEntryTitle">Een hyperlink maken</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>
