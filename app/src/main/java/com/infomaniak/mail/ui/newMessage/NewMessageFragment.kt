@@ -196,7 +196,7 @@ class NewMessageFragment : Fragment() {
             onAddUnrecognizedContact = {},
             snackbarManager = snackbarManager,
             getAddressBookWithGroup = null,
-            shouldDisplayAddUnrecognizedRecipient = false,
+            isForRecipients = false,
         )
     }
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
