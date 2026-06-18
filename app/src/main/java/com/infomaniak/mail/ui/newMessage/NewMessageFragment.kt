@@ -35,7 +35,6 @@ import android.widget.PopupWindow
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.ViewCompat
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -51,7 +50,6 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.core.legacy.utils.FilePicker
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
-import com.infomaniak.core.legacy.utils.toPx
 import com.infomaniak.core.legacy.views.DividerItemDecorator
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.core.ui.view.extension.setMargins
@@ -850,12 +848,6 @@ class NewMessageFragment : Fragment() {
 
         mentionAutoComplete.adapter = mentionContactAdapter
         mentionAutoComplete.addItemDecoration(divider)
-
-        // Keep panel right above IME if needed
-        ViewCompat.setOnApplyWindowInsetsListener(mentionAutoComplete) { view, insets ->
-            view.updatePadding(bottom = insets.ime().bottom)
-            insets
-        }
 
         newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (contacts, _) ->
             mentionContactAdapter.updateContacts(contacts.filterIsInstance<MergedContact>())
