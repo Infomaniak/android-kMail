@@ -387,6 +387,8 @@
     <string name="manageSignatures">Hallinnoi allekirjoituksiani</string>
     <string name="menuDrawerAdvancedActions">Edistyneet toiminnot</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s käytetty</string>
+    <string name="messageAlreadySummarized">Viesti on jo tiivistetty</string>
+    <string name="messageAlreadyTranslated">Viesti on jo käännetty</string>
     <string name="messageComesFromDiscussionList">Tämä viesti tulee keskustelulistalta.</string>
     <string name="messageDetailsDateAt">%1$s klo %2$s</string>
     <string name="messageDetailsYesterday">Eilen</string>

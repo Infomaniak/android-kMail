@@ -387,6 +387,8 @@
     <string name="manageSignatures">Διαχείριση υπογραφών</string>
     <string name="menuDrawerAdvancedActions">Προηγμένες ενέργειες</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s χρησιμοποιημένα</string>
+    <string name="messageAlreadySummarized">Το μήνυμα είναι ήδη συνοψισμένο</string>
+    <string name="messageAlreadyTranslated">Το μήνυμα είναι ήδη μεταφρασμένο</string>
     <string name="messageComesFromDiscussionList">Αυτό το μήνυμα προέρχεται από λίστα συζήτησης.</string>
     <string name="messageDetailsDateAt">%1$s στις %2$s</string>
     <string name="messageDetailsYesterday">Χθες</string>

@@ -295,6 +295,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onAskEuria() {
+                trackBottomSheetThreadActionsEvent(MatomoName.AskEuria)
                 setBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET, message.uid)
             }
             //endregion

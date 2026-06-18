@@ -387,6 +387,8 @@
     <string name="manageSignatures">Gestisci le mie firme</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
+    <string name="messageAlreadySummarized">Il messaggio è già riassunto</string>
+    <string name="messageAlreadyTranslated">Il messaggio è già tradotto</string>
     <string name="messageComesFromDiscussionList">Questo messaggio proviene da una lista di discussione.</string>
     <string name="messageDetailsDateAt">%1$s alle %2$s</string>
     <string name="messageDetailsYesterday">Ieri</string>
