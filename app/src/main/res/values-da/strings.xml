@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Vær opmærksom på, at afsenderen af denne e-mail tilsyneladende ikke ønsker et svar.</string>
     <string name="appSecurityDescription">Beskytt adgangen til din app ved at aktivere din telefons lås.</string>
     <string name="archiveFolder">Arkiveret</string>
+    <string name="askEuriaTitle">Spørg Euria</string>
     <string name="attachMailboxDescription1">Hvis du allerede har en Infomaniak e-mailadresse, opret forbindelse nu</string>
     <string name="attachMailboxDescription2">Kun Infomaniak e-mailadresser understøttes</string>
     <string name="attachMailboxInputHint">E-mailadresse</string>

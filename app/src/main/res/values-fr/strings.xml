@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Attention, l’expéditeur de cet e-mail semble ne pas vouloir de réponse.</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
+    <string name="askEuriaTitle">Demander à Euria</string>
     <string name="attachMailboxDescription1">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant</string>
     <string name="attachMailboxDescription2">Seules les adresses mail Infomaniak sont supportées</string>
     <string name="attachMailboxInputHint">Adresse mail</string>

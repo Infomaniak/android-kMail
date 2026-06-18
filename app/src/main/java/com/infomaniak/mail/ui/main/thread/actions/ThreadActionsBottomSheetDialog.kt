@@ -333,9 +333,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             )
         }
 
-        override fun onSummary() = Unit
-
-        override fun onTranslate() = Unit
+        override fun onAskEuria() = Unit
         //endregion
     }
 

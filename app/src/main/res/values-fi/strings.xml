@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Huomio, tämän sähköpostin lähettäjä ei ilmeisesti halua vastausta.</string>
     <string name="appSecurityDescription">Suojaa pääsy sovellukseesi ottamalla käyttöön puhelimesi lukitus.</string>
     <string name="archiveFolder">Arkisto</string>
+    <string name="askEuriaTitle">Kysy Eurialta</string>
     <string name="attachMailboxDescription1">Jos sinulla on jo Infomaniak-sähköpostiosoite, kirjaudu nyt sisään</string>
     <string name="attachMailboxDescription2">Vain Infomaniak-sähköpostiosoitteet tuetaan</string>
     <string name="attachMailboxInputHint">Sähköpostiosoite</string>

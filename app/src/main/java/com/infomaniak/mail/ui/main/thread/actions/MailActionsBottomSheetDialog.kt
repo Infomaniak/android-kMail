@@ -72,8 +72,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onShare() = Unit
         override fun onSaveToKDrive() = Unit
         override fun onReportDisplayProblem() = Unit
-        override fun onSummary() = Unit
-        override fun onTranslate() = Unit
+        override fun onAskEuria() = Unit
         //endregion
     }
 
@@ -110,8 +109,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
-        summary.setOnClickListener { onClickListener.onSummary() }
-        translate.setOnClickListener { onClickListener.onTranslate() }
+        askEuria.setOnClickListener { onClickListener.onAskEuria() }
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
@@ -211,14 +209,8 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
-    fun setTranslateUi(isEnabled: Boolean) {
-        binding.translate.isEnabled = isEnabled
-        binding.translate.isVisible = true
-    }
-
-    fun setSummaryUi(isEnabled: Boolean) {
-        binding.summary.isEnabled = isEnabled
-        binding.summary.isVisible = true
+    fun setAskEuriaUi(isVisible: Boolean) {
+        binding.askEuria.isVisible = isVisible
     }
 
     interface OnActionClick {
@@ -241,7 +233,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onShare()
         fun onSaveToKDrive()
         fun onReportDisplayProblem()
-        fun onSummary()
-        fun onTranslate()
+        fun onAskEuria()
     }
 }

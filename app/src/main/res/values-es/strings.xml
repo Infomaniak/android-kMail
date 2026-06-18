@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Atención, el remitente de este correo electrónico parece no querer una respuesta.</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
     <string name="archiveFolder">Archivado</string>
+    <string name="askEuriaTitle">Pregunta a Euria</string>
     <string name="attachMailboxDescription1">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora</string>
     <string name="attachMailboxDescription2">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
     <string name="attachMailboxInputHint">Dirección de correo electrónico</string>

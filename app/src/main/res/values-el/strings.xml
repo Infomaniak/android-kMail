@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Προσοχή, ο αποστολέας αυτού του email φαίνεται να μην επιθυμεί απάντηση.</string>
     <string name="appSecurityDescription">Προστατέψτε την πρόσβαση στην εφαρμογή σας ενεργοποιώντας το κλείδωμα του τηλεφώνου σας.</string>
     <string name="archiveFolder">Αρχειοθετημένα</string>
+    <string name="askEuriaTitle">Ρωτήστε την Euria</string>
     <string name="attachMailboxDescription1">Αν διαθέτετε ήδη διεύθυνση e-mail Infomaniak, συνδεθείτε τώρα</string>
     <string name="attachMailboxDescription2">Υποστηρίζονται μόνο διευθύνσεις e-mail Infomaniak</string>
     <string name="attachMailboxInputHint">Διεύθυνση e-mail</string>

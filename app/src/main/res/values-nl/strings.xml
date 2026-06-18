@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Let op, de verzender van deze e-mail lijkt geen antwoord te wensen.</string>
     <string name="appSecurityDescription">Bescherm de toegang tot uw app door de vergrendeling van uw telefoon in te schakelen.</string>
     <string name="archiveFolder">Gearchiveerd</string>
+    <string name="askEuriaTitle">Vraag het Euria</string>
     <string name="attachMailboxDescription1">Als u al een Infomaniak e-mailadres heeft, log dan nu in</string>
     <string name="attachMailboxDescription2">Alleen Infomaniak e-mailadressen worden ondersteund</string>
     <string name="attachMailboxInputHint">E-mailadres</string>

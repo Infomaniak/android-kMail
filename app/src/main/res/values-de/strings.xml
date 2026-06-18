@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Achtung, der Absender dieser E-Mail möchte offenbar keine Antwort.</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
+    <string name="askEuriaTitle">Euria fragen</string>
     <string name="attachMailboxDescription1">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>
     <string name="attachMailboxDescription2">Nur Infomaniak-Mailadressen werden unterstützt</string>
     <string name="attachMailboxInputHint">Mailadresse</string>

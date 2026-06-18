@@ -96,6 +96,7 @@
     <string name="alertSenderNoReply">Observera att avsändaren av detta e-postmeddelande verkar inte vilja ha ett svar.</string>
     <string name="appSecurityDescription">Skydda åtkomsten till din app genom att aktivera din telefons lås.</string>
     <string name="archiveFolder">Arkiverade</string>
+    <string name="askEuriaTitle">Fråga Euria</string>
     <string name="attachMailboxDescription1">Om du redan har en Infomaniak e-postadress, anslut nu</string>
     <string name="attachMailboxDescription2">Endast Infomaniak e-postadresser stöds</string>
     <string name="attachMailboxInputHint">E-postadress</string>

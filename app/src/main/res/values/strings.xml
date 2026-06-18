@@ -100,6 +100,7 @@
     <string name="alertSenderNoReply">Please note: The sender of this email does not appear to want a response.</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
+    <string name="askEuriaTitle">Ask Euria</string>
     <string name="attachMailboxDescription1">If you already have an Infomaniak email address, connect now</string>
     <string name="attachMailboxDescription2">Only Infomaniak email addresses are supported</string>
     <string name="attachMailboxInputHint">Email address</string>

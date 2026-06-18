@@ -100,6 +100,7 @@
     <string name="alertSenderNoReply">Uwaga, nadawca tej wiadomości e-mail wydaje się nie oczekiwać odpowiedzi.</string>
     <string name="appSecurityDescription">Chroń dostęp do aplikacji, włączając blokadę telefonu.</string>
     <string name="archiveFolder">Zarchiwizowane</string>
+    <string name="askEuriaTitle">Zapytaj Eurię</string>
     <string name="attachMailboxDescription1">Jeśli masz już adres e-mail Infomaniak, zaloguj się teraz</string>
     <string name="attachMailboxDescription2">Obsługiwane są tylko adresy e-mail Infomaniak</string>
     <string name="attachMailboxInputHint">Adres e-mail</string>
