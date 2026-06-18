@@ -348,7 +348,6 @@
     <string name="errorRefusedRecipients">Serwer odrzuca wszystkich odbiorców</string>
     <string name="errorRefusedSender">Serwer odrzuca nadawcę</string>
     <string name="errorReminderDelayTooShort">Przypomnienie musi być ustawione na co najmniej %d godzinę w przyszłości</string>
-    <string name="errorReminderTooCloseToSchedule">Przypomnienie musi być ustawione co najmniej %d godzinę po zaplanowanym czasie wysyłki.</string>
     <string name="errorScheduleDelayTooShort">Nie możesz zaplanować wiadomości e-mail na mniej niż %d minut w przyszłości</string>
     <string name="errorScheduledSnoozeDelayTooShort">Minimalny czas uśpienia wiadomości e-mail to %d minut</string>
     <string name="errorSendLimitExceeded">Osiągnięto limit wysyłania</string>
@@ -794,6 +793,8 @@
     <string name="trashFolder">Kosz</string>
     <string name="tryAgain">Spróbuj ponownie.</string>
     <string name="unblockButton">Odblokuj</string>
+    <string name="unitDays">Dni</string>
+    <string name="unitHours">Godziny</string>
     <string name="unknownDialogTitleExpeditor">Nieznany nadawca</string>
     <string name="unknownDialogTitleRecipient">Nieznany odbiorca</string>
     <string name="unknownRecipientTitle">(nieznany)</string>

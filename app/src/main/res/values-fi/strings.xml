@@ -340,7 +340,6 @@
     <string name="errorRefusedRecipients">Palvelin hylkää kaikki vastaanottajat</string>
     <string name="errorRefusedSender">Palvelin hylkää lähettäjän</string>
     <string name="errorReminderDelayTooShort">Muistutuksen on oltava vähintään %d tunti tulevaisuudessa</string>
-    <string name="errorReminderTooCloseToSchedule">Muistutuksen on oltava vähintään %d tuntia ajoitetun lähetysajan jälkeen.</string>
     <string name="errorScheduleDelayTooShort">Et voi ajastaa sähköpostia vähemmän kuin %d minuutin päähän</string>
     <string name="errorScheduledSnoozeDelayTooShort">Sähköpostin torkkuajan vähimmäisaika on %d minuuttia</string>
     <string name="errorSendLimitExceeded">Lähetysraja saavutettu</string>
@@ -736,6 +735,8 @@
     <string name="trashFolder">Roskakori</string>
     <string name="tryAgain">Yritä uudelleen.</string>
     <string name="unblockButton">Poista esto</string>
+    <string name="unitDays">Päivää</string>
+    <string name="unitHours">Tunnit</string>
     <string name="unknownDialogTitleExpeditor">Tuntematon lähettäjä</string>
     <string name="unknownDialogTitleRecipient">Tuntematon vastaanottaja</string>
     <string name="unknownRecipientTitle">(tuntematon)</string>

@@ -24,10 +24,15 @@ sealed class ScheduleConfig {
 sealed class ReminderConfig {
     data object None : ReminderConfig()
     data class Preset(val delayHours: DelayHours) : ReminderConfig()
-    data class Custom(val epochMillis: Long) : ReminderConfig()
+    data class Custom(val delayMillis: Long) : ReminderConfig()
 }
 
-enum class DelayHours(val hours: Int) { HOURS_24(24), DAYS_3(72), DAYS_7(168) }
+const val HOURS_IN_A_DAY = 24
+
+enum class DelayHours(val hours: Int) {
+    HOURS_24(HOURS_IN_A_DAY),
+    DAYS_3(3 * HOURS_IN_A_DAY),
+    DAYS_7(7 * HOURS_IN_A_DAY),
+}
 
 const val MIN_SELECTABLE_DATE_MINUTES = 5
-const val MIN_SELECTABLE_REMINDER_HOURS = 1

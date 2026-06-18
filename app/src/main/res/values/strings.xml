@@ -344,7 +344,6 @@
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
     <string name="errorRefusedSender">The server is refusing the sender</string>
     <string name="errorReminderDelayTooShort">The reminder must be at least %d hour in the future</string>
-    <string name="errorReminderTooCloseToSchedule">The reminder must be at least %d hour after the scheduled send time.</string>
     <string name="errorScheduleDelayTooShort">You can’t schedule an email less than %d minutes in the future</string>
     <string name="errorScheduledSnoozeDelayTooShort">The minimum time to snooze an email is %d minutes</string>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
@@ -740,6 +739,8 @@
     <string name="trashFolder">Trash</string>
     <string name="tryAgain">Please try again.</string>
     <string name="unblockButton">Unblock</string>
+    <string name="unitDays">Days</string>
+    <string name="unitHours">Hours</string>
     <string name="unknownDialogTitleExpeditor">Unknown expeditor</string>
     <string name="unknownDialogTitleRecipient">Unknown recipient</string>
     <string name="unknownRecipientTitle">(unknown)</string>

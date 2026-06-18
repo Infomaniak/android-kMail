@@ -23,10 +23,8 @@ import com.google.android.material.datepicker.CompositeDateValidator
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.infomaniak.core.common.utils.addYears
-import com.infomaniak.core.common.utils.startOfTheDay
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_DATE_MINUTES
-import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_REMINDER_HOURS
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import java.util.Date
@@ -38,15 +36,10 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 ) : SelectDateAndTimeDialog(activityContext) {
 
     override fun defineCalendarConstraint(): CalendarConstraints.Builder {
-        val dateValidators = mutableListOf(
+        val dateValidators = listOf(
             DateValidatorPointForward.now(),
             DateValidatorPointBackward.before(Date().addYears(MAX_SCHEDULE_DELAY_YEARS).time),
         )
-
-        scheduleDate?.let {
-            dateValidators.add(DateValidatorPointForward.from(it.startOfTheDay().time))
-        }
-
         return CalendarConstraints.Builder().setValidator(CompositeDateValidator.allOf(dateValidators))
     }
 
@@ -55,18 +48,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         MIN_SELECTABLE_DATE_MINUTES,
     )
 
-    override fun getTooCloseToScheduleErrorMessage(): String = activityContext.getString(
-        R.string.errorReminderTooCloseToSchedule,
-        MIN_HOURS_DISTANT_FROM_SCHEDULE,
-    )
-
-    override fun getReminderTooShortErrorMessage(): String = activityContext.getString(
-        R.string.errorReminderDelayTooShort,
-        MIN_SELECTABLE_REMINDER_HOURS,
-    )
-
     companion object {
         const val MAX_SCHEDULE_DELAY_YEARS = 10
-        const val MIN_HOURS_DISTANT_FROM_SCHEDULE = 1
     }
 }

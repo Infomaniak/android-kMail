@@ -340,7 +340,6 @@
     <string name="errorRefusedRecipients">Serveren nekter alle mottakere</string>
     <string name="errorRefusedSender">Serveren nekter avsenderen</string>
     <string name="errorReminderDelayTooShort">Påminnelsen må være minst %d time frem i tid</string>
-    <string name="errorReminderTooCloseToSchedule">Påminnelsen må være minst %d time etter den planlagte avsendelsestiden.</string>
     <string name="errorScheduleDelayTooShort">Du kan ikke planlegge en e-post på mindre enn %d minutter</string>
     <string name="errorScheduledSnoozeDelayTooShort">Minimumstid for å utsette en e-post er %d minutter</string>
     <string name="errorSendLimitExceeded">Sendegrense nådd</string>
@@ -736,6 +735,8 @@
     <string name="trashFolder">Papirkurv</string>
     <string name="tryAgain">Vennligst prøv igjen.</string>
     <string name="unblockButton">Opphev blokkering</string>
+    <string name="unitDays">Dager</string>
+    <string name="unitHours">Timer</string>
     <string name="unknownDialogTitleExpeditor">Ukjent avsender</string>
     <string name="unknownDialogTitleRecipient">Ukjent mottaker</string>
     <string name="unknownRecipientTitle">(ukjent)</string>

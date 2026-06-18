@@ -42,7 +42,6 @@ import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
 import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_DATE_MINUTES
-import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_REMINDER_HOURS
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import java.util.Calendar
 import java.util.Date
@@ -157,15 +156,8 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     }
 
     private fun updateErrorMessage(date: Date) {
-        val minMinutes = if (isForReminder) MIN_SELECTABLE_REMINDER_HOURS * 60 else MIN_SELECTABLE_DATE_MINUTES
-        val isDateValid = date.isAtLeastXMinutesInTheFuture(minMinutes)
-        val isAfterSchedule = scheduleDate?.let { date.time - it.time >= ONE_HOUR_IN_MILLIS } ?: true
-
-        val errorMessage = when {
-            isDateValid.not() -> if (isForReminder) getReminderTooShortErrorMessage() else getErrorText(date)
-            isAfterSchedule.not() -> getTooCloseToScheduleErrorMessage()
-            else -> null
-        }
+        val isDateValid = date.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES)
+        val errorMessage = if (!isDateValid) getErrorText(date) else null
 
         val hasError = errorMessage != null
         if (hasError) binding.errorMessage.text = errorMessage
@@ -207,10 +199,6 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
 
         datePicker.show(super.activity.supportFragmentManager, null)
     }
-
-    protected open fun getTooCloseToScheduleErrorMessage(): String? = null
-
-    protected open fun getReminderTooShortErrorMessage(): String? = null
 
     companion object {
         const val ONE_HOUR_IN_MILLIS = 3_600_000L

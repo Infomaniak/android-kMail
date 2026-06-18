@@ -948,6 +948,15 @@ class NewMessageViewModel @Inject constructor(
 
     fun resetScheduledDate() = setScheduleDate(date = null)
 
+    fun setReminderDelay(reminderDelaySeconds: Int) = viewModelScope.launch(ioDispatcher) {
+        val localUuid = draftLocalUuid ?: return@launch
+        mailboxContentRealm().write {
+            DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
+                draft.delay = if (reminderDelaySeconds > 0) reminderDelaySeconds else 0 // TODO: use real name instead of draft.delay when API is updated
+            }
+        }
+    }
+
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))

@@ -84,6 +84,7 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.DraftSendOptionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
@@ -120,6 +121,7 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
+import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -521,8 +523,8 @@ class NewMessageFragment : Fragment() {
             when (config) {
                 is ReminderConfig.Preset -> {
                     val hours = config.delayHours.hours
-                    val dateText = if (hours % NB_HOURS_IN_DAY == 0 && hours > NB_HOURS_IN_DAY) {
-                        getString(R.string.daysBeforeSendingReminder, hours / NB_HOURS_IN_DAY)
+                    val dateText = if (hours % HOURS_IN_A_DAY == 0 && hours > HOURS_IN_A_DAY) {
+                        getString(R.string.daysBeforeSendingReminder, hours / HOURS_IN_A_DAY)
                     } else {
                         getString(R.string.hoursBeforeSendingReminder, hours)
                     }
@@ -533,9 +535,9 @@ class NewMessageFragment : Fragment() {
                     binding.divider7.isVisible = true
                 }
                 is ReminderConfig.Custom -> {
-                    val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    val delayText = requireContext().formatDelayText(config.delayMillis)
                     binding.reminderAlert.apply {
-                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, date))
+                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, delayText))
                         isVisible = true
                     }
                     binding.divider7.isVisible = true
@@ -1009,7 +1011,7 @@ class NewMessageFragment : Fragment() {
             if (!checkMailboxStorage(mailbox)) return@setOnClickListener
 
             val scheduleConfig = newMessageViewModel.scheduleConfig.value
-            val isSendingScheduled = if (scheduleConfig is ScheduleConfig.Scheduled) {
+            val isSendingWithScheduled = if (scheduleConfig is ScheduleConfig.Scheduled) {
                 if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds > System.currentTimeMillis()) {
                     newMessageViewModel.setScheduleDate(Date(scheduleConfig.epochMillis))
                     true
@@ -1022,7 +1024,21 @@ class NewMessageFragment : Fragment() {
                 false
             }
 
-            tryToSendEmail(isSendingScheduled)
+            val reminderConfig = newMessageViewModel.reminderConfig.value
+            val isSendingWithReminder = if (reminderConfig !is ReminderConfig.None) {
+                val delayMillis = when (reminderConfig) {
+                    is ReminderConfig.Preset -> reminderConfig.delayHours.hours * ONE_HOUR_IN_MILLIS
+                    is ReminderConfig.Custom -> reminderConfig.delayMillis
+                    else -> 0L
+                }
+                newMessageViewModel.setReminderDelay((delayMillis / 1_000L).toInt())
+                true
+            } else {
+                newMessageViewModel.setReminderDelay(0)
+                false
+            }
+
+            tryToSendEmail(isSendingWithScheduled, isSendingWithReminder)
         }
     }
 
@@ -1038,19 +1054,27 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    private fun tryToSendEmail(isScheduled: Boolean = false) {
+    private fun tryToSendEmail(isScheduled: Boolean = false, isReminder: Boolean = false) {
 
         fun setSnackbarActivityResult() {
             val resultIntent = Intent()
             resultIntent.putExtra(
                 MainActivity.DRAFT_ACTION_KEY,
-                if (isScheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
+                when {
+                    isScheduled -> DraftAction.SCHEDULE.name
+                    isReminder -> DraftAction.REMINDER.name
+                    else -> DraftAction.SEND.name
+                },
             )
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
 
         fun sendEmail() {
-            newMessageViewModel.draftAction = if (isScheduled) DraftAction.SCHEDULE else DraftAction.SEND
+            newMessageViewModel.draftAction = when { // TODO: add an other DraftAction if it's reminder + schedule ?
+                isScheduled -> DraftAction.SCHEDULE
+                isReminder -> DraftAction.REMINDER
+                else -> DraftAction.SEND
+            }
             setSnackbarActivityResult()
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
@@ -1149,7 +1173,6 @@ class NewMessageFragment : Fragment() {
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
     companion object {
-        private const val NB_HOURS_IN_DAY = 24
         const val COMMON_MENTIONS_SCRIPT = "common_mentions_code_script"
         const val MENTION_OBSERVER_SCRIPT = "mention_observer_script"
         const val INSERT_MENTION_SCRIPT = "insert_mention_script"

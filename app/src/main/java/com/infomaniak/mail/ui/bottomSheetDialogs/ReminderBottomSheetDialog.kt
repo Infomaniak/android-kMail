@@ -29,17 +29,15 @@ import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetReminderOptionsBinding
+import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
-import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
-import com.infomaniak.mail.ui.newMessage.NewMessageFragment.Companion.NB_HOURS_IN_DAY
-import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
+import com.infomaniak.mail.ui.newMessage.HOURS_IN_A_DAY
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,12 +47,9 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     private val navigationArgs: ReminderBottomSheetDialogArgs by navArgs()
 
     @Inject
-    lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
+    lateinit var customReminderPickerDialog: CustomReminderPickerDialog
 
     private val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
-    private val currentlyScheduledEpochMillis: Long? by lazy {
-        navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetReminderOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -63,7 +58,7 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
         binding.title.text = getString(R.string.reminderBottomSheetTitle)
         createPresetOptions()
@@ -73,15 +68,14 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     private fun createPresetOptions() {
         listOf(ReminderPreset.HOURS_24, ReminderPreset.DAYS_3, ReminderPreset.DAYS_7).forEach { preset ->
             val itemView = ActionItemView(requireContext()).apply {
-                val dateText = if (preset.hours % NB_HOURS_IN_DAY == 0 && preset.hours > NB_HOURS_IN_DAY) {
-                    getString(R.string.daysBeforeSendingReminder, preset.hours / NB_HOURS_IN_DAY)
+                val dateText = if (preset.hours % HOURS_IN_A_DAY == 0 && preset.hours > HOURS_IN_A_DAY) {
+                    getString(R.string.daysBeforeSendingReminder, preset.hours / HOURS_IN_A_DAY)
                 } else {
                     getString(R.string.hoursBeforeSendingReminder, preset.hours)
                 }
 
                 setTitle(dateText)
                 removeIcon()
-                setDescription(context.dayOfWeekDateWithoutYear(date = Date(preset.epochMillis(currentlyScheduledEpochMillis))))
                 setOnClickListener { onPresetSelected(preset) }
             }
             binding.reminderOptions.addView(itemView)
@@ -99,7 +93,7 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     }
 
     private fun onPresetSelected(preset: ReminderPreset) {
-        setBackNavigationResult(REMINDER_RESULT, preset.epochMillis(currentlyScheduledEpochMillis))
+        setBackNavigationResult(REMINDER_RESULT, preset.delayMillis)
     }
 
     private fun onCustomReminderClicked() {
@@ -114,12 +108,9 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     }
 
     private fun showCustomDelayReminderDatePicker() {
-        dateAndTimeScheduleDialog.show(
-            positiveButtonResId = R.string.buttonModify,
-            scheduleDateMillis = currentlyScheduledEpochMillis,
-            isForReminder = true,
-            onDateSelected = { timestamp ->
-                setBackNavigationResult(REMINDER_RESULT, timestamp)
+        customReminderPickerDialog.show(
+            onDelaySelected = { delayMillis ->
+                setBackNavigationResult(REMINDER_RESULT, delayMillis)
                 dismiss()
             },
         )
@@ -130,13 +121,10 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     }
 
     private enum class ReminderPreset(@StringRes val titleRes: Int, val hours: Int) {
-        HOURS_24(R.string.hoursBeforeSendingReminder, 24),
-        DAYS_3(R.string.daysBeforeSendingReminder, 72),
-        DAYS_7(R.string.daysBeforeSendingReminder, 168);
+        HOURS_24(R.string.hoursBeforeSendingReminder, HOURS_IN_A_DAY),
+        DAYS_3(R.string.daysBeforeSendingReminder, 3 * HOURS_IN_A_DAY),
+        DAYS_7(R.string.daysBeforeSendingReminder, 7 * HOURS_IN_A_DAY);
 
-        fun epochMillis(scheduledEpochMillis: Long? = null): Long {
-            val base = scheduledEpochMillis ?: System.currentTimeMillis()
-            return base + hours * ONE_HOUR_IN_MILLIS
-        }
+        val delayMillis: Long get() = hours * ONE_HOUR_IN_MILLIS
     }
 }
