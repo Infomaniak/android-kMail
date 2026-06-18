@@ -68,11 +68,11 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.containsOnlyScheduledDrafts
 import com.infomaniak.mail.data.models.extensions.downloadUrl
+import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.ConfirmScheduledDraftModificationDialog
@@ -98,9 +98,14 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.DisplayType
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.NotifyType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
+import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
+import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiBodyUpdate
+import com.infomaniak.mail.ui.main.thread.actions.AskEuriaBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
@@ -206,6 +211,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val aiActionsViewModel: AiActionsViewModel by viewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -250,6 +256,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         observeMessageOfUserToBlock()
 
         observeCanSendEmails()
+
+        observeAiActionEvents()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -287,6 +295,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     override fun onDestroyView() {
+
         threadAdapter.resetCallbacks()
         super.onDestroyView()
         _binding = null
@@ -294,6 +303,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     fun resetThreadState() {
         threadViewModel.threadState.reset()
+        aiActionsViewModel.reset()
     }
 
     private fun setupUi() = with(binding) {
@@ -448,7 +458,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         val emojiDetails = getLocalEmojiReactionsDetailsFor(messageUid) ?: return@launch
                         binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
                     }
-                }
+                },
+                onAiBannerRetry = { messageUid, aiAction -> aiActionsViewModel.doAiAction(messageUid, aiAction) },
+                onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
+                onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
+                getAiState = { aiActionsViewModel.aiStateMap.value },
             ),
         )
 
@@ -522,6 +536,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun observeThreadOpening() {
         twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
+            aiActionsViewModel.reset()
             displayThreadView()
             threadViewModel.updateCurrentThreadUid(threadViewModel.AllMessages(threadUid))
         }
@@ -813,8 +828,28 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             )
         }
 
+        getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
+            navigateToAskEuriaBottomSheet(messageUid)
+        }
+
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
+        }
+
+        getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_SUMMARY_BOTTOM_SHEET) { (messageUid, isAlreadySummarized) ->
+            if (isAlreadySummarized) {
+                snackbarManager.setValue(getString(R.string.messageAlreadySummarized))
+            } else {
+                aiActionsViewModel.doAiAction(messageUid, AiAction.SUMMARY)
+            }
+        }
+
+        getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_TRANSLATE_BOTTOM_SHEET) { (messageUid, isAlreadyTranslated) ->
+            if (isAlreadyTranslated) {
+                snackbarManager.setValue(getString(R.string.messageAlreadyTranslated))
+            } else {
+                aiActionsViewModel.doAiAction(messageUid, AiAction.TRANSLATE)
+            }
         }
     }
 
@@ -966,6 +1001,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
+    private fun canStartAiProcess(isDoneInBody: Boolean?, state: AiProcessState?): Boolean = when (state) {
+        is AiProcessState.Loading, is AiProcessState.Success, is AiProcessState.Retrying -> false
+        is AiProcessState.Dismissed -> true
+        else -> isDoneInBody != true
+    }
+
     private fun scrollToFirstUnseenMessage() = with(threadViewModel) {
 
         fun getBottomY(): Int = binding.messagesListNestedScrollView.maxScrollAmount
@@ -1020,6 +1061,87 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         safeNavigate(
             resId = R.id.unencryptableRecipientsBottomSheetDialog,
             args = UnencryptableRecipientsBottomSheetDialogArgs(recipients.toTypedArray()).toBundle(),
+        )
+    }
+
+    private fun observeAiActionEvents() {
+        aiActionsViewModel.aiActionEvents.observe(viewLifecycleOwner) { (messageUid, aiAction, bodyUpdate) ->
+            val aiState = aiActionsViewModel.aiStateMap.value
+
+            val processState = if (aiAction == AiAction.SUMMARY) {
+                aiState.summaryStateMap[messageUid]
+            } else {
+                aiState.translateStateMap[messageUid]
+            }
+
+            if (processState is AiProcessState.Error &&
+                processState.canRetry &&
+                processState.hasAlreadyRetried &&
+                !processState.wasLoaderShown
+            ) {
+                val errorMessage = if (aiAction == AiAction.SUMMARY) {
+                    R.string.messageSummaryError
+                } else {
+                    R.string.messageTranslateError
+                }
+                snackbarManager.setValue(getString(errorMessage))
+            }
+
+            when (bodyUpdate) {
+                AiBodyUpdate.SHOW_TRANSLATED -> reloadMessageInAdapter(messageUid)
+                AiBodyUpdate.SHOW_ORIGINAL -> showOriginalMessage(messageUid)
+                AiBodyUpdate.NONE -> Unit
+            }
+            notifyAiStateChanged(messageUid, aiAction)
+        }
+    }
+
+    private fun notifyAiStateChanged(messageUid: String, aiAction: AiAction) {
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index < 0) return
+
+        val notifyType = when (aiAction) {
+            AiAction.SUMMARY -> NotifyType.AiSummaryStateChanged
+            AiAction.TRANSLATE -> NotifyType.AiTranslateStateChanged
+        }
+        threadAdapter.notifyItemChanged(index, notifyType)
+    }
+
+    private fun showOriginalMessage(messageUid: String) {
+        val originalSplitBody = threadViewModel.threadState.cachedSplitBodies[messageUid]
+        val message = threadAdapter.currentList
+            .filterIsInstance<MessageUi>()
+            .firstOrNull { it.message.uid == messageUid }
+            ?.message
+
+        message?.splitBody = originalSplitBody
+        reloadMessageInAdapter(messageUid)
+    }
+
+    private fun reloadMessageInAdapter(messageUid: String) {
+        val index = threadAdapter.currentList.indexOfFirst { it is MessageUi && it.message.uid == messageUid }
+        if (index >= 0) {
+            threadAdapter.notifyItemChanged(index)
+        }
+    }
+
+    private fun navigateToAskEuriaBottomSheet(messageUid: String) {
+        val message = threadAdapter.currentList
+            .filterIsInstance<MessageUi>()
+            .firstOrNull { it.message.uid == messageUid }
+            ?.message ?: return
+
+        val aiState = aiActionsViewModel.aiStateMap.value
+        val isAlreadyTranslated = !canStartAiProcess(message.body?.isTranslated, aiState.translateStateMap[messageUid])
+        val isAlreadySummarized = !canStartAiProcess(message.body?.hasSummary, aiState.summaryStateMap[messageUid])
+
+        safeNavigate(
+            resId = R.id.askEuriaBottomSheetDialog,
+            args = AskEuriaBottomSheetDialogArgs(
+                messageUid = messageUid,
+                isAlreadyTranslated = isAlreadyTranslated,
+                isAlreadySummarized = isAlreadySummarized,
+            ).toBundle(),
         )
     }
 
@@ -1160,6 +1282,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
+        const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
+        const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
+        const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"

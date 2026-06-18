@@ -44,6 +44,7 @@
     <string name="actionSnooze">Αναβολή</string>
     <string name="actionSpam">Αναφορά ως spam</string>
     <string name="actionStar">Προσθήκη στα αγαπημένα</string>
+    <string name="actionSummarize">Σύνοψη</string>
     <string name="actionUnstar">Διαγραφή από τα αγαπημένα</string>
     <string name="actionViewInDark">Προβολή σε σκούρο θέμα</string>
     <string name="actionViewInLight">Προβολή σε φωτεινό θέμα</string>
@@ -95,6 +96,7 @@
     <string name="alertSenderNoReply">Προσοχή, ο αποστολέας αυτού του email φαίνεται να μην επιθυμεί απάντηση.</string>
     <string name="appSecurityDescription">Προστατέψτε την πρόσβαση στην εφαρμογή σας ενεργοποιώντας το κλείδωμα του τηλεφώνου σας.</string>
     <string name="archiveFolder">Αρχειοθετημένα</string>
+    <string name="askEuriaTitle">Ρωτήστε την Euria</string>
     <string name="attachMailboxDescription1">Αν διαθέτετε ήδη διεύθυνση e-mail Infomaniak, συνδεθείτε τώρα</string>
     <string name="attachMailboxDescription2">Υποστηρίζονται μόνο διευθύνσεις e-mail Infomaniak</string>
     <string name="attachMailboxInputHint">Διεύθυνση e-mail</string>
@@ -157,11 +159,13 @@
     <string name="buttonSelectAll">Όλα</string>
     <string name="buttonSendWithDifferentAddress">Αποστολή με διαφορετική διεύθυνση</string>
     <string name="buttonShare">Κοινοποίηση</string>
+    <string name="buttonShowOriginal">Εμφάνιση αρχικού μηνύματος</string>
     <string name="buttonStart">Έναρξη</string>
     <string name="buttonStartSync">Έναρξη συγχρονισμού</string>
     <string name="buttonStrikeThrough">Διακριτή διαγραφή</string>
     <string name="buttonTextOptionsClose">Κλείσιμο μορφοποίησης κειμένου</string>
     <string name="buttonTextOptionsOpen">Άνοιγμα μορφοποίησης κειμένου</string>
+    <string name="buttonTranslate">Μεταφράστε</string>
     <string name="buttonTry">Δοκιμή</string>
     <string name="buttonUnderline">Υπογράμμιση</string>
     <string name="buttonUnorderedList">Μη ταξινομημένη λίστα</string>
@@ -202,6 +206,7 @@
     <string name="contentDescriptionButtonSelectSignature">Επιλογή διαφορετικής υπογραφής</string>
     <string name="contentDescriptionButtonSettings">Ρυθμίσεις</string>
     <string name="contentDescriptionButtonShowPassword">Εμφάνιση κωδικού πρόσβασης</string>
+    <string name="contentDescriptionButtonWarning">Προειδοποίηση</string>
     <string name="contentDescriptionContactAlreadyUsed">Η επαφή χρησιμοποιείται ήδη ως παραλήπτης</string>
     <string name="contentDescriptionDownloadIndicator">Λήψη σε εξέλιξη</string>
     <string name="contentDescriptionIconAttachments">Περιέχει συνημμένα</string>
@@ -335,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Δεν ήταν δυνατή η δημιουργία του φακέλου</string>
     <string name="errorUnableToFlushFolder">Δεν είναι δυνατή η εκκαθάριση του φακέλου</string>
     <string name="errorUserAlreadySynchronized">Ο χρήστης είναι ήδη συγχρονισμένος</string>
+    <string name="euriaTranslateMessage">Η Euria μεταφράζει το μήνυμά σας…</string>
     <string name="expeditorAuthenticationDescription">Η προέλευση του αποστολέα έχει επαληθευτεί.</string>
     <string name="externalDialogConfirmButton">Το κατάλαβα</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -356,6 +362,7 @@
         <item quantity="other">%d αρχεία στάλθηκαν μέσω SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Από:</string>
+    <string name="genericMessageTranslated">Μήνυμα μεταφρασμένο</string>
     <string name="googlePlayServicesAreRequired">Απαιτούνται οι Υπηρεσίες Google Play</string>
     <string name="groupContactsTitle">Ομάδα: %s</string>
     <string name="inboxFolder">Εισερχόμενα</string>
@@ -380,6 +387,8 @@
     <string name="manageSignatures">Διαχείριση υπογραφών</string>
     <string name="menuDrawerAdvancedActions">Προηγμένες ενέργειες</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s χρησιμοποιημένα</string>
+    <string name="messageAlreadySummarized">Το μήνυμα είναι ήδη συνοψισμένο</string>
+    <string name="messageAlreadyTranslated">Το μήνυμα είναι ήδη μεταφρασμένο</string>
     <string name="messageComesFromDiscussionList">Αυτό το μήνυμα προέρχεται από λίστα συζήτησης.</string>
     <string name="messageDetailsDateAt">%1$s στις %2$s</string>
     <string name="messageDetailsYesterday">Χθες</string>
@@ -392,6 +401,13 @@
     <string name="messageIsSpamShouldMoveToSpam">Αυτό το μήνυμα θεωρείται ανεπιθύμητο. Σας συνιστούμε να το μετακινήσετε στο φάκελο \"Spam\".</string>
     <string name="messageReplyHeader">Στις %1$s, ο/η %2$s έγραψε:</string>
     <string name="messageShowQuotedText">Εμφάνιση συνομιλίας</string>
+    <string name="messageSummary">Σύνοψη του μηνύματος</string>
+    <string name="messageSummaryError">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα.</string>
+    <string name="messageSummaryErrorRetry">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
+    <string name="messageSummaryLoading">Σύνοψη του μηνύματος…</string>
+    <string name="messageTranslateError">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα.</string>
+    <string name="messageTranslateErrorRetry">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
+    <string name="messageTranslatedTitle">Μεταφράστηκε σε %s</string>
     <string name="mondayAfternoon">Δευτέρα απόγευμα</string>
     <string name="mondayMorning">Δευτέρα πρωί</string>
     <string name="moveInSpamButton">Μετακίνηση στα Spam</string>
@@ -682,6 +698,7 @@
         <item quantity="one">%d διεύθυνση δεν μπόρεσε να προστεθεί επειδή έχετε φτάσει στο όριο των παραληπτών</item>
         <item quantity="other">%d διευθύνσεις δεν μπόρεσαν να προστεθούν επειδή έχετε φτάσει στο όριο των παραληπτών</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Αυτό το μήνυμα είναι ήδη στη γλώσσα σας</string>
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>

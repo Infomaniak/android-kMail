@@ -332,6 +332,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToExecuteAction) },
             )
         }
+
+        override fun onAskEuria() = Unit
         //endregion
     }
 

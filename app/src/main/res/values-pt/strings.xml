@@ -44,6 +44,7 @@
     <string name="actionSnooze">Adiar</string>
     <string name="actionSpam">Denunciar spam</string>
     <string name="actionStar">Adicionar aos favoritos</string>
+    <string name="actionSummarize">Resumir</string>
     <string name="actionUnstar">Remover dos favoritos</string>
     <string name="actionViewInDark">Ver no tema escuro</string>
     <string name="actionViewInLight">Ver no tema claro</string>
@@ -95,6 +96,7 @@
     <string name="alertSenderNoReply">Atenção, o remetente deste e-mail parece não querer uma resposta.</string>
     <string name="appSecurityDescription">Proteja o acesso à sua aplicação ativando o bloqueio do seu telefone.</string>
     <string name="archiveFolder">Arquivado</string>
+    <string name="askEuriaTitle">Perguntar a Euria</string>
     <string name="attachMailboxDescription1">Se já tiver um endereço de e-mail Infomaniak, conecte-se agora</string>
     <string name="attachMailboxDescription2">Apenas endereços de e-mail Infomaniak são suportados</string>
     <string name="attachMailboxInputHint">Endereço de e-mail</string>
@@ -157,11 +159,13 @@
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonSendWithDifferentAddress">Enviar com outro endereço</string>
     <string name="buttonShare">Partilhar</string>
+    <string name="buttonShowOriginal">Mostrar mensagem original</string>
     <string name="buttonStart">Iniciar</string>
     <string name="buttonStartSync">Iniciar sincronização</string>
     <string name="buttonStrikeThrough">Riscar</string>
     <string name="buttonTextOptionsClose">Fechar formatação de texto</string>
     <string name="buttonTextOptionsOpen">Abrir formatação de texto</string>
+    <string name="buttonTranslate">Traduzir</string>
     <string name="buttonTry">Experimentar</string>
     <string name="buttonUnderline">Sublinhar</string>
     <string name="buttonUnorderedList">Lista não ordenada</string>
@@ -202,6 +206,7 @@
     <string name="contentDescriptionButtonSelectSignature">Selecionar outra assinatura</string>
     <string name="contentDescriptionButtonSettings">Definições</string>
     <string name="contentDescriptionButtonShowPassword">Mostrar palavra-passe</string>
+    <string name="contentDescriptionButtonWarning">Aviso</string>
     <string name="contentDescriptionContactAlreadyUsed">Contacto já utilizado como destinatário</string>
     <string name="contentDescriptionDownloadIndicator">A transferir</string>
     <string name="contentDescriptionIconAttachments">Tem anexos</string>
@@ -335,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Não foi possível criar a pasta</string>
     <string name="errorUnableToFlushFolder">Não foi possível esvaziar a pasta</string>
     <string name="errorUserAlreadySynchronized">O utilizador já está sincronizado</string>
+    <string name="euriaTranslateMessage">Euria traduz a sua mensagem…</string>
     <string name="expeditorAuthenticationDescription">A origem deste remetente foi autenticada.</string>
     <string name="externalDialogConfirmButton">Compreendo</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -356,6 +362,7 @@
         <item quantity="other">%d ficheiros enviados via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">De:</string>
+    <string name="genericMessageTranslated">Mensagem traduzida</string>
     <string name="googlePlayServicesAreRequired">Os Google Play Services são necessários</string>
     <string name="groupContactsTitle">Grupo: %s</string>
     <string name="inboxFolder">Caixa de entrada</string>
@@ -380,6 +387,8 @@
     <string name="manageSignatures">Gerir as minhas assinaturas</string>
     <string name="menuDrawerAdvancedActions">Ações avançadas</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilizados</string>
+    <string name="messageAlreadySummarized">A mensagem já está resumida</string>
+    <string name="messageAlreadyTranslated">A mensagem já está traduzida</string>
     <string name="messageComesFromDiscussionList">Esta mensagem provém de uma lista de discussão.</string>
     <string name="messageDetailsDateAt">%1$s às %2$s</string>
     <string name="messageDetailsYesterday">Ontem</string>
@@ -392,6 +401,13 @@
     <string name="messageIsSpamShouldMoveToSpam">Esta mensagem é considerada spam. Recomendamos que a mova para a pasta \"Spam\".</string>
     <string name="messageReplyHeader">Em %1$s, %2$s escreveu:</string>
     <string name="messageShowQuotedText">Mostrar a conversa</string>
+    <string name="messageSummary">Resumo da mensagem</string>
+    <string name="messageSummaryError">A Euria não conseguiu resumir esta mensagem.</string>
+    <string name="messageSummaryErrorRetry">A Euria não conseguiu resumir esta mensagem. Por favor, tente novamente.</string>
+    <string name="messageSummaryLoading">Resumo da mensagem…</string>
+    <string name="messageTranslateError">A Euria não conseguiu traduzir esta mensagem.</string>
+    <string name="messageTranslateErrorRetry">A Euria não conseguiu traduzir esta mensagem. Por favor, tente novamente.</string>
+    <string name="messageTranslatedTitle">Traduzido em %s</string>
     <string name="mondayAfternoon">Segunda-feira à tarde</string>
     <string name="mondayMorning">Segunda-feira de manhã</string>
     <string name="moveInSpamButton">Mover para Spam</string>
@@ -682,6 +698,7 @@
         <item quantity="one">%d endereço não pôde ser adicionado porque atingiu o limite de destinatários</item>
         <item quantity="other">%d endereços não puderam ser adicionados porque atingiu o limite de destinatários</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Esta mensagem já está na sua língua</string>
     <string name="trashFolder">Lixo</string>
     <string name="unblockButton">Desbloquear</string>
     <string name="unknownDialogTitleExpeditor">Remetente desconhecido</string>

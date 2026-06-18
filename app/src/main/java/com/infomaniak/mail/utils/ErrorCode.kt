@@ -94,6 +94,8 @@ object ErrorCode {
     const val MAX_SYNTAX_TOKENS_REACHED = "max_token_reached"
     const val TOO_MANY_REQUESTS = "too_many_request"
     const val OBJECT_NOT_FOUND = "object_not_found"
+    const val TRANSLATION_API_NOT_AVAILABLE = "translation__api_not_available"
+    const val TRANSLATION_TARGET_SAME_AS_SOURCE = "translation__target_same_as_source"
     //endregion
 
     //region Snooze

@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_ACTIONS_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setSpamUi
@@ -109,6 +110,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setMoveUi(isFromDraft)
             setMarkUnreadUi(isFromDraft)
             setReportPhishingUi(isFromDraft)
+            setAskEuriaUi(isVisible = true)
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
@@ -290,6 +292,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     description = getString(R.string.reportDisplayProblemDescription),
                     onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(message.uid) },
                 )
+            }
+
+            override fun onAskEuria() {
+                trackBottomSheetThreadActionsEvent(MatomoName.AskEuria)
+                setBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET, message.uid)
             }
             //endregion
         })

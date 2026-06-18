@@ -22,6 +22,7 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 class Body : EmbeddedRealmObject {
@@ -34,6 +35,17 @@ class Body : EmbeddedRealmObject {
     @SerialName("subBody")
     var subBodies = realmListOf<SubBody>()
     //endregion
+    @Transient
+    var translatedValue: String? = null
+    @Transient
+    var summary: String? = null
+    val isTranslated: Boolean get() = translatedValue != null
+    val hasSummary: Boolean get() = summary != null
+
+    fun keepLocalValues(localBody: Body) {
+        translatedValue = localBody.translatedValue
+        summary = localBody.summary
+    }
 
     companion object
 }

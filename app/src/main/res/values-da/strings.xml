@@ -44,6 +44,7 @@
     <string name="actionSnooze">Udsæt</string>
     <string name="actionSpam">Rapportér spam</string>
     <string name="actionStar">Tilføj til favoritter</string>
+    <string name="actionSummarize">Resumé</string>
     <string name="actionUnstar">Fjern fra favoritter</string>
     <string name="actionViewInDark">Vis i mørk tema</string>
     <string name="actionViewInLight">Vis i lyst tema</string>
@@ -95,6 +96,7 @@
     <string name="alertSenderNoReply">Vær opmærksom på, at afsenderen af denne e-mail tilsyneladende ikke ønsker et svar.</string>
     <string name="appSecurityDescription">Beskytt adgangen til din app ved at aktivere din telefons lås.</string>
     <string name="archiveFolder">Arkiveret</string>
+    <string name="askEuriaTitle">Spørg Euria</string>
     <string name="attachMailboxDescription1">Hvis du allerede har en Infomaniak e-mailadresse, opret forbindelse nu</string>
     <string name="attachMailboxDescription2">Kun Infomaniak e-mailadresser understøttes</string>
     <string name="attachMailboxInputHint">E-mailadresse</string>
@@ -157,11 +159,13 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Send med en anden adresse</string>
     <string name="buttonShare">Del</string>
+    <string name="buttonShowOriginal">Vis den oprindelige besked</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synkronisering</string>
     <string name="buttonStrikeThrough">Gennemstreget</string>
     <string name="buttonTextOptionsClose">Luk tekstformatering</string>
     <string name="buttonTextOptionsOpen">Åbn tekstformatering</string>
+    <string name="buttonTranslate">Oversæt</string>
     <string name="buttonTry">Prøv</string>
     <string name="buttonUnderline">Understreget</string>
     <string name="buttonUnorderedList">Usorteret liste</string>
@@ -202,6 +206,7 @@
     <string name="contentDescriptionButtonSelectSignature">Vælg en anden signatur</string>
     <string name="contentDescriptionButtonSettings">Indstillinger</string>
     <string name="contentDescriptionButtonShowPassword">Vis adgangskode</string>
+    <string name="contentDescriptionButtonWarning">Advarsel</string>
     <string name="contentDescriptionContactAlreadyUsed">Kontakt allerede brugt som modtager</string>
     <string name="contentDescriptionDownloadIndicator">Downloader</string>
     <string name="contentDescriptionIconAttachments">Har vedhæftninger</string>
@@ -335,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Kan ikke oprette mappen</string>
     <string name="errorUnableToFlushFolder">Mappen kan ikke tømmes</string>
     <string name="errorUserAlreadySynchronized">Brugeren er allerede synkroniseret</string>
+    <string name="euriaTranslateMessage">Euria oversætter din besked…</string>
     <string name="expeditorAuthenticationDescription">Afsenderens oprindelse er blevet autentificeret.</string>
     <string name="externalDialogConfirmButton">Jeg forstår</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -356,6 +362,7 @@
         <item quantity="other">%d filer sendt via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Fra:</string>
+    <string name="genericMessageTranslated">Besked oversat</string>
     <string name="googlePlayServicesAreRequired">Google Play Services er påkrævet</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
     <string name="inboxFolder">Indbakke</string>
@@ -380,6 +387,8 @@
     <string name="manageSignatures">Administrer mine signaturer</string>
     <string name="menuDrawerAdvancedActions">Avancerede handlinger</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s brugt</string>
+    <string name="messageAlreadySummarized">Beskeden er allerede opsummeret</string>
+    <string name="messageAlreadyTranslated">Beskeden er allerede oversat</string>
     <string name="messageComesFromDiscussionList">Denne besked kommer fra en diskussionsliste.</string>
     <string name="messageDetailsDateAt">%1$s kl. %2$s</string>
     <string name="messageDetailsYesterday">I går</string>
@@ -392,6 +401,13 @@
     <string name="messageIsSpamShouldMoveToSpam">Denne besked betragtes som spam. Vi anbefaler dig at flytte den til \"Spam\"-mappen.</string>
     <string name="messageReplyHeader">Den %1$s skrev %2$s:</string>
     <string name="messageShowQuotedText">Vis samtalen</string>
+    <string name="messageSummary">Beskedens resumé</string>
+    <string name="messageSummaryError">Euria kunne ikke opsummere denne besked.</string>
+    <string name="messageSummaryErrorRetry">Euria kunne ikke opsummere denne besked. Prøv venligst igen.</string>
+    <string name="messageSummaryLoading">Beskedens resumé…</string>
+    <string name="messageTranslateError">Euria kunne ikke oversætte denne besked.</string>
+    <string name="messageTranslateErrorRetry">Euria kunne ikke oversætte denne besked. Prøv venligst igen.</string>
+    <string name="messageTranslatedTitle">Oversat i %s</string>
     <string name="mondayAfternoon">Mandag eftermiddag</string>
     <string name="mondayMorning">Mandag morgen</string>
     <string name="moveInSpamButton">Flyt til Spam</string>
@@ -682,6 +698,7 @@
         <item quantity="one">%d adresse kunne ikke tilføjes, fordi du har nået grænsen for modtagere</item>
         <item quantity="other">%d adresser kunne ikke tilføjes, fordi du har nået grænsen for modtagere</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Denne besked er allerede på dit sprog</string>
     <string name="trashFolder">Papirkurv</string>
     <string name="unblockButton">Fjern blokering</string>
     <string name="unknownDialogTitleExpeditor">Ukendt afsender</string>

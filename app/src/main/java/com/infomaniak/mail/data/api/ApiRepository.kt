@@ -503,6 +503,24 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
+    suspend fun aiSummary(languageCode: String, mailboxUuid: String, msgUid: String): ApiResponse<String> {
+        return callApi(
+            url = ApiRoutes.aiSummary(),
+            method = POST,
+            body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
+        )
+    }
+
+    suspend fun aiTranslate(languageCode: String, mailboxUuid: String, msgUid: String): ApiResponse<String> {
+        return callApi(
+            url = ApiRoutes.aiTranslate(),
+            method = POST,
+            body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
+        )
+    }
+
     private fun getAiBodyFromMessages(messages: List<AiMessage>) = mapOf("messages" to messages, "output" to "mail")
 
     suspend fun getFeatureFlags(currentMailboxUuid: String): ApiResponse<List<String>> {

@@ -467,6 +467,41 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider" />
 
+
+        <LinearLayout
+            android:id="@+id/aiBannerContainer"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:divider="@drawable/spacer_standard_medium"
+            android:showDividers="middle"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin">
+
+            <com.infomaniak.mail.views.InformationBlockView
+                android:id="@+id/blockInformationViewSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <com.infomaniak.mail.views.InformationBlockView
+                android:id="@+id/blockInformationViewTranslate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <Space
+            android:id="@+id/aiBannerContainerBottomMargin"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/marginStandardMedium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/aiBannerContainer"/>
+
         <com.infomaniak.mail.ui.main.thread.calendar.CalendarEventBannerView
             android:id="@+id/calendarEvent"
             android:layout_width="match_parent"
@@ -476,7 +511,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin"
+            app:layout_constraintTop_toBottomOf="@id/aiBannerContainerBottomMargin"
             tools:visibility="visible" />
 
         <include

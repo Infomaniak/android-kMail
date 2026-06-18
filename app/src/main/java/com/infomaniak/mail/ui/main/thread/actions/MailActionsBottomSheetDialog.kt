@@ -72,6 +72,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onShare() = Unit
         override fun onSaveToKDrive() = Unit
         override fun onReportDisplayProblem() = Unit
+        override fun onAskEuria() = Unit
         //endregion
     }
 
@@ -108,6 +109,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
+        askEuria.setOnClickListener { onClickListener.onAskEuria() }
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
@@ -207,6 +209,10 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         isVisible = canBeReactedTo
     }
 
+    fun setAskEuriaUi(isVisible: Boolean) {
+        binding.askEuria.isVisible = isVisible
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
@@ -227,5 +233,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onShare()
         fun onSaveToKDrive()
         fun onReportDisplayProblem()
+        fun onAskEuria()
     }
 }
