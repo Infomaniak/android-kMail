@@ -27,7 +27,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -46,8 +45,6 @@ import com.infomaniak.mail.ui.Utils.enterEmailToField
 import com.infomaniak.mail.ui.Utils.onViewWithTimeout
 import com.infomaniak.mail.ui.login.BaseActivityTest
 import com.infomaniak.mail.ui.login.LoginActivity
-import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
-import com.infomaniak.mail.utils.Env
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Test
