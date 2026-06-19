@@ -161,9 +161,6 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
             )
         )
 
-        // Dismissing the AI BottomSheet again
-        device.click(0, 0)
-
         onView(isRoot()).perform(waitFor(2.seconds))
 
         assertRecipientInField(R.id.toField, toAddress)
