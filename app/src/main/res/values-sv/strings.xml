@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Spamfilter</string>
     <string name="settingsSelectDisplayModeDescription">Välj visningsläge</string>
     <string name="settingsSendAcknowledgement">Begär en mottagningsbekräftelse för varje skickat e-postmeddelande</string>
+    <string name="settingsSendAcknowledgementSubtitle">Begär läskvitto för varje skickat meddelande</string>
+    <string name="settingsSendAcknowledgementTitle">Läskvitton</string>
     <string name="settingsSendIncludeOriginalMessage">Inkludera originalmeddelandet i svaret</string>
     <string name="settingsSendTitle">Sänd</string>
     <string name="settingsSignatureDescription">Välj en standardsignatur</string>

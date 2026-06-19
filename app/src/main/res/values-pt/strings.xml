@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Filtro anti-spam</string>
     <string name="settingsSelectDisplayModeDescription">Selecionar um modo de exibição</string>
     <string name="settingsSendAcknowledgement">Solicitar um aviso de receção para cada e-mail enviado</string>
+    <string name="settingsSendAcknowledgementSubtitle">Pedir confirmação de leitura para cada mensagem enviada</string>
+    <string name="settingsSendAcknowledgementTitle">Confirmações de leitura</string>
     <string name="settingsSendIncludeOriginalMessage">Incluir a mensagem original na resposta</string>
     <string name="settingsSendTitle">Envio</string>
     <string name="settingsSignatureDescription">Selecionar uma assinatura predefinida</string>

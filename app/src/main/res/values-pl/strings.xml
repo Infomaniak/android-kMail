@@ -588,6 +588,8 @@
     <string name="settingsSecuritySpamFilter">Filtr antyspamowy</string>
     <string name="settingsSelectDisplayModeDescription">Wybierz tryb wyświetlania</string>
     <string name="settingsSendAcknowledgement">Poproś o potwierdzenie odbioru dla każdej wysłanej wiadomości e-mail</string>
+    <string name="settingsSendAcknowledgementSubtitle">poproś o potwierdzenie odbioru dla każdej wysłanej wiadomości</string>
+    <string name="settingsSendAcknowledgementTitle">Potwierdzenia odbioru</string>
     <string name="settingsSendIncludeOriginalMessage">Dołącz oryginalną wiadomość do odpowiedzi</string>
     <string name="settingsSendTitle">Wysyłka</string>
     <string name="settingsSignatureDescription">Wybierz domyślny podpis</string>

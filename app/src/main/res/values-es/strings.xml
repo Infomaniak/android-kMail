@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Filtro de spam</string>
     <string name="settingsSelectDisplayModeDescription">Seleccionar un modo de visualización</string>
     <string name="settingsSendAcknowledgement">Solicite un acuse de recibo por cada correo electrónico enviado</string>
+    <string name="settingsSendAcknowledgementSubtitle">Solicitar una confirmación de lectura para cada mensaje enviado</string>
+    <string name="settingsSendAcknowledgementTitle">Leer recibos</string>
     <string name="settingsSendIncludeOriginalMessage">Incluir el mensaje original en la respuesta</string>
     <string name="settingsSendTitle">Enviar</string>
     <string name="settingsSignatureDescription">Seleccione una firma por defecto</string>

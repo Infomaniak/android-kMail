@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Roskapostisuodatin</string>
     <string name="settingsSelectDisplayModeDescription">Valitse näyttötila</string>
     <string name="settingsSendAcknowledgement">Pyydä vastaanottokuittaus jokaisesta lähetetystä sähköpostista</string>
+    <string name="settingsSendAcknowledgementSubtitle">Pyydä vastaanottokuittaus jokaiselle lähetetylle viestille</string>
+    <string name="settingsSendAcknowledgementTitle">Vastaanottokuittaukset</string>
     <string name="settingsSendIncludeOriginalMessage">Sisällytä alkuperäinen viesti vastaukseen</string>
     <string name="settingsSendTitle">Lähetä</string>
     <string name="settingsSignatureDescription">Valitse oletusallekirjoitus</string>

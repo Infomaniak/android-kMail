@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Spam-Filter</string>
     <string name="settingsSelectDisplayModeDescription">Wählen Sie einen Anzeigemodus</string>
     <string name="settingsSendAcknowledgement">Verlangen Sie eine Empfangsbestätigung für jede gesendete E-Mail</string>
+    <string name="settingsSendAcknowledgementSubtitle">Anforderung einer Lesebestätigung für jede gesendete Nachricht</string>
+    <string name="settingsSendAcknowledgementTitle">Lesebestätigungen</string>
     <string name="settingsSendIncludeOriginalMessage">Fügen Sie die ursprüngliche Nachricht in die Antwort ein</string>
     <string name="settingsSendTitle">Senden Sie</string>
     <string name="settingsSignatureDescription">Wählen Sie eine Standardsignatur</string>

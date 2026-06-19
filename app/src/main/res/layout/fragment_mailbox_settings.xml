@@ -47,6 +47,14 @@
                 app:title="@string/settingsMailboxGeneralSignature" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsMailboxGeneralAcknowledgment"
+                android:layout_width="match_parent"
+                app:subtitle="@string/settingsSendAcknowledgementSubtitle"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsSendAcknowledgementTitle" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsMailboxGeneralAutoreply"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

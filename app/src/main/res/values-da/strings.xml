@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Spamfilter</string>
     <string name="settingsSelectDisplayModeDescription">Vælg en visningstilstand</string>
     <string name="settingsSendAcknowledgement">Anmod om en modtagelsesbekræftelse for hver sendt e-mail</string>
+    <string name="settingsSendAcknowledgementSubtitle">Anmod om en kvittering for læsning for hver sendt besked</string>
+    <string name="settingsSendAcknowledgementTitle">Kvitteringer for læsning</string>
     <string name="settingsSendIncludeOriginalMessage">Inkluder den oprindelige besked i svaret</string>
     <string name="settingsSendTitle">Send</string>
     <string name="settingsSignatureDescription">Vælg en standard signatur</string>

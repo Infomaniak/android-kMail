@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Filtre anti-spam</string>
     <string name="settingsSelectDisplayModeDescription">Sélectionnez un mode d’affichage</string>
     <string name="settingsSendAcknowledgement">Demander un accusé de réception pour chaque message envoyé</string>
+    <string name="settingsSendAcknowledgementSubtitle">Demander un accusé de lecture pour chaque message envoyé</string>
+    <string name="settingsSendAcknowledgementTitle">Accusés de lecture</string>
     <string name="settingsSendIncludeOriginalMessage">Inclure le message original dans la réponse</string>
     <string name="settingsSendTitle">Envoi</string>
     <string name="settingsSignatureDescription">Sélectionner une signature par défaut</string>

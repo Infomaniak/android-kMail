@@ -562,6 +562,8 @@
     <string name="settingsSecuritySpamFilter">Φίλτρο ανεπιθύμητων</string>
     <string name="settingsSelectDisplayModeDescription">Επιλέξτε τρόπο εμφάνισης</string>
     <string name="settingsSendAcknowledgement">Ζητήστε επιβεβαίωση παραλαβής για κάθε αποσταλμένο email</string>
+    <string name="settingsSendAcknowledgementSubtitle">Ζητήστε επιβεβαίωση ανάγνωσης για κάθε μήνυμα που στέλνετε</string>
+    <string name="settingsSendAcknowledgementTitle">Αποδείξεις ανάγνωσης</string>
     <string name="settingsSendIncludeOriginalMessage">Συμπεριλάβετε το αρχικό μήνυμα στην απάντηση</string>
     <string name="settingsSendTitle">Αποστολή</string>
     <string name="settingsSignatureDescription">Επιλέξτε προεπιλεγμένη υπογραφή</string>
