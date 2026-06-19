@@ -170,15 +170,6 @@
                             android:layout_height="match_parent"
                             android:orientation="vertical">
 
-                            <com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-                                android:id="@+id/threadsList"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:clipToPadding="false"
-                                android:paddingBottom="@dimen/recyclerViewPaddingBottom"
-                                app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                                tools:listitem="@layout/cardview_thread_item" />
 
                             <com.infomaniak.mail.views.itemViews.KSuiteStorageBanner
                                 android:id="@+id/storageBanner"
@@ -203,17 +194,16 @@
                                 app:descriptionIcon="@drawable/ic_warning"
                                 app:isButtonAlignedWithDescription="false" />
 
+                            <com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                                android:id="@+id/threadsList"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:clipToPadding="false"
+                                android:paddingBottom="@dimen/recyclerViewPaddingBottom"
+                                app:behind_swiped_item_icon_margin="@dimen/marginStandard"
+                                tools:listitem="@layout/cardview_thread_item" />
                         </LinearLayout>
-
-                        <com.infomaniak.mail.ui.main.EmptyStateView
-                            android:id="@+id/emptyStateView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:visibility="gone"
-                            tools:description="@string/emptyStateInboxDescription"
-                            tools:icon="@drawable/ic_empty_state_folder"
-                            tools:title="@string/emptyStateInboxTitle"
-                            tools:visibility="visible" />
 
                     </FrameLayout>
                 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -225,6 +215,18 @@
                     android:layout_gravity="bottom"
                     android:visibility="gone"
                     app:menu="@menu/multiselection_menu"
+                    tools:visibility="visible" />
+
+                <com.infomaniak.mail.ui.main.EmptyStateView
+                    android:id="@+id/emptyStateView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    app:layout_anchor="@+id/swipeRefreshLayout"
+                    app:layout_anchorGravity="center"
+                    tools:description="@string/emptyStateInboxDescription"
+                    tools:icon="@drawable/ic_empty_state_folder"
+                    tools:title="@string/emptyStateInboxTitle"
                     tools:visibility="visible" />
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
