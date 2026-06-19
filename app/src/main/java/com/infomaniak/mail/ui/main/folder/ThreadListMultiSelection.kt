@@ -80,8 +80,9 @@ class ThreadListMultiSelection(
                         shouldRead = shouldMultiselectRead,
                         parentFolderId = currentFolderId,
                         mailbox = currentMailBox,
-                        shouldRefreshSearch = searchViewModel.currentFilters.contains(Thread.ThreadFilter.SEEN) ||
-                                searchViewModel.currentFilters.contains(Thread.ThreadFilter.UNSEEN)
+                        shouldRefreshSearch = searchViewModel.currentFilters.let {
+                            it.contains(Thread.ThreadFilter.SEEN) || it.contains(Thread.ThreadFilter.UNSEEN)
+                        }
                     )
                     isMultiSelectOn = false
                 }

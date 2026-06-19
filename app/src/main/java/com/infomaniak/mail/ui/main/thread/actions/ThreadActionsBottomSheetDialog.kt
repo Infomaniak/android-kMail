@@ -233,8 +233,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onReadUnread() {
             trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
-            val shouldRefreshSearch =
-                searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(ThreadFilter.UNSEEN)
+            val shouldRefreshSearch = searchViewModel.currentFilters.let {
+                it.contains(ThreadFilter.SEEN) || it.contains(ThreadFilter.UNSEEN)
+            }
             actionsViewModel.toggleThreadsSeenStatus(
                 threadsUids = listOf(navigationArgs.threadUid),
                 parentFolderId = thread.folderId,
@@ -246,7 +247,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onMove() {
             val navController = findNavController()
-            val isFromSearch = navigationArgs.isFromSearch
             descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Move)
                 navController.animatedNavigation(
@@ -255,7 +255,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         threadsUids = arrayOf(navigationArgs.threadUid),
                         action = FolderPickerAction.MOVE,
                         sourceFolderId = thread.folderId,
-                        isFromSearch = isFromSearch
+                        isFromSearch = navigationArgs.isFromSearch
                     ).toBundle(),
                 )
             }

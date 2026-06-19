@@ -381,14 +381,12 @@ class ActionsViewModel @Inject constructor(
                 currentThread?.let { (_, uid) ->
                     if (uidsToMove.isNotEmpty() && uidsToMove.contains(uid)) tryToAutoAdvance.postValue(Unit)
                 }
-                parentFolderId?.let {
-                    refreshFoldersAsync(
-                        mailbox = mailbox,
-                        messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                        parentFolderId = parentFolderId,
-                        threadsUids = uidsToMove,
-                    )
-                }
+                refreshFoldersAsync(
+                    mailbox = mailbox,
+                    messagesFoldersIds = messagesToDelete.getFoldersIds(),
+                    parentFolderId = parentFolderId,
+                    threadsUids = uidsToMove,
+                )
                 notifySearchRefresh()
                 val numberOfImpactedThreads = uidsToMove.distinct().count()
                 showDeleteSnackbar(

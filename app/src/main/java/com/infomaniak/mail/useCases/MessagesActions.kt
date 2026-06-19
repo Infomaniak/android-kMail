@@ -118,7 +118,7 @@ class MessagesActions @Inject constructor(
     private suspend fun moveOutMessagesThreadsLocally(messages: List<Message>): List<String> {
         val threadsUidsToMove = mutableListOf<String>()
         val movingMessageUids = messages.getUids().toSet()
-        val movingFolderIds = messages.mapTo(mutableSetOf(), Message::folderId)
+        val movingMessagesFoldersIds = messages.mapTo(mutableSetOf(), Message::folderId)
 
         mailboxContentRealm().run {
             messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
@@ -126,11 +126,11 @@ class MessagesActions @Inject constructor(
 
                 val messagesInThreadNotMoving = realmThread.messages.filterNot { it.uid in movingMessageUids }
 
-                val stillHasMessagesInMovedFolders = messagesInThreadNotMoving.any { message ->
-                    message.folderId in movingFolderIds
+                val stillHasMessagesInSourceFolder = messagesInThreadNotMoving.any { message ->
+                    message.folderId in movingMessagesFoldersIds
                 }
 
-                if (!stillHasMessagesInMovedFolders) {
+                if (!stillHasMessagesInSourceFolder) {
                     threadsUidsToMove.add(realmThread.uid)
                 }
             }

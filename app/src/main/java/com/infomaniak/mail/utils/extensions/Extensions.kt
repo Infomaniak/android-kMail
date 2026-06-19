@@ -77,36 +77,26 @@ import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SnoozeState
-import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
-import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
-import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
@@ -398,70 +388,6 @@ fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
 fun List<Thread>.getThreadsUids(): List<String> = map { it.uid }
-
-fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
-
-    addItemDecoration(
-        HeaderItemDecoration(
-            parent = this,
-            shouldFadeOutHeader = false,
-            isHeader = { position ->
-                return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is ThreadListItem.SectionTitle
-            },
-        ),
-    )
-
-    if (threadDensity == ThreadDensity.NORMAL) addItemDecoration(DateSeparatorItemDecoration())
-}
-
-fun DragDropSwipeRecyclerView.updateSwipeAvailability(
-    localSettings: LocalSettings,
-    isMultiSelectOn: Boolean,
-) {
-    val isLeftEnabled = localSettings.swipeLeft != SwipeAction.NONE && !isMultiSelectOn
-    if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
-
-    val isRightEnabled = localSettings.swipeRight != SwipeAction.NONE && !isMultiSelectOn
-    if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
-}
-
-fun DragDropSwipeRecyclerView.updateSwipeActionEnabledUi(
-    swipeAction: SwipeAction,
-    swipeDirection: DirectionFlag,
-    isEnabled: Boolean,
-) {
-    fun SwipeAction.iconResOrDisabled(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
-    fun SwipeAction.backgroundColorOrDisabled(): Int {
-        return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
-    }
-
-    if (swipeDirection == DirectionFlag.LEFT) {
-        behindSwipedItemIconDrawableId = swipeAction.iconResOrDisabled()
-        behindSwipedItemBackgroundColor = swipeAction.backgroundColorOrDisabled()
-    } else if (swipeDirection == DirectionFlag.RIGHT) {
-        behindSwipedItemIconSecondaryDrawableId = swipeAction.iconResOrDisabled()
-        behindSwipedItemBackgroundSecondaryColor = swipeAction.backgroundColorOrDisabled()
-    }
-}
-
-fun DragDropSwipeRecyclerView.updateSwipeActionsUi(
-    localSettings: LocalSettings,
-    featureFlags: Mailbox.FeatureFlagSet?,
-    folderRole: FolderRole?
-) {
-    apply {
-        updateSwipeActionEnabledUi(
-            swipeAction = localSettings.swipeLeft,
-            swipeDirection = DirectionFlag.LEFT,
-            isEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings),
-        )
-        updateSwipeActionEnabledUi(
-            swipeAction = localSettings.swipeRight,
-            swipeDirection = DirectionFlag.RIGHT,
-            isEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings),
-        )
-    }
-}
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
     return folder?.getLocalizedName(context = this) ?: getString(R.string.searchFilterFolder)

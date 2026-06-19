@@ -127,6 +127,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
             },
         )
     }
+
     private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     override val multiSelectionBinding: MultiSelectionBinding
