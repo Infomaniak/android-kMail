@@ -66,14 +66,21 @@ object Utils {
     }
 
     fun enterEmailToField(fieldResId: Int, value: String = Env.UI_TEST_ACCOUNT_EMAIL, suggestionListResId: Int) {
-        onView(
-            allOf(
+        onViewWithTimeout(
+            matcher = allOf(
                 withId(R.id.textInput),
                 isDescendantOfA(withId(fieldResId)),
             )
         ).perform(click(), typeText(value))
-        onView(withId(suggestionListResId))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<ContactViewHolder>(0, click()))
+
+        onViewWithTimeout(
+            matcher = withId(suggestionListResId),
+        ).perform(
+            RecyclerViewActions.actionOnItemAtPosition<ContactViewHolder>(
+                0,
+                click()
+            )
+        )
     }
 
     fun assertRecipientInField(fieldResId: Int, emailAddress: String) {
