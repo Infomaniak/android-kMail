@@ -1198,10 +1198,12 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun addMention(email: String) {
+        trackNewMessageEvent(MatomoName.InsertMention)
         _currentMentions.update { it + email }
     }
 
     fun removeMentions(emails: List<String>) {
+        trackNewMessageEvent(MatomoName.RemoveMention)
         _currentMentions.update { it - emails.toSet() }
     }
 

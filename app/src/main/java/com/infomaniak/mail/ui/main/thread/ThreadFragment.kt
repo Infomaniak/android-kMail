@@ -50,6 +50,7 @@ import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
+import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
@@ -520,6 +521,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun openContactDetails(email: String, displayName: String?) {
+        trackMessageEvent(MatomoName.ShowMentionDetails)
         val recipient = Recipient.createValidRecipientOrNull(email = email, name = displayName) ?: return
 
         safeNavigate(
