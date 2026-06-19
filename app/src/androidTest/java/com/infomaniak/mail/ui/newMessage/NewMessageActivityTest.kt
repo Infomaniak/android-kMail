@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
@@ -26,18 +27,28 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
+import androidx.test.espresso.web.sugar.Web.onWebView
+import androidx.test.espresso.web.webdriver.DriverAtoms.findElement
+import androidx.test.espresso.web.webdriver.DriverAtoms.getText
+import androidx.test.espresso.web.webdriver.Locator
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.runner.AndroidJUnit4
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.Scenarios.waitFor
+import com.infomaniak.mail.ui.Utils.assertRecipientInField
+import com.infomaniak.mail.ui.Utils.enterEmailToField
 import com.infomaniak.mail.ui.Utils.onViewWithTimeout
-import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.BaseActivityTest
+import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.Env
+import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,7 +62,10 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
 
     @Test
     fun sendEmail() {
-        onView(withId(R.id.newMessageFab)).perform(click())
+        onViewWithTimeout(
+            retryInterval = 500.milliseconds,
+            matcher = withId(R.id.newMessageFab)
+        ).perform(click())
 
         // Waiting for the view to settle
         onView(isRoot()).perform(waitFor(3.seconds))
@@ -67,9 +81,9 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
             )
         ).perform(click())
 
-        enterEmailToField(R.id.toField, R.id.autoCompleteTo)
-        enterEmailToField(R.id.ccField, R.id.autoCompleteCc)
-        enterEmailToField(R.id.bccField, R.id.autoCompleteBcc)
+        enterEmailToField(fieldResId = R.id.toField, suggestionListResId = R.id.autoCompleteTo)
+        enterEmailToField(fieldResId = R.id.ccField, suggestionListResId = R.id.autoCompleteCc)
+        enterEmailToField(fieldResId = R.id.bccField, suggestionListResId = R.id.autoCompleteBcc)
 
         val subject = "UI test mail #${UUID.randomUUID()}"
 
@@ -87,14 +101,81 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
         )
     }
 
-    private fun enterEmailToField(fieldResId: Int, suggestionListResId: Int) {
+    @Test
+    fun saveDraftAndCheckFields() {
+        val randomSuffix = UUID.randomUUID().toString().take(8)
+        val toAddress = "ui-test-to-$randomSuffix@example.com"
+        val ccAddress = "ui-test-cc-$randomSuffix@example.com"
+        val bccAddress = "ui-test-bcc-$randomSuffix@example.com"
+        val subject = "UI test draft subject #$randomSuffix"
+        val bodyUuid = UUID.randomUUID().toString()
+        val body = "UI test draft body $bodyUuid"
+
+        onViewWithTimeout(
+            retryInterval = 500.milliseconds,
+            matcher = withId(R.id.newMessageFab)
+        ).perform(click())
+
+        // Waiting for the view to settle
+        onView(isRoot()).perform(waitFor(3.seconds))
+
+        // Dismissing the AI BottomSheet. Clicking on "Later" is not working for some reason
+        device.click(0, 0)
+
         onView(
             allOf(
-                withId(R.id.textInput),
-                isDescendantOfA(withId(fieldResId)),
+                withId(R.id.chevron),
+                isDescendantOfA(withId(R.id.toField))
             )
-        ).perform(click(), typeText(Env.UI_TEST_ACCOUNT_EMAIL))
-        onView(withId(suggestionListResId))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<ContactViewHolder>(0, click()))
+        ).perform(click())
+
+        enterEmailToField(R.id.toField, toAddress, R.id.autoCompleteTo)
+        enterEmailToField(R.id.ccField, ccAddress, R.id.autoCompleteCc)
+        enterEmailToField(R.id.bccField, bccAddress, R.id.autoCompleteBcc)
+
+        onView(withId(R.id.subjectTextField)).perform(click(), typeText(subject), closeSoftKeyboard())
+        onView(withId(R.id.editorWebView)).perform(click(), typeText(body), closeSoftKeyboard())
+
+        onView(withContentDescription(R.string.buttonClose)).perform(click())
+
+        onView(isRoot()).perform(waitFor(3.seconds))
+
+        onView(withContentDescription(R.string.contentDescriptionButtonMenu)).perform(click())
+
+        onView(withId(R.id.menuDrawerRecyclerView)).perform(
+            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                hasDescendant(withText(R.string.draftFolder)),
+                click(),
+            )
+        )
+
+        onView(isRoot()).perform(waitFor(3.seconds))
+
+        onViewWithTimeout(
+            retryInterval = 500.milliseconds,
+            matcher = withId(R.id.threadsList),
+            assertion = matches(hasDescendant(withText(subject))),
+        )
+
+        onView(withId(R.id.threadsList)).perform(
+            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                hasDescendant(withText(subject)),
+                click(),
+            )
+        )
+
+        // Dismissing the AI BottomSheet again
+        device.click(0, 0)
+
+        onView(isRoot()).perform(waitFor(2.seconds))
+
+        assertRecipientInField(R.id.toField, toAddress)
+        assertRecipientInField(R.id.ccField, ccAddress)
+        assertRecipientInField(R.id.bccField, bccAddress)
+        onView(withId(R.id.subjectTextField)).check(matches(withText(subject)))
+
+        onWebView(withId(R.id.editorWebView))
+            .withElement(findElement(Locator.XPATH, "//*[contains(text(), '$bodyUuid')]"))
+            .check(webMatches(getText(), containsString(bodyUuid)))
     }
 }
