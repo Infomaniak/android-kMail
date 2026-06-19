@@ -66,6 +66,9 @@ class Draft : RealmObject {
     @InternalModelProperties
     var _action: String? = null
 
+    @SerialName("ack_request")
+    var ackRequest: Boolean = false
+
     @SerialName("in_reply_to")
     var inReplyTo: String? = null
     @SerialName("in_reply_to_uid")

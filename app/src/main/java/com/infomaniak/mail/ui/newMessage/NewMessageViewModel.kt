@@ -1015,6 +1015,8 @@ class NewMessageViewModel @Inject constructor(
 
         if (draftAction == DraftAction.SEND) delay = localSettings.cancelDelay
 
+        ackRequest = localSettings.askEmailAcknowledgement
+
         updateDraftAttachmentsWithLiveData(
             uiAttachments = attachmentsLiveData.valueOrEmpty(),
             step = "executeDraftActionWhenStopping (action = ${draftAction.name}) -> updateDraftFromLiveData",
