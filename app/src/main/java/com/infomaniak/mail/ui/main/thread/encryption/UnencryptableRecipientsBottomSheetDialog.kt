@@ -35,7 +35,7 @@ class UnencryptableRecipientsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetAttendeesBinding by safeBinding()
     private val navigationArgs: UnencryptableRecipientsBottomSheetDialogArgs by navArgs()
-    override val mainViewModel = null
+    override val multiselectionViewModel = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttendeesBinding.inflate(inflater, container, false).also { binding = it }.root

@@ -32,19 +32,23 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
+import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setSpamUi
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -64,12 +68,23 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
 
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
 
     override val shouldCloseMultiSelection: Boolean = false
+
+    override val substituteClassName: String by lazy {
+        if (navigationArgs.isFromSearch) {
+            SearchFragment::class.java.name
+        } else {
+            ThreadListFragment::class.java.name
+        }
+    }
+
     private var isFromSpam: Boolean = false
 
     @Inject
@@ -182,7 +197,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Delete)
                     actionsViewModel.deleteMessages(
                         messages = listOf(message),
-                        currentFolder = mainViewModel.currentFolder.value,
+                        parentFolderId = message.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
@@ -195,7 +210,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
                     actionsViewModel.archiveMessages(
                         messages = listOf(message),
-                        currentFolder = mainViewModel.currentFolder.value,
+                        parentFolderId = message.folderId,
                         mailbox = mainViewModel.currentMailbox.value!!,
                     )
                 }
@@ -205,8 +220,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen, message.isSeen)
                 actionsViewModel.toggleMessagesSeenStatus(
                     messages = listOf(message),
-                    currentFolderId = mainViewModel.currentFolderId,
+                    parentFolderId = message.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!,
+                    shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(
+                        ThreadFilter.UNSEEN
+                    )
                 )
                 twoPaneViewModel.closeThread()
             }
@@ -221,7 +239,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                             action = FolderPickerAction.MOVE,
                             threadsUids = arrayOf(threadUid),
                             messagesUids = arrayOf(messageUid),
-                            sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
+                            sourceFolderId = message.folderId,
                         ).toBundle(),
                     )
                 }
@@ -242,7 +260,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Favorite, message.isFavorite)
                 actionsViewModel.toggleMessagesFavoriteStatus(
                     messages = listOf(message),
-                    mailbox = mainViewModel.currentMailbox.value!!
+                    mailbox = mainViewModel.currentMailbox.value!!,
+                    shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.STARRED)
                 )
             }
 
@@ -250,7 +269,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetMessageActionsEvent(MatomoName.Spam, value = isFromSpam)
                 actionsViewModel.toggleMessagesSpamStatus(
                     messages = listOf(message),
-                    currentFolderId = mainViewModel.currentFolderId,
+                    parentFolderId = message.folderId,
                     mailbox = mainViewModel.currentMailbox.value!!,
                 )
             }
@@ -263,7 +282,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     onPositiveButtonClicked = {
                         actionsViewModel.reportPhishing(
                             messages = listOf(message),
-                            currentFolder = mainViewModel.currentFolder.value,
+                            parentFolderId = message.folderId,
                             mailbox = mainViewModel.currentMailbox.value!!,
                         )
                     },

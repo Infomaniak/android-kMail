@@ -77,11 +77,9 @@ import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.models.Attachment
@@ -99,10 +97,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
-import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
-import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
@@ -394,21 +388,6 @@ fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
 fun List<Thread>.getThreadsUids(): List<String> = map { it.uid }
-
-fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
-
-    addItemDecoration(
-        HeaderItemDecoration(
-            parent = this,
-            shouldFadeOutHeader = false,
-            isHeader = { position ->
-                return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is ThreadListItem.SectionTitle
-            },
-        ),
-    )
-
-    if (threadDensity == ThreadDensity.NORMAL) addItemDecoration(DateSeparatorItemDecoration())
-}
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
     return folder?.getLocalizedName(context = this) ?: getString(R.string.searchFilterFolder)

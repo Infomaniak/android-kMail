@@ -75,7 +75,7 @@ abstract class TwoPaneFragment : Fragment() {
     lateinit var threadListAdapter: ThreadListAdapter
 
     @Inject
-    lateinit var localSettings: LocalSettings
+    open lateinit var localSettings: LocalSettings
 
     abstract val substituteClassName: String
     abstract fun getLeftPane(): View?
@@ -84,7 +84,7 @@ abstract class TwoPaneFragment : Fragment() {
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
-    fun isOnlyLeftShown(): Boolean = isPhone() && !twoPaneViewModel.isThreadOpen
+    fun isThreadOpen(): Boolean = twoPaneViewModel.isThreadOpen
     fun isOnlyRightShown(): Boolean = isPhone() && twoPaneViewModel.isThreadOpen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

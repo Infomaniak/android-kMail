@@ -37,8 +37,6 @@ import com.infomaniak.core.network.networking.ManualAuthorizationRequired
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.mail.MatomoMail.MatomoName
-import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
@@ -81,7 +79,6 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
-import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
@@ -173,19 +170,7 @@ class MainViewModel @Inject constructor(
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection
-    val isMultiSelectOnLiveData = MutableLiveData(false)
-    inline var isMultiSelectOn
-        get() = isMultiSelectOnLiveData.value!!
-        set(value) {
-            isMultiSelectOnLiveData.value = value
-        }
 
-    val selectedThreadsLiveData = MutableLiveData(mutableSetOf<Thread>())
-    inline val selectedThreads
-        get() = selectedThreadsLiveData.value!!
-
-    val isEverythingSelected
-        get() = runCatchingRealm { selectedThreads.count() == currentThreadsLive.value?.list?.count() }.getOrDefault(false)
     //endregion
 
     //region Current Mailbox
@@ -746,7 +731,6 @@ class MainViewModel @Inject constructor(
             threadsUids = threadsUids,
             messagesUids = messagesUids,
             mailbox = mailbox,
-            currentFolderId = currentFolderId,
         ) ?: run {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             return@launch
@@ -754,13 +738,16 @@ class MainViewModel @Inject constructor(
 
         with(result) {
             if (apiResponses.atLeastOneSucceeded()) {
-                refreshFoldersAsync(
-                    mailbox = currentMailbox.value!!,
-                    messagesFoldersIds = messages.getFoldersIds(),
-                    destinationFolderId = newFolderId,
-                    currentFolderId = currentFolderId,
-                    threadsUids = movedThreads,
-                )
+                currentFolderId?.let {
+                    refreshFoldersAsync(
+                        mailbox = currentMailbox.value!!,
+                        messagesFoldersIds = messages.getFoldersIds(),
+                        destinationFolderId = newFolderId,
+                        currentFolderId = it,
+                        threadsUids = movedThreads,
+                    )
+                }
+                
                 showMoveSnackbar(
                     movedThreads.count(),
                     messages.count(),
@@ -782,14 +769,14 @@ class MainViewModel @Inject constructor(
         mailbox: Mailbox,
         messagesFoldersIds: ImpactedFolders,
         destinationFolderId: String? = null,
-        currentFolderId: String? = null,
+        currentFolderId: String,
         threadsUids: List<String> = emptyList(),
     ) = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.refreshFolders(
             mailbox = mailbox,
             messagesFoldersIds = messagesFoldersIds,
             destinationFolderId = destinationFolderId,
-            currentFolderId = currentFolderId,
+            parentFolderId = currentFolderId,
             threadsUids = threadsUids,
             onDownloadStop = { threadsUids -> onDownloadStop(threadsUids) }
         )
@@ -818,22 +805,6 @@ class MainViewModel @Inject constructor(
     }
 
     suspend fun getMessage(messageUid: String): Message? = messageController.getMessage(messageUid)
-
-    fun selectOrUnselectAll() {
-        if (isEverythingSelected) {
-            trackMultiSelectionEvent(MatomoName.None)
-            selectedThreads.clear()
-        } else {
-            trackMultiSelectionEvent(MatomoName.All)
-            currentThreadsLive.value?.list?.forEach { thread -> selectedThreads.add(thread) }
-        }
-
-        publishSelectedItems()
-    }
-
-    fun publishSelectedItems() {
-        selectedThreadsLiveData.value = selectedThreads
-    }
 
     fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
         val folder = folderController.getFolder(FolderRole.DRAFT)

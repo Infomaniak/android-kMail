@@ -45,6 +45,7 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
+import com.infomaniak.mail.utils.extensions.getThreadsUids
 import com.infomaniak.mail.utils.extensions.getUids
 import kotlinx.coroutines.coroutineScope
 import java.util.Date
@@ -63,13 +64,12 @@ class MessagesActions @Inject constructor(
 
     // Move Region
     suspend fun moveMessagesTo(
-        currentFolder: Folder,
         destinationFolder: Folder,
         mailbox: Mailbox,
         messages: List<Message>,
     ): MoveMessagesResult {
 
-        val movedThreads = moveOutMessagesThreadsLocally(messages, currentFolder)
+        val movedThreads = moveOutMessagesThreadsLocally(messages)
         val featureFlags = mailbox.featureFlags
 
         val apiResponses = moveMessages(
@@ -89,6 +89,10 @@ class MessagesActions @Inject constructor(
 
     suspend fun getMessagesFromThreadsToMove(threads: List<Thread>): List<Message> {
         return threads.flatMap { messageController.getMovableMessages(it) }
+    }
+
+    fun getMessagesToMove(messages: List<Message>, currentFolderId: String?): List<Message> {
+        return messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
     }
 
     private suspend fun moveMessages(
@@ -111,15 +115,24 @@ class MessagesActions @Inject constructor(
         return apiResponses
     }
 
-    private suspend fun moveOutMessagesThreadsLocally(messages: List<Message>, currentFolder: Folder): List<String> {
+    private suspend fun moveOutMessagesThreadsLocally(messages: List<Message>): List<String> {
         val threadsUidsToMove = mutableListOf<String>()
         val movingMessageUids = messages.getUids().toSet()
+        val movingMessagesFoldersIds = messages.mapTo(mutableSetOf(), Message::folderId)
+
         mailboxContentRealm().run {
             messages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
                 val realmThread = ThreadController.getThreadBlocking(thread.uid, realm = this) ?: return@forEach
+
                 val messagesInThreadNotMoving = realmThread.messages.filterNot { it.uid in movingMessageUids }
-                val messagesInCurrentFolder = messagesInThreadNotMoving.count { it.folderId == currentFolder.id }
-                if (messagesInCurrentFolder == 0) threadsUidsToMove.add(realmThread.uid)
+
+                val stillHasMessagesInSourceFolder = messagesInThreadNotMoving.any { message ->
+                    message.folderId in movingMessagesFoldersIds
+                }
+
+                if (!stillHasMessagesInSourceFolder) {
+                    threadsUidsToMove.add(realmThread.uid)
+                }
             }
         }
 
@@ -134,13 +147,8 @@ class MessagesActions @Inject constructor(
         threadsUids: List<String>,
         messagesUids: List<String>? = null,
         mailbox: Mailbox,
-        currentFolderId: String?,
     ): MoveMessagesResult? {
-        if (currentFolderId == null) return null
-
-        val currentFolder = folderController.getFolder(currentFolderId) ?: return null
         val destinationFolder = folderController.getFolder(destinationFolderId) ?: return null
-
         var messagesToMove: List<Message>
         if (messagesUids != null) {
             messagesToMove = messagesUids.let { messageController.getMessages(it) }
@@ -150,27 +158,21 @@ class MessagesActions @Inject constructor(
             messagesToMove = getMessagesFromThreadsToMove(threads)
         }
 
-        return moveMessagesTo(currentFolder, destinationFolder, mailbox, messagesToMove)
+        return moveMessagesTo(destinationFolder, mailbox, messagesToMove)
     }
     // End Region
 
     // Spam Region
     suspend fun toggleMessagesSpamStatus(
         messages: List<Message>,
-        currentFolderId: String?,
         mailbox: Mailbox,
     ): MoveMessagesResult? {
-        if (currentFolderId == null) return null
-        val folder = folderController.getFolder(currentFolderId) ?: return null
         val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
-
         val destinationFolderRole = if (messagesFolderRoles.contains(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
-
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
 
         val unscheduleMessages = messageController.getUnscheduledMessages(messages)
-
-        return moveMessagesTo(folder, destinationFolder, mailbox, unscheduleMessages)
+        return moveMessagesTo(destinationFolder, mailbox, unscheduleMessages)
     }
 
     suspend fun getMessagesFromThreadsToSpamOrHam(threads: Set<Thread>): List<Message> {
@@ -191,14 +193,13 @@ class MessagesActions @Inject constructor(
         messagesToDelete: List<Message>,
         mailbox: Mailbox,
         onApiFinished: () -> Unit,
-        currentFolder: Folder
     ): DeleteResult? {
         if (messagesToDelete.isEmpty()) {
             return null
         }
 
         val uids = messagesToDelete.getUids()
-        val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete, currentFolder)
+        val uidsToMove = moveOutMessagesThreadsLocally(messagesToDelete)
 
         val apiResponses = ApiRepository.deleteMessages(
             mailboxUuid = mailbox.uuid,
@@ -363,6 +364,11 @@ class MessagesActions @Inject constructor(
     private suspend fun updateFavoriteStatus(messagesUids: List<String>, isFavorite: Boolean) {
         mailboxContentRealm().write {
             MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
+            val threadUids = messagesUids
+                .flatMap { uid -> MessageController.getMessageBlocking(uid, realm = this)?.threads?.getThreadsUids().orEmpty() }
+                .distinct()
+
+            ThreadController.updateFavoriteStatus(threadUids, isFavorite, realm = this)
         }
     }
     // End Region
@@ -434,13 +440,13 @@ class MessagesActions @Inject constructor(
     suspend fun snoozeThreads(
         date: Date,
         threadUids: List<String>,
-        currentFolderId: String?,
+        parentFolderId: String?,
         mailbox: Mailbox,
     ): SnoozeResult {
         val threads = threadUids.mapNotNull { threadController.getThread(it) }
         val messageUids = threads.mapNotNull { thread ->
             thread.getDisplayedMessages(mailbox.featureFlags, localSettings)
-                .lastOrNull { it.folderId == currentFolderId }?.uid
+                .lastOrNull { it.folderId == parentFolderId }?.uid
         }
 
         val responses = ApiRepository.snoozeMessages(mailbox.uuid, messageUids, date)
