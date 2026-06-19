@@ -31,12 +31,20 @@ import com.infomaniak.mail.utils.Env
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
+import org.junit.rules.RuleChain
+import org.junit.rules.Timeout
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 open class BaseActivityTest(startingActivity: KClass<out ComponentActivity>, private val loginDirectly: Boolean = true) {
 
+    private val composeRule = createAndroidComposeRule(startingActivity.java)
+    private val timeoutRule = Timeout(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+
     @get:Rule
-    val composeTestRule = createAndroidComposeRule(startingActivity.java)
+    val ruleChain: RuleChain = RuleChain.outerRule(timeoutRule).around(composeRule)
+
+    val composeTestRule get() = composeRule
 
     private val packageName: String = InstrumentationRegistry.getInstrumentation().targetContext.packageName
 
@@ -63,5 +71,9 @@ open class BaseActivityTest(startingActivity: KClass<out ComponentActivity>, pri
     @After
     fun cleanUp() {
         device.toggleAnimations(activate = true)
+    }
+
+    companion object {
+        private const val TEST_TIMEOUT_SECONDS = 180L
     }
 }
