@@ -23,11 +23,10 @@ const mentionQueryRegex = /(?:^|\s)@(\S*)$/;
 
 const getBlockParent = (node) => {
     const editor = getEditor();
-    const blockTags = new Set(["DIV", "P", "H1", "H2", "H3", "H4", "H5", "H6", "LI", "BLOCKQUOTE", "TD", "TR"]);
     let current = node;
     
     while (current && current !== editor && current.nodeType !== Node.DOCUMENT_NODE) {
-        if (current.nodeType === Node.ELEMENT_NODE && blockTags.has(current.tagName.toUpperCase())) {
+        if (current.nodeType === Node.ELEMENT_NODE) {
             return current;
         }
         current = current.parentNode;
@@ -58,14 +57,6 @@ const getTextBeforeCaret = () => {
     const mentions = fragment.querySelectorAll("a[data-ik-mention-ref]");
     mentions.forEach(mention => mention.replaceWith(" "));
 
-    const brs = fragment.querySelectorAll("br");
-    brs.forEach(br => br.replaceWith("\n"));
-
-    const blocks = fragment.querySelectorAll("div, p, li, blockquote");
-    blocks.forEach(b => {
-        b.prepend(document.createTextNode("\n"));
-    });
-
     return fragment.textContent;
 };
 
@@ -81,30 +72,7 @@ const extractMentionQuery = (textBeforeCaret) => {
     return validMentionCharsRegex.test(query) ? query : null;
 };
 
-const isInsideMentionLink = () => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return false;
-
-    const range = selection.getRangeAt(0);
-    const node = range.startContainer.nodeType === Node.ELEMENT_NODE
-        ? range.startContainer
-        : range.startContainer.parentElement;
-
-    return !!node?.closest("a[data-ik-mention-ref]");
-};
-
-const resetMentionQuery = () => {
-    if (lastSentValue === null) return;
-    lastSentValue = null;
-    onMentionQueryChanged("");
-};
-
 const notifyIfChanged = () => {
-    if (isInsideMentionLink()) {
-        resetMentionQuery();
-        return;
-    }
-
     const textBeforeCaret = getTextBeforeCaret();
     const query = extractMentionQuery(textBeforeCaret);
 
