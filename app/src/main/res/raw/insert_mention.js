@@ -28,10 +28,9 @@ function insertMention(userMail, userName) {
     const editor = getEditor();
 
     const getBlockParent = (node) => {
-        const blockTags = new Set(["DIV", "P", "H1", "H2", "H3", "H4", "H5", "H6", "LI", "BLOCKQUOTE", "TD", "TR"]);
         let current = node;
         while (current && current !== editor && current.nodeType !== Node.DOCUMENT_NODE) {
-            if (current.nodeType === Node.ELEMENT_NODE && blockTags.has(current.tagName.toUpperCase())) {
+            if (current.nodeType === Node.ELEMENT_NODE) {
                 return current;
             }
             current = current.parentNode;
@@ -110,9 +109,10 @@ function insertMention(userMail, userName) {
     );
     anchor.textContent = `@${userName}`;
 
-    const trailingSpace = document.createTextNode(" ");
-    replaceRange.insertNode(trailingSpace);
     replaceRange.insertNode(anchor);
+
+    const trailingSpace = document.createTextNode("\u00A0");
+    anchor.after(trailingSpace);
 
     // We replace the cursor after the space of the mention
     const newCaretRange = document.createRange();
