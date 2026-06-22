@@ -111,6 +111,7 @@ function insertMention(userMail, userName) {
 
     replaceRange.insertNode(anchor);
 
+    // Add a non-breaking space after the mention
     const trailingSpace = document.createTextNode("\u00A0");
     anchor.after(trailingSpace);
 
