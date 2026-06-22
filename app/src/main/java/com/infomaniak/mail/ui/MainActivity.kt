@@ -64,7 +64,8 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.FirebaseNotificationReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -108,7 +109,9 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import com.infomaniak.core.legacy.R as RCore
+import kotlin.math.max
+import com.infomaniak.core.common.R as RCore
+import com.infomaniak.core.legacy.R as RCoreLegacy
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -355,7 +358,12 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
-                    showSentDraftSnackbar()
+                    val mailbox = mainViewModel.currentMailbox.value ?: return
+
+                    // Waits 2s after cancel delay to guarantee the send action is committed
+                    actionsViewModel.refreshFoldersAfterSendDelay(localSettings.cancelDelay + 2, mailbox)
+                    val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
+                    showSentDraftSnackbar(cancelResourceUrl)
                 }
                 DraftAction.SCHEDULE -> {
                     val scheduleDate = getString(DraftsActionsWorker.SCHEDULED_DRAFT_DATE_KEY)
@@ -393,9 +401,22 @@ class MainActivity : BaseActivity() {
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
-    private fun showSentDraftSnackbar() {
+    private fun showSentDraftSnackbar(cancelResourceUrl: String?) {
         showSendingSnackbarTimer.cancel()
-        snackbarManager.setValue(getString(R.string.snackbarEmailSent))
+        if (cancelResourceUrl == null) {
+            snackbarManager.setValue(getString(R.string.snackbarEmailSent))
+        } else {
+            val mailbox = mainViewModel.currentMailbox.value ?: return
+
+            snackbarManager.setValue(
+                title = getString(R.string.snackbarEmailSent),
+                buttonTitle = RCore.string.buttonCancel,
+                customBehavior = { actionsViewModel.unsendMessage(cancelResourceUrl, mailbox) },
+                // Snackbar displays for 2 seconds less than actual cancel delay
+                // to ensure the user sees the snackbar disappear before the action is committed
+                length = max(0, (localSettings.cancelDelay - 2) * 1000)
+            )
+        }
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
@@ -565,7 +586,7 @@ class MainActivity : BaseActivity() {
                 trackInAppUpdateEvent(if (isWantingUpdate) MatomoName.DiscoverNow else MatomoName.DiscoverLater)
             },
             onInstallStart = { trackInAppUpdateEvent(MatomoName.InstallUpdate) },
-            onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },
+            onInstallFailure = { snackbarManager.setValue(getString(RCoreLegacy.string.errorUpdateInstall)) },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
                 SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
                 mainViewModel.canInstallUpdate.value = isUpdateDownloaded

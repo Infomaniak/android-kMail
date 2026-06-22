@@ -23,14 +23,14 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.extensions.findSuspend
@@ -304,6 +304,8 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true
 
+                            localMessage.body?.let { localBody -> remoteMessage.body?.keepLocalValues(localBody) }
+
                             MessageController.upsertMessageBlocking(remoteMessage, realm = this)
                         }
                     } else {
@@ -358,7 +360,10 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
         private fun Message.getDraftLocalUuidBlocking(realm: TypedRealm): String? {
-            return if (isDraft) DraftController.getDraftByMessageUidBlocking(uid, realm)?.localUuid else null
+            return if (isDraft && !isScheduledMessage) DraftController.getDraftByMessageUidBlocking(
+                uid,
+                realm
+            )?.localUuid else null
         }
 
         fun deleteSearchThreads(realm: MutableRealm) = with(realm) {

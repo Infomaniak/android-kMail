@@ -37,6 +37,7 @@ import com.infomaniak.core.network.networking.ManualAuthorizationRequired
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
@@ -54,16 +55,19 @@ import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.MoveResult
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.extensions.getLocalizedName
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -192,7 +196,7 @@ class MainViewModel @Inject constructor(
             .map { it.list }
             .removeRolesThatHideWhenEmpty()
             .map { it.toFolderUiTree(isInDefaultFolderSection = true) }
-    }.catch {}
+    }.catch { it.printStackTrace() }
 
     private val customFoldersFlow = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController
@@ -200,7 +204,7 @@ class MainViewModel @Inject constructor(
             .map { it.list }
             .keepTopLevelFolders()
             .map { it.toFolderUiTree(isInDefaultFolderSection = false) }
-    }.catch {}
+    }.catch { it.printStackTrace() }
 
     val displayedFoldersFlow = combine(defaultFoldersFlow, customFoldersFlow) { default, custom ->
         DisplayedFolders(default, custom)
@@ -216,9 +220,9 @@ class MainViewModel @Inject constructor(
         val progress = quotas?.getProgress()
         when {
             quotas == null -> null
-            quotas.isFull -> StorageLevel.getFullStorageBanner(currentMailbox.value?.kSuite)
+            quotas.isFull -> currentMailbox.value?.let { StorageLevel.getFullStorageBanner(it.kSuite) }
             progress != null && progress > StorageLevel.WARNING_THRESHOLD -> {
-                if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 10 == 0) {
+                if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 50 == 0) {
                     localSettings.hasClosedStorageBanner = false
                     if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Warning.Perso else StorageLevel.Warning.Pro
                 } else {
@@ -320,7 +324,7 @@ class MainViewModel @Inject constructor(
         emit(openMailbox())
     }
 
-    private suspend fun openMailbox(): Mailbox? {
+    suspend fun openMailbox(): Mailbox? {
         SentryLog.d(TAG, "Load current mailbox from local")
 
         val mailbox = mailboxController.getMailboxWithFallback(
@@ -591,6 +595,7 @@ class MainViewModel @Inject constructor(
         )
     }
 
+    //region Move
     fun showMoveSnackbar(
         threadsMovedCount: Int,
         messagesMovedCount: Int,
@@ -620,7 +625,6 @@ class MainViewModel @Inject constructor(
         val undoData = messagesActions.getUndoData(impactedFolders, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
-
 
     private fun getMoveThreadSnackbarTitle(isSpam: Boolean, threadCount: Int, destination: String): String {
         return if (isSpam) {
@@ -747,7 +751,7 @@ class MainViewModel @Inject constructor(
                         threadsUids = movedThreads,
                     )
                 }
-                
+
                 showMoveSnackbar(
                     movedThreads.count(),
                     messages.count(),
@@ -887,6 +891,28 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    //region swipe
+    fun isAllowedToSwipe(swipeDirection: ListOrientation.DirectionFlag): Boolean {
+        if (currentFolderLive.value?.role != FolderRole.DRAFT) return true
+
+        val action = if (swipeDirection == ListOrientation.DirectionFlag.LEFT) {
+            localSettings.swipeLeft
+        } else {
+            localSettings.swipeRight
+        }
+
+        val allowedSwipeActionsForDraft = listOf(
+            SwipeAction.DELETE,
+            SwipeAction.QUICKACTIONS_MENU,
+            SwipeAction.READ_UNREAD,
+            SwipeAction.FAVORITE
+        )
+
+        return action in allowedSwipeActionsForDraft
+    }
+
+    //endregion
 
     // TODO: Remove this function when the Threads parental issues are fixed
     private fun removeThreadsWithParentalIssues() = viewModelScope.launch(ioCoroutineContext) {

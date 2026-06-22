@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.forEachNestedItem
 import com.infomaniak.mail.ui.MainViewModel
@@ -87,7 +88,7 @@ private fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
  */
 fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
     dividerType: FolderPickerItem.Divider,
-    excludedFolderRoles: Set<Folder.FolderRole> = emptySet(),
+    excludedFolderRoles: Set<FolderRole> = emptySet(),
 ): List<FolderPickerItem> = buildList {
     runCatchingRealm {
         default.forEachNestedItem { folderUi, _ ->

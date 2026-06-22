@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.infomaniak.core.bugtracker.BugTrackerActivity
 import com.infomaniak.core.bugtracker.BugTrackerActivityArgs
+import com.infomaniak.core.common.launchInOnLifecycle
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.core.legacy.utils.safeNavigate
@@ -48,6 +48,7 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
@@ -69,10 +70,13 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
+import com.infomaniak.mail.utils.extensions.submitListAndAwaitCommit
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -333,8 +337,22 @@ class MenuDrawerFragment : Fragment() {
             .asFlow()
             .map(menuDrawerAdapter::formatList)
             .flowOn(Dispatchers.IO)
-            .asLiveData()
-            .observe(viewLifecycleOwner, menuDrawerAdapter::submitList)
+            .conflate()
+            .onEach { newList ->
+                val mustClearListFirst = Utils.runCatchingRealm {
+                    val firstFolderUiModelInPreviousList = menuDrawerAdapter.currentList.firstOrNull {
+                        it is FolderUi
+                    } as FolderUi?
+                    firstFolderUiModelInPreviousList?.folder?.id // Check we can access the folder id.
+                }.isFailure // If we can't, the previous models are no longer readable.
+
+                if (mustClearListFirst) {
+                    menuDrawerAdapter.submitListAndAwaitCommit(emptyList()) // Ensure we won't try to compare dead models.
+                }
+                menuDrawerAdapter.submitListAndAwaitCommit(newList)
+
+            }
+            .launchInOnLifecycle(viewLifecycleOwner)
     }
 
     private fun observeCurrentFolder() {

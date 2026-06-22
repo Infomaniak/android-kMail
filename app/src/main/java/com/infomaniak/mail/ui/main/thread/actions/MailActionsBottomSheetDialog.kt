@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
@@ -45,7 +46,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     abstract val shouldCloseMultiSelection: Boolean
     protected abstract val substituteClassName: String
-
 
     private var onClickListener: OnActionClick = object : OnActionClick {
 
@@ -72,6 +72,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onShare() = Unit
         override fun onSaveToKDrive() = Unit
         override fun onReportDisplayProblem() = Unit
+        override fun onAskEuria() = Unit
         //endregion
     }
 
@@ -108,6 +109,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
+        askEuria.setOnClickListener { onClickListener.onAskEuria() }
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
@@ -167,21 +169,48 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         setTitle(readTextRes)
     }
 
-    fun setFavoriteUi(isFavorite: Boolean) = with(binding.favorite) {
-        val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
-        setIconResource(favoriteIconRes)
-        setTitle(favoriteText)
+    fun setFavoriteUi(isFavorite: Boolean, isFromDraft: Boolean) = with(binding.favorite) {
+        isVisible = !isFromDraft
+        if (!isFromDraft) {
+            val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
+            setIconResource(favoriteIconRes)
+            setTitle(favoriteText)
+        }
     }
 
-    fun setArchiveUi(isFromArchive: Boolean) = with(binding.archive) {
+    fun setMainActionUi(isFromDraft: Boolean) {
+        binding.mainActions.isVisible = !isFromDraft
+    }
+
+    fun setMoveUi(isFromDraft: Boolean) {
+        binding.move.isVisible = !isFromDraft
+    }
+
+    fun setMarkUnreadUi(isFromDraft: Boolean) {
+        binding.markAsReadUnread.isVisible = !isFromDraft
+    }
+
+    fun setReportPhishingUi(isFromDraft: Boolean) {
+        binding.phishing.isVisible = !isFromDraft
+    }
+
+    fun setArchiveUi(isFromArchive: Boolean, isFromDraft: Boolean) = with(binding.archive) {
+        isVisible = !isFromDraft
         if (isFromArchive) {
             setIconResource(R.drawable.ic_drawer_inbox)
             setTitle(R.string.actionMoveToInbox)
+        } else {
+            setIconResource(R.drawable.ic_archive_folder)
+            setTitle(R.string.actionArchive)
         }
     }
 
     fun setReactionUi(canBeReactedTo: Boolean) = with(binding.addReaction) {
         isVisible = canBeReactedTo
+    }
+
+    fun setAskEuriaUi(isVisible: Boolean) {
+        binding.askEuria.isVisible = isVisible
     }
 
     interface OnActionClick {
@@ -204,5 +233,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onShare()
         fun onSaveToKDrive()
         fun onReportDisplayProblem()
+        fun onAskEuria()
     }
 }

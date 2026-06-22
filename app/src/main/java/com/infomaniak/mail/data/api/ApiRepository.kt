@@ -53,7 +53,7 @@ import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
-import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
+import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Contact
@@ -62,6 +62,8 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
 import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
+import com.infomaniak.mail.data.models.extensions.computeFirstAndLastName
+import com.infomaniak.mail.data.models.extensions.getJsonRequestBody
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
@@ -322,6 +324,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.resource(unscheduleDraftUrl), DELETE)
     }
 
+    suspend fun unsendMessage(unsendMessageUrl: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.resource(unsendMessageUrl), PUT)
+    }
+
     suspend fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {
         return callApi(ApiRoutes.rescheduleDraft(draftResource, scheduleDate), PUT)
     }
@@ -494,6 +500,24 @@ object ApiRepository : ApiRepositoryCore() {
             method = POST,
             body = body,
             okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor
+        )
+    }
+
+    suspend fun aiSummary(languageCode: String, mailboxUuid: String, msgUid: String): ApiResponse<String> {
+        return callApi(
+            url = ApiRoutes.aiSummary(),
+            method = POST,
+            body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
+        )
+    }
+
+    suspend fun aiTranslate(languageCode: String, mailboxUuid: String, msgUid: String): ApiResponse<String> {
+        return callApi(
+            url = ApiRoutes.aiTranslate(),
+            method = POST,
+            body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }
 

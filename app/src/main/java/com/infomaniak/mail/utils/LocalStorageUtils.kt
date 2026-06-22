@@ -23,6 +23,7 @@ import com.infomaniak.core.common.cancellable
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.extensions.getCacheFile
 import com.infomaniak.mail.ui.main.SnackbarManager
 import io.sentry.Sentry
 import okhttp3.Response

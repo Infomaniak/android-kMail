@@ -185,6 +185,12 @@ class SettingsFragment : Fragment() {
             settingsThreadMode.setSubtitle(threadMode.localisedNameRes)
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
             settingsAutomaticAdvance.setSubtitle(autoAdvanceMode.localisedNameRes)
+            val cancelDelaySubtitle = if (cancelDelay == 0) {
+                getString(R.string.settingsDisabled)
+            } else {
+                getString(R.string.settingsDelaySeconds, cancelDelay)
+            }
+            settingsCancellationPeriod.setSubtitle(cancelDelaySubtitle)
             lifecycleScope.launch {
                 UserDatabase().userDao().allUsers.map { list -> list.any { it.isStaff } }.collectLatest { hasStaffAccount ->
                     if (!hasStaffAccount) return@collectLatest
@@ -236,6 +242,10 @@ class SettingsFragment : Fragment() {
 
         settingsAutomaticAdvance.setOnClickListener {
             safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToAutoAdvanceSettings(), currentClassName)
+        }
+
+        settingsCancellationPeriod.setOnClickListener {
+            safelyAnimatedNavigation(SettingsFragmentDirections.actionSettingsToCancelDelaySetting(), currentClassName)
         }
 
         settingsThreadListDensity.setOnClickListener {

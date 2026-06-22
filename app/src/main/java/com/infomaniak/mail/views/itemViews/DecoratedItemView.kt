@@ -28,7 +28,7 @@ import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isGone
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.core.legacy.utils.getAttributes
-import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 import com.infomaniak.core.legacy.R as RCore

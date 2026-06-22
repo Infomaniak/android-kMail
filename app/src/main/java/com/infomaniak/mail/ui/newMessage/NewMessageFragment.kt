@@ -48,10 +48,10 @@ import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.core.legacy.utils.FilePicker
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
-import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.core.ui.view.extension.setMargins
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
 import com.infomaniak.lib.richhtmleditor.StatusCommand.CREATE_LINK
 import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
@@ -70,8 +70,9 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -895,7 +896,6 @@ class NewMessageFragment : Fragment() {
         trackConfirmEvent = MatomoName.SendWithoutAttachmentConfirm,
         isScheduled = isScheduled,
     )
-
 
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
 

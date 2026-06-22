@@ -22,6 +22,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import com.infomaniak.core.applock.AppLockManager
+import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.inappupdate.BaseInAppUpdateManager.Companion.checkUpdateIsRequired
 import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
@@ -37,7 +38,12 @@ import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
-    private val hiltEntryPoint by lazy { EntryPointAccessors.fromActivity(this, ActivityModule.ActivityEntrypointInterface::class.java) }
+    private val hiltEntryPoint by lazy {
+        EntryPointAccessors.fromActivity(
+            this,
+            ActivityModule.ActivityEntrypointInterface::class.java
+        )
+    }
 
     protected val inAppUpdateManager by lazy { hiltEntryPoint.inAppUpdateManager() }
 
@@ -54,7 +60,7 @@ open class BaseActivity : AppCompatActivity() {
      * 2. If you need to use it inside a compose-based Activity (i.e. w/ `setContent`), use [TwoFactorAuthAutoManagedBottomSheet]
      */
     protected fun addTwoFactorAuthOverlay() {
-        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthManager) }
+        addComposeOverlay { TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthManager, isNightModeEnabled()) }
     }
 
     /**
@@ -62,7 +68,7 @@ open class BaseActivity : AppCompatActivity() {
      */
     @Composable
     protected fun TwoFactorAuthAutoManagedBottomSheet() {
-        TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthManager)
+        TwoFactorAuthApprovalAutoManagedBottomSheet(twoFactorAuthManager, isNightModeEnabled())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -25,6 +25,8 @@ import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.action
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
@@ -110,8 +112,7 @@ class EmojiReactionsViewModel @Inject constructor(
             }
 
             mimeType = Utils.TEXT_HTML
-
-            action = Draft.DraftAction.SEND_REACTION
+            action = DraftAction.SEND_REACTION
             emojiReaction = emoji
         }
 

@@ -40,11 +40,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.observe
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -55,12 +55,12 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -233,7 +233,11 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
     }
 
     fun unlockSwipeActionsIfSet() {
-        binding.mailRecyclerView.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
+        binding.mailRecyclerView.updateSwipeAvailability(
+            localSettings,
+            multiselectionViewModel.isMultiSelectOn,
+            mainViewModel::isAllowedToSwipe
+        )
     }
 
     private fun initializeMultiselection() {
@@ -406,9 +410,9 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
     }
 
     private fun selectCurrentFolder() {
-        val currentFolder = mainViewModel.currentFolder.value
-        if (!searchViewModel.isAllFoldersSelected && searchViewModel.filterFolder == null && currentFolder?.role != FolderRole.INBOX) {
-            searchViewModel.selectFolder(currentFolder)
+        val sourceFolder = mainViewModel.currentFolder.value
+        if (!searchViewModel.isAllFoldersSelected && searchViewModel.filterFolder == null && sourceFolder?.role != FolderRole.INBOX) {
+            searchViewModel.selectFolder(sourceFolder)
         }
 
         updateAllFoldersButtonUi()

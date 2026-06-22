@@ -99,7 +99,7 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
 
     private fun createMatchWrapLayoutParams() = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
-    override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
+    override fun addView(child: View, index: Int, params: LayoutParams?) {
         if (isBindingInflated) {
             childContainer.addView(child, index, params)
         } else {

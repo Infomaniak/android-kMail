@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/EncryptionPrimaryColorTheme"
     tools:context=".ui.newMessage.encryption.EncryptionActionsBottomSheet">
 
     <TextView
@@ -32,7 +33,7 @@
         android:paddingVertical="@dimen/marginStandardSmall"
         android:text="@string/encryptedStatePanelTitle"
         app:drawableStartCompat="@drawable/ic_shield_lock"
-        app:drawableTint="@color/encryptionIconColor" />
+        app:drawableTint="?attr/colorPrimary" />
 
     <TextView
         android:id="@+id/encryptionStatusDescription"
@@ -48,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_lock_password_field"
-        app:iconColor="@color/encryptionIconColor"
+        app:iconColor="?attr/colorPrimary"
         app:title="@string/encryptedMessageAddPasswordButton"
         app:visibleDivider="false" />
 
@@ -57,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_lock_open"
-        app:iconColor="@color/encryptionIconColor"
+        app:iconColor="?attr/colorPrimary"
         app:title="@string/encryptedMessageDisableEncryptionButton" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>

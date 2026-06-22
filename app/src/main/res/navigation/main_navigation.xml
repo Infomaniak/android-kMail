@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2025 Infomaniak Network SA
+  ~ Copyright (C) 2022-2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -205,6 +205,24 @@
     </dialog>
 
     <dialog
+        android:id="@+id/askEuriaBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.AskEuriaBottomSheetDialog"
+        android:label="AskEuriaBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_ask_euria_actions">
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
+        <argument
+            android:name="isAlreadyTranslated"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="isAlreadySummarized"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </dialog>
+
+    <dialog
         android:id="@+id/threadActionsBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog"
         android:label="ThreadActionsBottomSheetDialog"
@@ -327,6 +345,9 @@
         <action
             android:id="@+id/action_settings_to_autoAdvanceSettings"
             app:destination="@id/autoAdvanceFragment" />
+        <action
+            android:id="@+id/action_settings_to_cancelDelaySetting"
+            app:destination="@id/cancelDelaySettingFragment" />
         <action
             android:id="@+id/action_settings_to_threadListDensitySetting"
             app:destination="@id/threadListDensitySettingFragment" />
@@ -586,7 +607,7 @@
             app:argType="string" />
         <argument
             android:name="attachmentType"
-            app:argType="com.infomaniak.mail.data.models.Attachable$AttachmentType" />
+            app:argType="com.infomaniak.mail.data.models.AttachmentType" />
         <argument
             android:name="intentType"
             app:argType="com.infomaniak.mail.utils.extensions.AttachmentExt$AttachmentIntentType" />

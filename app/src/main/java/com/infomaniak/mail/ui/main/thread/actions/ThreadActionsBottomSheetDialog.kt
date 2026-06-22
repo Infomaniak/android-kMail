@@ -35,13 +35,13 @@ import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -85,6 +85,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private var messagesFolderRoles: List<FolderRole> = emptyList()
     private var isFromArchive: Boolean = false
     private var isFromSpam: Boolean = false
+    private var isFromDraft: Boolean = false
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -113,15 +114,20 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 folderRole = folderRoleUtils.getThreadActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
                 isFromSpam = folderRole == FolderRole.SPAM
+                isFromDraft = folderRole == FolderRole.DRAFT
 
                 setMarkAsReadUi(thread.isSeen)
-                setArchiveUi(isFromArchive)
-                setFavoriteUi(thread.isFavorite)
+                setArchiveUi(isFromArchive, isFromDraft)
+                setFavoriteUi(thread.isFavorite, isFromDraft)
                 if (!navigationArgs.isFromSearch) {
                     setSnoozeUi(thread.isSnoozed())
                     setReactionUi(canBeReactedTo = messageUidToReactTo != null)
                 }
-                setSpamUi(binding.spam, isFromSpam)
+                setSpamUi(binding.spam, isFromSpam, isFromDraft)
+                setMainActionUi(isFromDraft)
+                setMoveUi(isFromDraft)
+                setMarkUnreadUi(isFromDraft)
+                setReportPhishingUi(isFromDraft)
 
                 initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
@@ -148,7 +154,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private fun observePotentialBlockedUsers() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam, isFromDraft)
         }
     }
 
@@ -375,6 +381,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToExecuteAction) },
             )
         }
+
+        override fun onAskEuria() = Unit
         //endregion
     }
 
@@ -382,7 +390,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         const val TAG = "ThreadActionsBottomSheetDialog"
         const val OPEN_SNOOZE_BOTTOM_SHEET = "openSnoozeBottomSheet"
 
-        fun setSpamUi(spam: ActionItemView, isFromSpam: Boolean) {
+        fun setSpamUi(spam: ActionItemView, isFromSpam: Boolean, isFromDraft: Boolean) {
+            if (isFromDraft) {
+                spam.isVisible = false
+                return
+            }
+
             spam.apply {
                 val (text, icon) = if (isFromSpam) {
                     R.string.actionNonSpam to R.drawable.ic_non_spam
@@ -396,8 +409,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
         }
 
-        fun setBlockUserUi(blockSender: ActionItemView, potentialUsersToBlock: Map<Recipient, Message>, isFromSpam: Boolean) {
-            blockSender.isGone = potentialUsersToBlock.count() == 0 || isFromSpam
+        fun setBlockUserUi(
+            blockSender: ActionItemView,
+            potentialUsersToBlock: Map<Recipient, Message>,
+            isFromSpam: Boolean,
+            isFromDraft: Boolean = false
+        ) {
+            blockSender.isGone = potentialUsersToBlock.count() == 0 || isFromSpam || isFromDraft
         }
     }
 }

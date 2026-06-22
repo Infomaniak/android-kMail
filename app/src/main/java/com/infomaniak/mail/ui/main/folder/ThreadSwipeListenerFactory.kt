@@ -21,6 +21,7 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 

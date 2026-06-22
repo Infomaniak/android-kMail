@@ -73,3 +73,4 @@ android-kMail/
 3. **When working on:** 
    - `app/src/...` → read `app/AGENTS.md`
    - `Core/` → read `Core/AGENTS.md`
+4. **Realm migrations:** Any schema-affecting change to a Realm `RealmObject` or `EmbeddedRealmObject` must increment the matching schema version constant (`USER_INFO_SCHEMA_VERSION`, `MAILBOX_INFO_SCHEMA_VERSION`, or `MAILBOX_CONTENT_SCHEMA_VERSION`) in `app/src/main/java/com/infomaniak/mail/data/cache/RealmDatabase.kt`. Update the corresponding migration block in `MailboxContentMigration.kt`, `MailboxInfoMigration.kt`, or `RealmMigrations.kt` when existing data needs migration.

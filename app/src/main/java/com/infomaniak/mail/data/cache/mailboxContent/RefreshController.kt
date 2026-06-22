@@ -32,7 +32,11 @@ import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshSt
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.extensions.messagesBlocking
+import com.infomaniak.mail.data.models.extensions.refreshStrategy
+import com.infomaniak.mail.data.models.extensions.updateFlags
+import com.infomaniak.mail.data.models.extensions.updateSnoozeFlags
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
@@ -244,7 +248,7 @@ class RefreshController @Inject constructor(
             folder.unreadCountLocal = 0
             folder.oldMessagesUidsToFetch.clear()
             folder.newMessagesUidsToFetch.clear()
-            folder.remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
+            folder.remainingOldMessagesToFetch = Folder.NUMBER_OF_OLD_MESSAGES_TO_FETCH
         }
     }
 
@@ -278,8 +282,7 @@ class RefreshController @Inject constructor(
         ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realmReadOnly).forEach { snoozedThreadWithNewMessage ->
             scope.ensureActive()
 
-            val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)
-            when (result) {
+            when (val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)) {
                 is AutomaticUnsnoozeResult.Success -> impactedFolders += result.impactedFolders
                 AutomaticUnsnoozeResult.CannotBeUnsnoozedError -> cannotBeUnsnoozedThreadUids += snoozedThreadWithNewMessage.uid
                 AutomaticUnsnoozeResult.OtherError -> Unit

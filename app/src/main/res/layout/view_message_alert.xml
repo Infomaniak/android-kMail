@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="@dimen/marginStandardMedium"
     tools:theme="@style/BasicMessageAlertView">
 
     <ImageView
@@ -38,7 +39,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/alternativeMargin"
-        android:layout_marginTop="@dimen/marginStandardSmall"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@id/actionsLayout"

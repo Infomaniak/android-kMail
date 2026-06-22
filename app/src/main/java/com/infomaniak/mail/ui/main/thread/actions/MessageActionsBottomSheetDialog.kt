@@ -32,10 +32,11 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -45,6 +46,7 @@ import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_ACTIONS_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setSpamUi
@@ -86,6 +88,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private var isFromSpam: Boolean = false
+    private var isFromArchive: Boolean = false
+    private var isFromDraft: Boolean = false
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -112,12 +116,19 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             val folderRole = folderRoleUtils.getActionFolderRole(message)
             isFromSpam = folderRole == FolderRole.SPAM
+            isFromDraft = folderRole == FolderRole.DRAFT
+            isFromArchive = folderRole == FolderRole.ARCHIVE
 
             setMarkAsReadUi(message.isSeen)
-            setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
-            setFavoriteUi(message.isFavorite)
+            setArchiveUi(isFromArchive, isFromDraft)
+            setFavoriteUi(message.isFavorite, isFromDraft)
             setReactionUi(message.isValidReactionTarget)
-            setSpamUi(binding.spam, isFromSpam)
+            setSpamUi(binding.spam, isFromSpam, isFromDraft)
+            setMainActionUi(isFromDraft)
+            setMoveUi(isFromDraft)
+            setMarkUnreadUi(isFromDraft)
+            setReportPhishingUi(isFromDraft)
+            setAskEuriaUi(isVisible = true)
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
@@ -145,7 +156,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam, isFromDraft)
         }
     }
 
@@ -333,6 +344,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     description = getString(R.string.reportDisplayProblemDescription),
                     onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(message.uid) },
                 )
+            }
+
+            override fun onAskEuria() {
+                trackBottomSheetThreadActionsEvent(MatomoName.AskEuria)
+                setBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET, message.uid)
             }
             //endregion
         })

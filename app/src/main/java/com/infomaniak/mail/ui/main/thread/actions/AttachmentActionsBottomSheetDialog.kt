@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.SwissTransferFile
+import com.infomaniak.mail.data.models.extensions.downloadUrl
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.core.legacy.utils.removeAccents
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.extensions.messagesBlocking
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.sortFolders
@@ -119,6 +122,7 @@ class FolderController @Inject constructor(
             if (remoteFolder.role == FolderRole.SCHEDULED_DRAFTS && localFolder == null) remoteFolder.isDisplayed = false
 
             localFolder?.let {
+                SentryDebug.addCursorBreadcrumb("initLocalValues", folder = remoteFolder, it.cursor)
                 remoteFolder.initLocalValues(
                     it.lastUpdatedAt,
                     it.cursor,
@@ -129,6 +133,7 @@ class FolderController @Inject constructor(
                     it.remainingOldMessagesToFetch,
                     it.isDisplayed,
                     it.isCollapsed,
+                    sortedName = remoteFolder.name.lowercase().removeAccents(),
                 )
             }
         }

@@ -22,11 +22,16 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.DimenRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.ui.view.extension.hideProgressCatching
+import com.infomaniak.core.ui.view.extension.showProgressCatching
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewInformationBlockBinding
+import com.infomaniak.core.ui.view.R as RCore
 
 class InformationBlockView @JvmOverloads constructor(
     context: Context,
@@ -72,6 +77,41 @@ class InformationBlockView @JvmOverloads constructor(
             binding.icon.setCompoundDrawablesRelativeWithIntrinsicBounds(value, null, null, null)
         }
 
+    var isCloseButtonVisible: Boolean
+        get() = binding.closeButton.isVisible
+        set(value) {
+            binding.closeButton.isVisible = value
+        }
+
+    var isAiIconVisible: Boolean
+        get() = binding.iconAi.isVisible
+        set(value) {
+            binding.iconAi.isVisible = value
+        }
+
+    var isIconVisible: Boolean
+        get() = binding.icon.isVisible
+        set(value) {
+            binding.icon.isVisible = value
+        }
+
+    var isButtonVisible: Boolean
+        get() = binding.informationButton.isVisible
+        set(value) {
+            binding.informationButton.isVisible = value
+            if (value) {
+                setMarginBottomRes(R.dimen.marginComplementaryButton)
+            } else {
+                setMarginBottomRes(RCore.dimen.marginStandardMedium)
+            }
+        }
+
+    var isButtonEnabled: Boolean
+        get() = binding.informationButton.isEnabled
+        set(value) {
+            binding.informationButton.isEnabled = value
+        }
+
     init {
         attrs?.getAttributes(context, R.styleable.InformationBlockView) {
             title = getString(R.styleable.InformationBlockView_title)
@@ -92,5 +132,39 @@ class InformationBlockView @JvmOverloads constructor(
 
     fun setOnCloseListener(listener: () -> Unit) {
         onCloseClicked = listener
+    }
+
+    fun setAnimation(animationRes: Int) {
+        binding.iconAiAnimation.setAnimation(animationRes)
+    }
+
+    fun setIconRes(resId: Int?) {
+        if (resId != null && resId != 0) {
+            binding.icon.setCompoundDrawablesRelativeWithIntrinsicBounds(resId, 0, 0, 0)
+            binding.icon.isVisible = true
+        } else {
+            binding.icon.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+            binding.icon.isVisible = false
+        }
+    }
+
+    fun showButtonProgress(color: Int) {
+        binding.informationButton.showProgressCatching(color)
+    }
+
+    fun hideButtonProgress(textRes: Int) {
+        binding.informationButton.hideProgressCatching(textRes)
+    }
+
+    fun setMarginBottom(marginBottomPx: Int) {
+        binding.constraintLayoutContainer.updateLayoutParams<MarginLayoutParams> {
+            bottomMargin = marginBottomPx
+        }
+        requestLayout()
+    }
+
+    fun setMarginBottomRes(@DimenRes dimenRes: Int) {
+        val marginPx = resources.getDimensionPixelSize(dimenRes)
+        setMarginBottom(marginPx)
     }
 }

@@ -1,0 +1,2 @@
+- Correction de l'impossibilité de se connecter avec un compte nouvellement créé
+- Support du passage à un nouvel appareil en restant connecté

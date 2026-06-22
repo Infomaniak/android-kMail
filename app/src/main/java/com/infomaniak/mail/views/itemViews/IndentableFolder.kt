@@ -18,7 +18,7 @@
 package com.infomaniak.mail.views.itemViews
 
 import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 import com.infomaniak.core.legacy.R as RCore
@@ -32,9 +32,11 @@ interface IndentableFolder {
     }
 
     private fun updateItemNameMarginStart(indent: Int) {
-        val totalMarginStart = binding.context.resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt() + computeIndent(indent)
+        val totalMarginStart =
+            binding.context.resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt() + computeIndent(indent)
         binding.itemName.apply { setMarginsRelative(start = totalMarginStart) }
     }
 
-    private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandardMedium).toInt() * indent
+    private fun computeIndent(indent: Int) =
+        binding.context.resources.getDimension(RCore.dimen.marginStandardMedium).toInt() * indent
 }

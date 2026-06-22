@@ -25,8 +25,8 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.auth.utils.AccountCreationResult
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.CREATE_ACCOUNT_CANCEL_HOST
 import com.infomaniak.mail.CREATE_ACCOUNT_SUCCESS_HOST
 import com.infomaniak.mail.CREATE_ACCOUNT_URL

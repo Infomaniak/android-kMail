@@ -22,7 +22,7 @@ import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOr
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
@@ -48,11 +48,12 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
 fun DragDropSwipeRecyclerView.updateSwipeAvailability(
     localSettings: LocalSettings,
     isMultiSelectOn: Boolean,
+    isAllowedToSwipe: (DirectionFlag) -> Boolean
 ) {
-    val isLeftEnabled = localSettings.swipeLeft != SwipeAction.NONE && !isMultiSelectOn
+    val isLeftEnabled = localSettings.swipeLeft != SwipeAction.NONE && !isMultiSelectOn && isAllowedToSwipe(DirectionFlag.LEFT)
     if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
 
-    val isRightEnabled = localSettings.swipeRight != SwipeAction.NONE && !isMultiSelectOn
+    val isRightEnabled = localSettings.swipeRight != SwipeAction.NONE && !isMultiSelectOn && isAllowedToSwipe(DirectionFlag.RIGHT)
     if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
 }
 

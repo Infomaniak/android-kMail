@@ -18,8 +18,9 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.Snoozable
+import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -64,7 +65,6 @@ class FolderRoleUtils @Inject constructor(
     suspend fun getThreadActionFolderRole(thread: Thread): FolderRole? {
         return getActionFolderRole(thread.folderId, thread)
     }
-
 
     private suspend fun getActionFolderRole(folderId: String, snoozable: Snoozable): FolderRole? {
         val folderRole = folderController.getFolder(folderId)?.role

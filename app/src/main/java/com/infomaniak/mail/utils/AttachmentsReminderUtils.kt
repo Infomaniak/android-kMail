@@ -123,7 +123,6 @@ object AttachmentsReminderUtils {
         "[^\\w]ti allego[^\\w]"
     ).joinToString("|")
 
-
     private val daAttachmentsReminderRegex = listOf(
         "se vedhæftet",
         "vedhæftet fil",

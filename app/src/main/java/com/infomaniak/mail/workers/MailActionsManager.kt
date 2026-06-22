@@ -32,7 +32,9 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.action
+import com.infomaniak.mail.data.models.extensions.getDefaultSignatureWithFallback
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
@@ -46,6 +48,7 @@ import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ALL_EMOJI_SENT_STATUS
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ASSOCIATED_MAILBOX_UUID_KEY
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY
+import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.CANCEL_RESOURCE_URL_KEY
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ERROR_MESSAGE_RESID_KEY
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.IS_SUCCESS
@@ -104,6 +107,7 @@ class MailActionsManager(
         var trackedScheduledDraftDate: String? = null
         var trackedUnscheduledDraftUrl: String? = null
         var isTrackedDraftSuccess: Boolean? = null
+        var trackedUnSendDraftUrl: String? = null
 
         val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
         SentryLog.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
@@ -148,6 +152,7 @@ class MailActionsManager(
                             remoteUuidOfTrackedDraft = savedDraftUuid
                             trackedUnscheduledDraftUrl = unscheduleDraftUrl
                             isTrackedDraftSuccess = true
+                            trackedUnSendDraftUrl = cancelResourceUrl
                         }
                         scheduledMessageEtop?.let(scheduledMessagesEtops::add)
                         realmActionOnDraft?.let(realmActionsOnDraft::add)
@@ -214,6 +219,7 @@ class MailActionsManager(
             trackedDraftErrorMessageResId,
             trackedScheduledDraftDate,
             trackedUnscheduledDraftUrl,
+            trackedUnSendDraftUrl,
             emojiSendResults,
         )
     }
@@ -227,6 +233,7 @@ class MailActionsManager(
         trackedDraftErrorMessageResId: Int?,
         trackedScheduledDraftDate: String?,
         trackedUnscheduledDraftUrl: String?,
+        trackedUnsendDraftUrl: String?,
         emojiSendResults: List<EmojiSendResult>,
     ): ListenableWorker.Result {
 
@@ -257,6 +264,7 @@ class MailActionsManager(
                     isSuccessPair,
                     SCHEDULED_DRAFT_DATE_KEY to trackedScheduledDraftDate,
                     UNSCHEDULE_DRAFT_URL_KEY to trackedUnscheduledDraftUrl,
+                    CANCEL_RESOURCE_URL_KEY to trackedUnsendDraftUrl,
                 )
             } else {
                 emptyData
@@ -313,6 +321,7 @@ class MailActionsManager(
         var scheduledMessageEtop: String? = null
         var scheduleDraftAction: String? = null
         var savedDraftUuid: String? = null
+        var cancelResource: String? = null
 
         SentryDebug.addDraftBreadcrumbs(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
 
@@ -332,6 +341,7 @@ class MailActionsManager(
                 realmActionOnDraft = null,
                 scheduledMessageEtop = null,
                 unscheduleDraftUrl = null,
+                cancelResourceUrl = null,
                 errorMessageResId = R.string.errorCorruptAttachment,
                 savedDraftUuid = null,
                 isSuccess = false,
@@ -359,6 +369,7 @@ class MailActionsManager(
                 isSuccess() -> {
                     realmActionOnDraft = deleteDraftCallback(draft)
                     scheduledMessageEtop = data?.scheduledMessageEtop
+                    cancelResource = data?.cancelResourceUrl
                 }
                 error?.exception is SerializationException -> {
                     realmActionOnDraft = deleteDraftCallback(draft)
@@ -406,6 +417,7 @@ class MailActionsManager(
             realmActionOnDraft = realmActionOnDraft,
             scheduledMessageEtop = scheduledMessageEtop,
             unscheduleDraftUrl = scheduleDraftAction,
+            cancelResourceUrl = cancelResource,
             errorMessageResId = null,
             savedDraftUuid = savedDraftUuid,
             isSuccess = true,
@@ -471,6 +483,7 @@ class MailActionsManager(
         val realmActionOnDraft: ((MutableRealm) -> Unit)?,
         val scheduledMessageEtop: String?,
         val unscheduleDraftUrl: String?,
+        val cancelResourceUrl: String?,
         val errorMessageResId: Int?,
         val savedDraftUuid: String?,
         val isSuccess: Boolean,

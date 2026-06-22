@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,13 +43,18 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
+import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
+import com.infomaniak.mail.data.models.extensions.calendarAttachment
+import com.infomaniak.mail.data.models.extensions.folder
+import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.SplitBody
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.DefaultDispatcher
 import com.infomaniak.mail.di.IoDispatcher
@@ -91,13 +96,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
@@ -118,6 +126,7 @@ typealias MessagesWithoutHeavyData = List<Message>
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
+    val threadState: ThreadState,
     private val avatarMergedContactData: AvatarMergedContactData,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
@@ -148,8 +157,6 @@ class ThreadViewModel @Inject constructor(
     private val currentMailboxLive = currentMailboxFlow.asLiveData()
 
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
-
-    val threadState = ThreadState()
 
     @DoNotReadDirectly
     private val _threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
@@ -238,7 +245,14 @@ class ThreadViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            threadFlow.filterNotNull().collect { thread ->
+            threadOpeningModeFlow
+                .mapNotNull { it.threadUid }
+                .distinctUntilChanged()
+                .onEach { _ ->
+                    threadState.reset()
+                }.launchIn(viewModelScope)
+
+            threadFlow.filterNotNull().onEach { thread ->
                 val featureFlags = featureFlagsFlow.first()
 
                 // These 2 will always be empty or not all together at the same time.
@@ -255,7 +269,7 @@ class ThreadViewModel @Inject constructor(
                     sendMatomoAboutThreadMessagesCount(thread, featureFlags)
                     if (thread.isSeen.not()) markThreadAsSeen(thread)
                 }
-            }
+            }.launchIn(viewModelScope)
         }
     }
 
@@ -373,7 +387,7 @@ class ThreadViewModel @Inject constructor(
         messages: List<Message>,
         block: SuperCollapsedBlock?,
         computeBehavior: (Int, String) -> MessageBehavior,
-    ): Pair<MutableList<Any>, MutableList<Message>> = with(threadState) {
+    ): Pair<MutableList<Any>, MutableList<Message>> {
 
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
@@ -401,17 +415,32 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
-        if (message.body == null) return@withContext message
+        val bodyObj = message.body ?: return@withContext message
 
-        message.apply {
-            body?.let {
-                val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
-                if (isNotAlreadySplit) threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                splitBody = threadState.cachedSplitBodies[message.uid]
-            }
+        val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
+        if (isNotAlreadySplit) {
+            threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(bodyObj)
+        }
+
+        if (bodyObj.isTranslated) {
+            message.splitBody = loadTranslatedSplitBody(message.uid, bodyObj)
+        } else {
+            message.splitBody = threadState.cachedSplitBodies[message.uid]
         }
 
         return@withContext message
+    }
+
+    private suspend fun loadTranslatedSplitBody(messageUid: String, bodyObj: Body): SplitBody? {
+        val isTranslatedNotSplit = !threadState.cachedTranslatedSplitBodies.contains(messageUid)
+        if (isTranslatedNotSplit) {
+            val translatedBody = Body().apply {
+                value = bodyObj.translatedValue ?: ""
+                type = bodyObj.type
+            }
+            threadState.cachedTranslatedSplitBodies[messageUid] = MessageBodyUtils.splitContentAndQuote(translatedBody)
+        }
+        return threadState.cachedTranslatedSplitBodies[messageUid]
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {

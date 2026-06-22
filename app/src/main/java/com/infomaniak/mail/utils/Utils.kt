@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.mail.CHATBOT_URL
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.TimeoutCancellationException
@@ -42,7 +42,6 @@ object Utils {
     const val MIMETYPE_UNKNOWN = "application/octet-stream"
 
     const val NUMBER_OF_OLD_UIDS_TO_FETCH = 10_000 // Total number of Messages we will ever fetch in a Folder history
-    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500 // Number of Messages we want to fetch when 1st opening a Folder
     const val PAGE_SIZE = 50 // Beware: the API refuses a PAGE_SIZE bigger than 200
     const val MIN_THREADS_TO_GET_ENOUGH_THREADS = PAGE_SIZE / 2 // We want to get at least 25 Threads when we fetch 1 old page
     const val MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_THREADS = 5 // We don't want to spam the API, so we just get a few pages

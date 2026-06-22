@@ -22,10 +22,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.infomaniak.core.ui.showToast
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm

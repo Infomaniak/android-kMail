@@ -58,7 +58,7 @@ class InsertLinkDialog @Inject constructor(
                     setConfirmButtonListener(dialog)
                 }
                 urlEditText.doOnTextChanged { _, _, _, _ ->
-                    urlLayout.setError(null)
+                    urlLayout.error = null
                 }
             }
     }
@@ -98,7 +98,7 @@ class InsertLinkDialog @Inject constructor(
     }
 
     private fun resetDialogState() = with(binding) {
-        urlLayout.setError(null)
+        urlLayout.error = null
         displayNameLayout.placeholderText = null
     }
 
@@ -112,7 +112,7 @@ class InsertLinkDialog @Inject constructor(
 
                 dialog.dismiss()
             } else {
-                urlLayout.setError(activityContext.getString(R.string.snackbarInvalidUrl))
+                urlLayout.error = activityContext.getString(R.string.snackbarInvalidUrl)
             }
         }
     }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import com.infomaniak.core.network.utils.ApiErrorCode
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.extensions.asErrorCodeTranslated
 import com.infomaniak.mail.data.models.message.EmojiReactionNotAllowedReason
 import com.infomaniak.core.legacy.R as RCore
 
@@ -93,6 +94,8 @@ object ErrorCode {
     const val MAX_SYNTAX_TOKENS_REACHED = "max_token_reached"
     const val TOO_MANY_REQUESTS = "too_many_request"
     const val OBJECT_NOT_FOUND = "object_not_found"
+    const val TRANSLATION_API_NOT_AVAILABLE = "translation__api_not_available"
+    const val TRANSLATION_TARGET_SAME_AS_SOURCE = "translation__target_same_as_source"
     //endregion
 
     //region Snooze
@@ -165,15 +168,15 @@ object ErrorCode {
         ApiErrorCode(ENCRYPTION_PASSWORD_IS_REQUIRED, R.string.encryptedStatePanelIncomplete),
 
         // Emoji reactions
-        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedDraft,
-        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedScheduledDraft,
-        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedSpam,
-        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedTrash,
-        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToNotAllowed,
-        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToNotValid,
-        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToEncrypted,
-        EmojiReactionNotAllowedReason.EmojiReactionMaxRecipient,
-        EmojiReactionNotAllowedReason.EmojiReactionRecipientNotAllowed,
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedDraft.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedScheduledDraft.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedSpam.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedTrash.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToNotAllowed.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToNotValid.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToEncrypted.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionMaxRecipient.asErrorCodeTranslated(),
+        EmojiReactionNotAllowedReason.EmojiReactionRecipientNotAllowed.asErrorCodeTranslated(),
         EmojiReactions.maxReactionReached,
         EmojiReactions.alreadyUsed,
 

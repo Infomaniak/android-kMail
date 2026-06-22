@@ -29,8 +29,9 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
@@ -81,7 +82,7 @@ class ThreadListMultiSelection(
                         parentFolderId = currentFolderId,
                         mailbox = currentMailBox,
                         shouldRefreshSearch = searchViewModel.currentFilters.let {
-                            it.contains(Thread.ThreadFilter.SEEN) || it.contains(Thread.ThreadFilter.UNSEEN)
+                            it.contains(ThreadFilter.SEEN) || it.contains(ThreadFilter.UNSEEN)
                         }
                     )
                     isMultiSelectOn = false
@@ -106,7 +107,7 @@ class ThreadListMultiSelection(
                         threadsUids = selectedThreadsUids,
                         mailbox = currentMailBox,
                         shouldFavorite = shouldMultiselectFavorite,
-                        shouldRefreshSearch = searchViewModel.currentFilters.contains(Thread.ThreadFilter.STARRED)
+                        shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.STARRED)
                     )
                     isMultiSelectOn = false
                 }
@@ -190,7 +191,11 @@ class ThreadListMultiSelection(
                 disableSwipeDirection(DirectionFlag.RIGHT)
             }
         } else {
-            multiSelectionBinding.threadsList.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
+            multiSelectionBinding.threadsList.updateSwipeAvailability(
+                localSettings = localSettings,
+                isMultiSelectOn = multiselectionViewModel.isMultiSelectOn,
+                isAllowedToSwipe = mainViewModel::isAllowedToSwipe
+            )
         }
     }
 
@@ -240,9 +245,11 @@ class ThreadListMultiSelection(
             val isSelectionEmpty = selectedThreads.isEmpty()
 
             host.lifecycleScope.launch {
-                val isFromArchive = host.folderRoleUtils.getThreadsActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
+                val actionFolderRole = host.folderRoleUtils.getThreadsActionFolderRole(selectedThreads)
+                val isArchiveOrDraft = actionFolderRole == FolderRole.ARCHIVE || actionFolderRole == FolderRole.DRAFT
+
                 for (index in 0 until getButtonCount()) {
-                    val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
+                    val shouldDisable = isSelectionEmpty || (isArchiveOrDraft && index == ARCHIVE_INDEX)
                     if (shouldDisable) disable(index) else enable(index)
                 }
             }

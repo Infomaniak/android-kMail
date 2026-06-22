@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +27,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MANAGE_SIGNATURES_URL
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding

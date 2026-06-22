@@ -24,13 +24,15 @@ import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
+import com.infomaniak.mail.data.models.extensions.getLocalizedName
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
@@ -55,10 +57,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -90,6 +94,20 @@ class ActionsViewModel @Inject constructor(
 
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
+
+    //region unsendMessage
+    fun unsendMessage(unsendMessageUrl: String, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.unsendMessage(unsendMessageUrl)
+        if (apiResponse.isSuccess()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarSendCancelled))
+            val draftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id ?: return@launch
+
+            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftsFolderId)))
+        } else {
+            snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
+        }
+    }
+    //endregion
 
     //region refreshSearch
     private val _searchRefreshEvents = Channel<Unit>(Channel.CONFLATED)
@@ -798,7 +816,7 @@ class ActionsViewModel @Inject constructor(
     }
     //endregion
 
-    // region refresh
+    //region refresh
 
     private fun refreshFoldersAsync(
         mailbox: Mailbox,
@@ -817,6 +835,17 @@ class ActionsViewModel @Inject constructor(
             threadsUids = threadsUids,
             onDownloadStop = { threadsUids -> onDownloadStop(threadsUids) }
         )
+    }
+
+    fun refreshFoldersAfterSendDelay(sendDelay: Int, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        delay((sendDelay * 1_000L).milliseconds)
+        refreshFoldersAsync(
+            mailbox,
+            ImpactedFolders(mutableSetOf(FolderRole.DRAFT, FolderRole.SENT)),
+            destinationFolderId = folderController.getFolder(FolderRole.SENT)?.id,
+            parentFolderId = folderController.getFolder(FolderRole.DRAFT)?.id,
+        )
+
     }
 
     private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {

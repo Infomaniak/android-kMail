@@ -96,7 +96,7 @@
             app:argType="string" />
         <argument
             android:name="attachmentType"
-            app:argType="com.infomaniak.mail.data.models.Attachable$AttachmentType" />
+            app:argType="com.infomaniak.mail.data.models.AttachmentType" />
         <argument
             android:name="intentType"
             app:argType="com.infomaniak.mail.utils.extensions.AttachmentExt$AttachmentIntentType" />

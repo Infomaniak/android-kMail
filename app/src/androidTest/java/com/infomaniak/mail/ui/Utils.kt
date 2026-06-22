@@ -21,11 +21,22 @@ import android.view.View
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.ViewInteraction
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import com.infomaniak.mail.R
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
+import com.infomaniak.mail.utils.Env
 import junit.framework.AssertionFailedError
 import org.hamcrest.Matcher
+import org.hamcrest.core.AllOf.allOf
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -52,5 +63,32 @@ object Utils {
         if (viewInteraction == null) throw AssertionError("View matcher is broken for $matcher")
 
         return viewInteraction
+    }
+
+    fun enterEmailToField(fieldResId: Int, value: String = Env.UI_TEST_ACCOUNT_EMAIL, suggestionListResId: Int) {
+        onViewWithTimeout(
+            matcher = allOf(
+                withId(R.id.textInput),
+                isDescendantOfA(withId(fieldResId)),
+            )
+        ).perform(click(), typeText(value))
+
+        onViewWithTimeout(
+            matcher = withId(suggestionListResId),
+        ).perform(
+            RecyclerViewActions.actionOnItemAtPosition<ContactViewHolder>(
+                0,
+                click()
+            )
+        )
+    }
+
+    fun assertRecipientInField(fieldResId: Int, emailAddress: String) {
+        onView(
+            allOf(
+                withText(emailAddress),
+                isDescendantOfA(withId(fieldResId)),
+            )
+        ).check(matches(isDisplayed()))
     }
 }

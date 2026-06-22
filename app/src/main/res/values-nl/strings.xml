@@ -44,6 +44,7 @@
     <string name="actionSnooze">Snooze</string>
     <string name="actionSpam">Spam rapporteren</string>
     <string name="actionStar">Toevoegen aan favorieten</string>
+    <string name="actionSummarize">Samenvatten</string>
     <string name="actionUnstar">Uit favorieten verwijderen</string>
     <string name="actionViewInDark">Weergeven in donker thema</string>
     <string name="actionViewInLight">Weergeven in licht thema</string>
@@ -95,6 +96,7 @@
     <string name="alertSenderNoReply">Let op, de verzender van deze e-mail lijkt geen antwoord te wensen.</string>
     <string name="appSecurityDescription">Bescherm de toegang tot uw app door de vergrendeling van uw telefoon in te schakelen.</string>
     <string name="archiveFolder">Gearchiveerd</string>
+    <string name="askEuriaTitle">Vraag het Euria</string>
     <string name="attachMailboxDescription1">Als u al een Infomaniak e-mailadres heeft, log dan nu in</string>
     <string name="attachMailboxDescription2">Alleen Infomaniak e-mailadressen worden ondersteund</string>
     <string name="attachMailboxInputHint">E-mailadres</string>
@@ -157,11 +159,13 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Versturen met een ander adres</string>
     <string name="buttonShare">Delen</string>
+    <string name="buttonShowOriginal">Oorspronkelijk bericht weergeven</string>
     <string name="buttonStart">Starten</string>
     <string name="buttonStartSync">Synchronisatie starten</string>
     <string name="buttonStrikeThrough">Doorhalen</string>
     <string name="buttonTextOptionsClose">Tekstopmaak sluiten</string>
     <string name="buttonTextOptionsOpen">Tekstopmaak openen</string>
+    <string name="buttonTranslate">Vertaal</string>
     <string name="buttonTry">Proberen</string>
     <string name="buttonUnderline">Onderstrepen</string>
     <string name="buttonUnorderedList">Ongeordende lijst</string>
@@ -202,6 +206,7 @@
     <string name="contentDescriptionButtonSelectSignature">Een andere handtekening selecteren</string>
     <string name="contentDescriptionButtonSettings">Instellingen</string>
     <string name="contentDescriptionButtonShowPassword">Wachtwoord tonen</string>
+    <string name="contentDescriptionButtonWarning">Waarschuwing</string>
     <string name="contentDescriptionContactAlreadyUsed">Contact al gebruikt als ontvanger</string>
     <string name="contentDescriptionDownloadIndicator">Downloaden</string>
     <string name="contentDescriptionIconAttachments">Heeft bijlagen</string>
@@ -335,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Kan de map niet maken</string>
     <string name="errorUnableToFlushFolder">Map kan niet worden geleegd</string>
     <string name="errorUserAlreadySynchronized">Gebruiker is al gesynchroniseerd</string>
+    <string name="euriaTranslateMessage">Euria vertaalt uw bericht…</string>
     <string name="expeditorAuthenticationDescription">De herkomst van deze afzender is geauthenticeerd.</string>
     <string name="externalDialogConfirmButton">Ik begrijp het</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -356,6 +362,7 @@
         <item quantity="other">%d bestanden verzonden via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Van:</string>
+    <string name="genericMessageTranslated">Bericht vertaald</string>
     <string name="googlePlayServicesAreRequired">Google Play Services zijn vereist</string>
     <string name="groupContactsTitle">Groep: %s</string>
     <string name="inboxFolder">Inbox</string>
@@ -380,17 +387,27 @@
     <string name="manageSignatures">Mijn handtekeningen beheren</string>
     <string name="menuDrawerAdvancedActions">Geavanceerde acties</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s gebruikt</string>
+    <string name="messageAlreadySummarized">Het bericht is al samengevat</string>
+    <string name="messageAlreadyTranslated">Het bericht is al vertaald</string>
     <string name="messageComesFromDiscussionList">Dit bericht komt van een discussielijst.</string>
     <string name="messageDetailsDateAt">%1$s om %2$s</string>
     <string name="messageDetailsYesterday">Gisteren</string>
     <string name="messageForwardHeader">Doorgestuurd bericht</string>
     <string name="messageHideQuotedText">Gesprek verbergen</string>
     <string name="messageIsDraftOption">Concept</string>
+    <string name="messageIsSending">Verzenden…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Dit bericht staat in de spammap omdat %s op de lijst met geblokkeerde afzenders staat.</string>
     <string name="messageIsSpamShouldActivateFilter">Dit bericht wordt als spam beschouwd. Voor uw veiligheid raden wij u aan uw spamfilter te activeren.</string>
     <string name="messageIsSpamShouldMoveToSpam">Dit bericht wordt als spam beschouwd. Wij raden u aan het naar de \"Spam\"-map te verplaatsen.</string>
     <string name="messageReplyHeader">Op %1$s schreef %2$s:</string>
     <string name="messageShowQuotedText">Gesprek weergeven</string>
+    <string name="messageSummary">Samenvatting van het bericht</string>
+    <string name="messageSummaryError">Euria kon dit bericht niet samenvatten.</string>
+    <string name="messageSummaryErrorRetry">Euria kon dit bericht niet samenvatten. Probeer het opnieuw.</string>
+    <string name="messageSummaryLoading">Samenvatting van het bericht…</string>
+    <string name="messageTranslateError">Euria kon dit bericht niet vertalen.</string>
+    <string name="messageTranslateErrorRetry">Euria kon dit bericht niet vertalen. Probeer het opnieuw.</string>
+    <string name="messageTranslatedTitle">Vertaald in %s</string>
     <string name="mondayAfternoon">Maandagmiddag</string>
     <string name="mondayMorning">Maandagochtend</string>
     <string name="moveInSpamButton">Naar Spam verplaatsen</string>
@@ -595,6 +612,7 @@
     <string name="snackbarSaveInDraft">Uw bericht is opgeslagen in concepten.</string>
     <string name="snackbarScheduleSaved">Het bericht wordt verzonden op %s</string>
     <string name="snackbarScheduling">Het bericht wordt gepland</string>
+    <string name="snackbarSendCancelled">Verzenden geannuleerd</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Afzender succesvol op de blacklist gezet</item>
         <item quantity="other">Afzenders succesvol op de blacklist gezet</item>
@@ -684,6 +702,7 @@
         <item quantity="one">%d adres kon niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
         <item quantity="other">%d adressen konden niet worden toegevoegd omdat u de limiet voor ontvangers heeft bereikt</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Dit bericht is al in uw taal</string>
     <string name="trashFolder">Prullenbak</string>
     <string name="unblockButton">Deblokkeren</string>
     <string name="unknownDialogTitleExpeditor">Onbekende afzender</string>

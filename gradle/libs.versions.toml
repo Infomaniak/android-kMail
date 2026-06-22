@@ -1,10 +1,10 @@
 [versions]
-androidGradlePlugin = "8.13.1"
 compose = "1.10.0"
 desugarJDK = "2.1.5"
 dotsindicator = "5.1.0"
 dragDropSwipeRecyclerView = "1.0.0"
 emoji2 = "1.6.0"
+oldKotlinModules = "1.0.0"
 espresso = "3.7.0"
 espressoContrib = "3.7.0"
 firebaseMessagingKtx = "24.1.2"
@@ -19,7 +19,6 @@ lifecycleProcess = "2.10.0"
 mockk = "1.14.6"
 orchestrator = "1.6.1"
 playServices = "18.9.0"
-realmKotlin = "3.2.8-2"
 richHtmlEditor = "1.1.0"
 uiautomator = "2.3.0"
 uiTestJunit4 = "1.10.0"
@@ -30,6 +29,7 @@ compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = 
 desugar-jdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJDK" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 dragdropswipe-recyclerview = { module = "com.github.infomaniak:DragDropSwipeRecyclerview", version.ref = "dragDropSwipeRecyclerView" }
+emoji-reaction-models = { module = "com.infomaniak.mail:emoji-reaction-models", version.ref = "oldKotlinModules" }
 emoji2-emojipicker = { module = "androidx.emoji2:emoji2-emojipicker", version.ref = "emoji2" }
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
@@ -40,7 +40,7 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
-realm-kotlin-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realmKotlin" }
+realm-models = { module = "com.infomaniak.mail:realm-models", version.ref = "oldKotlinModules" }
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
@@ -54,4 +54,3 @@ ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", versi
 
 [plugins]
 google-services = { id = "com.google.gms.google-services" }
-realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }

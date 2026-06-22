@@ -19,8 +19,8 @@ package com.infomaniak.mail.ui.main.easterEgg
 
 import androidx.annotation.CallSuper
 import androidx.annotation.RawRes
-import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.common.utils.year
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R

@@ -40,6 +40,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSanitizedHtml
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs

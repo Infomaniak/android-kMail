@@ -44,6 +44,7 @@
     <string name="actionSnooze">In die Warteschlange verschieben</string>
     <string name="actionSpam">Spam melden</string>
     <string name="actionStar">Zu Favoriten hinzufügen</string>
+    <string name="actionSummarize">Zusammenfassen</string>
     <string name="actionUnstar">Aus Favoriten löschen</string>
     <string name="actionViewInDark">Ansicht im dunklen Thema</string>
     <string name="actionViewInLight">Ansicht im hellen Thema</string>
@@ -95,6 +96,7 @@
     <string name="alertSenderNoReply">Achtung, der Absender dieser E-Mail möchte offenbar keine Antwort.</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
+    <string name="askEuriaTitle">Euria fragen</string>
     <string name="attachMailboxDescription1">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>
     <string name="attachMailboxDescription2">Nur Infomaniak-Mailadressen werden unterstützt</string>
     <string name="attachMailboxInputHint">Mailadresse</string>
@@ -157,11 +159,13 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonSendWithDifferentAddress">Senden mit abweichender Adresse</string>
     <string name="buttonShare">Teilen Sie</string>
+    <string name="buttonShowOriginal">Originalnachricht anzeigen</string>
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStartSync">Start der Synchronisierung</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>
     <string name="buttonTextOptionsClose">Textformatierung schliessen</string>
     <string name="buttonTextOptionsOpen">Offene Textformatierung</string>
+    <string name="buttonTranslate">Übersetzen Sie</string>
     <string name="buttonTry">Probieren</string>
     <string name="buttonUnderline">Unterstreichen Sie</string>
     <string name="buttonUnorderedList">Unsortierte Liste</string>
@@ -202,6 +206,7 @@
     <string name="contentDescriptionButtonSelectSignature">Wählen Sie eine andere Signatur</string>
     <string name="contentDescriptionButtonSettings">Einstellungen</string>
     <string name="contentDescriptionButtonShowPassword">Passwort anzeigen</string>
+    <string name="contentDescriptionButtonWarning">Warnung</string>
     <string name="contentDescriptionContactAlreadyUsed">Kontakt bereits als Empfänger verwendet</string>
     <string name="contentDescriptionDownloadIndicator">Herunterladen von</string>
     <string name="contentDescriptionIconAttachments">Hat Anhänge</string>
@@ -335,6 +340,7 @@
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
     <string name="errorUserAlreadySynchronized">Benutzer ist bereits synchronisiert</string>
+    <string name="euriaTranslateMessage">Euria übersetzt Ihre Nachricht…</string>
     <string name="expeditorAuthenticationDescription">Die Herkunft dieses Absenders wurde authentifiziert.</string>
     <string name="externalDialogConfirmButton">Ich habe verstanden</string>
     <plurals name="externalDialogDescriptionExpeditor">
@@ -356,6 +362,7 @@
         <item quantity="other">%d Dateien gesendet von SwissTransfer</item>
     </plurals>
     <string name="fromTitle">Von:</string>
+    <string name="genericMessageTranslated">Nachricht übersetzt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
     <string name="inboxFolder">Posteingang</string>
@@ -380,17 +387,27 @@
     <string name="manageSignatures">Meine Signaturen verwalten</string>
     <string name="menuDrawerAdvancedActions">Erweiterte Aktionen</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s verwendet</string>
+    <string name="messageAlreadySummarized">Die Nachricht ist bereits zusammengefasst</string>
+    <string name="messageAlreadyTranslated">Die Nachricht ist bereits übersetzt</string>
     <string name="messageComesFromDiscussionList">Diese Nachricht stammt aus einer Diskussionsliste.</string>
     <string name="messageDetailsDateAt">%1$s um %2$s</string>
     <string name="messageDetailsYesterday">Gestern</string>
     <string name="messageForwardHeader">Weitergeleitete Nachricht</string>
     <string name="messageHideQuotedText">Unterhaltung verbergen</string>
     <string name="messageIsDraftOption">Entwurf</string>
+    <string name="messageIsSending">Senden…</string>
     <string name="messageIsSpamBecauseSenderIsBlocked">Diese Nachricht erscheint im Spam-Ordner, weil %s auf der Liste der blockierten Absender steht.</string>
     <string name="messageIsSpamShouldActivateFilter">Diese Nachricht wird als Spam betrachtet. Um sicher zu gehen, empfehlen wir Ihnen, Ihren Spam-Filter zu aktivieren.</string>
     <string name="messageIsSpamShouldMoveToSpam">Diese Nachricht wird als Spam betrachtet. Wir empfehlen Ihnen, sie in den Ordner \"Spam\" zu verschieben.</string>
     <string name="messageReplyHeader">Am %1$s, %2$s schrieb:</string>
     <string name="messageShowQuotedText">Anzeigen der Konversation</string>
+    <string name="messageSummary">Zusammenfassung der Nachricht</string>
+    <string name="messageSummaryError">Euria konnte diese Nachricht nicht zusammenfassen.</string>
+    <string name="messageSummaryErrorRetry">Euria konnte diese Nachricht nicht zusammenfassen. Bitte versuchen Sie es erneut.</string>
+    <string name="messageSummaryLoading">Zusammenfassung der Nachricht…</string>
+    <string name="messageTranslateError">Euria konnte diese Nachricht nicht übersetzen.</string>
+    <string name="messageTranslateErrorRetry">Euria konnte diese Nachricht nicht übersetzen. Bitte versuchen Sie es erneut.</string>
+    <string name="messageTranslatedTitle">Übersetzt in %s</string>
     <string name="mondayAfternoon">Montagnachmittag</string>
     <string name="mondayMorning">Montagmorgen</string>
     <string name="moveInSpamButton">Einzug von Spam</string>
@@ -507,7 +524,7 @@
     <string name="settingsAutoAdvancePreviousThreadTitle">Voriges Thema</string>
     <string name="settingsAutoAdvanceTitle">Autovorschuss</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
-    <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>
+    <string name="settingsCancellationPeriodTitle">Sendeverzögerung</string>
     <string name="settingsDefault">Standard</string>
     <string name="settingsDelaySeconds">%d Sekunden</string>
     <string name="settingsDensityOptionCompact">Kompakt</string>
@@ -595,6 +612,7 @@
     <string name="snackbarSaveInDraft">Ihre Nachricht wurde als Entwurf gespeichert.</string>
     <string name="snackbarScheduleSaved">Die Nachricht wird am %s verschickt</string>
     <string name="snackbarScheduling">Die Nachricht wird geplant</string>
+    <string name="snackbarSendCancelled">Senden abgebrochen</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Absender erfolgreich auf die schwarze Liste gesetzt</item>
         <item quantity="other">Erfolgreich auf die schwarze Liste gesetzte Absender</item>
@@ -684,6 +702,7 @@
         <item quantity="one">%d Adresse konnte nicht hinzugefügt werden, da Sie das Empfängerlimit erreicht haben</item>
         <item quantity="other">%d Adressen konnten nicht hinzugefügt werden, da Sie das Empfängerlimit erreicht haben</item>
     </plurals>
+    <string name="translationTargetSameAsSource">Diese Nachricht ist bereits in Ihrer Sprache</string>
     <string name="trashFolder">Papierkorb</string>
     <string name="unblockButton">Entsperren</string>
     <string name="unknownDialogTitleExpeditor">Unbekannter Spediteur</string>

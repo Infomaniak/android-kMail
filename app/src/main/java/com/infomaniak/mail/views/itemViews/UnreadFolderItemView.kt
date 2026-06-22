@@ -20,7 +20,7 @@ package com.infomaniak.mail.views.itemViews
 import android.content.Context
 import android.util.AttributeSet
 import androidx.core.view.isVisible
-import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.toggleChevron
 import com.infomaniak.mail.views.CollapsibleItem

@@ -34,7 +34,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity

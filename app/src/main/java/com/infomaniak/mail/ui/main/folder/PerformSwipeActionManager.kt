@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,19 @@
 package com.infomaniak.mail.ui.main.folder
 
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment

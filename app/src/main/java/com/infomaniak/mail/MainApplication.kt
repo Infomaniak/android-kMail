@@ -45,6 +45,7 @@ import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpda
 import com.infomaniak.core.inappupdate.AppUpdateScheduler
 import com.infomaniak.core.legacy.utils.clearStack
 import com.infomaniak.core.legacy.utils.hasPermissions
+import com.infomaniak.core.network.ApiEnvironment
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.network.networking.HttpClientConfig
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
@@ -203,7 +204,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     private fun configureSentry() {
         this.configureSentry(
             isDebug = BuildConfig.DEBUG,
-            isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
+            isSentryTrackingEnabled = { localSettings.isSentryTrackingEnabled },
             isFilteredException = { exception: Throwable? ->
                 when {
                     exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> true
@@ -235,6 +236,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
             appVersionCode = BuildConfig.VERSION_CODE,
             appVersionName = BuildConfig.VERSION_NAME,
             apiErrorCodes = ErrorCode.apiErrorCodes,
+            apiEnvironment = ApiEnvironment.Prod
         )
 
         AuthConfiguration.init(

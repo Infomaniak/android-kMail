@@ -38,11 +38,11 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -353,29 +353,41 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun observePotentialBlockedSenders() {
         junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
             val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam)
+            val isFromDraft = mainViewModel.currentFolder.value?.role == FolderRole.DRAFT
+            setBlockUserUi(binding.blockSender, potentialUsersToBlock, isFromSpam, isFromDraft)
+            hideFirstActionItemDivider()
         }
     }
 
     private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean, isFromArchive: Boolean, threads: Set<Thread>) {
-        val (readIcon, readText) = getReadIconAndShortText(shouldRead)
-        binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
+        with(binding) {
+            val isFromDraft = mainViewModel.currentFolder.value?.role == FolderRole.DRAFT
+            if (isFromDraft) {
+                mainActions.isVisible = false
+                phishing.isVisible = false
+                favorite.isVisible = false
+            } else {
+                val (readIcon, readText) = getReadIconAndShortText(shouldRead)
+                mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
 
-        val (archiveIcon, archiveText) = getArchiveIconAndShortText(isFromArchive)
-        binding.mainActions.setAction(R.id.actionArchive, archiveIcon, archiveText)
+                val (archiveIcon, archiveText) = getArchiveIconAndShortText(isFromArchive)
+                mainActions.setAction(R.id.actionArchive, archiveIcon, archiveText)
 
-        val (favoriteIcon, favoriteText) = getFavoriteIconAndShortText(shouldFavorite)
-        binding.favorite.apply {
-            setIconResource(favoriteIcon)
-            setTitle(favoriteText)
+                val (favoriteIcon, favoriteText) = getFavoriteIconAndShortText(shouldFavorite)
+                favorite.apply {
+                    setIconResource(favoriteIcon)
+                    setTitle(favoriteText)
+                }
+            }
+
+            if (!navigationArgs.isFromSearch) setSnoozeUi(threads)
+            ThreadActionsBottomSheetDialog.setSpamUi(
+                spam = spam,
+                isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM,
+                isFromDraft = isFromDraft,
+            )
+            hideFirstActionItemDivider()
         }
-
-        if (!navigationArgs.isFromSearch) setSnoozeUi(threads)
-        ThreadActionsBottomSheetDialog.setSpamUi(
-            spam = binding.spam,
-            isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-        )
-        hideFirstActionItemDivider()
     }
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {

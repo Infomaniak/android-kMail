@@ -103,4 +103,5 @@
     <dimen name="spaceBetweenContactsAndThreads">8dp</dimen>
     <dimen name="maxHorizontalSwipeTolerance">100dp</dimen>
     <dimen name="minVerticalSwipeDistance">32dp</dimen>
+    <dimen name="marginComplementaryButton">2dp</dimen>
 </resources>

@@ -51,17 +51,15 @@ import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.legacy.utils.safeNavigate
-import com.infomaniak.core.legacy.utils.setMargins
-import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.ui.view.extension.setMargins
+import com.infomaniak.core.ui.view.extension.setPaddingRelative
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
@@ -77,12 +75,15 @@ import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.extensions.getLocalizedName
+import com.infomaniak.mail.data.models.extensions.kSuite
+import com.infomaniak.mail.data.models.extensions.notificationsIsDisabled
 import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -109,7 +110,6 @@ import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChange
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -124,6 +124,7 @@ import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.updateSwipeActionsUi
 import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
+import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -182,7 +183,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
     override val multiSelectionLifecycleOwner: LifecycleOwner
         get() = viewLifecycleOwner
-
 
     override val multiSelectionBinding: MultiSelectionBinding
         get() = object : MultiSelectionBinding {
@@ -364,7 +364,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     }
 
     fun unlockSwipeActionsIfSet() {
-        binding.threadsList.updateSwipeAvailability(localSettings, multiselectionViewModel.isMultiSelectOn)
+        binding.threadsList.updateSwipeAvailability(
+            localSettings,
+            multiselectionViewModel.isMultiSelectOn,
+            mainViewModel::isAllowedToSwipe
+        )
     }
 
     private fun setupDensityDependentUi() = with(binding) {
@@ -600,6 +604,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
     private fun setupStorageBanner() = with(localSettings) {
         mainViewModel.storageBannerStatus.observeNotNull(viewLifecycleOwner) { storageBannerStatus ->
+            val isWarningStorage = storageBannerStatus is KSuiteStorageBanner.StorageLevel.Warning
+            if (localSettings.hasClosedStorageBanner && isWarningStorage) return@observeNotNull
+
             binding.storageBanner.apply {
                 storageLevel = storageBannerStatus
                 setupListener(
