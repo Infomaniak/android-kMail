@@ -21,21 +21,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 
 class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetAskEuriaActionsBinding by safeBinding()
-    override val mainViewModel: MainViewModel? = null
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val navigationArgs: AskEuriaBottomSheetDialogArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

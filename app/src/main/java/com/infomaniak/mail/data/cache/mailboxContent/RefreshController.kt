@@ -33,7 +33,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRec
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.extensions.messagesBlocking
 import com.infomaniak.mail.data.models.extensions.refreshStrategy
 import com.infomaniak.mail.data.models.extensions.updateFlags
@@ -46,6 +45,7 @@ import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.isSnoozeMalformed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SentryDebug
@@ -282,8 +282,7 @@ class RefreshController @Inject constructor(
         ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realmReadOnly).forEach { snoozedThreadWithNewMessage ->
             scope.ensureActive()
 
-            val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)
-            when (result) {
+            when (val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)) {
                 is AutomaticUnsnoozeResult.Success -> impactedFolders += result.impactedFolders
                 AutomaticUnsnoozeResult.CannotBeUnsnoozedError -> cannotBeUnsnoozedThreadUids += snoozedThreadWithNewMessage.uid
                 AutomaticUnsnoozeResult.OtherError -> Unit

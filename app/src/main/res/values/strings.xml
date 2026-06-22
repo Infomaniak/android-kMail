@@ -493,6 +493,10 @@
     <string name="reviewAlertTitle">Do you like Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Save to device</string>
     <string name="saveToDriveItem">Save to kDrive</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">This conversation will be deleted and any scheduled deliveries will be cancelled.</item>
+        <item quantity="other">These conversations will be deleted and any scheduled deliveries will be cancelled.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Schedule sending</string>
     <string name="scheduledEmailHeader">This email will be sent on this date: %s</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
@@ -622,7 +626,7 @@
         <item quantity="other">You will receive a reminder for these messages %s</item>
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Subject copied to the clipboard</string>
-    <string name="snackbarSwipeActionIncompatible">Swipe action incompatible</string>
+    <string name="snackbarSwipeActionIncompatible">Incompatible swipe action</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation deleted</item>
         <item quantity="other">Conversations deleted</item>

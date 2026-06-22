@@ -52,24 +52,29 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
+    private val threadUid: String = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)
+        ?: throw IllegalArgumentException("threadUid is required")
 
     private val threadMessageToExecuteAction: Flow<ThreadMessageInteraction.Action> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
 
-    private val threadMessageToExecuteReaction: Flow<ThreadMessageInteraction.Reaction?> = threadController.getThreadAsync(threadUid)
-        .mapNotNull { it.obj }
-        .map { getMessageUidToExecuteReaction(it) }
+    private val threadMessageToExecuteReaction: Flow<ThreadMessageInteraction.Reaction?> =
+        threadController.getThreadAsync(threadUid)
+            .mapNotNull { it.obj }
+            .map { getMessageUidToExecuteReaction(it) }
 
     val threadMessagesWithActionAndReaction: SharedFlow<ThreadMessageToExecuteInteraction> =
-        combine(threadMessageToExecuteAction, threadMessageToExecuteReaction) { messageToExecuteActions, messageToExecuteReaction ->
+        combine(
+            threadMessageToExecuteAction,
+            threadMessageToExecuteReaction
+        ) { messageToExecuteActions, messageToExecuteReaction ->
             ThreadMessageToExecuteInteraction(
                 messageToExecuteActions.thread,
                 messageToExecuteActions.messageUid,
                 messageToExecuteReaction?.messageUid
             )
         }
-        .shareIn(scope = viewModelScope, started = SharingStarted.Eagerly, replay = 1)
+            .shareIn(scope = viewModelScope, started = SharingStarted.Eagerly, replay = 1)
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -90,7 +95,7 @@ class ThreadActionsViewModel @Inject constructor(
 
     private sealed class ThreadMessageInteraction(open val messageUid: String) {
         data class Action(val thread: Thread, override val messageUid: String) : ThreadMessageInteraction(messageUid)
-        data class Reaction(override val messageUid: String): ThreadMessageInteraction(messageUid)
+        data class Reaction(override val messageUid: String) : ThreadMessageInteraction(messageUid)
     }
 
     data class ThreadMessageToExecuteInteraction(

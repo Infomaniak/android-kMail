@@ -19,6 +19,8 @@ package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,59 +29,84 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.showKeyboard
-import com.infomaniak.core.ui.view.extension.setMargins
+import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
+import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
+import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager.performSwipeAction
+import com.infomaniak.mail.ui.main.folder.SwipeActionHost
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
+import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
+import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
+import com.infomaniak.mail.ui.main.folder.ThreadSwipeListenerFactory
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionBinding
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
+import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safelyAnimatedNavigation
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
+import com.infomaniak.mail.utils.extensions.shareString
+import com.infomaniak.mail.utils.extensions.updateSwipeActionsUi
+import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
-class SearchFragment : TwoPaneFragment() {
+class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
-    private val searchViewModel: SearchViewModel by activityViewModels()
-
-    override val substituteClassName: String = javaClass.name
-
-    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
+    private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
+    private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private val recentSearchAdapter by lazy {
         RecentSearchAdapter(
@@ -101,6 +128,38 @@ class SearchFragment : TwoPaneFragment() {
         )
     }
 
+    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
+
+    override val multiSelectionBinding: MultiSelectionBinding
+        get() = object : MultiSelectionBinding {
+            override val quickActionBar get() = binding.quickActionBar
+            override val multiselectToolbar get() = binding.multiselectToolbar
+            override val toolbarLayout get() = binding.multiselectToolbar.multiselectionInfoToolbar
+            override val toolbar get() = binding.toolbar
+            override val threadsList get() = binding.mailRecyclerView
+            override val newMessageFab get() = null
+            override val unreadCountChip get() = null
+        }
+
+    override val searchViewModel: SearchViewModel by activityViewModels()
+
+    override val substituteClassName: String = javaClass.name
+
+    override val multiSelectionLifecycleOwner: LifecycleOwner
+        get() = viewLifecycleOwner
+
+    override val fragment: Fragment
+        get() = this@SearchFragment
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    override lateinit var folderRoleUtils: FolderRoleUtils
+
+    @Inject
+    override lateinit var descriptionDialog: DescriptionAlertDialog
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSearchBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
@@ -118,6 +177,8 @@ class SearchFragment : TwoPaneFragment() {
         setupAdapter()
         setupListeners()
 
+        initializeMultiselection()
+
         setAllFoldersButtonListener()
         setAttachmentsUi()
         setMutuallyExclusiveChipGroupUi()
@@ -128,23 +189,17 @@ class SearchFragment : TwoPaneFragment() {
         observeVisibilityModeUpdates()
         observeSearchResults()
         observeHistory()
+        observeMultiSelect()
+        observeSearchRefresh()
+        observeShareUrlResult()
     }
 
-    private fun handleEdgeToEdge(): Unit = with(binding) {
-        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
-            toolbar.apply {
-                applySideAndBottomSystemInsets(insets, withBottom = false)
-                // Apply a margin instead of a padding so the icon and the search bar are aligned
-                setMargins(top = insets.safeArea().top)
-            }
-            chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
-            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
-
-            with(insets.safeArea()) {
-                recentSearchesRecyclerView.updatePaddingRelative(bottom = bottom)
-                mailRecyclerView.updatePaddingRelative(bottom = bottom)
-            }
-        }
+    override fun onResume() {
+        super.onResume()
+        updateSwipeActionsAccordingToSettings()
+        // If the user opens the reply dialog and comes backs to search, the refresh layout doesn't hide. That's why we need
+        // to call hideRefreshLayout here.
+        hideRefreshLayout()
     }
 
     override fun onStop() {
@@ -165,10 +220,10 @@ class SearchFragment : TwoPaneFragment() {
     override fun getDragSeparator(): View? = _binding?.dragSeparator
 
     override fun getAnchor(): View? {
-        return if (isOnlyLeftShown()) {
-            null
-        } else {
+        return if (isThreadOpen()) {
             _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
+        } else {
+            null
         }
     }
 
@@ -177,13 +232,80 @@ class SearchFragment : TwoPaneFragment() {
         super.handleOnBackPressed()
     }
 
+    fun unlockSwipeActionsIfSet() {
+        binding.mailRecyclerView.updateSwipeAvailability(
+            localSettings,
+            multiselectionViewModel.isMultiSelectOn,
+            mainViewModel::isAllowedToSwipe
+        )
+    }
+
+    private fun initializeMultiselection() {
+        ThreadListMultiSelection(
+            mainViewModel = mainViewModel,
+            multiselectionViewModel = multiselectionViewModel,
+            actionsViewModel = actionsViewModel,
+            mainActivity = requireActivity() as MainActivity,
+            host = this,
+            localSettings = localSettings,
+            isFromSearch = true,
+            searchViewModel = searchViewModel,
+        )
+    }
+
+    private fun handleEdgeToEdge(): Unit = with(binding) {
+        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
+            appBar.applyStatusBarInsets(insets)
+            chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
+            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
+
+            val recyclerViewPaddingBottom = resources.getDimensionPixelSize(RCore.dimen.recyclerViewPaddingBottom)
+            mailRecyclerView.updatePaddingRelative(bottom = recyclerViewPaddingBottom + insets.safeArea().bottom)
+
+            with(insets.safeArea()) {
+                recentSearchesRecyclerView.updatePaddingRelative(bottom = bottom)
+            }
+        }
+    }
+
+    private fun observeSearchRefresh() {
+        actionsViewModel.searchRefreshEvents.observe(viewLifecycleOwner) {
+            showRefreshLayout()
+            searchViewModel.refreshSearch()
+        }
+    }
+
+    private fun observeShareUrlResult() {
+        mainViewModel.shareThreadUrlResult.observe(viewLifecycleOwner) { url ->
+            if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
+        }
+    }
+
+    private fun showErrorShareUrl() {
+        showSnackbar(title = if (mainViewModel.hasNetwork) RCore.string.anErrorHasOccurred else RCore.string.noConnection)
+    }
+
+    private fun updateSwipeActionsAccordingToSettings() {
+        unlockSwipeActionsIfSet()
+
+        // Manually update disabled ui in case LocalSettings have changed when coming back from settings
+        updateDisabledSwipeActionsUi(
+            featureFlags = mainViewModel.featureFlagsLive.value,
+            folderRole = searchViewModel.filterFolder?.role ?: mainViewModel.currentFolderLive.value?.role,
+        )
+    }
+
+    private fun updateDisabledSwipeActionsUi(featureFlags: FeatureFlagSet?, folderRole: FolderRole?) {
+        binding.mailRecyclerView.updateSwipeActionsUi(localSettings, featureFlags, folderRole)
+    }
+
     private fun setupAdapter() {
         threadListAdapter(
             folderRole = null,
             isFolderNameVisible = true,
             callbacks = object : ThreadListAdapterCallbacks {
 
-                override var onSwipeFinished: (() -> Unit)? = null
+                override var onSwipeFinished: (() -> Unit)? = { threadListViewModel.isRecoveringFinished.value = true }
 
                 override var onThreadClicked: (Thread) -> Unit = { thread ->
                     with(searchViewModel) {
@@ -207,8 +329,6 @@ class SearchFragment : TwoPaneFragment() {
 
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
-                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
-
                 override var onContactClicked: ((MergedContact) -> Unit)? = { contact ->
                     val emailWithQuotes = "\"${contact.email}\""
                     binding.searchBar.searchTextInput.apply {
@@ -216,6 +336,12 @@ class SearchFragment : TwoPaneFragment() {
                         setSelection(emailWithQuotes.length)
                     }
                 }
+                override val getFeatureFlags: () -> FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
+            },
+            multiSelection = object : MultiSelectionListener<Thread> {
+                override var isEnabled by multiselectionViewModel::isMultiSelectOn
+                override val selectedItems by multiselectionViewModel::selectedThreads
+                override val publishSelectedItems = multiselectionViewModel::publishSelectedItems
             },
         )
 
@@ -227,7 +353,47 @@ class SearchFragment : TwoPaneFragment() {
             searchViewModel.clearSearchState()
             findNavController().popBackStack()
         }
-        swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
+        multiselectToolbar.cancel.setOnClickListener {
+            trackMultiSelectionEvent(MatomoName.Cancel)
+            multiselectionViewModel.isMultiSelectOn = false
+        }
+        multiselectToolbar.selectAll.setOnClickListener {
+            lifecycleScope.launch {
+                multiselectionViewModel.selectOrUnselectAllSearchItems(searchViewModel.threadsSearchResults)
+                threadListAdapter.updateSelection()
+            }
+        }
+        mailRecyclerView.swipeListener = ThreadSwipeListenerFactory.create(
+            localSettings = localSettings,
+            threadListAdapter = threadListAdapter,
+            onRecoveringStarted = { threadListViewModel.isRecoveringFinished.value = false },
+            performSwipeActionOnThread = ::performSwipeActionOnThread,
+        )
+
+        swipeRefreshLayout.setOnRefreshListener {
+            searchViewModel.refreshSearch()
+        }
+    }
+
+    /**
+     * The boolean return value is used to know if we should keep the Thread in
+     * the RecyclerView (true), or remove it when the swipe is done (false).
+     */
+    private fun performSwipeActionOnThread(
+        swipeAction: SwipeAction,
+        thread: Thread,
+        position: Int,
+        isPermanentDeleteFolder: Boolean,
+    ): Boolean {
+        val currentMailbox = mainViewModel.currentMailbox.value ?: run {
+            snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+            SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
+                scope.setTag("context", "PerformSwipeActionManager.performSwipeAction")
+            }
+            return true
+        }
+
+        return performSwipeAction(this@SearchFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
     }
 
     private fun setAllFoldersButtonListener() {
@@ -248,6 +414,7 @@ class SearchFragment : TwoPaneFragment() {
         if (!searchViewModel.isAllFoldersSelected && searchViewModel.filterFolder == null && sourceFolder?.role != FolderRole.INBOX) {
             searchViewModel.selectFolder(sourceFolder)
         }
+
         updateAllFoldersButtonUi()
         trackSearchEvent(ThreadFilter.FOLDER.matomoName, true)
     }
@@ -305,11 +472,6 @@ class SearchFragment : TwoPaneFragment() {
 
             disableDragDirection(DirectionFlag.UP)
             disableDragDirection(DirectionFlag.DOWN)
-            disableDragDirection(DirectionFlag.LEFT)
-            disableDragDirection(DirectionFlag.RIGHT)
-
-            disableSwipeDirection(DirectionFlag.LEFT)
-            disableSwipeDirection(DirectionFlag.RIGHT)
 
             addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
             setPagination()
@@ -391,8 +553,16 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun observeSearchResults() = viewLifecycleOwner.lifecycleScope.launch {
+        val viewLifecycleScope = viewLifecycleOwner.lifecycleScope
         searchViewModel.allSearchResults.collectLatest { searchResults ->
-            threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleOwner.lifecycleScope)
+            // Wait for any running swipe animation to finish before updating the list
+            threadListViewModel.isRecoveringFinished.asFlow().first { it }
+
+            _binding?.mailRecyclerView?.postOnAnimation {
+                if (_binding != null) {
+                    threadListAdapter.updateListWithThreadListItems(searchResults, viewLifecycleScope)
+                }
+            }
         }
     }
 
@@ -401,6 +571,17 @@ class SearchFragment : TwoPaneFragment() {
             val hasInsertedSuccessfully = recentSearchAdapter.addSearchQuery(it)
             if (hasInsertedSuccessfully) localSettings.recentSearches = recentSearchAdapter.getSearchQueries()
             updateHistoryEmptyStateVisibility(true)
+        }
+    }
+
+    private fun observeMultiSelect() {
+        multiselectionViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
+            val autoTransition = AutoTransition().setDuration(TOOLBAR_FADE_DURATION)
+            TransitionManager.beginDelayedTransition(binding.horizontalScrollViewFilters, autoTransition)
+            binding.horizontalScrollViewFilters.isGone = isMultiSelectOn
+
+            // Update contact items so they aren't clickable/focusable while multiselect is on
+            threadListAdapter.updateContactsMultiSelectState()
         }
     }
 
@@ -413,6 +594,10 @@ class SearchFragment : TwoPaneFragment() {
         binding.swipeRefreshLayout.isRefreshing = true
     }
 
+    private fun hideRefreshLayout() {
+        binding.swipeRefreshLayout.isRefreshing = false
+    }
+
     enum class VisibilityMode {
         RECENT_SEARCHES,
         LOADING,
@@ -422,5 +607,6 @@ class SearchFragment : TwoPaneFragment() {
 
     companion object {
         private const val PAGINATION_TRIGGER_OFFSET = 15
+        private const val TOOLBAR_FADE_DURATION = 150L
     }
 }

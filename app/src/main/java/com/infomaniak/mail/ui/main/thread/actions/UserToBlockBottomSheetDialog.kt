@@ -25,13 +25,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetUserToBlockBinding
-import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 
 class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetUserToBlockBinding by safeBinding()
 
-    override val mainViewModel: MainViewModel by activityViewModels()
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

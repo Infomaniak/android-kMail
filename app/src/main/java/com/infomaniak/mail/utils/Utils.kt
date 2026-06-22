@@ -65,6 +65,10 @@ object Utils {
         else -> false
     }
 
+    fun hasPermanentlyDeleteMessage(roles: List<FolderRole>): Boolean {
+        return roles.any { role -> isPermanentDeleteFolder(role) }
+    }
+
     fun kSyncAccountUri(accountName: String): Uri = "content://com.infomaniak.sync.accounts/account/$accountName".toUri()
 
     inline fun <R> runCatchingRealm(block: () -> R): Result<R> {

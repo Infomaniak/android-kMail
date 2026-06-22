@@ -27,10 +27,10 @@ import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRec
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.extensions.folderNameRes
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.extensions.folderNameRes
 import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.NamedFolder

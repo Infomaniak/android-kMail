@@ -34,7 +34,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr), OnCheckListener {
 
     @IdRes
-    private var checkedId: Int = View.NO_ID
+    private var checkedId: Int = NO_ID
     private var checkedValue: String? = null
     private var onItemCheckedListener: ((Int, String?, Enum<*>?) -> Unit)? = null
     private var shouldAddDividers = true
@@ -45,7 +45,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
         orientation = VERTICAL
 
         attrs?.getAttributes(context, R.styleable.SettingRadioGroupView) {
-            checkedId = getResourceId(R.styleable.SettingRadioGroupView_defaultCheckedId, View.NO_ID)
+            checkedId = getResourceId(R.styleable.SettingRadioGroupView_defaultCheckedId, NO_ID)
             check(checkedId)
 
             shouldAddDividers = !getBoolean(R.styleable.SettingRadioGroupView_ignoreDividers, false)
@@ -60,7 +60,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
 
     override fun onFinishInflate() {
         children.forEach {
-            if (it is RadioCheckable && it.id == View.NO_ID) it.id = generateViewId()
+            if (it is RadioCheckable && it.id == NO_ID) it.id = generateViewId()
         }
         super.onFinishInflate()
     }

@@ -44,6 +44,7 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.TRUE_PREDICATE
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -102,8 +103,8 @@ class MessageController @Inject constructor(
         )
     }
 
-    suspend fun getUnseenMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, "${Message::isSeen.name} == false")
+    suspend fun getAllThreadMessagesAndDuplicates(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, TRUE_PREDICATE)
     }
 
     suspend fun getFavoriteMessages(thread: Thread): List<Message> {
@@ -115,8 +116,12 @@ class MessageController @Inject constructor(
         return getMessagesFromThread(thread, "$byFolderId AND $isNotScheduledMessage", includeDuplicates = false)
     }
 
-    suspend fun getUnscheduledMessages(thread: Thread, includeDuplicates: Boolean): List<Message> {
+    suspend fun getUnscheduledMessagesFromThread(thread: Thread, includeDuplicates: Boolean): List<Message> {
         return getMessagesFromThread(thread, isNotScheduledMessage, includeDuplicates)
+    }
+
+    fun getUnscheduledMessages(messages: List<Message>): List<Message> {
+        return messages.filter { message -> !message.isScheduledMessage }
     }
 
     private suspend fun getMessagesFromThread(thread: Thread, query: String, includeDuplicates: Boolean): List<Message> {
@@ -135,6 +140,13 @@ class MessageController @Inject constructor(
         val messagesAsync = async { thread.messages.query(query).findSuspend() }
         val duplicatesAsync = async { thread.duplicates.query(query).findSuspend() }
         messagesAsync.await() + duplicatesAsync.await()
+    }
+
+    suspend fun getMessagesAndDuplicates(messages: List<Message>): List<Message> {
+        return messages.flatMap { message ->
+            if (message.threads.isEmpty()) return@flatMap listOf(message)
+            getMessageAndDuplicates(message.threads.first(), message)
+        }
     }
 
     suspend fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {

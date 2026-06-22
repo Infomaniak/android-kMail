@@ -513,6 +513,12 @@
     <string name="reviewAlertTitle">Czy lubisz Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Zapisz na urządzeniu</string>
     <string name="saveToDriveItem">Zapisz w kDrive</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">Ta rozmowa zostanie usunięta, a wszystkie zaplanowane dostawy zostaną anulowane.</item>
+        <item quantity="few">Te rozmowy zostaną usunięte, a wszystkie zaplanowane dostawy zostaną anulowane.</item>
+        <item quantity="many">Te rozmowy zostaną usunięte, a wszystkie zaplanowane dostawy zostaną anulowane.</item>
+        <item quantity="other">Te rozmowy zostaną usunięte, a wszystkie zaplanowane dostawy zostaną anulowane.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Zaplanuj wysyłkę</string>
     <string name="scheduledEmailHeader">Ta wiadomość zostanie wysłana w tym dniu: %s</string>
     <string name="scheduledMessagesFolder">Zaplanowane wiadomości</string>

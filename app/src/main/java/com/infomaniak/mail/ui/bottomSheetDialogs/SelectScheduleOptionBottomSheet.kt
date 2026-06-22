@@ -26,14 +26,14 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.common.utils.getNextMonday
 import com.infomaniak.core.common.utils.getTimeAtHour
 import com.infomaniak.core.common.utils.isAtLeastXMinutesInTheFuture
 import com.infomaniak.core.common.utils.isWeekend
 import com.infomaniak.core.common.utils.tomorrow
+import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding

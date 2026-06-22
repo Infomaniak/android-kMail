@@ -42,9 +42,10 @@ fun Correspondent.isMe(): Boolean {
 
 fun Correspondent.shouldDisplayUserAvatar(): Boolean = isMe() && email.lowercase() == AccountUtils.currentUser?.email?.lowercase()
 
-val Correspondent.initials: String get() = cachedInitials ?: synchronized(this) {
-    cachedInitials ?: computeInitials().also { cachedInitials = it }
-}
+val Correspondent.initials: String
+    get() = cachedInitials ?: synchronized(this) {
+        cachedInitials ?: computeInitials().also { cachedInitials = it }
+    }
 
 fun Correspondent.computeInitials(): String {
     return runCatching {

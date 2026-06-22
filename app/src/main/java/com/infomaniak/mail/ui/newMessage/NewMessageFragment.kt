@@ -897,7 +897,6 @@ class NewMessageFragment : Fragment() {
         isScheduled = isScheduled,
     )
 
-
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
 
         val isMailboxFull = mailbox.quotas?.isFull == true

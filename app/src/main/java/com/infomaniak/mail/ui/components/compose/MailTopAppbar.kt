@@ -85,7 +85,7 @@ private fun BrandTopAppBarPreview() {
     MailTheme {
         MailTopAppBar(
             navigationIcon = {
-                TopAppBarButtons.Close {  }
+                TopAppBarButtons.Close { }
             }
         )
     }

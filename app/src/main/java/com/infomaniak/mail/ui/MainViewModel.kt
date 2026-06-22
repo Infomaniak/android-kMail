@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -32,21 +31,17 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.utils.DownloadManagerUtils
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
-import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.networking.HttpUtils
 import com.infomaniak.core.network.networking.ManualAuthorizationRequired
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
-import com.infomaniak.emojicomponents.data.Reaction
-import com.infomaniak.mail.MatomoMail.MatomoName
-import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -63,65 +58,47 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.FolderUi
 import com.infomaniak.mail.data.models.MoveResult
-import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.DraftAction
-import com.infomaniak.mail.data.models.extensions.action
-import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
 import com.infomaniak.mail.data.models.extensions.getLocalizedName
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.forEachNestedItem
-import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
-import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
+import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
-import com.infomaniak.mail.utils.DraftInitManager
-import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
-import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.FeatureAvailability
-import com.infomaniak.mail.utils.FolderRoleUtils
+import com.infomaniak.mail.utils.DownloadThreadsStatusManager
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
-import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.utils.NetworkManager
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
-import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
-import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
-import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import com.infomaniak.mail.utils.toFolderUiTree
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.query.RealmResults
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -144,10 +121,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -163,18 +138,16 @@ class MainViewModel @Inject constructor(
     application: Application,
     avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
-    private val draftController: DraftController,
-    private val draftInitManager: DraftInitManager,
-    private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
+    private val downloadThreadsStatusManager: DownloadThreadsStatusManager,
     private val folderController: FolderController,
-    private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val messagesActions: MessagesActions,
     private val myKSuiteDataUtils: MyKSuiteDataUtils,
-    private val notificationUtils: NotificationUtils,
+    private val networkManager: NetworkManager,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
@@ -188,37 +161,20 @@ class MainViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshEverythingJob: Job? = null
 
-    val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
-    val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val renameFolderResultTrigger = MutableLiveData<Unit>()
     val deleteFolderResultTrigger = MutableLiveData<Unit>()
-    val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
-
-    val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection
-    val isMultiSelectOnLiveData = MutableLiveData(false)
-    inline var isMultiSelectOn
-        get() = isMultiSelectOnLiveData.value!!
-        set(value) {
-            isMultiSelectOnLiveData.value = value
-        }
 
-    val selectedThreadsLiveData = MutableLiveData(mutableSetOf<Thread>())
-    inline val selectedThreads
-        get() = selectedThreadsLiveData.value!!
-
-    val isEverythingSelected
-        get() = runCatchingRealm { selectedThreads.count() == currentThreadsLive.value?.list?.count() }.getOrDefault(false)
     //endregion
 
     //region Current Mailbox
@@ -312,13 +268,10 @@ class MainViewModel @Inject constructor(
 
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
-    val isNetworkAvailable = NetworkAvailability().isNetworkAvailable.onEach {
-        SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
-
-    val hasNetwork: Boolean by isNetworkAvailable::value
-
     private var currentThreadsLiveJob: Job? = null
+
+    val isNetworkAvailable = networkManager.isNetworkAvailable
+    val hasNetwork: Boolean get() = networkManager.hasNetwork
 
     fun reassignCurrentThreadsLive() {
         currentThreadsLiveJob?.cancel()
@@ -354,10 +307,6 @@ class MainViewModel @Inject constructor(
 
     //region Merged Contacts
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
-    //endregion
-
-    //region Scheduled Draft
-    var draftResource: String? = null
     //endregion
 
     //region Share Thread URL
@@ -514,43 +463,6 @@ class MainViewModel @Inject constructor(
     }
 
     //region Spam
-    fun moveToSpamFolder(threadUid: String, messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
-        val message = messageController.getMessage(messageUid) ?: return@launch
-        toggleMessageSpamStatus(threadUid, message)
-    }
-
-    fun activateSpamFilter() = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value ?: return@launch
-
-        ApiRepository.setSpamFilter(
-            mailboxHostingId = mailbox.hostingId,
-            mailboxName = mailbox.mailboxName,
-            activateSpamFilter = true,
-        )
-    }
-
-    fun unblockMail(email: String) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value ?: return@launch
-
-        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) {
-                val updatedSendersRestrictions = data!!.apply {
-                    blockedSenders.removeIf { it.email == email }
-                }
-                updateBlockedSenders(mailbox, updatedSendersRestrictions)
-            }
-        }
-    }
-
-    private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
-        with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
-            if (isSuccess()) {
-                mailboxController.updateMailbox(mailbox.objectId) {
-                    it.sendersRestrictions = updatedSendersRestrictions
-                }
-            }
-        }
-    }
 
     private fun updateSendersRestrictions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Senders Restrictions")
@@ -642,7 +554,7 @@ class MainViewModel @Inject constructor(
 
     fun getOnePageOfOldMessages() = viewModelScope.launch(ioCoroutineContext) {
 
-        if (isDownloadingChanges.value == true) return@launch
+        if (downloadThreadsStatusManager.isDownloading.first()) return@launch
 
         refreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
@@ -683,344 +595,34 @@ class MainViewModel @Inject constructor(
         )
     }
 
-    //region Delete
-    fun deleteMessage(threadUid: String, message: Message) {
-        deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
-    }
-
-    fun deleteThread(threadUid: String) {
-        deleteThreadsOrMessage(threadsUids = listOf(threadUid))
-    }
-
-    fun deleteThreads(threadsUids: List<String>) {
-        deleteThreadsOrMessage(threadsUids = threadsUids)
-    }
-
-    // TODO: When the back is done refactoring how scheduled drafts are deleted, work on this function shall resume.
-    private fun deleteThreadsOrMessage(
-        threadsUids: List<String>,
-        message: Message? = null,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-
-        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-        val shouldPermanentlyDelete = isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(threads, message))
-        val messages = getMessagesToDelete(threads, message)
-
-        if (shouldPermanentlyDelete) {
-            permanentlyDelete(
-                threads = threads,
-                threadsUids = threadsUids,
-                messagesToDelete = messages,
-                message = message,
-            )
-        } else {
-            moveThreadsOrMessageTo(
-                destinationFolder = folderController.getFolder(FolderRole.TRASH)!!,
-                threadsUids = threadsUids,
-                threads = threads,
-                message = message,
-                messagesToMove = messages,
-            )
-        }
-    }
-
-    private suspend fun permanentlyDelete(
-        threads: RealmResults<Thread>,
-        threadsUids: List<String>,
-        messagesToDelete: List<Message>,
-        message: Message?,
-    ) {
-        val mailbox = currentMailbox.value!!
-        val undoResources = emptyList<String>()
-        val uids = messagesToDelete.getUids()
-
-        moveOutThreadsLocally(threadsUids, threads, message)
-
-        val apiResponses = ApiRepository.deleteMessages(
-            mailboxUuid = mailbox.uuid,
-            messagesUids = uids,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings)
-        )
-
-        activityDialogLoaderResetTrigger.postValue(Unit)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
-
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messagesToDelete.getFoldersIds(),
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
-            )
-        }
-
-        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-
-        val undoDestinationId = message?.folderId ?: threads.first().folderId
-        val undoFoldersIds = messagesToDelete.getFoldersIds(exception = undoDestinationId)
-        showDeleteSnackbar(
-            apiResponses = apiResponses,
-            message = message,
-            undoResources = undoResources,
-            undoFoldersIds = undoFoldersIds,
-            undoDestinationId = undoDestinationId,
-            numberOfImpactedThreads = threads.count(),
-        )
-    }
-
-    private fun showDeleteSnackbar(
-        apiResponses: List<ApiResponse<*>>,
-        message: Message?,
-        undoResources: List<String>,
-        undoFoldersIds: ImpactedFolders,
-        undoDestinationId: String?,
-        numberOfImpactedThreads: Int,
-    ) {
-        val snackbarTitle = if (apiResponses.atLeastOneSucceeded()) {
-            if (message == null) {
-                appContext.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
-            } else {
-                appContext.getString(R.string.snackbarMessageDeletedPermanently)
-            }
-        } else {
-            appContext.getString(apiResponses.first().translateError())
-        }
-
-        val undoData = if (undoResources.isEmpty()) null else UndoData(undoResources, undoFoldersIds, undoDestinationId)
-
-        snackbarManager.postValue(snackbarTitle, undoData)
-    }
-
-    private suspend fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { messageController.getUnscheduledMessages(it, includeDuplicates = true) }
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
-    }
-
-    fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
-
-        if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
-            val draftFolderId = folderController.getFolder(FolderRole.DRAFT)!!.id
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolderId)))
-        }
-
-        showDeletedDraftSnackbar(apiResponse)
-    }
-
-    private fun showDeletedDraftSnackbar(apiResponse: ApiResponse<Unit>) {
-        val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
-        snackbarManager.postValue(appContext.getString(titleRes))
-    }
-    //endregion
-
-    //region Scheduled Drafts
-    fun rescheduleDraft(scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
-        draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
-            with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
-                if (isSuccess()) {
-                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
-                } else {
-                    snackbarManager.postValue(title = appContext.getString(translateError()))
-                }
-            }
-        } ?: run {
-            snackbarManager.postValue(title = appContext.getString(RCore.string.anErrorHasOccurred))
-        }
-    }
-
-    fun modifyScheduledDraft(
-        unscheduleDraftUrl: String,
-        onSuccess: () -> Unit,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
-
-        if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
-            onSuccess()
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
-        }
-    }
-
-    fun unscheduleDraft(unscheduleDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
-
-        if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
-        }
-
-        showUnscheduledDraftSnackbar(apiResponse)
-    }
-
-    fun unsendMessage(unsendMessageUrl: String) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.unsendMessage(unsendMessageUrl)
-        if (apiResponse.isSuccess()) {
-            snackbarManager.postValue(appContext.getString(R.string.snackbarSendCancelled))
-            val draftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id ?: return@launch
-            
-            currentMailbox.value?.let { mailbox ->
-                refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftsFolderId)))
-            }
-        } else {
-            snackbarManager.postValue(appContext.getString(R.string.errorSnoozeFailedCancel))
-        }
-    }
-
-    fun refreshFoldersAfterSendDelay(sendDelay: Int) = viewModelScope.launch(ioCoroutineContext) {
-        delay(sendDelay * 1_000L)
-        currentMailbox.value?.let { mailbox ->
-            refreshFoldersAsync(
-                mailbox,
-                ImpactedFolders(mutableSetOf(FolderRole.DRAFT, FolderRole.SENT)),
-                destinationFolderId = folderController.getFolder(FolderRole.SENT)?.id,
-            )
-        }
-    }
-
-    private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
-
-        fun openDraftFolder() = viewModelScope.launch { folderController.getFolder(FolderRole.DRAFT)?.id?.let(::openFolder) }
-
-        if (apiResponse.isSuccess()) {
-            snackbarManager.postValue(
-                title = appContext.getString(R.string.snackbarSaveInDraft),
-                buttonTitle = R.string.draftFolder,
-                customBehavior = ::openDraftFolder,
-            )
-        } else {
-            snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
-        }
-    }
-    //endregion
-
     //region Move
-    fun moveThreadsOrMessageTo(
-        destinationFolderId: String,
-        threadsUids: List<String>,
-        messageUid: String? = null,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        val destinationFolder = folderController.getFolder(destinationFolderId)!!
-        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-        val message = messageUid?.let { messageController.getMessage(it)!! }
-        val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
-
-        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messagesToMove)
-    }
-
-    private suspend fun moveThreadsOrMessageTo(
-        destinationFolder: Folder,
-        threadsUids: List<String>,
-        threads: List<Thread>,
-        message: Message? = null,
-        messagesToMove: List<Message>,
-        shouldDisplaySnackbar: Boolean = true,
-    ) {
-        val mailbox = currentMailbox.value!!
-
-        moveOutThreadsLocally(threadsUids, threads, message)
-
-        val apiResponses = moveMessages(
-            mailbox = mailbox,
-            messagesToMove = messagesToMove,
-            destinationFolder = destinationFolder,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings),
-        )
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
-
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messagesToMove.getFoldersIds(exception = destinationFolder.id),
-                destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
-            )
-        }
-
-        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-
-        if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messagesToMove, apiResponses, destinationFolder)
-    }
-
-    private suspend fun moveMessages(
-        mailbox: Mailbox,
-        messagesToMove: List<Message>,
-        destinationFolder: Folder,
-        alsoMoveReactionMessages: Boolean,
-    ): List<ApiResponse<MoveResult>> {
-        val apiResponses = ApiRepository.moveMessages(
-            mailboxUuid = mailbox.uuid,
-            messagesUids = messagesToMove.getUids(),
-            destinationId = destinationFolder.id,
-            alsoMoveReactionMessages = alsoMoveReactionMessages,
-        )
-
-        // TODO: Will unsync permantly the mailbox if one message in one of the batches did succeed but some other messages in the
-        //  same batch or in other batches that are target by emoji reactions did not
-        if (alsoMoveReactionMessages && apiResponses.atLeastOneSucceeded()) deleteEmojiReactionMessagesLocally(messagesToMove)
-
-        return apiResponses
-    }
-
-    /**
-     * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
-     * that were targeting this message will display for a brief moment until we refresh their folders. This is because those
-     * messages don't have a target message anymore and emoji reactions messages with no target in their thread need to be
-     * displayed.
-     *
-     * Deleting them from the database in the first place will prevent them from being shown and the messages will be deleted by
-     * the api at the same time anyway.
-     */
-    private suspend fun deleteEmojiReactionMessagesLocally(messagesToMove: List<Message>) {
-        for (messageToMove in messagesToMove) {
-            if (messageToMove.emojiReactions.isEmpty()) continue
-
-            mailboxContentRealm().write {
-                messageToMove.emojiReactions.forEach { reaction ->
-                    reaction.authors.forEach { author ->
-                        MessageController.deleteMessageByUidBlocking(author.sourceMessageUid, this)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun showMoveSnackbar(
-        threads: List<Thread>,
-        message: Message?,
-        messages: List<Message>,
+    fun showMoveSnackbar(
+        threadsMovedCount: Int,
+        messagesMovedCount: Int,
+        impactedFolders: ImpactedFolders,
         apiResponses: List<ApiResponse<MoveResult>>,
         destinationFolder: Folder,
     ) {
-
         val destination = destinationFolder.getLocalizedName(appContext)
         val isSpam = destinationFolder.role == FolderRole.SPAM
 
         val snackbarTitle = when {
-            apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
-            message == null -> getMoveThreadSnackbarTitle(isSpam, threads.count(), destination)
+            apiResponses.allFailed() -> {
+                if (apiResponses.isNotEmpty()) {
+                    appContext.getString(apiResponses.first().translateError())
+                } else {
+                    appContext.getString(RCore.string.anErrorHasOccurred)
+                }
+            }
+            threadsMovedCount > 0 || messagesMovedCount > 1 -> getMoveThreadSnackbarTitle(
+                isSpam,
+                threadsMovedCount,
+                destination
+            )
             else -> getMoveMessageSnackbarTitle(isSpam, destination)
         }
 
-        val undoResources = apiResponses.mapNotNull { it.data?.undoResource }
-        val undoData = if (undoResources.isEmpty()) {
-            null
-        } else {
-            val undoDestinationId = message?.folderId ?: threads.first().folderId
-            val foldersIds = messages.getFoldersIds(exception = undoDestinationId)
-            foldersIds += destinationFolder.id
-            UndoData(
-                resources = apiResponses.mapNotNull { it.data?.undoResource },
-                foldersIds = foldersIds,
-                destinationFolderId = undoDestinationId,
-            )
-        }
-
+        val undoData = messagesActions.getUndoData(impactedFolders, apiResponses, destinationFolder)
         snackbarManager.postValue(snackbarTitle, undoData)
     }
 
@@ -1037,261 +639,6 @@ class MainViewModel @Inject constructor(
             appContext.getString(R.string.snackbarMessageMovedToSpam)
         } else {
             appContext.getString(R.string.snackbarMessageMoved, destination)
-        }
-    }
-    //endregion
-
-    //region Archive
-    fun archiveMessage(threadUid: String, message: Message) {
-        archiveThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
-    }
-
-    fun archiveThread(threadUid: String) {
-        archiveThreadsOrMessage(threadsUids = listOf(threadUid))
-    }
-
-    fun archiveThreads(threadsUids: List<String>) {
-        archiveThreadsOrMessage(threadsUids = threadsUids)
-    }
-
-    private fun archiveThreadsOrMessage(
-        threadsUids: List<String>,
-        message: Message? = null,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-
-        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-
-        val role = folderRoleUtils.getActionFolderRole(threads, message)
-        val isFromArchive = role == FolderRole.ARCHIVE
-
-        val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
-
-        val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
-
-        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messagesToMove)
-    }
-    //endregion
-
-    //region Seen
-    fun toggleMessageSeenStatus(threadUid: String, message: Message) {
-        toggleThreadsOrMessageSeenStatus(threadsUids = listOf(threadUid), message = message)
-    }
-
-    fun toggleThreadSeenStatus(threadUid: String) {
-        toggleThreadsOrMessageSeenStatus(threadsUids = listOf(threadUid))
-    }
-
-    fun toggleThreadsSeenStatus(threadsUids: List<String>, shouldRead: Boolean) {
-        toggleThreadsOrMessageSeenStatus(threadsUids = threadsUids, shouldRead = shouldRead)
-    }
-
-    private fun toggleThreadsOrMessageSeenStatus(
-        threadsUids: List<String>,
-        message: Message? = null,
-        shouldRead: Boolean = true,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-
-        val isSeen = when {
-            message != null -> message.isSeen
-            threads.count() == 1 -> threads.single().isSeen
-            else -> !shouldRead
-        }
-
-        if (isSeen) {
-            markAsUnseen(mailbox, threads, message)
-        } else {
-            sharedUtils.markAsSeen(
-                mailbox = mailbox,
-                threads = threads,
-                message = message,
-                currentFolderId = currentFolderId,
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-            )
-        }
-    }
-
-    private suspend fun markAsUnseen(
-        mailbox: Mailbox,
-        threads: List<Thread>,
-        message: Message? = null,
-    ) {
-
-        val messages = getMessagesToMarkAsUnseen(threads, message)
-        val threadsUids = threads.map { it.uid }
-        val messagesUids = messages.map { it.uid }
-
-        updateSeenStatus(threadsUids, messagesUids, isSeen = false)
-
-        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-            )
-        } else {
-            updateSeenStatus(threadsUids, messagesUids, isSeen = true)
-        }
-    }
-
-    private suspend fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { thread ->
-            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
-        }
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
-    }
-
-    private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
-        mailboxContentRealm().write {
-            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
-            ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
-        }
-    }
-    //endregion
-
-    //region Favorite
-    fun toggleMessageFavoriteStatus(threadUid: String, message: Message) {
-        toggleThreadsOrMessageFavoriteStatus(threadsUids = listOf(threadUid), message = message)
-    }
-
-    fun toggleThreadFavoriteStatus(threadUid: String) {
-        toggleThreadsOrMessageFavoriteStatus(threadsUids = listOf(threadUid))
-    }
-
-    fun toggleThreadsFavoriteStatus(threadsUids: List<String>, shouldFavorite: Boolean) {
-        toggleThreadsOrMessageFavoriteStatus(threadsUids = threadsUids, shouldFavorite = shouldFavorite)
-    }
-
-    private fun toggleThreadsOrMessageFavoriteStatus(
-        threadsUids: List<String>,
-        message: Message? = null,
-        shouldFavorite: Boolean = true,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-
-        val isFavorite = when {
-            message != null -> message.isFavorite
-            threads.count() == 1 -> threads.single().isFavorite
-            else -> !shouldFavorite
-        }
-
-        val messages = if (isFavorite) {
-            getMessagesToUnfavorite(threads, message)
-        } else {
-            getMessagesToFavorite(threads, message)
-        }
-        val uids = messages.getUids()
-
-        updateFavoriteStatus(threadsUids = threadsUids, messagesUids = uids, isFavorite = !isFavorite)
-
-        val apiResponses = if (isFavorite) {
-            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
-        } else {
-            ApiRepository.addToFavorites(mailbox.uuid, uids)
-        }
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(),
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-            )
-        } else {
-            updateFavoriteStatus(threadsUids = threadsUids, messagesUids = uids, isFavorite = isFavorite)
-        }
-    }
-
-    private suspend fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { thread ->
-            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
-        }
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
-    }
-
-    private suspend fun getMessagesToUnfavorite(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { messageController.getFavoriteMessages(it) }
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
-    }
-
-    private suspend fun updateFavoriteStatus(threadsUids: List<String>, messagesUids: List<String>, isFavorite: Boolean) {
-        mailboxContentRealm().write {
-            MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
-            ThreadController.updateFavoriteStatus(threadsUids, isFavorite, realm = this)
-        }
-    }
-    //endregion
-
-    //region Spam
-    fun toggleMessageSpamStatus(threadUid: String, message: Message, displaySnackbar: Boolean = true) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = displaySnackbar)
-    }
-
-    fun toggleThreadSpamStatus(threadUids: List<String>, displaySnackbar: Boolean = true) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = threadUids, displaySnackbar = displaySnackbar)
-    }
-
-    private fun toggleThreadsOrMessageSpamStatus(
-        threadsUids: List<String>,
-        message: Message? = null,
-        displaySnackbar: Boolean = true,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-
-        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-
-        val destinationFolderRole = if (folderRoleUtils.getActionFolderRole(threads, message) == FolderRole.SPAM) {
-            FolderRole.INBOX
-        } else {
-            FolderRole.SPAM
-        }
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
-
-        val messages = getMessagesToSpamOrHam(threads, message)
-
-        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messages, displaySnackbar)
-    }
-
-    private suspend fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap { messageController.getUnscheduledMessages(it, includeDuplicates = false) }
-        else -> listOf(message)
-    }
-    //endregion
-
-    //region Phishing
-    fun reportPhishing(threadUids: List<String>, messages: List<Message>) = viewModelScope.launch(ioCoroutineContext) {
-        val mailboxUuid = currentMailbox.value?.uuid!!
-        val messagesUids: List<String> = messages.map { it.uid }
-
-        if (messagesUids.isEmpty()) {
-            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-            return@launch
-        }
-
-        with(ApiRepository.reportPhishing(mailboxUuid, messagesUids)) {
-            val snackbarTitle = if (isSuccess()) {
-                // Check the first message, because it is not possible to select messages from multiple folders,
-                // so you won't have both SPAM and non-SPAM messages.
-                messages.firstOrNull()?.let { message ->
-                    if (folderRoleUtils.getActionFolderRole(message) != FolderRole.SPAM) {
-                        if (messages.count() == 1) {
-                            toggleMessageSpamStatus(threadUids.first(), message, displaySnackbar = false)
-                        } else {
-                            toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
-                        }
-                    }
-                }
-
-                R.string.snackbarReportPhishingConfirmation
-            } else {
-                translateError()
-            }
-
-            reportPhishingTrigger.postValue(Unit)
-            snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
     }
     //endregion
@@ -1319,250 +666,6 @@ class MainViewModel @Inject constructor(
 
         reportDisplayProblemTrigger.postValue(Unit)
         snackbarManager.postValue(appContext.getString(R.string.snackbarDisplayProblemReported))
-    }
-    //endregion
-
-    //region BlockUser
-    fun blockUser(folderId: String, shortUid: Int) = viewModelScope.launch(ioCoroutineContext) {
-        val mailboxUuid = currentMailbox.value?.uuid!!
-        with(ApiRepository.blockUser(mailboxUuid, folderId, shortUid)) {
-
-            val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
-            snackbarManager.postValue(appContext.getString(snackbarTitle))
-
-            reportPhishingTrigger.postValue(Unit)
-        }
-    }
-    //endregion
-
-    //region Snooze
-    suspend fun snoozeThreads(date: Date, threadUids: List<String>): Boolean {
-        var isSuccess = false
-
-        viewModelScope.launch {
-            currentMailbox.value?.let { currentMailbox ->
-                val threads = threadUids.mapNotNull { threadController.getThread(it) }
-
-                val messageUids = threads.mapNotNull { thread ->
-                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings)
-                        .lastOrNull { it.folderId == currentFolderId }?.uid
-                }
-
-                val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
-
-                isSuccess = responses.atLeastOneSucceeded()
-                val userFeedbackMessage = if (isSuccess) {
-                    // Snoozing threads requires to refresh the snooze folder.
-                    // It's the only folder that will update the snooze state of any message.
-                    refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
-
-                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
-                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threads.count(), formattedDate)
-                } else {
-                    val errorMessageRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
-                    appContext.getString(errorMessageRes)
-                }
-
-                snackbarManager.postValue(userFeedbackMessage)
-            }
-        }.join()
-
-        return isSuccess
-    }
-
-    suspend fun rescheduleSnoozedThreads(date: Date, threadUids: List<String>): BatchSnoozeResult {
-        var rescheduleResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
-
-        viewModelScope.launch(ioCoroutineContext) {
-            val snoozedThreadUuids = threadUids.mapNotNull { threadUid ->
-                val thread = threadController.getThread(threadUid) ?: return@mapNotNull null
-                thread.snoozeUuid.takeIf { thread.isSnoozed() }
-            }
-            if (snoozedThreadUuids.isEmpty()) return@launch
-
-            val currentMailbox = currentMailbox.value!!
-            val result = rescheduleSnoozedThreads(currentMailbox, snoozedThreadUuids, date)
-
-            val userFeedbackMessage = when (result) {
-                is BatchSnoozeResult.Success -> {
-                    refreshFoldersAsync(currentMailbox, result.impactedFolders)
-
-                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
-                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threadUids.count(), formattedDate)
-                }
-                is BatchSnoozeResult.Error -> getRescheduleSnoozedErrorMessage(result)
-            }
-
-            snackbarManager.postValue(userFeedbackMessage)
-
-            rescheduleResult = result
-        }.join()
-
-        return rescheduleResult
-    }
-
-    private suspend fun rescheduleSnoozedThreads(
-        currentMailbox: Mailbox,
-        snoozeUuids: List<String>,
-        date: Date,
-    ): BatchSnoozeResult {
-        return SharedUtils.rescheduleSnoozedThreads(
-            mailboxUuid = currentMailbox.uuid,
-            snoozeUuids = snoozeUuids,
-            newDate = date,
-            impactedFolders = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
-        )
-    }
-
-    private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {
-        val errorMessageRes = when (errorResult) {
-            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
-            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
-            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
-        }
-        return appContext.getString(errorMessageRes)
-    }
-
-    suspend fun unsnoozeThreads(threads: Collection<Thread>): BatchSnoozeResult {
-        var unsnoozeResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
-
-        viewModelScope.launch(ioCoroutineContext) {
-            val currentMailbox = currentMailbox.value
-            unsnoozeResult = if (currentMailbox == null) {
-                BatchSnoozeResult.Error.Unknown
-            } else {
-                ioDispatcher { unsnoozeThreadsWithoutRefresh(scope = null, currentMailbox, threads) }
-            }
-
-            unsnoozeResult.let {
-                val userFeedbackMessage = when (it) {
-                    is BatchSnoozeResult.Success -> {
-                        sharedUtils.refreshFolders(mailbox = currentMailbox!!, messagesFoldersIds = it.impactedFolders)
-                        appContext.resources.getQuantityString(R.plurals.snackbarUnsnoozeSuccess, threads.count())
-                    }
-                    is BatchSnoozeResult.Error -> getUnsnoozeErrorMessage(it)
-                }
-
-                snackbarManager.postValue(userFeedbackMessage)
-            }
-        }.join()
-
-        return unsnoozeResult
-    }
-
-    private fun getUnsnoozeErrorMessage(errorResult: BatchSnoozeResult.Error): String {
-        val errorMessageRes = when (errorResult) {
-            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
-            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
-            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
-        }
-
-        return appContext.getString(errorMessageRes)
-    }
-    //endregion
-
-    //region Emoji reaction
-    /**
-     * Wrapper method to send an emoji reaction to the api. This method will check if the emoji reaction is allowed before
-     * initiating an api call. This is the entry point to add an emoji reaction anywhere in the app.
-     *
-     * If sending is allowed, the caller place can fake the emoji reaction locally thanks to [onAllowed].
-     * If sending is not allowed, it will display the error directly to the user and avoid doing the api call.
-     */
-    fun trySendEmojiReply(emoji: String, messageUid: String, reactions: Map<String, Reaction>, onAllowed: () -> Unit = {}) {
-        viewModelScope.launch {
-            when (val status = reactions.getEmojiSendStatus(emoji)) {
-                EmojiSendStatus.Allowed -> {
-                    onAllowed()
-                    sendEmojiReply(emoji, messageUid)
-                }
-                is EmojiSendStatus.NotAllowed -> snackbarManager.postValue(appContext.getString(status.errorMessageRes))
-            }
-        }
-    }
-
-    private fun Map<String, Reaction>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
-        this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
-        hasAvailableReactionSlot().not() -> EmojiSendStatus.NotAllowed.MaxReactionReached
-        hasNetwork.not() -> EmojiSendStatus.NotAllowed.NoInternet
-        else -> EmojiSendStatus.Allowed
-    }
-
-    /**
-     * The actual logic of sending an emoji reaction to the api. This method initializes a [Draft] instance, stores it into the
-     * database and schedules the [DraftsActionsWorker] so the draft is uploaded on the api.
-     */
-    private suspend fun sendEmojiReply(emoji: String, messageUid: String) {
-        val targetMessage = messageController.getMessage(messageUid) ?: return
-        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
-        if (hasFailedFetching) return
-        val draftMode = Draft.DraftMode.REPLY_ALL
-
-        val draft = Draft().apply {
-            with(draftInitManager) {
-                setPreviousMessage(draftMode, fullMessage)
-            }
-
-            val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
-            body = EMOJI_REACTION_PLACEHOLDER + quote
-
-            val currentMailbox = currentMailboxLive.asFlow().first()
-            with(draftInitManager) {
-                // We don't want to send the HTML code of the signature for an emoji reaction but we still need to send the
-                // identityId stored in a Signature
-                val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
-                setSignatureIdentity(signature)
-            }
-
-            mimeType = Utils.TEXT_HTML
-
-            action = DraftAction.SEND_REACTION
-            emojiReaction = emoji
-        }
-
-        draftController.upsertDraft(draft)
-
-        draftsActionsWorkerScheduler.scheduleWork(draft.localUuid, AccountUtils.currentMailboxId, AccountUtils.currentUserId)
-    }
-
-    private sealed interface EmojiSendStatus {
-        data object Allowed : EmojiSendStatus
-
-        sealed class NotAllowed(@StringRes val errorMessageRes: Int) : EmojiSendStatus {
-            data object AlreadyUsed : NotAllowed(ErrorCode.EmojiReactions.alreadyUsed.translateRes)
-            data object MaxReactionReached : NotAllowed(ErrorCode.EmojiReactions.maxReactionReached.translateRes)
-            data object NoInternet : NotAllowed(RCore.string.noConnection)
-        }
-    }
-    //endregion
-
-    //region Undo action
-    fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
-
-        fun List<ApiResponse<*>>.getFailedCall() = firstOrNull { it.data != true }
-
-        val mailbox = currentMailbox.value!!
-        val (resources, foldersIds, destinationFolderId) = undoData
-
-        val apiResponses = resources.map { ApiRepository.undoAction(it) }
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-            sharedUtils.refreshFolders(
-                mailbox = mailbox,
-                messagesFoldersIds = foldersIds,
-                destinationFolderId = destinationFolderId,
-            )
-        }
-
-        val failedCall = apiResponses.getFailedCall()
-
-        val snackbarTitle = when {
-            failedCall == null -> R.string.snackbarMoveCancelled
-            else -> failedCall.translateError()
-        }
-
-        snackbarManager.postValue(appContext.getString(snackbarTitle))
     }
     //endregion
 
@@ -1613,55 +716,87 @@ class MainViewModel @Inject constructor(
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,
-        messageUid: String?,
+        messagesUids: List<String>?,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val newFolderId = createNewFolderSync(name) ?: return@launch
-        moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
-        isMovedToNewFolder.postValue(true)
-    }
-    //endregion
+        val newFolderId = createNewFolderSync(name)
+        val mailbox = currentMailbox.value
+        if (newFolderId == null || mailbox == null) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
 
-    private suspend fun moveOutThreadsLocally(
-        threadsUids: List<String>,
-        threads: List<Thread>,
-        message: Message?,
-    ) {
-        val uidsToMove = if (message == null) {
-            threadsUids
-        } else {
-            mutableListOf<String>().apply {
-                threads.forEach { thread ->
-                    var nbMessagesInCurrentFolder = thread.messages.count { it.folderId == currentFolderId }
-                    if (message.folderId == currentFolderId) nbMessagesInCurrentFolder--
-                    if (nbMessagesInCurrentFolder == 0) add(thread.uid)
+        val destinationFolder = folderController.getFolder(newFolderId) ?: run {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
+
+        val result = messagesActions.moveThreadsOrMessagesTo(
+            destinationFolderId = newFolderId,
+            threadsUids = threadsUids,
+            messagesUids = messagesUids,
+            mailbox = mailbox,
+        ) ?: run {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
+
+        with(result) {
+            if (apiResponses.atLeastOneSucceeded()) {
+                currentFolderId?.let {
+                    refreshFoldersAsync(
+                        mailbox = currentMailbox.value!!,
+                        messagesFoldersIds = messages.getFoldersIds(),
+                        destinationFolderId = newFolderId,
+                        currentFolderId = it,
+                        threadsUids = movedThreads,
+                    )
                 }
+
+                showMoveSnackbar(
+                    movedThreads.count(),
+                    messages.count(),
+                    messages.getFoldersIds(),
+                    apiResponses,
+                    destinationFolder
+                )
+                isMovedToNewFolder.postValue(true)
+            }
+
+            if (apiResponses.atLeastOneFailed()) {
+                threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
             }
         }
-        if (uidsToMove.isNotEmpty()) threadController.updateIsLocallyMovedOutStatus(uidsToMove, hasBeenMovedOut = true)
     }
+//endregion
 
-    private fun refreshFoldersAsync(
+    fun refreshFoldersAsync(
         mailbox: Mailbox,
         messagesFoldersIds: ImpactedFolders,
         destinationFolderId: String? = null,
-        callbacks: RefreshCallbacks? = null,
+        currentFolderId: String,
+        threadsUids: List<String> = emptyList(),
     ) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
+        sharedUtils.refreshFolders(
+            mailbox = mailbox,
+            messagesFoldersIds = messagesFoldersIds,
+            destinationFolderId = destinationFolderId,
+            parentFolderId = currentFolderId,
+            threadsUids = threadsUids,
+            onDownloadStop = { threadsUids -> onDownloadStop(threadsUids) }
+        )
     }
 
     private fun onDownloadStart() {
-        isDownloadingChanges.postValue(true)
+        downloadThreadsStatusManager.start()
     }
 
     private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        isDownloadingChanges.postValue(false)
+        downloadThreadsStatusManager.stop()
     }
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {
-
         with(ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient)) {
-
             val snackbarTitle = if (isSuccess()) {
                 updateUserInfo()
                 R.string.snackbarContactSaved
@@ -1674,22 +809,6 @@ class MainViewModel @Inject constructor(
     }
 
     suspend fun getMessage(messageUid: String): Message? = messageController.getMessage(messageUid)
-
-    fun selectOrUnselectAll() {
-        if (isEverythingSelected) {
-            trackMultiSelectionEvent(MatomoName.None)
-            selectedThreads.clear()
-        } else {
-            trackMultiSelectionEvent(MatomoName.All)
-            currentThreadsLive.value?.list?.forEach { thread -> selectedThreads.add(thread) }
-        }
-
-        publishSelectedItems()
-    }
-
-    fun publishSelectedItems() {
-        selectedThreadsLiveData.value = selectedThreads
-    }
 
     fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
         val folder = folderController.getFolder(FolderRole.DRAFT)
@@ -1755,15 +874,6 @@ class MainViewModel @Inject constructor(
         threadController.deleteThread(threadUid)
     }
 
-    private suspend fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
-        val isWorkingWithThread = message == null
-        return isWorkingWithThread || threadHasOnlyOneMessageLeft(threadsUids.first())
-    }
-
-    private suspend fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
-        return messageController.getMessagesCountInThread(threadUid, featureFlagsLive.value, mailboxContentRealm()) == 1
-    }
-
     fun shareThreadUrl(messageUid: String) {
         val mailboxUuid = currentMailbox.value?.uuid
 
@@ -1782,6 +892,28 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    //region swipe
+    fun isAllowedToSwipe(swipeDirection: ListOrientation.DirectionFlag): Boolean {
+        if (currentFolderLive.value?.role != FolderRole.DRAFT) return true
+
+        val action = if (swipeDirection == ListOrientation.DirectionFlag.LEFT) {
+            localSettings.swipeLeft
+        } else {
+            localSettings.swipeRight
+        }
+
+        val allowedSwipeActionsForDraft = listOf(
+            SwipeAction.DELETE,
+            SwipeAction.QUICKACTIONS_MENU,
+            SwipeAction.READ_UNREAD,
+            SwipeAction.FAVORITE
+        )
+
+        return action in allowedSwipeActionsForDraft
+    }
+
+    //endregion
+
     // TODO: Remove this function when the Threads parental issues are fixed
     private fun removeThreadsWithParentalIssues() = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Remove Threads with parental issues")
@@ -1799,8 +931,6 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
-
-        private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
 }
 

@@ -28,6 +28,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
@@ -39,26 +40,32 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
-import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getArchiveIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getFavoriteIconAndShortText
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.folderPicker.FolderPickerAction
+import com.infomaniak.mail.ui.main.folderPicker.FolderPickerFragmentArgs
+import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,8 +79,12 @@ import com.infomaniak.core.common.R as RCore
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
-    override val mainViewModel: MainViewModel by activityViewModels()
+    private val navigationArgs: MultiSelectBottomSheetDialogArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
+    override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -94,99 +105,76 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(mainViewModel) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(multiselectionViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
         // This `.toSet()` is used to make an immutable local copy of `selectedThreads`.
         val threads = selectedThreads.toSet()
         val threadsUids = threads.map { it.uid }
         val threadsCount = threadsUids.count()
+        val currentMailbox = mainViewModel.currentMailbox.value ?: run {
+            SentryLog.e(TAG, getString(R.string.sentryErrorMailboxIsNull)) { scope ->
+                scope.setTag("context", "$TAG.onViewCreated")
+            }
+            snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+            return@with
+        }
 
         // Initialization of threadsUids to populate junkMessages and potentialUsersToBlock
         junkMessagesViewModel.threadsUids = threadsUids
 
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
-        val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
 
         lifecycleScope.launch {
-            val folderRole = folderRoleUtils.getActionFolderRole(threads)
-            setupMainActions(threadsCount, threadsUids, shouldRead, folderRole)
+            val folderRole = folderRoleUtils.getThreadsActionFolderRole(threads)
+            val messages = threads.flatMap { it.messages }
+            val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
+            val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE ||
+                    messagesFolderRoles.all { it == FolderRole.ARCHIVE }
+            setupMainActions(threads, threadsUids, shouldRead, folderRole, messagesFolderRoles)
+            setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
         }
-
-        setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
 
         observeReportPhishingResult()
         observePotentialBlockedSenders()
 
         binding.snooze.setOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Snooze, threadsCount, isFromBottomSheet = true)
-            isMultiSelectOn = false
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(threadsUids))
         }
 
         binding.modifySnooze.setOnClickListener {
             trackMultiSelectActionEvent(MatomoName.ModifySnooze, threadsCount, isFromBottomSheet = true)
-            isMultiSelectOn = false
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify(threadsUids))
         }
 
         binding.cancelSnooze.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.CancelSnooze, threadsCount, isFromBottomSheet = true)
-            lifecycleScope.launch { mainViewModel.unsnoozeThreads(threads) }
-            isMultiSelectOn = false
+            lifecycleScope.launch { actionsViewModel.unsnoozeThreads(threads.toList(), mainViewModel.currentMailbox.value) }
         }
 
         binding.spam.setClosingOnClickListener {
             trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
-            toggleThreadSpamStatus(threadsUids)
-            isMultiSelectOn = false
-        }
-
-        binding.phishing.setOnClickListener {
-            trackMultiSelectActionEvent(MatomoName.SignalPhishing, threadsCount, isFromBottomSheet = true)
-            val messages = junkMessagesViewModel.junkMessages.value ?: emptyList()
-
-            if (messages.isEmpty()) {
-                //An error will be shown to the user in the reportPhishing function
-                //This should never happen, that's why we add a SentryLog.
-                SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
-            }
-
-            descriptionDialog.show(
-                title = getString(R.string.reportPhishingTitle),
-                description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
-                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
+            actionsViewModel.toggleThreadsSpamStatus(
+                threads = threads,
+                parentFolderId = mainViewModel.currentFolderId,
+                mailbox = currentMailbox,
             )
-
             isMultiSelectOn = false
         }
 
-        binding.blockSender.setClosingOnClickListener {
-            trackMultiSelectActionEvent(MatomoName.BlockUser, threadsCount, isFromBottomSheet = true)
-            val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
-            if (potentialUsersToBlock == null) {
-                snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
-                SentryLog.e(TAG, getString(R.string.sentryErrorPotentialUsersToBlockNull))
-                return@setClosingOnClickListener
-            }
+        binding.phishing.setOnClickListener { handlePhishing(threadsCount, currentMailbox) }
 
-            if (potentialUsersToBlock.count() > 1) {
-                safelyNavigate(
-                    resId = R.id.userToBlockBottomSheetDialog,
-                    substituteClassName = ThreadListFragment::class.java.name,
-                )
-            } else {
-                potentialUsersToBlock.values.firstOrNull()?.let { message ->
-                    junkMessagesViewModel.messageOfUserToBlock.value = message
-                }
-            }
-            isMultiSelectOn = false
-        }
+        binding.blockSender.setClosingOnClickListener { handleBlockSender(threadsCount) }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
-            toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
-            isMultiSelectOn = false
+            actionsViewModel.toggleThreadsFavoriteStatus(
+                threadsUids = threadsUids,
+                mailbox = currentMailbox,
+                shouldFavorite = shouldFavorite,
+                shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.STARRED)
+            )
         }
 
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
@@ -195,22 +183,97 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 messageUids = threads.flatMap { it.messages }.map { it.uid },
                 currentClassName = MultiSelectBottomSheetDialog::class.java.name,
             )
-            isMultiSelectOn = false
         }
     }
 
-    private fun setupMainActions(
+    private fun handlePhishing(
         threadsCount: Int,
+        currentMailbox: Mailbox
+    ) {
+        trackMultiSelectActionEvent(MatomoName.SignalPhishing, threadsCount, isFromBottomSheet = true)
+        val messages = junkMessagesViewModel.junkMessages.value ?: emptyList()
+
+        if (messages.isEmpty()) {
+            //An error will be shown to the user in the reportPhishing function
+            //This should never happen, that's why we add a SentryLog.
+            SentryLog.e(TAG, getString(R.string.sentryErrorPhishingMessagesEmpty))
+        }
+
+        val currentFolderId = if (navigationArgs.isFromSearch) searchViewModel.filterFolder?.id else mainViewModel.currentFolderId
+        descriptionDialog.show(
+            title = getString(R.string.reportPhishingTitle),
+            description = resources.getQuantityString(R.plurals.reportPhishingDescription, messages.count()),
+            onPositiveButtonClicked = {
+                actionsViewModel.reportPhishing(
+                    messages = messages,
+                    parentFolderId = currentFolderId,
+                    mailbox = currentMailbox,
+                )
+            },
+        )
+        multiselectionViewModel.isMultiSelectOn = false
+    }
+
+    private fun handleBlockSender(threadsCount: Int) {
+        trackMultiSelectActionEvent(MatomoName.BlockUser, threadsCount, isFromBottomSheet = true)
+        val potentialUsersToBlock = junkMessagesViewModel.potentialBlockedUsers.value
+        if (potentialUsersToBlock == null) {
+            snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+            SentryLog.e(TAG, getString(R.string.sentryErrorPotentialUsersToBlockNull))
+            return
+        }
+        val substituteClassName = if (navigationArgs.isFromSearch) {
+            SearchFragment::class.java.name
+        } else {
+            ThreadListFragment::class.java.name
+        }
+
+        if (potentialUsersToBlock.count() > 1) {
+            safelyNavigate(
+                resId = R.id.userToBlockBottomSheetDialog,
+                substituteClassName = substituteClassName,
+            )
+        } else {
+            potentialUsersToBlock.values.firstOrNull()?.let { message ->
+                junkMessagesViewModel.messageOfUserToBlock.value = message
+            }
+        }
+        multiselectionViewModel.isMultiSelectOn = false
+    }
+
+    private fun setupMainActions(
+        threads: Set<Thread>,
         threadsUids: List<String>,
         shouldRead: Boolean,
-        folderRole: FolderRole?
+        folderRole: FolderRole?,
+        messagesFolderRoles: List<FolderRole>
     ) {
-        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
+        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = false) { id: Int ->
+            val currentMailbox = mainViewModel.currentMailbox.value ?: run {
+                SentryLog.e(TAG, getString(R.string.sentryErrorMailboxIsNull)) { scope ->
+                    scope.setTag("context", "$TAG.setupMailAction")
+                }
+                return@setClosingOnClickListener
+            }
+
+            val threadsCount = threads.count()
+            val currentFolder = mainViewModel.currentFolder.value
+            val currentFolderId = mainViewModel.currentFolderId
+
             when (id) {
                 R.id.actionMove -> onMoveClicked(threadsCount, threadsUids, folderRole)
                 R.id.actionReadUnread -> {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
-                    mainViewModel.toggleThreadsSeenStatus(threadsUids, shouldRead)
+                    actionsViewModel.toggleThreadsSeenStatus(
+                        threadsUids = threadsUids,
+                        shouldRead = shouldRead,
+                        parentFolderId = currentFolderId,
+                        mailbox = currentMailbox,
+                        shouldRefreshSearch = searchViewModel.currentFilters.contains(ThreadFilter.SEEN) || searchViewModel.currentFilters.contains(
+                            ThreadFilter.UNSEEN
+                        ),
+                    )
+                    multiselectionViewModel.isMultiSelectOn = false
                 }
                 R.id.actionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(
@@ -218,16 +281,27 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
-                        mainViewModel.archiveThreads(threadsUids)
+                        actionsViewModel.archiveThreads(
+                            threads = threads.toList(),
+                            parentFolderId = currentFolderId,
+                            mailbox = currentMailbox,
+                        )
+                        multiselectionViewModel.isMultiSelectOn = false
                     }
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = folderRole,
+                        messagesFolderRoles = messagesFolderRoles,
                         count = threadsCount,
+                        currentFolderRole = currentFolder?.role
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
-                        mainViewModel.deleteThreads(threadsUids)
+                        actionsViewModel.deleteThreads(
+                            threads = threads.toList(),
+                            parentFolderId = currentFolderId,
+                            mailbox = currentMailbox,
+                        )
+                        multiselectionViewModel.isMultiSelectOn = false
                     }
                 }
             }
@@ -239,24 +313,38 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         threadsUids: List<String>,
         folderRole: FolderRole?
     ) {
-        val navController = findNavController()
         descriptionDialog.moveWithConfirmationPopup(
             folderRole = folderRole,
             count = threadsCount,
         ) {
             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
-            navController.animatedNavigation(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToFolderPickerFragment(
-                    threadsUids = threadsUids.toTypedArray(),
-                    action = FolderPickerAction.MOVE,
-                    sourceFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID,
-                ),
-            )
+            navigateToFolderPickerFragment(threadsUids)
         }
     }
 
+    private fun navigateToFolderPickerFragment(threadsUids: List<String>) {
+        val messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray()
+        multiselectionViewModel.isMultiSelectOn = false
+        val sourceFolderId = if (navigationArgs.isFromSearch) {
+            searchViewModel.filterFolder?.id
+        } else {
+            mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
+        }
+
+        animatedNavigation(
+            resId = R.id.folderPickerFragment,
+            args = FolderPickerFragmentArgs(
+                threadsUids = threadsUids.toTypedArray(),
+                messagesUids = messagesUids,
+                action = FolderPickerAction.MOVE,
+                sourceFolderId = sourceFolderId,
+                isFromSearch = navigationArgs.isFromSearch,
+            ).toBundle()
+        )
+    }
+
     private fun observeReportPhishingResult() {
-        mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
+        actionsViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
         }
@@ -275,9 +363,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         with(binding) {
             val isFromDraft = mainViewModel.currentFolder.value?.role == FolderRole.DRAFT
             if (isFromDraft) {
-                    mainActions.isVisible = false
-                    phishing.isVisible = false
-                    favorite.isVisible = false
+                mainActions.isVisible = false
+                phishing.isVisible = false
+                favorite.isVisible = false
             } else {
                 val (readIcon, readText) = getReadIconAndShortText(shouldRead)
                 mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
@@ -292,7 +380,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
             }
 
-            setSnoozeUi(threads)
+            if (!navigationArgs.isFromSearch) setSnoozeUi(threads)
             ThreadActionsBottomSheetDialog.setSpamUi(
                 spam = spam,
                 isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM,
@@ -304,7 +392,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {
         fun hasMixedSnoozeState(): Boolean {
-            val isFirstThreadSnoozed = threads.first().isSnoozed()
+            val isFirstThreadSnoozed = threads.firstOrNull()?.isSnoozed() ?: false
             return threads.any { it.isSnoozed() != isFirstThreadSnoozed }
         }
 

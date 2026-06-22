@@ -489,6 +489,10 @@
     <string name="reviewAlertTitle">Pidätkö Infomaniak Mailista?</string>
     <string name="saveToDriveDeviceItem">Tallenna laitteeseen</string>
     <string name="saveToDriveItem">Tallenna kDriveen</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">Tämä keskustelu poistetaan ja kaikki aikataulutetut toimitukset perutaan.</item>
+        <item quantity="other">Nämä keskustelut poistetaan ja kaikki aikataulutetut toimitukset perutaan.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Ajasta lähetys</string>
     <string name="scheduledEmailHeader">Tämä sähköposti lähetetään tänä päivämääränä: %s</string>
     <string name="scheduledMessagesFolder">Ajastetut viestit</string>
