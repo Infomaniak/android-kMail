@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Niebieski</string>
     <string name="accentColorPinkTitle">Różowy</string>
     <string name="accentColorSystemTitle">Kolor systemowy</string>
+    <string name="acknowledgementMessage">Nadawca zażądał potwierdzenia przeczytania.</string>
+    <string name="acknowledgementMessageSent">Potwierdzenie przeczytania zostało wysłane do nadawcy.</string>
     <string name="actionArchive">Archiwizuj</string>
     <string name="actionBlockSender">Zablokuj nadawcę</string>
     <string name="actionCancelSnooze">Anuluj uśpienie</string>
@@ -533,6 +535,7 @@
     <string name="selectSignatureNone">Brak podpisu</string>
     <string name="selectTimeDialogTitle">Wybierz godzinę</string>
     <string name="send">Wyślij</string>
+    <string name="sendConfirmationAction">Wyślij potwierdzenie</string>
     <string name="sentFolder">Wysłane wiadomości</string>
     <string name="settingsAccentColor">Kolor akcentu</string>
     <string name="settingsAccentColorDescription">Wybierz kolor akcentu dla aplikacji</string>
@@ -614,6 +617,8 @@
     <string name="settingsTransferEmailsTitle">Przekaż wiadomości</string>
     <string name="settingsTransferInBody">W treści wiadomości</string>
     <string name="shareEmail">Udostępnij wiadomość</string>
+    <string name="snackbarAcknowledgementFailure">Nie udało się wysłać</string>
+    <string name="snackbarAcknowledgementSuccess">Potwierdzenie odbioru wysłane</string>
     <string name="snackbarAdminDisabledMessageSending">Administrator wyłączył wysyłanie wiadomości</string>
     <string name="snackbarBlockUserConfirmation">Nadawca został zablokowany</string>
     <string name="snackbarCalendarChoiceSent">Odpowiedź uwzględniona</string>

@@ -22,6 +22,7 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.core.common.utils.mailApiEnum
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
+import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.InternalModelProperties
@@ -130,6 +131,8 @@ class Message : RealmObject, Snoozable {
     var isEncrypted: Boolean = false
     @SerialName("crypt_password_validity")
     var encryptionPasswordValidity: RealmInstant? = null
+    @SerialName("acknowledge")
+    var _acknowledgeStatus: String? = null
     @SerialName("emoji_reaction")
     var emojiReaction: String? = null
     @SerialName("emoji_reaction_not_allowed_reason")
@@ -194,6 +197,9 @@ class Message : RealmObject, Snoozable {
     @Ignore
     var emojiReactionNotAllowedReason: EmojiReactionNotAllowedReason? by mailApiEnum(::_emojiReactionNotAllowedReason)
 
+    @Ignore
+    var acknowledgeStatus: AcknowledgeStatus? by mailApiEnum(::_acknowledgeStatus)
+
     val isValidReactionTarget get() = _emojiReactionNotAllowedReason == null
 
     val isReaction get() = emojiReaction != null
@@ -205,6 +211,9 @@ class Message : RealmObject, Snoozable {
     val allRecipients inline get() = listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray())
 
     inline val sender get() = from.firstOrNull()
+
+    val hasAcknowledge: Boolean get() = acknowledgeStatus != null
+    val hasPendingAcknowledgement: Boolean get() = acknowledgeStatus == AcknowledgeStatus.Pending
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 

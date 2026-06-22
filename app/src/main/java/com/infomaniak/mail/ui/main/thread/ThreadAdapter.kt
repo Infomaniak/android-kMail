@@ -50,6 +50,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageBannerEvent
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
@@ -201,6 +202,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
+                NotifyType.AcknowledgeRebind -> bindAcknowledge(item.message)
                 NotifyType.AiSummaryStateChanged -> holder.bindAiAction(item.message, AiAction.SUMMARY)
                 NotifyType.AiTranslateStateChanged -> holder.bindAiAction(item.message, AiAction.TRANSLATE)
                 is NotifyType.MessagesCollapseStateChanged -> {
@@ -650,7 +652,8 @@ class ThreadAdapter(
 
             setOnActionClicked {
                 val aiProcessState = getAiStateMap(aiAction, message.uid)
-                val isSuccess = aiProcessState is AiProcessState.Success || (aiProcessState == null && message.body?.isTranslated == true)
+                val isSuccess = aiProcessState is AiProcessState.Success
+                        || (aiProcessState == null && message.body?.isTranslated == true)
                 if (isSuccess && aiAction == AiAction.TRANSLATE) {
                     threadAdapterCallbacks?.onShowOriginal?.invoke(message.uid)
                 } else {
@@ -744,6 +747,7 @@ class ThreadAdapter(
         }
 
         bindUnsubscribe(messageUi)
+        bindAcknowledge(message)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -821,6 +825,33 @@ class ThreadAdapter(
             }
             is UnsubscribeState.InProgress -> unsubscribeAlert.showAction1Progress()
             is UnsubscribeState.Completed, null -> unsubscribeAlert.isVisible = false
+        }
+    }
+
+    private fun ItemMessageBinding.bindAcknowledge(message: Message) {
+        when (message.acknowledgeStatus) {
+            AcknowledgeStatus.Pending -> {
+                acknowledgeAlert.apply {
+                    isVisible = true
+                    setActionsVisibility(isVisible = true)
+                    setDescription(context.getString(R.string.acknowledgementMessage))
+                    setIconRes(R.drawable.ic_envelope)
+                    setAction1Text(context.getString(R.string.sendConfirmationAction))
+                    onAction1 {
+                        trackMessageBannerEvent(MatomoName.Acknowledge)
+                        threadAdapterCallbacks?.onAcknowledgeClicked?.invoke(message)
+                    }
+                }
+            }
+            AcknowledgeStatus.Acknowledged -> {
+                acknowledgeAlert.apply {
+                    isVisible = true
+                    setActionsVisibility(isVisible = false)
+                    setDescription(context.getString(R.string.acknowledgementMessageSent))
+                    setIconRes(R.drawable.ic_check)
+                }
+            }
+            else -> Unit
         }
     }
 
@@ -1169,6 +1200,7 @@ class ThreadAdapter(
         data object OnlyRebindCalendarAttendance : NotifyType
         data object OnlyRebindEmojiReactions : NotifyType
         data object UnsubscribeRebind : NotifyType
+        data object AcknowledgeRebind : NotifyType
         data object UpdatePermissions : NotifyType
         data object AiSummaryStateChanged : NotifyType
         data object AiTranslateStateChanged : NotifyType
@@ -1215,6 +1247,7 @@ class ThreadAdapter(
                 MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
                 MessageDiffAspect.Unsubscribe.areDifferent(oldItem, newItem) -> NotifyType.UnsubscribeRebind
+                MessageDiffAspect.Acknowledge.areDifferent(oldItem, newItem) -> NotifyType.AcknowledgeRebind
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
@@ -1252,7 +1285,10 @@ class ThreadAdapter(
             }
 
             object MessageDiffAspect {
-                val entries: List<DiffAspect<MessageUi>> get() = listOf(EmojiReactions, Calendar, AnythingElse, Unsubscribe)
+                val entries: List<DiffAspect<MessageUi>>
+                    get() = listOf(
+                        EmojiReactions, Calendar, AnythingElse, Unsubscribe, Acknowledge
+                    )
 
                 data object EmojiReactions : DiffAspect<MessageUi>({
                     emojiReactionsState.containsTheSameEmojiValuesAs(it.emojiReactionsState)
@@ -1284,6 +1320,10 @@ class ThreadAdapter(
                             message.isDraft == oldMessage.message.isDraft &&
                             message.isScheduledMessage == oldMessage.message.isScheduledMessage
                 })
+
+                data object Acknowledge : DiffAspect<MessageUi>({
+                    message.acknowledgeStatus == it.message.acknowledgeStatus
+                })
             }
         }
     }
@@ -1304,6 +1344,7 @@ class ThreadAdapter(
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var onUnsubscribeClicked: ((Message) -> Unit)? = null,
+        var onAcknowledgeClicked: ((Message) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
         var activateSpamFilter: (() -> Unit)? = null,
         var unblockMail: ((String) -> Unit)? = null,

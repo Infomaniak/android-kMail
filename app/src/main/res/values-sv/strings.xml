@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Blå</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Systemfärg</string>
+    <string name="acknowledgementMessage">Avsändaren har begärt ett läskvitto.</string>
+    <string name="acknowledgementMessageSent">Ett läskvitto har skickats till avsändaren.</string>
     <string name="actionArchive">Arkivera</string>
     <string name="actionBlockSender">Blockera avsändare</string>
     <string name="actionCancelSnooze">Avbryt vänteläge</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Välj tid</string>
     <string name="send">Skicka</string>
+    <string name="sendConfirmationAction">Skicka bekräftelsen</string>
     <string name="sentFolder">Skickade meddelanden</string>
     <string name="settingsAccentColor">Accentfärg</string>
     <string name="settingsAccentColorDescription">Välj accentfärg för applikationen</string>
@@ -588,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">Vidarebefordra e-post</string>
     <string name="settingsTransferInBody">I meddelandetexten</string>
     <string name="shareEmail">Dela e-post</string>
+    <string name="snackbarAcknowledgementFailure">Kunde inte skicka</string>
+    <string name="snackbarAcknowledgementSuccess">Läskvitto skickat</string>
     <string name="snackbarAdminDisabledMessageSending">En administratör har inaktiverat meddelandesändning</string>
     <string name="snackbarBlockUserConfirmation">Avsändaren är nu blockerad</string>
     <string name="snackbarCalendarChoiceSent">Svar beaktat</string>

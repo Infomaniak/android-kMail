@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Blå</string>
     <string name="accentColorPinkTitle">Pink</string>
     <string name="accentColorSystemTitle">Systemfarve</string>
+    <string name="acknowledgementMessage">Afsenderen har anmodet om en kvittering for læsning.</string>
+    <string name="acknowledgementMessageSent">En kvittering for læsning er blevet sendt til afsenderen.</string>
     <string name="actionArchive">Arkivér</string>
     <string name="actionBlockSender">Bloker afsender</string>
     <string name="actionCancelSnooze">Annuller udsættelse</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Vælg tidspunkt</string>
     <string name="send">Send</string>
+    <string name="sendConfirmationAction">Send bekræftelsen</string>
     <string name="sentFolder">Sendte beskeder</string>
     <string name="settingsAccentColor">Accentfarve</string>
     <string name="settingsAccentColorDescription">Vælg accentfarven til applikationen</string>
@@ -588,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">Videresend e-mails</string>
     <string name="settingsTransferInBody">I meddelelsens brødtekst</string>
     <string name="shareEmail">Del e-mail</string>
+    <string name="snackbarAcknowledgementFailure">Kunne ikke sende</string>
+    <string name="snackbarAcknowledgementSuccess">Kvittering for læsning sendt</string>
     <string name="snackbarAdminDisabledMessageSending">En administrator har deaktiveret beskedafsendelse</string>
     <string name="snackbarBlockUserConfirmation">Afsender er nu blokeret</string>
     <string name="snackbarCalendarChoiceSent">Svar taget i betragtning</string>

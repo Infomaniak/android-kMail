@@ -175,7 +175,7 @@ object ApiRepository : ApiRepositoryCore() {
     suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         val encryptionWiths = "auto_uncrypt,recipient_provider_source"
         return callApi(
-            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=$encryptionWiths,emoji_reactions_per_message"),
+            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=$encryptionWiths,emoji_reactions_per_message,recipient_provider_source"),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
         )
@@ -193,6 +193,12 @@ object ApiRepository : ApiRepositoryCore() {
     suspend fun unsubscribe(messageResource: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.unsubscribe(messageResource), POST)
     }
+    //endregion
+    suspend fun acknowledgeMessage(messageResource: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.acknowledge(messageResource), GET)
+    }
+    //region acknowledge
+
     //endregion
 
     //region Spam

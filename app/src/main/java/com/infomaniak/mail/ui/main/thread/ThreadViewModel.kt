@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
@@ -749,6 +750,21 @@ class ThreadViewModel @Inject constructor(
         } else {
             snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeFailure))
             setUnsubscribeState(message, UnsubscribeState.CanUnsubscribe)
+        }
+    }
+
+    fun acknowledgeMessage(message: Message) = viewModelScope.launch {
+
+        val apiResponse = ApiRepository.acknowledgeMessage(message.resource)
+        if (apiResponse.isSuccess()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementSuccess))
+            mailboxContentRealm().write {
+                MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
+                    localMessage?._acknowledgeStatus = AcknowledgeStatus.Acknowledged.apiValue
+                }
+            }
+        } else {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementFailure))
         }
     }
 

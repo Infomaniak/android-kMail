@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Azul</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Color del sistema</string>
+    <string name="acknowledgementMessage">El remitente ha solicitado una confirmación de lectura.</string>
+    <string name="acknowledgementMessageSent">Se ha enviado una confirmación de lectura al remitente.</string>
     <string name="actionArchive">Archivar</string>
     <string name="actionBlockSender">Bloquear remitente</string>
     <string name="actionCancelSnooze">Cancelar el aplazamiento</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Sin firma</string>
     <string name="selectTimeDialogTitle">Seleccionar la hora</string>
     <string name="send">Enviar</string>
+    <string name="sendConfirmationAction">Enviar la confirmación</string>
     <string name="sentFolder">Mensajes enviados</string>
     <string name="settingsAccentColor">Color de acento</string>
     <string name="settingsAccentColorDescription">Elija el color de acento para la aplicación</string>
@@ -588,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">Transferir correos electrónicos</string>
     <string name="settingsTransferInBody">En el cuerpo del mensaje</string>
     <string name="shareEmail">Compartir correo electrónico</string>
+    <string name="snackbarAcknowledgementFailure">Error al enviar</string>
+    <string name="snackbarAcknowledgementSuccess">Recibo de lectura enviado</string>
     <string name="snackbarAdminDisabledMessageSending">Un administrador ha deshabilitado el envío de mensajes</string>
     <string name="snackbarBlockUserConfirmation">El remitente está bloqueado</string>
     <string name="snackbarCalendarChoiceSent">Respuesta tenida en cuenta</string>
