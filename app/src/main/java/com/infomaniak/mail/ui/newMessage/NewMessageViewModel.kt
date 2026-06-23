@@ -1073,6 +1073,11 @@ class NewMessageViewModel @Inject constructor(
         doc.removeEmptyElements(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         doc.removeEmptyElements(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
 
+        // If the user added mentions, we need to add their inline style to send to the backend.
+        // We don't do it in "insert_mentions.js" because we have a bug where the style is being deleted when the user deletes a
+        // mention and there is another mention in the same line.
+        doc.addMissingMentionsStyle()
+
         // If there are style tags inside the body of the editor JSoup will add them to the head tag automatically. So we always
         // need to send the whole doc.html() to not lose any style. Style can end up inside the <body> of the editor when
         // loading a draft.body that contains a whole <html><head><style>...</style></head><body>...</body></html>.
@@ -1082,6 +1087,19 @@ class NewMessageViewModel @Inject constructor(
     private fun Document.removeEmptyElements(className: String) {
         val elements = getElementsByClass(className)
         elements.forEach { if (it.text().isEmpty()) it.remove() }
+    }
+
+    private fun Document.addMissingMentionsStyle() {
+        val mentionTags = getElementsByAttribute(MENTION_ATTR)
+        mentionTags.forEach { it ->
+            it.attr(
+                "style",
+                "padding: 0 4px; border-radius: 100px; " +
+                        "color: var(--mail-content-mention-text-color, #333); " +
+                        "background-color: var(--mail-content-mention-background-color, #f1f1f1); " +
+                        "font-weight: var(--mail-content-mention-font-weight, inherit)"
+            )
+        }
     }
 
     private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>, step: String) {
