@@ -613,7 +613,11 @@ class ActionsViewModel @Inject constructor(
         )
 
         if (result is MessagesActions.SnoozeResult.Success) {
-            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+            refreshFoldersAsync(
+                mailbox = mailbox,
+                messagesFoldersIds = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
+                parentFolderId = parentFolderId
+            )
             notifySearchRefresh()
         }
 
@@ -825,7 +829,11 @@ class ActionsViewModel @Inject constructor(
         parentFolderId: String? = null,
         threadsUids: List<String> = emptyList(),
     ) = viewModelScope.launch(ioCoroutineContext) {
-        if (parentFolderId == null) return@launch
+        val downloadStopCallback: ((List<String>) -> Unit)? = if (parentFolderId != null) {
+            { uids: List<String> -> onDownloadStop(uids) }
+        } else {
+            null
+        }
 
         sharedUtils.refreshFolders(
             mailbox = mailbox,
@@ -833,7 +841,7 @@ class ActionsViewModel @Inject constructor(
             destinationFolderId = destinationFolderId,
             parentFolderId = parentFolderId,
             threadsUids = threadsUids,
-            onDownloadStop = { threadsUids -> onDownloadStop(threadsUids) }
+            onDownloadStop = downloadStopCallback
         )
     }
 
