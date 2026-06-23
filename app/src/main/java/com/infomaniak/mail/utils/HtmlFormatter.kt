@@ -259,7 +259,7 @@ class HtmlFormatter(private val html: String) {
         fun Context.getIncludeQuotesScript(): String = loadScript(R.raw.include_quotes_script)
 
         fun Context.getDeletedInlineImagesObserverScript(): String = loadScript(R.raw.deleted_inline_images_observer)
-        fun Context.getTagsObserverScript(): String = loadScript(R.raw.editor_mentions_detector)
+        fun Context.getEditorMentionsDetectorScript(): String = loadScript(R.raw.editor_mentions_detector)
         fun Context.getMentionDeletionObserverScript(): String = loadScript(R.raw.mention_deletion_observer)
 
         fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)

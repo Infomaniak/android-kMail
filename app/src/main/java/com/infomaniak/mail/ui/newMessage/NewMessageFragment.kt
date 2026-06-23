@@ -108,6 +108,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesO
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionClickObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionsDetectorScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
@@ -115,7 +116,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObser
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getTagsObserverScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -167,7 +167,7 @@ class NewMessageFragment : Fragment() {
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
-    private val tagsObserverScript by lazy { requireContext().getTagsObserverScript() }
+    private val tagsObserverScript by lazy { requireContext().getEditorMentionsDetectorScript() }
     private val mentionDeletionObserverScript by lazy { requireContext().getMentionDeletionObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
