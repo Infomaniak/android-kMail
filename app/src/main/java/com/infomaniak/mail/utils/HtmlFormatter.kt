@@ -270,7 +270,7 @@ class HtmlFormatter(private val html: String) {
         }
 
         fun Context.getMentionClickObserverScript(): String {
-            return loadScript(R.raw.mention_click_observer)
+            return loadScript(R.raw.message_display_mention_click_observer)
         }
 
         fun Context.getEditorJsBridgeScript(): String {
@@ -287,6 +287,10 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getInsertMentionScript(): String {
             return loadScript(R.raw.insert_mention)
+        }
+
+        fun Context.getEditorMentionClickObserverScript(): String {
+            return loadScript(R.raw.editor_mention_click_observer)
         }
     }
 }
