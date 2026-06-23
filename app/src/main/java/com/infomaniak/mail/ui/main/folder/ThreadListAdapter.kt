@@ -215,22 +215,30 @@ class ThreadListAdapter @Inject constructor(
 
             when (payload) {
                 NotificationType.SELECTED_STATE -> {
-                    if (holder.itemViewType == DisplayType.THREAD.layout) {
-                        val binding = holder.binding as CardviewThreadItemBinding
-                        val thread = (dataSet[position] as ThreadListItem.Content).thread
-                        binding.updateSelectedUi(thread)
-                    }
+                    handleSelectedStateNotification(holder, position)
                 }
                 NotificationType.UPDATE_CONTACT_INTERACTIVITY -> {
-                    if (holder.itemViewType == DisplayType.CONTACT_ITEM.layout) {
-                        val binding = holder.binding as ItemContactSearchBinding
-                        val contact = (dataSet[position] as ThreadListItem.ContactItem).contact
-                        binding.updateContactInteractivity(contact)
-                    }
+                    handleUpdateContactInteractivityNotification(holder, position)
                 }
             }
         }
     }.getOrDefault(Unit)
+
+    private fun handleUpdateContactInteractivityNotification(holder: ThreadListViewHolder, position: Int) {
+        if (holder.itemViewType == DisplayType.CONTACT_ITEM.layout) {
+            val binding = holder.binding as ItemContactSearchBinding
+            val contact = (dataSet[position] as ThreadListItem.ContactItem).contact
+            binding.updateContactInteractivity(contact)
+        }
+    }
+
+    private fun handleSelectedStateNotification(holder: ThreadListViewHolder, position: Int) {
+        if (holder.itemViewType == DisplayType.THREAD.layout) {
+            val binding = holder.binding as CardviewThreadItemBinding
+            val thread = (dataSet[position] as ThreadListItem.Content).thread
+            binding.updateSelectedUi(thread)
+        }
+    }
 
     override fun onBindViewHolder(
         item: ThreadListItem,
