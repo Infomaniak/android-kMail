@@ -36,7 +36,7 @@ const getBlockParent = (node) => {
 };
 
 const getTextBeforeCaret = () => {
-    const selection = window.getSelection();
+    const selection = globalThis.getSelection();
     if (!selection || selection.rangeCount === 0) return "";
 
     const range = selection.getRangeAt(0);
@@ -76,12 +76,12 @@ const notifyIfChanged = () => {
     if (query === lastSentValue) return;
 
     lastSentValue = query;
-    onMentionQueryChanged(query != null ? query : "");
+    onMentionQueryChanged(query == null ? "" : query);
 };
 
 // Check if the caret is right before a mention node
 const isCaretBeforeMention = () => {
-    const selection = window.getSelection();
+    const selection = globalThis.getSelection();
     if (!selection || selection.rangeCount === 0) return false;
     const range = selection.getRangeAt(0);
     if (!range.collapsed) return false;
@@ -91,7 +91,7 @@ const isCaretBeforeMention = () => {
     if (offset !== node.textContent.length) return false;
 
     const next = node.nextSibling;
-    if (!next || next.nodeType !== Node.ELEMENT_NODE) return false;
+    if (next?.nodeType !== Node.ELEMENT_NODE) return false;
 
     return next.matches?.("a[data-ik-mention-ref]") || false;
 }
@@ -104,7 +104,7 @@ const handleEnter = (event) => {
 
     event.preventDefault();
 
-    const selection = window.getSelection();
+    const selection = globalThis.getSelection();
     const range = selection.getRangeAt(0);
     const block = getBlockParent(range.startContainer);
 

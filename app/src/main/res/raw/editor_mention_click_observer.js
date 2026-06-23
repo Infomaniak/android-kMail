@@ -33,7 +33,7 @@ function observeEditorMentionClicks() {
             event.preventDefault();
 
             // move the caret to the right of the mention
-            const selection = window.getSelection();
+            const selection = globalThis.getSelection();
             const range = document.createRange();
             range.setStartAfter(mention);
             range.collapse(true);

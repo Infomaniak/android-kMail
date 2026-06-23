@@ -1092,8 +1092,8 @@ class NewMessageViewModel @Inject constructor(
 
     private fun Document.addMissingMentionsStyle() {
         val mentionTags = getElementsByAttribute(MENTION_ATTR)
-        mentionTags.forEach { it ->
-            it.attr(
+        mentionTags.forEach { mention ->
+            mention.attr(
                 "style",
                 "padding: 0 4px; border-radius: 100px; " +
                         "color: var(--mail-content-mention-text-color, #333); " +
