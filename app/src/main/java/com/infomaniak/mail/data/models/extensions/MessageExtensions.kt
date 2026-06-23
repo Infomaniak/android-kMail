@@ -91,6 +91,8 @@ val Message.folder: Folder
 
 fun Message.isInSpamFolder() = folder.role == FolderRole.SPAM
 
+fun Message.isAcknowledgementTargetForMe(): Boolean = hasPendingAcknowledgement && allRecipients.any { it.isMe() }
+
 fun Message.computeFolderAndReason(folderId: String): Pair<Folder?, String?> {
 
     var correctFolder: Folder? = null

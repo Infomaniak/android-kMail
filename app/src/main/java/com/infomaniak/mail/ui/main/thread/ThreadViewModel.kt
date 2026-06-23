@@ -50,6 +50,7 @@ import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.extensions.calendarAttachment
 import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
+import com.infomaniak.mail.data.models.extensions.isAcknowledgementTargetForMe
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
@@ -73,6 +74,7 @@ import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.data.models.extensions.isMe
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
@@ -278,7 +280,7 @@ class ThreadViewModel @Inject constructor(
                         val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
-                        if (shouldExpand && message.hasPendingAcknowledgement) refreshMessageIfNeeded(message)
+                        if (shouldExpand && message.isAcknowledgementTargetForMe()) refreshMessageIfNeeded(message)
                     }
                 }
 
@@ -706,7 +708,7 @@ class ThreadViewModel @Inject constructor(
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
             val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
             val canAcknowledgeOrNull = when {
-                item.hasPendingAcknowledgement -> MessageUi.AcknowledgeState.Pending
+                item.isAcknowledgementTargetForMe() -> MessageUi.AcknowledgeState.Pending
                 item.acknowledgeStatus == AcknowledgeStatus.Acknowledged -> MessageUi.AcknowledgeState.Completed
                 else -> null
             }

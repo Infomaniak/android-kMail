@@ -59,6 +59,7 @@ import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.extensions.calendarAttachment
 import com.infomaniak.mail.data.models.extensions.displayedName
+import com.infomaniak.mail.data.models.extensions.isAcknowledgementTargetForMe
 import com.infomaniak.mail.data.models.extensions.isInSpamFolder
 import com.infomaniak.mail.data.models.extensions.isMe
 import com.infomaniak.mail.data.models.extensions.isReplyAuthorized
@@ -683,7 +684,7 @@ class ThreadAdapter(
                         threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                     } else {
                         isExpandedMap[message.uid] = true
-                        if (message.hasPendingAcknowledgement) {
+                        if (message.isAcknowledgementTargetForMe()) {
                             threadAdapterCallbacks?.onMessageExpanded?.invoke(message)
                         }
                         onExpandOrCollapseMessage(message, shouldTrack = true)
