@@ -35,17 +35,19 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
-import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.common.extensions.goToAppStore
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.inappupdate.updatemanagers.InAppUpdateManager
 import com.infomaniak.core.ksuite.data.KSuite
@@ -58,8 +60,6 @@ import com.infomaniak.core.ui.view.extension.setPaddingRelative
 import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener
-import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
@@ -78,7 +78,6 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getLocalizedName
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.extensions.notificationsIsDisabled
@@ -93,18 +92,24 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.emojiPicker.PickerEmojiObserver
+import com.infomaniak.mail.ui.main.folder.PerformSwipeActionManager.performSwipeAction
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
+import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionBinding
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiSelectionHost
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.DownloadThreadsStatusManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -117,6 +122,8 @@ import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.shareString
 import com.infomaniak.mail.utils.extensions.toDate
+import com.infomaniak.mail.utils.extensions.updateSwipeActionsUi
+import com.infomaniak.mail.utils.extensions.updateSwipeAvailability
 import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -128,32 +135,34 @@ import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
-class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
+class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectionHost, SwipeActionHost {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
-
-    override val substituteClassName: String = javaClass.name
-
+    private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
+    private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
     private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
-
-    private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
-
-    private var lastUpdatedDate: Date? = null
-    private var previousCustomFolderId: String? = null
 
     private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
+    private var lastUpdatedDate: Date? = null
+    private var previousCustomFolderId: String? = null
     private var isFirstTimeRefreshingThreads = true
 
-    @Inject
-    lateinit var descriptionDialog: DescriptionAlertDialog
+    override val searchViewModel: SearchViewModel by activityViewModels()
+    override val substituteClassName: String = javaClass.name
 
     @Inject
-    lateinit var folderRoleUtils: FolderRoleUtils
+    override lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    override lateinit var folderRoleUtils: FolderRoleUtils
+
+    @Inject
+    lateinit var downloadThreadsStatusManager: DownloadThreadsStatusManager
 
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
@@ -169,6 +178,22 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     @Inject
     lateinit var titleDialog: TitleAlertDialog
+
+    override val fragment: Fragment get() = this
+
+    override val multiSelectionLifecycleOwner: LifecycleOwner
+        get() = viewLifecycleOwner
+
+    override val multiSelectionBinding: MultiSelectionBinding
+        get() = object : MultiSelectionBinding {
+            override val quickActionBar get() = binding.quickActionBar
+            override val multiselectToolbar get() = binding.multiselectToolbar
+            override val toolbarLayout get() = binding.toolbarLayout
+            override val toolbar get() = binding.toolbar
+            override val threadsList get() = binding.threadsList
+            override val newMessageFab get() = binding.newMessageFab
+            override val unreadCountChip get() = binding.unreadCountChip
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -191,12 +216,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         setupUnreadCountChip()
         setupStorageBanner()
 
-        threadListMultiSelection.initMultiSelection(
-            mainViewModel = mainViewModel,
-            threadListFragment = this,
-            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
-            localSettings = localSettings,
-        )
+        initializeMultiselection()
 
         observeNetworkStatus()
         observeCurrentThreads()
@@ -214,6 +234,19 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         observeShareUrlResult()
         observePickedEmoji()
     }.getOrDefault(Unit)
+
+    private fun initializeMultiselection() {
+        ThreadListMultiSelection(
+            mainViewModel = mainViewModel,
+            multiselectionViewModel = multiselectionViewModel,
+            actionsViewModel = actionsViewModel,
+            mainActivity = requireActivity() as MainActivity,
+            host = this,
+            localSettings = localSettings,
+            isFromSearch = false,
+            searchViewModel = searchViewModel,
+        )
+    }
 
     override fun getLeftPane(): View? = _binding?.threadsConstraintLayout
 
@@ -330,40 +363,12 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         _binding = null
     }
 
-    private fun isAllowedToSwipe(swipeDirection: DirectionFlag): Boolean {
-        if (mainViewModel.currentFolderLive.value?.role != FolderRole.DRAFT) return true
-
-        val action = if (swipeDirection == DirectionFlag.LEFT) {
-            localSettings.swipeLeft
-        } else {
-            localSettings.swipeRight
-        }
-
-        val allowedSwipeActionsForDraft = listOf(
-            SwipeAction.DELETE,
-            SwipeAction.QUICKACTIONS_MENU,
-            SwipeAction.READ_UNREAD,
-            SwipeAction.FAVORITE
+    fun unlockSwipeActionsIfSet() {
+        binding.threadsList.updateSwipeAvailability(
+            localSettings,
+            multiselectionViewModel.isMultiSelectOn,
+            mainViewModel::isAllowedToSwipe
         )
-
-        return action in allowedSwipeActionsForDraft
-    }
-
-    private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
-        val isMultiSelectClosed = !mainViewModel.isMultiSelectOn
-
-        fun updateSwipeDirection(direction: DirectionFlag, action: SwipeAction) {
-            val isActionSet = action != SwipeAction.NONE
-
-            if (isMultiSelectClosed && isActionSet && isAllowedToSwipe(direction)) {
-                enableSwipeDirection(direction)
-            } else {
-                disableSwipeDirection(direction)
-            }
-        }
-
-        updateSwipeDirection(DirectionFlag.LEFT, localSettings.swipeLeft)
-        updateSwipeDirection(DirectionFlag.RIGHT, localSettings.swipeRight)
     }
 
     private fun setupDensityDependentUi() = with(binding) {
@@ -373,8 +378,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
 
     private fun setupOnRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            if (mainViewModel.isDownloadingChanges.value == true) return@setOnRefreshListener
-            mainViewModel.forceRefreshThreads()
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (downloadThreadsStatusManager.isDownloading.first()) return@launch
+                mainViewModel.forceRefreshThreads()
+            }
         }
     }
 
@@ -421,9 +428,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                 override var onContactClicked: ((MergedContact) -> Unit)? = null
             },
             multiSelection = object : MultiSelectionListener<Thread> {
-                override var isEnabled by mainViewModel::isMultiSelectOn
-                override val selectedItems by mainViewModel::selectedThreads
-                override val publishSelectedItems = mainViewModel::publishSelectedItems
+                override var isEnabled by multiselectionViewModel::isMultiSelectOn
+                override val selectedItems by multiselectionViewModel::selectedThreads
+                override val publishSelectedItems = multiselectionViewModel::publishSelectedItems
             },
         )
 
@@ -442,51 +449,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     }
 
     private fun updateDisabledSwipeActionsUi(featureFlags: FeatureFlagSet?, folderRole: FolderRole?) {
-        val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
-        val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
-
-        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
-        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
-    }
-
-    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) {
-        val action = if (swipeDirection == DirectionFlag.LEFT) localSettings.swipeLeft else localSettings.swipeRight
-        updateSwipeEnableState(swipeDirection, action)
-        updateSwipeVisuals(swipeDirection, isEnabled, action)
-    }
-
-    private fun updateSwipeEnableState(swipeDirection: DirectionFlag, action: SwipeAction) {
-        val isActionSet = action != SwipeAction.NONE
-        val isMultiSelectClosed = !mainViewModel.isMultiSelectOn
-
-        val shouldEnableSwipe = isActionSet && isMultiSelectClosed && isAllowedToSwipe(swipeDirection)
-
-        with(binding.threadsList) {
-            if (shouldEnableSwipe) {
-                enableSwipeDirection(swipeDirection)
-            } else {
-                disableSwipeDirection(swipeDirection)
-            }
-        }
-    }
-
-    private fun updateSwipeVisuals(swipeDirection: DirectionFlag, isEnabled: Boolean, action: SwipeAction) {
-        with(binding.threadsList) {
-            val resolvedIconRes = if (isEnabled) action.iconRes else R.drawable.ic_close_small
-            val resolvedBackgroundColor = if (isEnabled) {
-                action.getBackgroundColor(context)
-            } else {
-                SwipeAction.NONE.getBackgroundColor(context)
-            }
-
-            if (swipeDirection == DirectionFlag.LEFT) {
-                behindSwipedItemIconDrawableId = resolvedIconRes
-                behindSwipedItemBackgroundColor = resolvedBackgroundColor
-            } else {
-                behindSwipedItemIconSecondaryDrawableId = resolvedIconRes
-                behindSwipedItemBackgroundSecondaryColor = resolvedBackgroundColor
-            }
-        }
+        binding.threadsList.updateSwipeActionsUi(localSettings, featureFlags, folderRole)
     }
 
     private fun setupListeners() = with(binding) {
@@ -496,12 +459,12 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             (requireActivity() as MainActivity).openDrawerLayout()
         }
 
-        cancel.setOnClickListener {
+        multiselectToolbar.cancel.setOnClickListener {
             trackMultiSelectionEvent(MatomoName.Cancel)
-            mainViewModel.isMultiSelectOn = false
+            multiselectionViewModel.isMultiSelectOn = false
         }
-        selectAll.setOnClickListener {
-            mainViewModel.selectOrUnselectAll()
+        multiselectToolbar.selectAll.setOnClickListener {
+            multiselectionViewModel.selectOrUnselectAll(mainViewModel.currentThreadsLive)
             threadListAdapter.updateSelection()
         }
 
@@ -544,36 +507,12 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             }
         }
 
-        threadsList.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
-            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: ThreadListItem.Content): Boolean {
-
-                val swipeAction = when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
-                    SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
-                    else -> error("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
-                }
-
-                val isPermanentDeleteFolder = isPermanentDeleteFolder(item.thread.folder.role)
-
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.thread, position, isPermanentDeleteFolder)
-
-                threadListAdapter.apply {
-                    blockOtherSwipes()
-
-                    if (swipeAction == SwipeAction.DELETE && isPermanentDeleteFolder) {
-                        Unit // The swiped Thread stay swiped all the way
-                    } else {
-                        notifyItemChanged(position) // Animate the swiped Thread back to its original position
-                    }
-                }
-
-                threadListViewModel.isRecoveringFinished.value = false
-
-                // The return value of this callback is used to determine if the
-                // swiped item should be kept or deleted from the adapter's list.
-                return shouldKeepItem
-            }
-        }
+        threadsList.swipeListener = ThreadSwipeListenerFactory.create(
+            localSettings = localSettings,
+            threadListAdapter = threadListAdapter,
+            onRecoveringStarted = { threadListViewModel.isRecoveringFinished.value = false },
+            performSwipeActionOnThread = ::performSwipeActionOnThread,
+        )
     }
 
     private fun setupGestureDetector(context: Context) =
@@ -617,8 +556,16 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         thread: Thread,
         position: Int,
         isPermanentDeleteFolder: Boolean,
-    ): Boolean = with(PerformSwipeActionManager) {
-        performSwipeAction(swipeAction, thread, position, isPermanentDeleteFolder)
+    ): Boolean {
+        val currentMailbox = mainViewModel.currentMailbox.value ?: run {
+            snackbarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+            SentryLog.e("PerformSwipeActionManager", getString(R.string.sentryErrorMailboxIsNull)) { scope ->
+                scope.setTag("context", "PerformSwipeActionManager.performSwipeAction")
+            }
+            return true
+        }
+
+        return performSwipeAction(this@ThreadListFragment, swipeAction, thread, position, isPermanentDeleteFolder, currentMailbox)
     }
 
     private fun extendCollapseFab(scrollDirection: ScrollDirection) = with(binding) {
@@ -720,8 +667,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
     }
 
     private fun observeDownloadState() {
-        mainViewModel.isDownloadingChanges
-            .distinctUntilChanged()
+        downloadThreadsStatusManager.isDownloading
             .observe(viewLifecycleOwner) { isDownloading ->
                 if (isDownloading) {
                     showLoadingTimer.start()
@@ -834,7 +780,12 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
             trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             viewLifecycleOwner.lifecycleScope.launch {
                 threadListViewModel.getEmojiReactionsFor(messageUid)?.let { reactions ->
-                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions)
+                    emojiReactionsViewModel.trySendEmojiReply(
+                        emoji = emoji,
+                        messageUid = messageUid,
+                        reactions = reactions,
+                        mailbox = mainViewModel.currentMailbox.value!!
+                    )
                 }
             }
         }
@@ -868,7 +819,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
                 unreadCount,
                 formatUnreadCount(unreadCount)
             )
-            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
+            isGone = unreadCount == 0 || multiselectionViewModel.isMultiSelectOn
         }
     }
 
@@ -878,13 +829,13 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver {
         binding.toolbar.title = folderName
     }
 
-    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(mainViewModel) {
+    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(multiselectionViewModel) {
         if (isMultiSelectOn) {
             val previousThreads = threadListAdapter.dataSet.filterIsInstance<ThreadListItem.Content>()
             var shouldPublish = false
             deletedIndices.forEach {
                 val thread = previousThreads.getOrElse(it) { return@forEach }.thread
-                val isRemoved = mainViewModel.selectedThreads.remove(thread)
+                val isRemoved = selectedThreads.remove(thread)
                 if (isRemoved) shouldPublish = true
             }
             if (shouldPublish) publishSelectedItems()

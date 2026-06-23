@@ -47,6 +47,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.extensions.AttachmentExt
@@ -60,6 +61,7 @@ import kotlin.math.roundToInt
 abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
+    val actionsViewModel: ActionsViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     private var dragStartX = 0f
@@ -75,7 +77,7 @@ abstract class TwoPaneFragment : Fragment() {
     lateinit var threadListAdapter: ThreadListAdapter
 
     @Inject
-    lateinit var localSettings: LocalSettings
+    open lateinit var localSettings: LocalSettings
 
     abstract val substituteClassName: String
     abstract fun getLeftPane(): View?
@@ -84,7 +86,7 @@ abstract class TwoPaneFragment : Fragment() {
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
-    fun isOnlyLeftShown(): Boolean = isPhone() && !twoPaneViewModel.isThreadOpen
+    fun isThreadOpen(): Boolean = twoPaneViewModel.isThreadOpen
     fun isOnlyRightShown(): Boolean = isPhone() && twoPaneViewModel.isThreadOpen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

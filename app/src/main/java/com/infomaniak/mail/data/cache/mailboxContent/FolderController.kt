@@ -23,9 +23,9 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.extensions.messagesBlocking
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.findSuspend

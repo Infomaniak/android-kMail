@@ -24,17 +24,26 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.utils.Utils
 
 fun DescriptionAlertDialog.deleteWithConfirmationPopup(
-    folderRole: FolderRole?,
+    messagesFolderRoles: List<FolderRole>,
+    currentFolderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
     onCancel: (() -> Unit)? = null,
     callback: () -> Unit,
 ): Boolean {
     var isDialogShown = true
+    val isDraftFolder = currentFolderRole == FolderRole.DRAFT
+    val hasPermanentlyDeleteMessages = Utils.hasPermanentlyDeleteMessage(messagesFolderRoles)
     when {
-        folderRole == FolderRole.SNOOZED -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
-        folderRole == FolderRole.DRAFT -> callback()
-        Utils.isPermanentDeleteFolder(folderRole) -> showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
+        messagesFolderRoles.contains(FolderRole.SNOOZED) -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
+        hasPermanentlyDeleteMessages -> showDeletePermanentlyDialog(
+            deletedCount = count,
+            displayLoader = displayLoader,
+            onPositiveButtonClicked = callback,
+            hasScheduleMessages = messagesFolderRoles.contains(FolderRole.SCHEDULED_DRAFTS),
+            onCancel = onCancel,
+        )
+        isDraftFolder -> callback()
         else -> {
             isDialogShown = false
             callback()
@@ -47,24 +56,30 @@ private fun DescriptionAlertDialog.showDeletePermanentlyDialog(
     deletedCount: Int,
     displayLoader: Boolean,
     onPositiveButtonClicked: () -> Unit,
+    hasScheduleMessages: Boolean = false,
     onCancel: (() -> Unit)? = null,
-) = show(
-    title = binding.context.resources.getQuantityString(
-        R.plurals.threadListDeletionConfirmationAlertTitle,
-        deletedCount,
-        deletedCount,
-    ),
-    description = binding.context.resources.getQuantityString(
-        R.plurals.threadListDeletionConfirmationAlertDescription,
-        deletedCount,
-    ),
-    displayLoader = displayLoader,
-    onPositiveButtonClicked = {
-        onPositiveButtonClicked()
-        resetLoadingAndDismiss()
-    },
-    onCancel = onCancel,
-)
+) {
+    val description = if (hasScheduleMessages) {
+        binding.context.resources.getQuantityString(R.plurals.scheduleDeleteConfirmAlertDescription, deletedCount)
+    } else {
+        binding.context.resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, deletedCount)
+    }
+
+    show(
+        title = binding.context.resources.getQuantityString(
+            R.plurals.threadListDeletionConfirmationAlertTitle,
+            deletedCount,
+            deletedCount,
+        ),
+        description = description,
+        displayLoader = displayLoader,
+        onPositiveButtonClicked = {
+            onPositiveButtonClicked()
+            resetLoadingAndDismiss()
+        },
+        onCancel = onCancel,
+    )
+}
 
 private fun DescriptionAlertDialog.showDeleteSnoozeDialog(
     deletedCount: Int,

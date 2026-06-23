@@ -76,6 +76,8 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.ui.sync.discovery.SyncDiscoveryManager
@@ -116,6 +118,8 @@ class MainActivity : BaseActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by viewModels()
+    private val multiselectionViewModel: MultiselectionViewModel by viewModels()
 
     private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let(MainActivityArgs::fromBundle) }
 
@@ -274,7 +278,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeActivityDialogLoaderReset() {
-        mainViewModel.activityDialogLoaderResetTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
+        actionsViewModel.activityDialogLoaderResetTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {
@@ -354,8 +358,10 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
+                    val mailbox = mainViewModel.currentMailbox.value ?: return
+
                     // Waits 2s after cancel delay to guarantee the send action is committed
-                    mainViewModel.refreshFoldersAfterSendDelay(localSettings.cancelDelay + 2)
+                    actionsViewModel.refreshFoldersAfterSendDelay(localSettings.cancelDelay + 2, mailbox)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
                     showSentDraftSnackbar(cancelResourceUrl)
                 }
@@ -389,7 +395,7 @@ class MainActivity : BaseActivity() {
             buttonTitle = R.string.actionDelete,
             customBehavior = {
                 trackEvent(MatomoMail.MatomoCategory.Snackbar, MatomoName.DeleteDraft)
-                mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
+                actionsViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid, mainViewModel.currentMailbox.value!!)
             },
         )
     }
@@ -400,10 +406,12 @@ class MainActivity : BaseActivity() {
         if (cancelResourceUrl == null) {
             snackbarManager.setValue(getString(R.string.snackbarEmailSent))
         } else {
+            val mailbox = mainViewModel.currentMailbox.value ?: return
+
             snackbarManager.setValue(
                 title = getString(R.string.snackbarEmailSent),
                 buttonTitle = RCore.string.buttonCancel,
-                customBehavior = { mainViewModel.unsendMessage(cancelResourceUrl) },
+                customBehavior = { actionsViewModel.unsendMessage(cancelResourceUrl, mailbox) },
                 // Snackbar displays for 2 seconds less than actual cancel delay
                 // to ensure the user sees the snackbar disappear before the action is committed
                 length = max(0, (localSettings.cancelDelay - 2) * 1000)
@@ -420,7 +428,13 @@ class MainActivity : BaseActivity() {
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
             buttonTitle = RCore.string.buttonCancel,
-            customBehavior = { mainViewModel.unscheduleDraft(unscheduleDraftUrl) },
+            customBehavior = {
+                actionsViewModel.unscheduleDraft(
+                    unscheduleDraftUrl = unscheduleDraftUrl,
+                    mailbox = mainViewModel.currentMailbox.value!!,
+                    openFolder = mainViewModel::openFolder,
+                )
+            },
         )
     }
 
@@ -476,7 +490,7 @@ class MainActivity : BaseActivity() {
         }
 
         fun closeMultiSelect() {
-            mainViewModel.isMultiSelectOn = false
+            multiselectionViewModel.isMultiSelectOn = false
         }
 
         fun popBack() {
@@ -490,7 +504,7 @@ class MainActivity : BaseActivity() {
         onBackPressedDispatcher.addCallback(this@MainActivity) {
             when {
                 drawerLayout.isOpen -> closeDrawer()
-                mainViewModel.isMultiSelectOn -> closeMultiSelect()
+                multiselectionViewModel.isMultiSelectOn -> closeMultiSelect()
                 else -> popBack()
             }
         }
@@ -519,7 +533,7 @@ class MainActivity : BaseActivity() {
             getAnchor = ::getAnchor,
             onUndoData = {
                 trackEvent(MatomoMail.MatomoCategory.Snackbar, MatomoName.Undo)
-                mainViewModel.undoAction(it)
+                actionsViewModel.undoAction(it, mainViewModel.currentMailbox.value!!)
             },
         )
     }

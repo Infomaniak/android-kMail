@@ -61,7 +61,7 @@
     <string name="addUnknownRecipientInvalidEmail">El correo electrónico no es válido</string>
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="addressBookTitle">Libreta de direcciones: %s</string>
-    <string name="aiButtonInsert">Insertar</string>
+    <string name="aiButtonInsert">Inserte</string>
     <string name="aiButtonRefine">Afinar</string>
     <string name="aiButtonRetry">Reintentar</string>
     <string name="aiDiscoveryDescription">Simplifique la redacción de sus mensajes con Inteligencia Artificial.</string>
@@ -85,7 +85,7 @@
     <string name="aiPromptGenerationLoader">Euria está escribiendo…</string>
     <string name="aiPromptPlaceholder">Dígale a Euria lo que quiere escribir. Por ejemplo \"%s\".</string>
     <string name="aiPromptTitle">Euria</string>
-    <string name="aiPromptValidateButton">Generar</string>
+    <string name="aiPromptValidateButton">Genere</string>
     <string name="aiReplaceSubjectDescription">El tema será:\n\n%s</string>
     <string name="aiReplaceSubjectTitle">¿Sustituir el asunto actual por la propuesta de Euria?</string>
     <string name="aiReplacementDialogDescription">Al pulsar \"Sustituir\", se perderá el contenido preexistente.</string>
@@ -489,6 +489,10 @@
     <string name="reviewAlertTitle">¿Te gusta Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Guardar en el dispositivo</string>
     <string name="saveToDriveItem">Guardar en kDrive</string>
+    <plurals name="scheduleDeleteConfirmAlertDescription">
+        <item quantity="one">Esta conversación será eliminada y todos los envíos programados serán cancelados.</item>
+        <item quantity="other">Estas conversaciones serán eliminadas y todos los envíos programados serán cancelados.</item>
+    </plurals>
     <string name="scheduleSendingTitle">Programar envío</string>
     <string name="scheduledEmailHeader">Este correo electrónico se enviará en esta fecha: %s</string>
     <string name="scheduledMessagesFolder">Mensajes programados</string>

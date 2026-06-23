@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.thread
+package com.infomaniak.mail.ui.main.thread.actions.multiselection
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import androidx.lifecycle.LifecycleOwner
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
+import com.infomaniak.mail.utils.FolderRoleUtils
 
-@Serializable
-data class ThreadResult(
-    val threads: List<Thread> = emptyList(),
-    @SerialName("resource_previous")
-    val resourcePrevious: String?,
-    @SerialName("resource_next")
-    val resourceNext: String?,
-)
+interface MultiSelectionHost : LifecycleOwner {
+    val multiSelectionLifecycleOwner: LifecycleOwner
+    val multiSelectionBinding: MultiSelectionBinding
+    val folderRoleUtils: FolderRoleUtils
+    val descriptionDialog: DescriptionAlertDialog
+    val threadListAdapter: ThreadListAdapter
+}

@@ -60,11 +60,11 @@
             android:id="@+id/action_threadListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
-            app:destination="@id/threadActionsBottomSheetDialog" />
-        <action
             android:id="@+id/action_threadListFragment_to_folderPickerFragment"
             app:destination="@id/folderPickerFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
         <action
             android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
             app:destination="@id/multiSelectBottomSheetDialog" />
@@ -152,6 +152,13 @@
         <action
             android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
             app:destination="@id/detailedContactBottomSheetDialog" />
+        <action
+            android:id="@+id/action_searchFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_searchFragment_to_multiSelectBottomSheetDialog"
+            app:destination="@id/multiSelectBottomSheetDialog" />
+
     </fragment>
 
     <dialog
@@ -191,6 +198,10 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
+        <argument
+            android:name="isFromSearch"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog
@@ -224,6 +235,10 @@
             app:argType="boolean" />
         <argument
             android:name="shouldCloseMultiSelection"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="isFromSearch"
             android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
@@ -294,9 +309,9 @@
             android:name="threadsUids"
             app:argType="string[]" />
         <argument
-            android:name="messageUid"
+            android:name="messagesUids"
             android:defaultValue="@null"
-            app:argType="string"
+            app:argType="string[]"
             app:nullable="true" />
         <argument
             android:name="action"
@@ -307,6 +322,10 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="isFromSearch"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
 
     <fragment
@@ -613,6 +632,10 @@
         <action
             android:id="@+id/action_multiSelectBottomSheetDialog_to_folderPickerFragment"
             app:destination="@id/folderPickerFragment" />
+        <argument
+            android:name="isFromSearch"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog

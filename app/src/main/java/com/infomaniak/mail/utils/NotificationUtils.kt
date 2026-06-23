@@ -65,7 +65,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import com.infomaniak.core.legacy.R as RCore
 
-
 @Singleton
 class NotificationUtils @Inject constructor(
     private val appContext: Context,
@@ -170,7 +169,6 @@ class NotificationUtils @Inject constructor(
             description = getString(errorMessageRes),
         )
     }
-
 
     suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,

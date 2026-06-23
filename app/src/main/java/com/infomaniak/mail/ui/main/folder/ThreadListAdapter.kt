@@ -54,7 +54,6 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.extensions.computeAvatarRecipient
@@ -66,6 +65,7 @@ import com.infomaniak.mail.data.models.extensions.displayedName
 import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
 import com.infomaniak.mail.data.models.extensions.isMe
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemBannerWithActionViewBinding
 import com.infomaniak.mail.databinding.ItemContactSearchBinding
@@ -205,18 +205,40 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-        val payload = payloads.firstOrNull()
-        if (payload !is NotificationType) {
+        if (payloads.isEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
             return@runCatchingRealm
         }
 
-        if (payload == NotificationType.SELECTED_STATE && holder.itemViewType == DisplayType.THREAD.layout) {
+        payloads.forEach { payload ->
+            if (payload !is NotificationType) return@forEach
+
+            when (payload) {
+                NotificationType.SELECTED_STATE -> {
+                    handleSelectedStateNotification(holder, position)
+                }
+                NotificationType.UPDATE_CONTACT_INTERACTIVITY -> {
+                    handleUpdateContactInteractivityNotification(holder, position)
+                }
+            }
+        }
+    }.getOrDefault(Unit)
+
+    private fun handleUpdateContactInteractivityNotification(holder: ThreadListViewHolder, position: Int) {
+        if (holder.itemViewType == DisplayType.CONTACT_ITEM.layout) {
+            val binding = holder.binding as ItemContactSearchBinding
+            val contact = (dataSet[position] as ThreadListItem.ContactItem).contact
+            binding.updateContactInteractivity(contact)
+        }
+    }
+
+    private fun handleSelectedStateNotification(holder: ThreadListViewHolder, position: Int) {
+        if (holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = (dataSet[position] as ThreadListItem.Content).thread
             binding.updateSelectedUi(thread)
         }
-    }.getOrDefault(Unit)
+    }
 
     override fun onBindViewHolder(
         item: ThreadListItem,
@@ -610,9 +632,17 @@ class ThreadListAdapter @Inject constructor(
         contactDetails.setAvatarMarginStart(0)
         contactDetails.removeBackground()
 
-        contactWithSpace.setOnClickListener {
-            trackSearchEvent(MatomoName.SelectContact)
-            callbacks?.onContactClicked?.invoke(contact)
+        updateContactInteractivity(contact)
+    }
+
+    private fun ItemContactSearchBinding.updateContactInteractivity(contact: MergedContact) {
+        contactWithSpace.apply {
+            isEnabled = multiSelection?.isEnabled == false
+
+            setOnClickListener {
+                trackSearchEvent(MatomoName.SelectContact)
+                callbacks?.onContactClicked?.invoke(contact)
+            }
         }
     }
 
@@ -750,6 +780,19 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
+    fun updateContactsMultiSelectState() {
+        val hasContacts = dataSet.any { it is ThreadListItem.ContactItem }
+        if (!hasContacts) {
+            return
+        }
+
+        dataSet.forEachIndexed { index, item ->
+            if (item is ThreadListItem.ContactItem) {
+                notifyItemChanged(index, NotificationType.UPDATE_CONTACT_INTERACTIVITY)
+            }
+        }
+    }
+
     private fun checkShouldUpdateOpenedThreadPosition(currentUid: String): Boolean {
 
         val currentPos = openedThreadPosition
@@ -853,6 +896,7 @@ class ThreadListAdapter @Inject constructor(
 
     enum class NotificationType {
         SELECTED_STATE,
+        UPDATE_CONTACT_INTERACTIVITY,
     }
 
     private data class SwipeActionUiData(@ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?)

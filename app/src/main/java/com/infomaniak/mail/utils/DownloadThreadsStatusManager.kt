@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.thread
+package com.infomaniak.mail.utils
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-@Serializable
-data class ThreadResult(
-    val threads: List<Thread> = emptyList(),
-    @SerialName("resource_previous")
-    val resourcePrevious: String?,
-    @SerialName("resource_next")
-    val resourceNext: String?,
-)
+@Singleton
+class DownloadThreadsStatusManager @Inject constructor() {
+
+    private val _isDownloading = MutableStateFlow(false)
+    val isDownloading: StateFlow<Boolean> = _isDownloading.asStateFlow()
+
+    fun start() {
+        _isDownloading.value = true
+    }
+
+    fun stop() {
+        _isDownloading.value = false
+    }
+}

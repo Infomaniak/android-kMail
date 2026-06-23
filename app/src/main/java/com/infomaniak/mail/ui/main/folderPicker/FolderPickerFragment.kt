@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,10 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentFolderPickerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.search.SearchViewModel
+import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
+import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
@@ -52,6 +55,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.core.common.R as RCore
 
 @AndroidEntryPoint
 class FolderPickerFragment : Fragment() {
@@ -61,12 +65,17 @@ class FolderPickerFragment : Fragment() {
     private val folderPickerViewModel: FolderPickerViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val actionsViewModel: ActionsViewModel by activityViewModels()
+    private val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
 
     @Inject
     lateinit var createFolderDialog: CreateFolderDialog
 
     @Inject
     lateinit var folderPickerAdapter: FolderPickerAdapter
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,7 +134,7 @@ class FolderPickerFragment : Fragment() {
     private fun setupCreateFolderDialog() = with(navigationArgs) {
         createFolderDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
-                mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
+                mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messagesUids?.toList())
             },
         )
     }
@@ -148,21 +157,42 @@ class FolderPickerFragment : Fragment() {
         }
     }
 
-    private fun onFolderSelected(folder: Folder?): Unit = with(navigationArgs) {
-        when (action) {
-            FolderPickerAction.MOVE -> folder?.id?.let {
-                mainViewModel.moveThreadsOrMessageTo(
-                    it,
-                    threadsUids.toList(),
-                    messageUid
-                )
-            }
+    private fun onFolderSelected(folder: Folder?) {
+        when (navigationArgs.action) {
+            FolderPickerAction.MOVE -> if (folder != null) handleMove(folder.id)
             FolderPickerAction.SEARCH -> {
                 searchViewModel.selectAllFoldersFilter(folder == null)
                 searchViewModel.selectFolder(folder)
             }
         }
+
         findNavController().popBackStack()
+    }
+
+    private fun handleMove(folderId: String) = with(navigationArgs) {
+        val mailbox = mainViewModel.currentMailbox.value
+        if (mailbox == null) {
+            snackbarManager.postValue(getString(RCore.string.anErrorHasOccurred))
+            return@with
+        }
+
+        if (messagesUids != null) {
+            actionsViewModel.moveMessagesTo(
+                destinationFolderId = folderId,
+                messagesUids = messagesUids.toList(),
+                parentFolderId = navigationArgs.sourceFolderId,
+                mailbox = mailbox,
+            )
+        } else {
+            actionsViewModel.moveThreadsTo(
+                destinationFolderId = folderId,
+                threadsUids = threadsUids.toList(),
+                parentFolderId = navigationArgs.sourceFolderId,
+                mailbox = mailbox,
+            )
+        }
+        
+        if (navigationArgs.isFromSearch) multiselectionViewModel.isMultiSelectOn = false
     }
 
     private fun setupSearchBar() = with(binding) {

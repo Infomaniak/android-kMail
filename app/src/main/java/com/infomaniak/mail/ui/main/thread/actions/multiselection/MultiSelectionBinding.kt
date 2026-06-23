@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.thread
+package com.infomaniak.mail.ui.main.thread.actions.multiselection
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+interface MultiSelectionBinding {
+    val quickActionBar: com.infomaniak.mail.views.BottomQuickActionBarView
+    val multiselectToolbar: com.infomaniak.mail.databinding.ViewMultiselectionInfoToolbarBinding
+    val toolbarLayout: android.view.View
+    val toolbar: android.view.View
+    val threadsList: com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+    val newMessageFab: android.view.View?
+    val unreadCountChip: android.view.View?
+}
 
-@Serializable
-data class ThreadResult(
-    val threads: List<Thread> = emptyList(),
-    @SerialName("resource_previous")
-    val resourcePrevious: String?,
-    @SerialName("resource_next")
-    val resourceNext: String?,
-)
