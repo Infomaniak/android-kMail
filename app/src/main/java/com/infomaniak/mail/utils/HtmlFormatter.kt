@@ -229,7 +229,10 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getMentionsStyle(aliases: List<String>): String {
             if (aliases.isEmpty()) return ""
-            val selectors = aliases.joinToString(", ") { "a[$MENTION_ATTR='$it']" }
+            val selectors = aliases.joinToString(", ") { alias ->
+                val escapedAlias = alias.replace("\\", "\\\\").replace("'", "\\'")
+                "a[$MENTION_ATTR='$escapedAlias']"
+            }
             return loadMentionsStyleTemplate().format(selectors)
         }
 

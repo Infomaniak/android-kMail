@@ -21,13 +21,13 @@ observeMentionDeletion();
 function observeMentionDeletion() {
     const extractRemovedRefs = (node, refsCollection) => {
         if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute("data-ik-mention-ref")) {
-            refsCollection.push(node.getAttribute("data-ik-mention-ref"));
+            refsCollection.push(node.dataset.ikMentionRef);
         }
 
         if (node.nodeType === Node.ELEMENT_NODE) {
             const mentions = node.querySelectorAll("[data-ik-mention-ref]");
             mentions.forEach((mention) => {
-                refsCollection.push(mention.getAttribute("data-ik-mention-ref"));
+                refsCollection.push(mention.dataset.ikMentionRef);
             });
         }
     };

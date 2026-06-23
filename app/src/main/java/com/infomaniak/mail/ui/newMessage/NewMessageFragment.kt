@@ -857,7 +857,6 @@ class NewMessageFragment : Fragment() {
             mentionContactAdapter.updateContacts(contacts.filterIsInstance<MergedContact>())
         }
 
-        // Query comes from updateMentionQuery(...)
         newMessageViewModel.mentionQuery.observe(viewLifecycleOwner) { query ->
             if (query.isBlank()) {
                 mentionAutoComplete.isVisible = false
