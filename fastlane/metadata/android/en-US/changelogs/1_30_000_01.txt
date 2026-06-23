@@ -1,0 +1,5 @@
+- Add multiselection and swipe action in search
+- Add emails' summarization and translation features with Euria
+- Add the delay configuration before sending an email
+- Improve editor empty body
+- Remove useless actions on draft

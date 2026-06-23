@@ -1,0 +1,5 @@
+- Ajout de la sélection multiple et des actions de balayage dans la recherche
+- Ajout des fonctionnalités de synthèse et de traduction des e-mails avec Euria
+- Ajout de la configuration du délai avant l'envoi d'un e-mail
+- Amélioration du comportement de l'éditeur lorsque le corps du message est vide
+- Suppression des actions inutiles sur les brouillons
