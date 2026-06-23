@@ -277,6 +277,7 @@ abstract class TwoPaneFragment : Fragment() {
         getDragSeparator()?.isVisible = isTabletOrFoldable() && rightWidth != 0
     }
 
+
     private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         return if (isTabletOrFoldable()) {
             val ratio = twoPaneViewModel.leftPaneRatio

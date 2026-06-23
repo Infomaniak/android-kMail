@@ -650,8 +650,7 @@ class ThreadAdapter(
 
             setOnActionClicked {
                 val aiProcessState = getAiStateMap(aiAction, message.uid)
-                val isSuccess =
-                    aiProcessState is AiProcessState.Success || (aiProcessState == null && message.body?.isTranslated == true)
+                val isSuccess = aiProcessState is AiProcessState.Success || (aiProcessState == null && message.body?.isTranslated == true)
                 if (isSuccess && aiAction == AiAction.TRANSLATE) {
                     threadAdapterCallbacks?.onShowOriginal?.invoke(message.uid)
                 } else {

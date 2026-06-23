@@ -120,6 +120,7 @@ private fun getTextColor(isSelected: Boolean): Color = if (isSelected) {
     colorResource(R.color.secondaryTextColor)
 }
 
+
 @Preview
 @Composable
 private fun Preview() {

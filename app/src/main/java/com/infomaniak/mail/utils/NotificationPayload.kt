@@ -42,7 +42,7 @@ data class NotificationPayload(
     private val payloadTitle: String? = null,
     private val payloadContent: String? = null,
     private val payloadDescription: String? = null,
-) : Parcelable {
+    ) : Parcelable {
 
     val isSummary get() = behavior?.type == NotificationType.SUMMARY
     val isUndo get() = behavior?.type == NotificationType.UNDO

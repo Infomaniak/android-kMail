@@ -35,12 +35,11 @@ inline val Mailbox.kSuite: KSuite?
         else -> null // It's an older offer, but it checks out.
     }
 
-fun Mailbox.notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean =
-    with(notificationManagerCompat) {
-        val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
-        val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
-        return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
-    }
+fun Mailbox.notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {
+    val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
+    val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
+    return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
+}
 
 val Mailbox.unreadCountDisplay: UnreadDisplay
     get() = UnreadDisplay(

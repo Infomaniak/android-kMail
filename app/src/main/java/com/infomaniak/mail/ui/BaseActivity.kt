@@ -38,12 +38,7 @@ import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
-    private val hiltEntryPoint by lazy {
-        EntryPointAccessors.fromActivity(
-            this,
-            ActivityModule.ActivityEntrypointInterface::class.java
-        )
-    }
+    private val hiltEntryPoint by lazy { EntryPointAccessors.fromActivity(this, ActivityModule.ActivityEntrypointInterface::class.java) }
 
     protected val inAppUpdateManager by lazy { hiltEntryPoint.inAppUpdateManager() }
 

@@ -67,13 +67,11 @@ object ApplicationModule {
 
     @Provides
     @Singleton
-    fun providesAppUpdateSettingsRepository(appContext: Context): AppUpdateSettingsRepository =
-        AppUpdateSettingsRepository(appContext)
+    fun providesAppUpdateSettingsRepository(appContext: Context): AppUpdateSettingsRepository = AppUpdateSettingsRepository(appContext)
 
     @Provides
     @Singleton
-    fun providesAppReviewSettingsRepository(appContext: Context): AppReviewSettingsRepository =
-        AppReviewSettingsRepository(appContext)
+    fun providesAppReviewSettingsRepository(appContext: Context): AppReviewSettingsRepository = AppReviewSettingsRepository(appContext)
 
     @Provides
     @Singleton

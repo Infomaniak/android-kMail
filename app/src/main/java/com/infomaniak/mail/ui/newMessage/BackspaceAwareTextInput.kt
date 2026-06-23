@@ -21,8 +21,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
-import com.google.android.material.textfield.TextInputEditText
 import android.R as RAndroid
+import com.google.android.material.textfield.TextInputEditText
 
 class BackspaceAwareTextInput @JvmOverloads constructor(
     context: Context,

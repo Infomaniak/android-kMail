@@ -282,7 +282,8 @@ class RefreshController @Inject constructor(
         ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realmReadOnly).forEach { snoozedThreadWithNewMessage ->
             scope.ensureActive()
 
-            when (val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)) {
+            val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)
+            when (result) {
                 is AutomaticUnsnoozeResult.Success -> impactedFolders += result.impactedFolders
                 AutomaticUnsnoozeResult.CannotBeUnsnoozedError -> cannotBeUnsnoozedThreadUids += snoozedThreadWithNewMessage.uid
                 AutomaticUnsnoozeResult.OtherError -> Unit

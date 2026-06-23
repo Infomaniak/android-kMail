@@ -59,11 +59,7 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
         return userInfoRealm.query<MergedContact>("${MergedContact::email.name} == $0", email)
     }
 
-    private fun searchMergedContactsQuery(
-        searchQuery: String,
-        searchQueryNoAccents: String,
-        limit: Int
-    ): RealmQuery<MergedContact> {
+    private fun searchMergedContactsQuery(searchQuery: String, searchQueryNoAccents: String, limit: Int): RealmQuery<MergedContact> {
         val queryStr = if (searchQuery != searchQueryNoAccents) {
             "(name CONTAINS[c] $0 OR email CONTAINS[c] $0) OR (name CONTAINS[c] $1 OR email CONTAINS[c] $1)"
         } else {

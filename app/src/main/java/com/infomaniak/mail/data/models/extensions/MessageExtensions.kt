@@ -110,17 +110,14 @@ fun Message.computeFolderAndReason(folderId: String): Pair<Folder?, String?> {
 
 val Message.calendarAttachment: Attachment? get() = if (isDraft) null else attachments.firstOrNull(Attachment::isCalendarEvent)
 
-fun Message.getFormattedPreview(context: Context, totalUnseenReactionOnLastEmoji: Int = 0): FormatedPreview = when {
+fun Message.getFormattedPreview(context: Context, totalUnseenReactionOnLastEmoji: Int = 0 ): FormatedPreview = when {
     isEncrypted -> FormatedPreview.Encryption(context.getString(R.string.encryptedMessageHeader))
-    isReaction && totalUnseenReactionOnLastEmoji > 1 -> FormatedPreview.Reaction(
-        context.resources.getQuantityString(
-            R.plurals.previewMultiReaction,
-            (totalUnseenReactionOnLastEmoji - 1),
-            emojiReaction,
-            from.firstOrNull()?.name.orEmpty(),
-            (totalUnseenReactionOnLastEmoji - 1)
-        )
-    )
+    isReaction && totalUnseenReactionOnLastEmoji > 1 -> FormatedPreview.Reaction(context.resources.getQuantityString(
+        R.plurals.previewMultiReaction,
+        (totalUnseenReactionOnLastEmoji - 1),
+        emojiReaction,
+        from.firstOrNull()?.name.orEmpty(),
+        (totalUnseenReactionOnLastEmoji - 1)))
     isReaction -> FormatedPreview.Reaction(context.getString(R.string.previewReaction, from.first().name, emojiReaction))
     preview.isBlank() -> FormatedPreview.Empty(context.getString(R.string.noBodyDescription))
     else -> FormatedPreview.Body(preview.trim())

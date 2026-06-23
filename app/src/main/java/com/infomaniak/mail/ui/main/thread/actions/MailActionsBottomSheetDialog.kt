@@ -47,6 +47,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     abstract val shouldCloseMultiSelection: Boolean
     protected abstract val substituteClassName: String
 
+
     private var onClickListener: OnActionClick = object : OnActionClick {
 
         //region Main actions

@@ -51,7 +51,7 @@ class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: V
     private fun showIconsAndDividers(popupMenu: PopupMenu) {
         @Suppress("RestrictedApi")
         (popupMenu.menu as? MenuBuilder)?.apply {
-            optionalIconsVisible = true
+            setOptionalIconsVisible(true)
             isGroupDividerEnabled = true
 
             visibleItems.forEach { item ->

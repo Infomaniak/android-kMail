@@ -191,7 +191,7 @@ class FolderPickerFragment : Fragment() {
                 mailbox = mailbox,
             )
         }
-
+        
         if (navigationArgs.isFromSearch) multiselectionViewModel.isMultiSelectOn = false
     }
 

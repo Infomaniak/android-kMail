@@ -58,7 +58,7 @@ fun LargeButton(
         enabled = enabled,
         showIndeterminateProgress = showIndeterminateProgress,
     ) {
-        Text(text = title, style = Typography.bodyMedium)
+        Text(text = title,  style = Typography.bodyMedium)
     }
 }
 
