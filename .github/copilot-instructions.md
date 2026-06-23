@@ -30,6 +30,8 @@ Replicate locally with the same sequence. Use flavor-specific tasks when needed:
 ```
 app/src/main/java/com/infomaniak/mail/
 ├── MainApplication.kt        # Entry — configureInfomaniakCore()
+├── ui/
+│   └── MainActivity.kt       # Main coordinator (at app/src/main/java/com/infomaniak/mail/ui/)
 ├── data/
 │   ├── cache/                # Realm controllers (RealmDatabase.kt — schema versions here)
 │   ├── models/               # Realm entities (Message, Thread, Draft, Mailbox…)
@@ -45,7 +47,7 @@ gradle/libs.versions.toml
 
 ## PR Review Instructions
 
-- Ensure strings are localized via `strings.xml` resources.
+- Ensure strings are localized via `strings.xml` resources (located at `app/src/main/res/values/strings.xml`).
 - When reviewing Realm model changes, check whether the persisted schema changed: added, removed, renamed, or type-changed persisted properties, changed optionality, lists, embedded objects, or object types.
 - If the persisted Realm schema changed, ensure the matching schema version constant (`USER_INFO_SCHEMA_VERSION`, `MAILBOX_INFO_SCHEMA_VERSION`, or `MAILBOX_CONTENT_SCHEMA_VERSION`) was incremented in `app/src/main/java/com/infomaniak/mail/data/cache/RealmDatabase.kt`, and that the relevant migration block in `MailboxContentMigration.kt`, `MailboxInfoMigration.kt`, or `RealmMigrations.kt` is updated when existing data needs migration.
 - Ensure new UI written in Jetpack Compose uses Material3 components and follows the hybrid approach (Compose for new screens, XML with ViewBinding for existing, supports different screen sizes).
