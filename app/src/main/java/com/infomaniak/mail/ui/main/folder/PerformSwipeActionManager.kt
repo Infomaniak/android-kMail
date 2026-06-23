@@ -127,7 +127,11 @@ object PerformSwipeActionManager {
             SwipeAction.QUICKACTIONS_MENU -> {
                 host.fragment.safelyNavigate(
                     R.id.threadActionsBottomSheetDialog,
-                    ThreadActionsBottomSheetDialogArgs(threadUid = thread.uid, shouldLoadDistantResources = false).toBundle()
+                    ThreadActionsBottomSheetDialogArgs(
+                        threadUid = thread.uid,
+                        shouldLoadDistantResources = false,
+                        isFromSearch = host is SearchFragment
+                    ).toBundle()
                 )
                 true
             }
