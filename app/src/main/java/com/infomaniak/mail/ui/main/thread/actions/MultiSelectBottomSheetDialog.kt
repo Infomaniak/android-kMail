@@ -27,6 +27,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
@@ -313,16 +314,17 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         threadsUids: List<String>,
         folderRole: FolderRole?
     ) {
+        val navController = findNavController()
         descriptionDialog.moveWithConfirmationPopup(
             folderRole = folderRole,
             count = threadsCount,
         ) {
             trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
-            navigateToFolderPickerFragment(threadsUids)
+            navigateToFolderPickerFragment(threadsUids, navController)
         }
     }
 
-    private fun navigateToFolderPickerFragment(threadsUids: List<String>) {
+    private fun navigateToFolderPickerFragment(threadsUids: List<String>, navController: NavController) {
         val messagesUids = multiselectionViewModel.selectedMessages.getUids().toTypedArray()
         multiselectionViewModel.isMultiSelectOn = false
         val sourceFolderId = if (navigationArgs.isFromSearch) {
@@ -331,7 +333,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
         }
 
-        animatedNavigation(
+        navController.animatedNavigation(
             resId = R.id.folderPickerFragment,
             args = FolderPickerFragmentArgs(
                 threadsUids = threadsUids.toTypedArray(),
