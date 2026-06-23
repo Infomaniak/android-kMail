@@ -116,7 +116,9 @@ object ThreadRecomputations {
                 isAnswered = false
             }
             if (message.hasAttachable) hasAttachable = true
-            if (currentMailboxEmail != null && message.mentions.any { it == currentMailboxEmail } && !message.isSeen) {
+            val amIMentioned = currentMailboxEmail != null &&
+                    message.mentions.any { it.equals(currentMailboxEmail, ignoreCase = true) }
+            if (amIMentioned && !message.isSeen) {
                 hasMentions = true
             }
             if (message.isScheduledDraft) numberOfScheduledDrafts++
