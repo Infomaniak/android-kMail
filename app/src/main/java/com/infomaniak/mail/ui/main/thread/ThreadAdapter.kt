@@ -674,25 +674,28 @@ class ThreadAdapter(
     private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsible: Boolean) = with(threadAdapterState) {
         // Disable ripple animation of `messageHeader` if `isCollapsible` is false
         binding.messageHeader.isEnabled = isCollapsible
-        if (isCollapsible) {
-            binding.messageHeader.setOnClickListener {
-                if (isExpandedMap[message.uid] == true) {
+
+        if (!isCollapsible) {
+            binding.messageHeader.setOnClickListener(null)
+            return@with
+        }
+
+        binding.messageHeader.setOnClickListener {
+            val isExpanded = isExpandedMap[message.uid] == true
+            val isUnscheduledDraft = message.isDraft && !message.isScheduledMessage
+
+            when {
+                isExpanded -> {
                     isExpandedMap[message.uid] = false
                     onExpandOrCollapseMessage(message, shouldTrack = true)
-                } else {
-                    if (message.isDraft && !message.isScheduledMessage) {
-                        threadAdapterCallbacks?.onDraftClicked?.invoke(message)
-                    } else {
-                        isExpandedMap[message.uid] = true
-                        if (message.isAcknowledgementTargetForMe()) {
-                            threadAdapterCallbacks?.onMessageExpanded?.invoke(message)
-                        }
-                        onExpandOrCollapseMessage(message, shouldTrack = true)
-                    }
+                }
+                isUnscheduledDraft -> threadAdapterCallbacks?.onDraftClicked?.invoke(message)
+                else -> {
+                    isExpandedMap[message.uid] = true
+                    if (message.isAcknowledgementTargetForMe()) threadAdapterCallbacks?.onMessageExpanded?.invoke(message)
+                    onExpandOrCollapseMessage(message, shouldTrack = true)
                 }
             }
-        } else {
-            binding.messageHeader.setOnClickListener(null)
         }
     }
 
