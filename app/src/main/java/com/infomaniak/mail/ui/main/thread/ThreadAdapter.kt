@@ -72,6 +72,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.ui.main.thread.actions.AiActionsViewModel.AiAction
 import com.infomaniak.mail.ui.main.thread.actions.AiStateMap
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
+import com.infomaniak.mail.ui.main.thread.models.MessageUi.AcknowledgeState
 import com.infomaniak.mail.ui.main.thread.models.MessageUi.UnsubscribeState
 import com.infomaniak.mail.ui.main.thread.webViewClient.MessageDisplayWebViewClient
 import com.infomaniak.mail.utils.AccountUtils
@@ -202,7 +203,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
-                NotifyType.AcknowledgeRebind -> bindAcknowledge(item.message)
+                NotifyType.AcknowledgeRebind -> bindAcknowledge(item)
                 NotifyType.AiSummaryStateChanged -> holder.bindAiAction(item.message, AiAction.SUMMARY)
                 NotifyType.AiTranslateStateChanged -> holder.bindAiAction(item.message, AiAction.TRANSLATE)
                 is NotifyType.MessagesCollapseStateChanged -> {
@@ -747,7 +748,7 @@ class ThreadAdapter(
         }
 
         bindUnsubscribe(messageUi)
-        bindAcknowledge(message)
+        bindAcknowledge(messageUi)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -828,22 +829,24 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindAcknowledge(message: Message) {
-        when (message.acknowledgeStatus) {
-            AcknowledgeStatus.Pending -> {
+    private fun ItemMessageBinding.bindAcknowledge(messageUi: MessageUi) {
+        when (messageUi.acknowledgeState) {
+            is AcknowledgeState.Pending -> {
                 acknowledgeAlert.apply {
                     isVisible = true
                     setActionsVisibility(isVisible = true)
+                    hideAction1Progress(R.string.sendConfirmationAction)
                     setDescription(context.getString(R.string.acknowledgementMessage))
                     setIconRes(R.drawable.ic_envelope)
                     setAction1Text(context.getString(R.string.sendConfirmationAction))
                     onAction1 {
                         trackMessageBannerEvent(MatomoName.Acknowledge)
-                        threadAdapterCallbacks?.onAcknowledgeClicked?.invoke(message)
+                        threadAdapterCallbacks?.onAcknowledgeClicked?.invoke(messageUi.message)
                     }
                 }
             }
-            AcknowledgeStatus.Acknowledged -> {
+            is AcknowledgeState.InProgress -> acknowledgeAlert.showAction1Progress()
+            is AcknowledgeState.Completed -> {
                 acknowledgeAlert.apply {
                     isVisible = true
                     setActionsVisibility(isVisible = false)
@@ -851,7 +854,7 @@ class ThreadAdapter(
                     setIconRes(R.drawable.ic_check)
                 }
             }
-            else -> Unit
+            null -> Unit
         }
     }
 
@@ -1322,7 +1325,7 @@ class ThreadAdapter(
                 })
 
                 data object Acknowledge : DiffAspect<MessageUi>({
-                    message.acknowledgeStatus == it.message.acknowledgeStatus
+                    acknowledgeState == it.acknowledgeState
                 })
             }
         }
