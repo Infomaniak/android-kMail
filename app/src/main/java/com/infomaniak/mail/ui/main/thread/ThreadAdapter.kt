@@ -50,7 +50,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageBannerEvent
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
@@ -684,6 +683,9 @@ class ThreadAdapter(
                         threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                     } else {
                         isExpandedMap[message.uid] = true
+                        if (message.hasPendingAcknowledgement) {
+                            threadAdapterCallbacks?.onMessageExpanded?.invoke(message)
+                        }
                         onExpandOrCollapseMessage(message, shouldTrack = true)
                     }
                 }
@@ -854,7 +856,7 @@ class ThreadAdapter(
                     setIconRes(R.drawable.ic_check)
                 }
             }
-            null -> Unit
+            null -> acknowledgeAlert.isVisible = false
         }
     }
 
@@ -1348,6 +1350,7 @@ class ThreadAdapter(
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var onUnsubscribeClicked: ((Message) -> Unit)? = null,
         var onAcknowledgeClicked: ((Message) -> Unit)? = null,
+        var onMessageExpanded: ((Message) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
         var activateSpamFilter: (() -> Unit)? = null,
         var unblockMail: ((String) -> Unit)? = null,

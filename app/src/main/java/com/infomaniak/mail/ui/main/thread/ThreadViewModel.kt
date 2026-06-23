@@ -117,6 +117,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /* Please note that, for the moment, the logic that uses this list assumes that the items are necessarily messages.
@@ -156,6 +157,8 @@ class ThreadViewModel @Inject constructor(
     ).mapNotNull { it.obj }
 
     private val currentMailboxLive = currentMailboxFlow.asLiveData()
+
+    private val refreshingAcknowledgeMessagesUids = ConcurrentHashMap.newKeySet<String>()
 
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
@@ -221,7 +224,12 @@ class ThreadViewModel @Inject constructor(
         ).flatMapLatest { (mode, featureFlags, fakeReactions, messageUidUnsubscribed, messageUidAcknowledged) ->
             val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
             mode.getMessages(featureFlags).mapLatest { (items, messagesToFetch) ->
-                items.toUiMessages(fakeReactions, isReactionsAvailable, messageUidUnsubscribed, messageUidAcknowledged) to messagesToFetch
+                items.toUiMessages(
+                    fakeReactions,
+                    isReactionsAvailable,
+                    messageUidUnsubscribed,
+                    messageUidAcknowledged
+                ) to messagesToFetch
             }
         }
 
@@ -267,8 +275,10 @@ class ThreadViewModel @Inject constructor(
                 if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
                     val displayedMessages = thread.getDisplayedMessages(featureFlags, localSettings)
                     displayedMessages.forEachIndexed { index, message ->
-                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, displayedMessages.lastIndex)
+                        val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
+                        threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
+                        if (shouldExpand && message.hasPendingAcknowledgement) refreshMessageIfNeeded(message)
                     }
                 }
 
@@ -782,6 +792,25 @@ class ThreadViewModel @Inject constructor(
         } else {
             snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementFailure))
             setAcknowledgeState(message, MessageUi.AcknowledgeState.Pending)
+        }
+    }
+
+    fun refreshMessageIfNeeded(message: Message) = viewModelScope.launch(ioCoroutineContext) {
+        if (!message.hasPendingAcknowledgement || !refreshingAcknowledgeMessagesUids.add(message.uid)) return@launch
+
+        runCatching {
+            val apiResponse = ApiRepository.getMessage(message.resource)
+            val responseMessage = apiResponse.data
+
+            if (apiResponse.isSuccess() && responseMessage != null) {
+                mailboxContentRealm().write {
+                    MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
+                        localMessage?._acknowledgeStatus = responseMessage._acknowledgeStatus
+                    }
+                }
+            }
+        }.also {
+            refreshingAcknowledgeMessagesUids.remove(message.uid)
         }
     }
 

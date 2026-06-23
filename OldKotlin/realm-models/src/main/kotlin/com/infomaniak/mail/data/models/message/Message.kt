@@ -212,7 +212,6 @@ class Message : RealmObject, Snoozable {
 
     inline val sender get() = from.firstOrNull()
 
-    val hasAcknowledge: Boolean get() = acknowledgeStatus != null
     val hasPendingAcknowledgement: Boolean get() = acknowledgeStatus == AcknowledgeStatus.Pending
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID

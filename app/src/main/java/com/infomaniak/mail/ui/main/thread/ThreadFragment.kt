@@ -409,6 +409,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 },
                 onUnsubscribeClicked = threadViewModel::unsubscribeMessage,
                 onAcknowledgeClicked = threadViewModel::acknowledgeMessage,
+                onMessageExpanded = threadViewModel::refreshMessageIfNeeded,
                 moveMessageToSpam = { messageUid ->
                     actionsViewModel.moveToSpamFolder(
                         messagesUid = listOf(messageUid),
