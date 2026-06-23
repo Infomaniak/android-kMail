@@ -45,6 +45,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.extensions.isNightModeEnabled
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
@@ -857,7 +858,7 @@ class NewMessageFragment : Fragment() {
         }
 
         // Query comes from updateMentionQuery(...)
-        newMessageViewModel.mentionQueryLiveData.observe(viewLifecycleOwner) { query ->
+        newMessageViewModel.mentionQuery.observe(viewLifecycleOwner) { query ->
             if (query.isBlank()) {
                 mentionAutoComplete.isVisible = false
                 mentionContactAdapter.clear()
