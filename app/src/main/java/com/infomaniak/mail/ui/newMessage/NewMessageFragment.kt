@@ -106,6 +106,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionClickObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
@@ -172,6 +173,7 @@ class NewMessageFragment : Fragment() {
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
     private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
+    private val mentionClickObserverScript by lazy { requireContext().getEditorMentionClickObserverScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -520,6 +522,7 @@ class NewMessageFragment : Fragment() {
         addScript(deletedInlineImagesObserverScript)
         addScript(tagsObserverScript)
         addScript(insertMentionScript)
+        addScript(mentionClickObserverScript)
         addScript(mentionDeletionObserverScript)
 
         val formattedAiContentScript = setAiContentScript.format(
