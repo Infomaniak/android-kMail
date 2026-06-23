@@ -249,7 +249,8 @@ class NewMessageViewModel @Inject constructor(
     private val _isPlaceHolderVisible = MutableStateFlow(false)
     val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
 
-    val mentionQueryLiveData = MutableLiveData("")
+    private val _mentionQuery = MutableStateFlow("")
+    val mentionQuery = _mentionQuery.asStateFlow()
 
     private val _currentMentions = MutableStateFlow<Set<String>>(emptySet())
     val currentMentions: StateFlow<Set<String>> = _currentMentions.asStateFlow()
@@ -1212,7 +1213,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun updateMentionQuery(query: String) {
-        mentionQueryLiveData.postValue(query)
+        _mentionQuery.value = query
     }
 
     fun addMention(email: String) {
