@@ -50,7 +50,7 @@ function insertMention(userMail, userName) {
 
     const textBeforeCaret = preRange.toString();
 
-    const extractRegex = /@([^@\s]*)$/;
+    const extractRegex = /@([A-Za-z0-9._+-]*(?:@[A-Za-z0-9.-]*)?)$/;
     const match = textBeforeCaret.match(extractRegex);
     if (!match) return;
 
