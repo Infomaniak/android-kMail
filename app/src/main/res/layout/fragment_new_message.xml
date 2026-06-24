@@ -417,6 +417,24 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mentionAutoComplete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_top_rounded"
+            android:clipToPadding="false"
+            android:elevation="10dp"
+            android:padding="@dimen/marginStandardVerySmall"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/externalBanner"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="176dp"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_contact"
+            tools:visibility="visible" />
+
         <LinearLayout
             android:id="@+id/externalBanner"
             android:layout_width="match_parent"
@@ -425,7 +443,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/editorToolbar"
             app:layout_constraintTop_toBottomOf="@id/mentionAutoComplete"
             tools:visibility="visible">
 
@@ -648,22 +665,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/mentionAutoComplete"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/background_top_rounded"
-            android:clipToPadding="false"
-            android:elevation="10dp"
-            android:padding="@dimen/marginStandardVerySmall"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/editorToolbar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:itemCount="3"
-            tools:listitem="@layout/item_contact"
-            tools:visibility="visible" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
