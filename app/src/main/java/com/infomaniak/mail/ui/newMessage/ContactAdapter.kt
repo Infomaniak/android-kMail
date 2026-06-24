@@ -156,11 +156,7 @@ class ContactAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if (isForRecipients) {
-            matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
-        } else {
-            minOf(matchedContacts.count(), 3)
-        }
+        return matchedContacts.count() + if (displayAddUnknownContactButton && isForRecipients) 1 else 0
     }
 
     override fun getItemId(position: Int): Long {
