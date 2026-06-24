@@ -91,46 +91,22 @@ object ThreadRecomputations {
         isLastInboxMessageSnoozed = false
     }
 
-    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
+    private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
+        if (hasMentions || message.mentions.isEmpty()) return
 
-        fun Thread.updateSnoozeStatesBasedOn(message: Message) {
-            message.snoozeState?.let {
-                snoozeState = it
-                snoozeEndDate = message.snoozeEndDate
-                snoozeUuid = message.snoozeUuid
-            }
+        val amIMentioned = message.mentions.any { mention ->
+            normalizedAliases.contains(mention.lowercase())
         }
 
+        hasMentions = amIMentioned && !message.isSeen
+    }
+
+    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
+        val rawAliases = mailbox?.aliases ?: currentMailboxAliases
+        val normalizedAliases = rawAliases?.map { it.lowercase() }?.toSet() ?: emptySet()
+
         allMessages.forEach { message ->
-            messagesIds += message.messageIds
-            if (!message.isSeen) unseenMessagesCount++
-            from += message.from
-            to += message.to
-            if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
-            if (message.isFavorite) isFavorite = true
-            if (message.isAnswered) {
-                isAnswered = true
-                isForwarded = false
-            }
-            if (message.isForwarded) {
-                isForwarded = true
-                isAnswered = false
-            }
-            if (message.hasAttachable) hasAttachable = true
-
-            if (message.mentions.isNotEmpty()) {
-                val aliases = mailbox?.aliases ?: currentMailboxAliases
-                val amIMentioned = !aliases.isNullOrEmpty() &&
-                        message.mentions.any { mention ->
-                            aliases.any { alias -> mention.equals(alias, ignoreCase = true) }
-                        }
-
-                if (amIMentioned && !message.isSeen) hasMentions = true
-            }
-
-            if (message.isScheduledDraft) numberOfScheduledDrafts++
-
-            updateSnoozeStatesBasedOn(message)
+            processMessage(message, normalizedAliases)
         }
 
         duplicates.forEach { message ->
@@ -143,6 +119,40 @@ object ThreadRecomputations {
         subject = allMessages.first().subject
 
         isLastInboxMessageSnoozed = allMessages.isLastInboxMessageSnoozed(folderId)
+    }
+
+    private fun Thread.updateSnoozeStatesBasedOn(message: Message) {
+        message.snoozeState?.let {
+            snoozeState = it
+            snoozeEndDate = message.snoozeEndDate
+            snoozeUuid = message.snoozeUuid
+        }
+    }
+
+    private fun Thread.processMessage(message: Message, normalizedAliases: Set<String>) {
+        messagesIds += message.messageIds
+        if (!message.isSeen) unseenMessagesCount++
+        from += message.from
+        to += message.to
+        if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
+        if (message.isFavorite) isFavorite = true
+
+        if (message.isAnswered) {
+            isAnswered = true
+            isForwarded = false
+        }
+        if (message.isForwarded) {
+            isForwarded = true
+            isAnswered = false
+        }
+
+        if (message.hasAttachable) hasAttachable = true
+
+        updateMentionsState(message, normalizedAliases)
+
+        if (message.isScheduledDraft) numberOfScheduledDrafts++
+
+        updateSnoozeStatesBasedOn(message)
     }
 
     /**
