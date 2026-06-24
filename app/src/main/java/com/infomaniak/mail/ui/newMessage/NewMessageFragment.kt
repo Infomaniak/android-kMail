@@ -84,6 +84,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
@@ -164,7 +165,7 @@ class NewMessageFragment : Fragment() {
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
-    private val tagsObserverScript by lazy { requireContext().getEditorMentionsDetectorScript() }
+    private val mentionsObserverScript by lazy { requireContext().getEditorMentionsDetectorScript() }
     private val mentionDeletionObserverScript by lazy { requireContext().getMentionDeletionObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
@@ -174,6 +175,7 @@ class NewMessageFragment : Fragment() {
     private val mentionClickObserverScript by lazy { requireContext().getEditorMentionClickObserverScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
@@ -501,7 +503,6 @@ class NewMessageFragment : Fragment() {
         if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
-        addMentionsStyle()
     }
 
     private fun addMentionsStyle() {
@@ -518,10 +519,7 @@ class NewMessageFragment : Fragment() {
         addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
-        addScript(tagsObserverScript)
-        addScript(insertMentionScript)
         addScript(mentionClickObserverScript)
-        addScript(mentionDeletionObserverScript)
 
         val formattedAiContentScript = setAiContentScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
@@ -840,6 +838,16 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
             binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+
+            val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
+            if (areMentionsAvailable) {
+                binding.editorWebView.apply {
+                    addScript(mentionsObserverScript)
+                    addScript(insertMentionScript)
+                    addScript(mentionDeletionObserverScript)
+                }
+                addMentionsStyle()
+            }
         }
     }
 
