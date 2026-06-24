@@ -70,15 +70,11 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.addressBook.AddressBook
-import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
-import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
@@ -94,7 +90,6 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogAr
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
-import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.TO
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
@@ -552,26 +547,17 @@ class NewMessageFragment : Fragment() {
     private fun onMentionContactClicked(contact: ContactAutocompletable) {
         val merged = when (contact) {
             is MergedContact -> contact
-            is ContactGroup -> newMessageViewModel.getMergedContactFromContactGroup(contact).firstOrNull()
-            is AddressBook -> newMessageViewModel.getMergedContactFromAddressBook(contact).firstOrNull()
             else -> null
         } ?: return
 
-        // Replace @query with a mention anchor carrying both display name and mail address.
         viewLifecycleOwner.lifecycleScope.launch {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(
                 JsExecutableMethod("insertMention", merged.email, merged.name),
             )
-            val recipients = newMessageViewModel.toLiveData.value?.recipients ?: emptyList()
-            if (recipients.none { recipient -> recipient.email == merged.email }) {
-                Recipient.createValidRecipientOrNull(email = merged.email, name = merged.name)?.let { recipient ->
-                    newMessageViewModel.addRecipientToField(recipient, TO)
-                }
-            }
+            binding.toField.addRecipient(merged.email, merged.name)
         }
 
         newMessageViewModel.addMention(merged.email)
-
         binding.mentionAutoComplete.isVisible = false
         newMessageViewModel.updateMentionQuery("")
     }
@@ -744,6 +730,7 @@ class NewMessageFragment : Fragment() {
 
         toLiveData.observe(viewLifecycleOwner) {
             if (shouldInitToField) {
+                shouldInitToField = false
                 binding.toField.initRecipients(it.recipients, it.otherFieldsAreEmpty)
             }
             updateIsSendingAllowed(

@@ -397,7 +397,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun addRecipient(email: String, name: String) {
+    fun addRecipient(email: String, name: String) {
         val recipient = Recipient.createValidRecipientOrNull(email = email, name = name)
 
         if (recipient == null) {
