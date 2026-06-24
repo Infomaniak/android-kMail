@@ -50,7 +50,8 @@ import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.extensions.calendarAttachment
 import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
-import com.infomaniak.mail.data.models.extensions.isAcknowledgementTargetForMe
+import com.infomaniak.mail.data.models.extensions.isAcknowledgementCompletedForMe
+import com.infomaniak.mail.data.models.extensions.isPendingAcknowledgementForMe
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
@@ -74,7 +75,6 @@ import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.data.models.extensions.isMe
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
@@ -280,7 +280,7 @@ class ThreadViewModel @Inject constructor(
                         val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
-                        if (shouldExpand && message.isAcknowledgementTargetForMe()) refreshMessageIfNeeded(message)
+                        if (shouldExpand && message.isPendingAcknowledgementForMe()) refreshMessageIfNeeded(message)
                     }
                 }
 
@@ -708,8 +708,8 @@ class ThreadViewModel @Inject constructor(
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
             val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
             val canAcknowledgeOrNull = when {
-                item.isAcknowledgementTargetForMe() -> MessageUi.AcknowledgeState.Pending
-                item.acknowledgeStatus == AcknowledgeStatus.Acknowledged -> MessageUi.AcknowledgeState.Completed
+                item.isPendingAcknowledgementForMe() -> MessageUi.AcknowledgeState.Pending
+                item.isAcknowledgementCompletedForMe() -> MessageUi.AcknowledgeState.Completed
                 else -> null
             }
             MessageUi(
@@ -787,7 +787,7 @@ class ThreadViewModel @Inject constructor(
             snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementSuccess))
             mailboxContentRealm().write {
                 MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                    localMessage?._acknowledgeStatus = AcknowledgeStatus.Acknowledged.apiValue
+                    localMessage?.acknowledgeStatus = AcknowledgeStatus.Acknowledged
                 }
             }
             setAcknowledgeState(message, MessageUi.AcknowledgeState.Completed)
@@ -800,18 +800,18 @@ class ThreadViewModel @Inject constructor(
     fun refreshMessageIfNeeded(message: Message) = viewModelScope.launch(ioCoroutineContext) {
         if (!message.hasPendingAcknowledgement || !refreshingAcknowledgeMessagesUids.add(message.uid)) return@launch
 
-        runCatching {
+        try {
             val apiResponse = ApiRepository.getMessage(message.resource)
             val responseMessage = apiResponse.data
 
             if (apiResponse.isSuccess() && responseMessage != null) {
                 mailboxContentRealm().write {
                     MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                        localMessage?._acknowledgeStatus = responseMessage._acknowledgeStatus
+                        localMessage?.acknowledgeStatus = responseMessage.acknowledgeStatus
                     }
                 }
             }
-        }.also {
+        } finally {
             refreshingAcknowledgeMessagesUids.remove(message.uid)
         }
     }

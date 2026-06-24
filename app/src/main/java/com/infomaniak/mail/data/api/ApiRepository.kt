@@ -194,11 +194,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.unsubscribe(messageResource), POST)
     }
     //endregion
+
+    //region acknowledge
     suspend fun acknowledgeMessage(messageResource: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.acknowledge(messageResource), GET)
     }
-    //region acknowledge
-
     //endregion
 
     //region Spam

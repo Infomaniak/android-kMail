@@ -48,7 +48,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var cancelDelay by sharedValue("cancelDelayKey", 10)
     var emailForwarding by sharedValue("emailForwardingKey", EmailForwarding.IN_BODY)
     var includeMessageInReply by sharedValue("includeMessageInReplyKey", true)
-    var askEmailAcknowledgement by sharedValue("askEmailAcknowledgmentKey", false)
+    var askEmailAcknowledgement by sharedValue("askEmailAcknowledgementKey", false)
     var hasAlreadyEnabledNotifications by sharedValue("hasAlreadyEnabledNotificationsKey", false)
     var isAppLocked by sharedValue("isAppLockedKey", false)
     var leftPaneRatio by sharedValue("leftPaneRatioKey", 0.4f)

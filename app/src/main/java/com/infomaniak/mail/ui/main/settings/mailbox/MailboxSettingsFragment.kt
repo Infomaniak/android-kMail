@@ -56,7 +56,7 @@ class MailboxSettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.root.setTitle(navigationArgs.mailboxEmail)
         setSubtitlesInitialState()
-        setAcknowledgmentToggle()
+        setAcknowledgementToggle()
         setupListeners()
     }
 
@@ -65,8 +65,8 @@ class MailboxSettingsFragment : Fragment() {
         settingsSecuritySpamFilter.updateActivatedSubtitle()
     }
 
-    private fun setAcknowledgmentToggle() = with(binding) {
-        settingsMailboxGeneralAcknowledgment.isChecked = localSettings.askEmailAcknowledgement
+    private fun setAcknowledgementToggle() = with(binding) {
+        settingsMailboxGeneralAcknowledgement.isChecked = localSettings.askEmailAcknowledgement
     }
 
     private fun ItemSettingView.updateActivatedSubtitle() {
@@ -79,9 +79,8 @@ class MailboxSettingsFragment : Fragment() {
                 MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting(navigationArgs.mailboxObjectId)
             )
         }
-        settingsMailboxGeneralAcknowledgment.setOnClickListener {
-            settingsMailboxGeneralAcknowledgment.isChecked = !localSettings.askEmailAcknowledgement
-            localSettings.askEmailAcknowledgement = settingsMailboxGeneralAcknowledgment.isChecked
+        settingsMailboxGeneralAcknowledgement.setOnClickListener {
+            localSettings.askEmailAcknowledgement = settingsMailboxGeneralAcknowledgement.isChecked
         }
         settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() }
