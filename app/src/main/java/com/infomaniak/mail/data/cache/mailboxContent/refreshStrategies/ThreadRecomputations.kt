@@ -19,12 +19,13 @@ package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.computeReactionsPerMessageId
 import com.infomaniak.mail.data.models.thread.overrideWith
-import com.infomaniak.mail.utils.AccountUtils.currentMailboxEmail
+import com.infomaniak.mail.utils.AccountUtils.currentMailboxAliases
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
@@ -35,7 +36,7 @@ import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmList
 
 object ThreadRecomputations {
-    fun Thread.recomputeThread(realm: MutableRealm? = null) {
+    fun Thread.recomputeThread(realm: MutableRealm? = null, mailbox: Mailbox? = null) {
 
         messages.sortBy { it.internalDate }
         // All of the following methods should not be inside of Thread to begin with. At least the input list of messages is
@@ -62,7 +63,7 @@ object ThreadRecomputations {
 
         resetThread()
 
-        updateThread(lastMessage, allMessages)
+        updateThread(lastMessage, allMessages, mailbox)
 
         recomputeMessagesWithContent(allMessages)
 
@@ -90,7 +91,7 @@ object ThreadRecomputations {
         isLastInboxMessageSnoozed = false
     }
 
-    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>) {
+    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
 
         fun Thread.updateSnoozeStatesBasedOn(message: Message) {
             message.snoozeState?.let {
@@ -116,11 +117,17 @@ object ThreadRecomputations {
                 isAnswered = false
             }
             if (message.hasAttachable) hasAttachable = true
-            val amIMentioned = currentMailboxEmail != null &&
-                    message.mentions.any { it.equals(currentMailboxEmail, ignoreCase = true) }
-            if (amIMentioned && !message.isSeen) {
-                hasMentions = true
+
+            if (message.mentions.isNotEmpty()) {
+                val aliases = mailbox?.aliases ?: currentMailboxAliases
+                val amIMentioned = !aliases.isNullOrEmpty() &&
+                        message.mentions.any { mention ->
+                            aliases.any { alias -> mention.equals(alias, ignoreCase = true) }
+                        }
+
+                if (amIMentioned && !message.isSeen) hasMentions = true
             }
+
             if (message.isScheduledDraft) numberOfScheduledDrafts++
 
             updateSnoozeStatesBasedOn(message)
