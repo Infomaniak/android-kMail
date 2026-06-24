@@ -83,6 +83,12 @@ class FolderController @Inject constructor(
         mailboxContentRealm().write { getFolderBlocking(id, realm = this)?.let { onUpdate(it) } }
     }
 
+    suspend fun deleteFolder(id: String, mailbox: Mailbox) {
+        mailboxContentRealm().write {
+            getFolderBlocking(id, realm = this)?.let { folder -> deleteLocalFolder(mailbox, folder) }
+        }
+    }
+
     suspend fun update(mailbox: Mailbox, remoteFolders: List<Folder>, realm: Realm) {
         val remoteFoldersWithChildren = remoteFolders.flattenFolderChildren()
 
