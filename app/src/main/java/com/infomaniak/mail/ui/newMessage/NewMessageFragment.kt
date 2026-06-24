@@ -22,7 +22,6 @@ package com.infomaniak.mail.ui.newMessage
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
@@ -51,7 +50,6 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.core.legacy.utils.FilePicker
 import com.infomaniak.core.legacy.utils.getBackNavigationResult
-import com.infomaniak.core.legacy.views.DividerItemDecorator
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
@@ -122,7 +120,6 @@ import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CL
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
-import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
@@ -847,12 +844,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupMentionAutocomplete() = with(binding) {
-        val margin = resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
-        val divider = DividerItemDecorator(InsetDrawable(UiUtils.dividerDrawable(requireContext()), margin, 0, margin, 0))
-
         mentionAutoComplete.adapter = mentionContactAdapter
-        mentionAutoComplete.addItemDecoration(divider)
-
         newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (contacts, _) ->
             mentionContactAdapter.updateContacts(contacts.filterIsInstance<MergedContact>())
         }
@@ -864,6 +856,21 @@ class NewMessageFragment : Fragment() {
             } else {
                 mentionContactAdapter.searchContacts(query)
                 mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
+                updateMentionAutocompleteHeight()
+            }
+        }
+    }
+
+    private fun updateMentionAutocompleteHeight() {
+        with(binding.mentionAutoComplete) {
+            if (!isVisible) return
+            post {
+                val itemHeight = getChildAt(0)?.height ?: return@post
+                val visibleRows = minOf(mentionContactAdapter.itemCount, 3)
+                val targetHeight = itemHeight * visibleRows + paddingTop + paddingBottom
+                if (layoutParams.height != targetHeight) {
+                    layoutParams = layoutParams.apply { height = targetHeight }
+                }
             }
         }
     }
