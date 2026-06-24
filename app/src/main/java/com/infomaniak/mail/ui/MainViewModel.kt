@@ -415,6 +415,7 @@ class MainViewModel @Inject constructor(
             SentryLog.d(TAG, "Select mailbox: ${mailbox.email}")
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxEmail = mailbox.email
+            AccountUtils.currentMailboxAliases = mailbox.aliases
             _currentMailboxObjectId.value = mailbox.objectId
             _currentFolderId.value = null
         }
