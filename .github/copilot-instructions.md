@@ -10,7 +10,7 @@ Infomaniak Mail for Android — full-featured email client. Hybrid UI (Jetpack C
 git submodule update --init --recursive   # pull Core submodule — required for Gradle settings plugin
 cp env.example.properties env.properties  # fill sentryAuthToken (use a dummy value locally)
 ```
-Missing `env.properties` or uninitialized submodule → Gradle config phase fails.
+Missing `Core/` submodule → Gradle config phase fails. Missing `env.properties` only blocks *release* tasks (requires `sentryAuthToken`); debug builds work without it (the file is optional).
 
 ## Build & Test (CI: `.github/workflows/android.yml`)
 CI runs on every non-draft PR:
@@ -38,6 +38,7 @@ app/src/main/java/com/infomaniak/mail/
 │   └── api/                  # API service interfaces
 ├── di/                       # Hilt modules
 ├── ui/                       # Compose + XML screens
+├── views/                    # Custom Views + XML/ViewBinding components
 └── workers/                  # WorkManager tasks
 EmojiComponents/              # Custom emoji picker module
 HtmlCleaner/                  # HTML sanitization module
