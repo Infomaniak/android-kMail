@@ -25,20 +25,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.notYetImplemented
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class MailboxSettingsFragment : Fragment() {
-
-    @Inject
-    lateinit var localSettings: LocalSettings
 
     private var binding: FragmentMailboxSettingsBinding by safeBinding()
     private val navigationArgs: MailboxSettingsFragmentArgs by navArgs()
@@ -56,17 +49,12 @@ class MailboxSettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.root.setTitle(navigationArgs.mailboxEmail)
         setSubtitlesInitialState()
-        setAcknowledgementToggle()
         setupListeners()
     }
 
     private fun setSubtitlesInitialState() = with(binding) {
         settingsSecurityAdsFilter.updateActivatedSubtitle()
         settingsSecuritySpamFilter.updateActivatedSubtitle()
-    }
-
-    private fun setAcknowledgementToggle() = with(binding) {
-        settingsMailboxGeneralAcknowledgement.isChecked = localSettings.askEmailAcknowledgement
     }
 
     private fun ItemSettingView.updateActivatedSubtitle() {
@@ -78,9 +66,6 @@ class MailboxSettingsFragment : Fragment() {
             animatedNavigation(
                 MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting(navigationArgs.mailboxObjectId)
             )
-        }
-        settingsMailboxGeneralAcknowledgement.setOnClickListener {
-            localSettings.askEmailAcknowledgement = settingsMailboxGeneralAcknowledgement.isChecked
         }
         settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() }

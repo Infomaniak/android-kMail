@@ -851,7 +851,16 @@ class ThreadAdapter(
                     }
                 }
             }
-            is AcknowledgeState.InProgress -> acknowledgeAlert.showAction1Progress()
+            is AcknowledgeState.InProgress -> {
+                acknowledgeAlert.apply {
+                    isVisible = true
+                    setActionsVisibility(isVisible = true)
+                    setDescription(context.getString(R.string.acknowledgementMessage))
+                    setIconRes(R.drawable.ic_envelope)
+                    setAction1Text(context.getString(R.string.sendConfirmationAction))
+                    showAction1Progress()
+                }
+            }
             is AcknowledgeState.Completed -> {
                 acknowledgeAlert.apply {
                     isVisible = true
