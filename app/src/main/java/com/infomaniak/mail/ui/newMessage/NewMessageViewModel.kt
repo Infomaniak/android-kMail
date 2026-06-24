@@ -1053,13 +1053,13 @@ class NewMessageViewModel @Inject constructor(
             isNewMessage = false
         }
 
-        body = removeUnwantedHtml(uiBodyValue)
+        body = prepareHtmlForSending(uiBodyValue)
     }
 
     /**
      * We filter out some HTML elements that we don't want to send with the email.
      */
-    private fun removeUnwantedHtml(html: String): String {
+    private fun prepareHtmlForSending(html: String): String {
         val doc = jsoupParseWithLog(html)
         // This assures that jsoup doesn't add line breaks that will impact the snapshot comparison when the user reopens the draft
         // and adds something and deletes it, leaving the draft back in its original state. This wouldn't be an issue if we had
