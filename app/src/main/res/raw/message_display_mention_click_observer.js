@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 function observeMentionClick() {
-    if (document.kmailMentionClickObserved) return else document.kmailMentionClickObserved = true;
+    if (document.kmailMentionClickObserved) {
+        return;
+    } else {
+        document.kmailMentionClickObserved = true;
+    }
 
     document.addEventListener('click', (event) => {
         const clickedNode = event.target;
