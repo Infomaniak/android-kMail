@@ -55,7 +55,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:fillViewport="true"
-            app:layout_constraintBottom_toTopOf="@id/externalBanner"
+            app:layout_constraintBottom_toTopOf="@id/mentionAutoComplete"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
             <LinearLayout
@@ -426,7 +426,7 @@
             android:orientation="horizontal"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/editorToolbar"
-            app:layout_constraintTop_toBottomOf="@id/compositionNestedScrollView"
+            app:layout_constraintTop_toBottomOf="@id/mentionAutoComplete"
             tools:visibility="visible">
 
             <LinearLayout
