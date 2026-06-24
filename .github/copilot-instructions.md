@@ -10,7 +10,7 @@ Infomaniak Mail for Android — full-featured email client. Hybrid UI (Jetpack C
 git submodule update --init --recursive   # pull Core submodule — required for Gradle settings plugin
 cp env.example.properties env.properties  # fill sentryAuthToken (use a dummy value locally)
 ```
-Missing `Core/` submodule → Gradle config phase fails. Missing `env.properties` only blocks *release* tasks (requires `sentryAuthToken`); debug builds work without it (the file is optional).
+Missing `Core/` submodule → Gradle config phase fails. `env.properties` is required for release variants (including `./gradlew build` as used in CI); debug-only tasks work without it.
 
 ## Build & Test (CI: `.github/workflows/android.yml`)
 CI runs on every non-draft PR:
@@ -30,14 +30,13 @@ Replicate locally with the same sequence. Use flavor-specific tasks when needed:
 ```
 app/src/main/java/com/infomaniak/mail/
 ├── MainApplication.kt        # Entry — configureInfomaniakCore()
-├── ui/
-│   └── MainActivity.kt       # Main coordinator (at app/src/main/java/com/infomaniak/mail/ui/)
+├── ui/                       # Compose + XML/ViewBinding screens (MainActivity and UI flows)
+│   └── MainActivity.kt       # Main coordinator
 ├── data/
 │   ├── cache/                # Realm controllers (RealmDatabase.kt — schema versions here)
 │   ├── models/               # Realm entities (Message, Thread, Draft, Mailbox…)
 │   └── api/                  # API service interfaces
 ├── di/                       # Hilt modules
-├── ui/                       # Compose + XML screens
 ├── views/                    # Custom Views + XML/ViewBinding components
 └── workers/                  # WorkManager tasks
 EmojiComponents/              # Custom emoji picker module
