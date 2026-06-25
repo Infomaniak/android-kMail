@@ -17,7 +17,7 @@
  */
 
 /**
- * This file comes from https://github.com/thundernest/k-9/tree/main/app/html-cleaner
+ * This file comes from https://github.com/thunderbird/thunderbird-android/blob/main/library/html-cleaner/src/main/kotlin/app/k9mail/html/cleaner/BodyCleaner.kt
  */
 package com.infomaniak.html.cleaner
 
@@ -48,7 +48,7 @@ internal class BodyCleaner {
                 "wbr",
             )
             .addAttributes(":all", "class", "dir", "id", "style")
-            .addAttributes("a", "name", "data-ik-mention-ref", "contenteditable")
+            .addAttributes("a", "name", "data-ik-mention-ref")
             // Allow all URI schemes in links.
             // Removing all protocols makes the list of protocols empty, which means allow all protocols.
             .removeProtocols("a", "href", "ftp", "http", "https", "mailto")
@@ -98,6 +98,14 @@ internal class BodyCleaner {
     fun clean(dirtyDocument: Document): Document {
         val cleanedDocument = cleaner.clean(dirtyDocument)
 
+        // We don't to accept the attribute contenteditable, but we need to keep contenteditable="false" for mentions to work
+        // properly. So we remove all contenteditable attributes, and then re-add contenteditable="false" for mentions.
+        cleanedDocument.select("a").forEach { anchor ->
+            if (anchor.hasAttr(MENTION_ATTRIBUTE)) {
+                anchor.attr("contenteditable", "false")
+            }
+        }
+
         // Cleaner.clean() nests two bodies inside one-another. To fix this, unwrap one of them so we don't end up with nested bodies
         val body = cleanedDocument.body()
         val hasNestedBodies = body.childNodeSize() == 1
@@ -114,4 +122,9 @@ internal class BodyCleaner {
             cleanedDocument.insertChildren(0, documentType)
         }
     }
+
+    companion object {
+        private const val MENTION_ATTRIBUTE = "data-ik-mention-ref"
+    }
 }
+
