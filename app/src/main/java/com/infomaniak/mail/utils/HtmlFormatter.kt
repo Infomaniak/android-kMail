@@ -258,9 +258,7 @@ class HtmlFormatter(private val html: String) {
         fun Context.getIncludeQuotesScript(): String = loadScript(R.raw.include_quotes_script)
 
         fun Context.getDeletedInlineImagesObserverScript(): String = loadScript(R.raw.deleted_inline_images_observer)
-        fun Context.getEditorMentionsDetectorScript(): String = loadScript(R.raw.editor_mentions_detector)
-        fun Context.getMentionDeletionObserverScript(): String = loadScript(R.raw.mention_deletion_observer)
-
+        
         fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
 
         fun Context.getFixStyleScript(): String {
@@ -282,6 +280,10 @@ class HtmlFormatter(private val html: String) {
         fun Context.getSetAiContentScript(): String {
             return loadScript(R.raw.set_ai_content_script)
         }
+
+        fun Context.getMentionDeletionObserverScript(): String = loadScript(R.raw.mention_deletion_observer)
+
+        fun Context.getEditorMentionsDetectorScript(): String = loadScript(R.raw.editor_mentions_detector)
 
         fun Context.getMentionClickObserverScript(): String {
             return loadScript(R.raw.message_display_mention_click_observer)
