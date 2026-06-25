@@ -94,13 +94,15 @@ object ThreadRecomputations {
     private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
         if (hasUnseenMentions || message.mentions.isEmpty()) return
 
-        val amIMentioned = message.mentions.any { mention -> normalizedAliases.contains(mention.lowercase()) }
+        val amIMentioned = message.mentions.any { mention ->
+            normalizedAliases.contains(mention.lowercase(java.util.Locale.ROOT))
+        }
         hasUnseenMentions = amIMentioned && !message.isSeen
     }
 
     private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
         val rawAliases = mailbox?.aliases ?: currentMailboxAliases
-        val normalizedAliases = rawAliases?.map { it.lowercase() }?.toSet() ?: emptySet()
+        val normalizedAliases = rawAliases?.map { it.lowercase(java.util.Locale.ROOT) }?.toSet() ?: emptySet()
 
         allMessages.forEach { message ->
             processMessage(message, normalizedAliases)
