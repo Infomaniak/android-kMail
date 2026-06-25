@@ -417,6 +417,8 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
+        <!--The adapter has 10 items, but we need to only show 3 and scroll for the rest. We had to add a maxHeight
+          because there was a flash the first time the adapter was created that showed the 10 items and then showed only the 3-->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mentionAutoComplete"
             android:layout_width="0dp"
@@ -664,7 +666,6 @@
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView

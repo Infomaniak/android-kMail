@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 function onInlineImagesDeleted(cids) {
-globalThis.kmail.onInlineImagesDeleted(cids);
+    globalThis.kmail.onInlineImagesDeleted(cids);
 }
 
 function onMentionQueryChanged(query) {
-globalThis.kmail.onMentionQueryChanged(query);
+    globalThis.kmail.onMentionQueryChanged(query);
 }
 
 function onMentionsDeleted(refsJson) {
-globalThis.kmail.onMentionsDeleted(refsJson);
+    globalThis.kmail.onMentionsDeleted(refsJson);
 }
