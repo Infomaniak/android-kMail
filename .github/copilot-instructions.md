@@ -10,7 +10,7 @@ Infomaniak Mail for Android — full-featured email client. Hybrid UI (Jetpack C
 git submodule update --init --recursive   # pull Core submodule — required for Gradle settings plugin
 cp env.example.properties env.properties  # fill sentryAuthToken (use a dummy value locally)
 ```
-Missing `Core/` submodule → Gradle config phase fails. `env.properties` is required for release variants (including `./gradlew build` as used in CI); debug-only tasks work without it.
+Missing `Core/` submodule → Gradle config phase fails. `env.properties` is required for explicit *Release* tasks (e.g. `assembleStandardRelease`, `bundleStandardRelease`); debug-only tasks work without it.
 
 ## Build & Test (CI: `.github/workflows/android.yml`)
 CI runs on every non-draft PR:
