@@ -255,6 +255,7 @@
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
     <string name="deleteFolderDialogDescription">The contents of the folder %s will be permanently deleted without going through the trash.</string>
     <string name="deleteFolderDialogTitle">Delete folder</string>
+    <string name="descriptionReminderRecipientsAndMe">Within the organization only</string>
     <string name="disabledFeatureFlagDescription">You will soon be able to unlock the limits of your ik.me email address\n(storage limit, custom schedule, sending and more…)</string>
     <string name="disabledFeatureFlagTitle">Need more storage and features?</string>
     <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>
@@ -358,7 +359,6 @@
     <string name="errorUserAlreadySynchronized">User is already synchronized</string>
     <string name="euriaTranslateMessage">Euria translates your message…</string>
     <string name="expeditorAuthenticationDescription">The sender’s origin has been authenticated.</string>
-    <string name="explanationActionCallIfNoResponse">Recipients within your organization will see that a response is expected.</string>
     <string name="externalDialogConfirmButton">I understand</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">The sender %s is not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>
@@ -505,6 +505,7 @@
     <string name="reminderFollowUpButton">Follow up</string>
     <string name="reminderFollowUpPlaceholderText">Hello,\nIs it possible to get some feedback on this subject?\nThank you in advance.</string>
     <string name="reminderNoResponseHeaderTitle">Reminder: no response from %1$s to this email since %2$s</string>
+    <string name="reminderVisibilityTitle">Reminder visibility</string>
     <string name="renameFolder">Rename the folder</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
     <string name="reportDisplayProblemTitle">Report a display problem</string>
@@ -537,6 +538,9 @@
     <string name="selectDateDialogTitle">Select date</string>
     <string name="selectSignatureNone">No signature</string>
     <string name="selectTimeDialogTitle">Select time</string>
+    <string name="selectionReminderMeOnly">Me only</string>
+    <string name="selectionReminderRecipientsAndMe">Recipients and me</string>
+    <string name="selectionReminderTitle">Choose who can see the reminder</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send the confirmation</string>
     <string name="sendOptions">Send options</string>

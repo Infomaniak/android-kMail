@@ -251,6 +251,7 @@
     <string name="deleteAccountWarning">Tilisi poistaminen on lopullista. Et voi enää aktivoida tiliäsi uudelleen.</string>
     <string name="deleteFolderDialogDescription">Kansion %s sisältö poistetaan pysyvästi ilman siirtämistä roskakoriin.</string>
     <string name="deleteFolderDialogTitle">Poista kansio</string>
+    <string name="descriptionReminderRecipientsAndMe">Vain organisaation sisällä</string>
     <string name="disabledFeatureFlagDescription">Voit pian poistaa ik.me-sähköpostiosoitteesi rajoitukset\n(tallennustilaraja, mukautettu aikataulu, lähetys ja muut…)</string>
     <string name="disabledFeatureFlagTitle">Tarvitsetko lisää tallennustilaa ja ominaisuuksia?</string>
     <string name="displayMailIssueDescription">Näyttöongelmien korjaamiseksi päivitä Android System Webview -sovellus.</string>
@@ -354,7 +355,6 @@
     <string name="errorUserAlreadySynchronized">Käyttäjä on jo synkronoitu</string>
     <string name="euriaTranslateMessage">Euria kääntää viestisi…</string>
     <string name="expeditorAuthenticationDescription">Lähettäjän alkuperä on vahvistettu.</string>
-    <string name="explanationActionCallIfNoResponse">Organisaatiosi vastaanottajat näkevät, että vastausta odotetaan.</string>
     <string name="externalDialogConfirmButton">Ymmärrän</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Lähettäjä %s ei ole organisaatiosi tai yhteystietojesi jäsen. Ole varovainen, jos jaat arkaluonteista tietoa.</item>
@@ -501,6 +501,7 @@
     <string name="reminderFollowUpButton">Seuraa</string>
     <string name="reminderFollowUpPlaceholderText">Hei,\nOnko mahdollista saada palautetta tästä aiheesta?\nKiitos etukäteen.</string>
     <string name="reminderNoResponseHeaderTitle">Muistutus: ei vastausta %1$s:ltä tähän sähköpostiin lähtien %2$s</string>
+    <string name="reminderVisibilityTitle">Muistutuksen näkyvyys</string>
     <string name="renameFolder">Nimeä kansio uudelleen</string>
     <string name="reportDisplayProblemDescription">Suostutko jakamaan tietojasi kehittäjiemme kanssa, jotta he voivat auttaa sinua ongelmassasi?</string>
     <string name="reportDisplayProblemTitle">Ilmoita näyttöongelmasta</string>
@@ -533,6 +534,9 @@
     <string name="selectDateDialogTitle">Valitse päivämäärä</string>
     <string name="selectSignatureNone">Ei allekirjoitusta</string>
     <string name="selectTimeDialogTitle">Valitse aika</string>
+    <string name="selectionReminderMeOnly">Vain minä</string>
+    <string name="selectionReminderRecipientsAndMe">Vastaanottajat ja minä</string>
+    <string name="selectionReminderTitle">Valitse, kuka voi nähdä muistutuksen</string>
     <string name="send">Lähetä</string>
     <string name="sendConfirmationAction">Lähetä vahvistus</string>
     <string name="sendOptions">Lähetysvalinnat</string>

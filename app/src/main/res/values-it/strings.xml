@@ -251,6 +251,7 @@
     <string name="deleteAccountWarning">La cancellazione dell’account sarà definitiva. Non sarà possibile riattivare l’account.</string>
     <string name="deleteFolderDialogDescription">Il contenuto della cartella %s verrà eliminato definitivamente senza passare per il cestino.</string>
     <string name="deleteFolderDialogTitle">Eliminare la cartella</string>
+    <string name="descriptionReminderRecipientsAndMe">Solo all’interno dell’organizzazione</string>
     <string name="disabledFeatureFlagDescription">Presto sarai in grado di sbloccare i limiti del tuo indirizzo email ik.me\n(limite di archiviazione, pianificazione personalizzata, invio e altro…)</string>
     <string name="disabledFeatureFlagTitle">Hai bisogno di più spazio di archiviazione e funzionalità?</string>
     <string name="displayMailIssueDescription">Per risolvere i problemi di visualizzazione, aggiornare l’applicazione Android System Webview.</string>
@@ -354,7 +355,6 @@
     <string name="errorUserAlreadySynchronized">L’utente è già sincronizzato</string>
     <string name="euriaTranslateMessage">Euria traduce il tuo messaggio…</string>
     <string name="expeditorAuthenticationDescription">L’origine del mittente è stata autenticata.</string>
-    <string name="explanationActionCallIfNoResponse">I destinatari della tua organizzazione vedranno che una risposta è attesa.</string>
     <string name="externalDialogConfirmButton">Capisco</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Il mittente %s non fa parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>
@@ -501,6 +501,7 @@
     <string name="reminderFollowUpButton">Sollecita</string>
     <string name="reminderFollowUpPlaceholderText">Ciao,\nÈ possibile avere un feedback su questo argomento?\nGrazie in anticipo.</string>
     <string name="reminderNoResponseHeaderTitle">Promemoria: nessuna risposta da %1$s a questa email dal %2$s</string>
+    <string name="reminderVisibilityTitle">Visibilità del promemoria</string>
     <string name="renameFolder">Rinominare la cartella</string>
     <string name="reportDisplayProblemDescription">Accetti di condividere i tuoi dati con i nostri sviluppatori in modo che possano aiutarvi a risolvere il vostro problema?</string>
     <string name="reportDisplayProblemTitle">Segnala un problema di visualizzazione</string>
@@ -533,6 +534,9 @@
     <string name="selectDateDialogTitle">Selezionare la data</string>
     <string name="selectSignatureNone">Nessuna firma</string>
     <string name="selectTimeDialogTitle">Selezionare l’ora</string>
+    <string name="selectionReminderMeOnly">Solo io</string>
+    <string name="selectionReminderRecipientsAndMe">I destinatari e io</string>
+    <string name="selectionReminderTitle">Scegliere chi può vedere il promemoria</string>
     <string name="send">Invia</string>
     <string name="sendConfirmationAction">Inviare la conferma</string>
     <string name="sendOptions">Opzioni di invio</string>
