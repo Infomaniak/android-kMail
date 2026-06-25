@@ -45,11 +45,11 @@ const getTextBeforeCaret = () => {
     const block = getBlockParent(range.startContainer);
     const preRange = range.cloneRange();
     
-    try {
-        preRange.setStart(block, 0);
-    } catch (e) {
-        preRange.selectNodeContents(getEditor());
-    }
+   if (block && block.nodeType === Node.ELEMENT_NODE) {
+       preRange.setStart(block, 0);
+   } else {
+       preRange.selectNodeContents(getEditor());
+   }
     
     preRange.setEnd(range.endContainer, range.endOffset);
 
