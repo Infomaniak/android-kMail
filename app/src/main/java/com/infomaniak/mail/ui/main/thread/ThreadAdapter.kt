@@ -92,6 +92,7 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.WebViewDisplayCallbacks
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.getAttributeColor
@@ -1466,20 +1467,24 @@ class ThreadAdapter(
                     attachments = message.attachments,
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
-                    onBlockedResourcesDetected = ::promptUserForDistantImages,
-                    navigateToNewMessageActivity = navigateToNewMessageActivity,
-                    onPageFinished = onPageFinished,
-                    onWebViewFinishedLoading = onWebViewFinishedLoading,
-                    onMentionContactClicked = onMentionContactClicked,
+                    callbacks = WebViewDisplayCallbacks(
+                        onBlockedResourcesDetected = ::promptUserForDistantImages,
+                        navigateToNewMessageActivity = navigateToNewMessageActivity,
+                        onPageFinished = onPageFinished,
+                        onWebViewFinishedLoading = onWebViewFinishedLoading,
+                        onMentionContactClicked = onMentionContactClicked,
+                    )
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initDisplayWebViewClientAndBridge(
                     attachments = message.attachments,
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
-                    onBlockedResourcesDetected = ::promptUserForDistantImages,
-                    navigateToNewMessageActivity = navigateToNewMessageActivity,
-                    onWebViewFinishedLoading = onWebViewFinishedLoading,
-                    onMentionContactClicked = onMentionContactClicked,
+                    callbacks = WebViewDisplayCallbacks(
+                        onBlockedResourcesDetected = ::promptUserForDistantImages,
+                        navigateToNewMessageActivity = navigateToNewMessageActivity,
+                        onWebViewFinishedLoading = onWebViewFinishedLoading,
+                        onMentionContactClicked = onMentionContactClicked,
+                    )
                 )
             }
         }

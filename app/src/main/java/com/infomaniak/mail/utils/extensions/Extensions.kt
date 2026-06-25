@@ -255,16 +255,12 @@ fun WebView.initDisplayWebViewClientAndBridge(
     attachments: List<Attachment>,
     messageUid: String,
     shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: () -> Unit,
-    navigateToNewMessageActivity: ((Uri) -> Unit)?,
-    onPageFinished: (() -> Unit)? = null,
-    onWebViewFinishedLoading: () -> Unit,
-    onMentionContactClicked: ((String, String?) -> Unit)? = null,
+    callbacks: WebViewDisplayCallbacks,
 ): MessageDisplayWebViewClient {
 
     WebViewUtils.initMessageDisplayJavascriptBridge(
-        onWebViewFinishedLoading = onWebViewFinishedLoading,
-        onMentionContactClicked = onMentionContactClicked
+        onWebViewFinishedLoading = callbacks.onWebViewFinishedLoading,
+        onMentionContactClicked = callbacks.onMentionContactClicked,
     )
     addJavascriptInterface(WebViewUtils.messageDisplayJsBridge, "kmail")
 
@@ -275,9 +271,9 @@ fun WebView.initDisplayWebViewClientAndBridge(
         cidDictionary,
         messageUid,
         shouldLoadDistantResources,
-        onBlockedResourcesDetected,
-        navigateToNewMessageActivity,
-        onPageFinished,
+        callbacks.onBlockedResourcesDetected,
+        callbacks.navigateToNewMessageActivity,
+        callbacks.onPageFinished,
     ).also {
         webViewClient = it
     }
@@ -318,6 +314,14 @@ private fun List<Attachment>.toCidDictionary(): Map<String, Attachment> {
         }
     }
 }
+
+data class WebViewDisplayCallbacks(
+    val onBlockedResourcesDetected: () -> Unit,
+    val navigateToNewMessageActivity: ((Uri) -> Unit)?,
+    val onPageFinished: (() -> Unit)? = null,
+    val onWebViewFinishedLoading: () -> Unit,
+    val onMentionContactClicked: ((String, String?) -> Unit)? = null,
+)
 //endregion
 
 //region API
