@@ -24,7 +24,7 @@ import org.json.JSONArray
 class EditorJavascriptBridge(
     private val onInlineImagesDeletedCallback: (List<String>) -> Unit,
     private val onMentionQueryChangedCallback: (String) -> Unit,
-    private val onMentionsDeletedCallback: (List<String>) -> Unit,
+    private val onMentionsDeletedCallback: (Set<String>) -> Unit,
 ) {
     @JavascriptInterface
     fun onInlineImagesDeleted(cidJson: String) {
@@ -54,6 +54,7 @@ class EditorJavascriptBridge(
         val refs = (0 until jsonArray.length())
             .map { jsonArray.optString(it, null) }
             .filter { it != null && it.isNotBlank() }
+            .toSet()
         onMentionsDeletedCallback(refs)
     }
 
