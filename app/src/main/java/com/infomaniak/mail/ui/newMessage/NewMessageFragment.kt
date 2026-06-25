@@ -194,6 +194,7 @@ class NewMessageFragment : Fragment() {
             isForRecipients = false,
         )
     }
+
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
 
     @Inject
@@ -545,10 +546,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onMentionContactClicked(contact: ContactAutocompletable) {
-        val merged = when (contact) {
-            is MergedContact -> contact
-            else -> null
-        } ?: return
+        val merged = contact as? MergedContact ?: return
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(

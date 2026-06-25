@@ -139,7 +139,6 @@ class Message : RealmObject, Snoozable {
     var _emojiReactionNotAllowedReason: String? = null
         @InternalModelProperties
         set
-    @SerialName("mentions")
     var mentions = realmListOf<String>()
     //endregion
 
