@@ -556,7 +556,7 @@ class NewMessageFragment : Fragment() {
 
         binding.toField.apply {
             addRecipient(merged.email, merged.name)
-            updateCollapsedChipValues(true)
+            updateCollapsedChipValues(isCollapsed)
         }
 
         newMessageViewModel.addMention(merged.email)

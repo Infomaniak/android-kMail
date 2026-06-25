@@ -73,6 +73,9 @@ class RecipientFieldView @JvmOverloads constructor(
     private var contactAdapter: ContactAdapter
     private var contactChipAdapter: ContactChipAdapter
 
+    val isCollapsed: Boolean
+        get() = isSelfCollapsed
+
     override var isEncryptionActivated: Boolean = false
         set(value) {
             field = value
