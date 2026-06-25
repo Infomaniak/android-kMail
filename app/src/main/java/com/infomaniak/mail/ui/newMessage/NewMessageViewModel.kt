@@ -1221,9 +1221,9 @@ class NewMessageViewModel @Inject constructor(
         _currentMentions.update { it + email }
     }
 
-    fun removeMentions(emails: List<String>) {
+    fun removeMentions(emails: Set<String>) {
         trackNewMessageEvent(MatomoName.RemoveMention)
-        _currentMentions.update { it - emails.toSet() }
+        _currentMentions.update { it - emails }
     }
 
     enum class ImportationResult {
