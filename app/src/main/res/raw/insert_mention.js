@@ -41,10 +41,10 @@ function insertMention(userMail, userName) {
     const block = getBlockParent(caretRange.startContainer);
 
     const preRange = caretRange.cloneRange();
-    try {
+    if (block && block.nodeType === Node.ELEMENT_NODE) {
         preRange.setStart(block, 0);
-    } catch (e) {
-        preRange.selectNodeContents(editor);
+    } else {
+        preRange.selectNodeContents(getEditor());
     }
     preRange.setEnd(caretRange.endContainer, caretRange.endOffset);
 
