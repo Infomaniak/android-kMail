@@ -86,7 +86,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.DraftSendOptionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.newMessage.sendOptions.DraftSendOptionsFragmentArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -1046,7 +1046,7 @@ class NewMessageFragment : Fragment() {
         val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
             resId = R.id.sendOptionsBottomSheetDialog,
-            args = DraftSendOptionsBottomSheetDialogArgs(
+            args = DraftSendOptionsFragmentArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
