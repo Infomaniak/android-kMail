@@ -256,6 +256,7 @@
     <string name="deleteAccountWarning">Usunięcie konta będzie ostateczne. Nie będziesz mógł/ mogła ponownie aktywować konta.</string>
     <string name="deleteFolderDialogDescription">Zawartość folderu %s zostanie trwale usunięta bez przenoszenia do kosza.</string>
     <string name="deleteFolderDialogTitle">Usuń folder</string>
+    <string name="descriptionReminderRecipientsAndMe">Tylko wewnątrz organizacji</string>
     <string name="disabledFeatureFlagDescription">Wkrótce będziesz mógł/ mogła odblokować limity swojego adresu e-mail ik.me\n(limit przechowywania, niestandardowy harmonogram, wysyłanie i więcej…)</string>
     <string name="disabledFeatureFlagTitle">Potrzebujesz więcej przestrzeni i funkcji?</string>
     <string name="displayMailIssueDescription">Aby rozwiązać problemy z wyświetlaniem, zaktualizuj aplikację Android System Webview.</string>
@@ -361,7 +362,6 @@
     <string name="errorUserAlreadySynchronized">Użytkownik jest już zsynchronizowany</string>
     <string name="euriaTranslateMessage">Euria tłumaczy twoją wiadomość…</string>
     <string name="expeditorAuthenticationDescription">Pochodzenie tego nadawcy zostało uwierzytelnione.</string>
-    <string name="explanationActionCallIfNoResponse">Odbiorcy w Twojej organizacji zobaczą, że oczekuje się odpowiedzi.</string>
     <string name="externalDialogConfirmButton">Rozumiem</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Nadawca %s nie jest częścią Twojej organizacji ani Twoich kontaktów. Zachowaj ostrożność, jeśli udostępniasz poufne informacje.</item>
@@ -528,6 +528,7 @@
     <string name="reminderFollowUpButton">Przypomnij</string>
     <string name="reminderFollowUpPlaceholderText">Cześć,\nCzy możliwe jest uzyskanie informacji zwrotnej na ten temat?\nZ góry dziękuję.</string>
     <string name="reminderNoResponseHeaderTitle">Przypomnienie: brak odpowiedzi od %1$s na ten e-mail od %2$s</string>
+    <string name="reminderVisibilityTitle">Widoczność przypomnienia</string>
     <string name="renameFolder">Zmień nazwę folderu</string>
     <string name="reportDisplayProblemDescription">Czy wyrażasz zgodę na udostępnienie swoich danych naszym deweloperom, aby mogli Ci pomóc w rozwiązaniu problemu?</string>
     <string name="reportDisplayProblemTitle">Zgłoś problem z wyświetlaniem</string>
@@ -564,6 +565,9 @@
     <string name="selectDateDialogTitle">Wybierz datę</string>
     <string name="selectSignatureNone">Brak podpisu</string>
     <string name="selectTimeDialogTitle">Wybierz godzinę</string>
+    <string name="selectionReminderMeOnly">Tylko ja</string>
+    <string name="selectionReminderRecipientsAndMe">Odbiorcy i ja</string>
+    <string name="selectionReminderTitle">Wybierz, kto może zobaczyć przypomnienie</string>
     <string name="send">Wyślij</string>
     <string name="sendConfirmationAction">Wyślij potwierdzenie</string>
     <string name="sendOptions">Opcje wysyłania</string>

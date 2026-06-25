@@ -19,6 +19,7 @@
 package com.infomaniak.mail.ui.newMessage.sendOptions
 
 import android.os.Bundle
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -104,7 +105,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
         setupToolbar()
         setupScheduleOptions()
-        hasLastScheduleOption = lastScheduleOption.isVisible
+        hasLastScheduleOption = lastSelectedEpoch != null
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
 
         setReminderOptionsVisible(isVisible = false)
@@ -175,7 +176,9 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         }
 
         val paddingStartValue = resources.getDimensionPixelSize(R.dimen.emptyStatePadding)
-        (scheduleOptions.children + customScheduleOption).forEach { view -> view.applyContentPaddingStart(paddingStartValue) }
+        (scheduleOptions.children + reminderVisibility + customScheduleOption).forEach { view ->
+            view.applyContentPaddingStart(paddingStartValue)
+        }
     }
 
     private fun setupReminderOptions() = with(binding) {
@@ -222,9 +225,11 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         else -> TrailingContent.Chevron
     }
 
-    private fun setReminderOptionsVisible(isVisible: Boolean) = with(binding) {
-        optionsDelays.isVisible = isVisible
-        customDelayReminder.isVisible = isVisible
+    private fun setReminderOptionsVisible(isVisible: Boolean) {
+        TransitionManager.beginDelayedTransition(binding.reminderOptionsWrapper.parent as ViewGroup)
+        binding.dividerTopReminderOptions.isVisible = isVisible
+        binding.reminderVisibility.isVisible = isVisible
+        binding.reminderOptionsWrapper.isVisible = isVisible
     }
 
     private fun removeReminderOptionsSelection() = with(binding) {
@@ -243,9 +248,10 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
     }
 
     private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
+        TransitionManager.beginDelayedTransition(scheduleOptionsWrapper.parent as ViewGroup)
+        dividerTopScheduleOptions.isVisible = isVisible
         lastScheduleOption.isVisible = isVisible && hasLastScheduleOption
-        scheduleOptions.isVisible = isVisible
-        customScheduleOption.isVisible = isVisible
+        scheduleOptionsWrapper.isVisible = isVisible
     }
 
     private fun restoreStateFromViewModel() {

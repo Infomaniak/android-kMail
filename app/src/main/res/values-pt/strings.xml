@@ -250,6 +250,7 @@
     <string name="deleteAccountWarning">A eliminação da sua conta será definitiva. Não poderá reativar a sua conta.</string>
     <string name="deleteFolderDialogDescription">O conteúdo da pasta %s será eliminado permanentemente sem passar pelo lixo.</string>
     <string name="deleteFolderDialogTitle">Eliminar pasta</string>
+    <string name="descriptionReminderRecipientsAndMe">Apenas dentro da organização</string>
     <string name="disabledFeatureFlagDescription">Em breve poderá desbloquear os limites do seu endereço de e-mail ik.me\n(limite de armazenamento, horário personalizado, envio e muito mais…)</string>
     <string name="disabledFeatureFlagTitle">Precisa de mais armazenamento e funcionalidades?</string>
     <string name="displayMailIssueDescription">Para corrigir os problemas de exibição, atualize a aplicação Android System Webview.</string>
@@ -353,7 +354,6 @@
     <string name="errorUserAlreadySynchronized">O utilizador já está sincronizado</string>
     <string name="euriaTranslateMessage">Euria traduz a sua mensagem…</string>
     <string name="expeditorAuthenticationDescription">A origem deste remetente foi autenticada.</string>
-    <string name="explanationActionCallIfNoResponse">Os destinatários da tua organização verão que se espera uma resposta.</string>
     <string name="externalDialogConfirmButton">Compreendo</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">O remetente %s não faz parte da sua organização nem dos seus contactos. Seja prudente se partilhar informações sensíveis.</item>
@@ -502,6 +502,7 @@
     <string name="reminderFollowUpButton">Relançar</string>
     <string name="reminderFollowUpPlaceholderText">Olá,\nÉ possível obter algum feedback sobre este assunto?\nObrigado desde já.</string>
     <string name="reminderNoResponseHeaderTitle">Lembrete: nenhuma resposta de %1$s a este email desde %2$s</string>
+    <string name="reminderVisibilityTitle">Visibilidade do lembrete</string>
     <string name="renameFolder">Renomear pasta</string>
     <string name="reportDisplayProblemDescription">Aceita partilhar os seus dados com os nossos programadores para que o ajudem com o seu problema?</string>
     <string name="reportDisplayProblemTitle">Reportar um problema de exibição</string>
@@ -534,6 +535,9 @@
     <string name="selectDateDialogTitle">Selecionar data</string>
     <string name="selectSignatureNone">Sem assinatura</string>
     <string name="selectTimeDialogTitle">Selecionar hora</string>
+    <string name="selectionReminderMeOnly">Só eu</string>
+    <string name="selectionReminderRecipientsAndMe">Os destinatários e eu</string>
+    <string name="selectionReminderTitle">Escolher quem pode ver o lembrete</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar a confirmação</string>
     <string name="sendOptions">Opções de envio</string>

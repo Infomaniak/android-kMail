@@ -250,6 +250,7 @@
     <string name="deleteAccountWarning">La eliminación de su cuenta será definitiva. No podrá reactivar su cuenta.</string>
     <string name="deleteFolderDialogDescription">El contenido de la carpeta %s se borrará definitivamente sin pasar por la papelera.</string>
     <string name="deleteFolderDialogTitle">Eliminar la carpeta</string>
+    <string name="descriptionReminderRecipientsAndMe">Solo dentro de la organización</string>
     <string name="disabledFeatureFlagDescription">Pronto podrás desbloquear los límites de tu dirección de correo electrónico ik.me\n(límite de almacenamiento, programación personalizada, envío y más…)</string>
     <string name="disabledFeatureFlagTitle">¿Necesita más almacenamiento y funciones?</string>
     <string name="displayMailIssueDescription">Para solucionar los problemas de visualización, actualice la aplicación Android System Webview.</string>
@@ -353,7 +354,6 @@
     <string name="errorUserAlreadySynchronized">El usuario ya está sincronizado</string>
     <string name="euriaTranslateMessage">Euria traduce tu mensaje…</string>
     <string name="expeditorAuthenticationDescription">Se ha autentificado el origen del remitente.</string>
-    <string name="explanationActionCallIfNoResponse">Los destinatarios de tu organización verán que se espera una respuesta.</string>
     <string name="externalDialogConfirmButton">Comprendo</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">El remitente %s no forma parte de tu organización ni de tus contactos. Ten cuidado si compartes información sensible.</item>
@@ -502,6 +502,7 @@
     <string name="reminderFollowUpButton">Relanzar</string>
     <string name="reminderFollowUpPlaceholderText">Hola,\n¿Es posible obtener algún comentario sobre este tema?\nGracias de antemano.</string>
     <string name="reminderNoResponseHeaderTitle">Recordatorio: sin respuesta de %1$s a este correo electrónico desde el %2$s</string>
+    <string name="reminderVisibilityTitle">Visibilidad del recordatorio</string>
     <string name="renameFolder">Cambiar el nombre de la carpeta</string>
     <string name="reportDisplayProblemDescription">¿Aceptas compartir tus datos con nuestros desarrolladores para que puedan ayudarte con tu problema?</string>
     <string name="reportDisplayProblemTitle">Informar de un problema de visualización</string>
@@ -534,6 +535,9 @@
     <string name="selectDateDialogTitle">Seleccione la fecha</string>
     <string name="selectSignatureNone">Sin firma</string>
     <string name="selectTimeDialogTitle">Seleccionar la hora</string>
+    <string name="selectionReminderMeOnly">Solo yo</string>
+    <string name="selectionReminderRecipientsAndMe">Los destinatarios y yo</string>
+    <string name="selectionReminderTitle">Elegir quién puede ver el recordatorio</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar la confirmación</string>
     <string name="sendOptions">Opciones de envío</string>

@@ -250,6 +250,7 @@
     <string name="deleteAccountWarning">Die Löschung Ihres Kontos ist endgültig. Sie werden nicht in der Lage sein, Ihr Konto zu reaktivieren.</string>
     <string name="deleteFolderDialogDescription">Der Inhalt des Ordners %s wird dauerhaft gelöscht, ohne den Papierkorb zu durchlaufen.</string>
     <string name="deleteFolderDialogTitle">Löschen Sie den Ordner</string>
+    <string name="descriptionReminderRecipientsAndMe">Nur innerhalb der Organisation</string>
     <string name="disabledFeatureFlagDescription">In Kürze können Sie die Beschränkungen Ihrer ik.me-E-Mail-Adresse entsperren\n(Speicherlimit, benutzerdefinierter Zeitplan, Senden und mehr…)</string>
     <string name="disabledFeatureFlagTitle">Benötigen Sie mehr Speicherplatz und Funktionen?</string>
     <string name="displayMailIssueDescription">Um Anzeigeprobleme zu beheben, aktualisieren Sie bitte die Anwendung Android System Webview.</string>
@@ -353,7 +354,6 @@
     <string name="errorUserAlreadySynchronized">Benutzer ist bereits synchronisiert</string>
     <string name="euriaTranslateMessage">Euria übersetzt Ihre Nachricht…</string>
     <string name="expeditorAuthenticationDescription">Die Herkunft dieses Absenders wurde authentifiziert.</string>
-    <string name="explanationActionCallIfNoResponse">Empfänger in deiner Organisation werden sehen, dass eine Antwort erwartet wird.</string>
     <string name="externalDialogConfirmButton">Ich habe verstanden</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Der Absender %s gehört nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>
@@ -502,6 +502,7 @@
     <string name="reminderFollowUpButton">Nachfassen</string>
     <string name="reminderFollowUpPlaceholderText">Hallo,\nIst es möglich, ein Feedback zu diesem Thema zu erhalten?\nVielen Dank im Voraus.</string>
     <string name="reminderNoResponseHeaderTitle">Erinnerung: keine Antwort von %1$s auf diese E-Mail seit dem %2$s</string>
+    <string name="reminderVisibilityTitle">Sichtbarkeit der Erinnerung</string>
     <string name="renameFolder">Benennen Sie den Ordner um</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>
     <string name="reportDisplayProblemTitle">Ein Anzeigeproblem melden</string>
@@ -534,6 +535,9 @@
     <string name="selectDateDialogTitle">Datum auswählen</string>
     <string name="selectSignatureNone">Keine Unterschrift</string>
     <string name="selectTimeDialogTitle">Zeit auswählen</string>
+    <string name="selectionReminderMeOnly">Nur ich</string>
+    <string name="selectionReminderRecipientsAndMe">Empfänger und mich</string>
+    <string name="selectionReminderTitle">Wählen, wer die Erinnerung sehen kann</string>
     <string name="send">Senden Sie</string>
     <string name="sendConfirmationAction">Senden Sie die Bestätigung</string>
     <string name="sendOptions">Sendeoptionen</string>

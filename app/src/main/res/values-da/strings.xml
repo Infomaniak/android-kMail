@@ -250,6 +250,7 @@
     <string name="deleteAccountWarning">Sletningen af din konto vil være endelig. Du vil ikke kunne genaktivere din konto.</string>
     <string name="deleteFolderDialogDescription">Indholdet af mappen %s vil blive slettet permanent uden at gå gennem papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slet mappe</string>
+    <string name="descriptionReminderRecipientsAndMe">Kun inden for organisationen</string>
     <string name="disabledFeatureFlagDescription">Du vil snart kunne låse op for begrænsningerne på din ik.me e-mailadresse\n(lagringsgrænse, tilpasset tidsplan, afsendelse og mere…)</string>
     <string name="disabledFeatureFlagTitle">Behov for mere lagerplads og funktioner?</string>
     <string name="displayMailIssueDescription">For at rette visningsproblemer skal du opdatere Android System Webview-applikationen.</string>
@@ -353,7 +354,6 @@
     <string name="errorUserAlreadySynchronized">Brugeren er allerede synkroniseret</string>
     <string name="euriaTranslateMessage">Euria oversætter din besked…</string>
     <string name="expeditorAuthenticationDescription">Afsenderens oprindelse er blevet autentificeret.</string>
-    <string name="explanationActionCallIfNoResponse">Modtagere i din organisation vil se, at der forventes et svar.</string>
     <string name="externalDialogConfirmButton">Jeg forstår</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Afsenderen %s er ikke en del af din organisation eller dine kontakter. Vær forsigtig, hvis du deler følsomme oplysninger.</item>
@@ -502,6 +502,7 @@
     <string name="reminderFollowUpButton">Følg op</string>
     <string name="reminderFollowUpPlaceholderText">Hej,\nEr det muligt at få feedback om dette emne?\nPå forhånd tak.</string>
     <string name="reminderNoResponseHeaderTitle">Påmindelse: intet svar fra %1$s på denne e-mail siden %2$s</string>
+    <string name="reminderVisibilityTitle">Påmindelsens synlighed</string>
     <string name="renameFolder">Omdøb mappen</string>
     <string name="reportDisplayProblemDescription">Er du enig i at dele dine data med vores udviklere, så de kan hjælpe dig med dit problem?</string>
     <string name="reportDisplayProblemTitle">Rapportér et visningsproblem</string>
@@ -534,6 +535,9 @@
     <string name="selectDateDialogTitle">Vælg dato</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Vælg tidspunkt</string>
+    <string name="selectionReminderMeOnly">Kun mig</string>
+    <string name="selectionReminderRecipientsAndMe">Modtagere og mig</string>
+    <string name="selectionReminderTitle">Vælg hvem der kan se påmindelsen</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send bekræftelsen</string>
     <string name="sendOptions">Sendevalg</string>

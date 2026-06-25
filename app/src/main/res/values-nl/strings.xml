@@ -250,6 +250,7 @@
     <string name="deleteAccountWarning">Het verwijderen van uw account is definitief. U kunt uw account niet opnieuw activeren.</string>
     <string name="deleteFolderDialogDescription">De inhoud van de map %s wordt definitief verwijderd zonder via de prullenbak te gaan.</string>
     <string name="deleteFolderDialogTitle">Map verwijderen</string>
+    <string name="descriptionReminderRecipientsAndMe">Alleen binnen de organisatie</string>
     <string name="disabledFeatureFlagDescription">U kunt binnenkort de limieten van uw ik.me e-mailadres ontgrendelen\n(opslaglimiet, aangepast schema, verzenden en meer…)</string>
     <string name="disabledFeatureFlagTitle">Meer opslag en functies nodig?</string>
     <string name="displayMailIssueDescription">Om weergaveproblemen op te lossen, werkt u de Android System Webview-applicatie bij.</string>
@@ -353,7 +354,6 @@
     <string name="errorUserAlreadySynchronized">Gebruiker is al gesynchroniseerd</string>
     <string name="euriaTranslateMessage">Euria vertaalt uw bericht…</string>
     <string name="expeditorAuthenticationDescription">De herkomst van deze afzender is geauthenticeerd.</string>
-    <string name="explanationActionCallIfNoResponse">Ontvangers binnen je organisatie zullen zien dat er een reactie wordt verwacht.</string>
     <string name="externalDialogConfirmButton">Ik begrijp het</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">De afzender %s maakt geen deel uit van uw organisatie of uw contacten. Wees voorzichtig als u gevoelige informatie deelt.</item>
@@ -502,6 +502,7 @@
     <string name="reminderFollowUpButton">Opvolgen</string>
     <string name="reminderFollowUpPlaceholderText">Hallo,\nIs het mogelijk om feedback te krijgen over dit onderwerp?\nBij voorbaat dank.</string>
     <string name="reminderNoResponseHeaderTitle">Herinnering: geen reactie van %1$s op deze e-mail sinds %2$s</string>
+    <string name="reminderVisibilityTitle">Zichtbaarheid van de herinnering</string>
     <string name="renameFolder">De map hernoemen</string>
     <string name="reportDisplayProblemDescription">Gaat u akkoord om uw gegevens te delen met onze ontwikkelaars zodat zij u kunnen helpen met uw probleem?</string>
     <string name="reportDisplayProblemTitle">Een weergaveprobleem melden</string>
@@ -534,6 +535,9 @@
     <string name="selectDateDialogTitle">Datum selecteren</string>
     <string name="selectSignatureNone">Geen handtekening</string>
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
+    <string name="selectionReminderMeOnly">Alleen ik</string>
+    <string name="selectionReminderRecipientsAndMe">Ontvangers en mij</string>
+    <string name="selectionReminderTitle">Kies wie de herinnering kan zien</string>
     <string name="send">Verzenden</string>
     <string name="sendConfirmationAction">De bevestiging verzenden</string>
     <string name="sendOptions">Verzendopties</string>

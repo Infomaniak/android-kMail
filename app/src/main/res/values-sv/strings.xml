@@ -250,6 +250,7 @@
     <string name="deleteAccountWarning">Raderingen av ditt konto blir slutgiltig. Du kommer inte att kunna återaktivera ditt konto.</string>
     <string name="deleteFolderDialogDescription">Innehållet i mappen %s kommer att raderas permanent utan att gå via papperskorgen.</string>
     <string name="deleteFolderDialogTitle">Ta bort mapp</string>
+    <string name="descriptionReminderRecipientsAndMe">Endast inom organisationen</string>
     <string name="disabledFeatureFlagDescription">Du kommer snart att kunna låsa upp begränsningarna för din ik.me e-postadress\n(lagringsgräns, anpassat schema, sändning och mer…)</string>
     <string name="disabledFeatureFlagTitle">Behöver du mer lagring och funktioner?</string>
     <string name="displayMailIssueDescription">För att åtgärda visningsproblem, vänligen uppdatera appen Android System Webview.</string>
@@ -353,7 +354,6 @@
     <string name="errorUserAlreadySynchronized">Användaren är redan synkroniserad</string>
     <string name="euriaTranslateMessage">Euria översätter ditt meddelande…</string>
     <string name="expeditorAuthenticationDescription">Avsändarens ursprung har autentiserats.</string>
-    <string name="explanationActionCallIfNoResponse">Mottagare inom din organisation kommer att se att ett svar förväntas.</string>
     <string name="externalDialogConfirmButton">Jag förstår</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Avsändaren %s är inte en del av din organisation eller dina kontakter. Var försiktig om du delar känslig information.</item>
@@ -502,6 +502,7 @@
     <string name="reminderFollowUpButton">Uppföljning</string>
     <string name="reminderFollowUpPlaceholderText">Hej,\nÄr det möjligt att få feedback om detta ämne?\nTack på förhand.</string>
     <string name="reminderNoResponseHeaderTitle">Påminnelse: inget svar från %1$s på detta e-postmeddelande sedan %2$s</string>
+    <string name="reminderVisibilityTitle">Påminnelsens synlighet</string>
     <string name="renameFolder">Byt namn på mappen</string>
     <string name="reportDisplayProblemDescription">Samtycker du till att dela dina data med våra utvecklare så att de kan hjälpa dig med ditt problem?</string>
     <string name="reportDisplayProblemTitle">Rapportera ett visningsproblem</string>
@@ -534,6 +535,9 @@
     <string name="selectDateDialogTitle">Välj datum</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Välj tid</string>
+    <string name="selectionReminderMeOnly">Bara jag</string>
+    <string name="selectionReminderRecipientsAndMe">Mottagare och mig</string>
+    <string name="selectionReminderTitle">Välj vem som kan se påminnelsen</string>
     <string name="send">Skicka</string>
     <string name="sendConfirmationAction">Skicka bekräftelsen</string>
     <string name="sendOptions">Skicka-alternativ</string>
