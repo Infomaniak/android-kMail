@@ -54,9 +54,7 @@ class MessageDisplayJavascriptBridge(
 
     @JavascriptInterface
     fun openMentionContact(email: String, displayName: String?) {
-        if (email.isBlank() || email.length > MAX_MENTION_EMAIL_LENGTH || !email.isEmail()) return
-        if (displayName != null && displayName.length > MAX_MENTION_DISPLAY_NAME_LENGTH) return
-
+        if (email.isBlank() || !email.isEmail()) return
         mainHandler.post { onMentionContactClicked?.invoke(email, displayName) }
     }
 
@@ -69,10 +67,5 @@ class MessageDisplayJavascriptBridge(
             correctErrorStack = correctErrorStack.replace(match.groupValues[0], "about:blank:$newLineNumber:")
         }
         return correctErrorStack
-    }
-
-    private companion object {
-        const val MAX_MENTION_EMAIL_LENGTH = 254
-        const val MAX_MENTION_DISPLAY_NAME_LENGTH = 256
     }
 }
