@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.infomaniak.mail.ui.bottomSheetDialogs
+package com.infomaniak.mail.ui.newMessage.sendOptions
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,15 +25,19 @@ import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.BottomSheetSendOptionsBinding
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
+import com.infomaniak.mail.ui.bottomSheetDialogs.BaseSchedulePickerBottomSheet
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
@@ -56,12 +60,11 @@ import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePickerBottomSheet() {
+class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
-    private var binding: BottomSheetSendOptionsBinding by safeBinding()
+    private var binding: FragmentSendOptionsBinding by safeBinding()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
-
-    private val navigationArgs: DraftSendOptionsBottomSheetDialogArgs by navArgs()
+    private val navigationArgs: DraftSendOptionsFragmentArgs by navArgs()
 
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
@@ -69,30 +72,37 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     @Inject
     lateinit var customReminderPickerDialog: CustomReminderPickerDialog
 
-    override val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
-    // Navigation args does not support nullable primitive types, so we use 0L
-    // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
+    private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
+    private var pendingReminderConfig: ReminderConfig = ReminderConfig.None
+    private var pendingLastSelectedScheduleEpochMillis: Long? = null
+    private var hasLastScheduleOption = false
+
+    override val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
     override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
-    override val currentlyScheduledEpochMillis: Long? by lazy { navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L } }
+    override val currentlyScheduledEpochMillis: Long? by lazy {
+        navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L }
+    }
 
     override val lastScheduleOption get() = binding.lastScheduleOption
     override val scheduleOptionsContainer get() = binding.scheduleOptions
     override val customScheduleOption get() = binding.customScheduleOption
 
-    private var hasLastScheduleOption = false
-
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return BottomSheetSendOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentSendOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
         customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
+        pendingLastSelectedScheduleEpochMillis = lastSelectedEpoch
+
+        setupToolbar()
         setupScheduleOptions()
         hasLastScheduleOption = lastScheduleOption.isVisible
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
@@ -105,6 +115,39 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         setupReminderOptions()
 
         restoreStateFromViewModel()
+
+        saveButton.setOnClickListener { saveOptions() }
+    }
+
+    override fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
+        return SettingRadioButtonView(requireContext()).apply {
+            id = View.generateViewId()
+            associatedValue = scheduleOption.date().time.toString()
+            setText(getString(scheduleOption.titleRes))
+            setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
+        }
+    }
+
+    override fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
+
+    override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+        binding.customScheduleOption.trailingContent = trailingContentFor(kSuite)
+    }
+
+    override fun onLastScheduleOptionClicked() {
+        pendingScheduleConfig = lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None
+        pendingLastSelectedScheduleEpochMillis = null
+    }
+
+    override fun onScheduleOptionClicked(dateItem: ScheduleOption) {
+        pendingScheduleConfig = ScheduleConfig.Scheduled(dateItem.date().time)
+        pendingLastSelectedScheduleEpochMillis = null
+    }
+
+    override fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
+
+    private fun setupToolbar() = with(binding.toolbar) {
+        setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
     private fun setupToggles() = with(binding) {
@@ -125,10 +168,10 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     private fun setupScheduleSelection() = with(binding) {
         scheduleOptions.onItemCheckedListener { _, value, _ ->
             val epoch = value?.toLongOrNull()
-            newMessageViewModel.scheduleConfig.value =
-                if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None
-            binding.customScheduleOption.setCheckMark(displayCheckMark = false)
-            binding.customScheduleOption.removeSubtitle()
+            pendingScheduleConfig = if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None
+            pendingLastSelectedScheduleEpochMillis = null
+            customScheduleOption.setCheckMark(displayCheckMark = false)
+            customScheduleOption.removeSubtitle()
         }
 
         val paddingStartValue = resources.getDimensionPixelSize(R.dimen.emptyStatePadding)
@@ -137,8 +180,20 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
 
     private fun setupReminderOptions() = with(binding) {
         hours24.setText(resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, HOURS_24.hours, HOURS_24.hours))
-        days3.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, DAYS_3.hours / HOURS_IN_A_DAY, DAYS_3.hours / HOURS_IN_A_DAY))
-        days7.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, DAYS_7.hours / HOURS_IN_A_DAY, DAYS_7.hours / HOURS_IN_A_DAY))
+        days3.setText(
+            resources.getQuantityString(
+                R.plurals.daysBeforeSendingReminder,
+                DAYS_3.hours / HOURS_IN_A_DAY,
+                DAYS_3.hours / HOURS_IN_A_DAY
+            )
+        )
+        days7.setText(
+            resources.getQuantityString(
+                R.plurals.daysBeforeSendingReminder,
+                DAYS_7.hours / HOURS_IN_A_DAY,
+                DAYS_7.hours / HOURS_IN_A_DAY
+            )
+        )
 
         customDelayReminder.trailingContent = trailingContentFor(currentKSuite)
 
@@ -153,7 +208,7 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
                 DAYS_7.hours -> DAYS_7
                 else -> null
             }
-            newMessageViewModel.reminderConfig.value = delay?.let { ReminderConfig.Preset(it) } ?: ReminderConfig.None
+            pendingReminderConfig = delay?.let { ReminderConfig.Preset(it) } ?: ReminderConfig.None
             customDelayReminder.setCheckMark(displayCheckMark = false)
             customDelayReminder.removeSubtitle()
         }
@@ -161,27 +216,11 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         customDelayReminder.setOnClickListener { onCustomDelayReminderClicked() }
     }
 
-    override fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
-        return SettingRadioButtonView(requireContext()).apply {
-            id = View.generateViewId()
-            associatedValue = scheduleOption.date().time.toString()
-            setText(getString(scheduleOption.titleRes))
-            setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
-        }
-    }
-
-    override fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
-
-    override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
-        binding.customScheduleOption.trailingContent = trailingContentFor(kSuite)
-    }
-
     private fun trailingContentFor(kSuite: KSuite?): TrailingContent = when (kSuite) {
         KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
         KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
         else -> TrailingContent.Chevron
     }
-
 
     private fun setReminderOptionsVisible(isVisible: Boolean) = with(binding) {
         optionsDelays.isVisible = isVisible
@@ -192,14 +231,15 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         optionsDelays.clearCheck()
         customDelayReminder.setCheckMark(displayCheckMark = false)
         customDelayReminder.removeSubtitle()
-        newMessageViewModel.reminderConfig.value = ReminderConfig.None
+        pendingReminderConfig = ReminderConfig.None
     }
 
     private fun removeScheduleOptionsSelection() = with(binding) {
         scheduleOptions.clearCheck()
         customScheduleOption.setCheckMark(displayCheckMark = false)
         customScheduleOption.removeSubtitle()
-        newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+        pendingScheduleConfig = ScheduleConfig.None
+        pendingLastSelectedScheduleEpochMillis = null
     }
 
     private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
@@ -217,22 +257,18 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         val savedSchedule = newMessageViewModel.scheduleConfig.value as? ScheduleConfig.Scheduled ?: return@with
         val epoch = savedSchedule.epochMillis
 
+        pendingScheduleConfig = savedSchedule
         scheduleSending.isChecked = true
         setScheduleOptionsVisible(isVisible = true)
 
         val scheduleStr = epoch.toString()
-
         val matchedOption = scheduleOptions.children
             .filterIsInstance<SettingRadioButtonView>()
             .firstOrNull { it.associatedValue == scheduleStr }
 
         when {
-            matchedOption != null -> {
-                scheduleOptions.check(matchedOption.id)
-            }
-            hasLastScheduleOption && lastScheduleOption.associatedValue == scheduleStr -> {
-                scheduleOptions.check(lastScheduleOption.id)
-            }
+            matchedOption != null -> scheduleOptions.check(matchedOption.id)
+            hasLastScheduleOption && lastScheduleOption.associatedValue == scheduleStr -> scheduleOptions.check(lastScheduleOption.id)
             else -> {
                 customScheduleOption.setSubtitle(requireContext().dayOfWeekDateWithoutYear(Date(epoch)))
                 customScheduleOption.setCheckMark(displayCheckMark = true)
@@ -241,9 +277,10 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
     }
 
     private fun restoreReminderState() = with(binding) {
-        val savedReminder = newMessageViewModel.reminderConfig.value
+        val savedReminder = newMessageViewModel.reminderConfig.value ?: ReminderConfig.None
         if (savedReminder is ReminderConfig.None) return@with
 
+        pendingReminderConfig = savedReminder
         reminderIfNoAnswer.isChecked = true
         setReminderOptionsVisible(isVisible = true)
 
@@ -264,12 +301,6 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         }
     }
 
-    override fun onLastScheduleOptionClicked() = Unit
-
-    override fun onScheduleOptionClicked(dateItem: ScheduleOption) = Unit
-
-    override fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
-
     private fun onCustomDelayReminderClicked() = executeIfAuthorized { showCustomDelayReminderDatePicker() }
 
     private fun executeIfAuthorized(onAuthorized: () -> Unit) {
@@ -288,7 +319,8 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         dateAndTimeScheduleDialog.show(
             onDateSelected = { timestamp ->
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
-                newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(timestamp)
+                pendingScheduleConfig = ScheduleConfig.Scheduled(timestamp)
+                pendingLastSelectedScheduleEpochMillis = timestamp
                 applyCustomDateSelectionUi(timestamp, binding.customScheduleOption, binding.scheduleOptions)
             },
         )
@@ -298,7 +330,7 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         customReminderPickerDialog.show(
             onDelaySelected = { delayMillis ->
                 trackScheduleSendEvent(MatomoName.CustomReminder)
-                newMessageViewModel.reminderConfig.value = ReminderConfig.Custom(delayMillis)
+                pendingReminderConfig = ReminderConfig.Custom(delayMillis)
                 binding.customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMillis))
                 binding.customDelayReminder.setCheckMark(displayCheckMark = true)
                 binding.optionsDelays.clearCheck()
@@ -316,5 +348,16 @@ class DraftSendOptionsBottomSheetDialog @Inject constructor() : BaseSchedulePick
         optionView.setSubtitle(formattedDate)
         optionView.setCheckMark(displayCheckMark = true)
         groupView.clearCheck()
+    }
+
+    private fun saveOptions() {
+        newMessageViewModel.scheduleConfig.value = pendingScheduleConfig
+        newMessageViewModel.reminderConfig.value = pendingReminderConfig
+
+        if (pendingScheduleConfig is ScheduleConfig.Scheduled) {
+            pendingLastSelectedScheduleEpochMillis?.let { localSettings.lastSelectedScheduleEpochMillis = it }
+        }
+
+        findNavController().popBackStack()
     }
 }
