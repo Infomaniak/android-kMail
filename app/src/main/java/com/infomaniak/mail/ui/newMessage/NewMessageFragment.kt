@@ -552,7 +552,11 @@ class NewMessageFragment : Fragment() {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(
                 JsExecutableMethod("insertMention", merged.email, merged.name),
             )
-            binding.toField.addRecipient(merged.email, merged.name)
+        }
+
+        binding.toField.apply {
+            addRecipient(merged.email, merged.name)
+            updateCollapsedChipValues(true)
         }
 
         newMessageViewModel.addMention(merged.email)

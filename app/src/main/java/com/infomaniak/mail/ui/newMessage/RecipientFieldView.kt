@@ -325,7 +325,7 @@ class RecipientFieldView @JvmOverloads constructor(
         chipsRecyclerView.isGone = isCollapsed || contactChipAdapter.isEmpty()
     }
 
-    private fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
+    fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
         val isTextInputAccessible = !isCollapsed || contactChipAdapter.isEmpty()
 
         singleChip.root.apply {
