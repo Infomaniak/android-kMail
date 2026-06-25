@@ -20,8 +20,7 @@ function observeEditorMentionClicks() {
     if (document.kmailEditorMentionClickObserved) return;
     document.kmailEditorMentionClickObserved = true;
 
-    const closestMention = (node) =>
-        node instanceof Element ? node.closest("a[data-ik-mention-ref]") : null;
+    const closestMention = (node) => node instanceof Element ? node.closest("a[data-ik-mention-ref]") : null;
 
     // Tapping a mention must not blur the editor, otherwise the Android keyboard (IME) closes.
     // Preventing the default on the pointer-down event stops the WebView from moving the

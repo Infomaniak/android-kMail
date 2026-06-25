@@ -219,19 +219,18 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getMessageDisplayStyle(): String = loadCss(R.raw.message_display_style)
 
-        fun Context.getMentionsStyle(aliases: List<String>): String {
-            if (aliases.isEmpty()) return ""
-            val selectors = aliases.joinToString(", ") { alias ->
-                val escapedAlias = alias.replace("\\", "\\\\").replace("'", "\\'")
-                "a[$MENTION_ATTR='$escapedAlias']"
-            }
-            return loadMentionsStyleTemplate().format(selectors)
-        }
-
         fun Context.getCustomEditorStyle(): String = loadCss(
             R.raw.editor_style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
+
+        fun Context.getMentionsStyle(aliases: List<String>): String {
+            if (aliases.isEmpty()) return ""
+            val selectors = aliases.joinToString(", ") { alias ->
+                "a[$MENTION_ATTR='$alias']"
+            }
+            return loadMentionsStyleTemplate().format(selectors)
+        }
 
         private fun Context.loadMentionsStyleTemplate(): String = loadCss(
             R.raw.mentions_style,
@@ -272,10 +271,6 @@ class HtmlFormatter(private val html: String) {
             return loadScript(R.raw.message_display_javascript_bridge)
         }
 
-        fun Context.getMentionClickObserverScript(): String {
-            return loadScript(R.raw.message_display_mention_click_observer)
-        }
-
         fun Context.getEditorJsBridgeScript(): String {
             return loadScript(R.raw.editor_javascript_bridge)
         }
@@ -286,6 +281,10 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getSetAiContentScript(): String {
             return loadScript(R.raw.set_ai_content_script)
+        }
+
+        fun Context.getMentionClickObserverScript(): String {
+            return loadScript(R.raw.message_display_mention_click_observer)
         }
 
         fun Context.getInsertMentionScript(): String {
