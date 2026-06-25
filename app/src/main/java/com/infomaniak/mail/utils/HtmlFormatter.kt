@@ -219,14 +219,6 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getMessageDisplayStyle(): String = loadCss(R.raw.message_display_style)
 
-        fun Context.getCustomStyle(): String = loadCss(
-            R.raw.style,
-            listOf(
-                PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
-                PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
-            ),
-        )
-
         fun Context.getMentionsStyle(aliases: List<String>): String {
             if (aliases.isEmpty()) return ""
             val selectors = aliases.joinToString(", ") { alias ->
@@ -247,6 +239,14 @@ class HtmlFormatter(private val html: String) {
                 PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
                 PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
             )
+        )
+
+        fun Context.getCustomStyle(): String = loadCss(
+            R.raw.style,
+            listOf(
+                PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
+                PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+            ),
         )
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)

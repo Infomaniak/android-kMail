@@ -139,7 +139,6 @@ class Message : RealmObject, Snoozable {
     var _emojiReactionNotAllowedReason: String? = null
         @InternalModelProperties
         set
-    @SerialName("mentions")
     var mentions = realmListOf<String>()
     //endregion
 
@@ -297,7 +296,8 @@ class Message : RealmObject, Snoozable {
 
     fun hasUnreadContent() = !isSeen || emojiReactions.any { !it.isSeen }
 
-    fun shouldBeExpanded(index: Int, lastIndex: Int) = (!isDraft || isScheduledMessage) && (hasUnreadContent() || index == lastIndex)
+    fun shouldBeExpanded(index: Int, lastIndex: Int) =
+        (!isDraft || isScheduledMessage) && (hasUnreadContent() || index == lastIndex)
 
     fun toThread() = Thread().apply {
         uid = this@Message.uid

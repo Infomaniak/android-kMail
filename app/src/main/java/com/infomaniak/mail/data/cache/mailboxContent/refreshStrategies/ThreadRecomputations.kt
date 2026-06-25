@@ -83,7 +83,7 @@ object ThreadRecomputations {
         isAnswered = false
         isForwarded = false
         hasAttachable = false
-        hasMentions = false
+        hasUnseenMentions = false
         numberOfScheduledDrafts = 0
         snoozeState = null
         snoozeEndDate = null
@@ -92,13 +92,10 @@ object ThreadRecomputations {
     }
 
     private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
-        if (hasMentions || message.mentions.isEmpty()) return
+        if (hasUnseenMentions || message.mentions.isEmpty()) return
 
-        val amIMentioned = message.mentions.any { mention ->
-            normalizedAliases.contains(mention.lowercase())
-        }
-
-        hasMentions = amIMentioned && !message.isSeen
+        val amIMentioned = message.mentions.any { mention -> normalizedAliases.contains(mention.lowercase()) }
+        hasUnseenMentions = amIMentioned && !message.isSeen
     }
 
     private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
@@ -136,7 +133,6 @@ object ThreadRecomputations {
         to += message.to
         if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
         if (message.isFavorite) isFavorite = true
-
         if (message.isAnswered) {
             isAnswered = true
             isForwarded = false
@@ -145,13 +141,9 @@ object ThreadRecomputations {
             isForwarded = true
             isAnswered = false
         }
-
         if (message.hasAttachable) hasAttachable = true
-
-        updateMentionsState(message, normalizedAliases)
-
         if (message.isScheduledDraft) numberOfScheduledDrafts++
-
+        updateMentionsState(message, normalizedAliases)
         updateSnoozeStatesBasedOn(message)
     }
 

@@ -52,8 +52,6 @@ class Draft : RealmObject {
     var to = realmListOf<Recipient>()
     var cc = realmListOf<Recipient>()
     var bcc = realmListOf<Recipient>()
-
-    @SerialName("mentions")
     var mentions = realmListOf<String>()
 
     var subject: String? = null
