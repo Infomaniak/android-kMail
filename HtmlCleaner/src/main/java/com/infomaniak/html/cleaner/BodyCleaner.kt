@@ -17,7 +17,8 @@
  */
 
 /**
- * This file comes from https://github.com/thunderbird/thunderbird-android/blob/main/library/html-cleaner/src/main/kotlin/app/k9mail/html/cleaner/BodyCleaner.kt
+ * This file comes from
+ * https://github.com/thunderbird/thunderbird-android/blob/main/library/html-cleaner/src/main/kotlin/app/k9mail/html/cleaner/BodyCleaner.kt
  */
 package com.infomaniak.html.cleaner
 

@@ -45,7 +45,7 @@ const getTextBeforeCaret = () => {
     const block = getBlockParent(range.startContainer);
     const preRange = range.cloneRange();
     
-   if (block && block.nodeType === Node.ELEMENT_NODE) {
+   if (block?.nodeType === Node.ELEMENT_NODE) {
        preRange.setStart(block, 0);
    } else {
        preRange.selectNodeContents(getEditor());
