@@ -219,6 +219,14 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getMessageDisplayStyle(): String = loadCss(R.raw.message_display_style)
 
+        fun Context.getCustomStyle(): String = loadCss(
+            R.raw.style,
+            listOf(
+                PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
+                PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+            ),
+        )
+        
         fun Context.getCustomEditorStyle(): String = loadCss(
             R.raw.editor_style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
@@ -240,14 +248,6 @@ class HtmlFormatter(private val html: String) {
             )
         )
 
-        fun Context.getCustomStyle(): String = loadCss(
-            R.raw.style,
-            listOf(
-                PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
-                PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
-            ),
-        )
-
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
         fun Context.getResizeScript(): String = loadScript(
@@ -258,7 +258,7 @@ class HtmlFormatter(private val html: String) {
         fun Context.getIncludeQuotesScript(): String = loadScript(R.raw.include_quotes_script)
 
         fun Context.getDeletedInlineImagesObserverScript(): String = loadScript(R.raw.deleted_inline_images_observer)
-        
+
         fun Context.getReplaceSignatureScript(): String = loadScript(R.raw.replace_signature_script)
 
         fun Context.getFixStyleScript(): String {
