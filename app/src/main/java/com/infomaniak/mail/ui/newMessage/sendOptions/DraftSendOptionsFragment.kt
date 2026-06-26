@@ -82,6 +82,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
     private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
     private var pendingReminderConfig: ReminderConfig = ReminderConfig.None
+    private var pendingReminderVisibility: Boolean = true
     private var pendingLastSelectedScheduleEpochMillis: Long? = null
     private var hasLastScheduleOption = false
 
@@ -115,6 +116,9 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
         setReminderOptionsVisible(isVisible = false)
         setScheduleOptionsVisible(isVisible = false)
+
+        pendingReminderVisibility = newMessageViewModel.reminderVisibility.value ?: true
+        updateReminderVisibilitySubtitle()
 
         setupToggles()
         setupScheduleSelection()
@@ -160,12 +164,16 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         reminderIfNoAnswer.setOnClickListener {
             if (!reminderIfNoAnswer.isChecked) {
                 removeReminderOptionsSelection()
+            } else {
+                defaultReminderSelection()
             }
             setReminderOptionsVisible(isVisible = reminderIfNoAnswer.isChecked)
         }
         scheduleSending.setOnClickListener {
             if (!scheduleSending.isChecked) {
                 removeScheduleOptionsSelection()
+            } else {
+                defaultScheduleSelection()
             }
             setScheduleOptionsVisible(isVisible = scheduleSending.isChecked)
         }
@@ -238,11 +246,35 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         binding.reminderOptionsWrapper.isVisible = isVisible
     }
 
-    private fun removeReminderOptionsSelection() = with(binding) {
-        optionsDelays.clearCheck()
-        customDelayReminder.setCheckMark(displayCheckMark = false)
-        customDelayReminder.removeSubtitle()
+    private fun removeReminderOptionsSelection() {
+        binding.optionsDelays.clearCheck()
+        binding.customDelayReminder.setCheckMark(displayCheckMark = false)
+        binding.customDelayReminder.removeSubtitle()
         pendingReminderConfig = ReminderConfig.None
+        pendingReminderVisibility = true
+        updateReminderVisibilitySubtitle()
+    }
+
+    private fun defaultReminderSelection() = with(binding) {
+        optionsDelays.check(R.id.hours24)
+        pendingReminderConfig = ReminderConfig.Preset(HOURS_24)
+        pendingReminderVisibility = true
+        updateReminderVisibilitySubtitle()
+    }
+
+    private fun defaultScheduleSelection() = with(binding) {
+        val firstVisibleOption = scheduleOptions.children
+            .filterIsInstance<SettingRadioButtonView>()
+            .firstOrNull { it.id != R.id.lastScheduleOption }
+
+        firstVisibleOption?.let { option ->
+            val epoch = option.associatedValue?.toLongOrNull()
+            if (epoch != null) {
+                scheduleOptions.check(option.id)
+                pendingScheduleConfig = ScheduleConfig.Scheduled(epoch)
+                pendingLastSelectedScheduleEpochMillis = null
+            }
+        }
     }
 
     private fun removeScheduleOptionsSelection() = with(binding) {
@@ -293,8 +325,10 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         if (savedReminder is ReminderConfig.None) return@with
 
         pendingReminderConfig = savedReminder
+        pendingReminderVisibility = newMessageViewModel.reminderVisibility.value ?: true
         reminderIfNoAnswer.isChecked = true
         setReminderOptionsVisible(isVisible = true)
+        updateReminderVisibilitySubtitle()
 
         when (savedReminder) {
             is ReminderConfig.Custom -> {
@@ -352,11 +386,21 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
     private fun showVisibilityReminderPicker() {
         selectVisibilityDialog.show(
-            selectRecipientsAndMe = true,
+            selectRecipientsAndMe = pendingReminderVisibility,
             onVisibilitySelected = { isRecipientsAndMe ->
-                // TODO: save the visibility selection in the view model
+                pendingReminderVisibility = isRecipientsAndMe
+                updateReminderVisibilitySubtitle()
             },
         )
+    }
+
+    private fun updateReminderVisibilitySubtitle() = with(binding) {
+        val subtitleRes = if (pendingReminderVisibility) {
+            R.string.selectionReminderRecipientsAndMe
+        } else {
+            R.string.selectionReminderMeOnly
+        }
+        reminderVisibility.setSubtitle(subtitleRes)
     }
 
     private fun applyCustomDateSelectionUi(
@@ -374,6 +418,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
     private fun saveOptions() {
         newMessageViewModel.scheduleConfig.value = pendingScheduleConfig
         newMessageViewModel.reminderConfig.value = pendingReminderConfig
+        newMessageViewModel.reminderVisibility.value = pendingReminderVisibility
 
         if (pendingScheduleConfig is ScheduleConfig.Scheduled) {
             pendingLastSelectedScheduleEpochMillis?.let { localSettings.lastSelectedScheduleEpochMillis = it }

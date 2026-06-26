@@ -258,6 +258,7 @@ class NewMessageViewModel @Inject constructor(
     
     val scheduleConfig: MutableLiveData<ScheduleConfig> = MutableLiveData(ScheduleConfig.None)
     val reminderConfig: MutableLiveData<ReminderConfig> = MutableLiveData(ReminderConfig.None)
+    val reminderVisibility: MutableLiveData<Boolean> = MutableLiveData(true)
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
