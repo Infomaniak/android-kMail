@@ -47,7 +47,7 @@ import kotlin.time.Duration.Companion.seconds
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::class) {
-    val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private fun searchMail(mailContent: String) {
         onView(isRoot()).perform(waitFor(5.seconds))
