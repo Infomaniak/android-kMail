@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
+import com.infomaniak.mail.ui.alertDialogs.SelectVisibilityReminderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.BaseSchedulePickerBottomSheet
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
@@ -74,6 +75,9 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
     lateinit var customReminderPickerDialog: CustomReminderPickerDialog
 
     @Inject
+    lateinit var selectVisibilityDialog: SelectVisibilityReminderDialog
+
+    @Inject
     lateinit var localSettings: LocalSettings
 
     private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
@@ -100,6 +104,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
         customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        selectVisibilityDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
         pendingLastSelectedScheduleEpochMillis = lastSelectedEpoch
 
@@ -217,6 +222,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         }
 
         customDelayReminder.setOnClickListener { onCustomDelayReminderClicked() }
+        reminderVisibility.setOnClickListener { showVisibilityReminderPicker() }
     }
 
     private fun trailingContentFor(kSuite: KSuite?): TrailingContent = when (kSuite) {
@@ -340,6 +346,15 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
                 binding.customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMillis))
                 binding.customDelayReminder.setCheckMark(displayCheckMark = true)
                 binding.optionsDelays.clearCheck()
+            },
+        )
+    }
+
+    private fun showVisibilityReminderPicker() {
+        selectVisibilityDialog.show(
+            selectRecipientsAndMe = true,
+            onVisibilitySelected = { isRecipientsAndMe ->
+                // TODO: save the visibility selection in the view model
             },
         )
     }
