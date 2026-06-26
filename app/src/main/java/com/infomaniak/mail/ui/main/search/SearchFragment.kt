@@ -334,6 +334,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
                     binding.searchBar.searchTextInput.apply {
                         setText(emailWithQuotes)
                         setSelection(emailWithQuotes.length)
+                        hideKeyboard()
                     }
                 }
                 override val getFeatureFlags: () -> FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }

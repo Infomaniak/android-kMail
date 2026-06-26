@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(RealmListKSerializer::class, RealmInstantSerializer::class)
+
 package com.infomaniak.mail.data.models.thread
 
 import com.infomaniak.core.common.utils.mailApiEnum
+import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.SnoozeState
@@ -27,6 +30,7 @@ import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
+import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
@@ -34,6 +38,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.UseSerializers
 import java.util.Date
 
 @Serializable
