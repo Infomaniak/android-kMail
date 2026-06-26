@@ -86,6 +86,8 @@ class CustomReminderPickerDialog @Inject constructor(
         }
 
         positiveButton.setOnClickListener {
+            numberPicker.clearFocus()
+            unitPicker.clearFocus()
             onDelaySelected?.invoke(getDelayMillis())
             alertDialog.dismiss()
         }
@@ -111,7 +113,7 @@ class CustomReminderPickerDialog @Inject constructor(
 
     companion object {
         private const val DAY_IN_MILLIS = 24 * ONE_HOUR_IN_MILLIS
-        private const val MAX_HOURS = 12
+        private const val MAX_HOURS = 23
         private const val MAX_DAYS = 30
 
         enum class TimeUnit(
