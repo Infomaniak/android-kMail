@@ -104,7 +104,7 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
 
         val mailContent = "#1 Search UI test"
         searchMail(mailContent)
-
+        onViewWithTimeout(matcher = withId(R.id.mailRecyclerView)).perform(swipeUp())
         onViewWithTimeout(
             matcher = withId(R.id.mailRecyclerView),
             assertion = matches(hasDescendant(withText(mailContent))),
@@ -258,10 +258,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
 
         clickOnHorizontalChipList(R.id.read)
 
+        val mailContent = "#13 Search UI test Read"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#13 Search UI test Read"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
