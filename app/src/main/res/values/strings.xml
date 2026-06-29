@@ -292,7 +292,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Recipients concerned</string>
     <string name="encryptedMessagePasswordLabel">Share this password by private message. You won’t be able to copy it once you’ve sent it.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Encryption has been disabled</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Scheduled emails not available for encrypted messages</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Schedule and reminder emails not available for encrypted messages</string>
     <string name="encryptedMessageUpdatePasswordButton">Change password</string>
     <string name="encryptedPasswordProtectionTitle">Password protection</string>
     <string name="encryptedProtectionAdDescription">Protect your message from unauthorized access with Infomaniak encryption.</string>
@@ -306,6 +306,7 @@
     <string name="encryptedStatePanelIncomplete">A password is required to finalize the sending.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partial</string>
     <string name="encryptedStatePanelTitle">Encryption</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Encryption is not available if scheduled or reminder is enabled</string>
     <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>

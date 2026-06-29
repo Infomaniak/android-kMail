@@ -288,7 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Destinatari interessati</string>
     <string name="encryptedMessagePasswordLabel">Condividi questa password tramite messaggio privato. Non sarà possibile copiarla una volta inviata.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">La crittografia è stata disattivata</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Email programmate non disponibili per i messaggi criptati</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">L’invio programmato e i promemoria non sono disponibili per i messaggi crittografati</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifica della password</string>
     <string name="encryptedPasswordProtectionTitle">Protezione con password</string>
     <string name="encryptedProtectionAdDescription">Proteggete i vostri messaggi dall’accesso non autorizzato con la crittografia Infomaniak.</string>
@@ -302,6 +302,7 @@
     <string name="encryptedStatePanelIncomplete">Per completare la trasmissione è necessaria una password.</string>
     <string name="encryptedStatePanelStatePartialLabel">Parziale</string>
     <string name="encryptedStatePanelTitle">Crittografia</string>
+    <string name="encryptionDisabledByScheduledOrReminder">La crittografia non è disponibile se l’invio programmato o il promemoria è attivo</string>
     <string name="enterPasswordTitle">Inserisci la password</string>
     <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>

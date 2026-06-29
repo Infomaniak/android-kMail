@@ -288,7 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Asianomaiset vastaanottajat</string>
     <string name="encryptedMessagePasswordLabel">Jaa tämä salasana yksityisviestillä. Et voi kopioida sitä enää lähetyksen jälkeen.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Salaus on poistettu käytöstä</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Ajastettu lähetys ei ole käytettävissä salatuille viesteille</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Ajastettu lähetys ja muistutukset eivät ole käytettävissä salatuille viesteille</string>
     <string name="encryptedMessageUpdatePasswordButton">Muuta salasanaa</string>
     <string name="encryptedPasswordProtectionTitle">Salasanasuojaus</string>
     <string name="encryptedProtectionAdDescription">Suojaa viestisi luvattomalta käytöltä Infomaniaxin salauksella.</string>
@@ -302,6 +302,7 @@
     <string name="encryptedStatePanelIncomplete">Salasana vaaditaan lähetyksen viimeistelemiseksi.</string>
     <string name="encryptedStatePanelStatePartialLabel">Osittainen</string>
     <string name="encryptedStatePanelTitle">Salaus</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Salaus ei ole käytettävissä, jos ajastettu lähetys tai muistutus on käytössä</string>
     <string name="enterPasswordTitle">Anna salasana</string>
     <string name="errorAlreadyLinkedMailbox">Tämä sähköpostiosoite on jo liitetty tiliisi</string>
     <string name="errorAtLeastOneRecipient">Vähintään yksi vastaanottaja vaaditaan</string>

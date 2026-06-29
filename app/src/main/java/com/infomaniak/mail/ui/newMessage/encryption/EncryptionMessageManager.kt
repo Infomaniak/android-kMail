@@ -30,6 +30,8 @@ import com.infomaniak.mail.ui.newMessage.NewMessageFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageFragmentDirections
 import com.infomaniak.mail.ui.newMessage.NewMessageManager
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
+import com.infomaniak.mail.ui.newMessage.ReminderConfig
+import com.infomaniak.mail.ui.newMessage.ScheduleConfig
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.scopes.FragmentScoped
@@ -145,10 +147,19 @@ class EncryptionMessageManager @Inject constructor(
                     password = newMessageViewModel.encryptionPassword.value ?: "",
                 )
             )
-        } else {
-            if (navigateToDiscoveryBottomSheetIfFirstTime()) return
-            newMessageViewModel.isEncryptionActivated.value = true
+            return
         }
+
+        val hasConflict = newMessageViewModel.scheduleConfig != ScheduleConfig.None && newMessageViewModel.reminderConfig != ReminderConfig.None
+
+        if (hasConflict) {
+            snackbarManager.postValue(context.getString(R.string.encryptionDisabledByScheduledOrReminder))
+            return
+        }
+
+        if (navigateToDiscoveryBottomSheetIfFirstTime()) return
+
+        newMessageViewModel.isEncryptionActivated.value = true
     }
 
     fun checkRecipientEncryptionStatus(recipient: Recipient) {
