@@ -1003,14 +1003,13 @@ class NewMessageFragment : Fragment() {
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            sendOptionsButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
         sendOptionsButton.setOnClickListener {
             if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
-                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
+                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledReminderUnavailable))
                 } else {
                     navigateToScheduleSendBottomSheet()
                 }

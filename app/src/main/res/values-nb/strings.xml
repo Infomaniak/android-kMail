@@ -289,7 +289,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Berørte mottakere</string>
     <string name="encryptedMessagePasswordLabel">Del dette passordet via privat melding. Du vil ikke kunne kopiere det etter at du har sendt det.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Kryptering er deaktivert</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Planlagte e-poster er ikke tilgjengelig for krypterte meldinger</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Planlagt sending og påminnelser er ikke tilgjengelig for krypterte meldinger</string>
     <string name="encryptedMessageUpdatePasswordButton">Endre passord</string>
     <string name="encryptedPasswordProtectionTitle">Passordbeskyttelse</string>
     <string name="encryptedProtectionAdDescription">Beskytte meldingen din mot uautorisert tilgang med Infomaniak-kryptering.</string>
@@ -303,6 +303,7 @@
     <string name="encryptedStatePanelIncomplete">Passord kreves for å fullføre sendingen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Delvis</string>
     <string name="encryptedStatePanelTitle">Kryptering</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Kryptering er ikke tilgjengelig hvis planlagt sending eller påminnelse er aktivert</string>
     <string name="enterPasswordTitle">Skriv inn passord</string>
     <string name="errorAlreadyLinkedMailbox">Denne e-postadressen er allerede koblet til kontoen din</string>
     <string name="errorAtLeastOneRecipient">Minst én mottaker kreves</string>

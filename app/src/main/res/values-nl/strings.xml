@@ -289,7 +289,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Betrokken ontvangers</string>
     <string name="encryptedMessagePasswordLabel">Deel dit wachtwoord via een privébericht. U kunt het niet meer kopiëren zodra u het heeft verzonden.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Versleuteling is uitgeschakeld</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Geplande e-mails niet beschikbaar voor versleutelde berichten</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Geplande verzending en herinneringen zijn niet beschikbaar voor versleutelde berichten</string>
     <string name="encryptedMessageUpdatePasswordButton">Wachtwoord wijzigen</string>
     <string name="encryptedPasswordProtectionTitle">Wachtwoordbeveiliging</string>
     <string name="encryptedProtectionAdDescription">Bescherm uw bericht tegen ongeautoriseerde toegang met Infomaniak-versleuteling.</string>
@@ -303,6 +303,7 @@
     <string name="encryptedStatePanelIncomplete">Een wachtwoord is vereist om de verzending te voltooien.</string>
     <string name="encryptedStatePanelStatePartialLabel">Gedeeltelijk</string>
     <string name="encryptedStatePanelTitle">Versleuteling</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Versleuteling is niet beschikbaar als geplande verzending of herinnering is ingeschakeld</string>
     <string name="enterPasswordTitle">Wachtwoord invoeren</string>
     <string name="errorAlreadyLinkedMailbox">Dit e-mailadres is al gekoppeld aan uw account</string>
     <string name="errorAtLeastOneRecipient">Er is minstens één ontvanger vereist</string>

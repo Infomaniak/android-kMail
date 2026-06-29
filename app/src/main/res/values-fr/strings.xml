@@ -289,7 +289,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Destinataires concernés</string>
     <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe par message privé. Vous ne pourrez plus le copier après l’envoi.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Le chiffrement a bien été désactivé</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">L’envoi programmé n’est pas disponible pour les messages chiffrés</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">L’envoi programmé et le rappel ne sont pas disponibles pour les messages chiffré</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifier le mot de passe</string>
     <string name="encryptedPasswordProtectionTitle">Protection par mot de passe</string>
     <string name="encryptedProtectionAdDescription">Protégez votre message contre tout accès non autorisé grâce au chiffrement Infomaniak.</string>
@@ -303,6 +303,7 @@
     <string name="encryptedStatePanelIncomplete">Un mot de passe est requis pour finaliser l’envoi.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partiel</string>
     <string name="encryptedStatePanelTitle">Chiffrement</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Le chiffrement n’est pas disponible si l’envoi programmé ou le rappel est activé</string>
     <string name="enterPasswordTitle">Saisir le mot de passe</string>
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>

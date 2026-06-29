@@ -289,7 +289,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Betroffene Adressaten</string>
     <string name="encryptedMessagePasswordLabel">Teilen Sie dieses Passwort per privater Nachricht mit. Sie können es nicht mehr kopieren, sobald Sie es gesendet haben.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Die Verschlüsselung wurde deaktiviert</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Geplante E-Mails für verschlüsselte Nachrichten nicht verfügbar</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Geplanter Versand und Erinnerungen sind für verschlüsselte Nachrichten nicht verfügbar</string>
     <string name="encryptedMessageUpdatePasswordButton">Passwort ändern</string>
     <string name="encryptedPasswordProtectionTitle">Passwortschutz</string>
     <string name="encryptedProtectionAdDescription">Schützen Sie Ihre Nachricht mit der Infomaniak-Verschlüsselung vor unbefugtem Zugriff.</string>
@@ -303,6 +303,7 @@
     <string name="encryptedStatePanelIncomplete">Ein Passwort ist erforderlich, um den Versand abzuschliessen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Teilweise</string>
     <string name="encryptedStatePanelTitle">Verschlüsselung</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Verschlüsselung ist nicht verfügbar, wenn der geplante Versand oder die Erinnerung aktiviert ist</string>
     <string name="enterPasswordTitle">Geben Sie das Passwort ein</string>
     <string name="errorAlreadyLinkedMailbox">Diese E-Mail-Adresse ist bereits mit Ihrem Konto verknüpft</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>

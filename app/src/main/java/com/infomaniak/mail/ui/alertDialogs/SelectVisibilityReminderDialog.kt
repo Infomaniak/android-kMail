@@ -69,6 +69,9 @@ class SelectVisibilityReminderDialog @Inject constructor(
             R.id.selectionReminderMeOnly
         }
         reminderVisibilityGroup.check(defaultSelection)
+        selectionReminderRecipientsAndMe.setDescription(
+            activityContext.getString(R.string.descriptionReminderRecipientsAndMe)
+        )
     }
 
     private fun setupListeners() = with(binding) {
