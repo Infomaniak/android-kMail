@@ -111,6 +111,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
@@ -183,22 +184,27 @@ class ThreadViewModel @Inject constructor(
         .map { it.obj }
         .asLiveData(ioCoroutineContext)
 
-    // To each Message ID, we associate a set of emojis that are added for fake so we can
-    // instantly apply clicked emojis without having to wait for the API call to return.
-    private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
-
     /**
-     * Flow tracking the unsubscribe status of each message, keyed by its UID.
+     * Flow grouping all transient UI states for each message, keyed by its UID.
      *
-     * Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress], [UnsubscribeState.Completed])
-     * is updated in this map, and the entire map is re-emitted to trigger a refresh of the [MessageUi].
+     * - Fake emoji reactions: To each Message ID, we associate a set of emojis that are added for fake so we can
+     *   instantly apply clicked emojis without having to wait for the API call to return.
      *
-     * This flow is collected inside a [combine] to ensure that unsubscribe statuses are preserved
-     * even when other changes (e.g., sorting, filtering, content updates) trigger a full rebuild
-     * of the [MessageUi] list.
+     * - Unsubscribe statuses: Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress],
+     *   [UnsubscribeState.Completed]) is updated in this map. This is collected inside a [combine] so that
+     *   unsubscribe statuses are preserved even when other changes trigger a full rebuild of the [MessageUi] list.
+     *
+     * - Acknowledge statuses: Whenever an acknowledgement is sent, its state (e.g., [MessageUi.AcknowledgeState.InProgress],
+     *   [MessageUi.AcknowledgeState.Completed]) is updated in this map. This is collected inside a [combine] so that
+     *   acknowledgement statuses are preserved even when other changes trigger a full rebuild of the [MessageUi] list.
      */
-    private val unsubscribeStateByMessageUid = MutableStateFlow<Map<String, UnsubscribeState>>(emptyMap())
-    private val acknowledgeStateByMessageUid = MutableStateFlow<Map<String, MessageUi.AcknowledgeState>>(emptyMap())
+    private val messageUiStates = MutableStateFlow(
+        MessageUiStates(
+            fakeReactions = emptyMap(),
+            unsubscribeStates = emptyMap(),
+            acknowledgeStates = emptyMap(),
+        )
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val messagesFlow: Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
@@ -210,29 +216,17 @@ class ThreadViewModel @Inject constructor(
          * The [ThreadOpeningMode.getMessages] method will independently determine the appropriate value to use.
          */
         combine(
-            combine(
-                threadOpeningModeFlow,
-                threadState.hasSuperCollapsedBlockBeenClicked,
-                featureFlagsFlow,
-                fakeReactions,
-                unsubscribeStateByMessageUid,
-                transform = { mode, _, featureFlags, fakeReactions, messageUidUnsubscribed ->
-                    CombineMessageToBuildMessageUi(mode, featureFlags, fakeReactions, messageUidUnsubscribed, emptyMap())
-                }
-            ),
-            acknowledgeStateByMessageUid,
-            transform = { partial, messageUidAcknowledged ->
-                partial.copy(messageUidAcknowledged = messageUidAcknowledged)
+            threadOpeningModeFlow,
+            threadState.hasSuperCollapsedBlockBeenClicked,
+            featureFlagsFlow,
+            messageUiStates,
+            transform = { mode, _, featureFlags, uiStates ->
+                CombineMessageToBuildMessageUi(mode, featureFlags, uiStates)
             },
-        ).flatMapLatest { (mode, featureFlags, fakeReactions, messageUidUnsubscribed, messageUidAcknowledged) ->
+        ).flatMapLatest { (mode, featureFlags, uiStates) ->
             val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
             mode.getMessages(featureFlags).mapLatest { (items, messagesToFetch) ->
-                items.toUiMessages(
-                    fakeReactions,
-                    isReactionsAvailable,
-                    messageUidUnsubscribed,
-                    messageUidAcknowledged
-                ) to messagesToFetch
+                items.toUiMessages(uiStates, isReactionsAvailable) to messagesToFetch
             }
         }
 
@@ -657,8 +651,12 @@ class ThreadViewModel @Inject constructor(
             val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
 
             // TODO: Optimize memory consumption
-            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
-                set(messageId, getOrDefault(messageId, emptySet()).plus(emoji))
+            messageUiStates.update {
+                it.copy(
+                    fakeReactions = it.fakeReactions.toMutableMap().apply {
+                        set(messageId, getOrDefault(messageId, emptySet()).plus(emoji))
+                    }
+                )
             }
         }
     }
@@ -668,11 +666,15 @@ class ThreadViewModel @Inject constructor(
             val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
 
             // If the value isn't present, there's nothing to remove, so we can exit
-            if (fakeReactions.value[messageId]?.contains(emoji) != true) return@launch
+            if (messageUiStates.value.fakeReactions[messageId]?.contains(emoji) != true) return@launch
 
             // TODO: Optimize memory consumption
-            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
-                set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))
+            messageUiStates.update {
+                it.copy(
+                    fakeReactions = it.fakeReactions.toMutableMap().apply {
+                        set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))
+                    }
+                )
             }
         }
     }
@@ -703,13 +705,11 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun <E : Any> List<E>.toUiMessages(
-        fakeReactions: Map<String, Set<String>>,
+        uiStates: MessageUiStates,
         isReactionsAvailable: Boolean,
-        unsubscribeStateByMessageUid: Map<String, UnsubscribeState>,
-        acknowledgeStateByMessageUid: Map<String, MessageUi.AcknowledgeState>,
     ): List<Any> = map { item ->
         if (item is Message) {
-            val localReactions = fakeReactions[item.messageId] ?: emptySet()
+            val localReactions = uiStates.fakeReactions[item.messageId] ?: emptySet()
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
             val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
             val canAcknowledgeOrNull = when {
@@ -721,8 +721,8 @@ class ThreadViewModel @Inject constructor(
                 message = item,
                 emojiReactionsState = reactions,
                 isReactionsFeatureAvailable = isReactionsAvailable,
-                unsubscribeState = unsubscribeStateByMessageUid[item.uid] ?: canUnsubscribeOrNull,
-                acknowledgeState = acknowledgeStateByMessageUid[item.uid] ?: canAcknowledgeOrNull,
+                unsubscribeState = uiStates.unsubscribeStates[item.uid] ?: canUnsubscribeOrNull,
+                acknowledgeState = uiStates.acknowledgeStates[item.uid] ?: canAcknowledgeOrNull,
             )
         } else {
             item
@@ -775,9 +775,6 @@ class ThreadViewModel @Inject constructor(
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeSuccess))
             setUnsubscribeState(message, UnsubscribeState.Completed)
-            unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-                set(message.uid, UnsubscribeState.Completed)
-            }
         } else {
             snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeFailure))
             setUnsubscribeState(message, UnsubscribeState.CanUnsubscribe)
@@ -828,14 +825,22 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun setUnsubscribeState(message: Message, state: UnsubscribeState) {
-        unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-            set(message.uid, state)
+        messageUiStates.update {
+            it.copy(
+                unsubscribeStates = it.unsubscribeStates.toMutableMap().apply {
+                    set(message.uid, state)
+                }
+            )
         }
     }
 
     private fun setAcknowledgeState(message: Message, state: MessageUi.AcknowledgeState) {
-        acknowledgeStateByMessageUid.value = acknowledgeStateByMessageUid.value.toMutableMap().apply {
-            set(message.uid, state)
+        messageUiStates.update {
+            it.copy(
+                acknowledgeStates = it.acknowledgeStates.toMutableMap().apply {
+                    set(message.uid, state)
+                }
+            )
         }
     }
     //endregion
@@ -852,12 +857,16 @@ class ThreadViewModel @Inject constructor(
         val menuId: Int,
     )
 
+    private data class MessageUiStates(
+        val fakeReactions: Map<String, Set<String>>,
+        val unsubscribeStates: Map<String, UnsubscribeState>,
+        val acknowledgeStates: Map<String, MessageUi.AcknowledgeState>,
+    )
+
     private data class CombineMessageToBuildMessageUi(
         val mode: ThreadOpeningMode,
         val featureFlags: Mailbox.FeatureFlagSet,
-        val fakeReactions: Map<String, Set<String>>,
-        val messageUidUnsubscribed: Map<String, UnsubscribeState>,
-        val messageUidAcknowledged: Map<String, MessageUi.AcknowledgeState>
+        val uiStates: MessageUiStates,
     )
 
     private enum class MessageBehavior {
