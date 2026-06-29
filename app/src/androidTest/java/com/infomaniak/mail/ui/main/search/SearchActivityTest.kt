@@ -25,6 +25,7 @@ import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.pressImeActionButton
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.swipeLeft
+import androidx.test.espresso.action.ViewActions.swipeUp
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
@@ -270,6 +271,7 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
 
         onViewWithTimeout(matcher = withId(R.id.searchButton)).perform(click())
         searchMail("mobiletest@ik.me")
+        onViewWithTimeout(matcher = withId(R.id.mailRecyclerView)).perform(swipeUp())
         onViewWithTimeout(
             matcher = withId(R.id.mailRecyclerView),
             assertion = matches(hasDescendant(withText("#1 Search UI test"))),
