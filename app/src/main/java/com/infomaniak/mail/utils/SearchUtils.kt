@@ -41,6 +41,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -55,7 +56,7 @@ class SearchUtils @Inject constructor(
 
         val filtersQuery = StringBuilder("severywhere=${if (filters.contains(ThreadFilter.FOLDER)) "0" else "1"}")
 
-        if (query?.isNotBlank() == true) filtersQuery.append("&scontains=$query")
+        if (query?.isNotBlank() == true) filtersQuery.append("&scontains=${URLEncoder.encode(query, Charsets.UTF_8.name())}")
 
         with(filters) {
             if (contains(ThreadFilter.ATTACHMENTS)) filtersQuery.append("&sattachments=yes")
