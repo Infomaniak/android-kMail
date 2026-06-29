@@ -26,6 +26,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH_YEAR
 import com.infomaniak.core.common.utils.day
 import com.infomaniak.core.common.utils.format
@@ -38,7 +39,6 @@ import com.infomaniak.core.common.utils.roundUpToNextTenMinutes
 import com.infomaniak.core.common.utils.setHour
 import com.infomaniak.core.common.utils.setMinute
 import com.infomaniak.core.common.utils.year
-import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
 import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_DATE_MINUTES
@@ -63,8 +63,6 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
 
     private var onDateSelected: ((Long) -> Unit)? = null
     private var onAbort: (() -> Unit)? = null
-    protected var scheduleDate: Date? = null
-    protected var isForReminder: Boolean = false
 
     private lateinit var selectedDate: Date
 
@@ -81,15 +79,7 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
         onAbort = null
     }
 
-    fun show(
-        positiveButtonResId: Int? = null,
-        scheduleDateMillis: Long? = null,
-        isForReminder: Boolean = false,
-        onDateSelected: (Long) -> Unit,
-        onAbort: (() -> Unit)? = null,
-    ) {
-        scheduleDate = scheduleDateMillis?.let { Date(it) }
-        this.isForReminder = isForReminder
+    fun show(positiveButtonResId: Int? = null, onDateSelected: (Long) -> Unit, onAbort: (() -> Unit)? = null) {
         showDialogWithBasicInfo(positiveButtonResId)
         setupListeners(onDateSelected, onAbort)
     }
@@ -97,19 +87,7 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     private fun showDialogWithBasicInfo(positiveButtonResId: Int?) {
         alertDialog.show()
 
-        val initialDate = when {
-            scheduleDate != null -> Calendar.getInstance().apply {
-                time = scheduleDate!!
-                add(Calendar.HOUR_OF_DAY, 1)
-            }.time.roundUpToNextTenMinutes()
-            isForReminder -> Calendar.getInstance().apply {
-                time = Date()
-                add(Calendar.HOUR_OF_DAY, 1)
-            }.time.roundUpToNextTenMinutes()
-            else -> Date().roundUpToNextTenMinutes()
-        }
-
-        selectDate(initialDate)
+        selectDate(Date().roundUpToNextTenMinutes())
         positiveButton.setText(positiveButtonResId ?: defaultPositiveButtonResId)
     }
 
@@ -156,13 +134,11 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     }
 
     private fun updateErrorMessage(date: Date) {
-        val isDateValid = date.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES)
-        val errorMessage = if (!isDateValid) getErrorText(date) else null
+        val isValid = date.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES)
 
-        val hasError = errorMessage != null
-        if (hasError) binding.errorMessage.text = errorMessage
-        binding.errorMessage.isVisible = hasError
-        positiveButton.isEnabled = !hasError
+        if (isValid.not()) binding.errorMessage.text = getErrorText(date)
+        binding.errorMessage.isVisible = isValid.not()
+        positiveButton.isEnabled = isValid
     }
 
     private fun getErrorText(date: Date): String = if (date.isInTheFuture()) {
