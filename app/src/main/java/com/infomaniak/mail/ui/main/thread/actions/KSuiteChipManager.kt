@@ -47,6 +47,3 @@ class KSuiteChipManager(private val container: ViewGroup) {
 enum class TrailingContent {
     None, Chevron, Description, KSuitePersoChip, KSuiteProChip,
 }
-
-
-

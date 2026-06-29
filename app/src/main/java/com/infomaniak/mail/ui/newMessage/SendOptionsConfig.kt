@@ -27,8 +27,6 @@ sealed class ReminderConfig {
     data class Custom(val delayMillis: Long) : ReminderConfig()
 }
 
-const val HOURS_IN_A_DAY = 24
-
 enum class DelayHours(val hours: Int) {
     HOURS_24(HOURS_IN_A_DAY),
     DAYS_3(3 * HOURS_IN_A_DAY),
@@ -36,3 +34,4 @@ enum class DelayHours(val hours: Int) {
 }
 
 const val MIN_SELECTABLE_DATE_MINUTES = 5
+const val HOURS_IN_A_DAY = 24
