@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 sealed class ScheduleConfig {
     data object None : ScheduleConfig()
-    data class Scheduled(val epochMillis: Long) : ScheduleConfig()
+    data class Scheduled(val epochMillis: Long, val isCustom: Boolean = false) : ScheduleConfig()
 }
 
 sealed class ReminderConfig {
