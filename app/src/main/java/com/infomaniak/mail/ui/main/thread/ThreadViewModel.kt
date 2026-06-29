@@ -112,6 +112,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -160,7 +161,7 @@ class ThreadViewModel @Inject constructor(
 
     private val currentMailboxLive = currentMailboxFlow.asLiveData()
 
-    private val refreshingAcknowledgeMessagesUids = ConcurrentHashMap.newKeySet<String>()
+    private val refreshingAcknowledgeMessagesUids = ConcurrentHashMap<String, Job>()
 
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
@@ -801,10 +802,12 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun refreshMessageIfNeeded(hasPendingAcknowledgement: Boolean, messageUid: String, resource: String) =
-        viewModelScope.launch(ioCoroutineContext) {
-            if (!hasPendingAcknowledgement || !refreshingAcknowledgeMessagesUids.add(messageUid)) return@launch
+    fun refreshMessageIfNeeded(hasPendingAcknowledgement: Boolean, messageUid: String, resource: String) {
+        if (!hasPendingAcknowledgement) return
 
+        refreshingAcknowledgeMessagesUids[messageUid]?.cancel()
+
+        val job = viewModelScope.launch(ioCoroutineContext) {
             try {
                 val apiResponse = ApiRepository.getMessage(resource)
                 val responseMessage = apiResponse.data
@@ -817,9 +820,12 @@ class ThreadViewModel @Inject constructor(
                     }
                 }
             } finally {
-                refreshingAcknowledgeMessagesUids.remove(messageUid)
+                refreshingAcknowledgeMessagesUids.remove(messageUid, coroutineContext.job)
             }
         }
+
+        refreshingAcknowledgeMessagesUids[messageUid] = job
+    }
 
     private fun setUnsubscribeState(message: Message, state: UnsubscribeState) {
         unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
