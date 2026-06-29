@@ -280,7 +280,11 @@ class ThreadViewModel @Inject constructor(
                         val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
-                        if (shouldExpand && message.isPendingAcknowledgementForMe()) refreshMessageIfNeeded(message)
+                        if (shouldExpand && message.isPendingAcknowledgementForMe()) refreshMessageIfNeeded(
+                            message.hasPendingAcknowledgement,
+                            message.uid,
+                            message.resource
+                        )
                     }
                 }
 
@@ -797,24 +801,25 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun refreshMessageIfNeeded(message: Message) = viewModelScope.launch(ioCoroutineContext) {
-        if (!message.hasPendingAcknowledgement || !refreshingAcknowledgeMessagesUids.add(message.uid)) return@launch
+    fun refreshMessageIfNeeded(hasPendingAcknowledgement: Boolean, messageUid: String, resource: String) =
+        viewModelScope.launch(ioCoroutineContext) {
+            if (!hasPendingAcknowledgement || !refreshingAcknowledgeMessagesUids.add(messageUid)) return@launch
 
-        try {
-            val apiResponse = ApiRepository.getMessage(message.resource)
-            val responseMessage = apiResponse.data
+            try {
+                val apiResponse = ApiRepository.getMessage(resource)
+                val responseMessage = apiResponse.data
 
-            if (apiResponse.isSuccess() && responseMessage != null) {
-                mailboxContentRealm().write {
-                    MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                        localMessage?.acknowledgeStatus = responseMessage.acknowledgeStatus
+                if (apiResponse.isSuccess() && responseMessage != null) {
+                    mailboxContentRealm().write {
+                        MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                            localMessage?.acknowledgeStatus = responseMessage.acknowledgeStatus
+                        }
                     }
                 }
+            } finally {
+                refreshingAcknowledgeMessagesUids.remove(messageUid)
             }
-        } finally {
-            refreshingAcknowledgeMessagesUids.remove(message.uid)
         }
-    }
 
     private fun setUnsubscribeState(message: Message, state: UnsubscribeState) {
         unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {

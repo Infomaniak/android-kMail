@@ -692,7 +692,11 @@ class ThreadAdapter(
                 isUnscheduledDraft -> threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                 else -> {
                     isExpandedMap[message.uid] = true
-                    if (message.isPendingAcknowledgementForMe()) threadAdapterCallbacks?.onMessageExpanded?.invoke(message)
+                    if (message.isPendingAcknowledgementForMe()) threadAdapterCallbacks?.onMessageExpanded?.invoke(
+                        message.hasPendingAcknowledgement,
+                        message.uid,
+                        message.resource
+                    )
                     onExpandOrCollapseMessage(message, shouldTrack = true)
                 }
             }
@@ -863,13 +867,17 @@ class ThreadAdapter(
             }
             is AcknowledgeState.Completed -> {
                 acknowledgeAlert.apply {
+                    hideAction1Progress(R.string.sendConfirmationAction)
                     isVisible = true
                     setActionsVisibility(isVisible = false)
                     setDescription(context.getString(R.string.acknowledgementMessageSent))
                     setIconRes(R.drawable.ic_check)
                 }
             }
-            null -> acknowledgeAlert.isVisible = false
+            null -> {
+                acknowledgeAlert.hideAction1Progress(R.string.sendConfirmationAction)
+                acknowledgeAlert.isVisible = false
+            }
         }
     }
 
@@ -1363,7 +1371,7 @@ class ThreadAdapter(
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var onUnsubscribeClicked: ((Message) -> Unit)? = null,
         var onAcknowledgeClicked: ((Message) -> Unit)? = null,
-        var onMessageExpanded: ((Message) -> Unit)? = null,
+        var onMessageExpanded: ((hasPendingAcknowledgement: Boolean, messageUid: String, resource: String) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
         var activateSpamFilter: (() -> Unit)? = null,
         var unblockMail: ((String) -> Unit)? = null,
