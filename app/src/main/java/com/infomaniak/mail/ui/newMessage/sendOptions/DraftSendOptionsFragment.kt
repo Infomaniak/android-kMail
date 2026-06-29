@@ -311,6 +311,10 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
             .firstOrNull { it.associatedValue == scheduleStr }
 
         when {
+            savedSchedule.isCustom -> {
+                customScheduleOption.setSubtitle(requireContext().dayOfWeekDateWithoutYear(Date(epoch)))
+                customScheduleOption.setCheckMark(displayCheckMark = true)
+            }
             matchedOption != null -> scheduleOptions.check(matchedOption.id)
             hasLastScheduleOption && lastScheduleOption.associatedValue == scheduleStr -> scheduleOptions.check(lastScheduleOption.id)
             else -> {
@@ -365,7 +369,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         dateAndTimeScheduleDialog.show(
             onDateSelected = { timestamp ->
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
-                pendingScheduleConfig = ScheduleConfig.Scheduled(timestamp)
+                pendingScheduleConfig = ScheduleConfig.Scheduled(timestamp, isCustom = true)
                 pendingLastSelectedScheduleEpochMillis = timestamp
                 applyCustomDateSelectionUi(timestamp, binding.customScheduleOption, binding.scheduleOptions)
             },
