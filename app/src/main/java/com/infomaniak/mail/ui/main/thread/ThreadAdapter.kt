@@ -841,9 +841,11 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.bindRequestResponseAlert(message: Message) {
+        topReminderAlertGroup.isVisible = true
+        endReminderAlert.setActionsVisibility(shouldDisplayAction = false)
         val senderNames = message.from.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, senderNames)
-        topReminderAlertGroup.isVisible = true
+
         requestResponseAlert.apply {
             isVisible = true
             setDescription(
@@ -858,6 +860,7 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.bindEndReminder(message: Message) {
+        endReminderAlert.setActionsVisibility(shouldDisplayAction = false)
         val recipientsNames = message.allRecipients.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, recipientsNames)
 
