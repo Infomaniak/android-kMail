@@ -29,12 +29,13 @@ import javax.inject.Inject
 class SelectVisibilityReminderDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
-
     private val binding: DialogSelectVisibilityReminderBinding by lazy {
         DialogSelectVisibilityReminderBinding.inflate(activity.layoutInflater)
     }
 
     override val alertDialog = initDialog()
+
+    private var isRecipientsAndMeSelected: Boolean = true
 
     private var onVisibilitySelected: ((Boolean) -> Unit)? = null
 
@@ -69,8 +70,6 @@ class SelectVisibilityReminderDialog @Inject constructor(
         }
         reminderVisibilityGroup.check(defaultSelection)
     }
-
-    private var isRecipientsAndMeSelected: Boolean = true
 
     private fun setupListeners() = with(binding) {
         reminderVisibilityGroup.onItemCheckedListener { id, _, _ ->

@@ -83,7 +83,6 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
-import com.infomaniak.mail.ui.newMessage.sendOptions.DraftSendOptionsFragmentArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -93,6 +92,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
+import com.infomaniak.mail.ui.newMessage.sendOptions.DraftSendOptionsFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
@@ -283,7 +283,8 @@ class NewMessageFragment : Fragment() {
         }
 
         observeScheduledDraftsFeatureFlagUpdates()
-        observeScheduleAndReminder()
+        observeSchedule()
+        observeReminder()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -477,7 +478,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeScheduleAndReminder() {
+    private fun observeSchedule() {
         newMessageViewModel.scheduleConfig.observe(viewLifecycleOwner) { config ->
             when (config) {
                 is ScheduleConfig.Scheduled -> {
@@ -494,13 +495,19 @@ class NewMessageFragment : Fragment() {
                 }
             }
         }
+    }
 
+    private fun observeReminder() {
         newMessageViewModel.reminderConfig.observe(viewLifecycleOwner) { config ->
             when (config) {
                 is ReminderConfig.Preset -> {
                     val hours = config.delayHours.hours
                     val dateText = if (hours % HOURS_IN_A_DAY == 0 && hours > HOURS_IN_A_DAY) {
-                        resources.getQuantityString(R.plurals.daysBeforeSendingReminder, hours / HOURS_IN_A_DAY, hours / HOURS_IN_A_DAY)
+                        resources.getQuantityString(
+                            R.plurals.daysBeforeSendingReminder,
+                            hours / HOURS_IN_A_DAY,
+                            hours / HOURS_IN_A_DAY
+                        )
                     } else {
                         resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, hours, hours)
                     }
@@ -883,38 +890,49 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        sendButton.setOnClickListener {
+        onSendButtonClicked(mailbox)
+    }
+
+    private fun onSendButtonClicked(mailbox: Mailbox) {
+        binding.sendButton.setOnClickListener {
             if (!checkMailboxStorage(mailbox)) return@setOnClickListener
 
-            val scheduleConfig = newMessageViewModel.scheduleConfig.value
-            val isSendingWithScheduled = if (scheduleConfig is ScheduleConfig.Scheduled) {
-                if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds > System.currentTimeMillis()) {
-                    newMessageViewModel.setScheduleDate(Date(scheduleConfig.epochMillis))
-                    true
-                } else {
-                    newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
-                    newMessageViewModel.resetScheduledDate()
-                    false
-                }
-            } else {
-                false
-            }
-
-            val reminderConfig = newMessageViewModel.reminderConfig.value
-            val isSendingWithReminder = if (reminderConfig !is ReminderConfig.None) {
-                val delayMillis = when (reminderConfig) {
-                    is ReminderConfig.Preset -> reminderConfig.delayHours.hours * ONE_HOUR_IN_MILLIS
-                    is ReminderConfig.Custom -> reminderConfig.delayMillis
-                    else -> 0L
-                }
-                newMessageViewModel.setReminderDelay((delayMillis / 1_000L).toInt())
-                true
-            } else {
-                newMessageViewModel.setReminderDelay(0)
-                false
-            }
+            val isSendingWithScheduled = processScheduleConfig()
+            val isSendingWithReminder = processReminderConfig()
 
             tryToSendEmail(isSendingWithScheduled, isSendingWithReminder)
+        }
+    }
+
+    private fun processScheduleConfig(): Boolean {
+        val scheduleConfig = newMessageViewModel.scheduleConfig.value
+        return if (scheduleConfig is ScheduleConfig.Scheduled) {
+            if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds > System.currentTimeMillis()) {
+                newMessageViewModel.setScheduleDate(Date(scheduleConfig.epochMillis))
+                true
+            } else {
+                newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+                newMessageViewModel.resetScheduledDate()
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    private fun processReminderConfig(): Boolean {
+        val reminderConfig = newMessageViewModel.reminderConfig.value
+        return if (reminderConfig !is ReminderConfig.None) {
+            val delayMillis = when (reminderConfig) {
+                is ReminderConfig.Preset -> reminderConfig.delayHours.hours * ONE_HOUR_IN_MILLIS
+                is ReminderConfig.Custom -> reminderConfig.delayMillis
+                else -> 0L
+            }
+            newMessageViewModel.setReminderDelay((delayMillis / 1_000L).toInt())
+            true
+        } else {
+            newMessageViewModel.setReminderDelay(0)
+            false
         }
     }
 

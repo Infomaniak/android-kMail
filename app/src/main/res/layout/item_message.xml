@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_alarm_clock"
-            tools:description="Laura attend une réponse avant le jeudi 17 mai à 12:00"
+            tools:description="Laura is awaiting a response before Thursday, May 17 at 12:00"
             tools:visibility="visible" />
 
         <com.google.android.material.divider.MaterialDivider
