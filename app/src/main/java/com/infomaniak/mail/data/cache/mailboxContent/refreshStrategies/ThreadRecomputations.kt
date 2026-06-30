@@ -102,7 +102,7 @@ object ThreadRecomputations {
 
     private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
         val rawAliases = mailbox?.aliases ?: currentMailboxAliases
-        val normalizedAliases = rawAliases?.map { it.lowercase(java.util.Locale.ROOT) }?.toSet() ?: emptySet()
+        val normalizedAliases = rawAliases?.map { it.lowercase() }?.toSet() ?: emptySet()
 
         allMessages.forEach { message ->
             processMessage(message, normalizedAliases)
