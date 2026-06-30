@@ -46,6 +46,7 @@ import com.infomaniak.core.legacy.utils.parcelableExtra
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -99,7 +100,6 @@ import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
-import com.infomaniak.mail.utils.MessageBodyUtils.MENTION_ATTR
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
@@ -1091,7 +1091,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun Document.addMissingMentionsStyle() {
-        val mentionTags = getElementsByAttribute(MENTION_ATTR)
+        val mentionTags = getElementsByAttribute(MENTION_ATTRIBUTE)
         mentionTags.forEach { mention ->
             mention.attr(
                 "style",
