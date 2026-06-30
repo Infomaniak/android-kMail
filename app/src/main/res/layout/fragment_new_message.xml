@@ -426,7 +426,6 @@
             android:background="@drawable/background_top_rounded"
             android:clipToPadding="false"
             android:elevation="10dp"
-            android:padding="@dimen/marginStandardVerySmall"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/externalBanner"
