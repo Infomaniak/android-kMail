@@ -291,15 +291,12 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
                             } ?: realmListOf()
 
                             remoteMessage.initLocalValues(
-                                areHeavyDataFetched = true,
-                                isTrashed = localMessage.isTrashed,
-                                messageIds = localMessage.messageIds,
-                                draftLocalUuid = remoteMessage.getDraftLocalUuidBlocking(realm),
-                                isFromSearch = localMessage.isFromSearch,
-                                isDeletedOnApi = false,
-                                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
-                                swissTransferFiles = swissTransferFiles,
-                                emojiReactions = localMessage.emojiReactions,
+                                localMessage.toLocalValues().copy(
+                                    areHeavyDataFetched = true,
+                                    draftLocalUuid = remoteMessage.getDraftLocalUuidBlocking(realm),
+                                    isDeletedOnApi = false,
+                                    swissTransferFiles = swissTransferFiles,
+                                )
                             )
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true

@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.isSnoozeMalformed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.MessageLocalValues
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
@@ -61,7 +62,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.Sort
 import io.sentry.Sentry
@@ -696,15 +696,11 @@ class RefreshController @Inject constructor(
 
     private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
         remoteMessage.initLocalValues(
-            areHeavyDataFetched = false,
-            isTrashed = folder.role == FolderRole.TRASH,
-            messageIds = remoteMessage.computeMessageIds(),
-            draftLocalUuid = null,
-            isFromSearch = false,
-            isDeletedOnApi = false,
-            latestCalendarEventResponse = null,
-            swissTransferFiles = realmListOf(),
-            emojiReactions = realmListOf(),
+            MessageLocalValues(
+                areHeavyDataFetched = false,
+                isTrashed = folder.role == FolderRole.TRASH,
+                messageIds = remoteMessage.computeMessageIds(),
+            )
         )
     }
     //endregion

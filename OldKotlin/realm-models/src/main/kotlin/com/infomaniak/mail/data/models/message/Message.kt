@@ -144,8 +144,8 @@ class Message : RealmObject, Snoozable {
     //region Local data (Transient)
 
     // ------------- !IMPORTANT! -------------
-    // Every field that is added in this Transient region should be declared in
-    // `initLocalValue()` too to avoid loosing data when updating from the API.
+    // Every field that is added in this Transient region should be added to
+    // `MessageLocalValues` and handled in `initLocalValues()` too, to avoid losing data when updating from the API.
     // If the Field is a "heavy data" (i.e. an embedded object), it should also be added in 'keepHeavyData()'.
 
     @Transient
@@ -223,44 +223,36 @@ class Message : RealmObject, Snoozable {
     }
 
     fun keepLocalValues(localMessage: Message) {
-        initLocalValues(
-            areHeavyDataFetched = localMessage.areHeavyDataFetched,
-            isTrashed = localMessage.isTrashed,
-            messageIds = localMessage.messageIds,
-            draftLocalUuid = localMessage.draftLocalUuid,
-            isFromSearch = localMessage.isFromSearch,
-            isDeletedOnApi = localMessage.isDeletedOnApi,
-            latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
-            swissTransferFiles = localMessage.swissTransferFiles,
-            emojiReactions = localMessage.emojiReactions,
-        )
+        initLocalValues(localMessage.toLocalValues())
         keepHeavyData(localMessage)
     }
 
-    fun initLocalValues(
-        areHeavyDataFetched: Boolean,
-        isTrashed: Boolean,
-        messageIds: RealmSet<String>,
-        draftLocalUuid: String?,
-        isFromSearch: Boolean,
-        isDeletedOnApi: Boolean,
-        latestCalendarEventResponse: CalendarEventResponse?,
-        swissTransferFiles: RealmList<SwissTransferFile>,
-        emojiReactions: RealmList<EmojiReactionState>,
-    ) {
-        this.areHeavyDataFetched = areHeavyDataFetched
-        this.isTrashed = isTrashed
-        this.messageIds = messageIds
-        this.draftLocalUuid = draftLocalUuid
-        this.isFromSearch = isFromSearch
-        this.isDeletedOnApi = isDeletedOnApi
-        this.latestCalendarEventResponse = latestCalendarEventResponse
-        this.swissTransferFiles.replaceContent(swissTransferFiles)
-        this.emojiReactions = emojiReactions
+    fun initLocalValues(localValues: MessageLocalValues) {
+        this.areHeavyDataFetched = localValues.areHeavyDataFetched
+        this.isTrashed = localValues.isTrashed
+        this.messageIds = localValues.messageIds
+        this.draftLocalUuid = localValues.draftLocalUuid
+        this.isFromSearch = localValues.isFromSearch
+        this.isDeletedOnApi = localValues.isDeletedOnApi
+        this.latestCalendarEventResponse = localValues.latestCalendarEventResponse
+        this.swissTransferFiles.replaceContent(localValues.swissTransferFiles)
+        this.emojiReactions = localValues.emojiReactions
 
         this.shortUid = uid.toShortUid()
         this.hasAttachable = hasAttachments || swissTransferUuid != null
     }
+
+    fun toLocalValues() = MessageLocalValues(
+        areHeavyDataFetched = areHeavyDataFetched,
+        isTrashed = isTrashed,
+        messageIds = messageIds,
+        draftLocalUuid = draftLocalUuid,
+        isFromSearch = isFromSearch,
+        isDeletedOnApi = isDeletedOnApi,
+        latestCalendarEventResponse = latestCalendarEventResponse,
+        swissTransferFiles = swissTransferFiles,
+        emojiReactions = emojiReactions,
+    )
 
     private fun keepHeavyData(message: Message) {
         attachments.replaceContent(message.attachments.copyFromRealm())
@@ -313,6 +305,18 @@ class Message : RealmObject, Snoozable {
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
+
+    data class MessageLocalValues(
+        val areHeavyDataFetched: Boolean = false,
+        val isTrashed: Boolean = false,
+        val messageIds: RealmSet<String> = realmSetOf(),
+        val draftLocalUuid: String? = null,
+        val isFromSearch: Boolean = false,
+        val isDeletedOnApi: Boolean = false,
+        val latestCalendarEventResponse: CalendarEventResponse? = null,
+        val swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
+        val emojiReactions: RealmList<EmojiReactionState> = realmListOf(),
+    )
 
     companion object {
         // Encountered formats so far:
