@@ -25,7 +25,6 @@ import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
 import com.infomaniak.mail.data.models.javascriptBridge.MessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
@@ -54,14 +53,15 @@ class WebViewUtils(context: Context) {
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
-    private val mentionClickObserverScript by lazy { context.getMentionClickObserverScript() }
+    private val preventMentionClickScript by lazy { context.getMentionClickObserverScript() }
     private val messageDisplayJsBridgeScript by lazy { context.getMessageDisplayJavascriptBridge() }
 
     fun processHtmlForPrint(
         html: String,
         printData: HtmlFormatter.PrintData,
+        aliases: List<String>,
     ): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode = false)
+        addCommonDisplayContent(isDisplayedInDarkMode = false, aliases)
         registerIsForPrint(printData)
         registerCss(printMailStyle)
         return@with inject()
@@ -73,11 +73,13 @@ class WebViewUtils(context: Context) {
         aliases: List<String>,
     ): String = with(HtmlFormatter(html)) {
         addCommonDisplayContent(isDisplayedInDarkMode, aliases)
+        registerScript(preventMentionClickScript)
         return@with inject()
     }
 
     private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, aliases: List<String> = emptyList()) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
+        registerScript(messageDisplayJsBridgeScript)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
         registerCss(messageDisplayStyle)
@@ -85,8 +87,6 @@ class WebViewUtils(context: Context) {
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
-        registerScript(mentionClickObserverScript)
-        registerScript(messageDisplayJsBridgeScript)
         registerBodyEncapsulation()
         registerBreakLongWords()
     }
@@ -95,7 +95,6 @@ class WebViewUtils(context: Context) {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
         lateinit var messageDisplayJsBridge: MessageDisplayJavascriptBridge // TODO: Avoid excessive memory consumption with injection
-        lateinit var editorJsBridge: EditorJavascriptBridge
 
         fun initMessageDisplayJavascriptBridge(
             onWebViewFinishedLoading: () -> Unit,

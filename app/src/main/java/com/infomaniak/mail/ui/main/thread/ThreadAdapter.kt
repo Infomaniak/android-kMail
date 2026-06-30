@@ -421,10 +421,15 @@ class ThreadAdapter(
     private fun WebView.processMailDisplay(styledBody: String, uid: String, isForPrinting: Boolean): String {
         val isDisplayedInDark =
             context.isNightModeEnabled() && isThemeTheSameForMessageUid(uid) && !isForPrinting
+        val aliases = aliases()
         return if (isForPrinting) {
-            webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, (items.first() as MessageUi).message))
+            webViewUtils.processHtmlForPrint(
+                html = styledBody,
+                printData = HtmlFormatter.PrintData(context, (items.first() as MessageUi).message),
+                aliases = aliases
+            )
         } else {
-            webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark, aliases())
+            webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark, aliases)
         }
     }
 

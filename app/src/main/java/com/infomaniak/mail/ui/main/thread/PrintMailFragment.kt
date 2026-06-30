@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -32,6 +33,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,6 +46,7 @@ class PrintMailFragment : Fragment() {
 
     private val navigationArgs: PrintMailFragmentArgs by navArgs()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val printMailViewModel: PrintMailViewModel by viewModels()
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
 
@@ -77,6 +80,7 @@ class PrintMailFragment : Fragment() {
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
             areMessagesCollapsibles = { threadViewModel.messagesAreCollapsiblesFlow.value },
+            aliases = { mainViewModel.currentMailbox.value?.aliases?.toList() ?: emptyList() },
             threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onBodyWebViewFinishedLoading = { startPrintingView() },
             ),
