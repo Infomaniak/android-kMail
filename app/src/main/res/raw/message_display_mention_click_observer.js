@@ -16,24 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 function observeMentionClick() {
-    if (document.kmailMentionClickObserved) {
-        return;
-    } else {
-        document.kmailMentionClickObserved = true;
-    }
 
     document.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
         const clickedNode = event.target;
         if (!(clickedNode instanceof Element)) return;
 
         const mention = clickedNode.closest('a[data-ik-mention-ref]');
         if (!mention) return;
-
-        const mentionHandler = globalThis.kmail?.openMentionContact;
-        if (typeof mentionHandler !== 'function') return;
-
-        event.preventDefault();
-        event.stopPropagation();
 
         const email = mention.dataset.ikMentionRef || '';
         if (!email) return;
@@ -43,7 +35,7 @@ function observeMentionClick() {
             name = name.substring(1).trim();
         }
 
-        mentionHandler.call(globalThis.kmail, email, name || null);
+        globalThis.kmail?.openMentionContact(email, name)
     }, true);
 }
 
