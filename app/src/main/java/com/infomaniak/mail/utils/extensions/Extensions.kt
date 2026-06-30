@@ -525,6 +525,8 @@ fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit)
 
 fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()
 
+fun CharSequence.toSearchableForm(): String = toString().removeAccents().lowercase()
+
 inline val AndroidViewModel.appContext: Context get() = getApplication()
 
 val TextInputEditText.trimmedText inline get() = text?.trim().toString()

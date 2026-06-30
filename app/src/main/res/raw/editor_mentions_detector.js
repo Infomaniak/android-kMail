@@ -17,9 +17,7 @@
  */
 
 let lastSentValue = null;
-const validMentionCharsRegex = /^[A-Za-z0-9._+-]*(?:@[A-Za-z0-9.-]*)?$/;
 const zeroWidthCharsRegex = /[\u200B-\u200D\uFEFF]/g;
-const mentionQueryRegex = /(?:^|\s)@(\S*)$/;
 
 // We get the parent block to get the correct range to look for the @
 const getBlockParent = (node) => {
@@ -63,11 +61,20 @@ const getTextBeforeCaret = () => {
 
 const extractMentionQuery = (textBeforeCaret) => {
     const normalizedText = textBeforeCaret.replace(zeroWidthCharsRegex, "");
-    const match = normalizedText.match(mentionQueryRegex);
-    if (!match) return null;
+    // Search backwards for @ preceded by space, non-breaking space, or start of string
+    const lastAtPos = [...normalizedText].reduceRight((pos, char, i) => {
+        if (pos !== -1) return pos;
+        return char === "@" && (i === 0 || normalizedText[i - 1] === " " || normalizedText[i - 1] === "\u00A0") ? i : -1;
+    }, -1);
 
-    const query = match[1];
-    return validMentionCharsRegex.test(query) ? query : null;
+    if (lastAtPos < 0) return null;
+
+    let query = normalizedText.slice(lastAtPos + 1);
+    if (!query.trim().includes(" ")) {
+        query = query.trim();
+    }
+
+    return query.length > 0 ? query : null;
 };
 
 const notifyIfChanged = () => {
@@ -83,6 +90,7 @@ const notifyIfChanged = () => {
 const isCaretBeforeMention = () => {
     const selection = globalThis.getSelection();
     if (!selection || selection.rangeCount === 0) return false;
+
     const range = selection.getRangeAt(0);
     if (!range.collapsed) return false;
 
