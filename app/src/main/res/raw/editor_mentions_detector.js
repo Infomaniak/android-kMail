@@ -137,9 +137,6 @@ const handleEnter = (event) => {
 }
 
 const observeMention = () => {
-    if (globalThis.__kmailMentionDetectionInitialized) return;
-    globalThis.__kmailMentionDetectionInitialized = true;
-
     document.addEventListener("selectionchange", notifyIfChanged);
     document.addEventListener("input", notifyIfChanged);
     document.addEventListener("keydown", handleEnter);

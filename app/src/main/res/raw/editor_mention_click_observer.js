@@ -17,9 +17,6 @@
  */
 
 function observeEditorMentionClicks() {
-    if (document.kmailEditorMentionClickObserved) return;
-    document.kmailEditorMentionClickObserved = true;
-
     const closestMention = (node) => node instanceof Element ? node.closest("a[data-ik-mention-ref]") : null;
 
     // Tapping a mention must not blur the editor, otherwise the Android keyboard (IME) closes.
@@ -40,7 +37,7 @@ function observeEditorMentionClicks() {
             selection.addRange(range);
         }
     };
-    document.addEventListener("mousedown", handleMentionPointerEvent, true);
+    
     document.addEventListener("touchstart", handleMentionPointerEvent, { capture: true, passive: false });
 
     // Never navigate to the mailto link when a mention is tapped.
