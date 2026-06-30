@@ -91,15 +91,6 @@ object ThreadRecomputations {
         isLastInboxMessageSnoozed = false
     }
 
-    private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
-        if (hasUnseenMentions || message.mentions.isEmpty()) return
-
-        val amIMentioned = message.mentions.any { mention ->
-            normalizedAliases.contains(mention.lowercase(java.util.Locale.ROOT))
-        }
-        hasUnseenMentions = amIMentioned && !message.isSeen
-    }
-
     private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
         val rawAliases = mailbox?.aliases ?: currentMailboxAliases
         val normalizedAliases = rawAliases?.map { it.lowercase() }?.toSet() ?: emptySet()
@@ -118,14 +109,6 @@ object ThreadRecomputations {
         subject = allMessages.first().subject
 
         isLastInboxMessageSnoozed = allMessages.isLastInboxMessageSnoozed(folderId)
-    }
-
-    private fun Thread.updateSnoozeStatesBasedOn(message: Message) {
-        message.snoozeState?.let {
-            snoozeState = it
-            snoozeEndDate = message.snoozeEndDate
-            snoozeUuid = message.snoozeUuid
-        }
     }
 
     private fun Thread.processMessage(message: Message, normalizedAliases: Set<String>) {
@@ -147,6 +130,23 @@ object ThreadRecomputations {
         if (message.isScheduledDraft) numberOfScheduledDrafts++
         updateMentionsState(message, normalizedAliases)
         updateSnoozeStatesBasedOn(message)
+    }
+
+    private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
+        if (hasUnseenMentions || message.mentions.isEmpty()) return
+
+        val amIMentioned = message.mentions.any { mention ->
+            normalizedAliases.contains(mention.lowercase())
+        }
+        hasUnseenMentions = amIMentioned && !message.isSeen
+    }
+
+    private fun Thread.updateSnoozeStatesBasedOn(message: Message) {
+        message.snoozeState?.let {
+            snoozeState = it
+            snoozeEndDate = message.snoozeEndDate
+            snoozeUuid = message.snoozeUuid
+        }
     }
 
     /**
