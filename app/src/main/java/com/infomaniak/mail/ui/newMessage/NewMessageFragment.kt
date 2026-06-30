@@ -80,7 +80,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
@@ -170,7 +169,6 @@ class NewMessageFragment : Fragment() {
     private val mentionClickObserverScript by lazy { requireContext().getEditorMentionClickObserverScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
@@ -505,7 +503,7 @@ class NewMessageFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val selfEmails = newMessageViewModel.currentMailbox().aliases
             val formatMentionsStyle = context?.getMentionsStyle(selfEmails)
-            if (!formatMentionsStyle.isNullOrBlank()) {
+            if (formatMentionsStyle != null) {
                 binding.editorWebView.addCss(formatMentionsStyle)
             }
         }
@@ -546,21 +544,25 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onMentionContactClicked(contact: ContactAutocompletable) {
-        val merged = contact as? MergedContact ?: return
+        val mergedContact = contact as? MergedContact ?: return
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(
-                JsExecutableMethod("insertMention", merged.email, merged.name, newMessageViewModel.mentionQuery.value),
+                JsExecutableMethod(
+                    "insertMention",
+                    mergedContact.email,
+                    mergedContact.name,
+                    newMessageViewModel.mentionQuery.value
+                ),
             )
         }
 
         binding.toField.apply {
-            addRecipient(merged.email, merged.name)
+            addRecipient(mergedContact.email, mergedContact.name)
             updateCollapsedChipValues(isCollapsed)
         }
 
-        newMessageViewModel.addMention(merged.email)
-        binding.mentionAutoComplete.isVisible = false
+        newMessageViewModel.addMention(mergedContact.email)
         newMessageViewModel.updateMentionQuery("")
     }
 
