@@ -550,7 +550,7 @@ class NewMessageFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(
-                JsExecutableMethod("insertMention", merged.email, merged.name),
+                JsExecutableMethod("insertMention", merged.email, merged.name, newMessageViewModel.mentionQuery.value),
             )
         }
 
@@ -851,7 +851,7 @@ class NewMessageFragment : Fragment() {
                 mentionAutoComplete.isVisible = false
                 mentionContactAdapter.clear()
             } else {
-                mentionContactAdapter.searchContacts(query)
+                mentionContactAdapter.searchContacts(query, shouldStandardize = false)
                 mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
                 updateMentionAutocompleteHeight()
             }

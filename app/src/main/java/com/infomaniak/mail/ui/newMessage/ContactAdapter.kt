@@ -41,6 +41,7 @@ import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.Autocompleta
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.UnknownContact
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.extensions.standardize
+import com.infomaniak.mail.utils.extensions.toSearchableForm
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
@@ -201,8 +202,9 @@ class ContactAdapter(
         }
     }
 
-    private fun performFiltering(constraint: CharSequence): List<MatchedContact> {
-        val searchTerm = constraint.standardize()
+    private fun performFiltering(constraint: CharSequence, shouldStandardize: Boolean = true): List<MatchedContact> {
+        // toSearchableForm doesn't include trim() since we need to search in the form "[name] [lastname]"
+        val searchTerm = if (shouldStandardize) constraint.standardize() else constraint.toSearchableForm()
 
         val finalUserList = mutableListOf<MatchedContact>()
         displayAddUnknownContactButton = isForRecipients
@@ -239,9 +241,9 @@ class ContactAdapter(
         } ?: ""
     }
 
-    fun searchContacts(text: CharSequence) {
+    fun searchContacts(text: CharSequence, shouldStandardize: Boolean = true) {
         searchQuery = text.toString()
-        matchedContacts = performFiltering(text)
+        matchedContacts = performFiltering(text, shouldStandardize)
         notifyDataSetChanged()
     }
 
