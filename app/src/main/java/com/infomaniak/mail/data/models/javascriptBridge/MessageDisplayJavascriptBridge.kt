@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.data.models.javascriptBridge
 
-import android.os.Handler
-import android.os.Looper
 import android.webkit.JavascriptInterface
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.extensions.isEmail
@@ -27,8 +25,6 @@ class MessageDisplayJavascriptBridge(
     private val onWebViewFinishedLoading: () -> Unit,
     private val onMentionContactClicked: ((String, String?) -> Unit)? = null,
 ) {
-
-    private val mainHandler = Handler(Looper.getMainLooper())
 
     @JavascriptInterface
     fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
@@ -49,13 +45,13 @@ class MessageDisplayJavascriptBridge(
 
     @JavascriptInterface
     fun webviewFinishedLoading() {
-        mainHandler.post(onWebViewFinishedLoading)
+        onWebViewFinishedLoading()
     }
 
     @JavascriptInterface
     fun openMentionContact(email: String, displayName: String?) {
         if (email.isBlank() || !email.isEmail()) return
-        mainHandler.post { onMentionContactClicked?.invoke(email, displayName) }
+        onMentionContactClicked?.invoke(email, displayName)
     }
 
     private fun fixStackTraceLineNumber(errorStack: String, scriptFirstLine: String): String {
