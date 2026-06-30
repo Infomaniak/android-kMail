@@ -252,8 +252,8 @@ class NewMessageViewModel @Inject constructor(
     private val _mentionQuery = MutableStateFlow("")
     val mentionQuery = _mentionQuery.asStateFlow()
 
-    private val _currentMentions = MutableStateFlow<Set<String>>(emptySet())
-    val currentMentions: StateFlow<Set<String>> = _currentMentions.asStateFlow()
+    private val _currentMentions = MutableStateFlow<List<String>>(emptyList())
+    val currentMentions: StateFlow<List<String>> = _currentMentions.asStateFlow()
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -1033,7 +1033,7 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
-        mentions = currentMentions.value.toRealmList()
+        mentions = currentMentions.value.toSet().toRealmList()
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -1221,9 +1221,21 @@ class NewMessageViewModel @Inject constructor(
         _currentMentions.update { it + email }
     }
 
-    fun removeMentions(emails: Set<String>) {
+    fun removeMentions(emails: List<String>) {
         trackNewMessageEvent(MatomoName.RemoveMention)
-        _currentMentions.update { it - emails }
+        _currentMentions.update { mentions ->
+            val updatedMentions = mentions.toMutableList()
+
+            emails.forEach { email ->
+                val index = updatedMentions.indexOf(email)
+                if (index >= 0) {
+                    updatedMentions.removeAt(index)
+                }
+            }
+
+            updatedMentions
+        }
+
     }
 
     enum class ImportationResult {
