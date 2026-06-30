@@ -116,13 +116,10 @@ class MessageAlertView @JvmOverloads constructor(
         }
     }
 
-    fun setActionsVisibility(isVisible: Boolean) {
-        binding.actionsLayout.isVisible = isVisible
-        if (isVisible) {
-            binding.root.updatePadding(top = resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium))
-        } else {
-            binding.root.updatePadding(top = resources.getDimensionPixelSize(RCore.dimen.marginStandardSmall))
-        }
+    fun setActionsVisibility(shouldDisplayAction: Boolean) {
+        binding.actionsLayout.isVisible = shouldDisplayAction
+        val margin = if (shouldDisplayAction) RCore.dimen.marginStandardMedium else RCore.dimen.marginStandardSmall
+        binding.root.updatePadding(top = resources.getDimensionPixelSize(margin))
     }
 
     fun setIconRes(@DrawableRes resId: Int) {

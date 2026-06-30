@@ -692,11 +692,13 @@ class ThreadAdapter(
                 isUnscheduledDraft -> threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                 else -> {
                     isExpandedMap[message.uid] = true
-                    if (message.isPendingAcknowledgementForMe()) threadAdapterCallbacks?.onMessageExpanded?.invoke(
-                        message.hasPendingAcknowledgement,
-                        message.uid,
-                        message.resource
-                    )
+                    if (message.isPendingAcknowledgementForMe()) {
+                        threadAdapterCallbacks?.onMessageExpanded?.invoke(
+                            message.hasPendingAcknowledgement,
+                            message.uid,
+                            message.resource
+                        )
+                    }
                     onExpandOrCollapseMessage(message, shouldTrack = true)
                 }
             }
@@ -785,7 +787,7 @@ class ThreadAdapter(
                     trackMessageBannerEvent(MatomoName.Encryption)
                     threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(recipientsNeedingPassword)
                 }
-            } ?: setActionsVisibility(isVisible = false)
+            } ?: setActionsVisibility(shouldDisplayAction = false)
         }
     }
 
@@ -844,7 +846,7 @@ class ThreadAdapter(
             is AcknowledgeState.Pending -> {
                 acknowledgeAlert.apply {
                     isVisible = true
-                    setActionsVisibility(isVisible = true)
+                    setActionsVisibility(shouldDisplayAction = true)
                     hideAction1Progress(R.string.sendConfirmationAction)
                     setDescription(context.getString(R.string.acknowledgementMessage))
                     setIconRes(R.drawable.ic_envelope)
@@ -858,7 +860,7 @@ class ThreadAdapter(
             is AcknowledgeState.InProgress -> {
                 acknowledgeAlert.apply {
                     isVisible = true
-                    setActionsVisibility(isVisible = true)
+                    setActionsVisibility(shouldDisplayAction = true)
                     setDescription(context.getString(R.string.acknowledgementMessage))
                     setIconRes(R.drawable.ic_envelope)
                     setAction1Text(context.getString(R.string.sendConfirmationAction))
@@ -869,7 +871,7 @@ class ThreadAdapter(
                 acknowledgeAlert.apply {
                     hideAction1Progress(R.string.sendConfirmationAction)
                     isVisible = true
-                    setActionsVisibility(isVisible = false)
+                    setActionsVisibility(shouldDisplayAction = false)
                     setDescription(context.getString(R.string.acknowledgementMessageSent))
                     setIconRes(R.drawable.ic_check)
                 }

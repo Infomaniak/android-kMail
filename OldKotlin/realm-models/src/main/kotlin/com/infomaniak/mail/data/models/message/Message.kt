@@ -132,9 +132,7 @@ class Message : RealmObject, Snoozable {
     @SerialName("crypt_password_validity")
     var encryptionPasswordValidity: RealmInstant? = null
     @SerialName("acknowledge")
-    var _acknowledgeStatus: String? = null
-        @InternalModelProperties
-        set
+    private var _acknowledgeStatus: String? = null
     @SerialName("emoji_reaction")
     var emojiReaction: String? = null
     @SerialName("emoji_reaction_not_allowed_reason")

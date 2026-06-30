@@ -275,11 +275,13 @@ class ThreadViewModel @Inject constructor(
                         val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
-                        if (shouldExpand && message.isPendingAcknowledgementForMe()) refreshMessageIfNeeded(
-                            message.hasPendingAcknowledgement,
-                            message.uid,
-                            message.resource
-                        )
+                        if (shouldExpand && message.isPendingAcknowledgementForMe()) {
+                            refreshMessageIfNeeded(
+                                message.hasPendingAcknowledgement,
+                                message.uid,
+                                message.resource
+                            )
+                        }
                     }
                 }
 
@@ -650,14 +652,7 @@ class ThreadViewModel @Inject constructor(
         viewModelScope.launch {
             val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
 
-            // TODO: Optimize memory consumption
-            messageUiStates.update {
-                it.copy(
-                    fakeReactions = it.fakeReactions.toMutableMap().apply {
-                        set(messageId, getOrDefault(messageId, emptySet()).plus(emoji))
-                    }
-                )
-            }
+            updateFakeReactions(messageId, emoji, shouldAddToMap = true)
         }
     }
 
@@ -668,14 +663,21 @@ class ThreadViewModel @Inject constructor(
             // If the value isn't present, there's nothing to remove, so we can exit
             if (messageUiStates.value.fakeReactions[messageId]?.contains(emoji) != true) return@launch
 
-            // TODO: Optimize memory consumption
-            messageUiStates.update {
-                it.copy(
-                    fakeReactions = it.fakeReactions.toMutableMap().apply {
-                        set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))
+            updateFakeReactions(messageId, emoji, shouldAddToMap = false)
+        }
+    }
+
+    private fun updateFakeReactions(messageId: String, emoji: String, shouldAddToMap: Boolean) {
+        // TODO: Optimize memory consumption
+        messageUiStates.update {
+            it.copy(
+                fakeReactions = it.fakeReactions.toMutableMap().apply {
+                    val reactions = getOrDefault(messageId, emptySet()).apply {
+                        if (shouldAddToMap) plus(emoji) else minus(emoji)
                     }
-                )
-            }
+                    set(messageId, reactions)
+                }
+            )
         }
     }
 
@@ -804,7 +806,7 @@ class ThreadViewModel @Inject constructor(
 
         refreshingAcknowledgeMessagesUids[messageUid]?.cancel()
 
-        val job = viewModelScope.launch(ioCoroutineContext) {
+        val job = viewModelScope.launch {
             try {
                 val apiResponse = ApiRepository.getMessage(resource)
                 val responseMessage = apiResponse.data
