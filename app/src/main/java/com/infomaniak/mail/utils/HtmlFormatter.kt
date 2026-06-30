@@ -20,10 +20,10 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
+import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
-import com.infomaniak.mail.utils.MessageBodyUtils.MENTION_ATTR
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
@@ -232,7 +232,7 @@ class HtmlFormatter(private val html: String) {
         fun Context.getMentionsStyle(aliases: List<String>): String {
             if (aliases.isEmpty()) return ""
             val selectors = aliases.joinToString(", ") { alias ->
-                "a[$MENTION_ATTR='$alias']"
+                "a[${MENTION_ATTRIBUTE}='$alias']"
             }
             return loadMentionsStyleTemplate().format(selectors)
         }

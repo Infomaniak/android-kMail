@@ -22,6 +22,7 @@
  */
 package com.infomaniak.html.cleaner
 
+import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import org.jsoup.nodes.Document
 import org.jsoup.safety.Cleaner
 import org.jsoup.safety.Safelist
@@ -49,7 +50,7 @@ internal class BodyCleaner {
                 "wbr",
             )
             .addAttributes(":all", "class", "dir", "id", "style")
-            .addAttributes("a", "name", "data-ik-mention-ref")
+            .addAttributes("a", "name", MENTION_ATTRIBUTE)
             // Allow all URI schemes in links.
             // Removing all protocols makes the list of protocols empty, which means allow all protocols.
             .removeProtocols("a", "href", "ftp", "http", "https", "mailto")
@@ -122,10 +123,6 @@ internal class BodyCleaner {
         dirtyDocument.documentType()?.let { documentType ->
             cleanedDocument.insertChildren(0, documentType)
         }
-    }
-
-    companion object {
-        private const val MENTION_ATTRIBUTE = "data-ik-mention-ref"
     }
 }
 
