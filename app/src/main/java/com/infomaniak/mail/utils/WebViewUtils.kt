@@ -77,7 +77,7 @@ class WebViewUtils(context: Context) {
         return@with inject()
     }
 
-    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, aliases: List<String> = emptyList()) {
+    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, aliases: List<String>) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerScript(messageDisplayJsBridgeScript)
         registerCss(improveRenderingStyle)
