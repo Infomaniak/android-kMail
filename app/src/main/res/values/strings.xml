@@ -184,7 +184,7 @@
     <string name="calendarAllDayLong">All day long</string>
     <string name="calendarNotInvited">You are not invited</string>
     <string name="calendarOrganizerName">%s (Organizer)</string>
-    <string name="callIfNoResponseHeaderTitle">Remind me if there is no response after sending: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Remind me if there is no response: %s after sending</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
@@ -306,7 +306,7 @@
     <string name="encryptedStatePanelIncomplete">A password is required to finalize the sending.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partial</string>
     <string name="encryptedStatePanelTitle">Encryption</string>
-    <string name="encryptionDisabledByScheduledOrReminder">Encryption is not available if scheduled or reminder is enabled</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Encryption is not available if scheduled sending or a reminder is enabled</string>
     <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>

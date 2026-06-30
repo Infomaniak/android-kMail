@@ -186,7 +186,7 @@
     <string name="calendarAllDayLong">Cały dzień</string>
     <string name="calendarNotInvited">Nie jesteś zaproszony</string>
     <string name="calendarOrganizerName">%s (Organizator)</string>
-    <string name="callIfNoResponseHeaderTitle">Przypomnij mi, jeśli nie będzie odpowiedzi po wysłaniu: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Przypomnij mi, jeśli brak odpowiedzi: %s po wysłaniu</string>
     <string name="ccTitle">DW:</string>
     <string name="comingSoon">Wkrótce…</string>
     <string name="commercialFolder">Promocje</string>
@@ -252,6 +252,8 @@
     <plurals name="daysBeforeSendingReminder">
         <item quantity="one">%d dzień</item>
         <item quantity="few">%d dni</item>
+        <item quantity="many">%d dni</item>
+        <item quantity="other">%d dnia</item>
     </plurals>
     <string name="deleteAccountWarning">Usunięcie konta będzie ostateczne. Nie będziesz mógł/ mogła ponownie aktywować konta.</string>
     <string name="deleteFolderDialogDescription">Zawartość folderu %s zostanie trwale usunięta bez przenoszenia do kosza.</string>

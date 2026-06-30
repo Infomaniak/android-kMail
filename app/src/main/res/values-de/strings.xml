@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Gesamter Tag</string>
     <string name="calendarNotInvited">Sie zählen nicht zu den eingeladenen Personen</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>
-    <string name="callIfNoResponseHeaderTitle">Mich erinnern, wenn nach dem Senden keine Antwort erfolgt: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Erinnern, wenn keine Antwort: %s nach dem Senden</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Demnächst…</string>
     <string name="commercialFolder">Werbeaktionen</string>

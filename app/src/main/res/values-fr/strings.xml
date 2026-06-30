@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Toute la journée</string>
     <string name="calendarNotInvited">Vous ne faites pas partie des invités</string>
     <string name="calendarOrganizerName">%s (Organisateur)</string>
-    <string name="callIfNoResponseHeaderTitle">Me rappeler si pas de réponse après envoi : %s</string>
+    <string name="callIfNoResponseHeaderTitle">Me rappeler si pas de réponse : %s après envoi</string>
     <string name="ccTitle">Cc :</string>
     <string name="comingSoon">À venir…</string>
     <string name="commercialFolder">Promotions</string>
@@ -302,7 +302,7 @@
     <string name="encryptedStatePanelIncomplete">Un mot de passe est requis pour finaliser l’envoi.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partiel</string>
     <string name="encryptedStatePanelTitle">Chiffrement</string>
-    <string name="encryptionDisabledByScheduledOrReminder">Le chiffrement n’est pas disponible si l’envoi programmé ou le rappel est activé</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Le chiffrement n’est pas disponible lorsque l’envoi programmé ou le rappel est activé</string>
     <string name="enterPasswordTitle">Saisir le mot de passe</string>
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>

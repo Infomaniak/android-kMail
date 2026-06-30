@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Koko päivä</string>
     <string name="calendarNotInvited">Et ole kutsuttu</string>
     <string name="calendarOrganizerName">%s (Järjestäjä)</string>
-    <string name="callIfNoResponseHeaderTitle">Muistuta minua, jos vastausta ei tule lähettämisen jälkeen: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Muistuta, jos vastausta ei kuulu: %s lähettämisen jälkeen</string>
     <string name="ccTitle">Kopio:</string>
     <string name="comingSoon">Tulossa pian…</string>
     <string name="commercialFolder">Tarjoukset</string>

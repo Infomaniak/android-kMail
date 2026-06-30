@@ -180,7 +180,7 @@
     <string name="calendarAllDayLong">Hele dagen</string>
     <string name="calendarNotInvited">Du er ikke invitert</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>
-    <string name="callIfNoResponseHeaderTitle">Påminn meg hvis det ikke kommer svar etter sending: %s</string>
+    <string name="callIfNoResponseHeaderTitle">Påminn meg hvis det ikke er svar: %s etter sending</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
