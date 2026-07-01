@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.infomaniak.mail.ui.newMessage
+
+import androidx.annotation.StringRes
+import com.infomaniak.mail.R
+
 sealed class ScheduleConfig {
     data object None : ScheduleConfig()
     data class Scheduled(val epochMillis: Long, val isCustom: Boolean = false) : ScheduleConfig()
@@ -23,15 +27,14 @@ sealed class ScheduleConfig {
 
 sealed class ReminderConfig {
     data object None : ReminderConfig()
-    data class Preset(val delayHours: DelayHours) : ReminderConfig()
-    data class Custom(val delayMillis: Long) : ReminderConfig()
+    data class Delayed(val delayMinutes: Int, val isCustom: Boolean = false) : ReminderConfig()
 }
 
-enum class DelayHours(val hours: Int) {
-    HOURS_24(HOURS_IN_A_DAY),
-    DAYS_3(3 * HOURS_IN_A_DAY),
-    DAYS_7(7 * HOURS_IN_A_DAY),
+enum class ReminderPreset(@StringRes val titleRes: Int, val delayMinutes: Int) {
+    HOURS_24(R.plurals.hoursBeforeSendingReminder, MINUTES_IN_A_DAY),
+    DAYS_3(R.plurals.daysBeforeSendingReminder, 3 * MINUTES_IN_A_DAY),
+    DAYS_7(R.plurals.daysBeforeSendingReminder, 7 * MINUTES_IN_A_DAY);
 }
 
 const val MIN_SELECTABLE_DATE_MINUTES = 5
-const val HOURS_IN_A_DAY = 24
+const val MINUTES_IN_A_DAY = 1440

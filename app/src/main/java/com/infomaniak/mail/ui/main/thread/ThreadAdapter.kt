@@ -852,7 +852,7 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.bindRequestResponseAlert(message: Message) {
         topReminderAlertGroup.isVisible = true
-        endReminderAlert.setActionsVisibility(shouldDisplayAction = false)
+        requestResponseAlert.setActionsVisibility(shouldDisplayAction = false)
         val senderNames = message.from.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, senderNames)
 

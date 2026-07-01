@@ -118,6 +118,12 @@ class Draft : RealmObject {
             delay = null
             field = value
         }
+
+    @SerialName("reminder_delta")
+    var reminderDelta: Int? = null
+
+    @SerialName("reminder_display")
+    var shouldRemindRecipient: Boolean? = null
     //endregion
 
     //region Local data (Transient)

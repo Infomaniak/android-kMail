@@ -875,7 +875,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
                 return@getBackNavigationResult
             }
-            actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox) // TODO: adapt it to a real reminder api call when it will be available
+            // actionsViewModel.rescheduleDraft(Date(System.currentTimeMillis() + delayMinutes), mailbox) // TODO: adapt it to a real reminder api call when it will be available
         }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->

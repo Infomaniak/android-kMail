@@ -133,7 +133,11 @@ class MainActivity : BaseActivity() {
 
     private val showSendingSnackbarTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(milliseconds = 1_000L) {
-            val resId = if (draftAction == DraftAction.SCHEDULE) R.string.snackbarScheduling else R.string.snackbarEmailSending
+            val resId = when (draftAction) {
+                DraftAction.SCHEDULE -> R.string.snackbarScheduling
+                DraftAction.REMINDER -> R.string.snackbarReminder
+                else -> R.string.snackbarEmailSending
+            }
             snackbarManager.setValue(getString(resId))
         }
     }
@@ -142,7 +146,9 @@ class MainActivity : BaseActivity() {
         draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
 
         if (draftAction == DraftAction.SEND) showEasterEggs()
-        if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE) showSendingSnackbarTimer.start()
+        if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE || draftAction == DraftAction.REMINDER) {
+            showSendingSnackbarTimer.start()
+        }
     }
 
     private val syncAutoConfigActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
