@@ -150,7 +150,8 @@ class EncryptionMessageManager @Inject constructor(
             return
         }
 
-        val hasConflict = newMessageViewModel.scheduleConfig != ScheduleConfig.None && newMessageViewModel.reminderConfig != ReminderConfig.None
+        val hasConflict = newMessageViewModel.scheduleConfig.value != ScheduleConfig.None
+                && newMessageViewModel.reminderConfig.value != ReminderConfig.None
 
         if (hasConflict) {
             snackbarManager.postValue(context.getString(R.string.encryptionDisabledByScheduledOrReminder))

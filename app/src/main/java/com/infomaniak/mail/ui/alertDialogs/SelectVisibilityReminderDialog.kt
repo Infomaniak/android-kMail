@@ -54,6 +54,7 @@ class SelectVisibilityReminderDialog @Inject constructor(
     ) {
         this.onVisibilitySelected = onVisibilitySelected
         alertDialog.show()
+        isRecipientsAndMeSelected = selectRecipientsAndMe
         setupRadioGroup(selectRecipientsAndMe)
         setupListeners()
     }

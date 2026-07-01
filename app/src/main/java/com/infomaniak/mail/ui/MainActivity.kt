@@ -380,9 +380,10 @@ class MainActivity : BaseActivity() {
                     val reminderDate = getString(DraftsActionsWorker.REMINDER_DRAFT_DATE_KEY)
                     if (reminderDate != null) {
                         val dateFormat = SimpleDateFormat(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR, Locale.getDefault())
-                        showReminderDraftSnackbar(
-                            reminderDate = dateFormat.parse(reminderDate)!!,
-                        )
+                        val parsedDate = dateFormat.parse(reminderDate)
+                        if (parsedDate != null) {
+                            showReminderDraftSnackbar(reminderDate = parsedDate)
+                        }
                     }
                 }
             }
