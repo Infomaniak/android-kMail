@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Lisää kansio</string>
     <string name="buttonCustomReminder">Mukautettu muistutus</string>
     <string name="buttonCustomSchedule">Mukautettu aikataulu</string>
+    <string name="buttonDisable">Poista käytöstä</string>
     <string name="buttonDownload">Lataa</string>
     <string name="buttonDownloadAll">Lataa kaikki</string>
     <string name="buttonFeedback">Palaute</string>
@@ -629,6 +630,8 @@
     <string name="snackbarCalendarChoiceSent">Vastaus otettu huomioon</string>
     <string name="snackbarContactSaved">Uusi yhteystieto rekisteröity onnistuneesti</string>
     <string name="snackbarDeletedConversation">Keskustelua ei ole enää olemassa</string>
+    <string name="snackbarDisableReminderFailure">Muistutusta ei voitu poistaa käytöstä</string>
+    <string name="snackbarDisableReminderSuccess">Muistutus poistettu onnistuneesti käytöstä</string>
     <string name="snackbarDisplayProblemReported">Näyttöongelma ilmoitettu</string>
     <string name="snackbarDownloadInProgress">Lataus käynnissä…</string>
     <string name="snackbarDraftDeleted">Luonnos poistettu</string>

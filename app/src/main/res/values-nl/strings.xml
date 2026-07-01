@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Een map toevoegen</string>
     <string name="buttonCustomReminder">Aangepaste herinnering</string>
     <string name="buttonCustomSchedule">Aangepast schema</string>
+    <string name="buttonDisable">Uitschakelen</string>
     <string name="buttonDownload">Downloaden</string>
     <string name="buttonDownloadAll">Alles downloaden</string>
     <string name="buttonFeedback">Feedback</string>
@@ -629,6 +630,8 @@
     <string name="snackbarCalendarChoiceSent">Antwoord verwerkt</string>
     <string name="snackbarContactSaved">Nieuw contact succesvol geregistreerd</string>
     <string name="snackbarDeletedConversation">Het gesprek bestaat niet meer</string>
+    <string name="snackbarDisableReminderFailure">Herinnering kon niet worden uitgeschakeld</string>
+    <string name="snackbarDisableReminderSuccess">Herinnering succesvol uitgeschakeld</string>
     <string name="snackbarDisplayProblemReported">Weergaveprobleem gemeld</string>
     <string name="snackbarDownloadInProgress">Download bezig…</string>
     <string name="snackbarDraftDeleted">Concept verwijderd</string>

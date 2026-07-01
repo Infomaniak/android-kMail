@@ -23,6 +23,7 @@ import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.view.ViewConfiguration
@@ -774,7 +775,8 @@ class ThreadAdapter(
         bindUnsubscribe(messageUi)
         bindAcknowledge(messageUi)
         bindRequestResponseAlert(message)
-        bindEndReminder(message)
+        bindReminderAlert(message)
+        bindEndReminderAlert(message)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -869,8 +871,38 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindEndReminder(message: Message) {
-        endReminderAlert.setActionsVisibility(shouldDisplayAction = false)
+    private fun ItemMessageBinding.bindReminderAlert(message: Message){
+        reminderAlert.setActionsVisibility(shouldDisplayAction = true)
+
+        reminderAlert.setDescription(
+            context.getString(
+                R.string.callIfNoResponseHeaderTitle,
+                message.displayDate.toDate().format(FORMAT_DATE_DAY_MONTH), // TODO: Use real reminder date
+            ),
+        )
+
+        alertsGroup.isVisible = true
+        reminderAlert.isVisible = true
+
+        message.draftResource?.let { draftResource ->
+            endReminderAlert.onAction1 {
+                trackMessageBannerEvent(MatomoName.ReprogramReminder)
+                threadAdapterCallbacks?.onReminderClicked?.invoke(
+                    // TODO: Create a specific callback for rescheduling reminders
+                    draftResource,
+                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
+                )
+            }
+        }
+
+        reminderAlert.onAction2 {
+            // TODO: add matomo
+            threadAdapterCallbacks?.onDisableReminder?.invoke(message)
+        }
+    }
+
+    private fun ItemMessageBinding.bindEndReminderAlert(message: Message) {
+        endReminderAlert.setActionsVisibility(shouldDisplayAction = true)
         val recipientsNames = message.allRecipients.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, recipientsNames)
 
@@ -1473,6 +1505,7 @@ class ThreadAdapter(
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
         var getAiState: (() -> AiStateMap)? = null,
+        var onDisableReminder: ((Message) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

@@ -145,6 +145,7 @@
     <string name="buttonCreateFolder">Dodaj folder</string>
     <string name="buttonCustomReminder">Niestandardowe przypomnienie</string>
     <string name="buttonCustomSchedule">Niestandardowy harmonogram</string>
+    <string name="buttonDisable">Wyłącz</string>
     <string name="buttonDownload">Pobierz</string>
     <string name="buttonDownloadAll">Pobierz wszystko</string>
     <string name="buttonFeedback">Opinia</string>
@@ -663,6 +664,8 @@
     <string name="snackbarCalendarChoiceSent">Odpowiedź uwzględniona</string>
     <string name="snackbarContactSaved">Nowy kontakt został pomyślnie zapisany</string>
     <string name="snackbarDeletedConversation">Konwersacja już nie istnieje</string>
+    <string name="snackbarDisableReminderFailure">Nie udało się wyłączyć przypomnienia</string>
+    <string name="snackbarDisableReminderSuccess">Przypomnienie zostało pomyślnie wyłączone</string>
     <string name="snackbarDisplayProblemReported">Problem z wyświetlaniem zgłoszony</string>
     <string name="snackbarDownloadInProgress">Pobieranie w toku…</string>
     <string name="snackbarDraftDeleted">Wersja robocza usunięta</string>

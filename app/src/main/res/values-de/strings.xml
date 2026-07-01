@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
     <string name="buttonCustomReminder">Benutzerdefinierte Erinnerung</string>
     <string name="buttonCustomSchedule">Benutzerdefinierter Zeitplan</string>
+    <string name="buttonDisable">Deaktivieren</string>
     <string name="buttonDownload">Herunterladen</string>
     <string name="buttonDownloadAll">Alle herunterladen</string>
     <string name="buttonFeedback">Rückmeldung</string>
@@ -629,6 +630,8 @@
     <string name="snackbarCalendarChoiceSent">Antwort berücksichtigt</string>
     <string name="snackbarContactSaved">Neuer Kontakt erfolgreich registriert</string>
     <string name="snackbarDeletedConversation">Unterhaltung existiert nicht mehr</string>
+    <string name="snackbarDisableReminderFailure">Erinnerung konnte nicht deaktiviert werden</string>
+    <string name="snackbarDisableReminderSuccess">Erinnerung erfolgreich deaktiviert</string>
     <string name="snackbarDisplayProblemReported">Anzeigeproblem gemeldet</string>
     <string name="snackbarDownloadInProgress">Download läuft…</string>
     <string name="snackbarDraftDeleted">Entwurf gelöscht</string>

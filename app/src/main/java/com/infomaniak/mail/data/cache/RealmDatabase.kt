@@ -46,6 +46,7 @@ import com.infomaniak.mail.data.models.message.EmojiReactionAuthor
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Headers
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.ReminderInfo
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
@@ -236,6 +237,7 @@ object RealmDatabase {
             Folder::class,
             Thread::class,
             Message::class,
+            ReminderInfo::class,
             Headers::class,
             Draft::class,
             Recipient::class,

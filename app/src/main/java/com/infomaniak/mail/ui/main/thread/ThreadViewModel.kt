@@ -21,6 +21,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -767,6 +768,25 @@ class ThreadViewModel @Inject constructor(
         )
 
         return fakedReaction
+    }
+
+    fun disableReminder(message: Message) {
+        val messageId = message.messageId
+        val reminderUuid = message.reminder?.uuid
+        if (messageId.isNullOrBlank() || reminderUuid.isNullOrBlank()) return
+        viewModelScope.launch {
+            val apiResponse = ApiRepository.disableReminder(
+                mailboxUuid = mailbox().uuid,
+                folderId = message.folderId,
+                messageId = messageId,
+                reminderUuid = reminderUuid
+            )
+            if (apiResponse.isSuccess()) {
+                snackbarManager.postValue(appContext.getString(R.string.snackbarDisableReminderSuccess))
+            } else {
+                snackbarManager.postValue(appContext.getString(R.string.snackbarDisableReminderFailure))
+            }
+        }
     }
 
     //region Unsubscribe list diffusion

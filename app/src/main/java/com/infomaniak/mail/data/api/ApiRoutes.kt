@@ -310,6 +310,12 @@ object ApiRoutes {
         return "${resource(messageResource)}/acknowledge"
     }
 
+    //region reminder
+    fun disableReminder(mailboxUuid: String, folderId: String, messageId: String, reminderUuid: String): String {
+        return "${mailMailbox(mailboxUuid)}/folder/$folderId/message/$messageId/reminder/$reminderUuid"
+    }
+    //endregion
+
     private fun mailboxUuidParameter(mailboxUuid: String): String {
         return "?mailbox_uuid=$mailboxUuid"
     }

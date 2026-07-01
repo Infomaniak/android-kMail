@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Aggiungi una cartella</string>
     <string name="buttonCustomReminder">Promemoria personalizzato</string>
     <string name="buttonCustomSchedule">Programma personalizzato</string>
+    <string name="buttonDisable">Disattiva</string>
     <string name="buttonDownload">Scarica</string>
     <string name="buttonDownloadAll">Scarica tutti</string>
     <string name="buttonFeedback">Feedback</string>
@@ -629,6 +630,8 @@
     <string name="snackbarCalendarChoiceSent">Risposta presa in considerazione</string>
     <string name="snackbarContactSaved">Nuovo contatto registrato con successo</string>
     <string name="snackbarDeletedConversation">La conversazione non esiste più</string>
+    <string name="snackbarDisableReminderFailure">Impossibile disattivare il promemoria</string>
+    <string name="snackbarDisableReminderSuccess">Promemoria disattivato con successo</string>
     <string name="snackbarDisplayProblemReported">Problema di visualizzazione segnalato</string>
     <string name="snackbarDownloadInProgress">Download in corso…</string>
     <string name="snackbarDraftDeleted">Bozza cancellata</string>
