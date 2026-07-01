@@ -255,6 +255,14 @@ class HtmlFormatter(private val html: String) {
             return loadMentionsLightStyleTemplate().format(selectors)
         }
 
+        fun Context.getMentionsEditorStyle(aliases: List<String>): String {
+            if (aliases.isEmpty()) return ""
+            val selectors = aliases.joinToString(", ") { alias ->
+                "a[${MENTION_ATTRIBUTE}='$alias']"
+            }
+            return loadMentionsTemplate().format(selectors)
+        }
+
         private fun Context.loadMentionsLightStyleTemplate(): String {
             val lightContext = withMode(Configuration.UI_MODE_NIGHT_NO)
             return loadCss(
@@ -262,6 +270,16 @@ class HtmlFormatter(private val html: String) {
                 listOf(
                     PRIMARY_COLOR_CODE to lightContext.getAttributeColor(RAndroid.attr.colorPrimary),
                     PRIMARY_CONTAINER_COLOR_CODE to lightContext.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+                )
+            )
+        }
+
+        private fun Context.loadMentionsTemplate(): String {
+            return loadCss(
+                R.raw.mentions_style,
+                listOf(
+                    PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
+                    PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
                 )
             )
         }

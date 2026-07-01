@@ -43,7 +43,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.common.observe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
@@ -94,7 +93,6 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
@@ -106,7 +104,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObserverScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
@@ -496,18 +494,12 @@ class NewMessageFragment : Fragment() {
         enableAlgorithmicDarkening(isEnabled = true)
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
-        if (context.isNightModeEnabled()) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                val selfEmails = newMessageViewModel.currentMailbox().aliases
-                addCss(context.getCustomDarkMode(selfEmails))
-            }
-        }
     }
 
     private fun addMentionsStyle() {
         viewLifecycleOwner.lifecycleScope.launch {
             val selfEmails = newMessageViewModel.currentMailbox().aliases
-            val formatMentionsStyle = context?.getMentionsStyle(selfEmails)
+            val formatMentionsStyle = context?.getMentionsEditorStyle(selfEmails)
             if (formatMentionsStyle != null) {
                 binding.editorWebView.addCss(formatMentionsStyle)
             }
@@ -892,6 +884,7 @@ class NewMessageFragment : Fragment() {
         binding.editorWebView.exportHtml { html ->
             newMessageViewModel.storeBodyAndSubject(subject, html)
         }
+        newMessageViewModel.updateMentionQuery("")
 
         super.onStop()
     }
