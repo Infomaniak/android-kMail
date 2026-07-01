@@ -45,8 +45,11 @@ class EditorJavascriptBridge(
 
     @JavascriptInterface
     fun onMentionsDeleted(refsJson: String) {
-        val jsonArray = runCatching {
-            JSONArray(refsJson)
+        val refs = runCatching {
+            Json.decodeFromString<List<String>>(refsJson)
+                .map(String::trim)
+                .filter(String::isNotBlank)
+                .toList()
         }.onFailure {
             SentryLog.e(TAG, "Failed to parse mention refs", it)
         }.getOrNull() ?: return
