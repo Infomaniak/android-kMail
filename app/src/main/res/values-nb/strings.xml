@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Legg til mappe</string>
     <string name="buttonCustomReminder">Egendefinert påminnelse</string>
     <string name="buttonCustomSchedule">Egendefinert timeplan</string>
+    <string name="buttonDisable">Deaktiver</string>
     <string name="buttonDownload">Last ned</string>
     <string name="buttonDownloadAll">Last ned alle</string>
     <string name="buttonFeedback">Tilbakemelding</string>
@@ -630,6 +631,8 @@
     <string name="snackbarCalendarChoiceSent">Svar tatt i betraktning</string>
     <string name="snackbarContactSaved">Ny kontakt registrert</string>
     <string name="snackbarDeletedConversation">Samtalen finnes ikke lenger</string>
+    <string name="snackbarDisableReminderFailure">Kunne ikke deaktivere påminnelsen</string>
+    <string name="snackbarDisableReminderSuccess">Påminnelsen ble deaktivert</string>
     <string name="snackbarDisplayProblemReported">Visningsproblem rapportert</string>
     <string name="snackbarDownloadInProgress">Nedlasting pågår…</string>
     <string name="snackbarDraftDeleted">Utkast slettet</string>

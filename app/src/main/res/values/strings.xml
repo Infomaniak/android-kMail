@@ -143,6 +143,7 @@
     <string name="buttonCreateFolder">Add a folder</string>
     <string name="buttonCustomReminder">Custom reminder</string>
     <string name="buttonCustomSchedule">Custom schedule</string>
+    <string name="buttonDisable">Disable</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedback">Feedback</string>
@@ -634,6 +635,8 @@
     <string name="snackbarCalendarChoiceSent">Response taken into account</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>
     <string name="snackbarDeletedConversation">Conversation no longer exists</string>
+    <string name="snackbarDisableReminderFailure">Failed to disable reminder</string>
+    <string name="snackbarDisableReminderSuccess">Reminder successfully disabled</string>
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarDownloadInProgress">Download in progress…</string>
     <string name="snackbarDraftDeleted">Draft deleted</string>

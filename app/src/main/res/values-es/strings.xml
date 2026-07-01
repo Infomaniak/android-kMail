@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Añadir una carpeta</string>
     <string name="buttonCustomReminder">Recordatorio personalizado</string>
     <string name="buttonCustomSchedule">Horario personalizado</string>
+    <string name="buttonDisable">Desactivar</string>
     <string name="buttonDownload">Descargar</string>
     <string name="buttonDownloadAll">Descargar todo</string>
     <string name="buttonFeedback">Comentarios</string>
@@ -630,6 +631,8 @@
     <string name="snackbarCalendarChoiceSent">Respuesta tenida en cuenta</string>
     <string name="snackbarContactSaved">Nuevo contacto registrado correctamente</string>
     <string name="snackbarDeletedConversation">La conversación ya no existe</string>
+    <string name="snackbarDisableReminderFailure">No se ha podido desactivar el recordatorio</string>
+    <string name="snackbarDisableReminderSuccess">Recordatorio desactivado correctamente</string>
     <string name="snackbarDisplayProblemReported">Problema de visualización notificado</string>
     <string name="snackbarDownloadInProgress">Descarga en proceso…</string>
     <string name="snackbarDraftDeleted">Borrador suprimido</string>

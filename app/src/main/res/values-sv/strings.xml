@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Lägg till en mapp</string>
     <string name="buttonCustomReminder">Anpassad påminnelse</string>
     <string name="buttonCustomSchedule">Anpassat schema</string>
+    <string name="buttonDisable">Inaktivera</string>
     <string name="buttonDownload">Ladda ner</string>
     <string name="buttonDownloadAll">Ladda ner alla</string>
     <string name="buttonFeedback">Feedback</string>
@@ -630,6 +631,8 @@
     <string name="snackbarCalendarChoiceSent">Svar beaktat</string>
     <string name="snackbarContactSaved">Ny kontakt registrerad</string>
     <string name="snackbarDeletedConversation">Konversationen finns inte längre</string>
+    <string name="snackbarDisableReminderFailure">Det gick inte att inaktivera påminnelsen</string>
+    <string name="snackbarDisableReminderSuccess">Påminnelsen har inaktiverats</string>
     <string name="snackbarDisplayProblemReported">Visningsproblem rapporterat</string>
     <string name="snackbarDownloadInProgress">Nedladdning pågår…</string>
     <string name="snackbarDraftDeleted">Utkast raderat</string>

@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Ajouter un dossier</string>
     <string name="buttonCustomReminder">Délai personnalisé</string>
     <string name="buttonCustomSchedule">Horaire personnalisé</string>
+    <string name="buttonDisable">Désactiver</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
     <string name="buttonFeedback">Feedback</string>
@@ -630,6 +631,8 @@
     <string name="snackbarCalendarChoiceSent">Réponse prise en compte</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>
     <string name="snackbarDeletedConversation">La conversation n’existe plus</string>
+    <string name="snackbarDisableReminderFailure">Échec de la désactivation du rappel</string>
+    <string name="snackbarDisableReminderSuccess">Le rappel a bien été désactivé</string>
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarDownloadInProgress">Téléchargement en cours…</string>
     <string name="snackbarDraftDeleted">Brouillon supprimé</string>

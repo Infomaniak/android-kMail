@@ -491,6 +491,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
                 getAiState = { aiActionsViewModel.aiStateMap.value },
+                onDisableReminder = ::disableReminder,
             ),
         )
 

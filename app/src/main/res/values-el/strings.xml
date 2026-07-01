@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Προσθήκη φακέλου</string>
     <string name="buttonCustomReminder">Προσαρμοσμένη υπενθύμιση</string>
     <string name="buttonCustomSchedule">Προσαρμοσμένο πρόγραμμα</string>
+    <string name="buttonDisable">Απενεργοποίηση</string>
     <string name="buttonDownload">Λήψη</string>
     <string name="buttonDownloadAll">Λήψη όλων</string>
     <string name="buttonFeedback">Σχόλια</string>
@@ -630,6 +631,8 @@
     <string name="snackbarCalendarChoiceSent">Η απάντηση καταχωρήθηκε</string>
     <string name="snackbarContactSaved">Η επαφή καταχωρήθηκε με επιτυχία</string>
     <string name="snackbarDeletedConversation">Η συνομιλία δεν υπάρχει πλέον</string>
+    <string name="snackbarDisableReminderFailure">Δεν ήταν δυνατή η απενεργοποίηση της υπενθύμισης</string>
+    <string name="snackbarDisableReminderSuccess">Η υπενθύμιση απενεργοποιήθηκε με επιτυχία</string>
     <string name="snackbarDisplayProblemReported">Το πρόβλημα εμφάνισης αναφέρθηκε</string>
     <string name="snackbarDownloadInProgress">Η λήψη βρίσκεται σε εξέλιξη…</string>
     <string name="snackbarDraftDeleted">Το πρόχειρο διαγράφηκε</string>

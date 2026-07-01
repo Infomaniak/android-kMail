@@ -201,6 +201,12 @@ object ApiRepository : ApiRepositoryCore() {
     }
     //endregion
 
+    //region reminder
+    suspend fun disableReminder(mailboxUuid: String, folderId: String, messageId: String, reminderUuid: String): ApiResponse<Unit> {
+        return callApi(ApiRoutes.disableReminder(mailboxUuid, folderId, messageId, reminderUuid), DELETE)
+    }
+    //endregion
+
     //region Spam
     suspend fun setSpamFilter(mailboxHostingId: Int, mailboxName: String, activateSpamFilter: Boolean): ApiResponse<Unit> {
         return callApi(ApiRoutes.mailboxInfo(mailboxHostingId, mailboxName), PATCH, mapOf("has_move_spam" to activateSpamFilter))

@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Adicionar uma pasta</string>
     <string name="buttonCustomReminder">Lembrete personalizado</string>
     <string name="buttonCustomSchedule">Programação personalizada</string>
+    <string name="buttonDisable">Desativar</string>
     <string name="buttonDownload">Transferir</string>
     <string name="buttonDownloadAll">Transferir tudo</string>
     <string name="buttonFeedback">Feedback</string>
@@ -630,6 +631,8 @@
     <string name="snackbarCalendarChoiceSent">Resposta considerada</string>
     <string name="snackbarContactSaved">Novo contacto guardado com sucesso</string>
     <string name="snackbarDeletedConversation">A conversa já não existe</string>
+    <string name="snackbarDisableReminderFailure">Não foi possível desativar o lembrete</string>
+    <string name="snackbarDisableReminderSuccess">Lembrete desativado com sucesso</string>
     <string name="snackbarDisplayProblemReported">Problema de exibição reportado</string>
     <string name="snackbarDownloadInProgress">Transferência em curso…</string>
     <string name="snackbarDraftDeleted">Rascunho eliminado</string>
