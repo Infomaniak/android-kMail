@@ -94,6 +94,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AttachmentsReminderUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.DraftInitManager
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.MENTIONS_STYLE
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -1093,13 +1094,7 @@ class NewMessageViewModel @Inject constructor(
     private fun Document.addMissingMentionsStyle() {
         val mentionTags = getElementsByAttribute(MENTION_ATTRIBUTE)
         mentionTags.forEach { mention ->
-            mention.attr(
-                "style",
-                "padding: 0 4px; border-radius: 100px; " +
-                        "color: var(--mail-content-mention-text-color, #333); " +
-                        "background-color: var(--mail-content-mention-background-color, #f1f1f1); " +
-                        "font-weight: var(--mail-content-mention-font-weight, inherit)"
-            )
+            mention.attr("style", MENTIONS_STYLE)
         }
     }
 
