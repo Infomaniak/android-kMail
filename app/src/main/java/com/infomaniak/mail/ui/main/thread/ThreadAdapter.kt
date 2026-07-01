@@ -595,11 +595,12 @@ class ThreadAdapter(
     ) {
         with(targetView) {
             val errorMessageRes = if (aiAction == AiAction.SUMMARY) {
-                R.string.messageSummaryErrorRetry
+                R.string.messageSummaryError
             } else {
-                R.string.messageTranslateErrorRetry
+                R.string.messageTranslateError
             }
             title = context.getString(errorMessageRes)
+            description = context.getString(R.string.tryAgain)
             setIconRes(R.drawable.ic_warning)
             isButtonEnabled = false
 
@@ -621,11 +622,12 @@ class ThreadAdapter(
 
             if (state.canRetry) {
                 val errorMessageRes = if (aiAction == AiAction.SUMMARY) {
-                    R.string.messageSummaryErrorRetry
+                    R.string.messageSummaryError
                 } else {
-                    R.string.messageTranslateErrorRetry
+                    R.string.messageTranslateError
                 }
                 title = this.context.getString(errorMessageRes)
+                description = context.getString(R.string.tryAgain)
                 isButtonEnabled = true
                 hideButtonProgress(R.string.aiButtonRetry)
             } else {
@@ -635,6 +637,7 @@ class ThreadAdapter(
                     else -> R.string.messageTranslateError
                 }
                 title = context.getString(errorMessageRes)
+                description = null
                 isButtonVisible = false
             }
         }

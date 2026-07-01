@@ -405,10 +405,8 @@
     <string name="messageShowQuotedText">Gesprek weergeven</string>
     <string name="messageSummary">Samenvatting van het bericht</string>
     <string name="messageSummaryError">Euria kon dit bericht niet samenvatten.</string>
-    <string name="messageSummaryErrorRetry">Euria kon dit bericht niet samenvatten. Probeer het opnieuw.</string>
     <string name="messageSummaryLoading">Samenvatting van het bericht…</string>
     <string name="messageTranslateError">Euria kon dit bericht niet vertalen.</string>
-    <string name="messageTranslateErrorRetry">Euria kon dit bericht niet vertalen. Probeer het opnieuw.</string>
     <string name="messageTranslatedTitle">Vertaald in %s</string>
     <string name="mondayAfternoon">Maandagmiddag</string>
     <string name="mondayMorning">Maandagochtend</string>
@@ -711,6 +709,7 @@
     </plurals>
     <string name="translationTargetSameAsSource">Dit bericht is al in uw taal</string>
     <string name="trashFolder">Prullenbak</string>
+    <string name="tryAgain">Probeer het opnieuw.</string>
     <string name="unblockButton">Deblokkeren</string>
     <string name="unknownDialogTitleExpeditor">Onbekende afzender</string>
     <string name="unknownDialogTitleRecipient">Onbekende ontvanger</string>

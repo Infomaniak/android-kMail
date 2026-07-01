@@ -409,10 +409,8 @@
     <string name="messageShowQuotedText">Display the conversation</string>
     <string name="messageSummary">Message summary</string>
     <string name="messageSummaryError">Euria could not summarize this message.</string>
-    <string name="messageSummaryErrorRetry">Euria could not summarize this message. Please try again.</string>
     <string name="messageSummaryLoading">Message summary…</string>
     <string name="messageTranslateError">Euria could not translate this message.</string>
-    <string name="messageTranslateErrorRetry">Euria could not translate this message. Please try again.</string>
     <string name="messageTranslatedTitle">Translated in %s</string>
     <string name="mondayAfternoon">Monday afternoon</string>
     <string name="mondayMorning">Monday morning</string>
@@ -715,6 +713,7 @@
     </plurals>
     <string name="translationTargetSameAsSource">This message is already in your language</string>
     <string name="trashFolder">Trash</string>
+    <string name="tryAgain">Please try again.</string>
     <string name="unblockButton">Unblock</string>
     <string name="unknownDialogTitleExpeditor">Unknown expeditor</string>
     <string name="unknownDialogTitleRecipient">Unknown recipient</string>
