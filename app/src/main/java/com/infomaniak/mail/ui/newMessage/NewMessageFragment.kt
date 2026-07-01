@@ -494,9 +494,14 @@ class NewMessageFragment : Fragment() {
 
     private fun setEditorStyle() = with(binding.editorWebView) {
         enableAlgorithmicDarkening(isEnabled = true)
-        if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
+        if (context.isNightModeEnabled()) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val selfEmails = newMessageViewModel.currentMailbox().aliases
+                addCss(context.getCustomDarkMode(selfEmails))
+            }
+        }
     }
 
     private fun addMentionsStyle() {

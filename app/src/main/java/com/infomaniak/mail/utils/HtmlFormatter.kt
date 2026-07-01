@@ -18,7 +18,9 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.content.res.Configuration
 import androidx.annotation.RawRes
+import androidx.appcompat.view.ContextThemeWrapper
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import com.infomaniak.mail.R
@@ -26,6 +28,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_DARK_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_DARK_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
@@ -213,7 +217,21 @@ class HtmlFormatter(private val html: String) {
             }
         }
 
-        fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
+        fun Context.getCustomDarkMode(aliases: List<String>): String {
+            if (aliases.isEmpty()) return ""
+            val selectors = aliases.joinToString(", ") { alias ->
+                "a[${MENTION_ATTRIBUTE}='$alias']"
+            }
+            val darkContext = withMode(Configuration.UI_MODE_NIGHT_YES)
+            val darkModeCss = loadCss(
+                R.raw.custom_dark_mode,
+                listOf(
+                    PRIMARY_DARK_COLOR_CODE to darkContext.getAttributeColor(RAndroid.attr.colorPrimary),
+                    PRIMARY_CONTAINER_DARK_COLOR_CODE to darkContext.getAttributeColor(RMaterial.attr.colorPrimaryContainer)
+                )
+            )
+            return darkModeCss.format(selectors)
+        }
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
@@ -234,16 +252,30 @@ class HtmlFormatter(private val html: String) {
             val selectors = aliases.joinToString(", ") { alias ->
                 "a[${MENTION_ATTRIBUTE}='$alias']"
             }
-            return loadMentionsStyleTemplate().format(selectors)
+            return loadMentionsLightStyleTemplate().format(selectors)
         }
 
-        private fun Context.loadMentionsStyleTemplate(): String = loadCss(
-            R.raw.mentions_style,
-            listOf(
-                PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
-                PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+        private fun Context.loadMentionsLightStyleTemplate(): String {
+            val lightContext = withMode(Configuration.UI_MODE_NIGHT_NO)
+            return loadCss(
+                R.raw.mentions_style,
+                listOf(
+                    PRIMARY_COLOR_CODE to lightContext.getAttributeColor(RAndroid.attr.colorPrimary),
+                    PRIMARY_CONTAINER_COLOR_CODE to lightContext.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+                )
             )
-        )
+        }
+
+        private fun Context.withMode(mode: Int): Context {
+            val config = Configuration(resources.configuration).apply {
+                uiMode = (uiMode and Configuration.UI_MODE_TYPE_MASK) or mode
+            }
+
+            val configContext = createConfigurationContext(config)
+            return ContextThemeWrapper(configContext, 0).apply {
+                theme.setTo(this@withMode.theme)
+            }
+        }
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
