@@ -343,5 +343,9 @@ class HtmlFormatter(private val html: String) {
         fun Context.getEditorMentionClickObserverScript(): String {
             return loadScript(R.raw.editor_mention_click_observer)
         }
+
+        fun Context.removeMentionsScript(): String {
+            return loadScript(R.raw.remove_mentions_scripts)
+        }
     }
 }

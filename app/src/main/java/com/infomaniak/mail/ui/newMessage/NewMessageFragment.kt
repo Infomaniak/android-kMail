@@ -107,6 +107,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObser
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.removeMentionsScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -165,6 +166,7 @@ class NewMessageFragment : Fragment() {
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
     private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
     private val mentionClickObserverScript by lazy { requireContext().getEditorMentionClickObserverScript() }
+    private val removeMentionsScript by lazy { requireContext().removeMentionsScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -828,13 +830,16 @@ class NewMessageFragment : Fragment() {
             binding.scheduleButton.isVisible = isScheduledDraftsEnabled
 
             val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
-            if (areMentionsAvailable) {
-                binding.editorWebView.apply {
-                    addScript(mentionsObserverScript)
-                    addScript(insertMentionScript)
-                    addScript(mentionDeletionObserverScript)
+
+            binding.editorWebView.apply {
+                if (areMentionsAvailable) {
+                    addScript(mentionsObserverScript, MENTION_OBSERVER_SCRIPT)
+                    addScript(insertMentionScript, INSERT_MENTION_SCRIPT)
+                    addScript(mentionDeletionObserverScript, MENTION_DELETION_OBSERVER_SCRIPT)
+                    addMentionsStyle()
+                } else {
+                    evaluateJavascript(removeMentionsScript, null)
                 }
-                addMentionsStyle()
             }
         }
     }
@@ -1035,4 +1040,9 @@ class NewMessageFragment : Fragment() {
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
+    companion object {
+        const val MENTION_OBSERVER_SCRIPT = "mention_observer_script"
+        const val INSERT_MENTION_SCRIPT = "insert_mention_script"
+        const val MENTION_DELETION_OBSERVER_SCRIPT = "mention_deletion_observer_script"
+    }
 }
