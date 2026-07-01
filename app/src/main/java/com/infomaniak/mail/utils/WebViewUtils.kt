@@ -24,7 +24,6 @@ import android.view.ViewParent
 import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.javascriptBridge.MessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
@@ -37,7 +36,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
-import com.infomaniak.mail.utils.extensions.loadCss
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.math.abs
@@ -126,18 +124,18 @@ class WebViewUtils(context: Context) {
             setupCommonWebViewSettings()
         }
 
-        fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
+        fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean, aliases: List<String>) {
             enableAlgorithmicDarkening(isThemeTheSame)
-            if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
+            if (isThemeTheSame) addBackgroundJs(aliases) else removeBackgroundJs()
         }
 
-        private fun WebView.addBackgroundJs() {
-            val css = context.loadCss(R.raw.custom_dark_mode)
+        private fun WebView.addBackgroundJs(aliases: List<String>) {
+            val customDarkMode = context.getCustomDarkMode(aliases)
             evaluateJavascript(
                 """ var style = document.createElement('style')
                 document.head.appendChild(style)
                 style.id = "$DARK_BACKGROUND_STYLE_ID"
-                style.innerHTML = `$css`
+                style.innerHTML = `$customDarkMode`
             """.trimIndent(),
                 null,
             )
