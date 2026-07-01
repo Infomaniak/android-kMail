@@ -197,6 +197,11 @@ class HtmlFormatter(private val html: String) {
         private val DETECT_BUT_DO_NOT_BREAK = setOf(' ')
         private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
 
+        const val MENTIONS_STYLE = "padding: 0 4px; border-radius: 100px; " +
+                "color: var(--mail-content-mention-text-color, #333); " +
+                "background-color: var(--mail-content-mention-background-color, #f1f1f1); " +
+                "font-weight: var(--mail-content-mention-font-weight, inherit)"
+
         private fun Context.loadScript(
             @RawRes scriptResId: Int,
             customVariablesDeclaration: List<Pair<String, Any>> = emptyList(),
