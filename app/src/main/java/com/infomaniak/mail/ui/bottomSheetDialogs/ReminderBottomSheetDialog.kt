@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -30,10 +29,9 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetReminderOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
-import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
-import com.infomaniak.mail.ui.newMessage.HOURS_IN_A_DAY
+import com.infomaniak.mail.ui.newMessage.ReminderPreset
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
@@ -68,10 +66,12 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     private fun createPresetOptions() {
         listOf(ReminderPreset.HOURS_24, ReminderPreset.DAYS_3, ReminderPreset.DAYS_7).forEach { preset ->
             val itemView = ActionItemView(requireContext()).apply {
-                val dateText = if (preset.hours % HOURS_IN_A_DAY == 0 && preset.hours > HOURS_IN_A_DAY) {
-                    resources.getQuantityString(R.plurals.daysBeforeSendingReminder, preset.hours / HOURS_IN_A_DAY, preset.hours / HOURS_IN_A_DAY)
+                val days = preset.delayMinutes / (24 * 60)
+                val dateText = if (preset.delayMinutes % (24 * 60) == 0 && days > 0) {
+                    resources.getQuantityString(R.plurals.daysBeforeSendingReminder, days, days)
                 } else {
-                    resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, preset.hours, preset.hours)
+                    val hours = preset.delayMinutes / 60
+                    resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, hours, hours)
                 }
 
                 setTitle(dateText)
@@ -93,7 +93,7 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
     }
 
     private fun onPresetSelected(preset: ReminderPreset) {
-        setBackNavigationResult(REMINDER_RESULT, preset.delayMillis)
+        setBackNavigationResult(REMINDER_RESULT, preset.delayMinutes)
     }
 
     private fun onCustomReminderClicked() {
@@ -109,8 +109,8 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
 
     private fun showCustomDelayReminderDatePicker() {
         customReminderPickerDialog.show(
-            onDelaySelected = { delayMillis ->
-                setBackNavigationResult(REMINDER_RESULT, delayMillis)
+            onDelaySelected = { delayMinutes ->
+                setBackNavigationResult(REMINDER_RESULT, delayMinutes)
                 dismiss()
             },
         )
@@ -118,13 +118,5 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
 
     companion object {
         const val REMINDER_RESULT = "reminder_result"
-    }
-
-    private enum class ReminderPreset(@StringRes val titleRes: Int, val hours: Int) {
-        HOURS_24(R.plurals.hoursBeforeSendingReminder, HOURS_IN_A_DAY),
-        DAYS_3(R.plurals.daysBeforeSendingReminder, 3 * HOURS_IN_A_DAY),
-        DAYS_7(R.plurals.daysBeforeSendingReminder, 7 * HOURS_IN_A_DAY);
-
-        val delayMillis: Long get() = hours * ONE_HOUR_IN_MILLIS
     }
 }

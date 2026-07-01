@@ -21,7 +21,6 @@ import android.content.Context
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogCustomReminderPickerBinding
-import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -37,7 +36,7 @@ class CustomReminderPickerDialog @Inject constructor(
 
     override val alertDialog = initDialog()
 
-    private var onDelaySelected: ((Long) -> Unit)? = null
+    private var onDelaySelected: ((Int) -> Unit)? = null
 
     private val timeUnits = TimeUnit.entries.toTypedArray()
 
@@ -50,7 +49,7 @@ class CustomReminderPickerDialog @Inject constructor(
             .create()
     }
 
-    fun show(onDelaySelected: (Long) -> Unit) {
+    fun show(onDelaySelected: (Int) -> Unit) {
         this.onDelaySelected = onDelaySelected
         alertDialog.show()
         setupPickers()
@@ -88,7 +87,7 @@ class CustomReminderPickerDialog @Inject constructor(
         positiveButton.setOnClickListener {
             numberPicker.clearFocus()
             unitPicker.clearFocus()
-            onDelaySelected?.invoke(getDelayMillis())
+            onDelaySelected?.invoke(getDelayMinutes())
             alertDialog.dismiss()
         }
 
@@ -103,26 +102,25 @@ class CustomReminderPickerDialog @Inject constructor(
         binding.unitPicker.displayedValues = displayedUnits
     }
 
-    private fun getDelayMillis(): Long {
+    private fun getDelayMinutes(): Int {
         val number = binding.numberPicker.value
         val selectedUnitIndex = binding.unitPicker.value
         val selectedUnit = timeUnits[selectedUnitIndex]
 
-        return number * selectedUnit.multiplierInMillis
+        return number * selectedUnit.multiplierInMinutes
     }
 
     companion object {
-        private const val DAY_IN_MILLIS = 24 * ONE_HOUR_IN_MILLIS
         private const val MAX_HOURS = 23
         private const val MAX_DAYS = 30
 
         enum class TimeUnit(
             val titleRes: Int,
             val maxValue: Int,
-            val multiplierInMillis: Long
+            val multiplierInMinutes: Int
         ) {
-            HOURS(R.plurals.unitHours, MAX_HOURS, ONE_HOUR_IN_MILLIS),
-            DAYS(R.plurals.unitDays, MAX_DAYS, DAY_IN_MILLIS)
+            HOURS(R.plurals.unitHours, MAX_HOURS, 60),
+            DAYS(R.plurals.unitDays, MAX_DAYS, 24 * 60)
         }
     }
 }

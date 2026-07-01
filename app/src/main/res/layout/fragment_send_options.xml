@@ -112,21 +112,21 @@
                         android:id="@+id/hours24"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:value="24"
+                        app:value="1440"
                         tools:text="24 hours" />
 
                     <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                         android:id="@+id/days3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:value="72"
+                        app:value="4320"
                         tools:text="3 days" />
 
                     <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                         android:id="@+id/days7"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:value="168"
+                        app:value="10080"
                         tools:text="7 days" />
 
                 </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>

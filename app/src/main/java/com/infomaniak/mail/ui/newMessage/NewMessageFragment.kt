@@ -81,7 +81,6 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
-import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
@@ -450,7 +449,7 @@ class NewMessageFragment : Fragment() {
             onAction1 { navigateToScheduleSendBottomSheet() }
             onAction2 {
                 newMessageViewModel.reminderConfig.value = ReminderConfig.None
-                newMessageViewModel.reminderVisibility.value = true
+                newMessageViewModel.shouldRemindRecipient.value = true
             }
         }
 
@@ -500,32 +499,16 @@ class NewMessageFragment : Fragment() {
     private fun observeReminder() {
         newMessageViewModel.reminderConfig.observe(viewLifecycleOwner) { config ->
             when (config) {
-                is ReminderConfig.Preset -> {
-                    val hours = config.delayHours.hours
-                    val dateText = if (hours % HOURS_IN_A_DAY == 0 && hours > HOURS_IN_A_DAY) {
-                        resources.getQuantityString(
-                            R.plurals.daysBeforeSendingReminder,
-                            hours / HOURS_IN_A_DAY,
-                            hours / HOURS_IN_A_DAY
-                        )
-                    } else {
-                        resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, hours, hours)
-                    }
+                is ReminderConfig.Delayed -> {
+                    val dateText = requireContext().formatDelayText(config.delayMinutes)
+
                     binding.reminderAlert.apply {
                         setDescription(getString(R.string.callIfNoResponseHeaderTitle, dateText))
                         isVisible = true
                     }
                     binding.divider7.isVisible = true
                 }
-                is ReminderConfig.Custom -> {
-                    val delayText = requireContext().formatDelayText(config.delayMillis)
-                    binding.reminderAlert.apply {
-                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, delayText))
-                        isVisible = true
-                    }
-                    binding.divider7.isVisible = true
-                }
-                ReminderConfig.None -> {
+                is ReminderConfig.None -> {
                     binding.reminderAlert.isVisible = false
                     binding.divider7.isVisible = false
                 }
@@ -921,13 +904,8 @@ class NewMessageFragment : Fragment() {
 
     private fun processReminderConfig(): Boolean {
         val reminderConfig = newMessageViewModel.reminderConfig.value
-        return if (reminderConfig !is ReminderConfig.None) {
-            val delayMillis = when (reminderConfig) {
-                is ReminderConfig.Preset -> reminderConfig.delayHours.hours * ONE_HOUR_IN_MILLIS
-                is ReminderConfig.Custom -> reminderConfig.delayMillis
-                else -> 0L
-            }
-            newMessageViewModel.setReminderDelay((delayMillis / 1_000L).toInt())
+        return if (reminderConfig is ReminderConfig.Delayed) {
+            newMessageViewModel.setReminderDelay(reminderConfig.delayMinutes)
             true
         } else {
             newMessageViewModel.setReminderDelay(0)

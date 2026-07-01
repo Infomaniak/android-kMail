@@ -247,7 +247,7 @@ class NewMessageViewModel @Inject constructor(
 
     val scheduleConfig: MutableLiveData<ScheduleConfig> = MutableLiveData(ScheduleConfig.None)
     val reminderConfig: MutableLiveData<ReminderConfig> = MutableLiveData(ReminderConfig.None)
-    val reminderVisibility: MutableLiveData<Boolean> = MutableLiveData(true)
+    val shouldRemindRecipient: MutableLiveData<Boolean> = MutableLiveData(true)
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -938,11 +938,17 @@ class NewMessageViewModel @Inject constructor(
 
     fun resetScheduledDate() = setScheduleDate(date = null)
 
-    fun setReminderDelay(reminderDelaySeconds: Int) = viewModelScope.launch(ioDispatcher) {
+    fun setReminderDelay(reminderDelayMinutes: Int) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
         mailboxContentRealm().write {
             DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
-                draft.delay = if (reminderDelaySeconds > 0) reminderDelaySeconds else 0 // TODO: use real name instead of draft.delay when API is updated
+                if (reminderDelayMinutes > 0) {
+                    draft.reminderDelta = reminderDelayMinutes
+                    draft.shouldRemindRecipient = shouldRemindRecipient.value ?: true
+                } else {
+                    draft.reminderDelta = null
+                    draft.shouldRemindRecipient = null
+                }
             }
         }
     }

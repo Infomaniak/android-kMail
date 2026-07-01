@@ -44,12 +44,9 @@ import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
-import com.infomaniak.mail.ui.newMessage.DelayHours.DAYS_3
-import com.infomaniak.mail.ui.newMessage.DelayHours.DAYS_7
-import com.infomaniak.mail.ui.newMessage.DelayHours.HOURS_24
-import com.infomaniak.mail.ui.newMessage.HOURS_IN_A_DAY
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.ui.newMessage.ReminderConfig
+import com.infomaniak.mail.ui.newMessage.ReminderPreset
 import com.infomaniak.mail.ui.newMessage.ScheduleConfig
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
@@ -82,7 +79,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
     private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
     private var pendingReminderConfig: ReminderConfig = ReminderConfig.None
-    private var pendingReminderVisibility: Boolean = true
+    private var pendingShouldRemindRecipient: Boolean = true
     private var pendingLastSelectedScheduleEpochMillis: Long? = null
     private var hasLastScheduleOption = false
 
@@ -117,7 +114,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         setReminderOptionsVisible(isVisible = false)
         setScheduleOptionsVisible(isVisible = false)
 
-        pendingReminderVisibility = newMessageViewModel.reminderVisibility.value ?: true
+        pendingShouldRemindRecipient = newMessageViewModel.shouldRemindRecipient.value ?: true
         updateReminderVisibilitySubtitle()
 
         setupToggles()
@@ -195,21 +192,9 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
     }
 
     private fun setupReminderOptions() = with(binding) {
-        hours24.setText(resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, HOURS_24.hours, HOURS_24.hours))
-        days3.setText(
-            resources.getQuantityString(
-                R.plurals.daysBeforeSendingReminder,
-                DAYS_3.hours / HOURS_IN_A_DAY,
-                DAYS_3.hours / HOURS_IN_A_DAY
-            )
-        )
-        days7.setText(
-            resources.getQuantityString(
-                R.plurals.daysBeforeSendingReminder,
-                DAYS_7.hours / HOURS_IN_A_DAY,
-                DAYS_7.hours / HOURS_IN_A_DAY
-            )
-        )
+        hours24.setText(resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, 24, 24))
+        days3.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 3, 3))
+        days7.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 7, 7))
 
         customDelayReminder.trailingContent = trailingContentFor(currentKSuite)
 
@@ -217,14 +202,14 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         (optionsDelays.children + customDelayReminder).forEach { view -> view.applyContentPaddingStart(paddingStartValue) }
 
         optionsDelays.onItemCheckedListener { _, value, _ ->
-            val hours = value?.toIntOrNull()
-            val delay = when (hours) {
-                HOURS_24.hours -> HOURS_24
-                DAYS_3.hours -> DAYS_3
-                DAYS_7.hours -> DAYS_7
-                else -> null
+            val minutes = value?.toIntOrNull()
+            val isKnownPreset = ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
+            pendingReminderConfig = if (minutes != null && isKnownPreset) {
+                ReminderConfig.Delayed(minutes, isCustom = false)
+            } else {
+                ReminderConfig.None
             }
-            pendingReminderConfig = delay?.let { ReminderConfig.Preset(it) } ?: ReminderConfig.None
+
             customDelayReminder.setCheckMark(displayCheckMark = false)
             customDelayReminder.removeSubtitle()
         }
@@ -251,14 +236,14 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         binding.customDelayReminder.setCheckMark(displayCheckMark = false)
         binding.customDelayReminder.removeSubtitle()
         pendingReminderConfig = ReminderConfig.None
-        pendingReminderVisibility = true
+        pendingShouldRemindRecipient = true
         updateReminderVisibilitySubtitle()
     }
 
     private fun defaultReminderSelection() = with(binding) {
         optionsDelays.check(R.id.hours24)
-        pendingReminderConfig = ReminderConfig.Preset(HOURS_24)
-        pendingReminderVisibility = true
+        pendingReminderConfig = ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false)
+        pendingShouldRemindRecipient = true
         updateReminderVisibilitySubtitle()
     }
 
@@ -326,28 +311,26 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
     private fun restoreReminderState() = with(binding) {
         val savedReminder = newMessageViewModel.reminderConfig.value ?: ReminderConfig.None
-        if (savedReminder is ReminderConfig.None) return@with
+        if (savedReminder !is ReminderConfig.Delayed) return@with
 
         pendingReminderConfig = savedReminder
-        pendingReminderVisibility = newMessageViewModel.reminderVisibility.value ?: true
+        pendingShouldRemindRecipient = newMessageViewModel.shouldRemindRecipient.value ?: true
         reminderIfNoAnswer.isChecked = true
         setReminderOptionsVisible(isVisible = true)
         updateReminderVisibilitySubtitle()
 
-        when (savedReminder) {
-            is ReminderConfig.Custom -> {
-                customDelayReminder.setSubtitle(requireContext().formatDelayText(savedReminder.delayMillis))
-                customDelayReminder.setCheckMark(displayCheckMark = true)
+
+        if (savedReminder.isCustom) {
+            customDelayReminder.setSubtitle(requireContext().formatDelayText(savedReminder.delayMinutes))
+            customDelayReminder.setCheckMark(displayCheckMark = true)
+        } else {
+            val targetId = when (savedReminder.delayMinutes) {
+                ReminderPreset.HOURS_24.delayMinutes -> R.id.hours24
+                ReminderPreset.DAYS_3.delayMinutes -> R.id.days3
+                ReminderPreset.DAYS_7.delayMinutes -> R.id.days7
+                else -> null
             }
-            is ReminderConfig.Preset -> {
-                val targetId = when (savedReminder.delayHours) {
-                    HOURS_24 -> R.id.hours24
-                    DAYS_3 -> R.id.days3
-                    DAYS_7 -> R.id.days7
-                }
-                optionsDelays.check(targetId)
-            }
-            else -> Unit
+            targetId?.let { optionsDelays.check(it) }
         }
     }
 
@@ -378,10 +361,10 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
     private fun showCustomDelayReminderDatePicker() {
         customReminderPickerDialog.show(
-            onDelaySelected = { delayMillis ->
+            onDelaySelected = { delayMinutes ->
                 trackScheduleSendEvent(MatomoName.CustomReminder)
-                pendingReminderConfig = ReminderConfig.Custom(delayMillis)
-                binding.customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMillis))
+                pendingReminderConfig = ReminderConfig.Delayed(delayMinutes, isCustom = true)
+                binding.customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMinutes))
                 binding.customDelayReminder.setCheckMark(displayCheckMark = true)
                 binding.optionsDelays.clearCheck()
             },
@@ -390,16 +373,16 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
 
     private fun showVisibilityReminderPicker() {
         selectVisibilityDialog.show(
-            selectRecipientsAndMe = pendingReminderVisibility,
+            selectRecipientsAndMe = pendingShouldRemindRecipient,
             onVisibilitySelected = { isRecipientsAndMe ->
-                pendingReminderVisibility = isRecipientsAndMe
+                pendingShouldRemindRecipient = isRecipientsAndMe
                 updateReminderVisibilitySubtitle()
             },
         )
     }
 
     private fun updateReminderVisibilitySubtitle() = with(binding) {
-        val subtitleRes = if (pendingReminderVisibility) {
+        val subtitleRes = if (pendingShouldRemindRecipient) {
             R.string.selectionReminderRecipientsAndMe
         } else {
             R.string.selectionReminderMeOnly
@@ -422,7 +405,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
     private fun saveOptions() {
         newMessageViewModel.scheduleConfig.value = pendingScheduleConfig
         newMessageViewModel.reminderConfig.value = pendingReminderConfig
-        newMessageViewModel.reminderVisibility.value = pendingReminderVisibility
+        newMessageViewModel.shouldRemindRecipient.value = pendingShouldRemindRecipient
 
         if (pendingScheduleConfig is ScheduleConfig.Scheduled) {
             pendingLastSelectedScheduleEpochMillis?.let { localSettings.lastSelectedScheduleEpochMillis = it }

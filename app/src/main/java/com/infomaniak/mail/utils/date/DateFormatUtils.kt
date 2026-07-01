@@ -23,7 +23,7 @@ import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH_YEAR
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.ONE_HOUR_IN_MILLIS
+import com.infomaniak.mail.ui.newMessage.MINUTES_IN_A_DAY
 import java.util.Date
 
 object DateFormatUtils {
@@ -52,15 +52,16 @@ object DateFormatUtils {
 
     private fun Context.localHourFormat() = if (DateFormat.is24HourFormat(this)) FORMAT_DATE_24_HOUR else FORMAT_DATE_12_HOUR
 
-    fun Context.formatDelayText(delayMillis: Long): String {
-        val hours = delayMillis / ONE_HOUR_IN_MILLIS
-        val days = delayMillis / DAY_IN_MILLIS
-        return if (delayMillis % DAY_IN_MILLIS == 0L) {
-            resources.getQuantityString(R.plurals.daysBeforeSendingReminder, days.toInt(), days.toInt())
-        } else {
-            resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, hours.toInt(), hours.toInt())
+    fun Context.formatDelayText(delayMinutes: Int): String {
+        val hours = delayMinutes / MINUTES_IN_AN_HOUR
+        val days = delayMinutes / MINUTES_IN_A_DAY
+
+        val (pluralId, quantity) = when {
+            delayMinutes % MINUTES_IN_A_DAY == 0 -> R.plurals.daysBeforeSendingReminder to days
+            else -> R.plurals.hoursBeforeSendingReminder to hours
         }
+        return resources.getQuantityString(pluralId, quantity, quantity)
     }
 
-    private const val DAY_IN_MILLIS = 24 * ONE_HOUR_IN_MILLIS
+    private const val MINUTES_IN_AN_HOUR = 60
 }

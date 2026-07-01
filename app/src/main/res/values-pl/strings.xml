@@ -397,6 +397,8 @@
     <plurals name="hoursBeforeSendingReminder">
         <item quantity="one">%d godzina</item>
         <item quantity="few">%d godziny</item>
+        <item quantity="many">%d godzin</item>
+        <item quantity="other">%d godzin</item>
     </plurals>
     <string name="inboxFolder">Skrzynka odbiorcza</string>
     <string name="kSuiteProQuotasAlertDescription">Miejsce do przechowywania Twojej poczty jest prawie pełne. Przejdź na nieograniczoną przestrzeń i odblokuj nowe funkcje.</string>
