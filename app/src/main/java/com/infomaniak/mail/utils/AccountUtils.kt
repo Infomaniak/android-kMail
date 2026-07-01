@@ -78,9 +78,7 @@ object AccountUtils : CredentialManager() {
         }
 
     var currentMailboxEmail: String? = null
-
-    var currentMailboxAliases: List<String>? = null
-
+    
     suspend fun switchToMailbox(mailboxId: Int) {
         RealmDatabase.backupPreviousMailboxContent()
         currentMailboxId = mailboxId

@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesId
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.computeReactionsPerMessageId
 import com.infomaniak.mail.data.models.thread.overrideWith
-import com.infomaniak.mail.utils.AccountUtils.currentMailboxAliases
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
@@ -92,7 +91,7 @@ object ThreadRecomputations {
     }
 
     private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
-        val rawAliases = mailbox?.aliases ?: currentMailboxAliases
+        val rawAliases = mailbox?.aliases
         val normalizedAliases = rawAliases?.map { it.lowercase() }?.toSet() ?: emptySet()
 
         allMessages.forEach { message ->
