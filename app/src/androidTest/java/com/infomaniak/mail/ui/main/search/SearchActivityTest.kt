@@ -118,10 +118,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
         goToFolderAndBackToInbox(folderName)
         filterSearchWithFolder(folderName)
 
+        val mailContent = "#12 Search UI test SearchUITest folder"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#12 Search UI test SearchUITest folder"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
@@ -133,10 +135,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
         goToFolderAndBackToInbox(archiveFolderName)
         filterSearchWithFolder(archiveFolderName)
 
+        val mailContent = "#11 Search UI test Archived folder"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#11 Search UI test Archived folder"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
@@ -148,10 +152,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
         goToFolderAndBackToInbox(trashFolderName)
         filterSearchWithFolder(trashFolderName)
 
+        val mailContent = "#9 Search UI test Trash folder"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#9 Search UI test Trash folder"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
@@ -163,10 +169,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
         goToFolderAndBackToInbox(spamFolderName)
         filterSearchWithFolder(spamFolderName)
 
+        val mailContent = "#8 Search UI test Spam folder"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#8 Search UI test Spam folder"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
@@ -176,10 +184,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
 
         filterSearchWithFolder(context.getString(R.string.draftFolder))
 
+        val mailContent = "#7 Search UI test Drafts folder"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#7 Search UI test Drafts folder"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
@@ -189,10 +199,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
 
         filterSearchWithFolder(context.getString(R.string.sentFolder))
 
+        val mailContent = "#5 Search UI test Sent messages folder"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#5 Search UI test Sent messages folder"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
@@ -217,10 +229,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
 
         clickOnHorizontalChipList(R.id.attachments)
 
+        val mailContent = "#16 Search UI test Attachments"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#16 Search UI test Attachments"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
@@ -230,10 +244,12 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
 
         clickOnHorizontalChipList(R.id.favorites)
 
+        val mailContent = "#15 Search UI test Favorites"
+        searchMail(mailContent)
         onViewWithTimeout(
             retryInterval = 5.seconds,
             matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText("#15 Search UI test Favorites"))),
+            assertion = matches(hasDescendant(withText(mailContent))),
         )
     }
 
