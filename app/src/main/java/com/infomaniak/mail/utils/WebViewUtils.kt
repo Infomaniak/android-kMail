@@ -44,7 +44,7 @@ import kotlin.math.abs
 
 class WebViewUtils(context: Context) {
 
-    private val customDarkMode by lazy { context.getCustomDarkMode() }
+    private val customDarkMode by lazy { { aliases: List<String> -> context.getCustomDarkMode(aliases) } }
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
     private val messageDisplayStyle by lazy { context.getMessageDisplayStyle() }
@@ -78,12 +78,12 @@ class WebViewUtils(context: Context) {
     }
 
     private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, aliases: List<String>) {
-        if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerScript(messageDisplayJsBridgeScript)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
         registerCss(messageDisplayStyle)
         if (aliases.isNotEmpty()) registerCss(dynamicMentionsStyle(aliases))
+        if (isDisplayedInDarkMode) registerCss(customDarkMode(aliases), DARK_BACKGROUND_STYLE_ID)
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
