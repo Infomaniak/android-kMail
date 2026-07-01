@@ -94,6 +94,14 @@
                 app:title="@string/settingsAppLock" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsAcknowledgement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:subtitle="@string/settingsSendAcknowledgementSubtitle"
+                app:title="@string/settingsSendAcknowledgementTitle" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

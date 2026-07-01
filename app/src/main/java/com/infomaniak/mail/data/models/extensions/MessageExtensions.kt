@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.models.extensions
 import android.content.Context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
@@ -91,6 +92,11 @@ val Message.folder: Folder
 
 fun Message.isInSpamFolder() = folder.role == FolderRole.SPAM
 
+fun Message.isPendingAcknowledgementForMe(): Boolean = hasPendingAcknowledgement && allRecipients.any { it.isMe() }
+fun Message.isAcknowledgementCompletedForMe(): Boolean {
+    return acknowledgeStatus == AcknowledgeStatus.Acknowledged && allRecipients.any { it.isMe() }
+}
+
 fun Message.computeFolderAndReason(folderId: String): Pair<Folder?, String?> {
 
     var correctFolder: Folder? = null
@@ -110,14 +116,17 @@ fun Message.computeFolderAndReason(folderId: String): Pair<Folder?, String?> {
 
 val Message.calendarAttachment: Attachment? get() = if (isDraft) null else attachments.firstOrNull(Attachment::isCalendarEvent)
 
-fun Message.getFormattedPreview(context: Context, totalUnseenReactionOnLastEmoji: Int = 0 ): FormatedPreview = when {
+fun Message.getFormattedPreview(context: Context, totalUnseenReactionOnLastEmoji: Int = 0): FormatedPreview = when {
     isEncrypted -> FormatedPreview.Encryption(context.getString(R.string.encryptedMessageHeader))
-    isReaction && totalUnseenReactionOnLastEmoji > 1 -> FormatedPreview.Reaction(context.resources.getQuantityString(
-        R.plurals.previewMultiReaction,
-        (totalUnseenReactionOnLastEmoji - 1),
-        emojiReaction,
-        from.firstOrNull()?.name.orEmpty(),
-        (totalUnseenReactionOnLastEmoji - 1)))
+    isReaction && totalUnseenReactionOnLastEmoji > 1 -> FormatedPreview.Reaction(
+        context.resources.getQuantityString(
+            R.plurals.previewMultiReaction,
+            (totalUnseenReactionOnLastEmoji - 1),
+            emojiReaction,
+            from.firstOrNull()?.name.orEmpty(),
+            (totalUnseenReactionOnLastEmoji - 1)
+        )
+    )
     isReaction -> FormatedPreview.Reaction(context.getString(R.string.previewReaction, from.first().name, emojiReaction))
     preview.isBlank() -> FormatedPreview.Empty(context.getString(R.string.noBodyDescription))
     else -> FormatedPreview.Body(preview.trim())

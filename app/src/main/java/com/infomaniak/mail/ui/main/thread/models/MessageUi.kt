@@ -24,7 +24,8 @@ data class MessageUi(
     val message: Message,
     val emojiReactionsState: Map<String, EmojiReactionStateUi>,
     val isReactionsFeatureAvailable: Boolean,
-    val unsubscribeState: UnsubscribeState?
+    val unsubscribeState: UnsubscribeState?,
+    val acknowledgeState: AcknowledgeState?,
 ) {
     fun hasEmojis(): Boolean = emojiReactionsState.isNotEmpty()
     fun canBeReactedTo(): Boolean = message.isValidReactionTarget && emojiReactionsState.hasAvailableReactionSlot()
@@ -33,5 +34,11 @@ data class MessageUi(
         data object CanUnsubscribe : UnsubscribeState
         data object InProgress : UnsubscribeState
         data object Completed : UnsubscribeState
+    }
+
+    sealed interface AcknowledgeState {
+        data object Pending : AcknowledgeState
+        data object InProgress : AcknowledgeState
+        data object Completed : AcknowledgeState
     }
 }

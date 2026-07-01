@@ -23,6 +23,8 @@
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>
     <string name="accentColorSystemTitle">System colour</string>
+    <string name="acknowledgementMessage">The sender requested a read receipt.</string>
+    <string name="acknowledgementMessageSent">A read receipt has been sent to the sender.</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
     <string name="actionCancelSnooze">Cancel snooze</string>
@@ -511,6 +513,7 @@
     <string name="selectSignatureNone">No signature</string>
     <string name="selectTimeDialogTitle">Select time</string>
     <string name="send">Send</string>
+    <string name="sendConfirmationAction">Send the confirmation</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent colour</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
@@ -566,6 +569,8 @@
     <string name="settingsSecuritySpamFilter">Spam filter</string>
     <string name="settingsSelectDisplayModeDescription">Select a display mode</string>
     <string name="settingsSendAcknowledgement">Request an acknowledgement of receipt for every email sent</string>
+    <string name="settingsSendAcknowledgementSubtitle">Request a read receipt for each message sent</string>
+    <string name="settingsSendAcknowledgementTitle">Read receipts</string>
     <string name="settingsSendIncludeOriginalMessage">Include the original message in the reply</string>
     <string name="settingsSendTitle">Send</string>
     <string name="settingsSignatureDescription">Select a default signature</string>
@@ -590,6 +595,8 @@
     <string name="settingsTransferEmailsTitle">Transfer emails</string>
     <string name="settingsTransferInBody">In the message body</string>
     <string name="shareEmail">Share email</string>
+    <string name="snackbarAcknowledgementFailure">Failed to send</string>
+    <string name="snackbarAcknowledgementSuccess">Read receipt sent</string>
     <string name="snackbarAdminDisabledMessageSending">An administrator has disabled message sending</string>
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarCalendarChoiceSent">Response taken into account</string>

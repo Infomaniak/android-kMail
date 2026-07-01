@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Sininen</string>
     <string name="accentColorPinkTitle">Pinkki</string>
     <string name="accentColorSystemTitle">Järjestelmän väri</string>
+    <string name="acknowledgementMessage">Lähettäjä pyysi vastaanottokuittausta.</string>
+    <string name="acknowledgementMessageSent">Vastaanottokuittaus on lähetetty lähettäjälle.</string>
     <string name="actionArchive">Arkistoi</string>
     <string name="actionBlockSender">Estä lähettäjä</string>
     <string name="actionCancelSnooze">Peruuta torkku</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Ei allekirjoitusta</string>
     <string name="selectTimeDialogTitle">Valitse aika</string>
     <string name="send">Lähetä</string>
+    <string name="sendConfirmationAction">Lähetä vahvistus</string>
     <string name="sentFolder">Lähetetyt viestit</string>
     <string name="settingsAccentColor">Korostusväri</string>
     <string name="settingsAccentColorDescription">Valitse sovelluksen korostusväri</string>
@@ -562,6 +565,8 @@
     <string name="settingsSecuritySpamFilter">Roskapostisuodatin</string>
     <string name="settingsSelectDisplayModeDescription">Valitse näyttötila</string>
     <string name="settingsSendAcknowledgement">Pyydä vastaanottokuittaus jokaisesta lähetetystä sähköpostista</string>
+    <string name="settingsSendAcknowledgementSubtitle">Pyydä vastaanottokuittaus jokaiselle lähetetylle viestille</string>
+    <string name="settingsSendAcknowledgementTitle">Vastaanottokuittaukset</string>
     <string name="settingsSendIncludeOriginalMessage">Sisällytä alkuperäinen viesti vastaukseen</string>
     <string name="settingsSendTitle">Lähetä</string>
     <string name="settingsSignatureDescription">Valitse oletusallekirjoitus</string>
@@ -586,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">Välitä sähköpostit</string>
     <string name="settingsTransferInBody">Viestin rungossa</string>
     <string name="shareEmail">Jaa sähköposti</string>
+    <string name="snackbarAcknowledgementFailure">Lähetys epäonnistui</string>
+    <string name="snackbarAcknowledgementSuccess">Vastaanottokuittaus lähetetty</string>
     <string name="snackbarAdminDisabledMessageSending">Järjestelmänvalvoja on poistanut viestinlähetyksen käytöstä</string>
     <string name="snackbarBlockUserConfirmation">Lähettäjä on nyt estetty</string>
     <string name="snackbarCalendarChoiceSent">Vastaus otettu huomioon</string>

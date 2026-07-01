@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Μπλε</string>
     <string name="accentColorPinkTitle">Ροζ</string>
     <string name="accentColorSystemTitle">Χρώμα συστήματος</string>
+    <string name="acknowledgementMessage">Ο αποστολέας ζήτησε απόδειξη ανάγνωσης.</string>
+    <string name="acknowledgementMessageSent">Μια απόδειξη ανάγνωσης στάλθηκε στον αποστολέα.</string>
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Χωρίς υπογραφή</string>
     <string name="selectTimeDialogTitle">Επιλέξτε ώρα</string>
     <string name="send">Αποστολή</string>
+    <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>
     <string name="sentFolder">Απεσταλμένα μηνύματα</string>
     <string name="settingsAccentColor">Χρώμα έμφασης</string>
     <string name="settingsAccentColorDescription">Επιλέξτε το χρώμα έμφασης για την εφαρμογή</string>
@@ -562,6 +565,8 @@
     <string name="settingsSecuritySpamFilter">Φίλτρο ανεπιθύμητων</string>
     <string name="settingsSelectDisplayModeDescription">Επιλέξτε τρόπο εμφάνισης</string>
     <string name="settingsSendAcknowledgement">Ζητήστε επιβεβαίωση παραλαβής για κάθε αποσταλμένο email</string>
+    <string name="settingsSendAcknowledgementSubtitle">Ζητήστε επιβεβαίωση ανάγνωσης για κάθε μήνυμα που στέλνετε</string>
+    <string name="settingsSendAcknowledgementTitle">Αποδείξεις ανάγνωσης</string>
     <string name="settingsSendIncludeOriginalMessage">Συμπεριλάβετε το αρχικό μήνυμα στην απάντηση</string>
     <string name="settingsSendTitle">Αποστολή</string>
     <string name="settingsSignatureDescription">Επιλέξτε προεπιλεγμένη υπογραφή</string>
@@ -586,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">Προώθηση email</string>
     <string name="settingsTransferInBody">Στο σώμα του μηνύματος</string>
     <string name="shareEmail">Κοινοποίηση email</string>
+    <string name="snackbarAcknowledgementFailure">Αποτυχία αποστολής</string>
+    <string name="snackbarAcknowledgementSuccess">Η απόδειξη ανάγνωσης εστάλη</string>
     <string name="snackbarAdminDisabledMessageSending">Ένας διαχειριστής έχει απενεργοποιήσει την αποστολή μηνυμάτων</string>
     <string name="snackbarBlockUserConfirmation">Ο αποστολέας έχει αποκλειστεί</string>
     <string name="snackbarCalendarChoiceSent">Η απάντηση καταχωρήθηκε</string>

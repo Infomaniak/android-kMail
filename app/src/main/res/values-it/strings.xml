@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Blu</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Colore del sistema</string>
+    <string name="acknowledgementMessage">Il mittente ha richiesto una ricevuta di lettura.</string>
+    <string name="acknowledgementMessageSent">È stata inviata una ricevuta di lettura al mittente.</string>
     <string name="actionArchive">Archivia</string>
     <string name="actionBlockSender">Blocca mittente</string>
     <string name="actionCancelSnooze">Annulla il posticipo</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Nessuna firma</string>
     <string name="selectTimeDialogTitle">Selezionare l’ora</string>
     <string name="send">Invia</string>
+    <string name="sendConfirmationAction">Inviare la conferma</string>
     <string name="sentFolder">Messaggi inviati</string>
     <string name="settingsAccentColor">Colore d’accento</string>
     <string name="settingsAccentColorDescription">Scegliere il colore d’accento per l’applicazione</string>
@@ -562,6 +565,8 @@
     <string name="settingsSecuritySpamFilter">Filtro antispam</string>
     <string name="settingsSelectDisplayModeDescription">Seleziona una modalità di visualizzazione</string>
     <string name="settingsSendAcknowledgement">Richiedi una conferma di ricezione per ogni e-mail inviata</string>
+    <string name="settingsSendAcknowledgementSubtitle">Richiedere una ricevuta di lettura per ogni messaggio inviato</string>
+    <string name="settingsSendAcknowledgementTitle">Accusati di lettura</string>
     <string name="settingsSendIncludeOriginalMessage">Includi il messaggio originale nella risposta</string>
     <string name="settingsSendTitle">Invia</string>
     <string name="settingsSignatureDescription">Seleziona una firma predefinita</string>
@@ -586,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">Trasferimento di e-mail</string>
     <string name="settingsTransferInBody">Nel corpo del messaggio</string>
     <string name="shareEmail">Condividi e-mail</string>
+    <string name="snackbarAcknowledgementFailure">Invio non riuscito</string>
+    <string name="snackbarAcknowledgementSuccess">Ricevuta di lettura inviata</string>
     <string name="snackbarAdminDisabledMessageSending">Un amministratore ha disabilitato l’invio di messaggi</string>
     <string name="snackbarBlockUserConfirmation">Il mittente è ora bloccato</string>
     <string name="snackbarCalendarChoiceSent">Risposta presa in considerazione</string>

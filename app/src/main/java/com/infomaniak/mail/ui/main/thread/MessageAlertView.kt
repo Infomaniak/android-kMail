@@ -23,9 +23,11 @@ import android.util.AttributeSet
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.getAttributes
@@ -33,6 +35,7 @@ import com.infomaniak.core.ui.view.extension.hideProgressCatching
 import com.infomaniak.core.ui.view.extension.showProgressCatching
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMessageAlertBinding
+import com.infomaniak.core.ui.view.R as RCore
 
 class MessageAlertView @JvmOverloads constructor(
     context: Context,
@@ -113,8 +116,14 @@ class MessageAlertView @JvmOverloads constructor(
         }
     }
 
-    fun setActionsVisibility(isVisible: Boolean) {
-        binding.actionsLayout.isVisible = isVisible
+    fun setActionsVisibility(shouldDisplayAction: Boolean) {
+        binding.actionsLayout.isVisible = shouldDisplayAction
+        val margin = if (shouldDisplayAction) RCore.dimen.marginStandardMedium else RCore.dimen.marginStandardSmall
+        binding.root.updatePadding(top = resources.getDimensionPixelSize(margin))
+    }
+
+    fun setIconRes(@DrawableRes resId: Int) {
+        binding.icon.setImageResource(resId)
     }
 
     private fun TypedArray.inflateBindingWithCustomStyle(context: Context) {

@@ -43,12 +43,15 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.extensions.calendarAttachment
 import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
+import com.infomaniak.mail.data.models.extensions.isAcknowledgementCompletedForMe
+import com.infomaniak.mail.data.models.extensions.isPendingAcknowledgementForMe
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
@@ -108,7 +111,9 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.invoke
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -116,6 +121,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /* Please note that, for the moment, the logic that uses this list assumes that the items are necessarily messages.
@@ -156,6 +162,8 @@ class ThreadViewModel @Inject constructor(
 
     private val currentMailboxLive = currentMailboxFlow.asLiveData()
 
+    private val refreshingAcknowledgeMessagesUids = ConcurrentHashMap<String, Job>()
+
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
     @DoNotReadDirectly
@@ -176,21 +184,27 @@ class ThreadViewModel @Inject constructor(
         .map { it.obj }
         .asLiveData(ioCoroutineContext)
 
-    // To each Message ID, we associate a set of emojis that are added for fake so we can
-    // instantly apply clicked emojis without having to wait for the API call to return.
-    private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
-
     /**
-     * Flow tracking the unsubscribe status of each message, keyed by its UID.
+     * Flow grouping all transient UI states for each message, keyed by its UID.
      *
-     * Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress], [UnsubscribeState.Completed])
-     * is updated in this map, and the entire map is re-emitted to trigger a refresh of the [MessageUi].
+     * - Fake emoji reactions: To each Message ID, we associate a set of emojis that are added for fake so we can
+     *   instantly apply clicked emojis without having to wait for the API call to return.
      *
-     * This flow is collected inside a [combine] to ensure that unsubscribe statuses are preserved
-     * even when other changes (e.g., sorting, filtering, content updates) trigger a full rebuild
-     * of the [MessageUi] list.
+     * - Unsubscribe statuses: Whenever a message is unsubscribed, its state (e.g., [UnsubscribeState.InProgress],
+     *   [UnsubscribeState.Completed]) is updated in this map. This is collected inside a [combine] so that
+     *   unsubscribe statuses are preserved even when other changes trigger a full rebuild of the [MessageUi] list.
+     *
+     * - Acknowledge statuses: Whenever an acknowledgement is sent, its state (e.g., [MessageUi.AcknowledgeState.InProgress],
+     *   [MessageUi.AcknowledgeState.Completed]) is updated in this map. This is collected inside a [combine] so that
+     *   acknowledgement statuses are preserved even when other changes trigger a full rebuild of the [MessageUi] list.
      */
-    private val unsubscribeStateByMessageUid = MutableStateFlow<Map<String, UnsubscribeState>>(emptyMap())
+    private val messageUiStates = MutableStateFlow(
+        MessageUiStates(
+            fakeReactions = emptyMap(),
+            unsubscribeStates = emptyMap(),
+            acknowledgeStates = emptyMap(),
+        )
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val messagesFlow: Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
@@ -205,15 +219,14 @@ class ThreadViewModel @Inject constructor(
             threadOpeningModeFlow,
             threadState.hasSuperCollapsedBlockBeenClicked,
             featureFlagsFlow,
-            fakeReactions,
-            unsubscribeStateByMessageUid,
-            transform = { mode, _, featureFlags, fakeReactions, messageUidUnsubscribed ->
-                CombineMessageToBuildMessageUi(mode, featureFlags, fakeReactions, messageUidUnsubscribed)
+            messageUiStates,
+            transform = { mode, _, featureFlags, uiStates ->
+                CombineMessageToBuildMessageUi(mode, featureFlags, uiStates)
             },
-        ).flatMapLatest { (mode, featureFlags, fakeReactions, messageUidUnsubscribed) ->
+        ).flatMapLatest { (mode, featureFlags, uiStates) ->
             val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
             mode.getMessages(featureFlags).mapLatest { (items, messagesToFetch) ->
-                items.toUiMessages(fakeReactions, isReactionsAvailable, messageUidUnsubscribed) to messagesToFetch
+                items.toUiMessages(uiStates, isReactionsAvailable) to messagesToFetch
             }
         }
 
@@ -259,8 +272,16 @@ class ThreadViewModel @Inject constructor(
                 if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
                     val displayedMessages = thread.getDisplayedMessages(featureFlags, localSettings)
                     displayedMessages.forEachIndexed { index, message ->
-                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, displayedMessages.lastIndex)
+                        val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
+                        threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
+                        if (shouldExpand && message.isPendingAcknowledgementForMe()) {
+                            refreshMessageIfNeeded(
+                                message.hasPendingAcknowledgement,
+                                message.uid,
+                                message.resource
+                            )
+                        }
                     }
                 }
 
@@ -631,10 +652,7 @@ class ThreadViewModel @Inject constructor(
         viewModelScope.launch {
             val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
 
-            // TODO: Optimize memory consumption
-            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
-                set(messageId, getOrDefault(messageId, emptySet()).plus(emoji))
-            }
+            updateFakeReactions(messageId, emoji, shouldAddToMap = true)
         }
     }
 
@@ -643,12 +661,23 @@ class ThreadViewModel @Inject constructor(
             val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
 
             // If the value isn't present, there's nothing to remove, so we can exit
-            if (fakeReactions.value[messageId]?.contains(emoji) != true) return@launch
+            if (messageUiStates.value.fakeReactions[messageId]?.contains(emoji) != true) return@launch
 
-            // TODO: Optimize memory consumption
-            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
-                set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))
-            }
+            updateFakeReactions(messageId, emoji, shouldAddToMap = false)
+        }
+    }
+
+    private fun updateFakeReactions(messageId: String, emoji: String, shouldAddToMap: Boolean) {
+        // TODO: Optimize memory consumption
+        messageUiStates.update {
+            it.copy(
+                fakeReactions = it.fakeReactions.toMutableMap().apply {
+                    val reactions = getOrDefault(messageId, emptySet()).run {
+                        if (shouldAddToMap) plus(emoji) else minus(emoji)
+                    }
+                    set(messageId, reactions)
+                }
+            )
         }
     }
 
@@ -678,19 +707,24 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun <E : Any> List<E>.toUiMessages(
-        fakeReactions: Map<String, Set<String>>,
+        uiStates: MessageUiStates,
         isReactionsAvailable: Boolean,
-        unsubscribeStateByMessageUid: Map<String, UnsubscribeState>,
     ): List<Any> = map { item ->
         if (item is Message) {
-            val localReactions = fakeReactions[item.messageId] ?: emptySet()
+            val localReactions = uiStates.fakeReactions[item.messageId] ?: emptySet()
             val reactions = item.emojiReactions.toFakedReactions(localReactions)
             val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
+            val canAcknowledgeOrNull = when {
+                item.isPendingAcknowledgementForMe() -> MessageUi.AcknowledgeState.Pending
+                item.isAcknowledgementCompletedForMe() -> MessageUi.AcknowledgeState.Completed
+                else -> null
+            }
             MessageUi(
                 message = item,
                 emojiReactionsState = reactions,
                 isReactionsFeatureAvailable = isReactionsAvailable,
-                unsubscribeState = unsubscribeStateByMessageUid[item.uid] ?: canUnsubscribeOrNull
+                unsubscribeState = uiStates.unsubscribeStates[item.uid] ?: canUnsubscribeOrNull,
+                acknowledgeState = uiStates.acknowledgeStates[item.uid] ?: canAcknowledgeOrNull,
             )
         } else {
             item
@@ -743,18 +777,72 @@ class ThreadViewModel @Inject constructor(
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeSuccess))
             setUnsubscribeState(message, UnsubscribeState.Completed)
-            unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-                set(message.uid, UnsubscribeState.Completed)
-            }
         } else {
             snackbarManager.postValue(appContext.getString(R.string.snackbarUnsubscribeFailure))
             setUnsubscribeState(message, UnsubscribeState.CanUnsubscribe)
         }
     }
 
+    fun acknowledgeMessage(message: Message) = viewModelScope.launch {
+        setAcknowledgeState(message, MessageUi.AcknowledgeState.InProgress)
+
+        val apiResponse = ApiRepository.acknowledgeMessage(message.resource)
+        if (apiResponse.isSuccess()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementSuccess))
+            mailboxContentRealm().write {
+                MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
+                    localMessage?.acknowledgeStatus = AcknowledgeStatus.Acknowledged
+                }
+            }
+            setAcknowledgeState(message, MessageUi.AcknowledgeState.Completed)
+        } else {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementFailure))
+            setAcknowledgeState(message, MessageUi.AcknowledgeState.Pending)
+        }
+    }
+
+    fun refreshMessageIfNeeded(hasPendingAcknowledgement: Boolean, messageUid: String, resource: String) {
+        if (!hasPendingAcknowledgement) return
+
+        refreshingAcknowledgeMessagesUids[messageUid]?.cancel()
+
+        val job = viewModelScope.launch {
+            try {
+                val apiResponse = ApiRepository.getMessage(resource)
+                val responseMessage = apiResponse.data
+
+                if (apiResponse.isSuccess() && responseMessage != null) {
+                    mailboxContentRealm().write {
+                        MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                            localMessage?.acknowledgeStatus = responseMessage.acknowledgeStatus
+                        }
+                    }
+                }
+            } finally {
+                refreshingAcknowledgeMessagesUids.remove(messageUid, coroutineContext.job)
+            }
+        }
+
+        refreshingAcknowledgeMessagesUids[messageUid] = job
+    }
+
     private fun setUnsubscribeState(message: Message, state: UnsubscribeState) {
-        unsubscribeStateByMessageUid.value = unsubscribeStateByMessageUid.value.toMutableMap().apply {
-            set(message.uid, state)
+        messageUiStates.update {
+            it.copy(
+                unsubscribeStates = it.unsubscribeStates.toMutableMap().apply {
+                    set(message.uid, state)
+                }
+            )
+        }
+    }
+
+    private fun setAcknowledgeState(message: Message, state: MessageUi.AcknowledgeState) {
+        messageUiStates.update {
+            it.copy(
+                acknowledgeStates = it.acknowledgeStates.toMutableMap().apply {
+                    set(message.uid, state)
+                }
+            )
         }
     }
     //endregion
@@ -771,11 +859,16 @@ class ThreadViewModel @Inject constructor(
         val menuId: Int,
     )
 
+    private data class MessageUiStates(
+        val fakeReactions: Map<String, Set<String>>,
+        val unsubscribeStates: Map<String, UnsubscribeState>,
+        val acknowledgeStates: Map<String, MessageUi.AcknowledgeState>,
+    )
+
     private data class CombineMessageToBuildMessageUi(
         val mode: ThreadOpeningMode,
         val featureFlags: Mailbox.FeatureFlagSet,
-        val fakeReactions: Map<String, Set<String>>,
-        val messageUidUnsubscribed: Map<String, UnsubscribeState>
+        val uiStates: MessageUiStates,
     )
 
     private enum class MessageBehavior {

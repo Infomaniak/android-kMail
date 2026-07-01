@@ -306,6 +306,10 @@ object ApiRoutes {
     }
     //endregion
 
+    fun acknowledge(messageResource: String): String {
+        return "${resource(messageResource)}/acknowledge"
+    }
+
     private fun mailboxUuidParameter(mailboxUuid: String): String {
         return "?mailbox_uuid=$mailboxUuid"
     }

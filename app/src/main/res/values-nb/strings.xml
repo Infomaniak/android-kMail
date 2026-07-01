@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Blå</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Systemfarge</string>
+    <string name="acknowledgementMessage">Avsenderen har bedt om lesebekreftelse.</string>
+    <string name="acknowledgementMessageSent">Lesebekreftelse er sendt til avsenderen.</string>
     <string name="actionArchive">Arkiver</string>
     <string name="actionBlockSender">Blokker avsender</string>
     <string name="actionCancelSnooze">Avbryt utsettelse</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Velg tid</string>
     <string name="send">Send</string>
+    <string name="sendConfirmationAction">Send bekreftelsen</string>
     <string name="sentFolder">Sendte meldinger</string>
     <string name="settingsAccentColor">Aksentfarge</string>
     <string name="settingsAccentColorDescription">Velg aksentfargen for applikasjonen</string>
@@ -562,6 +565,8 @@
     <string name="settingsSecuritySpamFilter">Spam-filter</string>
     <string name="settingsSelectDisplayModeDescription">Velg en visningsmodus</string>
     <string name="settingsSendAcknowledgement">Be om en mottaksbekreftelse for hver sendt e-post</string>
+    <string name="settingsSendAcknowledgementSubtitle">Be om lesebekreftelse for hver sendt melding</string>
+    <string name="settingsSendAcknowledgementTitle">Lesebekreftelser</string>
     <string name="settingsSendIncludeOriginalMessage">Inkluder den originale meldingen i svaret</string>
     <string name="settingsSendTitle">Send</string>
     <string name="settingsSignatureDescription">Velg en standard signatur</string>
@@ -586,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">Videresend e-poster</string>
     <string name="settingsTransferInBody">I meldingskroppen</string>
     <string name="shareEmail">Del e-post</string>
+    <string name="snackbarAcknowledgementFailure">Kunne ikke sende</string>
+    <string name="snackbarAcknowledgementSuccess">Lesebekreftelse sendt</string>
     <string name="snackbarAdminDisabledMessageSending">En administrator har deaktivert sending av meldinger</string>
     <string name="snackbarBlockUserConfirmation">Avsender er nå blokkert</string>
     <string name="snackbarCalendarChoiceSent">Svar tatt i betraktning</string>

@@ -438,6 +438,16 @@
                 tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/acknowledgeAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/sendConfirmationAction"
+                app:icon="@drawable/ic_envelope"
+                tools:description="@string/acknowledgementMessage"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/encryptionAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -471,11 +481,11 @@
         <LinearLayout
             android:id="@+id/aiBannerContainer"
             android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:divider="@drawable/spacer_standard_medium"
-            android:showDividers="middle"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:divider="@drawable/spacer_standard_medium"
+            android:orientation="vertical"
+            android:showDividers="middle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin">
@@ -484,13 +494,13 @@
                 android:id="@+id/blockInformationViewSummary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <com.infomaniak.mail.views.InformationBlockView
                 android:id="@+id/blockInformationViewTranslate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -500,7 +510,7 @@
             android:layout_height="@dimen/marginStandardMedium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aiBannerContainer"/>
+            app:layout_constraintTop_toBottomOf="@id/aiBannerContainer" />
 
         <com.infomaniak.mail.ui.main.thread.calendar.CalendarEventBannerView
             android:id="@+id/calendarEvent"

@@ -206,6 +206,7 @@ class SettingsFragment : Fragment() {
 
     private fun setSwitchesInitialState() = with(binding) {
         settingsAppLock.isChecked = localSettings.isAppLocked
+        settingsAcknowledgement.isChecked = localSettings.askEmailAcknowledgement
     }
 
     private fun setupListeners() = with(binding) {
@@ -220,6 +221,10 @@ class SettingsFragment : Fragment() {
                     if (isChecked) AppLockManager.unlock()
                 }
             }
+        }
+
+        settingsAcknowledgement.setOnClickListener {
+            localSettings.askEmailAcknowledgement = settingsAcknowledgement.isChecked
         }
 
         settingsNotifications.setOnClickListener {

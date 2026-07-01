@@ -19,6 +19,8 @@
     <string name="accentColorBlueTitle">Blauw</string>
     <string name="accentColorPinkTitle">Roze</string>
     <string name="accentColorSystemTitle">Systeemkleur</string>
+    <string name="acknowledgementMessage">De afzender heeft om een leesbewijs gevraagd.</string>
+    <string name="acknowledgementMessageSent">Een leesbewijs is naar de afzender verzonden.</string>
     <string name="actionArchive">Archiveren</string>
     <string name="actionBlockSender">Afzender blokkeren</string>
     <string name="actionCancelSnooze">Snooze annuleren</string>
@@ -507,6 +509,7 @@
     <string name="selectSignatureNone">Geen handtekening</string>
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
     <string name="send">Verzenden</string>
+    <string name="sendConfirmationAction">De bevestiging verzenden</string>
     <string name="sentFolder">Verzonden berichten</string>
     <string name="settingsAccentColor">Accentkleur</string>
     <string name="settingsAccentColorDescription">Kies de accentkleur voor de applicatie</string>
@@ -562,6 +565,8 @@
     <string name="settingsSecuritySpamFilter">Spamfilter</string>
     <string name="settingsSelectDisplayModeDescription">Selecteer een weergavemodus</string>
     <string name="settingsSendAcknowledgement">Anmod om en modtagelsesbekræftelse for hver sendt e-mail</string>
+    <string name="settingsSendAcknowledgementSubtitle">Vraag een leesbevestiging voor elk verzonden bericht</string>
+    <string name="settingsSendAcknowledgementTitle">Leesbevestigingen</string>
     <string name="settingsSendIncludeOriginalMessage">Het originele bericht opnemen in het antwoord</string>
     <string name="settingsSendTitle">Verzenden</string>
     <string name="settingsSignatureDescription">Selecteer een standaardhandtekening</string>
@@ -586,6 +591,8 @@
     <string name="settingsTransferEmailsTitle">E-mails doorsturen</string>
     <string name="settingsTransferInBody">In de tekst van het bericht</string>
     <string name="shareEmail">E-mail delen</string>
+    <string name="snackbarAcknowledgementFailure">Verzenden mislukt</string>
+    <string name="snackbarAcknowledgementSuccess">Leesbevestiging verzonden</string>
     <string name="snackbarAdminDisabledMessageSending">Een beheerder heeft het verzenden van berichten uitgeschakeld</string>
     <string name="snackbarBlockUserConfirmation">De afzender is nu geblokkeerd</string>
     <string name="snackbarCalendarChoiceSent">Antwoord verwerkt</string>
