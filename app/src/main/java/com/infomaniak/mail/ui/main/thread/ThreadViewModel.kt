@@ -672,7 +672,7 @@ class ThreadViewModel @Inject constructor(
         messageUiStates.update {
             it.copy(
                 fakeReactions = it.fakeReactions.toMutableMap().apply {
-                    val reactions = getOrDefault(messageId, emptySet()).apply {
+                    val reactions = getOrDefault(messageId, emptySet()).run {
                         if (shouldAddToMap) plus(emoji) else minus(emoji)
                     }
                     set(messageId, reactions)
