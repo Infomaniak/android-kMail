@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.models.javascriptBridge
 
 import android.webkit.JavascriptInterface
 import com.infomaniak.core.sentry.SentryLog
+import kotlinx.serialization.json.Json
 import org.json.JSONArray
 
 class EditorJavascriptBridge(
@@ -54,9 +55,6 @@ class EditorJavascriptBridge(
             SentryLog.e(TAG, "Failed to parse mention refs", it)
         }.getOrNull() ?: return
 
-        val refs = (0 until jsonArray.length())
-            .map { jsonArray.optString(it, null) }
-            .filter { it != null && it.isNotBlank() }
         onMentionsDeletedCallback(refs)
     }
 
