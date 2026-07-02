@@ -46,7 +46,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     abstract val shouldCloseMultiSelection: Boolean
     protected abstract val substituteClassName: String
 
-
     private var onClickListener: OnActionClick = object : OnActionClick {
 
         //region Main actions
@@ -61,6 +60,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onReadUnread() = Unit
         override fun onMove() = Unit
         override fun onAddReaction() = Unit
+        override fun onReminder() = Unit
         override fun onSnooze() = Unit
         override fun onModifySnooze() = Unit
         override fun onCancelSnooze() = Unit
@@ -92,6 +92,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         // Not a setClosingOnClickListener because we need to send a setBackNavigationResult,
         // and setClosingOnClickListener closes before we had time to set the result
         addReaction.setOnClickListener { onClickListener.onAddReaction() }
+        reminder.setOnClickListener { onClickListener.onReminder() }
         snooze.setOnClickListener { onClickListener.onSnooze() }
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
@@ -213,6 +214,10 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.askEuria.isVisible = isVisible
     }
 
+    fun setReminderUi(isFromDraft: Boolean) {
+        binding.reminder.isVisible = !isFromDraft
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
@@ -222,6 +227,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onReadUnread()
         fun onMove()
         fun onAddReaction()
+        fun onReminder()
         fun onSnooze()
         fun onModifySnooze()
         fun onCancelSnooze()

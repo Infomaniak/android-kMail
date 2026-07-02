@@ -626,6 +626,8 @@
     <string name="shareEmail">E-Mail austauschen</string>
     <string name="snackbarAcknowledgementFailure">Senden fehlgeschlagen</string>
     <string name="snackbarAcknowledgementSuccess">Lesebestätigung gesendet</string>
+    <string name="snackbarAddReminderFailure">Fehler beim Hinzufügen der Erinnerung</string>
+    <string name="snackbarAddReminderSuccess">Erinnerung hinzugefügt</string>
     <string name="snackbarAdminDisabledMessageSending">Ein Administrator hat den Nachrichtenversand deaktiviert</string>
     <string name="snackbarBlockUserConfirmation">Absender ist jetzt blockiert</string>
     <string name="snackbarCalendarChoiceSent">Antwort berücksichtigt</string>

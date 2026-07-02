@@ -626,6 +626,8 @@
     <string name="shareEmail">Jaa sähköposti</string>
     <string name="snackbarAcknowledgementFailure">Lähetys epäonnistui</string>
     <string name="snackbarAcknowledgementSuccess">Vastaanottokuittaus lähetetty</string>
+    <string name="snackbarAddReminderFailure">Muistutuksen lisääminen epäonnistui</string>
+    <string name="snackbarAddReminderSuccess">Muistutus lisätty</string>
     <string name="snackbarAdminDisabledMessageSending">Järjestelmänvalvoja on poistanut viestinlähetyksen käytöstä</string>
     <string name="snackbarBlockUserConfirmation">Lähettäjä on nyt estetty</string>
     <string name="snackbarCalendarChoiceSent">Vastaus otettu huomioon</string>

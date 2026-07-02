@@ -30,7 +30,7 @@ sealed class ReminderConfig {
     data class Delayed(val delayMinutes: Int, val isCustom: Boolean = false) : ReminderConfig()
 }
 
-enum class ReminderPreset(@StringRes val titleRes: Int, val delayMinutes: Int) {
+enum class ReminderPreset(val titleRes: Int, val delayMinutes: Int) {
     HOURS_24(R.plurals.hoursBeforeSendingReminder, MINUTES_IN_A_DAY),
     DAYS_3(R.plurals.daysBeforeSendingReminder, 3 * MINUTES_IN_A_DAY),
     DAYS_7(R.plurals.daysBeforeSendingReminder, 7 * MINUTES_IN_A_DAY);

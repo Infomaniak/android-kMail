@@ -626,6 +626,8 @@
     <string name="shareEmail">Condividi e-mail</string>
     <string name="snackbarAcknowledgementFailure">Invio non riuscito</string>
     <string name="snackbarAcknowledgementSuccess">Ricevuta di lettura inviata</string>
+    <string name="snackbarAddReminderFailure">Impossibile aggiungere il promemoria</string>
+    <string name="snackbarAddReminderSuccess">Promemoria aggiunto</string>
     <string name="snackbarAdminDisabledMessageSending">Un amministratore ha disabilitato l’invio di messaggi</string>
     <string name="snackbarBlockUserConfirmation">Il mittente è ora bloccato</string>
     <string name="snackbarCalendarChoiceSent">Risposta presa in considerazione</string>

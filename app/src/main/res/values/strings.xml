@@ -226,7 +226,7 @@
     <string name="contentDescriptionIconForward">Forwarded</string>
     <string name="contentDescriptionIconMention">You have been mentioned.</string>
     <string name="contentDescriptionIconNewMail">New</string>
-    <string name="contentDescriptionIconReminder">Is reminder</string>
+    <string name="contentDescriptionIconReminder">Is a reminder</string>
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>
@@ -630,6 +630,8 @@
     <string name="shareEmail">Share email</string>
     <string name="snackbarAcknowledgementFailure">Failed to send</string>
     <string name="snackbarAcknowledgementSuccess">Read receipt sent</string>
+    <string name="snackbarAddReminderFailure">Failed to add reminder</string>
+    <string name="snackbarAddReminderSuccess">Reminder added</string>
     <string name="snackbarAdminDisabledMessageSending">An administrator has disabled message sending</string>
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarCalendarChoiceSent">Response taken into account</string>

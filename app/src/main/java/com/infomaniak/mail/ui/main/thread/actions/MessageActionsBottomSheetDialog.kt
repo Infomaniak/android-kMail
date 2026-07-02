@@ -48,6 +48,7 @@ import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_ACTIONS_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REMINDER_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setSpamUi
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
@@ -129,6 +130,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setMarkUnreadUi(isFromDraft)
             setReportPhishingUi(isFromDraft)
             setAskEuriaUi(isVisible = true)
+            setReminderUi(isFromDraft = isFromDraft)
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
@@ -259,6 +261,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onAddReaction() {
                 trackBottomSheetMessageActionsEvent(MatomoName.OpenEmojiPicker)
                 setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUid)
+            }
+
+            override fun onReminder() {
+                // TODO: matomo
+                setBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET, messageUid)
             }
 
             override fun onSnooze() = Unit

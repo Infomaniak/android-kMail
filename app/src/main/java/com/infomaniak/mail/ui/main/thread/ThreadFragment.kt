@@ -876,7 +876,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
                 return@getBackNavigationResult
             }
-            threadViewModel.modifyReminder(message, delayMinutes)
+            if (message.reminder == null) {
+                threadViewModel.addReminder(message, delayMinutes)
+            } else {
+                threadViewModel.modifyReminder(message, delayMinutes)
+            }
         }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
@@ -904,6 +908,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     EmojiPickerObserverTarget.ThreadList
                 }
             )
+        }
+
+        getBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET) { messageUid: String ->
+            threadViewModel.setMessageForReminder(messageUid)
+            navigateToReminderBottomSheet()
         }
 
         getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
@@ -1426,6 +1435,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
+        const val OPEN_REMINDER_BOTTOM_SHEET = "openReminderBottomSheet"
         const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
         const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"

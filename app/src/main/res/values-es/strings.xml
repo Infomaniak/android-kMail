@@ -626,6 +626,8 @@
     <string name="shareEmail">Compartir correo electrónico</string>
     <string name="snackbarAcknowledgementFailure">Error al enviar</string>
     <string name="snackbarAcknowledgementSuccess">Recibo de lectura enviado</string>
+    <string name="snackbarAddReminderFailure">Error al añadir el recordatorio</string>
+    <string name="snackbarAddReminderSuccess">Recordatorio añadido</string>
     <string name="snackbarAdminDisabledMessageSending">Un administrador ha deshabilitado el envío de mensajes</string>
     <string name="snackbarBlockUserConfirmation">El remitente está bloqueado</string>
     <string name="snackbarCalendarChoiceSent">Respuesta tenida en cuenta</string>

@@ -777,11 +777,11 @@ class ThreadViewModel @Inject constructor(
         message: Message,
         successResId: Int,
         failureResId: Int,
-        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: String, reminderUuid: String) -> ApiResponse<Unit>
+        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: String) -> ApiResponse<Unit>
     ) {
         val messageId = message.messageId
-        val reminderUuid = message.reminder?.uuid
-        if (messageId.isNullOrBlank() || reminderUuid.isNullOrBlank()) {
+
+        if (messageId.isNullOrBlank()) {
             snackbarManager.postValue(appContext.getString(failureResId))
             return
         }
@@ -790,8 +790,7 @@ class ThreadViewModel @Inject constructor(
             val apiResponse = apiAction(
                 mailbox().uuid,
                 message.folderId,
-                messageId,
-                reminderUuid
+                messageId
             )
 
             if (apiResponse.isSuccess()) {
@@ -802,12 +801,37 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun setMessageForReminder(messageUid: String) = viewModelScope.launch {
+        modifyingReminderMessage = messageController.getMessage(messageUid)
+    }
+
+    fun addReminder(message: Message, delayMinutes: Int) {
+        processReminderAction(
+            message = message,
+            successResId = R.string.snackbarAddReminderSuccess,
+            failureResId = R.string.snackbarAddReminderFailure
+        ) { mailboxUuid, folderId, messageId ->
+            ApiRepository.addReminder(
+                mailboxUuid = mailboxUuid,
+                folderId = folderId,
+                messageId = messageId,
+                delayMinutes = delayMinutes
+            )
+        }
+    }
+
     fun disableReminder(message: Message) {
+        val reminderUuid = message.reminder?.uuid
+        if (reminderUuid.isNullOrBlank()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarDisableReminderFailure))
+            return
+        }
+
         processReminderAction(
             message = message,
             successResId = R.string.snackbarDisableReminderSuccess,
             failureResId = R.string.snackbarDisableReminderFailure
-        ) { mailboxUuid, folderId, messageId, reminderUuid ->
+        ) { mailboxUuid, folderId, messageId ->
             ApiRepository.disableReminder(
                 mailboxUuid = mailboxUuid,
                 folderId = folderId,
@@ -818,11 +842,17 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun modifyReminder(message: Message, delayMinutes: Int) {
+        val reminderUuid = message.reminder?.uuid
+        if (reminderUuid.isNullOrBlank()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarModifyReminderFailure))
+            return
+        }
+
         processReminderAction(
             message = message,
             successResId = R.string.snackbarModifyReminderSuccess,
             failureResId = R.string.snackbarModifyReminderFailure
-        ) { mailboxUuid, folderId, messageId, reminderUuid ->
+        ) { mailboxUuid, folderId, messageId ->
             ApiRepository.modifyReminder(
                 mailboxUuid = mailboxUuid,
                 folderId = folderId,
