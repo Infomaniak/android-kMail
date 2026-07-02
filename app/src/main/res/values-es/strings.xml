@@ -502,6 +502,7 @@
     <string name="reminderBottomSheetTitle">Posponer el recordatorio</string>
     <string name="reminderFollowUpButton">Relanzar</string>
     <string name="reminderFollowUpPlaceholderText">Hola,\n¿Es posible obtener algún comentario sobre este tema?\nGracias de antemano.</string>
+    <string name="reminderMarkAsDoneButton">Marcar como hecho</string>
     <string name="reminderNoResponseHeaderTitle">Recordatorio: sin respuesta de %1$s a este correo electrónico desde el %2$s</string>
     <string name="reminderVisibilityTitle">Visibilidad del recordatorio</string>
     <string name="renameFolder">Cambiar el nombre de la carpeta</string>

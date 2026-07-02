@@ -48,6 +48,7 @@ class MessageAlertView @JvmOverloads constructor(
 
     private val action1LoadingTimer = Utils.createRefreshTimer(onTimerFinish = { binding.action1.showProgress() })
     private val action2LoadingTimer = Utils.createRefreshTimer(onTimerFinish = { binding.action2.showProgress() })
+    private val action3LoadingTimer = Utils.createRefreshTimer(onTimerFinish = { binding.action3.showProgress() })
 
     init {
         attrs?.getAttributes(context, R.styleable.MessageAlertView) {
@@ -64,6 +65,12 @@ class MessageAlertView @JvmOverloads constructor(
                     isVisible = hasAction2
                 }
                 divider.isVisible = hasAction2
+
+                val hasAction3 = hasValue(R.styleable.MessageAlertView_action3)
+                action3.apply {
+                    text = getString(R.styleable.MessageAlertView_action3)
+                    isVisible = hasAction3
+                }
             }
         }
     }
@@ -72,6 +79,7 @@ class MessageAlertView @JvmOverloads constructor(
         super.setEnabled(isEnabled)
         action1.isEnabled = isEnabled
         action2.isEnabled = isEnabled
+        action3.isEnabled = isEnabled
     }
 
     fun setDescription(text: String) {
@@ -111,6 +119,24 @@ class MessageAlertView @JvmOverloads constructor(
     fun hideAction2Progress(@StringRes text: Int) {
         action2LoadingTimer.cancel()
         binding.action2.apply {
+            hideProgressCatching(text)
+            isEnabled = true
+        }
+    }
+
+    fun onAction3(listener: OnClickListener) {
+        binding.action3.setOnClickListener(listener)
+    }
+
+
+    fun showAction3Progress() {
+        binding.action3.isEnabled = false
+        action3LoadingTimer.start()
+    }
+
+    fun hideAction3Progress(@StringRes text: Int) {
+        action3LoadingTimer.cancel()
+        binding.action3.apply {
             hideProgressCatching(text)
             isEnabled = true
         }

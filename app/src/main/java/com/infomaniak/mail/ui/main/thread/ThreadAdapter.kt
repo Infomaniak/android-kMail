@@ -774,8 +774,10 @@ class ThreadAdapter(
         bindUnsubscribe(messageUi)
         bindAcknowledge(messageUi)
         bindRequestResponseAlert(message)
+        // if (message.reminder != null) { // TODO: Uncomment this when the backend is ready to send the reminder date
         bindReminderAlert(message)
         bindEndReminderAlert(message)
+        // }
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -910,20 +912,20 @@ class ThreadAdapter(
         alertsGroup.isVisible = true
         endReminderAlert.isVisible = true
 
-        // message.draftResource?.let { draftResource ->
-        //     endReminderAlert.onAction1 {
-        //         trackMessageBannerEvent(MatomoName.ReprogramReminder)
-        //         threadAdapterCallbacks?.onReminderClicked?.invoke(
-        //             // TODO: Create a specific callback for rescheduling reminders
-        //             draftResource,
-        //             message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
-        //         )
-        //     }
-        // }
 
-        endReminderAlert.onAction2 {
+        endReminderAlert.onAction1 {
             trackMessageBannerEvent(MatomoName.FollowUp)
             threadAdapterCallbacks?.onFollowUpClicked?.invoke(message)
+        }
+
+        endReminderAlert.onAction2 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message)
+        }
+
+        endReminderAlert.onAction3 {
+            trackMessageBannerEvent(MatomoName.DeleteDraft)
+            threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message)
         }
     }
 

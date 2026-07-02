@@ -502,6 +502,7 @@
     <string name="reminderBottomSheetTitle">Lykkää muistutusta</string>
     <string name="reminderFollowUpButton">Seuraa</string>
     <string name="reminderFollowUpPlaceholderText">Hei,\nOnko mahdollista saada palautetta tästä aiheesta?\nKiitos etukäteen.</string>
+    <string name="reminderMarkAsDoneButton">Merkitse valmiiksi</string>
     <string name="reminderNoResponseHeaderTitle">Muistutus: ei vastausta %1$s:ltä tähän sähköpostiin lähtien %2$s</string>
     <string name="reminderVisibilityTitle">Muistutuksen näkyvyys</string>
     <string name="renameFolder">Nimeä kansio uudelleen</string>

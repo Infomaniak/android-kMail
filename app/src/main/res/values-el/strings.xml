@@ -502,6 +502,7 @@
     <string name="reminderBottomSheetTitle">Αναβολή της υπενθύμισης</string>
     <string name="reminderFollowUpButton">Παρακολούθηση</string>
     <string name="reminderFollowUpPlaceholderText">Γεια σας,\nΕίναι δυνατόν να λάβετε κάποια ανατροφοδότηση για αυτό το θέμα;\nΣας ευχαριστώ εκ των προτέρων.</string>
+    <string name="reminderMarkAsDoneButton">Σημείωση ως ολοκληρωμένο</string>
     <string name="reminderNoResponseHeaderTitle">Υπενθύμιση: καμία απάντηση από %1$s σε αυτό το email από τις %2$s</string>
     <string name="reminderVisibilityTitle">Ορατότητα υπενθύμισης</string>
     <string name="renameFolder">Μετονομασία φακέλου</string>

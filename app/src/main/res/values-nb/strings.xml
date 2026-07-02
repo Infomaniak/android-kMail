@@ -502,6 +502,7 @@
     <string name="reminderBottomSheetTitle">Utsett påminnelsen</string>
     <string name="reminderFollowUpButton">Følg opp</string>
     <string name="reminderFollowUpPlaceholderText">Hei,\nEr det mulig å få tilbakemelding om dette emnet?\nPå forhånd takk.</string>
+    <string name="reminderMarkAsDoneButton">Merk som fullført</string>
     <string name="reminderNoResponseHeaderTitle">Påminnelse: ingen respons fra %1$s på denne e-posten siden %2$s</string>
     <string name="reminderVisibilityTitle">Påminnelsens synlighet</string>
     <string name="renameFolder">Gi nytt navn til mappen</string>

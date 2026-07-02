@@ -502,6 +502,7 @@
     <string name="reminderBottomSheetTitle">Reporter le rappel</string>
     <string name="reminderFollowUpButton">Relancer</string>
     <string name="reminderFollowUpPlaceholderText">Bonjour,\nEst-il possible d’avoir un retour sur ce sujet ?\nMerci d’avance.</string>
+    <string name="reminderMarkAsDoneButton">Marquer comme terminé</string>
     <string name="reminderNoResponseHeaderTitle">Rappel : aucune réponse de %1$s à cet e-mail depuis le %2$s</string>
     <string name="reminderVisibilityTitle">Visibilité du rappel</string>
     <string name="renameFolder">Renommer le dossier</string>

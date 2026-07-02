@@ -502,6 +502,7 @@
     <string name="reminderBottomSheetTitle">Herinnering uitstellen</string>
     <string name="reminderFollowUpButton">Opvolgen</string>
     <string name="reminderFollowUpPlaceholderText">Hallo,\nIs het mogelijk om feedback te krijgen over dit onderwerp?\nBij voorbaat dank.</string>
+    <string name="reminderMarkAsDoneButton">Markeer als voltooid</string>
     <string name="reminderNoResponseHeaderTitle">Herinnering: geen reactie van %1$s op deze e-mail sinds %2$s</string>
     <string name="reminderVisibilityTitle">Zichtbaarheid van de herinnering</string>
     <string name="renameFolder">De map hernoemen</string>
