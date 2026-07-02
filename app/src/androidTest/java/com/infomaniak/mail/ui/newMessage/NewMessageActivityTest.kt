@@ -21,12 +21,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
-import androidx.test.espresso.action.ViewActions.swipeDown
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -42,11 +43,15 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.ui.Utils.assertRecipientInField
 import com.infomaniak.mail.ui.Utils.enterEmailToField
+import com.infomaniak.mail.ui.Utils.getFakeAttachment
+import com.infomaniak.mail.ui.Utils.interceptFilePickerIntent
 import com.infomaniak.mail.ui.Utils.onViewWithTimeout
 import com.infomaniak.mail.ui.login.BaseActivityTest
 import com.infomaniak.mail.ui.login.LoginActivity
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.core.AllOf.allOf
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
@@ -57,6 +62,72 @@ import kotlin.time.Duration.Companion.seconds
 @LargeTest
 class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity::class) {
 
+    @Before
+    fun initIntents() = Intents.init()
+
+    @After
+    fun releaseIntents() = Intents.release()
+
+    @Test
+    fun sendEmailWithAttachment() {
+        val fakeAttachment = getFakeAttachment()
+        interceptFilePickerIntent(fakeAttachment.uri)
+
+        val subjectUuid = UUID.randomUUID().toString()
+        val subject = "UI test mail attachment #$subjectUuid"
+
+        onViewWithTimeout(
+            retryInterval = 500.milliseconds,
+            matcher = withId(R.id.newMessageFab)
+        ).perform(click())
+
+        // Waiting for the view to settle
+        onView(isRoot()).perform(waitFor(3.seconds))
+
+        onView(withId(R.id.editorAttachment)).perform(click())
+
+        onViewWithTimeout(matcher = withId(R.id.attachmentsRecyclerView), assertion = matches(isDisplayed()))
+        onViewWithTimeout(matcher = withText(fakeAttachment.name), assertion = matches(isDisplayed()))
+
+        onView(
+            allOf(
+                withId(R.id.chevron),
+                isDescendantOfA(withId(R.id.toField))
+            )
+        ).perform(click())
+        enterEmailToField(R.id.toField, "uitest.test@ik.me", R.id.autoCompleteTo)
+        onView(withId(R.id.subjectTextField)).perform(click(), typeText(subject), closeSoftKeyboard())
+        onView(withId(R.id.sendButton)).perform(click())
+
+        // Waiting for the mail to appear in the Thread list fragment
+        onViewWithTimeout(
+            numberOfRetries = 20,
+            retryInterval = 5_000.milliseconds,
+            matcher = withId(R.id.threadsList),
+            assertion = matches(hasDescendant(withText(subject))),
+        )
+
+        // Open the received email
+        onViewWithTimeout(
+            retryInterval = 500.milliseconds,
+            matcher = allOf(withId(R.id.threadsList), hasDescendant(withText(subject))),
+        ).perform(
+            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                hasDescendant(withText(subject)),
+                click(),
+            )
+        )
+
+        // Verify that the attachment with the correct name is displayed in the received email
+        onViewWithTimeout(
+            retryInterval = 2_000.milliseconds,
+            matcher = allOf(withId(R.id.fileName), withText(fakeAttachment.name)),
+            assertion = matches(isDisplayed()),
+        )
+
+        fakeAttachment.file.delete()
+    }
+
     @Test
     fun sendEmail() {
         onViewWithTimeout(
@@ -66,9 +137,6 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
 
         // Waiting for the view to settle
         onView(isRoot()).perform(waitFor(3.seconds))
-
-        // Dismissing the AI BottomSheet. Clicking on "Later" is not working for some reason
-        device.click(0, 0)
 
         // Just clicking on the toField does not work ...
         onView(
@@ -88,10 +156,9 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
         onView(withId(R.id.editorWebView)).perform(click(), typeText("This is an email from UI test"), closeSoftKeyboard())
         onView(withId(R.id.sendButton)).perform(click())
 
-        onView(withId(R.id.threadsList)).perform(swipeDown())
-
         // Checking if the email with a specific ID to be received
         onViewWithTimeout(
+            numberOfRetries = 20,
             retryInterval = 5_000.milliseconds,
             matcher = withId(R.id.threadsList),
             assertion = matches(hasDescendant(withText(subject))),
@@ -115,9 +182,6 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
 
         // Waiting for the view to settle
         onView(isRoot()).perform(waitFor(3.seconds))
-
-        // Dismissing the AI BottomSheet. Clicking on "Later" is not working for some reason
-        device.click(0, 0)
 
         onView(
             allOf(
