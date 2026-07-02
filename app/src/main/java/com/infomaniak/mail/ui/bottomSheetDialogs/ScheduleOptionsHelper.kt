@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2025-2026 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,9 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
-import androidx.annotation.DrawableRes
-import androidx.annotation.IntRange
-import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.infomaniak.core.common.utils.getNextMonday
@@ -32,12 +30,9 @@ import com.infomaniak.core.common.utils.tomorrow
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Afternoon
-import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Evening
-import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Morning
+import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.*
 import com.infomaniak.mail.ui.bottomSheetDialogs.RelativeDay.NextMonday
 import com.infomaniak.mail.ui.bottomSheetDialogs.RelativeDay.Today
-import com.infomaniak.mail.ui.bottomSheetDialogs.RelativeDay.Tomorrow
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.LaterThisMorning
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.MondayAfternoon
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.MondayMorning
@@ -51,26 +46,23 @@ import java.util.Calendar
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 
-abstract class BaseSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
+class ScheduleOptionsHelper(
+    private val context: Context,
+    private val lastScheduleOption: View,
+    private val scheduleOptionsContainer: LinearLayout,
+    private val customScheduleOption: View,
+    private val lastSelectedEpoch: Long?,
+    private val currentlyScheduledEpochMillis: Long?,
+    private val currentKSuite: KSuite?,
+    private val onLastScheduleOptionClicked: () -> Unit,
+    private val onCustomScheduleOptionClicked: () -> Unit,
+    private val createScheduleOptionItem: (ScheduleOption) -> View,
+    private val bindLastScheduleOptionDescription: (String) -> Unit,
+    private val setupCustomScheduleOptionTrailing: (KSuite?) -> Unit,
+    private val setupFirstScheduleOptionDivider: ((View, Boolean) -> Unit)? = null,
+) {
 
-    protected abstract val lastScheduleOption: View
-    protected abstract val scheduleOptionsContainer: LinearLayout
-    protected abstract val customScheduleOption: View
-
-    abstract val lastSelectedEpoch: Long?
-    abstract val currentlyScheduledEpochMillis: Long?
-    abstract val currentKSuite: KSuite?
-
-    abstract fun onLastScheduleOptionClicked()
-    abstract fun onScheduleOptionClicked(dateItem: ScheduleOption)
-    abstract fun onCustomScheduleOptionClicked()
-
-    protected abstract fun createScheduleOptionItem(scheduleOption: ScheduleOption): View
-    protected abstract fun bindLastScheduleOptionDescription(description: String)
-    protected abstract fun setupCustomScheduleOptionTrailing(kSuite: KSuite?)
-    protected open fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) = Unit
-
-    protected fun setupScheduleOptions() {
+    fun setup() {
         computeLastScheduleOption()
 
         setLastScheduleOptionClickListener()
@@ -78,7 +70,9 @@ abstract class BaseSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         setCustomScheduleOptionClickListener()
 
         val shouldDisplayDivider = lastScheduleOption.isVisible
-        scheduleOptionsContainer.children.firstOrNull()?.let { setupFirstScheduleOptionDivider(it, shouldDisplayDivider) }
+        scheduleOptionsContainer.children.firstOrNull()?.let { firstItem ->
+            setupFirstScheduleOptionDivider?.invoke(firstItem, shouldDisplayDivider)
+        }
 
         setupCustomScheduleOptionTrailing(currentKSuite)
     }
@@ -88,7 +82,7 @@ abstract class BaseSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
         if (lastSelectedDate?.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES) == true && lastSelectedDate.isNotAlreadySelected()) {
             lastScheduleOption.isVisible = true
-            bindLastScheduleOptionDescription(requireContext().dayOfWeekDateWithoutYear(date = lastSelectedDate))
+            bindLastScheduleOptionDescription(context.dayOfWeekDateWithoutYear(date = lastSelectedDate))
         }
     }
 
@@ -96,7 +90,7 @@ abstract class BaseSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         lastScheduleOption.setOnClickListener { onLastScheduleOptionClicked() }
     }
 
-    protected open fun createCommonScheduleOptions() {
+    private fun createCommonScheduleOptions() {
         val currentTime = Date()
         WeekPeriod.getCurrent().scheduleOptions.forEach { scheduleOption ->
             if (scheduleOption.canBeDisplayedAt(currentTime) && scheduleOption.isNotAlreadySelected()) {
@@ -104,7 +98,6 @@ abstract class BaseSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
             }
         }
     }
-
 
     private fun setCustomScheduleOptionClickListener() {
         customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
@@ -125,13 +118,13 @@ abstract class BaseSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
     private fun ScheduleOption.isNotAlreadySelected() = date().isNotAlreadySelected()
 }
 
-private val HIDE_INTERVAL = 5.minutes // Beware: the API refuses schedules smaller than 5 minutes
+val HIDE_INTERVAL = 5.minutes // Beware: the API refuses schedules smaller than 5 minutes
 
 enum class ScheduleOption(
     private val day: RelativeDay,
     private val hour: HourOfTheDay,
-    @StringRes val titleRes: Int,
-    @DrawableRes val iconRes: Int,
+    val titleRes: Int,
+    val iconRes: Int,
     val matomoName: MatomoName,
 ) {
     LaterThisMorning(
@@ -141,12 +134,26 @@ enum class ScheduleOption(
         R.drawable.ic_morning_sunrise_schedule,
         MatomoName.LaterThisMorning
     ),
-    ThisAfternoon(Today, Afternoon, R.string.thisAfternoon, R.drawable.ic_afternoon_schedule, MatomoName.ThisAfternoon),
+    ThisAfternoon(
+        Today,
+        Afternoon,
+        R.string.thisAfternoon,
+        R.drawable.ic_afternoon_schedule,
+        MatomoName.ThisAfternoon
+    ),
     ThisEvening(Today, Evening, R.string.thisEvening, R.drawable.ic_evening_schedule, MatomoName.ThisEvening),
-    TomorrowMorning(Tomorrow, Morning, R.string.tomorrowMorning, R.drawable.ic_morning_schedule, MatomoName.TomorrowMorning),
+    TomorrowMorning(
+        RelativeDay.Tomorrow,
+        Morning, R.string.tomorrowMorning, R.drawable.ic_morning_schedule, MatomoName.TomorrowMorning
+    ),
     NextMondayMorning(NextMonday, Morning, R.string.nextMonday, R.drawable.ic_arrow_return, MatomoName.NextMonday),
-
-    MondayMorning(NextMonday, Morning, R.string.mondayMorning, R.drawable.ic_morning_schedule, MatomoName.NextMondayMorning),
+    MondayMorning(
+        NextMonday,
+        Morning,
+        R.string.mondayMorning,
+        R.drawable.ic_morning_schedule,
+        MatomoName.NextMondayMorning
+    ),
     MondayAfternoon(
         NextMonday,
         Afternoon,
@@ -160,16 +167,14 @@ enum class ScheduleOption(
     private fun minimalDisplayTime() = date().time - HIDE_INTERVAL.inWholeMilliseconds
 }
 
-private enum class RelativeDay(val getDate: () -> Date) {
+enum class RelativeDay(val getDate: () -> Date) {
     Today({ Date() }),
     Tomorrow({ Date().tomorrow() }),
     NextMonday({ Date().getNextMonday() }),
 }
 
-private enum class HourOfTheDay(@IntRange(0, 23) val hourOfTheDay: Int) {
-    Morning(8),
-    Afternoon(14),
-    Evening(18),
+enum class HourOfTheDay(val hourOfTheDay: Int) {
+    Morning(8), Afternoon(14), Evening(18),
 }
 
 /**
@@ -178,7 +183,7 @@ private enum class HourOfTheDay(@IntRange(0, 23) val hourOfTheDay: Int) {
  *
  * @param scheduleOptions The available schedule options that can be displayed to the user during each period
  */
-private enum class WeekPeriod(vararg val scheduleOptions: ScheduleOption) {
+enum class WeekPeriod(vararg val scheduleOptions: ScheduleOption) {
     Weekday(LaterThisMorning, ThisAfternoon, ThisEvening, TomorrowMorning, NextMondayMorning),
     Weekend(MondayMorning, MondayAfternoon);
 

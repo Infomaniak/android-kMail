@@ -103,9 +103,9 @@
     </dialog>
 
     <fragment
-        android:id="@+id/sendOptionsBottomSheetDialog"
+        android:id="@+id/sendOptionsFragment"
         android:name="com.infomaniak.mail.ui.newMessage.sendOptions.DraftSendOptionsFragment"
-        android:label="SendOptionsBottomSheetDialog"
+        android:label="SendOptionsFragment"
         tools:layout="@layout/fragment_send_options">
         <argument
             android:name="lastSelectedScheduleEpochMillis"

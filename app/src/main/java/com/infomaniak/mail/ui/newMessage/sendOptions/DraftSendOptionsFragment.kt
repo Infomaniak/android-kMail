@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -38,7 +39,7 @@ import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectVisibilityReminderDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.BaseSchedulePickerBottomSheet
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionsHelper
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
@@ -59,7 +60,7 @@ import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
+class DraftSendOptionsFragment : Fragment() {
 
     private var binding: FragmentSendOptionsBinding by safeBinding()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -83,23 +84,21 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
     private var pendingLastSelectedScheduleEpochMillis: Long? = null
     private var hasLastScheduleOption = false
 
-    override val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
-    override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
-    override val currentlyScheduledEpochMillis: Long? by lazy {
+    private val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
+    private val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
+    private val currentlyScheduledEpochMillis: Long? by lazy {
         navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L }
     }
 
-    override val lastScheduleOption get() = binding.lastScheduleOption
-    override val scheduleOptionsContainer get() = binding.scheduleOptions
-    override val customScheduleOption get() = binding.customScheduleOption
+    private val lastScheduleOption get() = binding.lastScheduleOption
+    private val scheduleOptionsContainer get() = binding.scheduleOptions
+    private val customScheduleOption get() = binding.customScheduleOption
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSendOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        super.onViewCreated(view, savedInstanceState)
-
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
         customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
         selectVisibilityDialog.bindAlertToLifecycle(viewLifecycleOwner)
@@ -107,7 +106,20 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         pendingLastSelectedScheduleEpochMillis = lastSelectedEpoch
 
         setupToolbar()
-        setupScheduleOptions()
+        ScheduleOptionsHelper(
+            context = requireContext(),
+            lastScheduleOption = lastScheduleOption,
+            scheduleOptionsContainer = scheduleOptionsContainer,
+            customScheduleOption = customScheduleOption,
+            lastSelectedEpoch = lastSelectedEpoch,
+            currentlyScheduledEpochMillis = currentlyScheduledEpochMillis,
+            currentKSuite = currentKSuite,
+            onLastScheduleOptionClicked = ::onLastScheduleOptionClicked,
+            onCustomScheduleOptionClicked = ::onCustomScheduleOptionClicked,
+            createScheduleOptionItem = ::createScheduleOptionItem,
+            bindLastScheduleOptionDescription = ::bindLastScheduleOptionDescription,
+            setupCustomScheduleOptionTrailing = ::setupCustomScheduleOptionTrailing,
+        ).setup()
         hasLastScheduleOption = lastSelectedEpoch != null
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
 
@@ -126,7 +138,7 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         saveButton.setOnClickListener { saveOptions() }
     }
 
-    override fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
+    private fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
         return SettingRadioButtonView(requireContext()).apply {
             id = View.generateViewId()
             associatedValue = scheduleOption.date().time.toString()
@@ -135,23 +147,18 @@ class DraftSendOptionsFragment : BaseSchedulePickerBottomSheet() {
         }
     }
 
-    override fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
+    private fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
 
-    override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+    private fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
         binding.customScheduleOption.trailingContent = trailingContentFor(kSuite)
     }
 
-    override fun onLastScheduleOptionClicked() {
+    private fun onLastScheduleOptionClicked() {
         pendingScheduleConfig = lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None
         pendingLastSelectedScheduleEpochMillis = null
     }
 
-    override fun onScheduleOptionClicked(dateItem: ScheduleOption) {
-        pendingScheduleConfig = ScheduleConfig.Scheduled(dateItem.date().time)
-        pendingLastSelectedScheduleEpochMillis = null
-    }
-
-    override fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
+    private fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
 
     private fun setupToolbar() = with(binding.toolbar) {
         setNavigationOnClickListener { findNavController().popBackStack() }

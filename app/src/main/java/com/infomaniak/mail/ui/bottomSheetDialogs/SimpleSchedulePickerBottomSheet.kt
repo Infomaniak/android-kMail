@@ -29,17 +29,63 @@ import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 
-
-abstract class SimpleSchedulePickerBottomSheet : BaseSchedulePickerBottomSheet() {
+abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
     private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
 
     @get:StringRes
     abstract val titleRes: Int
 
-    override val lastScheduleOption get() = binding.lastScheduleOption
-    override val scheduleOptionsContainer get() = binding.scheduleOptions
-    override val customScheduleOption get() = binding.customScheduleOption
+    abstract val lastSelectedEpoch: Long?
+    abstract val currentlyScheduledEpochMillis: Long?
+    abstract val currentKSuite: KSuite?
+
+    abstract fun onLastScheduleOptionClicked()
+    abstract fun onScheduleOptionClicked(dateItem: ScheduleOption)
+    abstract fun onCustomScheduleOptionClicked()
+
+    protected open fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
+        return ActionItemView(requireContext()).apply {
+            setTitle(scheduleOption.titleRes)
+            setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
+            setIconResource(scheduleOption.iconRes)
+            setOnClickListener { onScheduleOptionClicked(scheduleOption) }
+        }
+    }
+
+    protected open fun bindLastScheduleOptionDescription(description: String) {
+        binding.lastScheduleOption.setDescription(description)
+    }
+
+    protected open fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) {
+        (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
+    }
+
+    protected open fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+        binding.customScheduleOption.trailingContent = when (kSuite) {
+            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+            else -> TrailingContent.Chevron
+        }
+    }
+
+    protected fun setupScheduleOptions() {
+        ScheduleOptionsHelper(
+            context = requireContext(),
+            lastScheduleOption = binding.lastScheduleOption,
+            scheduleOptionsContainer = binding.scheduleOptions,
+            customScheduleOption = binding.customScheduleOption,
+            lastSelectedEpoch = lastSelectedEpoch,
+            currentlyScheduledEpochMillis = currentlyScheduledEpochMillis,
+            currentKSuite = currentKSuite,
+            onLastScheduleOptionClicked = ::onLastScheduleOptionClicked,
+            onCustomScheduleOptionClicked = ::onCustomScheduleOptionClicked,
+            createScheduleOptionItem = ::createScheduleOptionItem,
+            bindLastScheduleOptionDescription = ::bindLastScheduleOptionDescription,
+            setupCustomScheduleOptionTrailing = ::setupCustomScheduleOptionTrailing,
+            setupFirstScheduleOptionDivider = ::setupFirstScheduleOptionDivider,
+        ).setup()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetScheduleOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -50,30 +96,5 @@ abstract class SimpleSchedulePickerBottomSheet : BaseSchedulePickerBottomSheet()
 
         binding.title.text = getString(titleRes)
         setupScheduleOptions()
-    }
-
-    override fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
-        return ActionItemView(requireContext()).apply {
-            setTitle(scheduleOption.titleRes)
-            setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
-            setIconResource(scheduleOption.iconRes)
-            setOnClickListener { onScheduleOptionClicked(scheduleOption) }
-        }
-    }
-
-    override fun bindLastScheduleOptionDescription(description: String) {
-        binding.lastScheduleOption.setDescription(description)
-    }
-
-    override fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) {
-        (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
-    }
-
-    override fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
-        binding.customScheduleOption.trailingContent = when (kSuite) {
-            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
-            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
-            else -> TrailingContent.Chevron
-        }
     }
 }
