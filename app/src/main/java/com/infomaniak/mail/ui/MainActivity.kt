@@ -456,14 +456,8 @@ class MainActivity : BaseActivity() {
 
     private fun showReminderDraftSnackbar(reminderDate: Date) {
         showSendingSnackbarTimer.cancel()
-
         val dateString = formatDayOfWeekAdaptiveYear(reminderDate)
-
-        snackbarManager.setValue(
-            title = String.format(getString(R.string.snackbarReminderSaved), dateString),
-            buttonTitle = R.string.settingsDisabled,
-            customBehavior = { mainViewModel.disabledReminder() },
-        )
+        snackbarManager.setValue(title = String.format(getString(R.string.snackbarReminderSaved), dateString))
     }
 
     private fun loadCurrentMailbox() {
