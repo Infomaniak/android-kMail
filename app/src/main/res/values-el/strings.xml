@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Μια απόδειξη ανάγνωσης στάλθηκε στον αποστολέα.</string>
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
+    <string name="actionCallIfNoResponse">Υπενθύμισέ μου αν δεν υπάρξει απάντηση μετά την αποστολή</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
     <string name="actionDelete">Διαγραφή</string>
     <string name="actionEditMenu">Επεξεργασία μενού</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Αντιγραφή κωδικού πρόσβασης</string>
     <string name="buttonCreate">Δημιουργία</string>
     <string name="buttonCreateFolder">Προσθήκη φακέλου</string>
+    <string name="buttonCustomReminder">Προσαρμοσμένη υπενθύμιση</string>
     <string name="buttonCustomSchedule">Προσαρμοσμένο πρόγραμμα</string>
+    <string name="buttonDisable">Απενεργοποίηση</string>
     <string name="buttonDownload">Λήψη</string>
     <string name="buttonDownloadAll">Λήψη όλων</string>
     <string name="buttonFeedback">Σχόλια</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">Όλη την ημέρα</string>
     <string name="calendarNotInvited">Δεν είστε προσκεκλημένος</string>
     <string name="calendarOrganizerName">%s (Διοργανωτής)</string>
+    <string name="callIfNoResponseHeaderTitle">Υπενθύμιση αν δεν υπάρχει απάντηση: %s μετά την αποστολή</string>
     <string name="ccTitle">Κοινοποίηση:</string>
     <string name="comingSoon">Έρχεται σύντομα…</string>
     <string name="commercialFolder">Προσφορές</string>
@@ -217,6 +221,7 @@
     <string name="contentDescriptionIconFolderSelected">Επιλεγμένος φάκελος</string>
     <string name="contentDescriptionIconForward">Προωθήθηκε</string>
     <string name="contentDescriptionIconNewMail">Νέο</string>
+    <string name="contentDescriptionIconReminder">Είναι μια υπενθύμιση</string>
     <string name="contentDescriptionIconReply">Απάντηση</string>
     <string name="contentDescriptionIconStorage">Κατάσταση αποθήκευσης</string>
     <string name="contentDescriptionOpenMailActions">Άνοιγμα ενεργειών μηνύματος</string>
@@ -239,6 +244,10 @@
     <string name="createFolderName">Όνομα φακέλου</string>
     <string name="datePickerTitle">Επιλέξτε ημερομηνία και ώρα</string>
     <string name="dateTitle">Ημερομηνία:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d μέρα</item>
+        <item quantity="other">%d μέρες</item>
+    </plurals>
     <string name="deleteAccountWarning">Η διαγραφή του λογαριασμού σας θα είναι οριστική. Δεν θα μπορείτε να τον επανενεργοποιήσετε.</string>
     <string name="deleteFolderDialogDescription">Το περιεχόμενο του φακέλου %s θα διαγραφεί οριστικά χωρίς να μεταφερθεί στον κάδο απορριμμάτων.</string>
     <string name="deleteFolderDialogTitle">Διαγραφή φακέλου</string>
@@ -279,7 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Σχετικοί παραλήπτες</string>
     <string name="encryptedMessagePasswordLabel">Μοιραστείτε αυτόν τον κωδικό μέσω ιδιωτικού μηνύματος. Δεν θα μπορείτε να τον αντιγράψετε μετά την αποστολή.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Η κρυπτογράφηση απενεργοποιήθηκε</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Τα προγραμματισμένα email δεν είναι διαθέσιμα για κρυπτογραφημένα μηνύματα</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Η προγραμματισμένη αποστολή και οι υπενθυμίσεις δεν είναι διαθέσιμες για κρυπτογραφημένα μηνύματα</string>
     <string name="encryptedMessageUpdatePasswordButton">Αλλαγή κωδικού</string>
     <string name="encryptedPasswordProtectionTitle">Προστασία με κωδικό πρόσβασης</string>
     <string name="encryptedProtectionAdDescription">Προστατέψτε το μήνυμά σας από μη εξουσιοδοτημένη πρόσβαση με την κρυπτογράφηση Infomaniak.</string>
@@ -293,6 +302,7 @@
     <string name="encryptedStatePanelIncomplete">Απαιτείται κωδικός για την ολοκλήρωση της αποστολής.</string>
     <string name="encryptedStatePanelStatePartialLabel">Μερικό</string>
     <string name="encryptedStatePanelTitle">Κρυπτογράφηση</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Η κρυπτογράφηση δεν είναι διαθέσιμη αν η προγραμματισμένη αποστολή ή η υπενθύμιση είναι ενεργοποιημένη</string>
     <string name="enterPasswordTitle">Εισαγωγή κωδικού πρόσβασης</string>
     <string name="errorAlreadyLinkedMailbox">Αυτή η διεύθυνση email είναι ήδη συνδεδεμένη με τον λογαριασμό σας</string>
     <string name="errorAtLeastOneRecipient">Απαιτείται τουλάχιστον ένας παραλήπτης</string>
@@ -333,6 +343,7 @@
     <string name="errorNewFolderNameTooLong">Το όνομα φακέλου δεν πρέπει να υπερβαίνει τους 255 χαρακτήρες</string>
     <string name="errorRefusedRecipients">Ο διακομιστής απορρίπτει όλους τους παραλήπτες</string>
     <string name="errorRefusedSender">Ο διακομιστής απορρίπτει τον αποστολέα</string>
+    <string name="errorReminderDelayTooShort">Η υπενθύμιση πρέπει να είναι τουλάχιστον %d ώρα στο μέλλον</string>
     <string name="errorScheduleDelayTooShort">Δεν μπορείτε να προγραμματίσετε email σε λιγότερο από %d λεπτά</string>
     <string name="errorScheduledSnoozeDelayTooShort">Ο ελάχιστος χρόνος αναμονής για email είναι %d λεπτά</string>
     <string name="errorSendLimitExceeded">Έχει επιτευχθεί το όριο αποστολής</string>
@@ -367,6 +378,10 @@
     <string name="genericMessageTranslated">Μήνυμα μεταφρασμένο</string>
     <string name="googlePlayServicesAreRequired">Απαιτούνται οι Υπηρεσίες Google Play</string>
     <string name="groupContactsTitle">Ομάδα: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d ώρα</item>
+        <item quantity="other">%d ώρες</item>
+    </plurals>
     <string name="inboxFolder">Εισερχόμενα</string>
     <string name="kSuiteProQuotasAlertDescription">Ο χώρος αποθήκευσης του Mail σας είναι σχεδόν πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Ο χώρος αποθήκευσης του Mail σας είναι πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
@@ -474,6 +489,20 @@
     <string name="readMore">Διαβάστε περισσότερα</string>
     <string name="recentSearchesTitle">Πρόσφατες αναζητήσεις</string>
     <string name="refreshTokenError">Έχετε αποσυνδεθεί</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s περιμένει απάντηση από %2$s</item>
+        <item quantity="other">%1$s περιμένουν απάντηση από %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s περιμένει απάντηση έως %2$s</item>
+        <item quantity="other">%1$s περιμένουν απάντηση έως %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Αναβολή της υπενθύμισης</string>
+    <string name="reminderFollowUpButton">Παρακολούθηση</string>
+    <string name="reminderFollowUpPlaceholderText">Γεια σας,\nΕίναι δυνατόν να λάβετε κάποια ανατροφοδότηση για αυτό το θέμα;\nΣας ευχαριστώ εκ των προτέρων.</string>
+    <string name="reminderMarkAsDoneButton">Σημείωση ως ολοκληρωμένο</string>
+    <string name="reminderNoResponseHeaderTitle">Υπενθύμιση: καμία απάντηση από %1$s σε αυτό το email από τις %2$s</string>
+    <string name="reminderVisibilityTitle">Ορατότητα υπενθύμισης</string>
     <string name="renameFolder">Μετονομασία φακέλου</string>
     <string name="reportDisplayProblemDescription">Συμφωνείτε να μοιραστείτε τα δεδομένα σας με τους προγραμματιστές μας ώστε να σας βοηθήσουν με το πρόβλημά σας;</string>
     <string name="reportDisplayProblemTitle">Αναφορά προβλήματος εμφάνισης</string>
@@ -506,8 +535,12 @@
     <string name="selectDateDialogTitle">Επιλέξτε ημερομηνία</string>
     <string name="selectSignatureNone">Χωρίς υπογραφή</string>
     <string name="selectTimeDialogTitle">Επιλέξτε ώρα</string>
+    <string name="selectionReminderMeOnly">Μόνο εγώ</string>
+    <string name="selectionReminderRecipientsAndMe">Οι παραλήπτες και εγώ</string>
+    <string name="selectionReminderTitle">Επίλεξε ποιος μπορεί να δει την υπενθύμιση</string>
     <string name="send">Αποστολή</string>
     <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>
+    <string name="sendOptions">Επιλογές αποστολής</string>
     <string name="sentFolder">Απεσταλμένα μηνύματα</string>
     <string name="settingsAccentColor">Χρώμα έμφασης</string>
     <string name="settingsAccentColorDescription">Επιλέξτε το χρώμα έμφασης για την εφαρμογή</string>
@@ -591,11 +624,15 @@
     <string name="shareEmail">Κοινοποίηση email</string>
     <string name="snackbarAcknowledgementFailure">Αποτυχία αποστολής</string>
     <string name="snackbarAcknowledgementSuccess">Η απόδειξη ανάγνωσης εστάλη</string>
+    <string name="snackbarAddReminderFailure">Δεν ήταν δυνατή η προσθήκη υπενθύμισης</string>
+    <string name="snackbarAddReminderSuccess">Η υπενθύμιση προστέθηκε</string>
     <string name="snackbarAdminDisabledMessageSending">Ένας διαχειριστής έχει απενεργοποιήσει την αποστολή μηνυμάτων</string>
     <string name="snackbarBlockUserConfirmation">Ο αποστολέας έχει αποκλειστεί</string>
     <string name="snackbarCalendarChoiceSent">Η απάντηση καταχωρήθηκε</string>
     <string name="snackbarContactSaved">Η επαφή καταχωρήθηκε με επιτυχία</string>
     <string name="snackbarDeletedConversation">Η συνομιλία δεν υπάρχει πλέον</string>
+    <string name="snackbarDisableReminderFailure">Δεν ήταν δυνατή η απενεργοποίηση της υπενθύμισης</string>
+    <string name="snackbarDisableReminderSuccess">Η υπενθύμιση απενεργοποιήθηκε με επιτυχία</string>
     <string name="snackbarDisplayProblemReported">Το πρόβλημα εμφάνισης αναφέρθηκε</string>
     <string name="snackbarDownloadInProgress">Η λήψη βρίσκεται σε εξέλιξη…</string>
     <string name="snackbarDraftDeleted">Το πρόχειρο διαγράφηκε</string>
@@ -609,9 +646,13 @@
     <string name="snackbarMessageDeletedPermanently">Το μήνυμα διαγράφηκε</string>
     <string name="snackbarMessageMoved">Το μήνυμα μετακινήθηκε στο %s</string>
     <string name="snackbarMessageMovedToSpam">Το μήνυμα μεταφέρθηκε στα spam και ο χρήστης εμποδίστηκε</string>
+    <string name="snackbarModifyReminderFailure">Αποτυχία τροποποίησης της υπενθύμισης</string>
+    <string name="snackbarModifyReminderSuccess">Η υπενθύμιση τροποποιήθηκε</string>
     <string name="snackbarMoveCancelled">Η μετακίνηση ακυρώθηκε</string>
     <string name="snackbarPasswordCopied">Ο κωδικός αντιγράφηκε</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Ο αριθμός αντιγράφηκε στο πρόχειρο</string>
+    <string name="snackbarReminder">Η υπενθύμιση δημιουργείται</string>
+    <string name="snackbarReminderSaved">Η υπενθύμιση έχει οριστεί για %s</string>
     <string name="snackbarReportPhishingConfirmation">Η αναφορά ολοκληρώθηκε με επιτυχία</string>
     <string name="snackbarRestorationLaunched">Εκκίνηση επαναφοράς</string>
     <string name="snackbarSaveInDraft">Το μήνυμα αποθηκεύτηκε στα πρόχειρα.</string>
@@ -711,11 +752,20 @@
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="tryAgain">Παρακαλώ, δοκιμάστε ξανά.</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
+    <plurals name="unitDays">
+        <item quantity="one">Ημέρα</item>
+        <item quantity="other">Ημέρες</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Ώρα</item>
+        <item quantity="other">Ώρες</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>
     <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>
     <string name="unknownTag">Άγνωστο</string>
     <string name="unsubscribeButtonTitle">Κατάργηση εγγραφής</string>
+    <string name="urgencyReminderDescription">Ενημερωθείτε εάν ο παραλήπτης σας δεν έχει απαντήσει μέχρι μια επιλεγμένη ημερομηνία.</string>
     <string name="urlEntryTitle">Δημιουργία υπερσύνδεσμου</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

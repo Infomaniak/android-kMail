@@ -293,7 +293,7 @@
                     android:layout_height="0dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
-                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintEnd_toStartOf="@id/iconReminder"
                     app:layout_constraintHorizontal_bias="1"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toEndOf="@id/mailSubject"
@@ -305,6 +305,22 @@
                     tools:visibility="visible" />
 
                 <ImageView
+                    android:id="@+id/iconReminder"
+                    android:layout_width="@dimen/standardIconSize"
+                    android:layout_height="@dimen/standardIconSize"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:background="@drawable/bg_reminder_icon"
+                    android:contentDescription="@string/contentDescriptionIconReminder"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_alarm_clock"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintStart_toEndOf="@id/folderNameCompactMode"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    app:tint="?attr/colorPrimary" />
+
+                <ImageView
                     android:id="@+id/iconAttachment"
                     android:layout_width="@dimen/mediumIconSize"
                     android:layout_height="@dimen/mediumIconSize"
@@ -314,7 +330,7 @@
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toStartOf="@id/iconCalendar"
-                    app:layout_constraintStart_toEndOf="@id/folderNameCompactMode"
+                    app:layout_constraintStart_toEndOf="@id/iconReminder"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
                     app:tint="@color/iconColorPrimaryText"
                     tools:visibility="visible" />

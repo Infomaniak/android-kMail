@@ -39,7 +39,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH
 import com.infomaniak.core.common.utils.FormatData
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.common.utils.formatWithLocal
@@ -764,6 +766,11 @@ class ThreadAdapter(
 
         bindUnsubscribe(messageUi)
         bindAcknowledge(messageUi)
+        // if (message.reminder != null) { // TODO: Uncomment this when the backend is ready to send the reminder date
+        bindRequestResponseAlert(message)
+        bindReminderAlert(message)
+        bindEndReminderAlert(message)
+        // }
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -824,6 +831,93 @@ class ThreadAdapter(
         scheduleAlert.onAction2 {
             trackMessageBannerEvent(MatomoName.ModifySchedule)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
+        }
+    }
+
+    private fun formatNamesList(context: Context, names: List<String>): String {
+        return when (names.size) {
+            0 -> ""
+            1 -> names[0]
+            2 -> "${names[0]} ${context.getString(R.string.linkingWord)} ${names[1]}"
+            else -> {
+                val allButLast = names.dropLast(1).joinToString(", ")
+                "$allButLast ${context.getString(R.string.linkingWord)} ${names.last()}"
+            }
+        }
+    }
+
+    private fun ItemMessageBinding.bindRequestResponseAlert(message: Message) {
+        requestResponseAlert.setActionsVisibility(shouldDisplayAction = false)
+        val senderNames = message.from.map { it.name.ifBlank { it.email } }
+        val formatNamesList = formatNamesList(context, senderNames)
+
+        requestResponseAlert.apply {
+            isVisible = true
+            setDescription(
+                context.resources.getQuantityString(
+                    R.plurals.reminderBeforeHeaderTitle,
+                    message.from.size,
+                    formatNamesList,
+                    message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME) // TODO: Use real reminder date
+                )
+            ) // TODO: change dynamically when the reminder expires
+        }
+    }
+
+    private fun ItemMessageBinding.bindReminderAlert(message: Message) {
+        reminderAlert.setActionsVisibility(shouldDisplayAction = true)
+
+        reminderAlert.setDescription(
+            context.getString(
+                R.string.callIfNoResponseHeaderTitle,
+                message.displayDate.toDate().format(FORMAT_DATE_DAY_MONTH), // TODO: Use real reminder date
+            ),
+        )
+
+        alertsGroup.isVisible = true
+        reminderAlert.isVisible = true
+
+        reminderAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
+        }
+
+        reminderAlert.onAction2 {
+            // TODO: add matomo
+            threadAdapterCallbacks?.onDisableReminderClicked?.invoke(message)
+        }
+    }
+
+    private fun ItemMessageBinding.bindEndReminderAlert(message: Message) {
+        endReminderAlert.setActionsVisibility(shouldDisplayAction = true)
+        val recipientsNames = message.allRecipients.map { it.name.ifBlank { it.email } }
+        val formatNamesList = formatNamesList(context, recipientsNames)
+
+        endReminderAlert.setDescription(
+            context.getString(
+                R.string.reminderNoResponseHeaderTitle,
+                formatNamesList,
+                message.displayDate.toDate().format(FORMAT_DATE_DAY_MONTH), // TODO: Use real reminder date
+            ),
+        )
+
+        alertsGroup.isVisible = true
+        endReminderAlert.isVisible = true
+
+
+        endReminderAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.FollowUp)
+            threadAdapterCallbacks?.onFollowUpClicked?.invoke(message)
+        }
+
+        endReminderAlert.onAction2 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onAddReminderClicked?.invoke(message)
+        }
+
+        endReminderAlert.onAction3 {
+            trackMessageBannerEvent(MatomoName.DeleteDraft)
+            threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message)
         }
     }
 
@@ -1368,6 +1462,7 @@ class ThreadAdapter(
         var onAttachmentOptionsClicked: ((attachment: Attachable) -> Unit)? = null,
         var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
         var onReplyClicked: ((Message) -> Unit)? = null,
+        var onFollowUpClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
         var onSuperCollapsedBlockClicked: (() -> Unit)? = null,
@@ -1392,6 +1487,9 @@ class ThreadAdapter(
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
         var getAiState: (() -> AiStateMap)? = null,
+        var onDisableReminderClicked: ((Message) -> Unit)? = null,
+        var onModifyReminderClicked: ((Message) -> Unit)? = null,
+        var onAddReminderClicked: ((Message) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

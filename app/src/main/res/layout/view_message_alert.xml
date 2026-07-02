@@ -87,5 +87,13 @@
             tools:text="Toujours afficher pour cet expéditeur"
             tools:visibility="visible" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_wrapBefore="true"
+            tools:text="Action 3" />
+
     </com.google.android.flexbox.FlexboxLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

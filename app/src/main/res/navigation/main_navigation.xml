@@ -258,7 +258,7 @@
 
     <dialog
         android:id="@+id/scheduleSendBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog"
         android:label="ScheduleSendBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_schedule_options">
         <argument
@@ -291,6 +291,20 @@
             android:name="currentlyScheduledEpochMillis"
             android:defaultValue="0L"
             app:argType="long" />
+        <argument
+            android:name="currentKSuite"
+            app:argType="com.infomaniak.core.ksuite.data.KSuite"
+            app:nullable="true" />
+        <argument
+            android:name="isAdmin"
+            app:argType="boolean" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/reminderBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialog"
+        android:label="ReminderBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_reminder_options">
         <argument
             android:name="currentKSuite"
             app:argType="com.infomaniak.core.ksuite.data.KSuite"

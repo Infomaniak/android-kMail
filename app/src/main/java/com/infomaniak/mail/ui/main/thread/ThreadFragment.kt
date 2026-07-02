@@ -85,9 +85,11 @@ import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.PhoneContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForSnoozeDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialog.Companion.REMINDER_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialogArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -399,6 +401,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         }
                     )
                 },
+                onFollowUpClicked = ::followUpDraft,
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
                 onSuperCollapsedBlockClicked = ::expandSuperCollapsedBlock,
@@ -487,6 +490,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
                 getAiState = { aiActionsViewModel.aiStateMap.value },
+                onDisableReminderClicked = ::disableReminder,
+                onModifyReminderClicked = ::modifyReminder,
+                onAddReminderClicked = ::addReminder,
             ),
         )
 
@@ -851,6 +857,19 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox)
         }
 
+        getBackNavigationResult(REMINDER_RESULT) { delayMinutes: Int ->
+            val message = threadViewModel.modifyingReminderMessage
+            if (message == null) {
+                snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+                return@getBackNavigationResult
+            }
+            if (message.reminder == null) {
+                threadViewModel.addReminder(message, delayMinutes)
+            } else {
+                threadViewModel.modifyReminder(message, delayMinutes)
+            }
+        }
+
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
             navigateToSnoozeBottomSheet(snoozeScheduleType)
         }
@@ -876,6 +895,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     EmojiPickerObserverTarget.ThreadList
                 }
             )
+        }
+
+        getBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET) { messageUid: String ->
+            threadViewModel.setMessageForReminder(messageUid)
+            navigateToReminderBottomSheet()
         }
 
         getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
@@ -1230,13 +1254,43 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         navigateToScheduleSendBottomSheet()
     }
 
+    private fun addReminder(message: Message) {
+        threadViewModel.modifyingReminderMessage = message
+        message.reminder = null
+        navigateToReminderBottomSheet()
+    }
+
+    private fun modifyReminder(message: Message) {
+        threadViewModel.modifyingReminderMessage = message
+        navigateToReminderBottomSheet()
+    }
+
+    private fun followUpDraft(message: Message) {
+        twoPaneViewModel.navigateToNewMessage(
+            draftMode = DraftMode.FOLLOW_UP,
+            previousMessageUid = message.uid,
+            shouldLoadDistantResources = true,
+        )
+    }
+
     private fun navigateToScheduleSendBottomSheet() {
         val mailbox = mainViewModel.currentMailbox.value ?: return
         safeNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
-            args = ScheduleSendBottomSheetDialogArgs(
+            args = RescheduleDraftBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
+            ).toBundle(),
+        )
+    }
+
+    private fun navigateToReminderBottomSheet() {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
+        safeNavigate(
+            resId = R.id.reminderBottomSheetDialog,
+            args = ReminderBottomSheetDialogArgs(
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
             ).toBundle(),
@@ -1374,6 +1428,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
+        const val OPEN_REMINDER_BOTTOM_SHEET = "openReminderBottomSheet"
         const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
         const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"

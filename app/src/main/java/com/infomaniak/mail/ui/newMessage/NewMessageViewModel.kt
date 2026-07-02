@@ -245,6 +245,10 @@ class NewMessageViewModel @Inject constructor(
     private val _isPlaceHolderVisible = MutableStateFlow(false)
     val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
 
+    val scheduleConfig: MutableLiveData<ScheduleConfig> = MutableLiveData(ScheduleConfig.None)
+    val reminderConfig: MutableLiveData<ReminderConfig> = MutableLiveData(ReminderConfig.None)
+    val shouldRemindRecipient: MutableLiveData<Boolean> = MutableLiveData(true)
+
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
@@ -427,7 +431,7 @@ class NewMessageViewModel @Inject constructor(
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
-            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
+            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD, DraftMode.FOLLOW_UP -> {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
@@ -442,6 +446,13 @@ class NewMessageViewModel @Inject constructor(
                         }
                     }
             }
+        }
+
+        if (draftMode == DraftMode.FOLLOW_UP) {
+            initialBody = BodyContentPayload(
+                appContext.getString(R.string.reminderFollowUpPlaceholderText),
+                BodyContentType.TEXT_PLAIN_WITH_HTML
+            )
         }
 
         val signature: Signature
@@ -923,6 +934,21 @@ class NewMessageViewModel @Inject constructor(
 
     fun resetScheduledDate() = setScheduleDate(date = null)
 
+    fun setReminderDelay(reminderDelayMinutes: Int) = viewModelScope.launch(ioDispatcher) {
+        val localUuid = draftLocalUuid ?: return@launch
+        mailboxContentRealm().write {
+            DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
+                if (reminderDelayMinutes > 0) {
+                    draft.reminderDelta = reminderDelayMinutes
+                    draft.shouldRemindRecipient = shouldRemindRecipient.value ?: true
+                } else {
+                    draft.reminderDelta = null
+                    draft.shouldRemindRecipient = null
+                }
+            }
+        }
+    }
+
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
@@ -1142,6 +1168,7 @@ class NewMessageViewModel @Inject constructor(
             DraftAction.SAVE -> showSaveToast(isFinishing, isTaskRoot)
             DraftAction.SEND, DraftAction.SEND_REACTION -> showSendToast(isTaskRoot)
             DraftAction.SCHEDULE -> showScheduleToast(isTaskRoot)
+            DraftAction.REMINDER -> showReminderToast(isTaskRoot)
         }
     }
 
@@ -1159,6 +1186,10 @@ class NewMessageViewModel @Inject constructor(
 
     private fun showScheduleToast(isTaskRoot: Boolean) {
         if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
+    }
+
+    private fun showReminderToast(isTaskRoot: Boolean) {
+        if (isTaskRoot) appContext.showToast(R.string.snackbarReminder)
     }
 
     private fun MutableLiveData<UiRecipients>.addRecipientThenSetValue(recipient: Recipient) {

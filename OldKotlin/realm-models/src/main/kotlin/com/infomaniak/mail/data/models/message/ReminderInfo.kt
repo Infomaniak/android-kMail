@@ -15,14 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.draft
+@file:UseSerializers(RealmInstantSerializer::class)
 
-import com.infomaniak.mail.MatomoMail
+package com.infomaniak.mail.data.models.message
 
-enum class DraftAction(val apiCallValue: String, val matomoName: MatomoMail.MatomoName) {
-    SAVE("save", MatomoMail.MatomoName.SaveDraft),
-    SEND("send", MatomoMail.MatomoName.SendMail),
-    SEND_REACTION("send_reaction", MatomoMail.MatomoName.SendReaction),
-    SCHEDULE("schedule", MatomoMail.MatomoName.ScheduleDraft),
-    REMINDER("reminder", MatomoMail.MatomoName.ReminderDraft),
+import com.infomaniak.mail.data.api.RealmInstantSerializer
+import io.realm.kotlin.types.EmbeddedRealmObject
+import io.realm.kotlin.types.RealmInstant
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+
+@Serializable
+class ReminderInfo : EmbeddedRealmObject {
+    @SerialName("date")
+    var date: RealmInstant? = null
+    @SerialName("uuid")
+    var uuid: String? = null
+
+    companion object
 }

@@ -397,6 +397,15 @@
             app:layout_constraintTop_toBottomOf="@id/messageDetails">
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/requestResponseAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Laura is awaiting a response before Thursday, May 17 at 12:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/scheduleAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -405,6 +414,29 @@
                 app:action2="@string/buttonModify"
                 app:icon="@drawable/ic_schedule_send"
                 tools:description="Cet e-mail sera envoyé à cette date : mercredi 30 juillet 2024 à 09:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/reminderAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/buttonReschedule"
+                app:action2="@string/buttonDisable"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Me rappeler si pas de réponse : mercredi 30 juillet 2024 à 09:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/endReminderAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/reminderFollowUpButton"
+                app:action2="@string/buttonReschedule"
+                app:action3="@string/reminderMarkAsDoneButton"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Rappel : aucune réponse de Laura à cet e-mail depuis le 16 mai."
                 tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView

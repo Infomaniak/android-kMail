@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">En kvittering for læsning er blevet sendt til afsenderen.</string>
     <string name="actionArchive">Arkivér</string>
     <string name="actionBlockSender">Bloker afsender</string>
+    <string name="actionCallIfNoResponse">Påmind mig, hvis der ikke kommer svar efter afsendelse</string>
     <string name="actionCancelSnooze">Annuller udsættelse</string>
     <string name="actionDelete">Slet</string>
     <string name="actionEditMenu">Rediger menu</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Kopiér adgangskode</string>
     <string name="buttonCreate">Opret</string>
     <string name="buttonCreateFolder">Tilføj en mappe</string>
+    <string name="buttonCustomReminder">Brugerdefineret påmindelse</string>
     <string name="buttonCustomSchedule">Tilpasset tidsplan</string>
+    <string name="buttonDisable">Deaktiver</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download alle</string>
     <string name="buttonFeedback">Feedback</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">Hele dagen</string>
     <string name="calendarNotInvited">Du er ikke inviteret</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>
+    <string name="callIfNoResponseHeaderTitle">Påmind mig, hvis der ikke er svar: %s efter afsendelse</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Tilbud</string>
@@ -217,6 +221,7 @@
     <string name="contentDescriptionIconFolderSelected">Mappe valgt</string>
     <string name="contentDescriptionIconForward">Videresendt</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
+    <string name="contentDescriptionIconReminder">Er en påmindelse</string>
     <string name="contentDescriptionIconReply">Svar</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>
     <string name="contentDescriptionOpenMailActions">Åbn mailhandlinger</string>
@@ -239,6 +244,10 @@
     <string name="createFolderName">Navn på mappen</string>
     <string name="datePickerTitle">Vælg en dato og et tidspunkt</string>
     <string name="dateTitle">Dato:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dage</item>
+    </plurals>
     <string name="deleteAccountWarning">Sletningen af din konto vil være endelig. Du vil ikke kunne genaktivere din konto.</string>
     <string name="deleteFolderDialogDescription">Indholdet af mappen %s vil blive slettet permanent uden at gå gennem papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slet mappe</string>
@@ -279,7 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Berørte modtagere</string>
     <string name="encryptedMessagePasswordLabel">Del denne adgangskode via privat besked. Du vil ikke kunne kopiere den, når du har sendt den.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Kryptering er blevet deaktiveret</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Planlagte e-mails er ikke tilgængelige for krypterede beskeder</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Planlagt afsendelse og påmindelser er ikke tilgængelige for krypterede beskeder</string>
     <string name="encryptedMessageUpdatePasswordButton">Skift adgangskode</string>
     <string name="encryptedPasswordProtectionTitle">Adgangskodebeskyttelse</string>
     <string name="encryptedProtectionAdDescription">Beskyt din besked mod uautoriseret adgang med Infomaniak-kryptering.</string>
@@ -293,6 +302,7 @@
     <string name="encryptedStatePanelIncomplete">En adgangskode er påkrævet for at færdiggøre afsendelsen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Delvis</string>
     <string name="encryptedStatePanelTitle">Kryptering</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Kryptering er ikke tilgængelig, hvis planlagt afsendelse eller påmindelse er aktiveret</string>
     <string name="enterPasswordTitle">Indtast adgangskode</string>
     <string name="errorAlreadyLinkedMailbox">Denne e-mailadresse er allerede knyttet til din konto</string>
     <string name="errorAtLeastOneRecipient">Mindst én modtager er påkrævet</string>
@@ -333,6 +343,7 @@
     <string name="errorNewFolderNameTooLong">Mappenavnet må ikke overstige 255 tegn</string>
     <string name="errorRefusedRecipients">Serveren afviser alle modtagere</string>
     <string name="errorRefusedSender">Serveren afviser afsenderen</string>
+    <string name="errorReminderDelayTooShort">Påmindelsen skal være mindst %d time fremme i tiden</string>
     <string name="errorScheduleDelayTooShort">Du kan ikke planlægge en e-mail mindre end %d minutter frem i tiden</string>
     <string name="errorScheduledSnoozeDelayTooShort">Den minimale tid for at udsætte en e-mail er %d minutter</string>
     <string name="errorSendLimitExceeded">Afsendelsesgrænse nået</string>
@@ -367,6 +378,10 @@
     <string name="genericMessageTranslated">Besked oversat</string>
     <string name="googlePlayServicesAreRequired">Google Play Services er påkrævet</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
     <string name="inboxFolder">Indbakke</string>
     <string name="kSuiteProQuotasAlertDescription">Din mail-lagerplads er næsten fuld. Opgrader til ubegrænset lagerplads og lås nye funktioner op.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din mail-lagerplads er fuld. Opgrader til ubegrænset lagerplads og lås nye funktioner op.</string>
@@ -474,6 +489,20 @@
     <string name="readMore">Læs mere</string>
     <string name="recentSearchesTitle">Seneste søgninger</string>
     <string name="refreshTokenError">Du er blevet afbrudt</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s har ventet på svar siden %2$s</item>
+        <item quantity="other">%1$s har ventet på svar siden %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s afventer et svar senest %2$s</item>
+        <item quantity="other">%1$s afventer et svar senest %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Udsæt påmindelsen</string>
+    <string name="reminderFollowUpButton">Følg op</string>
+    <string name="reminderFollowUpPlaceholderText">Hej,\nEr det muligt at få feedback om dette emne?\nPå forhånd tak.</string>
+    <string name="reminderMarkAsDoneButton">Marker som udført</string>
+    <string name="reminderNoResponseHeaderTitle">Påmindelse: intet svar fra %1$s på denne e-mail siden %2$s</string>
+    <string name="reminderVisibilityTitle">Påmindelsens synlighed</string>
     <string name="renameFolder">Omdøb mappen</string>
     <string name="reportDisplayProblemDescription">Er du enig i at dele dine data med vores udviklere, så de kan hjælpe dig med dit problem?</string>
     <string name="reportDisplayProblemTitle">Rapportér et visningsproblem</string>
@@ -506,8 +535,12 @@
     <string name="selectDateDialogTitle">Vælg dato</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Vælg tidspunkt</string>
+    <string name="selectionReminderMeOnly">Kun mig</string>
+    <string name="selectionReminderRecipientsAndMe">Modtagere og mig</string>
+    <string name="selectionReminderTitle">Vælg hvem der kan se påmindelsen</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send bekræftelsen</string>
+    <string name="sendOptions">Sendevalg</string>
     <string name="sentFolder">Sendte beskeder</string>
     <string name="settingsAccentColor">Accentfarve</string>
     <string name="settingsAccentColorDescription">Vælg accentfarven til applikationen</string>
@@ -591,11 +624,15 @@
     <string name="shareEmail">Del e-mail</string>
     <string name="snackbarAcknowledgementFailure">Kunne ikke sende</string>
     <string name="snackbarAcknowledgementSuccess">Kvittering for læsning sendt</string>
+    <string name="snackbarAddReminderFailure">Kunne ikke tilføje påmindelsen</string>
+    <string name="snackbarAddReminderSuccess">Påmindelse tilføjet</string>
     <string name="snackbarAdminDisabledMessageSending">En administrator har deaktiveret beskedafsendelse</string>
     <string name="snackbarBlockUserConfirmation">Afsender er nu blokeret</string>
     <string name="snackbarCalendarChoiceSent">Svar taget i betragtning</string>
     <string name="snackbarContactSaved">Ny kontakt succesfuldt registreret</string>
     <string name="snackbarDeletedConversation">Samtalen eksisterer ikke længere</string>
+    <string name="snackbarDisableReminderFailure">Kunne ikke deaktivere påmindelsen</string>
+    <string name="snackbarDisableReminderSuccess">Påmindelsen blev deaktiveret</string>
     <string name="snackbarDisplayProblemReported">Visningsproblem rapporteret</string>
     <string name="snackbarDownloadInProgress">Download i gang…</string>
     <string name="snackbarDraftDeleted">Kladde slettet</string>
@@ -609,9 +646,13 @@
     <string name="snackbarMessageDeletedPermanently">Besked slettet</string>
     <string name="snackbarMessageMoved">Besked flyttet til %s</string>
     <string name="snackbarMessageMovedToSpam">Besked flyttet til spam og bruger blokeret</string>
+    <string name="snackbarModifyReminderFailure">Kunne ikke ændre påmindelsen</string>
+    <string name="snackbarModifyReminderSuccess">Påmindelse ændret</string>
     <string name="snackbarMoveCancelled">Flytning annulleret</string>
     <string name="snackbarPasswordCopied">Adgangskode kopieret</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopieret til udklipsholderen</string>
+    <string name="snackbarReminder">Påmindelsen oprettes</string>
+    <string name="snackbarReminderSaved">Påmindelsen er indstillet til %s</string>
     <string name="snackbarReportPhishingConfirmation">Succesfuldt rapporteret</string>
     <string name="snackbarRestorationLaunched">Starter gendannelsen</string>
     <string name="snackbarSaveInDraft">Din besked er blevet gemt i kladder.</string>
@@ -711,11 +752,20 @@
     <string name="trashFolder">Papirkurv</string>
     <string name="tryAgain">Prøv venligst igen.</string>
     <string name="unblockButton">Fjern blokering</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dage</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Time</item>
+        <item quantity="other">Timer</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Ukendt afsender</string>
     <string name="unknownDialogTitleRecipient">Ukendt modtager</string>
     <string name="unknownRecipientTitle">(ukendt)</string>
     <string name="unknownTag">Ukendt</string>
     <string name="unsubscribeButtonTitle">Afmeld</string>
+    <string name="urgencyReminderDescription">Få besked, hvis din modtager ikke har svaret inden en valgt dato.</string>
     <string name="urlEntryTitle">Opret et hyperlink</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

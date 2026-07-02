@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Vastaanottokuittaus on lähetetty lähettäjälle.</string>
     <string name="actionArchive">Arkistoi</string>
     <string name="actionBlockSender">Estä lähettäjä</string>
+    <string name="actionCallIfNoResponse">Muistuta minua, jos vastausta ei tule lähettämisen jälkeen</string>
     <string name="actionCancelSnooze">Peruuta torkku</string>
     <string name="actionDelete">Poista</string>
     <string name="actionEditMenu">Muokkaa valikkoa</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Kopioi salasana</string>
     <string name="buttonCreate">Luo</string>
     <string name="buttonCreateFolder">Lisää kansio</string>
+    <string name="buttonCustomReminder">Mukautettu muistutus</string>
     <string name="buttonCustomSchedule">Mukautettu aikataulu</string>
+    <string name="buttonDisable">Poista käytöstä</string>
     <string name="buttonDownload">Lataa</string>
     <string name="buttonDownloadAll">Lataa kaikki</string>
     <string name="buttonFeedback">Palaute</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">Koko päivä</string>
     <string name="calendarNotInvited">Et ole kutsuttu</string>
     <string name="calendarOrganizerName">%s (Järjestäjä)</string>
+    <string name="callIfNoResponseHeaderTitle">Muistuta, jos vastausta ei kuulu: %s lähettämisen jälkeen</string>
     <string name="ccTitle">Kopio:</string>
     <string name="comingSoon">Tulossa pian…</string>
     <string name="commercialFolder">Tarjoukset</string>
@@ -217,6 +221,7 @@
     <string name="contentDescriptionIconFolderSelected">Kansio valittu</string>
     <string name="contentDescriptionIconForward">Välitetty</string>
     <string name="contentDescriptionIconNewMail">Uusi</string>
+    <string name="contentDescriptionIconReminder">On muistutus</string>
     <string name="contentDescriptionIconReply">Vastaus</string>
     <string name="contentDescriptionIconStorage">Tallennustilan tila</string>
     <string name="contentDescriptionOpenMailActions">Avaa sähköpostin toiminnot</string>
@@ -239,6 +244,10 @@
     <string name="createFolderName">Kansion nimi</string>
     <string name="datePickerTitle">Valitse päivämäärä ja aika</string>
     <string name="dateTitle">Päivämäärä:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
     <string name="deleteAccountWarning">Tilisi poistaminen on lopullista. Et voi enää aktivoida tiliäsi uudelleen.</string>
     <string name="deleteFolderDialogDescription">Kansion %s sisältö poistetaan pysyvästi ilman siirtämistä roskakoriin.</string>
     <string name="deleteFolderDialogTitle">Poista kansio</string>
@@ -279,7 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Asianomaiset vastaanottajat</string>
     <string name="encryptedMessagePasswordLabel">Jaa tämä salasana yksityisviestillä. Et voi kopioida sitä enää lähetyksen jälkeen.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Salaus on poistettu käytöstä</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Ajastettu lähetys ei ole käytettävissä salatuille viesteille</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Ajastettu lähetys ja muistutukset eivät ole käytettävissä salatuille viesteille</string>
     <string name="encryptedMessageUpdatePasswordButton">Muuta salasanaa</string>
     <string name="encryptedPasswordProtectionTitle">Salasanasuojaus</string>
     <string name="encryptedProtectionAdDescription">Suojaa viestisi luvattomalta käytöltä Infomaniaxin salauksella.</string>
@@ -293,6 +302,7 @@
     <string name="encryptedStatePanelIncomplete">Salasana vaaditaan lähetyksen viimeistelemiseksi.</string>
     <string name="encryptedStatePanelStatePartialLabel">Osittainen</string>
     <string name="encryptedStatePanelTitle">Salaus</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Salaus ei ole käytettävissä, jos ajastettu lähetys tai muistutus on käytössä</string>
     <string name="enterPasswordTitle">Anna salasana</string>
     <string name="errorAlreadyLinkedMailbox">Tämä sähköpostiosoite on jo liitetty tiliisi</string>
     <string name="errorAtLeastOneRecipient">Vähintään yksi vastaanottaja vaaditaan</string>
@@ -333,6 +343,7 @@
     <string name="errorNewFolderNameTooLong">Kansion nimi ei saa ylittää 255 merkkiä</string>
     <string name="errorRefusedRecipients">Palvelin hylkää kaikki vastaanottajat</string>
     <string name="errorRefusedSender">Palvelin hylkää lähettäjän</string>
+    <string name="errorReminderDelayTooShort">Muistutuksen on oltava vähintään %d tunti tulevaisuudessa</string>
     <string name="errorScheduleDelayTooShort">Et voi ajastaa sähköpostia vähemmän kuin %d minuutin päähän</string>
     <string name="errorScheduledSnoozeDelayTooShort">Sähköpostin torkkuajan vähimmäisaika on %d minuuttia</string>
     <string name="errorSendLimitExceeded">Lähetysraja saavutettu</string>
@@ -367,6 +378,10 @@
     <string name="genericMessageTranslated">Viesti käännetty</string>
     <string name="googlePlayServicesAreRequired">Google Play Services vaaditaan</string>
     <string name="groupContactsTitle">Ryhmä: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d tunti</item>
+        <item quantity="other">%d tuntia</item>
+    </plurals>
     <string name="inboxFolder">Saapuneet</string>
     <string name="kSuiteProQuotasAlertDescription">Mail-tallennustilasi on melkein täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Mail-tallennustilasi on täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
@@ -474,6 +489,20 @@
     <string name="readMore">Lue lisää</string>
     <string name="recentSearchesTitle">Viimeisimmät haut</string>
     <string name="refreshTokenError">Sinut on kirjattu ulos</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s on odottanut vastausta %2$s lähtien</item>
+        <item quantity="other">%1$s ovat odottaneet vastausta %2$s lähtien</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s odottaa vastausta %2$s mennessä</item>
+        <item quantity="other">%1$s odottavat vastausta %2$s mennessä</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Lykkää muistutusta</string>
+    <string name="reminderFollowUpButton">Seuraa</string>
+    <string name="reminderFollowUpPlaceholderText">Hei,\nOnko mahdollista saada palautetta tästä aiheesta?\nKiitos etukäteen.</string>
+    <string name="reminderMarkAsDoneButton">Merkitse valmiiksi</string>
+    <string name="reminderNoResponseHeaderTitle">Muistutus: ei vastausta %1$s:ltä tähän sähköpostiin lähtien %2$s</string>
+    <string name="reminderVisibilityTitle">Muistutuksen näkyvyys</string>
     <string name="renameFolder">Nimeä kansio uudelleen</string>
     <string name="reportDisplayProblemDescription">Suostutko jakamaan tietojasi kehittäjiemme kanssa, jotta he voivat auttaa sinua ongelmassasi?</string>
     <string name="reportDisplayProblemTitle">Ilmoita näyttöongelmasta</string>
@@ -506,8 +535,12 @@
     <string name="selectDateDialogTitle">Valitse päivämäärä</string>
     <string name="selectSignatureNone">Ei allekirjoitusta</string>
     <string name="selectTimeDialogTitle">Valitse aika</string>
+    <string name="selectionReminderMeOnly">Vain minä</string>
+    <string name="selectionReminderRecipientsAndMe">Vastaanottajat ja minä</string>
+    <string name="selectionReminderTitle">Valitse, kuka voi nähdä muistutuksen</string>
     <string name="send">Lähetä</string>
     <string name="sendConfirmationAction">Lähetä vahvistus</string>
+    <string name="sendOptions">Lähetysvalinnat</string>
     <string name="sentFolder">Lähetetyt viestit</string>
     <string name="settingsAccentColor">Korostusväri</string>
     <string name="settingsAccentColorDescription">Valitse sovelluksen korostusväri</string>
@@ -591,11 +624,15 @@
     <string name="shareEmail">Jaa sähköposti</string>
     <string name="snackbarAcknowledgementFailure">Lähetys epäonnistui</string>
     <string name="snackbarAcknowledgementSuccess">Vastaanottokuittaus lähetetty</string>
+    <string name="snackbarAddReminderFailure">Muistutuksen lisääminen epäonnistui</string>
+    <string name="snackbarAddReminderSuccess">Muistutus lisätty</string>
     <string name="snackbarAdminDisabledMessageSending">Järjestelmänvalvoja on poistanut viestinlähetyksen käytöstä</string>
     <string name="snackbarBlockUserConfirmation">Lähettäjä on nyt estetty</string>
     <string name="snackbarCalendarChoiceSent">Vastaus otettu huomioon</string>
     <string name="snackbarContactSaved">Uusi yhteystieto rekisteröity onnistuneesti</string>
     <string name="snackbarDeletedConversation">Keskustelua ei ole enää olemassa</string>
+    <string name="snackbarDisableReminderFailure">Muistutusta ei voitu poistaa käytöstä</string>
+    <string name="snackbarDisableReminderSuccess">Muistutus poistettu onnistuneesti käytöstä</string>
     <string name="snackbarDisplayProblemReported">Näyttöongelma ilmoitettu</string>
     <string name="snackbarDownloadInProgress">Lataus käynnissä…</string>
     <string name="snackbarDraftDeleted">Luonnos poistettu</string>
@@ -609,9 +646,13 @@
     <string name="snackbarMessageDeletedPermanently">Viesti poistettu</string>
     <string name="snackbarMessageMoved">Viesti siirretty kohteeseen %s</string>
     <string name="snackbarMessageMovedToSpam">Viesti siirretty roskapostiksi ja käyttäjä estetty</string>
+    <string name="snackbarModifyReminderFailure">Muistutuksen muokkaaminen epäonnistui</string>
+    <string name="snackbarModifyReminderSuccess">Muistutus muutettu</string>
     <string name="snackbarMoveCancelled">Siirto peruutettu</string>
     <string name="snackbarPasswordCopied">Salasana kopioitu</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero kopioitu leikepöydälle</string>
+    <string name="snackbarReminder">Muistutusta luodaan</string>
+    <string name="snackbarReminderSaved">Muistutus on asetettu ajalle %s</string>
     <string name="snackbarReportPhishingConfirmation">Ilmoitus tehty onnistuneesti</string>
     <string name="snackbarRestorationLaunched">Restaurointi käynnistetty</string>
     <string name="snackbarSaveInDraft">Viestisi on tallennettu luonnoksiin.</string>
@@ -711,11 +752,20 @@
     <string name="trashFolder">Roskakori</string>
     <string name="tryAgain">Yritä uudelleen.</string>
     <string name="unblockButton">Poista esto</string>
+    <plurals name="unitDays">
+        <item quantity="one">Päivä</item>
+        <item quantity="other">Päivää</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Tunti</item>
+        <item quantity="other">Tuntia</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Tuntematon lähettäjä</string>
     <string name="unknownDialogTitleRecipient">Tuntematon vastaanottaja</string>
     <string name="unknownRecipientTitle">(tuntematon)</string>
     <string name="unknownTag">Tuntematon</string>
     <string name="unsubscribeButtonTitle">Peruuta tilaus</string>
+    <string name="urgencyReminderDescription">Saat ilmoituksen, jos vastaanottajasi ei ole vastannut valittuun päivämäärään mennessä.</string>
     <string name="urlEntryTitle">Luo hyperlinkki</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>

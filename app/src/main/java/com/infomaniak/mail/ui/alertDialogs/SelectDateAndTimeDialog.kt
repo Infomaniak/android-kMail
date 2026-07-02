@@ -41,6 +41,7 @@ import com.infomaniak.core.common.utils.setMinute
 import com.infomaniak.core.common.utils.year
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
+import com.infomaniak.mail.ui.newMessage.MIN_SELECTABLE_DATE_MINUTES
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import java.util.Calendar
 import java.util.Date
@@ -176,6 +177,6 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     }
 
     companion object {
-        const val MIN_SELECTABLE_DATE_MINUTES = 5
+        const val ONE_HOUR_IN_MILLIS = 3_600_000L
     }
 }

@@ -139,6 +139,8 @@ class Message : RealmObject, Snoozable {
     var _emojiReactionNotAllowedReason: String? = null
         @InternalModelProperties
         set
+    @SerialName("reminder")
+    var reminder: ReminderInfo? = null
     //endregion
 
     //region Local data (Transient)

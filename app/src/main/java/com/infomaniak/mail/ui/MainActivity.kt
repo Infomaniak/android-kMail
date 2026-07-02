@@ -133,7 +133,11 @@ class MainActivity : BaseActivity() {
 
     private val showSendingSnackbarTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(milliseconds = 1_000L) {
-            val resId = if (draftAction == DraftAction.SCHEDULE) R.string.snackbarScheduling else R.string.snackbarEmailSending
+            val resId = when (draftAction) {
+                DraftAction.SCHEDULE -> R.string.snackbarScheduling
+                DraftAction.REMINDER -> R.string.snackbarReminder
+                else -> R.string.snackbarEmailSending
+            }
             snackbarManager.setValue(getString(resId))
         }
     }
@@ -142,7 +146,9 @@ class MainActivity : BaseActivity() {
         draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
 
         if (draftAction == DraftAction.SEND) showEasterEggs()
-        if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE) showSendingSnackbarTimer.start()
+        if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE || draftAction == DraftAction.REMINDER) {
+            showSendingSnackbarTimer.start()
+        }
     }
 
     private val syncAutoConfigActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -376,6 +382,16 @@ class MainActivity : BaseActivity() {
                         )
                     }
                 }
+                DraftAction.REMINDER -> {
+                    val reminderDate = getString(DraftsActionsWorker.REMINDER_DRAFT_DATE_KEY)
+                    if (reminderDate != null) {
+                        val dateFormat = SimpleDateFormat(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR, Locale.getDefault())
+                        val parsedDate = dateFormat.parse(reminderDate)
+                        if (parsedDate != null) {
+                            showReminderDraftSnackbar(reminderDate = parsedDate)
+                        }
+                    }
+                }
             }
         }
     }
@@ -436,6 +452,12 @@ class MainActivity : BaseActivity() {
                 )
             },
         )
+    }
+
+    private fun showReminderDraftSnackbar(reminderDate: Date) {
+        showSendingSnackbarTimer.cancel()
+        val dateString = formatDayOfWeekAdaptiveYear(reminderDate)
+        snackbarManager.setValue(title = String.format(getString(R.string.snackbarReminderSaved), dateString))
     }
 
     private fun loadCurrentMailbox() {

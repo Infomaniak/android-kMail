@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Une confirmation de lecture a été envoyée à l’expéditeur.</string>
     <string name="actionArchive">Archiver</string>
     <string name="actionBlockSender">Bloquer l’expéditeur</string>
+    <string name="actionCallIfNoResponse">Me rappeler si pas de réponse après envoi</string>
     <string name="actionCancelSnooze">Annuler la mise en attente</string>
     <string name="actionDelete">Supprimer</string>
     <string name="actionEditMenu">Modifier le menu</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Copier le mot de passe</string>
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
+    <string name="buttonCustomReminder">Délai personnalisé</string>
     <string name="buttonCustomSchedule">Horaire personnalisé</string>
+    <string name="buttonDisable">Désactiver</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
     <string name="buttonFeedback">Feedback</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">Toute la journée</string>
     <string name="calendarNotInvited">Vous ne faites pas partie des invités</string>
     <string name="calendarOrganizerName">%s (Organisateur)</string>
+    <string name="callIfNoResponseHeaderTitle">Me rappeler si pas de réponse : %s après envoi</string>
     <string name="ccTitle">Cc :</string>
     <string name="comingSoon">À venir…</string>
     <string name="commercialFolder">Promotions</string>
@@ -217,6 +221,7 @@
     <string name="contentDescriptionIconFolderSelected">Dossier sélectionné</string>
     <string name="contentDescriptionIconForward">Transféré</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
+    <string name="contentDescriptionIconReminder">Est un rappel</string>
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
@@ -239,6 +244,10 @@
     <string name="createFolderName">Nom du dossier</string>
     <string name="datePickerTitle">Choisir une date et une heure</string>
     <string name="dateTitle">Date :</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d jour</item>
+        <item quantity="other">%d jours</item>
+    </plurals>
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
     <string name="deleteFolderDialogDescription">Le contenu du dossier %s sera définitivement supprimé sans passer par la corbeille.</string>
     <string name="deleteFolderDialogTitle">Supprimer le dossier</string>
@@ -279,7 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Destinataires concernés</string>
     <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe par message privé. Vous ne pourrez plus le copier après l’envoi.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Le chiffrement a bien été désactivé</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">L’envoi programmé n’est pas disponible pour les messages chiffrés</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">L’envoi programmé et le rappel ne sont pas disponibles pour les messages chiffrés</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifier le mot de passe</string>
     <string name="encryptedPasswordProtectionTitle">Protection par mot de passe</string>
     <string name="encryptedProtectionAdDescription">Protégez votre message contre tout accès non autorisé grâce au chiffrement Infomaniak.</string>
@@ -293,6 +302,7 @@
     <string name="encryptedStatePanelIncomplete">Un mot de passe est requis pour finaliser l’envoi.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partiel</string>
     <string name="encryptedStatePanelTitle">Chiffrement</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Le chiffrement n’est pas disponible lorsque l’envoi programmé ou le rappel est activé</string>
     <string name="enterPasswordTitle">Saisir le mot de passe</string>
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
@@ -333,6 +343,7 @@
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
     <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>
+    <string name="errorReminderDelayTooShort">Le rappel doit être fixé au moins %d heure dans le futur</string>
     <string name="errorScheduleDelayTooShort">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</string>
     <string name="errorScheduledSnoozeDelayTooShort">Le délai minimum pour mettre un e-mail en attente est de %d minutes</string>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>
@@ -367,6 +378,10 @@
     <string name="genericMessageTranslated">Message traduit</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="groupContactsTitle">Groupe : %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d heure</item>
+        <item quantity="other">%d heures</item>
+    </plurals>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="kSuiteProQuotasAlertDescription">L’espace de stockage de votre Mail est bientôt plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
     <string name="kSuiteProQuotasAlertFullDescription">L’espace de stockage de votre Mail est plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
@@ -474,6 +489,20 @@
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s attend une réponse depuis %2$s</item>
+        <item quantity="other">%1$s attendent une réponse depuis %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s attend une réponse avant le %2$s</item>
+        <item quantity="other">%1$s attendent une réponse avant le %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Reporter le rappel</string>
+    <string name="reminderFollowUpButton">Relancer</string>
+    <string name="reminderFollowUpPlaceholderText">Bonjour,\nEst-il possible d’avoir un retour sur ce sujet ?\nMerci d’avance.</string>
+    <string name="reminderMarkAsDoneButton">Marquer comme terminé</string>
+    <string name="reminderNoResponseHeaderTitle">Rappel : aucune réponse de %1$s à cet e-mail depuis le %2$s</string>
+    <string name="reminderVisibilityTitle">Visibilité du rappel</string>
     <string name="renameFolder">Renommer le dossier</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>
     <string name="reportDisplayProblemTitle">Signaler un problème d’affichage</string>
@@ -506,8 +535,12 @@
     <string name="selectDateDialogTitle">Sélectionner la date</string>
     <string name="selectSignatureNone">Aucune signature</string>
     <string name="selectTimeDialogTitle">Sélectionner l’heure</string>
+    <string name="selectionReminderMeOnly">Moi uniquement</string>
+    <string name="selectionReminderRecipientsAndMe">Les destinataires et moi</string>
+    <string name="selectionReminderTitle">Choisir qui peut voir le rappel</string>
     <string name="send">Envoyer</string>
     <string name="sendConfirmationAction">Envoyer la confirmation</string>
+    <string name="sendOptions">Options d’envoi</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
     <string name="settingsAccentColorDescription">Choisissez la couleur d’accentuation de l’application</string>
@@ -591,11 +624,15 @@
     <string name="shareEmail">Partager l’e-mail</string>
     <string name="snackbarAcknowledgementFailure">Échec de l’envoi</string>
     <string name="snackbarAcknowledgementSuccess">Accusé de lecture envoyé</string>
+    <string name="snackbarAddReminderFailure">Échec de l’ajout du rappel</string>
+    <string name="snackbarAddReminderSuccess">Rappel ajouté</string>
     <string name="snackbarAdminDisabledMessageSending">Un administrateur a désactivé l’envoi de message</string>
     <string name="snackbarBlockUserConfirmation">L’expéditeur est maintenant bloqué</string>
     <string name="snackbarCalendarChoiceSent">Réponse prise en compte</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>
     <string name="snackbarDeletedConversation">La conversation n’existe plus</string>
+    <string name="snackbarDisableReminderFailure">Échec de la désactivation du rappel</string>
+    <string name="snackbarDisableReminderSuccess">Le rappel a bien été désactivé</string>
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarDownloadInProgress">Téléchargement en cours…</string>
     <string name="snackbarDraftDeleted">Brouillon supprimé</string>
@@ -609,9 +646,13 @@
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMessageMovedToSpam">Message déplacé vers Spam et utilisateur bloqué</string>
+    <string name="snackbarModifyReminderFailure">Échec de la modification du rappel</string>
+    <string name="snackbarModifyReminderSuccess">Le rappel a bien été modifié</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
     <string name="snackbarPasswordCopied">Mot de passe copié</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numéro copié dans le presse-papiers</string>
+    <string name="snackbarReminder">Le rappel est en cours de création</string>
+    <string name="snackbarReminderSaved">Le rappel est programmé pour le %s</string>
     <string name="snackbarReportPhishingConfirmation">Signalement effectué avec succès</string>
     <string name="snackbarRestorationLaunched">Lancement de la restauration</string>
     <string name="snackbarSaveInDraft">Votre message a été sauvegardé dans les brouillons.</string>
@@ -711,11 +752,20 @@
     <string name="trashFolder">Corbeille</string>
     <string name="tryAgain">Veuillez réessayer.</string>
     <string name="unblockButton">Débloquer</string>
+    <plurals name="unitDays">
+        <item quantity="one">Jour</item>
+        <item quantity="other">Jours</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Heure</item>
+        <item quantity="other">Heures</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Expéditeur inconnu</string>
     <string name="unknownDialogTitleRecipient">Destinataire inconnu</string>
     <string name="unknownRecipientTitle">(inconnu)</string>
     <string name="unknownTag">Inconnu</string>
     <string name="unsubscribeButtonTitle">Se désabonner</string>
+    <string name="urgencyReminderDescription">Soyez notifié si votre destinataire n’a pas répondu à une date souhaitée.</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>
