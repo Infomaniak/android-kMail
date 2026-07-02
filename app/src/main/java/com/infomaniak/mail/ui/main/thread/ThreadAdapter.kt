@@ -873,20 +873,14 @@ class ThreadAdapter(
         alertsGroup.isVisible = true
         reminderAlert.isVisible = true
 
-        message.draftResource?.let { draftResource ->
-            reminderAlert.onAction1 {
-                trackMessageBannerEvent(MatomoName.ReprogramReminder)
-                threadAdapterCallbacks?.onReminderClicked?.invoke(
-                    // TODO: Create a specific callback for rescheduling reminders
-                    draftResource,
-                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
-                )
-            }
+        reminderAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
         }
 
         reminderAlert.onAction2 {
             // TODO: add matomo
-            threadAdapterCallbacks?.onDisableReminder?.invoke(message)
+            threadAdapterCallbacks?.onDisableReminderClicked?.invoke(message)
         }
     }
 
@@ -906,16 +900,16 @@ class ThreadAdapter(
         alertsGroup.isVisible = true
         endReminderAlert.isVisible = true
 
-        message.draftResource?.let { draftResource ->
-            endReminderAlert.onAction1 {
-                trackMessageBannerEvent(MatomoName.ReprogramReminder)
-                threadAdapterCallbacks?.onReminderClicked?.invoke(
-                    // TODO: Create a specific callback for rescheduling reminders
-                    draftResource,
-                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
-                )
-            }
-        }
+        // message.draftResource?.let { draftResource ->
+        //     endReminderAlert.onAction1 {
+        //         trackMessageBannerEvent(MatomoName.ReprogramReminder)
+        //         threadAdapterCallbacks?.onReminderClicked?.invoke(
+        //             // TODO: Create a specific callback for rescheduling reminders
+        //             draftResource,
+        //             message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
+        //         )
+        //     }
+        // }
 
         endReminderAlert.onAction2 {
             trackMessageBannerEvent(MatomoName.FollowUp)
@@ -1480,7 +1474,6 @@ class ThreadAdapter(
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
-        var onReminderClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
         var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
         var onAddReaction: ((Message) -> Unit)? = null,
@@ -1490,7 +1483,8 @@ class ThreadAdapter(
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
         var getAiState: (() -> AiStateMap)? = null,
-        var onDisableReminder: ((Message) -> Unit)? = null,
+        var onDisableReminderClicked: ((Message) -> Unit)? = null,
+        var onModifyReminderClicked: ((Message) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

@@ -202,8 +202,27 @@ object ApiRepository : ApiRepositoryCore() {
     //endregion
 
     //region reminder
-    suspend fun disableReminder(mailboxUuid: String, folderId: String, messageId: String, reminderUuid: String): ApiResponse<Unit> {
-        return callApi(ApiRoutes.disableReminder(mailboxUuid, folderId, messageId, reminderUuid), DELETE)
+    suspend fun disableReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: String,
+        reminderUuid: String
+    ): ApiResponse<Unit> {
+        return callApi(ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid), DELETE)
+    }
+
+    suspend fun modifyReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: String,
+        reminderUuid: String,
+        delayMinutes: Int
+    ): ApiResponse<Unit> {
+        return callApi(
+            ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid),
+            PUT,
+            mapOf("reminder_delta" to delayMinutes)
+        )
     }
     //endregion
 

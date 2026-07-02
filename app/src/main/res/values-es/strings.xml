@@ -646,6 +646,8 @@
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
     <string name="snackbarMessageMovedToSpam">Mensaje movido a spam y usuario bloqueado</string>
+    <string name="snackbarModifyReminderFailure">Error al modificar el recordatorio</string>
+    <string name="snackbarModifyReminderSuccess">Recordatorio modificado</string>
     <string name="snackbarMoveCancelled">Desplazamiento cancelado</string>
     <string name="snackbarPasswordCopied">Contraseña copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado en el portapapeles</string>
