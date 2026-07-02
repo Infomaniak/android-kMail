@@ -17,7 +17,7 @@
  */
 
 function insertMention(userMail, userName, query) {
-    if (!userMail || !userName) return;
+    if (!userMail) return;
 
     const selection = globalThis.getSelection();
     if (!selection || selection.rangeCount === 0) return;
@@ -100,7 +100,7 @@ function insertMention(userMail, userName, query) {
     anchor.dataset.ikMentionRef = userMail;
     anchor.setAttribute("href", `mailto:${userMail}`);
     anchor.setAttribute("contenteditable", "false");
-    anchor.textContent = `@${userName}`;
+    anchor.textContent = `@${userName? userName: userMail}`;
 
     replaceRange.insertNode(anchor);
 

@@ -25,6 +25,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.infomaniak.core.common.utils.isValidEmail
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -56,7 +57,7 @@ class ContactAdapter(
     private var allContacts: List<ContactAutocompletable> = emptyList()
     private var matchedContacts = listOf<MatchedContact>()
 
-    private var displayAddUnknownContactButton = isForRecipients
+    private var displayAddUnknownContactButton = true
     private var searchQuery = ""
 
     init {
@@ -183,7 +184,7 @@ class ContactAdapter(
         emailMatched: String,
         searchTerm: String,
     ): MatchedContact? {
-        val nameMatchedIndex = nameMatched.standardize().indexOf(searchTerm)
+        val nameMatchedIndex = nameMatched.toSearchableForm().indexOf(searchTerm)
         val standardizedEmail = emailMatched.standardize()
         val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
         val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
@@ -202,12 +203,12 @@ class ContactAdapter(
         }
     }
 
-    private fun performFiltering(constraint: CharSequence, shouldStandardize: Boolean = true): List<MatchedContact> {
+    private fun performFiltering(constraint: CharSequence, isForRecipients: Boolean = true): List<MatchedContact> {
         // toSearchableForm doesn't include trim() since we need to search in the form "[name] [lastname]"
-        val searchTerm = if (shouldStandardize) constraint.standardize() else constraint.toSearchableForm()
-
+        val searchTerm = if (isForRecipients) constraint.standardize() else constraint.toSearchableForm()
         val finalUserList = mutableListOf<MatchedContact>()
-        displayAddUnknownContactButton = isForRecipients
+        displayAddUnknownContactButton = isForRecipients || (searchTerm.isValidEmail())
+        
         for (contact in allContacts) {
             val matchedContact = getMatchedContact(
                 contact = contact,
@@ -241,9 +242,9 @@ class ContactAdapter(
         } ?: ""
     }
 
-    fun searchContacts(text: CharSequence, shouldStandardize: Boolean = true) {
+    fun searchContacts(text: CharSequence, isForRecipients: Boolean = true) {
         searchQuery = text.toString()
-        matchedContacts = performFiltering(text, shouldStandardize)
+        matchedContacts = performFiltering(text, isForRecipients)
         notifyDataSetChanged()
     }
 

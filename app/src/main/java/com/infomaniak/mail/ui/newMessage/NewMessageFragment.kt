@@ -186,7 +186,7 @@ class NewMessageFragment : Fragment() {
         ContactAdapter(
             usedEmails = mutableSetOf(),
             onContactClicked = ::onMentionContactClicked,
-            onAddUnrecognizedContact = {},
+            onAddUnrecognizedContact = ::onAddUnrecognizedContactClicked,
             snackbarManager = snackbarManager,
             getAddressBookWithGroup = null,
             isForRecipients = false,
@@ -542,26 +542,33 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun onAddUnrecognizedContactClicked() {
+        addMention(newMessageViewModel.mentionQuery.value, null)
+    }
+
     private fun onMentionContactClicked(contact: ContactAutocompletable) {
         val mergedContact = contact as? MergedContact ?: return
+        addMention(mergedContact.email, mergedContact.name)
+    }
 
+    private fun addMention(email: String, name: String?) {
         viewLifecycleOwner.lifecycleScope.launch {
             binding.editorWebView.executeJsMethodWhenEditorIsSetup(
                 JsExecutableMethod(
                     "insertMention",
-                    mergedContact.email,
-                    mergedContact.name,
+                    email,
+                    name,
                     newMessageViewModel.mentionQuery.value
                 ),
             )
         }
 
         binding.toField.apply {
-            addRecipient(mergedContact.email, mergedContact.name)
+            addRecipient(email, name)
             updateCollapsedChipValues(isCollapsed)
         }
 
-        newMessageViewModel.addMention(mergedContact.email)
+        newMessageViewModel.addMention(email)
         newMessageViewModel.updateMentionQuery("")
     }
 
@@ -855,7 +862,7 @@ class NewMessageFragment : Fragment() {
                 mentionAutoComplete.isVisible = false
                 mentionContactAdapter.clear()
             } else {
-                mentionContactAdapter.searchContacts(query, shouldStandardize = false)
+                mentionContactAdapter.searchContacts(query, isForRecipients = false)
                 mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
                 updateMentionAutocompleteHeight()
             }

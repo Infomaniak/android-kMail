@@ -69,7 +69,12 @@ const extractMentionQuery = (textBeforeCaret) => {
 
     if (lastAtPos < 0) return null;
 
+    // If there are 2 empty spaces we restart the query. One empty space is possible for the name, but not two.
     let query = normalizedText.slice(lastAtPos + 1);
+    if (/\s{2,}/.test(query)) {
+        return null;
+    }
+
     if (!query.trim().includes(" ")) {
         query = query.trim();
     }
