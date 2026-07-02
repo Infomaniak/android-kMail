@@ -54,7 +54,6 @@ function insertMention(userMail, userName, query) {
     const searchIndex = textBeforeCaret.lastIndexOf(searchText);
     if (searchIndex < 0) return;
 
-    const deleteCount = searchText.length;
     const mentionStartOffset = searchIndex;
 
     const getDomPositionForTextOffset = (targetOffset) => {
