@@ -645,6 +645,8 @@
     <string name="snackbarMessageDeletedPermanently">Viesti poistettu</string>
     <string name="snackbarMessageMoved">Viesti siirretty kohteeseen %s</string>
     <string name="snackbarMessageMovedToSpam">Viesti siirretty roskapostiksi ja käyttäjä estetty</string>
+    <string name="snackbarModifyReminderFailure">Muistutuksen muokkaaminen epäonnistui</string>
+    <string name="snackbarModifyReminderSuccess">Muistutus muutettu</string>
     <string name="snackbarMoveCancelled">Siirto peruutettu</string>
     <string name="snackbarPasswordCopied">Salasana kopioitu</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero kopioitu leikepöydälle</string>

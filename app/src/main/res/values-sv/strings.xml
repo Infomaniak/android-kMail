@@ -645,6 +645,8 @@
     <string name="snackbarMessageDeletedPermanently">Meddelande raderat</string>
     <string name="snackbarMessageMoved">Meddelande flyttat till %s</string>
     <string name="snackbarMessageMovedToSpam">Meddelande flyttat till skräppost och användare blockerad</string>
+    <string name="snackbarModifyReminderFailure">Det gick inte att ändra påminnelsen</string>
+    <string name="snackbarModifyReminderSuccess">Påminnelsen har ändrats</string>
     <string name="snackbarMoveCancelled">Flytt avbruten</string>
     <string name="snackbarPasswordCopied">Lösenord kopierat</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopierat till urklipp</string>

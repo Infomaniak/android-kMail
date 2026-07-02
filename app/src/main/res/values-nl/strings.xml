@@ -645,6 +645,8 @@
     <string name="snackbarMessageDeletedPermanently">Bericht verwijderd</string>
     <string name="snackbarMessageMoved">Bericht verplaatst naar %s</string>
     <string name="snackbarMessageMovedToSpam">Bericht verplaatst naar spam en gebruiker geblokkeerd</string>
+    <string name="snackbarModifyReminderFailure">Wijzigen van herinnering mislukt</string>
+    <string name="snackbarModifyReminderSuccess">Herinnering gewijzigd</string>
     <string name="snackbarMoveCancelled">Verplaatsing geannuleerd</string>
     <string name="snackbarPasswordCopied">Wachtwoord gekopieerd</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer gekopieerd naar het klembord</string>

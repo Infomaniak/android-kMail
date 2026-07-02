@@ -244,6 +244,9 @@ class ThreadViewModel @Inject constructor(
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
+    // Save the message whose reminder we're modifying, so we can retrieve it when the bottom sheet returns
+    var modifyingReminderMessage: Message? = null
+
     val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils
         .waitInitMediator(currentMailboxLive, threadLive)
         .map { (mailbox, thread) ->
@@ -769,24 +772,67 @@ class ThreadViewModel @Inject constructor(
         return fakedReaction
     }
 
-    fun disableReminder(message: Message) {
+    //region reminder
+    private fun processReminderAction(
+        message: Message,
+        successResId: Int,
+        failureResId: Int,
+        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: String, reminderUuid: String) -> ApiResponse<Unit>
+    ) {
         val messageId = message.messageId
         val reminderUuid = message.reminder?.uuid
-        if (messageId.isNullOrBlank() || reminderUuid.isNullOrBlank()) return
+        if (messageId.isNullOrBlank() || reminderUuid.isNullOrBlank()) {
+            snackbarManager.postValue(appContext.getString(failureResId))
+            return
+        }
+
         viewModelScope.launch {
-            val apiResponse = ApiRepository.disableReminder(
-                mailboxUuid = mailbox().uuid,
-                folderId = message.folderId,
-                messageId = messageId,
-                reminderUuid = reminderUuid
+            val apiResponse = apiAction(
+                mailbox().uuid,
+                message.folderId,
+                messageId,
+                reminderUuid
             )
+
             if (apiResponse.isSuccess()) {
-                snackbarManager.postValue(appContext.getString(R.string.snackbarDisableReminderSuccess))
+                snackbarManager.postValue(appContext.getString(successResId))
             } else {
-                snackbarManager.postValue(appContext.getString(R.string.snackbarDisableReminderFailure))
+                snackbarManager.postValue(appContext.getString(failureResId))
             }
         }
     }
+
+    fun disableReminder(message: Message) {
+        processReminderAction(
+            message = message,
+            successResId = R.string.snackbarDisableReminderSuccess,
+            failureResId = R.string.snackbarDisableReminderFailure
+        ) { mailboxUuid, folderId, messageId, reminderUuid ->
+            ApiRepository.disableReminder(
+                mailboxUuid = mailboxUuid,
+                folderId = folderId,
+                messageId = messageId,
+                reminderUuid = reminderUuid
+            )
+        }
+    }
+
+    fun modifyReminder(message: Message, delayMinutes: Int) {
+        processReminderAction(
+            message = message,
+            successResId = R.string.snackbarModifyReminderSuccess,
+            failureResId = R.string.snackbarModifyReminderFailure
+        ) { mailboxUuid, folderId, messageId, reminderUuid ->
+            ApiRepository.modifyReminder(
+                mailboxUuid = mailboxUuid,
+                folderId = folderId,
+                messageId = messageId,
+                reminderUuid = reminderUuid,
+                delayMinutes = delayMinutes
+            )
+        }
+    }
+    //endregion
 
     //region Unsubscribe list diffusion
     fun unsubscribeMessage(message: Message) = viewModelScope.launch {

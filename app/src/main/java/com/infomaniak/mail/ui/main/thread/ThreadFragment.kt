@@ -458,7 +458,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     }
                 },
                 onRescheduleClicked = ::rescheduleDraft,
-                onReminderClicked = ::reminderDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
                 onAddReaction = {
@@ -495,7 +494,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
                 getAiState = { aiActionsViewModel.aiStateMap.value },
-                onDisableReminder = ::disableReminder,
+                onDisableReminderClicked = ::disableReminder,
+                onModifyReminderClicked = ::modifyReminder,
             ),
         )
 
@@ -870,13 +870,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox)
         }
 
-        getBackNavigationResult(REMINDER_RESULT) { selectedScheduleEpoch: Long ->
-            val mailbox = mainViewModel.currentMailbox.value
-            if (mailbox == null) {
+        getBackNavigationResult(REMINDER_RESULT) { delayMinutes: Int ->
+            val message = threadViewModel.modifyingReminderMessage
+            if (message == null) {
                 snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
                 return@getBackNavigationResult
             }
-            // actionsViewModel.rescheduleDraft(Date(System.currentTimeMillis() + delayMinutes), mailbox) // TODO: adapt it to a real reminder api call when it will be available
+            threadViewModel.modifyReminder(message, delayMinutes)
         }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
@@ -1258,9 +1258,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         navigateToScheduleSendBottomSheet()
     }
 
-    private fun reminderDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
-        actionsViewModel.draftResource = draftResource
-        threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
+    private fun modifyReminder(message: Message) {
+        threadViewModel.modifyingReminderMessage = message
         navigateToReminderBottomSheet()
     }
 
@@ -1292,7 +1291,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             args = ReminderBottomSheetDialogArgs(
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
-                currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
             ).toBundle(),
         )
     }
