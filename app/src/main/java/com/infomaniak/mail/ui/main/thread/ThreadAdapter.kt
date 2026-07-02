@@ -23,7 +23,6 @@ import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.view.ViewConfiguration
@@ -861,7 +860,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindReminderAlert(message: Message){
+    private fun ItemMessageBinding.bindReminderAlert(message: Message) {
         reminderAlert.setActionsVisibility(shouldDisplayAction = true)
 
         reminderAlert.setDescription(
@@ -875,7 +874,7 @@ class ThreadAdapter(
         reminderAlert.isVisible = true
 
         message.draftResource?.let { draftResource ->
-            endReminderAlert.onAction1 {
+            reminderAlert.onAction1 {
                 trackMessageBannerEvent(MatomoName.ReprogramReminder)
                 threadAdapterCallbacks?.onReminderClicked?.invoke(
                     // TODO: Create a specific callback for rescheduling reminders

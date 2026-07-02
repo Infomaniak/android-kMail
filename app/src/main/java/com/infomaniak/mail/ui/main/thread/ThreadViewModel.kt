@@ -21,7 +21,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
 import android.os.Parcelable
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
