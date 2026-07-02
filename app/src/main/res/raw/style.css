@@ -28,3 +28,10 @@ a:link, a:visited, a:hover, a:active {
 pre {
     font-family: 'Helvetica';
 }
+
+a[data-ik-mention-ref] {
+    text-decoration: none;
+    display: inline-block;
+    margin: 2px 0px;
+    word-break: break-all;
+}

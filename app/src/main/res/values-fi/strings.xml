@@ -216,6 +216,7 @@
     <string name="contentDescriptionIconFavorite">On suosikki</string>
     <string name="contentDescriptionIconFolderSelected">Kansio valittu</string>
     <string name="contentDescriptionIconForward">Välitetty</string>
+    <string name="contentDescriptionIconMention">Sinut on mainittu.</string>
     <string name="contentDescriptionIconNewMail">Uusi</string>
     <string name="contentDescriptionIconReply">Vastaus</string>
     <string name="contentDescriptionIconStorage">Tallennustilan tila</string>

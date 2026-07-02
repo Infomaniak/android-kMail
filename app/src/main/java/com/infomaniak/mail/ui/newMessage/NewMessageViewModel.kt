@@ -46,6 +46,7 @@ import com.infomaniak.core.legacy.utils.parcelableExtra
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.ui.showToast
+import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -93,10 +94,13 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AttachmentsReminderUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.DraftInitManager
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.MENTIONS_STYLE
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
@@ -139,6 +143,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -244,6 +249,12 @@ class NewMessageViewModel @Inject constructor(
 
     private val _isPlaceHolderVisible = MutableStateFlow(false)
     val isPlaceHolderVisible: StateFlow<Boolean> = _isPlaceHolderVisible.asStateFlow()
+
+    private val _mentionQuery = MutableStateFlow("")
+    val mentionQuery = _mentionQuery.asStateFlow()
+
+    private val _currentMentions = MutableStateFlow<List<String>>(emptyList())
+    val currentMentions: StateFlow<List<String>> = _currentMentions.asStateFlow()
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -1023,6 +1034,7 @@ class NewMessageViewModel @Inject constructor(
         )
 
         subject = subjectValue
+        mentions = currentMentions.value.toSet().toRealmList()
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -1042,13 +1054,13 @@ class NewMessageViewModel @Inject constructor(
             isNewMessage = false
         }
 
-        body = removeUnwantedHtml(uiBodyValue)
+        body = prepareHtmlForSending(uiBodyValue)
     }
 
     /**
      * We filter out some HTML elements that we don't want to send with the email.
      */
-    private fun removeUnwantedHtml(html: String): String {
+    private fun prepareHtmlForSending(html: String): String {
         val doc = jsoupParseWithLog(html)
         // This assures that jsoup doesn't add line breaks that will impact the snapshot comparison when the user reopens the draft
         // and adds something and deletes it, leaving the draft back in its original state. This wouldn't be an issue if we had
@@ -1060,8 +1072,13 @@ class NewMessageViewModel @Inject constructor(
 
         // If the user deleted the quotes' text, remove the quotes' div so user doesn't write in it
         // (the text could get hidden later with the show quotes button).
-        doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        doc.removeEmptyElements(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        doc.removeEmptyElements(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        doc.removeEmptyElements(INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+
+        // If the user added mentions, we need to add their inline style to send to the backend.
+        // We don't do it in "insert_mentions.js" because we have a bug where the style is being deleted when the user deletes a
+        // mention and there is another mention in the same line.
+        doc.addMissingMentionsStyle()
 
         // If there are style tags inside the body of the editor JSoup will add them to the head tag automatically. So we always
         // need to send the whole doc.html() to not lose any style. Style can end up inside the <body> of the editor when
@@ -1072,6 +1089,13 @@ class NewMessageViewModel @Inject constructor(
     private fun Document.removeEmptyElements(className: String) {
         val elements = getElementsByClass(className)
         elements.forEach { if (it.text().isEmpty()) it.remove() }
+    }
+
+    private fun Document.addMissingMentionsStyle() {
+        val mentionTags = getElementsByAttribute(MENTION_ATTRIBUTE)
+        mentionTags.forEach { mention ->
+            mention.attr("style", MENTIONS_STYLE)
+        }
     }
 
     private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>, step: String) {
@@ -1181,6 +1205,32 @@ class NewMessageViewModel @Inject constructor(
         val attachmentsData = attachmentsLiveData.value ?: return
         val newAttachments = attachmentsData.filter { attachment -> !cidsToDelete.contains(attachment.contentId) }
         attachmentsLiveData.postValue(newAttachments)
+    }
+
+    fun updateMentionQuery(query: String) {
+        _mentionQuery.value = query
+    }
+
+    fun addMention(email: String) {
+        trackNewMessageEvent(MatomoName.InsertMention)
+        _currentMentions.update { it + email }
+    }
+
+    fun removeMentions(emails: List<String>) {
+        trackNewMessageEvent(MatomoName.RemoveMention)
+        _currentMentions.update { mentions ->
+            val updatedMentions = mentions.toMutableList()
+
+            emails.forEach { email ->
+                val index = updatedMentions.indexOf(email)
+                if (index >= 0) {
+                    updatedMentions.removeAt(index)
+                }
+            }
+
+            updatedMentions
+        }
+
     }
 
     enum class ImportationResult {

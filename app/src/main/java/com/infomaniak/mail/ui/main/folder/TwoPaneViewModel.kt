@@ -122,7 +122,7 @@ class TwoPaneViewModel @Inject constructor(
     }
 
     fun safelyNavigate(@IdRes resId: Int, args: Bundle) {
-        navArgs.value = NavData(resId, args)
+        navArgs.postValue(NavData(resId, args))
     }
 
     data class NavData(

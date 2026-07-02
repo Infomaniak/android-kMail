@@ -279,20 +279,29 @@ class MessagesActions @Inject constructor(
 
         val messagesUids = messages.getUids()
 
-        updateSeenStatus(messagesUids, threadsUids, isSeen = true)
+        updateSeenStatus(messagesUids, threadsUids, isSeen = true, hasUnseenMentions = false)
 
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = false)
+        if (apiResponses.atLeastOneFailed()) updateSeenStatus(
+            messagesUids,
+            threadsUids,
+            isSeen = false,
+            hasUnseenMentions = false
+        )
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
     }
 
-    suspend fun updateSeenStatus(messagesUids: List<String>, threadsUids: List<String>? = null, isSeen: Boolean) {
-
+    suspend fun updateSeenStatus(
+        messagesUids: List<String>,
+        threadsUids: List<String>? = null,
+        isSeen: Boolean,
+        hasUnseenMentions: Boolean
+    ) {
         mailboxContentRealm().write {
             if (threadsUids != null) {
-                ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+                ThreadController.updateSeenStatus(threadsUids, isSeen, hasUnseenMentions, realm = this)
             }
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
         }
@@ -300,14 +309,23 @@ class MessagesActions @Inject constructor(
 
     private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, threadsUids: List<String>? = null): ToggleResult {
         val messagesUids = messages.getUids()
-
-        updateSeenStatus(messagesUids, threadsUids, isSeen = false)
+        val hasUnseenMentions = hasUnseenMentions(mailbox, messages)
+        updateSeenStatus(messagesUids, threadsUids, isSeen = false, hasUnseenMentions)
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true)
+        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true, hasUnseenMentions)
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
+    }
+
+    private fun hasUnseenMentions(
+        mailbox: Mailbox,
+        messages: List<Message>
+    ): Boolean {
+        val rawAliases = mailbox.aliases
+        val normalizedAliases = rawAliases.map { it.lowercase() }.toSet()
+        return messages.flatMap { it.mentions }.any { mention -> mention.lowercase() in normalizedAliases }
     }
     // End Region
 

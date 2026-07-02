@@ -19,9 +19,11 @@ package com.infomaniak.mail.data.models.javascriptBridge
 
 import android.webkit.JavascriptInterface
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.extensions.isEmail
 
 class MessageDisplayJavascriptBridge(
     private val onWebViewFinishedLoading: () -> Unit,
+    private val onMentionContactClicked: ((String, String?) -> Unit)? = null,
 ) {
 
     @JavascriptInterface
@@ -44,6 +46,12 @@ class MessageDisplayJavascriptBridge(
     @JavascriptInterface
     fun webviewFinishedLoading() {
         onWebViewFinishedLoading()
+    }
+
+    @JavascriptInterface
+    fun openMentionContact(email: String, displayName: String?) {
+        if (email.isBlank() || !email.isEmail()) return
+        onMentionContactClicked?.invoke(email, displayName)
     }
 
     private fun fixStackTraceLineNumber(errorStack: String, scriptFirstLine: String): String {

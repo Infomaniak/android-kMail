@@ -25,6 +25,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.infomaniak.core.common.utils.isValidEmail
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -41,6 +42,7 @@ import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.Autocompleta
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.UnknownContact
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.extensions.standardize
+import com.infomaniak.mail.utils.extensions.toSearchableForm
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
@@ -48,7 +50,8 @@ class ContactAdapter(
     private val onContactClicked: (item: ContactAutocompletable) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
     private val snackbarManager: SnackbarManager,
-    private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?
+    private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?,
+    private val isForRecipients: Boolean = true, // if false, the adapter is used for mentions.
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<ContactAutocompletable> = emptyList()
@@ -154,7 +157,9 @@ class ContactAdapter(
         }
     }
 
-    override fun getItemCount(): Int = matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
+    override fun getItemCount(): Int {
+        return matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
+    }
 
     override fun getItemId(position: Int): Long {
         // To check that each contactautocomplatable has a different id, even if the types are different,
@@ -179,7 +184,7 @@ class ContactAdapter(
         emailMatched: String,
         searchTerm: String,
     ): MatchedContact? {
-        val nameMatchedIndex = nameMatched.standardize().indexOf(searchTerm)
+        val nameMatchedIndex = nameMatched.toSearchableForm().indexOf(searchTerm)
         val standardizedEmail = emailMatched.standardize()
         val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
         val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
@@ -198,11 +203,12 @@ class ContactAdapter(
         }
     }
 
-    private fun performFiltering(constraint: CharSequence): List<MatchedContact> {
-        val searchTerm = constraint.standardize()
-
+    private fun performFiltering(constraint: CharSequence, isForRecipients: Boolean = true): List<MatchedContact> {
+        // toSearchableForm doesn't include trim() since we need to search in the form "[name] [lastname]"
+        val searchTerm = if (isForRecipients) constraint.standardize() else constraint.toSearchableForm()
         val finalUserList = mutableListOf<MatchedContact>()
-        displayAddUnknownContactButton = true
+        displayAddUnknownContactButton = isForRecipients || (searchTerm.isValidEmail())
+        
         for (contact in allContacts) {
             val matchedContact = getMatchedContact(
                 contact = contact,
@@ -236,9 +242,9 @@ class ContactAdapter(
         } ?: ""
     }
 
-    fun searchContacts(text: CharSequence) {
+    fun searchContacts(text: CharSequence, isForRecipients: Boolean = true) {
         searchQuery = text.toString()
-        matchedContacts = performFiltering(text)
+        matchedContacts = performFiltering(text, isForRecipients)
         notifyDataSetChanged()
     }
 

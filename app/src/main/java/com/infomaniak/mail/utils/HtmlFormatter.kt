@@ -18,12 +18,18 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.content.res.Configuration
 import androidx.annotation.RawRes
+import androidx.appcompat.view.ContextThemeWrapper
 import com.infomaniak.html.cleaner.HtmlSanitizer
+import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_DARK_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_DARK_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
@@ -31,6 +37,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import androidx.appcompat.R as RAndroid
+import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
 
@@ -190,6 +197,11 @@ class HtmlFormatter(private val html: String) {
         private val DETECT_BUT_DO_NOT_BREAK = setOf(' ')
         private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
 
+        const val MENTIONS_STYLE = "padding: 0 4px; border-radius: 100px; " +
+                "color: var(--mail-content-mention-text-color, #333); " +
+                "background-color: var(--mail-content-mention-background-color, #f1f1f1); " +
+                "font-weight: var(--mail-content-mention-font-weight, inherit)"
+
         private fun Context.loadScript(
             @RawRes scriptResId: Int,
             customVariablesDeclaration: List<Pair<String, Any>> = emptyList(),
@@ -210,7 +222,21 @@ class HtmlFormatter(private val html: String) {
             }
         }
 
-        fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
+        fun Context.getCustomDarkMode(aliases: List<String>): String {
+            if (aliases.isEmpty()) return ""
+            val selectors = aliases.joinToString(", ") { alias ->
+                "a[${MENTION_ATTRIBUTE}='$alias']"
+            }
+            val darkContext = withMode(Configuration.UI_MODE_NIGHT_YES)
+            val darkModeCss = loadCss(
+                R.raw.custom_dark_mode,
+                listOf(
+                    PRIMARY_DARK_COLOR_CODE to darkContext.getAttributeColor(RAndroid.attr.colorPrimary),
+                    PRIMARY_CONTAINER_DARK_COLOR_CODE to darkContext.getAttributeColor(RMaterial.attr.colorPrimaryContainer)
+                )
+            )
+            return darkModeCss.format(selectors)
+        }
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
@@ -225,6 +251,54 @@ class HtmlFormatter(private val html: String) {
             R.raw.editor_style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
+
+        fun Context.getMentionsStyle(aliases: List<String>): String {
+            if (aliases.isEmpty()) return ""
+            val selectors = aliases.joinToString(", ") { alias ->
+                "a[${MENTION_ATTRIBUTE}='$alias']"
+            }
+            return loadMentionsLightStyleTemplate().format(selectors)
+        }
+
+        fun Context.getMentionsEditorStyle(aliases: List<String>): String {
+            if (aliases.isEmpty()) return ""
+            val selectors = aliases.joinToString(", ") { alias ->
+                "a[${MENTION_ATTRIBUTE}='$alias']"
+            }
+            return loadMentionsTemplate().format(selectors)
+        }
+
+        private fun Context.loadMentionsLightStyleTemplate(): String {
+            val lightContext = withMode(Configuration.UI_MODE_NIGHT_NO)
+            return loadCss(
+                R.raw.mentions_style,
+                listOf(
+                    PRIMARY_COLOR_CODE to lightContext.getAttributeColor(RAndroid.attr.colorPrimary),
+                    PRIMARY_CONTAINER_COLOR_CODE to lightContext.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+                )
+            )
+        }
+
+        private fun Context.loadMentionsTemplate(): String {
+            return loadCss(
+                R.raw.mentions_style,
+                listOf(
+                    PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
+                    PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+                )
+            )
+        }
+
+        private fun Context.withMode(mode: Int): Context {
+            val config = Configuration(resources.configuration).apply {
+                uiMode = (uiMode and Configuration.UI_MODE_TYPE_MASK) or mode
+            }
+
+            val configContext = createConfigurationContext(config)
+            return ContextThemeWrapper(configContext, 0).apply {
+                theme.setTo(this@withMode.theme)
+            }
+        }
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
@@ -257,6 +331,26 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getSetAiContentScript(): String {
             return loadScript(R.raw.set_ai_content_script)
+        }
+
+        fun Context.getMentionDeletionObserverScript(): String = loadScript(R.raw.mention_deletion_observer)
+
+        fun Context.getEditorMentionsDetectorScript(): String = loadScript(R.raw.editor_mentions_detector)
+
+        fun Context.getMentionClickObserverScript(): String {
+            return loadScript(R.raw.message_display_mention_click_observer)
+        }
+
+        fun Context.getInsertMentionScript(): String {
+            return loadScript(R.raw.insert_mention)
+        }
+
+        fun Context.getEditorMentionClickObserverScript(): String {
+            return loadScript(R.raw.editor_mention_click_observer)
+        }
+
+        fun Context.removeMentionsScript(): String {
+            return loadScript(R.raw.remove_mentions_scripts)
         }
     }
 }

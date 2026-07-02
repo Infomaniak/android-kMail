@@ -1,3 +1,9 @@
 html {
     background: #101010;
 }
+
+%s {
+    --mail-content-mention-text-color: var(--kmail-primary-dark-color);
+    --mail-content-mention-background-color: var(--kmail-primary-container-dark-color);
+    --mail-content-mention-font-weight: 500;
+}

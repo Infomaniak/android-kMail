@@ -19,10 +19,13 @@ package com.infomaniak.mail.data.models.javascriptBridge
 
 import android.webkit.JavascriptInterface
 import com.infomaniak.core.sentry.SentryLog
+import kotlinx.serialization.json.Json
 import org.json.JSONArray
 
 class EditorJavascriptBridge(
-    private val onInlineImagesDeleted: (List<String>) -> Unit,
+    private val onInlineImagesDeletedCallback: (List<String>) -> Unit,
+    private val onMentionQueryChangedCallback: (String) -> Unit,
+    private val onMentionsDeletedCallback: (List<String>) -> Unit,
 ) {
     @JavascriptInterface
     fun onInlineImagesDeleted(cidJson: String) {
@@ -33,7 +36,26 @@ class EditorJavascriptBridge(
         }.getOrNull() ?: return
 
         val cids = (0 until jsonArray.length()).map { jsonArray.getString(it) }
-        onInlineImagesDeleted(cids)
+        onInlineImagesDeletedCallback(cids)
+    }
+
+    @JavascriptInterface
+    fun onMentionQueryChanged(query: String) {
+        onMentionQueryChangedCallback(query)
+    }
+
+    @JavascriptInterface
+    fun onMentionsDeleted(refsJson: String) {
+        val refs = runCatching {
+            Json.decodeFromString<List<String>>(refsJson)
+                .map(String::trim)
+                .filter(String::isNotBlank)
+                .toList()
+        }.onFailure {
+            SentryLog.e(TAG, "Failed to parse mention refs", it)
+        }.getOrNull() ?: return
+
+        onMentionsDeletedCallback(refs)
     }
 
     companion object {

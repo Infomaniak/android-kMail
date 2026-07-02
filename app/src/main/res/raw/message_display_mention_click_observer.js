@@ -15,14 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-function onInlineImagesDeleted(cids) {
-    globalThis.kmail.onInlineImagesDeleted(cids);
+function observeMentionClick() {
+
+    document.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const clickedNode = event.target;
+        if (!(clickedNode instanceof Element)) return;
+
+        const mention = clickedNode.closest('a[data-ik-mention-ref]');
+        if (!mention) return;
+
+        const email = mention.dataset.ikMentionRef || '';
+        if (!email) return;
+
+        let name = (mention.textContent || '').trim();
+        if (name.startsWith('@')) {
+            name = name.substring(1).trim();
+        }
+
+        globalThis.kmail?.openMentionContact(email, name)
+    }, true);
 }
 
-function onMentionQueryChanged(query) {
-    globalThis.kmail.onMentionQueryChanged(query);
-}
-
-function onMentionsDeleted(refsJson) {
-    globalThis.kmail.onMentionsDeleted(refsJson);
-}
+observeMentionClick();

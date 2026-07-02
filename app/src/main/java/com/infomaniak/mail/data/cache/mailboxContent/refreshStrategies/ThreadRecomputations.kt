@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.data.models.thread.Thread
@@ -34,7 +35,7 @@ import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmList
 
 object ThreadRecomputations {
-    fun Thread.recomputeThread(realm: MutableRealm? = null) {
+    fun Thread.recomputeThread(realm: MutableRealm? = null, mailbox: Mailbox? = null) {
 
         messages.sortBy { it.internalDate }
         // All of the following methods should not be inside of Thread to begin with. At least the input list of messages is
@@ -61,7 +62,7 @@ object ThreadRecomputations {
 
         resetThread()
 
-        updateThread(lastMessage, allMessages)
+        updateThread(lastMessage, allMessages, mailbox)
 
         recomputeMessagesWithContent(allMessages)
 
@@ -81,6 +82,7 @@ object ThreadRecomputations {
         isAnswered = false
         isForwarded = false
         hasAttachable = false
+        hasUnseenMentions = false
         numberOfScheduledDrafts = 0
         snoozeState = null
         snoozeEndDate = null
@@ -88,35 +90,12 @@ object ThreadRecomputations {
         isLastInboxMessageSnoozed = false
     }
 
-    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>) {
-
-        fun Thread.updateSnoozeStatesBasedOn(message: Message) {
-            message.snoozeState?.let {
-                snoozeState = it
-                snoozeEndDate = message.snoozeEndDate
-                snoozeUuid = message.snoozeUuid
-            }
-        }
+    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
+        val rawAliases = mailbox?.aliases
+        val normalizedAliases = rawAliases?.map { it.lowercase() }?.toSet() ?: emptySet()
 
         allMessages.forEach { message ->
-            messagesIds += message.messageIds
-            if (!message.isSeen) unseenMessagesCount++
-            from += message.from
-            to += message.to
-            if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
-            if (message.isFavorite) isFavorite = true
-            if (message.isAnswered) {
-                isAnswered = true
-                isForwarded = false
-            }
-            if (message.isForwarded) {
-                isForwarded = true
-                isAnswered = false
-            }
-            if (message.hasAttachable) hasAttachable = true
-            if (message.isScheduledDraft) numberOfScheduledDrafts++
-
-            updateSnoozeStatesBasedOn(message)
+            processMessage(message, normalizedAliases)
         }
 
         duplicates.forEach { message ->
@@ -129,6 +108,44 @@ object ThreadRecomputations {
         subject = allMessages.first().subject
 
         isLastInboxMessageSnoozed = allMessages.isLastInboxMessageSnoozed(folderId)
+    }
+
+    private fun Thread.processMessage(message: Message, normalizedAliases: Set<String>) {
+        messagesIds += message.messageIds
+        if (!message.isSeen) unseenMessagesCount++
+        from += message.from
+        to += message.to
+        if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
+        if (message.isFavorite) isFavorite = true
+        if (message.isAnswered) {
+            isAnswered = true
+            isForwarded = false
+        }
+        if (message.isForwarded) {
+            isForwarded = true
+            isAnswered = false
+        }
+        if (message.hasAttachable) hasAttachable = true
+        if (message.isScheduledDraft) numberOfScheduledDrafts++
+        updateMentionsState(message, normalizedAliases)
+        updateSnoozeStatesBasedOn(message)
+    }
+
+    private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
+        if (hasUnseenMentions || message.mentions.isEmpty()) return
+
+        val amIMentioned = message.mentions.any { mention ->
+            normalizedAliases.contains(mention.lowercase())
+        }
+        hasUnseenMentions = amIMentioned && !message.isSeen
+    }
+
+    private fun Thread.updateSnoozeStatesBasedOn(message: Message) {
+        message.snoozeState?.let {
+            snoozeState = it
+            snoozeEndDate = message.snoozeEndDate
+            snoozeUuid = message.snoozeUuid
+        }
     }
 
     /**

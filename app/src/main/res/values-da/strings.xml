@@ -216,6 +216,7 @@
     <string name="contentDescriptionIconFavorite">Er favorit</string>
     <string name="contentDescriptionIconFolderSelected">Mappe valgt</string>
     <string name="contentDescriptionIconForward">Videresendt</string>
+    <string name="contentDescriptionIconMention">Du er blevet nævnt.</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
     <string name="contentDescriptionIconReply">Svar</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>

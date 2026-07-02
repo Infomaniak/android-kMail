@@ -64,11 +64,11 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         impactedFolders += folderId
     }
 
-    override fun processDeletedThread(thread: Thread, realm: MutableRealm) {
+    override fun processDeletedThread(thread: Thread, realm: MutableRealm, mailbox: Mailbox?) {
         if (thread.getNumberOfMessagesInFolder() == 0) {
             realm.delete(thread)
         } else {
-            thread.recomputeThread(realm)
+            thread.recomputeThread(realm, mailbox)
         }
     }
 

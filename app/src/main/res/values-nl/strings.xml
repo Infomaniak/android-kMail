@@ -216,6 +216,7 @@
     <string name="contentDescriptionIconFavorite">Is favoriet</string>
     <string name="contentDescriptionIconFolderSelected">Map geselecteerd</string>
     <string name="contentDescriptionIconForward">Doorgestuurd</string>
+    <string name="contentDescriptionIconMention">Je bent vermeld.</string>
     <string name="contentDescriptionIconNewMail">Nieuw</string>
     <string name="contentDescriptionIconReply">Antwoord</string>
     <string name="contentDescriptionIconStorage">Opslagstatus</string>

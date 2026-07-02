@@ -43,7 +43,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.core.common.extensions.isNightModeEnabled
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
@@ -69,6 +69,8 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
@@ -91,16 +93,21 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionClickObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionsDetectorScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.removeMentionsScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -151,10 +158,15 @@ class NewMessageFragment : Fragment() {
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
+    private val mentionsObserverScript by lazy { requireContext().getEditorMentionsDetectorScript() }
+    private val mentionDeletionObserverScript by lazy { requireContext().getMentionDeletionObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
+    private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
+    private val mentionClickObserverScript by lazy { requireContext().getEditorMentionClickObserverScript() }
+    private val removeMentionsScript by lazy { requireContext().removeMentionsScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -169,6 +181,17 @@ class NewMessageFragment : Fragment() {
 
     private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
+
+    private val mentionContactAdapter by lazy {
+        ContactAdapter(
+            usedEmails = mutableSetOf(),
+            onContactClicked = ::onMentionContactClicked,
+            onAddUnrecognizedContact = ::onAddUnrecognizedContactClicked,
+            snackbarManager = snackbarManager,
+            getAddressBookWithGroup = null,
+            isForRecipients = false,
+        )
+    }
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
 
@@ -438,6 +461,7 @@ class NewMessageFragment : Fragment() {
         })
 
         initEditorUi()
+        setupMentionAutocomplete()
         setupShowQuotesButton()
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -454,7 +478,11 @@ class NewMessageFragment : Fragment() {
 
     private fun initEditorUi() = with(binding) {
         editorWebView.settings.setupNewMessageWebViewSettings()
-        editorWebView.initEditorWebviewBridge(onInlineImagesDeleted = newMessageViewModel::deleteInlineAttachments)
+        editorWebView.initEditorWebviewBridge(
+            onInlineImagesDeleted = newMessageViewModel::deleteInlineAttachments,
+            onMentionQueryChanged = newMessageViewModel::updateMentionQuery,
+            onMentionsDeleted = newMessageViewModel::removeMentions,
+        )
         editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
         setEditorScript()
@@ -466,15 +494,25 @@ class NewMessageFragment : Fragment() {
 
     private fun setEditorStyle() = with(binding.editorWebView) {
         enableAlgorithmicDarkening(isEnabled = true)
-        if (context.isNightModeEnabled()) addCss(context.getCustomDarkMode())
         addCss(context.getCustomStyle())
         addCss(context.getCustomEditorStyle())
+    }
+
+    private fun addMentionsStyle() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val selfEmails = newMessageViewModel.currentMailbox().aliases
+            val formatMentionsStyle = context?.getMentionsEditorStyle(selfEmails)
+            if (formatMentionsStyle != null) {
+                binding.editorWebView.addCss(formatMentionsStyle)
+            }
+        }
     }
 
     private fun setEditorScript() = with(binding.editorWebView) {
         addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
+        addScript(mentionClickObserverScript)
 
         val formattedAiContentScript = setAiContentScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
@@ -502,6 +540,36 @@ class NewMessageFragment : Fragment() {
                 setPlaceholderVisibility(isVisible = false)
             }
         }
+    }
+
+    private fun onAddUnrecognizedContactClicked() {
+        addMention(newMessageViewModel.mentionQuery.value, null)
+    }
+
+    private fun onMentionContactClicked(contact: ContactAutocompletable) {
+        val mergedContact = contact as? MergedContact ?: return
+        addMention(mergedContact.email, mergedContact.name)
+    }
+
+    private fun addMention(email: String, name: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.editorWebView.executeJsMethodWhenEditorIsSetup(
+                JsExecutableMethod(
+                    "insertMention",
+                    email,
+                    name,
+                    newMessageViewModel.mentionQuery.value
+                ),
+            )
+        }
+
+        binding.toField.apply {
+            addRecipient(email, name)
+            updateCollapsedChipValues(isCollapsed)
+        }
+
+        newMessageViewModel.addMention(email)
+        newMessageViewModel.updateMentionQuery("")
     }
 
     private fun setToolbarEnabledStatus(isEnabled: Boolean) {
@@ -767,6 +835,51 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
             binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+
+            val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
+
+            binding.editorWebView.apply {
+                if (areMentionsAvailable) {
+                    addScript(mentionsObserverScript, MENTION_OBSERVER_SCRIPT)
+                    addScript(insertMentionScript, INSERT_MENTION_SCRIPT)
+                    addScript(mentionDeletionObserverScript, MENTION_DELETION_OBSERVER_SCRIPT)
+                    addMentionsStyle()
+                } else {
+                    evaluateJavascript(removeMentionsScript, null)
+                }
+            }
+        }
+    }
+
+    private fun setupMentionAutocomplete() = with(binding) {
+        mentionAutoComplete.adapter = mentionContactAdapter
+        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (contacts, _) ->
+            mentionContactAdapter.updateContacts(contacts.filterIsInstance<MergedContact>())
+        }
+
+        newMessageViewModel.mentionQuery.observe(viewLifecycleOwner) { query ->
+            if (query.isBlank()) {
+                mentionAutoComplete.isVisible = false
+                mentionContactAdapter.clear()
+            } else {
+                mentionContactAdapter.searchContacts(query, isForRecipients = false)
+                mentionAutoComplete.isVisible = mentionContactAdapter.itemCount > 0
+                updateMentionAutocompleteHeight()
+            }
+        }
+    }
+
+    private fun updateMentionAutocompleteHeight() {
+        with(binding.mentionAutoComplete) {
+            if (!isVisible) return
+            post {
+                val itemHeight = getChildAt(0)?.height ?: return@post
+                val visibleRows = minOf(mentionContactAdapter.itemCount, 3)
+                val targetHeight = itemHeight * visibleRows + paddingTop + paddingBottom
+                if (layoutParams.height != targetHeight) {
+                    layoutParams = layoutParams.apply { height = targetHeight }
+                }
+            }
         }
     }
 
@@ -783,6 +896,7 @@ class NewMessageFragment : Fragment() {
         binding.editorWebView.exportHtml { html ->
             newMessageViewModel.storeBodyAndSubject(subject, html)
         }
+        newMessageViewModel.updateMentionQuery("")
 
         super.onStop()
     }
@@ -933,4 +1047,9 @@ class NewMessageFragment : Fragment() {
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
+    companion object {
+        const val MENTION_OBSERVER_SCRIPT = "mention_observer_script"
+        const val INSERT_MENTION_SCRIPT = "insert_mention_script"
+        const val MENTION_DELETION_OBSERVER_SCRIPT = "mention_deletion_observer_script"
+    }
 }

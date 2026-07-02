@@ -50,6 +50,7 @@ import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
+import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
@@ -67,6 +68,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.containsOnlyScheduledDrafts
+import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.data.models.extensions.downloadUrl
 import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
@@ -371,6 +373,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
             areMessagesCollapsibles = { threadViewModel.messagesAreCollapsiblesFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
+            aliases = { mainViewModel.currentMailbox.value?.aliases?.toList() ?: emptyList() },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
@@ -384,6 +387,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         args = DetailedContactBottomSheetDialogArgs(recipient, bimi).toBundle(),
                     )
                 },
+                onMentionContactClicked = ::openContactDetails,
                 onDraftClicked = ::openDraft,
                 onDeleteDraftClicked = ::deleteDraft,
                 onAttachmentClicked = ::onAttachableClicked,
@@ -513,6 +517,16 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             draftLocalUuid = message.draftLocalUuid,
             draftResource = message.draftResource,
             messageUid = message.uid,
+        )
+    }
+
+    private fun openContactDetails(email: String, displayName: String?) {
+        trackMessageEvent(MatomoName.ShowMentionDetails)
+        val recipient = Recipient.createValidRecipientOrNull(email = email, name = displayName) ?: return
+
+        safeNavigate(
+            resId = R.id.detailedContactBottomSheetDialog,
+            args = DetailedContactBottomSheetDialogArgs(recipient, null).toBundle(),
         )
     }
 
