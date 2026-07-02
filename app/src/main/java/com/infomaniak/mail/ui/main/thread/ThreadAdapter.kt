@@ -910,7 +910,7 @@ class ThreadAdapter(
 
         endReminderAlert.onAction2 {
             trackMessageBannerEvent(MatomoName.ReprogramReminder)
-            threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message)
+            threadAdapterCallbacks?.onAddReminderClicked?.invoke(message)
         }
 
         endReminderAlert.onAction3 {
@@ -1487,6 +1487,7 @@ class ThreadAdapter(
         var getAiState: (() -> AiStateMap)? = null,
         var onDisableReminderClicked: ((Message) -> Unit)? = null,
         var onModifyReminderClicked: ((Message) -> Unit)? = null,
+        var onAddReminderClicked: ((Message) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {
