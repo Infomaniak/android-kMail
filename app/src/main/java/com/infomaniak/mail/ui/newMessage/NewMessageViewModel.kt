@@ -398,10 +398,6 @@ class NewMessageViewModel @Inject constructor(
         if (initialSanitizedQuote != null) setQuotesButtonVisibility(isVisible = true)
     }
 
-    fun disabledReminder() {
-        reminderConfig.value = ReminderConfig.None
-    }
-
     private suspend fun getExistingDraft(localUuid: String?): Draft? {
 
         fun String.sanitize(): String {

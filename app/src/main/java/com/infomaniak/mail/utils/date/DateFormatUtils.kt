@@ -23,7 +23,6 @@ import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_MONTH_YEAR
 import com.infomaniak.core.common.utils.format
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.newMessage.MINUTES_IN_A_DAY
 import java.util.Date
 
 object DateFormatUtils {
