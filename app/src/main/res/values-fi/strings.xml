@@ -252,7 +252,6 @@
     <string name="deleteAccountWarning">Tilisi poistaminen on lopullista. Et voi enää aktivoida tiliäsi uudelleen.</string>
     <string name="deleteFolderDialogDescription">Kansion %s sisältö poistetaan pysyvästi ilman siirtämistä roskakoriin.</string>
     <string name="deleteFolderDialogTitle">Poista kansio</string>
-    <string name="descriptionReminderRecipientsAndMe">Vain organisaation sisällä</string>
     <string name="disabledFeatureFlagDescription">Voit pian poistaa ik.me-sähköpostiosoitteesi rajoitukset\n(tallennustilaraja, mukautettu aikataulu, lähetys ja muut…)</string>
     <string name="disabledFeatureFlagTitle">Tarvitsetko lisää tallennustilaa ja ominaisuuksia?</string>
     <string name="displayMailIssueDescription">Näyttöongelmien korjaamiseksi päivitä Android System Webview -sovellus.</string>

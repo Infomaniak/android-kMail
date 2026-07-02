@@ -252,7 +252,6 @@
     <string name="deleteAccountWarning">A eliminação da sua conta será definitiva. Não poderá reativar a sua conta.</string>
     <string name="deleteFolderDialogDescription">O conteúdo da pasta %s será eliminado permanentemente sem passar pelo lixo.</string>
     <string name="deleteFolderDialogTitle">Eliminar pasta</string>
-    <string name="descriptionReminderRecipientsAndMe">Apenas dentro da organização</string>
     <string name="disabledFeatureFlagDescription">Em breve poderá desbloquear os limites do seu endereço de e-mail ik.me\n(limite de armazenamento, horário personalizado, envio e muito mais…)</string>
     <string name="disabledFeatureFlagTitle">Precisa de mais armazenamento e funcionalidades?</string>
     <string name="displayMailIssueDescription">Para corrigir os problemas de exibição, atualize a aplicação Android System Webview.</string>

@@ -252,7 +252,6 @@
     <string name="deleteAccountWarning">Sletningen af din konto vil være endelig. Du vil ikke kunne genaktivere din konto.</string>
     <string name="deleteFolderDialogDescription">Indholdet af mappen %s vil blive slettet permanent uden at gå gennem papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slet mappe</string>
-    <string name="descriptionReminderRecipientsAndMe">Kun inden for organisationen</string>
     <string name="disabledFeatureFlagDescription">Du vil snart kunne låse op for begrænsningerne på din ik.me e-mailadresse\n(lagringsgrænse, tilpasset tidsplan, afsendelse og mere…)</string>
     <string name="disabledFeatureFlagTitle">Behov for mere lagerplads og funktioner?</string>
     <string name="displayMailIssueDescription">For at rette visningsproblemer skal du opdatere Android System Webview-applikationen.</string>
