@@ -27,16 +27,15 @@ import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRec
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
+import com.infomaniak.mail.data.models.extensions.folderNameRes
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.extensions.folderNameRes
 import com.infomaniak.mail.data.models.thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.NamedFolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -142,15 +141,12 @@ class SearchUtils @Inject constructor(
                 // The Search only returns Messages from TRASH if we explicitly selected this folder,
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
-                    areHeavyDataFetched = false,
-                    isTrashed = filterFolder?.role == FolderRole.TRASH,
-                    messageIds = remoteMessage.computeMessageIds(),
-                    draftLocalUuid = null,
-                    isFromSearch = true,
-                    isDeletedOnApi = false,
-                    latestCalendarEventResponse = null,
-                    swissTransferFiles = realmListOf(),
-                    emojiReactions = realmListOf(),
+                    Message.MessageLocalValues(
+                        areHeavyDataFetched = false,
+                        isTrashed = filterFolder?.role == FolderRole.TRASH,
+                        messageIds = remoteMessage.computeMessageIds(),
+                        isFromSearch = true,
+                    )
                 )
             } else {
                 remoteMessage.keepLocalValues(localMessage)

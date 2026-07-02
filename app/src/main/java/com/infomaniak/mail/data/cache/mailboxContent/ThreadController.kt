@@ -291,15 +291,12 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
                             } ?: realmListOf()
 
                             remoteMessage.initLocalValues(
-                                areHeavyDataFetched = true,
-                                isTrashed = localMessage.isTrashed,
-                                messageIds = localMessage.messageIds,
-                                draftLocalUuid = remoteMessage.getDraftLocalUuidBlocking(realm),
-                                isFromSearch = localMessage.isFromSearch,
-                                isDeletedOnApi = false,
-                                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
-                                swissTransferFiles = swissTransferFiles,
-                                emojiReactions = localMessage.emojiReactions,
+                                localMessage.toLocalValues().copy(
+                                    areHeavyDataFetched = true,
+                                    draftLocalUuid = remoteMessage.getDraftLocalUuidBlocking(realm),
+                                    isDeletedOnApi = false,
+                                    swissTransferFiles = swissTransferFiles,
+                                )
                             )
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true
@@ -360,7 +357,11 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
         private fun Message.getDraftLocalUuidBlocking(realm: TypedRealm): String? {
-            return if (isDraft && !isScheduledMessage) DraftController.getDraftByMessageUidBlocking(uid, realm)?.localUuid else null
+            return if (isDraft && !isScheduledMessage) {
+                DraftController.getDraftByMessageUidBlocking(uid, realm)?.localUuid
+            } else {
+                null
+            }
         }
 
         fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
