@@ -627,6 +627,8 @@
     <string name="shareEmail">Dela e-post</string>
     <string name="snackbarAcknowledgementFailure">Kunde inte skicka</string>
     <string name="snackbarAcknowledgementSuccess">Läskvitto skickat</string>
+    <string name="snackbarAddReminderFailure">Det gick inte att lägga till påminnelsen</string>
+    <string name="snackbarAddReminderSuccess">Påminnelse tillagd</string>
     <string name="snackbarAdminDisabledMessageSending">En administratör har inaktiverat meddelandesändning</string>
     <string name="snackbarBlockUserConfirmation">Avsändaren är nu blockerad</string>
     <string name="snackbarCalendarChoiceSent">Svar beaktat</string>

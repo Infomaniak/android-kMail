@@ -627,6 +627,8 @@
     <string name="shareEmail">Κοινοποίηση email</string>
     <string name="snackbarAcknowledgementFailure">Αποτυχία αποστολής</string>
     <string name="snackbarAcknowledgementSuccess">Η απόδειξη ανάγνωσης εστάλη</string>
+    <string name="snackbarAddReminderFailure">Δεν ήταν δυνατή η προσθήκη υπενθύμισης</string>
+    <string name="snackbarAddReminderSuccess">Η υπενθύμιση προστέθηκε</string>
     <string name="snackbarAdminDisabledMessageSending">Ένας διαχειριστής έχει απενεργοποιήσει την αποστολή μηνυμάτων</string>
     <string name="snackbarBlockUserConfirmation">Ο αποστολέας έχει αποκλειστεί</string>
     <string name="snackbarCalendarChoiceSent">Η απάντηση καταχωρήθηκε</string>

@@ -627,6 +627,8 @@
     <string name="shareEmail">Del e-mail</string>
     <string name="snackbarAcknowledgementFailure">Kunne ikke sende</string>
     <string name="snackbarAcknowledgementSuccess">Kvittering for læsning sendt</string>
+    <string name="snackbarAddReminderFailure">Kunne ikke tilføje påmindelsen</string>
+    <string name="snackbarAddReminderSuccess">Påmindelse tilføjet</string>
     <string name="snackbarAdminDisabledMessageSending">En administrator har deaktiveret beskedafsendelse</string>
     <string name="snackbarBlockUserConfirmation">Afsender er nu blokeret</string>
     <string name="snackbarCalendarChoiceSent">Svar taget i betragtning</string>

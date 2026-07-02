@@ -224,6 +224,19 @@ object ApiRepository : ApiRepositoryCore() {
             mapOf("reminder_delta" to delayMinutes)
         )
     }
+
+    suspend fun addReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: String,
+        delayMinutes: Int
+    ): ApiResponse<Unit> {
+        return callApi(
+            ApiRoutes.addReminder(mailboxUuid, folderId, messageId),
+            POST,
+            mapOf("reminder_delta" to delayMinutes)
+        )
+    }
     //endregion
 
     //region Spam

@@ -627,6 +627,8 @@
     <string name="shareEmail">Del e-post</string>
     <string name="snackbarAcknowledgementFailure">Kunne ikke sende</string>
     <string name="snackbarAcknowledgementSuccess">Lesebekreftelse sendt</string>
+    <string name="snackbarAddReminderFailure">Kunne ikke legge til påminnelsen</string>
+    <string name="snackbarAddReminderSuccess">Påminnelse lagt til</string>
     <string name="snackbarAdminDisabledMessageSending">En administrator har deaktivert sending av meldinger</string>
     <string name="snackbarBlockUserConfirmation">Avsender er nå blokkert</string>
     <string name="snackbarCalendarChoiceSent">Svar tatt i betraktning</string>

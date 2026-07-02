@@ -627,6 +627,8 @@
     <string name="shareEmail">E-mail delen</string>
     <string name="snackbarAcknowledgementFailure">Verzenden mislukt</string>
     <string name="snackbarAcknowledgementSuccess">Leesbevestiging verzonden</string>
+    <string name="snackbarAddReminderFailure">Herinnering kon niet worden toegevoegd</string>
+    <string name="snackbarAddReminderSuccess">Herinnering toegevoegd</string>
     <string name="snackbarAdminDisabledMessageSending">Een beheerder heeft het verzenden van berichten uitgeschakeld</string>
     <string name="snackbarBlockUserConfirmation">De afzender is nu geblokkeerd</string>
     <string name="snackbarCalendarChoiceSent">Antwoord verwerkt</string>

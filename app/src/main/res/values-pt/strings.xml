@@ -627,6 +627,8 @@
     <string name="shareEmail">Partilhar e-mail</string>
     <string name="snackbarAcknowledgementFailure">Falha no envio</string>
     <string name="snackbarAcknowledgementSuccess">Confirmação de leitura enviada</string>
+    <string name="snackbarAddReminderFailure">Não foi possível adicionar o lembrete</string>
+    <string name="snackbarAddReminderSuccess">Lembrete adicionado</string>
     <string name="snackbarAdminDisabledMessageSending">Um administrador desabilitou o envio de mensagens</string>
     <string name="snackbarBlockUserConfirmation">Remetente bloqueado</string>
     <string name="snackbarCalendarChoiceSent">Resposta considerada</string>

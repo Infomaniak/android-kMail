@@ -627,6 +627,8 @@
     <string name="shareEmail">Partager l’e-mail</string>
     <string name="snackbarAcknowledgementFailure">Échec de l’envoi</string>
     <string name="snackbarAcknowledgementSuccess">Accusé de lecture envoyé</string>
+    <string name="snackbarAddReminderFailure">Échec de l’ajout du rappel</string>
+    <string name="snackbarAddReminderSuccess">Rappel ajouté</string>
     <string name="snackbarAdminDisabledMessageSending">Un administrateur a désactivé l’envoi de message</string>
     <string name="snackbarBlockUserConfirmation">L’expéditeur est maintenant bloqué</string>
     <string name="snackbarCalendarChoiceSent">Réponse prise en compte</string>

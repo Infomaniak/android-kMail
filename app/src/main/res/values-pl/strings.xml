@@ -661,6 +661,8 @@
     <string name="shareEmail">Udostępnij wiadomość</string>
     <string name="snackbarAcknowledgementFailure">Nie udało się wysłać</string>
     <string name="snackbarAcknowledgementSuccess">Potwierdzenie odbioru wysłane</string>
+    <string name="snackbarAddReminderFailure">Nie udało się dodać przypomnienia</string>
+    <string name="snackbarAddReminderSuccess">Przypomnienie dodane</string>
     <string name="snackbarAdminDisabledMessageSending">Administrator wyłączył wysyłanie wiadomości</string>
     <string name="snackbarBlockUserConfirmation">Nadawca został zablokowany</string>
     <string name="snackbarCalendarChoiceSent">Odpowiedź uwzględniona</string>
