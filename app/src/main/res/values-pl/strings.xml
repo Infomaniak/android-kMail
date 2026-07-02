@@ -533,6 +533,7 @@
     <string name="reminderBottomSheetTitle">Opóźnij przypomnienie</string>
     <string name="reminderFollowUpButton">Przypomnij</string>
     <string name="reminderFollowUpPlaceholderText">Cześć,\nCzy możliwe jest uzyskanie informacji zwrotnej na ten temat?\nZ góry dziękuję.</string>
+    <string name="reminderMarkAsDoneButton">Zaznacz jako zakończone</string>
     <string name="reminderNoResponseHeaderTitle">Przypomnienie: brak odpowiedzi od %1$s na ten e-mail od %2$s</string>
     <string name="reminderVisibilityTitle">Widoczność przypomnienia</string>
     <string name="renameFolder">Zmień nazwę folderu</string>

@@ -507,6 +507,7 @@
     <string name="reminderBottomSheetTitle">Delay the reminder</string>
     <string name="reminderFollowUpButton">Follow up</string>
     <string name="reminderFollowUpPlaceholderText">Hello,\nIs it possible to get some feedback on this subject?\nThank you in advance.</string>
+    <string name="reminderMarkAsDoneButton">Mark as done</string>
     <string name="reminderNoResponseHeaderTitle">Reminder: no response from %1$s to this email since %2$s</string>
     <string name="reminderVisibilityTitle">Reminder visibility</string>
     <string name="renameFolder">Rename the folder</string>

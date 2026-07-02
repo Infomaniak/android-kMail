@@ -503,6 +503,7 @@
     <string name="reminderBottomSheetTitle">Skjut upp påminnelsen</string>
     <string name="reminderFollowUpButton">Uppföljning</string>
     <string name="reminderFollowUpPlaceholderText">Hej,\nÄr det möjligt att få feedback om detta ämne?\nTack på förhand.</string>
+    <string name="reminderMarkAsDoneButton">Markera som klar</string>
     <string name="reminderNoResponseHeaderTitle">Påminnelse: inget svar från %1$s på detta e-postmeddelande sedan %2$s</string>
     <string name="reminderVisibilityTitle">Påminnelsens synlighet</string>
     <string name="renameFolder">Byt namn på mappen</string>

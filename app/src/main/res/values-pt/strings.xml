@@ -503,6 +503,7 @@
     <string name="reminderBottomSheetTitle">Adiar o lembrete</string>
     <string name="reminderFollowUpButton">Relançar</string>
     <string name="reminderFollowUpPlaceholderText">Olá,\nÉ possível obter algum feedback sobre este assunto?\nObrigado desde já.</string>
+    <string name="reminderMarkAsDoneButton">Marcar como concluído</string>
     <string name="reminderNoResponseHeaderTitle">Lembrete: nenhuma resposta de %1$s a este email desde %2$s</string>
     <string name="reminderVisibilityTitle">Visibilidade do lembrete</string>
     <string name="renameFolder">Renomear pasta</string>

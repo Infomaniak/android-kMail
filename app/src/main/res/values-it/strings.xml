@@ -503,6 +503,7 @@
     <string name="reminderBottomSheetTitle">Posticipare il promemoria</string>
     <string name="reminderFollowUpButton">Sollecita</string>
     <string name="reminderFollowUpPlaceholderText">Ciao,\nÈ possibile avere un feedback su questo argomento?\nGrazie in anticipo.</string>
+    <string name="reminderMarkAsDoneButton">Segna come fatto</string>
     <string name="reminderNoResponseHeaderTitle">Promemoria: nessuna risposta da %1$s a questa email dal %2$s</string>
     <string name="reminderVisibilityTitle">Visibilità del promemoria</string>
     <string name="renameFolder">Rinominare la cartella</string>
