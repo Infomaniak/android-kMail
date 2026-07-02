@@ -294,7 +294,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Recipients concerned</string>
     <string name="encryptedMessagePasswordLabel">Share this password by private message. You won’t be able to copy it once you’ve sent it.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Encryption has been disabled</string>
-    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Schedule and reminder emails not available for encrypted messages</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Scheduled and reminder emails not available for encrypted messages</string>
     <string name="encryptedMessageUpdatePasswordButton">Change password</string>
     <string name="encryptedPasswordProtectionTitle">Password protection</string>
     <string name="encryptedProtectionAdDescription">Protect your message from unauthorized access with Infomaniak encryption.</string>

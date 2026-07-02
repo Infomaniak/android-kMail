@@ -290,7 +290,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Destinataires concernés</string>
     <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe par message privé. Vous ne pourrez plus le copier après l’envoi.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Le chiffrement a bien été désactivé</string>
-    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">L’envoi programmé et le rappel ne sont pas disponibles pour les messages chiffré</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">L’envoi programmé et le rappel ne sont pas disponibles pour les messages chiffrés</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifier le mot de passe</string>
     <string name="encryptedPasswordProtectionTitle">Protection par mot de passe</string>
     <string name="encryptedProtectionAdDescription">Protégez votre message contre tout accès non autorisé grâce au chiffrement Infomaniak.</string>
