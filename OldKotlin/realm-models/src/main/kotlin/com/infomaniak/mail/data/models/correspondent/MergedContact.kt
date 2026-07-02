@@ -46,6 +46,9 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable {
     var comesFromApi: Boolean = false // In opposition to coming from the phone's address book
         private set
 
+    var remoteContactId: String? = null
+        private set
+
     var remoteContactGroupIds: RealmList<Int> = realmListOf()
 
     var addressbookIds: RealmList<Int?> = realmListOf()
@@ -78,6 +81,7 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable {
 
         this.contactedTimes = apiContact.contactedTimes?.get(email)
         this.other = apiContact.other
+        this.remoteContactId = apiContact.id
 
         this.comesFromApi = comesFromApi
 
@@ -113,6 +117,7 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable {
             avatar = apiContact.avatar
             comesFromApi = true
         }
+        remoteContactId = apiContact.id
         addressbookIds += realmListOf(apiContact.addressbookId)
         remoteContactGroupIds += apiContact.remoteContactGroupIds
     }
