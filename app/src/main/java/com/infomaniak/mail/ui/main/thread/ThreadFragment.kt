@@ -496,6 +496,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 getAiState = { aiActionsViewModel.aiStateMap.value },
                 onDisableReminderClicked = ::disableReminder,
                 onModifyReminderClicked = ::modifyReminder,
+                onAddReminderClicked = ::addReminder,
             ),
         )
 
@@ -1265,6 +1266,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         actionsViewModel.draftResource = draftResource
         threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
         navigateToScheduleSendBottomSheet()
+    }
+
+    private fun addReminder(message: Message) {
+        threadViewModel.modifyingReminderMessage = message
+        message.reminder = null
+        navigateToReminderBottomSheet()
     }
 
     private fun modifyReminder(message: Message) {
