@@ -486,11 +486,11 @@ class NewMessageFragment : Fragment() {
                         setDescription(getString(R.string.scheduledEmailHeader, date))
                         isVisible = true
                     }
-                    binding.divider6.isVisible = true
+                    binding.divider7.isVisible = true
                 }
                 ScheduleConfig.None -> {
                     binding.scheduleAlert.isVisible = false
-                    binding.divider6.isVisible = false
+                    binding.divider7.isVisible = false
                 }
             }
         }
@@ -506,11 +506,11 @@ class NewMessageFragment : Fragment() {
                         setDescription(getString(R.string.callIfNoResponseHeaderTitle, dateText))
                         isVisible = true
                     }
-                    binding.divider7.isVisible = true
+                    binding.divider6.isVisible = true
                 }
                 is ReminderConfig.None -> {
                     binding.reminderAlert.isVisible = false
-                    binding.divider7.isVisible = false
+                    binding.divider6.isVisible = false
                 }
             }
         }

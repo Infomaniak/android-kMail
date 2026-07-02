@@ -277,17 +277,17 @@
                         app:layout_constraintTop_toBottomOf="@id/subjectBarrier" />
 
                     <com.infomaniak.mail.ui.main.thread.MessageAlertView
-                        android:id="@+id/scheduleAlert"
+                        android:id="@+id/reminderAlert"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone"
-                        app:action1="@string/buttonReschedule"
+                        app:action1="@string/buttonModify"
                         app:action2="@string/buttonDisable"
-                        app:icon="@drawable/ic_schedule_send"
+                        app:icon="@drawable/ic_alarm_clock"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider5"
-                        tools:description="This email will be sent on this date: Wednesday, July 30, 2024 at 09:00" />
+                        tools:description="Remind me if no response: Wednesday, July 30, 2024 at 09:00" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/divider6"
@@ -299,20 +299,20 @@
                         app:dividerColor="@color/dividerColor"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/scheduleAlert" />
+                        app:layout_constraintTop_toBottomOf="@id/reminderAlert" />
 
                     <com.infomaniak.mail.ui.main.thread.MessageAlertView
-                        android:id="@+id/reminderAlert"
+                        android:id="@+id/scheduleAlert"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone"
-                        app:action1="@string/buttonModify"
+                        app:action1="@string/buttonReschedule"
                         app:action2="@string/buttonDisable"
-                        app:icon="@drawable/ic_alarm_clock"
+                        app:icon="@drawable/ic_schedule_send"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider6"
-                        tools:description="Remind me if no response: Wednesday, July 30, 2024 at 09:00" />
+                        tools:description="This email will be sent on this date: Wednesday, July 30, 2024 at 09:00" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/divider7"
@@ -323,7 +323,7 @@
                         app:dividerColor="@color/dividerColor"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/reminderAlert" />
+                        app:layout_constraintTop_toBottomOf="@id/scheduleAlert" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/attachmentsRecyclerView"

@@ -259,7 +259,6 @@
     <string name="deleteAccountWarning">Usunięcie konta będzie ostateczne. Nie będziesz mógł/ mogła ponownie aktywować konta.</string>
     <string name="deleteFolderDialogDescription">Zawartość folderu %s zostanie trwale usunięta bez przenoszenia do kosza.</string>
     <string name="deleteFolderDialogTitle">Usuń folder</string>
-    <string name="descriptionReminderRecipientsAndMe">Tylko wewnątrz organizacji</string>
     <string name="disabledFeatureFlagDescription">Wkrótce będziesz mógł/ mogła odblokować limity swojego adresu e-mail ik.me\n(limit przechowywania, niestandardowy harmonogram, wysyłanie i więcej…)</string>
     <string name="disabledFeatureFlagTitle">Potrzebujesz więcej przestrzeni i funkcji?</string>
     <string name="displayMailIssueDescription">Aby rozwiązać problemy z wyświetlaniem, zaktualizuj aplikację Android System Webview.</string>

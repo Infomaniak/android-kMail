@@ -251,7 +251,6 @@
     <string name="deleteAccountWarning">Raderingen av ditt konto blir slutgiltig. Du kommer inte att kunna återaktivera ditt konto.</string>
     <string name="deleteFolderDialogDescription">Innehållet i mappen %s kommer att raderas permanent utan att gå via papperskorgen.</string>
     <string name="deleteFolderDialogTitle">Ta bort mapp</string>
-    <string name="descriptionReminderRecipientsAndMe">Endast inom organisationen</string>
     <string name="disabledFeatureFlagDescription">Du kommer snart att kunna låsa upp begränsningarna för din ik.me e-postadress\n(lagringsgräns, anpassat schema, sändning och mer…)</string>
     <string name="disabledFeatureFlagTitle">Behöver du mer lagring och funktioner?</string>
     <string name="displayMailIssueDescription">För att åtgärda visningsproblem, vänligen uppdatera appen Android System Webview.</string>

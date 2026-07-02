@@ -251,7 +251,6 @@
     <string name="deleteAccountWarning">Η διαγραφή του λογαριασμού σας θα είναι οριστική. Δεν θα μπορείτε να τον επανενεργοποιήσετε.</string>
     <string name="deleteFolderDialogDescription">Το περιεχόμενο του φακέλου %s θα διαγραφεί οριστικά χωρίς να μεταφερθεί στον κάδο απορριμμάτων.</string>
     <string name="deleteFolderDialogTitle">Διαγραφή φακέλου</string>
-    <string name="descriptionReminderRecipientsAndMe">Μόνο εντός του οργανισμού</string>
     <string name="disabledFeatureFlagDescription">Σύντομα θα μπορείτε να ξεκλειδώσετε τα όρια της διεύθυνσης email ik.me\n(όριο αποθήκευσης, προσαρμοσμένο πρόγραμμα αποστολής και άλλα…)</string>
     <string name="disabledFeatureFlagTitle">Χρειάζεστε περισσότερο χώρο αποθήκευσης και λειτουργίες;</string>
     <string name="displayMailIssueDescription">Για να διορθώσετε τα προβλήματα εμφάνισης, ενημερώστε την εφαρμογή Android System WebView.</string>

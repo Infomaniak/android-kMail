@@ -251,7 +251,6 @@
     <string name="deleteAccountWarning">Het verwijderen van uw account is definitief. U kunt uw account niet opnieuw activeren.</string>
     <string name="deleteFolderDialogDescription">De inhoud van de map %s wordt definitief verwijderd zonder via de prullenbak te gaan.</string>
     <string name="deleteFolderDialogTitle">Map verwijderen</string>
-    <string name="descriptionReminderRecipientsAndMe">Alleen binnen de organisatie</string>
     <string name="disabledFeatureFlagDescription">U kunt binnenkort de limieten van uw ik.me e-mailadres ontgrendelen\n(opslaglimiet, aangepast schema, verzenden en meer…)</string>
     <string name="disabledFeatureFlagTitle">Meer opslag en functies nodig?</string>
     <string name="displayMailIssueDescription">Om weergaveproblemen op te lossen, werkt u de Android System Webview-applicatie bij.</string>

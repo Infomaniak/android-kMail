@@ -22,34 +22,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/topReminderAlertGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <com.google.android.material.divider.MaterialDivider
-            style="@style/AlertDivider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <com.infomaniak.mail.ui.main.thread.MessageAlertView
-            android:id="@+id/requestResponseAlert"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:icon="@drawable/ic_alarm_clock"
-            tools:description="Laura is awaiting a response before Thursday, May 17 at 12:00"
-            tools:visibility="visible" />
-
-        <com.google.android.material.divider.MaterialDivider
-            style="@style/AlertDivider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/messageHeader"
         style="@style/CardViewMail"
@@ -425,6 +397,26 @@
             app:layout_constraintTop_toBottomOf="@id/messageDetails">
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/requestResponseAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Laura is awaiting a response before Thursday, May 17 at 12:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/scheduleAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/buttonReschedule"
+                app:action2="@string/buttonModify"
+                app:icon="@drawable/ic_schedule_send"
+                tools:description="Cet e-mail sera envoyé à cette date : mercredi 30 juillet 2024 à 09:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/reminderAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -445,17 +437,6 @@
                 app:action3="@string/reminderMarkAsDoneButton"
                 app:icon="@drawable/ic_alarm_clock"
                 tools:description="Rappel : aucune réponse de Laura à cet e-mail depuis le 16 mai."
-                tools:visibility="visible" />
-
-            <com.infomaniak.mail.ui.main.thread.MessageAlertView
-                android:id="@+id/scheduleAlert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:action1="@string/buttonReschedule"
-                app:action2="@string/buttonModify"
-                app:icon="@drawable/ic_schedule_send"
-                tools:description="Cet e-mail sera envoyé à cette date : mercredi 30 juillet 2024 à 09:00"
                 tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView

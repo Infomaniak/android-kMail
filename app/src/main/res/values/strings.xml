@@ -255,7 +255,6 @@
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
     <string name="deleteFolderDialogDescription">The contents of the folder %s will be permanently deleted without going through the trash.</string>
     <string name="deleteFolderDialogTitle">Delete folder</string>
-    <string name="descriptionReminderRecipientsAndMe">Within the organization only</string>
     <string name="disabledFeatureFlagDescription">You will soon be able to unlock the limits of your ik.me email address\n(storage limit, custom schedule, sending and more…)</string>
     <string name="disabledFeatureFlagTitle">Need more storage and features?</string>
     <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>

@@ -763,8 +763,8 @@ class ThreadAdapter(
 
         bindUnsubscribe(messageUi)
         bindAcknowledge(messageUi)
-        bindRequestResponseAlert(message)
         // if (message.reminder != null) { // TODO: Uncomment this when the backend is ready to send the reminder date
+        bindRequestResponseAlert(message)
         bindReminderAlert(message)
         bindEndReminderAlert(message)
         // }
@@ -844,7 +844,6 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.bindRequestResponseAlert(message: Message) {
-        topReminderAlertGroup.isVisible = true
         requestResponseAlert.setActionsVisibility(shouldDisplayAction = false)
         val senderNames = message.from.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, senderNames)
