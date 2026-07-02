@@ -1043,7 +1043,7 @@ class NewMessageFragment : Fragment() {
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
-            resId = R.id.sendOptionsBottomSheetDialog,
+            resId = R.id.sendOptionsFragment,
             args = DraftSendOptionsFragmentArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentKSuite = mailbox.kSuite,
