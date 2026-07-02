@@ -405,10 +405,8 @@
     <string name="messageShowQuotedText">Vis samtalen</string>
     <string name="messageSummary">Beskedens resumé</string>
     <string name="messageSummaryError">Euria kunne ikke opsummere denne besked.</string>
-    <string name="messageSummaryErrorRetry">Euria kunne ikke opsummere denne besked. Prøv venligst igen.</string>
     <string name="messageSummaryLoading">Beskedens resumé…</string>
     <string name="messageTranslateError">Euria kunne ikke oversætte denne besked.</string>
-    <string name="messageTranslateErrorRetry">Euria kunne ikke oversætte denne besked. Prøv venligst igen.</string>
     <string name="messageTranslatedTitle">Oversat i %s</string>
     <string name="mondayAfternoon">Mandag eftermiddag</string>
     <string name="mondayMorning">Mandag morgen</string>
@@ -711,6 +709,7 @@
     </plurals>
     <string name="translationTargetSameAsSource">Denne besked er allerede på dit sprog</string>
     <string name="trashFolder">Papirkurv</string>
+    <string name="tryAgain">Prøv venligst igen.</string>
     <string name="unblockButton">Fjern blokering</string>
     <string name="unknownDialogTitleExpeditor">Ukendt afsender</string>
     <string name="unknownDialogTitleRecipient">Ukendt modtager</string>

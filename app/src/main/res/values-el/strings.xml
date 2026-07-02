@@ -405,10 +405,8 @@
     <string name="messageShowQuotedText">Εμφάνιση συνομιλίας</string>
     <string name="messageSummary">Σύνοψη του μηνύματος</string>
     <string name="messageSummaryError">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα.</string>
-    <string name="messageSummaryErrorRetry">Η Euria δεν μπόρεσε να συνοψίσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
     <string name="messageSummaryLoading">Σύνοψη του μηνύματος…</string>
     <string name="messageTranslateError">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα.</string>
-    <string name="messageTranslateErrorRetry">Η Euria δεν μπόρεσε να μεταφράσει αυτό το μήνυμα. Παρακαλώ δοκιμάστε ξανά.</string>
     <string name="messageTranslatedTitle">Μεταφράστηκε σε %s</string>
     <string name="mondayAfternoon">Δευτέρα απόγευμα</string>
     <string name="mondayMorning">Δευτέρα πρωί</string>
@@ -711,6 +709,7 @@
     </plurals>
     <string name="translationTargetSameAsSource">Αυτό το μήνυμα είναι ήδη στη γλώσσα σας</string>
     <string name="trashFolder">Κάδος απορριμμάτων</string>
+    <string name="tryAgain">Παρακαλώ, δοκιμάστε ξανά.</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>
     <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
