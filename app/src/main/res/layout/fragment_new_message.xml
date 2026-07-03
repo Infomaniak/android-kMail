@@ -281,7 +281,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone"
-                        app:action1="@string/buttonModify"
+                        app:action1="@string/buttonReschedule"
                         app:action2="@string/buttonDisable"
                         app:icon="@drawable/ic_alarm_clock"
                         app:layout_constraintEnd_toEndOf="parent"

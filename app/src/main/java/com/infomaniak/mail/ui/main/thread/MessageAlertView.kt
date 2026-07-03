@@ -64,7 +64,6 @@ class MessageAlertView @JvmOverloads constructor(
                     text = getString(R.styleable.MessageAlertView_action2)
                     isVisible = hasAction2
                 }
-                divider.isVisible = hasAction2
 
                 val hasAction3 = hasValue(R.styleable.MessageAlertView_action3)
                 action3.apply {
@@ -127,7 +126,6 @@ class MessageAlertView @JvmOverloads constructor(
     fun onAction3(listener: OnClickListener) {
         binding.action3.setOnClickListener(listener)
     }
-
 
     fun showAction3Progress() {
         binding.action3.isEnabled = false
