@@ -13,6 +13,18 @@ jobs:
     runs-on: [ self-hosted, Android ]
 
     steps:
+      - name: Notify KChat
+        env:
+          KCHAT_TESTS_WEBHOOK_URL: ${{ secrets.KCHAT_TESTS_WEBHOOK_URL }}
+        run: |
+          RUN_URL="test_url"
+
+          MESSAGE="Test"
+
+          curl -s -X POST "$KCHAT_TESTS_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"$MESSAGE\"}"
+
       - name: Checkout the code
         uses: actions/checkout@v5.0.0
         with:
