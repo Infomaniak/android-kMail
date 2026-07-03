@@ -773,11 +773,7 @@ class ThreadAdapter(
 
         bindUnsubscribe(messageUi)
         bindAcknowledge(messageUi)
-        // if (message.reminder != null) { // TODO: Uncomment this when the backend is ready to send the reminder date
-        bindRequestResponseAlert(message)
-        bindReminderAlert(message)
-        bindEndReminderAlert(message)
-        // }
+        bindReminder(message)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -853,31 +849,49 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindRequestResponseAlert(message: Message) {
+    private fun ItemMessageBinding.bindRequestResponseAlert(message: Message, reminder: Date, isReminderExpired: Boolean) {
         requestResponseAlert.setActionsVisibility(shouldDisplayAction = false)
         val senderNames = message.from.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, senderNames)
 
+        val pluralsRes = if (isReminderExpired) R.plurals.reminderAfterHeaderTitle else R.plurals.reminderBeforeHeaderTitle
+        val formattedDate = reminder.format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME)
         requestResponseAlert.apply {
             isVisible = true
             setDescription(
                 context.resources.getQuantityString(
-                    R.plurals.reminderBeforeHeaderTitle,
+                    pluralsRes,
                     message.from.size,
                     formatNamesList,
-                    message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME) // TODO: Use real reminder date
+                    formattedDate,
                 )
-            ) // TODO: change dynamically when the reminder expires
+            )
         }
     }
 
-    private fun ItemMessageBinding.bindReminderAlert(message: Message) {
+    private fun ItemMessageBinding.bindReminder(message: Message) {
+        reminderAlert.isGone = true
+        endReminderAlert.isGone = true
+        requestResponseAlert.isGone = true
+        message.reminder?.date?.toDate()?.let { reminderDate ->
+            val now = Date()
+            val isExpired = reminderDate.before(now)
+            bindRequestResponseAlert(message, reminderDate, isExpired)
+            if (isExpired) {
+                bindEndReminderAlert(message, reminderDate)
+            } else {
+                bindReminderAlert(message, reminderDate)
+            }
+        }
+    }
+
+    private fun ItemMessageBinding.bindReminderAlert(message: Message, reminderDate: Date) {
         reminderAlert.setActionsVisibility(shouldDisplayAction = true)
 
         reminderAlert.setDescription(
             context.getString(
                 R.string.callIfNoResponseHeaderTitle,
-                message.displayDate.toDate().format(FORMAT_DATE_DAY_MONTH), // TODO: Use real reminder date
+                reminderDate.format(FORMAT_DATE_DAY_MONTH),
             ),
         )
 
@@ -895,7 +909,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindEndReminderAlert(message: Message) {
+    private fun ItemMessageBinding.bindEndReminderAlert(message: Message, reminderDate: Date) {
         endReminderAlert.setActionsVisibility(shouldDisplayAction = true)
         val recipientsNames = message.allRecipients.map { it.name.ifBlank { it.email } }
         val formatNamesList = formatNamesList(context, recipientsNames)
@@ -904,7 +918,7 @@ class ThreadAdapter(
             context.getString(
                 R.string.reminderNoResponseHeaderTitle,
                 formatNamesList,
-                message.displayDate.toDate().format(FORMAT_DATE_DAY_MONTH), // TODO: Use real reminder date
+                reminderDate.format(FORMAT_DATE_DAY_MONTH),
             ),
         )
 
