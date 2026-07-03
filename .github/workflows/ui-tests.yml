@@ -47,14 +47,15 @@ jobs:
           name: ui-test-report
           path: app/build/reports/androidTests/managedDevice/debug/flavors/standard/allDevices
 
-      - name: Create Github issue with tests failure
+      - name: Notify KChat
         if: failure()
-        uses: actions/github-script@v7.0.1
-        with:
-          script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'UI tests failure',
-              body: 'Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.',
-            })
+        env:
+          KCHAT_TESTS_WEBHOOK_URL: ${{ secrets.KCHAT_TESTS_WEBHOOK_URL }}
+        run: |
+           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+           MESSAGE=":rotating_light: *Official Communication from CI JinPing*\n\nAn act of software disharmony has been detected.\n\nRepository: ${{ github.repository }}\nWorkflow run: $RUN_URL\n\nThe Central Committee requires immediate correction.\nThe failing tests have been documented.\nResistance is futile. Green pipeline is mandatory."
+
+           curl -s -X POST "$KCHAT_TESTS_WEBHOOK_URL" \
+             -H "Content-Type: application/json" \
+           -d "{\"text\": \"$MESSAGE\"}"
