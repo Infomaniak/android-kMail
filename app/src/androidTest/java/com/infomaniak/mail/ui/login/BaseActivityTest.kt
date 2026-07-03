@@ -22,11 +22,15 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.Scenarios.grantPermissions
 import com.infomaniak.mail.ui.Scenarios.login
 import com.infomaniak.mail.ui.Scenarios.toggleAnimations
+import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.utils.Env
 import org.junit.After
 import org.junit.Before
@@ -35,6 +39,7 @@ import org.junit.rules.RuleChain
 import org.junit.rules.Timeout
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
+import kotlin.time.Duration.Companion.seconds
 
 open class BaseActivityTest(startingActivity: KClass<out ComponentActivity>, private val loginDirectly: Boolean = true) {
 
@@ -62,9 +67,16 @@ open class BaseActivityTest(startingActivity: KClass<out ComponentActivity>, pri
 
         grantPermissions(device, permissions, packageName)
 
+        // Disable AI discovery bottom sheet for tests to avoid interruptions
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        LocalSettings.getInstance(context).showAiDiscoveryBottomSheet = false
+
         if (loginDirectly) {
             composeTestRule.onNodeWithTag("button_login_onboarding").performClick()
             login(Env.UI_TEST_ACCOUNT_EMAIL, Env.UI_TEST_ACCOUNT_PASSWORD)
+
+            // Waiting a little bit to let the app load
+            onView(isRoot()).perform(waitFor(3.seconds))
         }
     }
 

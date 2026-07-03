@@ -250,6 +250,7 @@ dependencies {
     androidTestImplementation(core.stdlib)
     androidTestImplementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.espresso.intents)
     androidTestImplementation(libs.espresso.web)
     androidTestImplementation(libs.hamcrest)
     androidTestImplementation(libs.junit.ktx)
