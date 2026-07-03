@@ -1016,7 +1016,7 @@ class NewMessageFragment : Fragment() {
     private fun processScheduleConfig(): Boolean {
         val scheduleConfig = newMessageViewModel.scheduleConfig.value
         return if (scheduleConfig is ScheduleConfig.Scheduled) {
-            if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds > System.currentTimeMillis()) {
+            if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()) {
                 newMessageViewModel.setScheduleDate(Date(scheduleConfig.epochMillis))
                 true
             } else {
@@ -1060,7 +1060,6 @@ class NewMessageFragment : Fragment() {
                 MainActivity.DRAFT_ACTION_KEY,
                 when {
                     isScheduled -> DraftAction.SCHEDULE.name
-                    isReminder -> DraftAction.REMINDER.name
                     else -> DraftAction.SEND.name
                 },
             )
@@ -1068,9 +1067,8 @@ class NewMessageFragment : Fragment() {
         }
 
         fun sendEmail() {
-            newMessageViewModel.draftAction = when { // TODO: add an other DraftAction if it's reminder + schedule ?
+            newMessageViewModel.draftAction = when {
                 isScheduled -> DraftAction.SCHEDULE
-                isReminder -> DraftAction.REMINDER
                 else -> DraftAction.SEND
             }
             setSnackbarActivityResult()

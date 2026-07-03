@@ -405,34 +405,11 @@ class MailActionsManager(
                 }
             }
         }
-        
-        suspend fun executeReminderAction() = with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
-            // TODO: Change this when we will have a specific API for reminders
-            when {
-                isSuccess() -> {
-                    realmActionOnDraft = deleteDraftCallback(draft)
-                    scheduledMessageEtop = data?.scheduledMessageEtop
-                    cancelResource = data?.cancelResourceUrl
-                }
-                error?.exception is SerializationException -> {
-                    realmActionOnDraft = deleteDraftCallback(draft)
-                    Sentry.captureMessage("Return JSON for SendDraft API call was modified", SentryLevel.ERROR) { scope ->
-                        scope.setExtra("Is data null ?", "${data == null}")
-                        scope.setExtra("Error code", error?.code.toString())
-                        scope.setExtra("Error description", error?.description.toString())
-                    }
-                }
-                else -> {
-                    retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
-                }
-            }
-        }
 
         when (draft.action) {
             DraftAction.SAVE -> executeSaveAction()
             DraftAction.SEND, DraftAction.SEND_REACTION -> executeSendAction()
             DraftAction.SCHEDULE -> executeScheduleAction()
-            DraftAction.REMINDER -> executeReminderAction()
             null -> Unit
         }
 

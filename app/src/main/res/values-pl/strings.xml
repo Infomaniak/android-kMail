@@ -686,8 +686,6 @@
     <string name="snackbarMoveCancelled">Przeniesienie anulowane</string>
     <string name="snackbarPasswordCopied">Hasło skopiowane</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numer skopiowany do schowka</string>
-    <string name="snackbarReminder">Trwa tworzenie przypomnienia</string>
-    <string name="snackbarReminderSaved">Przypomnienie zostało ustawione na %s</string>
     <string name="snackbarReportPhishingConfirmation">Pomyślnie zgłoszono</string>
     <string name="snackbarRestorationLaunched">Uruchamianie przywracania</string>
     <string name="snackbarSaveInDraft">Twoja wiadomość została zapisana w wersjach roboczych.</string>

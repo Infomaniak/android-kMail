@@ -24,5 +24,4 @@ enum class DraftAction(val apiCallValue: String, val matomoName: MatomoMail.Mato
     SEND("send", MatomoMail.MatomoName.SendMail),
     SEND_REACTION("send_reaction", MatomoMail.MatomoName.SendReaction),
     SCHEDULE("schedule", MatomoMail.MatomoName.ScheduleDraft),
-    REMINDER("reminder", MatomoMail.MatomoName.ReminderDraft),
 }

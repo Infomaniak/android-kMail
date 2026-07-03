@@ -652,8 +652,6 @@
     <string name="snackbarMoveCancelled">Flytning annulleret</string>
     <string name="snackbarPasswordCopied">Adgangskode kopieret</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopieret til udklipsholderen</string>
-    <string name="snackbarReminder">Påmindelsen oprettes</string>
-    <string name="snackbarReminderSaved">Påmindelsen er indstillet til %s</string>
     <string name="snackbarReportPhishingConfirmation">Succesfuldt rapporteret</string>
     <string name="snackbarRestorationLaunched">Starter gendannelsen</string>
     <string name="snackbarSaveInDraft">Din besked er blevet gemt i kladder.</string>

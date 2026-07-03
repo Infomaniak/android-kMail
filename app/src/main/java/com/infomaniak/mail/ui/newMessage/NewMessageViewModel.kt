@@ -1192,7 +1192,6 @@ class NewMessageViewModel @Inject constructor(
             DraftAction.SAVE -> showSaveToast(isFinishing, isTaskRoot)
             DraftAction.SEND, DraftAction.SEND_REACTION -> showSendToast(isTaskRoot)
             DraftAction.SCHEDULE -> showScheduleToast(isTaskRoot)
-            DraftAction.REMINDER -> showReminderToast(isTaskRoot)
         }
     }
 
@@ -1210,10 +1209,6 @@ class NewMessageViewModel @Inject constructor(
 
     private fun showScheduleToast(isTaskRoot: Boolean) {
         if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
-    }
-
-    private fun showReminderToast(isTaskRoot: Boolean) {
-        if (isTaskRoot) appContext.showToast(R.string.snackbarReminder)
     }
 
     private fun MutableLiveData<UiRecipients>.addRecipientThenSetValue(recipient: Recipient) {
