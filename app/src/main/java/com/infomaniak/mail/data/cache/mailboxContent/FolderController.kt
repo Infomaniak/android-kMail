@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.content.Context
 import com.infomaniak.core.legacy.utils.removeAccents
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.mail.data.api.ApiRoutes.folder
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
@@ -85,7 +86,18 @@ class FolderController @Inject constructor(
 
     suspend fun deleteFolder(id: String, mailbox: Mailbox) {
         mailboxContentRealm().write {
-            getFolderBlocking(id, realm = this)?.let { folder -> deleteLocalFolder(mailbox, folder) }
+            getFolderBlocking(id, realm = this)?.let { parentFolder ->
+                parentFolder.children
+                    .flattenFolderChildren()
+                    .map(Folder::id)
+                    .asReversed()
+                    .forEach { childFolderId ->
+                        getFolderBlocking(childFolderId, realm = this)?.let { childFolder ->
+                            deleteLocalFolder(mailbox, childFolder)
+                        }
+                    }
+                deleteLocalFolder(mailbox, parentFolder)
+            }
         }
     }
 
