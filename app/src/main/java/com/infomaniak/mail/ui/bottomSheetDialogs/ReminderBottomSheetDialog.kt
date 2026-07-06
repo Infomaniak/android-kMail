@@ -99,6 +99,7 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
 
     private fun onPresetSelected(preset: ReminderPreset) {
         setBackNavigationResult(REMINDER_RESULT, preset.delayMinutes)
+        dismiss()
     }
 
     private fun onCustomReminderClicked() {

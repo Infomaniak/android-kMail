@@ -595,9 +595,6 @@ class MainViewModel @Inject constructor(
         )
     }
 
-    fun disabledReminder(){
-        // TODO
-    }
     //region Move
     fun showMoveSnackbar(
         threadsMovedCount: Int,

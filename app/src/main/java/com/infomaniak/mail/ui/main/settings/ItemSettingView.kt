@@ -108,7 +108,7 @@ class ItemSettingView @JvmOverloads constructor(
         }
     }
 
-    fun removeSubtitle(){
+    fun removeSubtitle() {
         binding.subtitle.apply {
             text = null
             isGone = true
@@ -122,7 +122,7 @@ class ItemSettingView @JvmOverloads constructor(
         }
     }
 
-    fun setCheckMark(displayCheckMark: Boolean){
+    fun setCheckMark(displayCheckMark: Boolean) {
         binding.checkMark.isVisible = displayCheckMark
     }
 
