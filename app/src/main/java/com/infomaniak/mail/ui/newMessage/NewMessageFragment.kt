@@ -93,6 +93,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
@@ -158,6 +159,7 @@ class NewMessageFragment : Fragment() {
     private val replaceSignatureScript by lazy { requireContext().getReplaceSignatureScript() }
     private val includeQuotesScript by lazy { requireContext().getIncludeQuotesScript() }
     private val deletedInlineImagesObserverScript by lazy { requireContext().getDeletedInlineImagesObserverScript() }
+    private val commonMentionsCodeScript by lazy { requireContext().getCommonMentionsCodeScript() }
     private val mentionsObserverScript by lazy { requireContext().getEditorMentionsDetectorScript() }
     private val mentionDeletionObserverScript by lazy { requireContext().getMentionDeletionObserverScript() }
     private val editorJsBridgeScript by lazy { requireContext().getEditorJsBridgeScript() }
@@ -840,6 +842,7 @@ class NewMessageFragment : Fragment() {
 
             binding.editorWebView.apply {
                 if (areMentionsAvailable) {
+                    addScript(commonMentionsCodeScript, COMMON_MENTIONS_SCRIPT)
                     addScript(mentionsObserverScript, MENTION_OBSERVER_SCRIPT)
                     addScript(insertMentionScript, INSERT_MENTION_SCRIPT)
                     addScript(mentionDeletionObserverScript, MENTION_DELETION_OBSERVER_SCRIPT)
@@ -1048,6 +1051,7 @@ class NewMessageFragment : Fragment() {
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
     companion object {
+        const val COMMON_MENTIONS_SCRIPT = "common_mentions_code_script"
         const val MENTION_OBSERVER_SCRIPT = "mention_observer_script"
         const val INSERT_MENTION_SCRIPT = "insert_mention_script"
         const val MENTION_DELETION_OBSERVER_SCRIPT = "mention_deletion_observer_script"

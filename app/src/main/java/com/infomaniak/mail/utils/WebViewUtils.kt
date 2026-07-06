@@ -25,6 +25,7 @@ import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
 import com.infomaniak.mail.data.models.javascriptBridge.MessageDisplayJavascriptBridge
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
@@ -51,6 +52,7 @@ class WebViewUtils(context: Context) {
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
+    private val commonMentionsScript by lazy { context.getCommonMentionsCodeScript() }
     private val preventMentionClickScript by lazy { context.getMentionClickObserverScript() }
     private val messageDisplayJsBridgeScript by lazy { context.getMessageDisplayJavascriptBridge() }
 

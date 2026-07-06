@@ -25,30 +25,8 @@ function insertMention(userMail, userName, query) {
     const caretRange = selection.getRangeAt(0);
     if (!caretRange.collapsed) return;
 
-    const editor = getEditor();
-
-    const getBlockParent = (node) => {
-        let current = node;
-        while (current && current !== editor && current.nodeType !== Node.DOCUMENT_NODE) {
-            if (current.nodeType === Node.ELEMENT_NODE) {
-                return current;
-            }
-            current = current.parentNode;
-        }
-        return editor;
-    };
-
     const block = getBlockParent(caretRange.startContainer);
-
-    const preRange = caretRange.cloneRange();
-    if (block?.nodeType === Node.ELEMENT_NODE) {
-        preRange.setStart(block, 0);
-    } else {
-        preRange.selectNodeContents(getEditor());
-    }
-    preRange.setEnd(caretRange.endContainer, caretRange.endOffset);
-
-    const textBeforeCaret = preRange.toString();
+    const textBeforeCaret = getTextBeforeCaret(false);
 
     const searchText = "@" + query;
     const searchIndex = textBeforeCaret.lastIndexOf(searchText);
@@ -96,6 +74,7 @@ function insertMention(userMail, userName, query) {
     replaceRange.setEnd(caretRange.endContainer, caretRange.endOffset);
     replaceRange.deleteContents();
 
+    // Replace by the anchor with the mention information
     const anchor = document.createElement("a");
     anchor.dataset.ikMentionRef = userMail;
     anchor.setAttribute("href", `mailto:${userMail}`);
