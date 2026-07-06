@@ -243,6 +243,7 @@
     <string name="contextMenuPhoneNumberDial">Κλήση</string>
     <string name="contextMenuPhoneNumberSms">Σύνταξη SMS</string>
     <string name="createFolderName">Όνομα φακέλου</string>
+    <string name="createReminderBottomSheetTitle">Προσθήκη υπενθύμισης</string>
     <string name="datePickerTitle">Επιλέξτε ημερομηνία και ώρα</string>
     <string name="dateTitle">Ημερομηνία:</string>
     <plurals name="daysBeforeSendingReminder">

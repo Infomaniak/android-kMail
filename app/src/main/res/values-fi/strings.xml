@@ -243,6 +243,7 @@
     <string name="contextMenuPhoneNumberDial">Soita</string>
     <string name="contextMenuPhoneNumberSms">Kirjoita tekstiviesti</string>
     <string name="createFolderName">Kansion nimi</string>
+    <string name="createReminderBottomSheetTitle">Lisää muistutus</string>
     <string name="datePickerTitle">Valitse päivämäärä ja aika</string>
     <string name="dateTitle">Päivämäärä:</string>
     <plurals name="daysBeforeSendingReminder">

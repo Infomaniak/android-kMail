@@ -58,7 +58,12 @@ class ReminderBottomSheetDialog @Inject constructor() : EdgeToEdgeBottomSheetDia
 
         customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
-        binding.title.text = getString(R.string.reminderBottomSheetTitle)
+        val titleRes = if (navigationArgs.isFromActionsBottomSheet) {
+            R.string.createReminderBottomSheetTitle
+        } else {
+            R.string.reminderBottomSheetTitle
+        }
+        binding.title.text = getString(titleRes)
         createPresetOptions()
         setupCustomOption()
     }

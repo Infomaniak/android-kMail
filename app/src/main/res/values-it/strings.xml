@@ -243,6 +243,7 @@
     <string name="contextMenuPhoneNumberDial">Componi</string>
     <string name="contextMenuPhoneNumberSms">Scrivi un SMS</string>
     <string name="createFolderName">Nome della cartella</string>
+    <string name="createReminderBottomSheetTitle">Aggiungi un promemoria</string>
     <string name="datePickerTitle">Scegli una data e un’ora</string>
     <string name="dateTitle">Data:</string>
     <plurals name="daysBeforeSendingReminder">

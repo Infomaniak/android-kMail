@@ -243,6 +243,7 @@
     <string name="contextMenuPhoneNumberDial">Wählen</string>
     <string name="contextMenuPhoneNumberSms">Eine SMS schreiben</string>
     <string name="createFolderName">Name des Ordners</string>
+    <string name="createReminderBottomSheetTitle">Erinnerung hinzufügen</string>
     <string name="datePickerTitle">Wählen Sie ein Datum und eine Uhrzeit</string>
     <string name="dateTitle">Datum:</string>
     <plurals name="daysBeforeSendingReminder">

@@ -243,6 +243,7 @@
     <string name="contextMenuPhoneNumberDial">Kiezen</string>
     <string name="contextMenuPhoneNumberSms">SMS schrijven</string>
     <string name="createFolderName">Naam van de map</string>
+    <string name="createReminderBottomSheetTitle">Herinnering toevoegen</string>
     <string name="datePickerTitle">Kies een datum en tijd</string>
     <string name="dateTitle">Datum:</string>
     <plurals name="daysBeforeSendingReminder">

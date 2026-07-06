@@ -243,6 +243,7 @@
     <string name="contextMenuPhoneNumberDial">Ring</string>
     <string name="contextMenuPhoneNumberSms">Skriv ett SMS</string>
     <string name="createFolderName">Mappens namn</string>
+    <string name="createReminderBottomSheetTitle">Lägg till en påminnelse</string>
     <string name="datePickerTitle">Välj datum och tid</string>
     <string name="dateTitle">Datum:</string>
     <plurals name="daysBeforeSendingReminder">

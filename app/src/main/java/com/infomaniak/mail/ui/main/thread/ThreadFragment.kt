@@ -913,7 +913,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         getBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET) { messageUid: String ->
             threadViewModel.setMessageForReminder(messageUid)
-            navigateToReminderBottomSheet()
+            navigateToReminderBottomSheet(isFromActionsBottomSheet = true)
         }
 
         getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
@@ -1271,12 +1271,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private fun addReminder(message: Message) {
         threadViewModel.modifyingReminderMessage = message
         message.reminder = null
-        navigateToReminderBottomSheet()
+        navigateToReminderBottomSheet(isFromActionsBottomSheet = false)
     }
 
     private fun modifyReminder(message: Message) {
         threadViewModel.modifyingReminderMessage = message
-        navigateToReminderBottomSheet()
+        navigateToReminderBottomSheet(isFromActionsBottomSheet = false)
     }
 
     private fun followUpDraft(message: Message) {
@@ -1300,13 +1300,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun navigateToReminderBottomSheet() {
+    private fun navigateToReminderBottomSheet(isFromActionsBottomSheet: Boolean) {
         val mailbox = mainViewModel.currentMailbox.value ?: return
         safeNavigate(
             resId = R.id.reminderBottomSheetDialog,
             args = ReminderBottomSheetDialogArgs(
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
+                isFromActionsBottomSheet = isFromActionsBottomSheet,
             ).toBundle(),
         )
     }

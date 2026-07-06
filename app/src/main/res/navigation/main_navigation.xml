@@ -312,6 +312,9 @@
         <argument
             android:name="isAdmin"
             app:argType="boolean" />
+        <argument
+            android:name="isFromActionsBottomSheet"
+            app:argType="boolean" />
     </dialog>
 
     <fragment
