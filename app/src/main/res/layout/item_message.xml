@@ -187,6 +187,18 @@
                 android:contentDescription="@string/contentDescriptionOpenMailActions"
                 app:icon="@drawable/ic_param_dots" />
 
+            <ImageView
+                android:id="@+id/iconReminder"
+                android:layout_width="@dimen/largeIconSize"
+                android:layout_height="@dimen/largeIconSize"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:background="@drawable/bg_reminder_icon"
+                android:contentDescription="@string/contentDescriptionIconReminder"
+                android:padding="4dp"
+                android:src="@drawable/ic_alarm_clock"
+                android:visibility="visible"
+                app:tint="?attr/colorPrimary" />
+
             <TextView
                 android:id="@+id/sendingProgressText"
                 android:layout_width="wrap_content"
