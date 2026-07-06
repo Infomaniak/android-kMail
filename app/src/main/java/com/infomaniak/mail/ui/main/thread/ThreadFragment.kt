@@ -109,6 +109,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.DisplayType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.NotifyType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ReminderAction
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
@@ -872,16 +873,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(REMINDER_RESULT) { delayMinutes: Int ->
-            val message = threadViewModel.modifyingReminderMessage
-            if (message == null) {
-                snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
-                return@getBackNavigationResult
+            when (val action = threadViewModel.currentReminderAction) {
+                null -> snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+                is ReminderAction.Add -> threadViewModel.addReminder(action.message, delayMinutes)
+                is ReminderAction.Modify -> threadViewModel.modifyReminder(action.message, delayMinutes)
             }
-            if (message.reminder == null) {
-                threadViewModel.addReminder(message, delayMinutes)
-            } else {
-                threadViewModel.modifyReminder(message, delayMinutes)
-            }
+            threadViewModel.clearReminderAction()
         }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
@@ -913,7 +910,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         getBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET) { messageUid: String ->
             threadViewModel.setMessageForReminder(messageUid)
-            navigateToReminderBottomSheet(isFromActionsBottomSheet = true)
+            navigateToReminderBottomSheet(isAddingNewReminder = true)
         }
 
         getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
@@ -1269,14 +1266,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun addReminder(message: Message) {
-        threadViewModel.modifyingReminderMessage = message
-        message.reminder = null
-        navigateToReminderBottomSheet(isFromActionsBottomSheet = false)
+        threadViewModel.currentReminderAction = ReminderAction.Add(message)
+        navigateToReminderBottomSheet(isAddingNewReminder = true)
     }
 
     private fun modifyReminder(message: Message) {
-        threadViewModel.modifyingReminderMessage = message
-        navigateToReminderBottomSheet(isFromActionsBottomSheet = false)
+        threadViewModel.currentReminderAction = ReminderAction.Modify(message)
+        navigateToReminderBottomSheet(isAddingNewReminder = false)
     }
 
     private fun followUpDraft(message: Message) {
@@ -1300,14 +1296,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
-    private fun navigateToReminderBottomSheet(isFromActionsBottomSheet: Boolean) {
+    private fun navigateToReminderBottomSheet(isAddingNewReminder: Boolean) {
         val mailbox = mainViewModel.currentMailbox.value ?: return
         safeNavigate(
             resId = R.id.reminderBottomSheetDialog,
             args = ReminderBottomSheetDialogArgs(
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
-                isFromActionsBottomSheet = isFromActionsBottomSheet,
+                isAddingNewReminder = isAddingNewReminder,
             ).toBundle(),
         )
     }

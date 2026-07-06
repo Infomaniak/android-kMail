@@ -245,7 +245,11 @@ class ThreadViewModel @Inject constructor(
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
     // Save the message whose reminder we're modifying, so we can retrieve it when the bottom sheet returns
-    var modifyingReminderMessage: Message? = null
+    var currentReminderAction: ReminderAction? = null
+
+    fun clearReminderAction() {
+        currentReminderAction = null
+    }
 
     val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils
         .waitInitMediator(currentMailboxLive, threadLive)
@@ -802,7 +806,9 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun setMessageForReminder(messageUid: String) = viewModelScope.launch {
-        modifyingReminderMessage = messageController.getMessage(messageUid)
+        messageController.getMessage(messageUid)?.let { message ->
+            currentReminderAction = ReminderAction.Add(message)
+        }
     }
 
     fun addReminder(message: Message, delayMinutes: Int) {
@@ -991,6 +997,11 @@ class ThreadViewModel @Inject constructor(
     sealed interface ThreadOpeningMode {
         val threadUid: String?
         fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>
+    }
+
+    sealed class ReminderAction(open val message: Message) {
+        data class Add(override val message: Message) : ReminderAction(message)
+        data class Modify(override val message: Message) : ReminderAction(message)
     }
 
     inner class SingleMessage(val messageUid: String) : ThreadOpeningMode {

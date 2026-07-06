@@ -313,7 +313,7 @@
             android:name="isAdmin"
             app:argType="boolean" />
         <argument
-            android:name="isFromActionsBottomSheet"
+            android:name="isAddingNewReminder"
             app:argType="boolean" />
     </dialog>
 
