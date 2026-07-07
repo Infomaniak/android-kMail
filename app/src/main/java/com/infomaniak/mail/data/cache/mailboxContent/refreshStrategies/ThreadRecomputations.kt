@@ -91,8 +91,7 @@ object ThreadRecomputations {
     }
 
     private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
-        val rawAliases = mailbox?.aliases
-        val normalizedAliases = rawAliases?.map { it.lowercase() }?.toSet() ?: emptySet()
+        val normalizedAliases = mailbox?.aliases?.mapTo(mutableSetOf()) { it.lowercase() } ?: emptySet()
 
         allMessages.forEach { message ->
             processMessage(message, normalizedAliases)
