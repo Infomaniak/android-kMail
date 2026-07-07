@@ -31,6 +31,7 @@ import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewH
 class SwitchUserAdapter(
     val currentUserId: Int,
     val onChangingUserAccount: ((User) -> Unit),
+    val onOpenContactCard: ((User) -> Unit),
 ) : Adapter<SwitchUserAccountViewHolder>() {
 
     private var accounts: List<User> = emptyList()
@@ -57,10 +58,13 @@ class SwitchUserAdapter(
         userMailAddress.text = account.email
         updateSelectedUi(position)
         accountCardview.setOnClickListener { selectAccount(position) }
+        qrcode.setOnClickListener { if (account.id == currentUserId) onOpenContactCard(account) }
     }
 
     private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
-        checkmark.isVisible = accounts[position].id == currentUserId
+        val isCurrentUser = accounts[position].id == currentUserId
+        checkmark.isVisible = isCurrentUser
+        qrcode.isVisible = isCurrentUser
     }
 
     private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])

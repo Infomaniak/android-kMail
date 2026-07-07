@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -82,6 +83,9 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
                 switchUserViewModel.switchAccount(user)
             }
         },
+        onOpenContactCard = { user ->
+            if (user.id == AccountUtils.currentUserId) openContactCard()
+        },
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -135,5 +139,10 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
             halloween.playAnimation()
         }
+    }
+
+    private fun openContactCard() {
+        findNavController().navigate(R.id.contactCardFragment)
+        dismiss()
     }
 }

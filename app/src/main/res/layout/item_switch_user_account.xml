@@ -77,12 +77,22 @@
                 android:id="@+id/checkmark"
                 android:layout_width="@dimen/mediumIconSize"
                 android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
+                android:layout_marginEnd="@dimen/marginStandardSmall"
                 android:contentDescription="@string/contentDescriptionAccountSelection"
                 android:src="@drawable/ic_check"
                 app:layout_constraintBottom_toBottomOf="@id/userAvatar"
+                app:layout_constraintEnd_toStartOf="@id/qrcode"
+                app:layout_constraintTop_toTopOf="@id/userAvatar"
+                app:tint="?android:attr/colorPrimary" />
+
+            <ImageView
+                android:id="@+id/qrcode"
+                android:layout_width="@dimen/mediumIconSize"
+                android:layout_height="@dimen/mediumIconSize"
+                android:contentDescription="todo"
+                android:src="@drawable/ic_qrcode"
+                app:layout_constraintBottom_toBottomOf="@id/userAvatar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/userName"
                 app:layout_constraintTop_toTopOf="@id/userAvatar"
                 app:tint="?android:attr/colorPrimary" />
 
