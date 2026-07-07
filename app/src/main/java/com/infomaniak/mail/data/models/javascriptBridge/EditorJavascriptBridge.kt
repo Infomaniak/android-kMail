@@ -50,7 +50,6 @@ class EditorJavascriptBridge(
             Json.decodeFromString<List<String>>(refsJson)
                 .map(String::trim)
                 .filter(String::isNotBlank)
-                .toList()
         }.onFailure {
             SentryLog.e(TAG, "Failed to parse mention refs", it)
         }.getOrNull() ?: return
