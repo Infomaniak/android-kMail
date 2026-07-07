@@ -25,12 +25,11 @@ import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
 import com.infomaniak.mail.data.models.javascriptBridge.MessageDisplayJavascriptBridge
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionClickObserverScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionClickHandlerScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
@@ -52,8 +51,7 @@ class WebViewUtils(context: Context) {
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
-    private val commonMentionsScript by lazy { context.getCommonMentionsCodeScript() }
-    private val preventMentionClickScript by lazy { context.getMentionClickObserverScript() }
+    private val mentionClickHandlerScript by lazy { context.getMentionClickHandlerScript() }
     private val messageDisplayJsBridgeScript by lazy { context.getMessageDisplayJavascriptBridge() }
 
     fun processHtmlForPrint(
@@ -73,7 +71,7 @@ class WebViewUtils(context: Context) {
         aliases: List<String>,
     ): String = with(HtmlFormatter(html)) {
         addCommonDisplayContent(isDisplayedInDarkMode, aliases)
-        registerScript(preventMentionClickScript)
+        registerScript(mentionClickHandlerScript)
         return@with inject()
     }
 

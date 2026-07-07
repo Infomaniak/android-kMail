@@ -27,3 +27,7 @@ function reportError(error, scriptFirstLine, messageUid) {
 function webviewFinishedLoading() {
     globalThis.kmail.webviewFinishedLoading();
 }
+
+function openMentionContact(email, name) {
+    globalThis.kmail.openMentionContact(email, name)
+}

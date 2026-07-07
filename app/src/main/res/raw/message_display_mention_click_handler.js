@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-function observeMentionClick() {
+function handleMentionClick() {
 
     document.addEventListener('click', (event) => {
         const clickedNode = event.target;
@@ -26,7 +26,7 @@ function observeMentionClick() {
 
         event.preventDefault();
         event.stopPropagation();
-        
+
         const email = mention.dataset.ikMentionRef || '';
         if (!email) return;
 
@@ -35,8 +35,8 @@ function observeMentionClick() {
             name = name.substring(1).trim();
         }
 
-        globalThis.kmail?.openMentionContact(email, name)
+        openMentionContact(email, name)
     }, true);
 }
 
-observeMentionClick();
+handleMentionClick();
