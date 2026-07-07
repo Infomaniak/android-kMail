@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function observeEditorMentionClicks() {
+function blockEditorMentionClicks() {
     const closestMention = (node) => node instanceof Element ? node.closest("a[data-ik-mention-ref]") : null;
 
     // Tapping a mention must not blur the editor, otherwise the Android keyboard (IME) closes.
@@ -53,4 +53,4 @@ function observeEditorMentionClicks() {
     );
 }
 
-observeEditorMentionClicks();
+blockEditorMentionClicks();
