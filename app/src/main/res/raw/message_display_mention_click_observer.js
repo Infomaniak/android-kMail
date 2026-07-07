@@ -18,15 +18,15 @@
 function observeMentionClick() {
 
     document.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
         const clickedNode = event.target;
         if (!(clickedNode instanceof Element)) return;
 
         const mention = clickedNode.closest('a[data-ik-mention-ref]');
         if (!mention) return;
 
+        event.preventDefault();
+        event.stopPropagation();
+        
         const email = mention.dataset.ikMentionRef || '';
         if (!email) return;
 
