@@ -79,7 +79,10 @@ function insertMention(userMail, userName, query) {
     anchor.dataset.ikMentionRef = userMail;
     anchor.setAttribute("href", `mailto:${userMail}`);
     anchor.setAttribute("contenteditable", "false");
-    anchor.textContent = `@${userName? userName: userMail}`;
+
+    const mentionText = `@${userName? userName: userMail}`;
+    // Add non-breaking space after emoji to fix Chrome deletion bug
+    anchor.textContent = endsWithEmoji(mentionText) ? mentionText + "\u00A0" : mentionText;
 
     replaceRange.insertNode(anchor);
 
@@ -95,3 +98,8 @@ function insertMention(userMail, userName, query) {
     selection.removeAllRanges();
     selection.addRange(newCaretRange);
 }
+
+const endsWithEmoji = (text) => {
+    // Matches an emoji at the end (supports ZWJ sequences like 👨‍👩‍👧‍👦)
+    return /(?:\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?)*)$/u.test(text);
+};
