@@ -77,7 +77,7 @@
                 android:id="@+id/checkmark"
                 android:layout_width="@dimen/mediumIconSize"
                 android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
+                android:layout_marginEnd="@dimen/marginStandardMedium"
                 android:contentDescription="@string/contentDescriptionAccountSelection"
                 android:src="@drawable/ic_check"
                 app:layout_constraintBottom_toBottomOf="@id/userAvatar"
@@ -87,10 +87,12 @@
 
             <ImageView
                 android:id="@+id/qrcode"
-                android:layout_width="@dimen/mediumIconSize"
-                android:layout_height="@dimen/mediumIconSize"
+                android:layout_width="@dimen/largeIconSize"
+                android:layout_height="@dimen/largeIconSize"
+                android:padding="@dimen/marginStandardSmall"
                 android:contentDescription="todo"
                 android:src="@drawable/ic_qrcode"
+                android:background="@drawable/bg_reminder_icon"
                 app:layout_constraintBottom_toBottomOf="@id/userAvatar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/userAvatar"
