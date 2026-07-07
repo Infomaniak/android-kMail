@@ -207,8 +207,8 @@ class ContactAdapter(
         // toSearchableForm doesn't include trim() since we need to search in the form "[name] [lastname]"
         val searchTerm = if (isForRecipients) constraint.standardize() else constraint.toSearchableForm()
         val finalUserList = mutableListOf<MatchedContact>()
-        displayAddUnknownContactButton = isForRecipients || (searchTerm.isValidEmail())
-        
+        displayAddUnknownContactButton = isForRecipients || searchTerm.isValidEmail()
+
         for (contact in allContacts) {
             val matchedContact = getMatchedContact(
                 contact = contact,
