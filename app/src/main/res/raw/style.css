@@ -34,4 +34,5 @@ a[data-ik-mention-ref] {
     display: inline-block;
     margin: 2px 0px;
     word-break: break-all;
+    -webkit-tap-highlight-color: transparent; /* removes default blue tap flash */
 }
