@@ -36,3 +36,7 @@ a[data-ik-mention-ref] {
     word-break: break-all;
     -webkit-tap-highlight-color: transparent; /* removes default blue tap flash */
 }
+
+a[data-ik-mention-ref]:active {
+    opacity: 0.75;
+}
