@@ -33,41 +33,7 @@ function insertMention(userMail, userName, query) {
     if (searchIndex < 0) return;
 
     const mentionStartOffset = searchIndex;
-
-    const getDomPositionForTextOffset = (targetOffset) => {
-        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
-        let traversed = 0;
-        let currentNode = walker.nextNode();
-        let lastNode = null;
-
-        while (currentNode) {
-            lastNode = currentNode;
-            const currentLength = currentNode.textContent.length;
-
-            if (traversed + currentLength >= targetOffset) {
-                return {
-                    node: currentNode,
-                    offset: targetOffset - traversed,
-                };
-            }
-            traversed += currentLength;
-            currentNode = walker.nextNode();
-        }
-
-        if (lastNode) {
-            return {
-                node: lastNode,
-                offset: lastNode.textContent.length,
-            };
-        }
-
-        return {
-            node: block,
-            offset: 0,
-        };
-    };
-
-    const startPos = getDomPositionForTextOffset(mentionStartOffset);
+    const startPos = getDomPositionForTextOffset(mentionStartOffset, block);
 
     const replaceRange = document.createRange();
     replaceRange.setStart(startPos.node, startPos.offset);
@@ -102,4 +68,37 @@ function insertMention(userMail, userName, query) {
 const endsWithEmoji = (text) => {
     // Matches an emoji at the end (supports ZWJ sequences like 👨‍👩‍👧‍👦)
     return /(?:\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?)*)$/u.test(text);
+};
+
+const getDomPositionForTextOffset = (targetOffset, block) => {
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+    let traversed = 0;
+    let currentNode = walker.nextNode();
+    let lastNode = null;
+
+    while (currentNode) {
+        lastNode = currentNode;
+        const currentLength = currentNode.textContent.length;
+
+        if (traversed + currentLength >= targetOffset) {
+            return {
+                node: currentNode,
+                offset: targetOffset - traversed,
+            };
+        }
+        traversed += currentLength;
+        currentNode = walker.nextNode();
+    }
+
+    if (lastNode) {
+        return {
+            node: lastNode,
+            offset: lastNode.textContent.length,
+        };
+    }
+
+    return {
+        node: block,
+        offset: 0,
+    };
 };
