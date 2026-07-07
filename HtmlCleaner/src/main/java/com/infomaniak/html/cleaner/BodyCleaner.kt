@@ -100,8 +100,8 @@ internal class BodyCleaner {
     fun clean(dirtyDocument: Document): Document {
         val cleanedDocument = cleaner.clean(dirtyDocument)
 
-        // We don't want to accept the attribute contenteditable, but we need to keep contenteditable="false" for mentions to work
-        // properly. So we remove all contenteditable attributes, and then re-add contenteditable="false" for mentions.
+        // `contenteditable` isn't in the allowlist, so it gets removed during cleaning.
+        // Re-add contenteditable="false" on mention anchors so they stay non-editable.
         cleanedDocument.select("a").forEach { anchor ->
             if (anchor.hasAttr(MENTION_ATTRIBUTE)) {
                 anchor.attr("contenteditable", "false")
