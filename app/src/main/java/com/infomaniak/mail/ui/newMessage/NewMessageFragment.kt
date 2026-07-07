@@ -505,7 +505,7 @@ class NewMessageFragment : Fragment() {
             val selfEmails = newMessageViewModel.currentMailbox().aliases
             val formatMentionsStyle = context?.getMentionsEditorStyle(selfEmails)
             if (formatMentionsStyle != null) {
-                binding.editorWebView.addCss(formatMentionsStyle)
+                binding.editorWebView.addCss(formatMentionsStyle, MENTIONS_STYLE)
             }
         }
     }
@@ -841,6 +841,8 @@ class NewMessageFragment : Fragment() {
             val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
 
             binding.editorWebView.apply {
+                addScript(removeMentionsScript)
+
                 if (areMentionsAvailable) {
                     addScript(commonMentionsCodeScript, COMMON_MENTIONS_SCRIPT)
                     addScript(mentionsObserverScript, MENTION_OBSERVER_SCRIPT)
@@ -848,7 +850,18 @@ class NewMessageFragment : Fragment() {
                     addScript(mentionDeletionObserverScript, MENTION_DELETION_OBSERVER_SCRIPT)
                     addMentionsStyle()
                 } else {
-                    evaluateJavascript(removeMentionsScript, null)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        executeJsMethodWhenEditorIsSetup(
+                            JsExecutableMethod(
+                                "removeMentionScripts",
+                                COMMON_MENTIONS_SCRIPT,
+                                MENTION_OBSERVER_SCRIPT,
+                                INSERT_MENTION_SCRIPT,
+                                MENTION_DELETION_OBSERVER_SCRIPT,
+                                MENTIONS_STYLE,
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -1055,5 +1068,6 @@ class NewMessageFragment : Fragment() {
         const val MENTION_OBSERVER_SCRIPT = "mention_observer_script"
         const val INSERT_MENTION_SCRIPT = "insert_mention_script"
         const val MENTION_DELETION_OBSERVER_SCRIPT = "mention_deletion_observer_script"
+        const val MENTIONS_STYLE = "mentions_style"
     }
 }
