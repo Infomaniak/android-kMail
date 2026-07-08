@@ -503,10 +503,8 @@ class NewMessageFragment : Fragment() {
     private fun addMentionsStyle() {
         viewLifecycleOwner.lifecycleScope.launch {
             val selfEmails = newMessageViewModel.currentMailbox().aliases
-            val formatMentionsStyle = context?.getMentionsEditorStyle(selfEmails)
-            if (formatMentionsStyle != null) {
-                binding.editorWebView.addCss(formatMentionsStyle, MENTIONS_STYLE)
-            }
+            val formatMentionsStyle = requireContext().getMentionsEditorStyle(selfEmails)
+            binding.editorWebView.addCss(formatMentionsStyle, MENTIONS_STYLE)
         }
     }
 
