@@ -117,7 +117,7 @@ class ThreadAdapter(
     private val isSpamFilterActivated: () -> Boolean = { false },
     private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
-    private val aliases: () -> List<String> = { emptyList() },
+    private val aliases: () -> List<String>,
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {

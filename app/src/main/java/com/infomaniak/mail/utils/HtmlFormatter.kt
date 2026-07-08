@@ -223,7 +223,6 @@ class HtmlFormatter(private val html: String) {
         }
 
         fun Context.getCustomDarkMode(aliases: List<String>): String {
-            if (aliases.isEmpty()) return ""
             val selectors = aliases.joinToString(", ") { alias ->
                 "a[${MENTION_ATTRIBUTE}='$alias']"
             }
@@ -253,7 +252,6 @@ class HtmlFormatter(private val html: String) {
         )
 
         fun Context.getMentionsStyle(aliases: List<String>): String {
-            if (aliases.isEmpty()) return ""
             val selectors = aliases.joinToString(", ") { alias ->
                 "a[${MENTION_ATTRIBUTE}='$alias']"
             }
@@ -261,7 +259,6 @@ class HtmlFormatter(private val html: String) {
         }
 
         fun Context.getMentionsEditorStyle(aliases: List<String>): String {
-            if (aliases.isEmpty()) return ""
             val selectors = aliases.joinToString(", ") { alias ->
                 "a[${MENTION_ATTRIBUTE}='$alias']"
             }
