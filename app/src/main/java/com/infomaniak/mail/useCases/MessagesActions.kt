@@ -283,12 +283,15 @@ class MessagesActions @Inject constructor(
 
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneFailed()) updateSeenStatus(
-            messagesUids,
-            threadsUids,
-            isSeen = false,
-            hasUnseenMentions = false
-        )
+        if (apiResponses.atLeastOneFailed()) {
+            val hasUnseenMentions = hasUnseenMentions(mailbox, messages)
+            updateSeenStatus(
+                messagesUids,
+                threadsUids,
+                isSeen = false,
+                hasUnseenMentions = hasUnseenMentions
+            )
+        }
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
     }
@@ -301,7 +304,8 @@ class MessagesActions @Inject constructor(
     ) {
         mailboxContentRealm().write {
             if (threadsUids != null) {
-                ThreadController.updateSeenStatus(threadsUids, isSeen, hasUnseenMentions, realm = this)
+                ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+                ThreadController.updateHasMentions(threadsUids, hasUnseenMentions, realm = this)
             }
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
         }
@@ -314,7 +318,7 @@ class MessagesActions @Inject constructor(
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true, hasUnseenMentions)
+        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true, hasUnseenMentions = false)
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
     }

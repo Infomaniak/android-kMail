@@ -407,11 +407,18 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
             }
         }
 
-        fun updateSeenStatus(threadUids: List<String>, isSeen: Boolean, hasMentions: Boolean, realm: MutableRealm) {
+        fun updateSeenStatus(threadUids: List<String>, isSeen: Boolean, realm: MutableRealm) {
             threadUids.forEach {
                 getThreadBlocking(it, realm)?.apply {
                     unseenMessagesCount = if (isSeen) 0 else 1
-                    hasUnseenMentions = hasMentions
+                }
+            }
+        }
+
+        fun updateHasMentions(threadUids: List<String>, hasMentions: Boolean, realm: MutableRealm) {
+            threadUids.forEach { threadUid ->
+                updateThread(threadUid, realm) {
+                    it?.hasUnseenMentions = hasMentions
                 }
             }
         }
