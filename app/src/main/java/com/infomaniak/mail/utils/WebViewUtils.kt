@@ -42,7 +42,7 @@ import kotlin.math.abs
 
 class WebViewUtils(context: Context) {
 
-    private val customDarkMode by lazy { { aliases: List<String> -> context.getCustomDarkMode(aliases) } }
+    private val customDarkMode: (List<String>) -> String = { aliases -> context.getCustomDarkMode(aliases) }
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
     private val messageDisplayStyle by lazy { context.getMessageDisplayStyle() }
