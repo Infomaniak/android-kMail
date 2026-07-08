@@ -70,35 +70,17 @@ const endsWithEmoji = (text) => {
     return /(?:\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?)*)$/u.test(text);
 };
 
+// Converts a plain-text character offset into a DOM position.
+// Walks all text nodes inside block, subtracting their lengths until it finds the node containing that character position
 const getDomPositionForTextOffset = (targetOffset, block) => {
     const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
-    let traversed = 0;
-    let currentNode = walker.nextNode();
-    let lastNode = null;
+    let node;
 
-    while (currentNode) {
-        lastNode = currentNode;
-        const currentLength = currentNode.textContent.length;
-
-        if (traversed + currentLength >= targetOffset) {
-            return {
-                node: currentNode,
-                offset: targetOffset - traversed,
-            };
-        }
-        traversed += currentLength;
-        currentNode = walker.nextNode();
+    while ((node = walker.nextNode())) {
+        const length = node.textContent.length;
+        if (targetOffset <= length) return { node, offset: targetOffset };
+        targetOffset -= length;
     }
 
-    if (lastNode) {
-        return {
-            node: lastNode,
-            offset: lastNode.textContent.length,
-        };
-    }
-
-    return {
-        node: block,
-        offset: 0,
-    };
+    return { node: block, offset: 0 };
 };
