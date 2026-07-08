@@ -29,6 +29,7 @@ import androidx.test.uiautomator.UiDevice
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.Scenarios.grantPermissions
 import com.infomaniak.mail.ui.Scenarios.login
+import com.infomaniak.mail.ui.Scenarios.logout
 import com.infomaniak.mail.ui.Scenarios.toggleAnimations
 import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.utils.Env
@@ -82,6 +83,7 @@ open class BaseActivityTest(startingActivity: KClass<out ComponentActivity>, pri
 
     @After
     fun cleanUp() {
+        runCatching { logout(composeTestRule) }
         device.toggleAnimations(activate = true)
     }
 
