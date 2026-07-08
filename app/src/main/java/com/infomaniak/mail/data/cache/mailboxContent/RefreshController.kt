@@ -630,7 +630,7 @@ class RefreshController @Inject constructor(
         messageFlags: List<MessageFlags>,
         folderId: String,
         refreshStrategy: RefreshStrategy,
-        mailbox: Mailbox?
+        mailbox: Mailbox
     ): ImpactedFolders {
         val threads = mutableSetOf<Thread>()
         messageFlags.forEach { flags ->
