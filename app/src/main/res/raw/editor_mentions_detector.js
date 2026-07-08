@@ -35,10 +35,6 @@ const extractMentionQuery = (textBeforeCaret) => {
         return null;
     }
 
-    if (!query.trim().includes(" ")) {
-        query = query.trim();
-    }
-
     return query.length > 0 ? query : null;
 };
 
@@ -81,8 +77,19 @@ const handleEnter = (event) => {
     const range = selection.getRangeAt(0);
     const block = getBlockParent(range.startContainer);
 
-    const newBlock = document.createElement('div');
+    const newBlock = moveSiblingsToNewLine(range, block);
 
+    const newRange = document.createRange();
+    newRange.setStart(newBlock, 0);
+    newRange.collapse(true);
+
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+}
+
+// We move all the existing elements (after the caret) on the current line to the new line
+function moveSiblingsToNewLine(range, block) {
+    const newBlock = document.createElement('div');
     const mentionNode = range.startContainer.nextSibling;
     let current = mentionNode;
     while (current) {
@@ -92,13 +99,7 @@ const handleEnter = (event) => {
     }
 
     block.parentNode.insertBefore(newBlock, block.nextSibling);
-
-    const newRange = document.createRange();
-    newRange.setStart(newBlock, 0);
-    newRange.collapse(true);
-
-    selection.removeAllRanges();
-    selection.addRange(newRange);
+    return newBlock;
 }
 
 const observeMention = () => {

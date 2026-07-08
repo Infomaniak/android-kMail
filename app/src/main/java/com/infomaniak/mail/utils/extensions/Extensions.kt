@@ -523,7 +523,9 @@ fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit)
     }
 }
 
-fun CharSequence.toSearchableForm(): String = toString().removeAccents().lowercase()
+fun String.normalizeSpaces(): String = replace(Regex("\\s+"), " ")
+
+fun CharSequence.toSearchableForm(): String = toString().removeAccents().normalizeSpaces().lowercase()
 
 fun CharSequence.standardize(): String = toSearchableForm().trim()
 
