@@ -309,7 +309,7 @@
                     android:layout_width="@dimen/standardIconSize"
                     android:layout_height="@dimen/standardIconSize"
                     android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:background="@drawable/bg_reminder_icon"
+                    android:background="@drawable/background_mention_icon"
                     android:contentDescription="@string/contentDescriptionIconMention"
                     android:padding="@dimen/marginStandardVerySmall"
                     android:src="@drawable/ic_at"
