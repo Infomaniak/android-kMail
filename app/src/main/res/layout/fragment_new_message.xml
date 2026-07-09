@@ -429,7 +429,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/externalBanner"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_max="176dp"
+            app:layout_constraintHeight_max="@dimen/mentionsMaxHeight"
             app:layout_constraintStart_toStartOf="parent"
             tools:itemCount="3"
             tools:listitem="@layout/item_contact"
