@@ -46,7 +46,7 @@ function insertMention(userMail, userName, query) {
     anchor.setAttribute("href", `mailto:${userMail}`);
     anchor.setAttribute("contenteditable", "false");
 
-    const mentionText = `@${userName? userName: userMail}`;
+    const mentionText = `@${userName || userMail}`;
     // Add non-breaking space after emoji to fix Chrome deletion bug
     anchor.textContent = endsWithEmoji(mentionText) ? mentionText + "\u00A0" : mentionText;
 
@@ -67,7 +67,7 @@ function insertMention(userMail, userName, query) {
 
 const endsWithEmoji = (text) => {
     // Matches an emoji at the end (supports ZWJ sequences like 👨‍👩‍👧‍👦)
-    return /(?:\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?)*)$/u.test(text);
+    return /(?:\p{Extended_Pictographic}(?:[\uFE0E\uFE0F])?(?:\u200D\p{Extended_Pictographic}(?:[\uFE0E\uFE0F])?)*)$/u.test(text);
 };
 
 // Converts a plain-text character offset into a DOM position.
