@@ -191,7 +191,6 @@ class NewMessageFragment : Fragment() {
             onAddUnrecognizedContact = ::onAddUnrecognizedContactClicked,
             snackbarManager = snackbarManager,
             getAddressBookWithGroup = null,
-            isForRecipients = false,
         )
     }
 
