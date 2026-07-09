@@ -105,7 +105,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObserverScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsEditorStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.removeMentionsScript
@@ -502,7 +502,7 @@ class NewMessageFragment : Fragment() {
     private fun addMentionsStyle() {
         viewLifecycleOwner.lifecycleScope.launch {
             val selfEmails = newMessageViewModel.currentMailbox().aliases
-            val formatMentionsStyle = requireContext().getMentionsEditorStyle(selfEmails)
+            val formatMentionsStyle = requireContext().getMentionsStyle(selfEmails)
             binding.editorWebView.addCss(formatMentionsStyle, MENTIONS_STYLE)
         }
     }
