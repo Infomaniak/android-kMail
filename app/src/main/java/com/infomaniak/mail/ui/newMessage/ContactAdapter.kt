@@ -51,7 +51,6 @@ class ContactAdapter(
     private val onAddUnrecognizedContact: () -> Unit,
     private val snackbarManager: SnackbarManager,
     private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?,
-    private val isForRecipients: Boolean = true, // if false, the adapter is used for mentions.
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<ContactAutocompletable> = emptyList()
