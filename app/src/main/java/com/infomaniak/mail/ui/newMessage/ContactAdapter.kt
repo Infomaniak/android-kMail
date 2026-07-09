@@ -51,6 +51,7 @@ class ContactAdapter(
     private val onAddUnrecognizedContact: () -> Unit,
     private val snackbarManager: SnackbarManager,
     private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?,
+    private val isForMentions: Boolean = false
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<ContactAutocompletable> = emptyList()
@@ -91,11 +92,16 @@ class ContactAdapter(
         }
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun ItemContactBinding.bindContact(position: Int) = with(matchedContacts[position]) {
         val mergedContact = contact as MergedContact
         contactDetails.apply {
             setMergedContact(mergedContact)
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
+            if (isForMentions) {
+                setBackgroundColor(resources.getColor(R.color.backgroundColorTertiary, context.theme))
+                background = resources.getDrawable(R.drawable.background_mentions, context.theme)
+            }
         }
 
         val isAlreadyUsed = usedEmails.contains(mergedContact.email.standardize())
