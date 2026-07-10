@@ -3,5 +3,3 @@ function removeMentionScripts(...ids) {
         document.getElementById(id)?.remove();
     });
 }
-
-removeMentionScripts();
