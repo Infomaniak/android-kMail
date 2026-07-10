@@ -99,8 +99,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getDeletedInlineImagesObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorBodyScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorJsBridgeScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionClickBlockerScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionPointerEventsHandlerScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionClickHandlerScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionsDetectorScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
@@ -168,8 +167,7 @@ class NewMessageFragment : Fragment() {
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
     private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
-    private val mentionClickBlockerScript by lazy { requireContext().getEditorMentionClickBlockerScript() }
-    private val mentionPointerEventsHandlerScript by lazy { requireContext().getEditorMentionPointerEventsHandlerScript() }
+    private val mentionClickHandlerScript by lazy { requireContext().getEditorMentionClickHandlerScript() }
     private val removeMentionsScript by lazy { requireContext().removeMentionsScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
@@ -514,8 +512,7 @@ class NewMessageFragment : Fragment() {
         addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
-        addScript(mentionClickBlockerScript)
-        addScript(mentionPointerEventsHandlerScript)
+        addScript(mentionClickHandlerScript)
         addScript(removeMentionsScript)
 
         val formattedAiContentScript = setAiContentScript.format(
