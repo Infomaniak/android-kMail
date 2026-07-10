@@ -147,9 +147,7 @@ class WebViewUtils(private val context: Context) {
 
         fun WebView.addCss(css: String, id: String? = null) {
             val escapedStringLiteralId = id?.let { looselyEscapeAsStringLiteralForJs(it) }
-
-            val removePreviousIdScript =
-                escapedStringLiteralId?.let { getRemovePreviousElementByIdScript(escapedStringLiteralId) }
+            val removePreviousIdScript = getRemovePreviousElementByIdScript(escapedStringLiteralId)
             val setId = escapedStringLiteralId?.let { "style.id = ${it};" } ?: ""
 
             val escapedStringLiteralCss = looselyEscapeAsStringLiteralForJs(css)
