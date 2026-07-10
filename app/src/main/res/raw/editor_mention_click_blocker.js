@@ -19,27 +19,6 @@
 function blockEditorMentionClicks() {
     const closestMention = (node) => node instanceof Element ? node.closest("a[data-ik-mention-ref]") : null;
 
-    // Tapping a mention must not blur the editor, otherwise the Android keyboard (IME) closes.
-    // Preventing the default on the pointer-down event stops the WebView from moving the
-    // focus/caret onto the non-editable mention, keeping the editor focused and the IME open.
-    const handleMentionPointerEvent = (event) => {
-        const mention = closestMention(event.target);
-
-        if (mention) {
-            event.preventDefault();
-
-            // move the caret to the right of the mention
-            const selection = globalThis.getSelection();
-            const range = document.createRange();
-            range.setStartAfter(mention);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-    };
-    
-    document.addEventListener("touchstart", handleMentionPointerEvent, { capture: true, passive: false });
-
     // Never navigate to the mailto link when a mention is tapped.
     document.addEventListener(
         "click",
