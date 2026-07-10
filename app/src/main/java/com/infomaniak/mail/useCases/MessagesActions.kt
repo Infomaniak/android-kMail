@@ -304,8 +304,7 @@ class MessagesActions @Inject constructor(
     ) {
         mailboxContentRealm().write {
             if (threadsUids != null) {
-                ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
-                ThreadController.updateHasMentions(threadsUids, hasUnseenMentions, realm = this)
+                ThreadController.updateSeenStatusAndMentions(threadsUids, isSeen, hasUnseenMentions, realm = this)
             }
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
         }
