@@ -512,8 +512,8 @@ class NewMessageFragment : Fragment() {
         addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
-        addScript(mentionClickObserverScript)
         addScript(mentionClickBlockerScript)
+        addScript(removeMentionsScript)
 
         val formattedAiContentScript = setAiContentScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
@@ -840,8 +840,6 @@ class NewMessageFragment : Fragment() {
             val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
 
             binding.editorWebView.apply {
-                addScript(removeMentionsScript)
-
                 if (areMentionsAvailable) {
                     addScript(commonMentionsCodeScript, COMMON_MENTIONS_SCRIPT)
                     addScript(mentionsObserverScript, MENTION_OBSERVER_SCRIPT)
