@@ -570,7 +570,6 @@ class NewMessageFragment : Fragment() {
         }
 
         newMessageViewModel.addMention(email)
-        newMessageViewModel.updateMentionQuery("")
     }
 
     private fun setToolbarEnabledStatus(isEnabled: Boolean) {
