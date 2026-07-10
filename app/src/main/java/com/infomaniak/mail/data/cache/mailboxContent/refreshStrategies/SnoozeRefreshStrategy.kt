@@ -65,7 +65,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     }
 
     override fun processDeletedThread(thread: Thread, realm: MutableRealm, mailbox: Mailbox?) {
-        thread.recomputeThread(mailbox = mailbox)
+        thread.recomputeThread(aliases = mailbox?.aliases)
     }
 
     override fun shouldQueryFolderThreadsOnDeletedUid(): Boolean = true

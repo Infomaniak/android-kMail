@@ -651,7 +651,7 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             refreshStrategy.addFolderToImpactedFolders(thread.folderId, impactedFolders)
-            thread.recomputeThread(realm = this, mailbox = mailbox)
+            thread.recomputeThread(realm = this, aliases = mailbox.aliases)
         }
 
         return impactedFolders
@@ -689,7 +689,7 @@ class RefreshController @Inject constructor(
         impactedThreadsManaged.forEach {
             scope.ensureActive()
 
-            it.recomputeThread(realm = this, mailbox = mailbox)
+            it.recomputeThread(realm = this, aliases = mailbox?.aliases)
             impactedThreadsUnmanaged.add(it.copyFromRealm(depth = 0u))
         }
 

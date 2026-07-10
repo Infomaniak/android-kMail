@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.isSnoozed
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.data.models.thread.Thread
@@ -35,7 +34,7 @@ import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmList
 
 object ThreadRecomputations {
-    fun Thread.recomputeThread(realm: MutableRealm? = null, mailbox: Mailbox? = null) {
+    fun Thread.recomputeThread(realm: MutableRealm? = null, aliases: List<String>? = null) {
 
         messages.sortBy { it.internalDate }
         // All of the following methods should not be inside of Thread to begin with. At least the input list of messages is
@@ -62,7 +61,7 @@ object ThreadRecomputations {
 
         resetThread()
 
-        updateThread(lastMessage, allMessages, mailbox)
+        updateThread(lastMessage, allMessages, aliases)
 
         recomputeMessagesWithContent(allMessages)
 
@@ -90,8 +89,8 @@ object ThreadRecomputations {
         isLastInboxMessageSnoozed = false
     }
 
-    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, mailbox: Mailbox?) {
-        val normalizedAliases = mailbox?.aliases?.mapTo(mutableSetOf()) { it.lowercase() } ?: emptySet()
+    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, aliases: List<String>?) {
+        val normalizedAliases = aliases?.mapTo(mutableSetOf()) { it.lowercase() } ?: emptySet()
 
         allMessages.forEach { message ->
             processMessage(message, normalizedAliases)
