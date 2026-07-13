@@ -106,9 +106,9 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getRemoveElementsByIdScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.removeMentionsScript
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -168,7 +168,7 @@ class NewMessageFragment : Fragment() {
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
     private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
     private val mentionClickHandlerScript by lazy { requireContext().getEditorMentionClickHandlerScript() }
-    private val removeMentionsScript by lazy { requireContext().removeMentionsScript() }
+    private val removeElementsByIdScript by lazy { requireContext().getRemoveElementsByIdScript() }
 
     private val newMessageFragmentArgs: NewMessageFragmentArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
@@ -513,7 +513,7 @@ class NewMessageFragment : Fragment() {
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
         addScript(mentionClickHandlerScript)
-        addScript(removeMentionsScript)
+        addScript(removeElementsByIdScript)
 
         val formattedAiContentScript = setAiContentScript.format(
             INFOMANIAK_SIGNATURE_HTML_CLASS_NAME,
@@ -849,7 +849,7 @@ class NewMessageFragment : Fragment() {
                     viewLifecycleOwner.lifecycleScope.launch {
                         executeJsMethodWhenEditorIsSetup(
                             JsExecutableMethod(
-                                "removeMentionScripts",
+                                "removeElementsById",
                                 COMMON_MENTIONS_SCRIPT,
                                 MENTION_OBSERVER_SCRIPT,
                                 INSERT_MENTION_SCRIPT,
