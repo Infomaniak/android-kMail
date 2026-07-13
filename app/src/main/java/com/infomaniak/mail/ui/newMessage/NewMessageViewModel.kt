@@ -460,9 +460,11 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (draftMode == DraftMode.FOLLOW_UP) {
-            initialBody = BodyContentPayload(
-                appContext.getString(R.string.reminderFollowUpPlaceholderText),
-                BodyContentType.TEXT_PLAIN_WITH_HTML
+            initialBody = BodyContentPayload.bodyOf(
+                BodyContentPayload(
+                    appContext.getString(R.string.reminderFollowUpPlaceholderText),
+                    BodyContentType.TEXT_PLAIN_WITHOUT_HTML
+                )
             )
         }
 
