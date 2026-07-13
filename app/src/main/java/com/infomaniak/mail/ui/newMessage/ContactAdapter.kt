@@ -99,7 +99,6 @@ class ContactAdapter(
             setMergedContact(mergedContact)
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
             if (isForMentions) {
-                setBackgroundColor(resources.getColor(R.color.backgroundColorTertiary, context.theme))
                 background = resources.getDrawable(R.drawable.background_mentions, context.theme)
             }
         }
