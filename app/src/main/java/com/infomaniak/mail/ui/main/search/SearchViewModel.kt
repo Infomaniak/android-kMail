@@ -434,7 +434,11 @@ class SearchViewModel @Inject constructor(
 
     private suspend fun createSearchThreadsFromRemote(remoteThreads: List<Thread>, folder: Folder?) {
         runCatching {
-            val searchThreads = searchUtils.convertRemoteThreadsToSearchThreads(remoteThreads, folder)
+            val searchThreads = searchUtils.convertRemoteThreadsToSearchThreads(
+                remoteThreads,
+                folder,
+                currentMailboxFlow.first().aliases
+            )
             threadController.saveSearchThreads(searchThreads)
         }.getOrElse { exception ->
             exception.printStackTrace()
@@ -454,7 +458,10 @@ class SearchViewModel @Inject constructor(
             featureFlags = featureFlagsFlow.first(),
             localSettings = localSettings
         )
-        val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
+        val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(
+            searchMessages,
+            currentMailboxFlow.first().aliases
+        )
         threadController.saveSearchThreads(searchThreads)
     }
 

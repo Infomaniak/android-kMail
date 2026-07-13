@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.ThreadListUtils.hasUnseenMentions
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
@@ -284,7 +285,7 @@ class MessagesActions @Inject constructor(
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messagesUids)
 
         if (apiResponses.atLeastOneFailed()) {
-            val hasUnseenMentions = hasUnseenMentions(mailbox, messages)
+            val hasUnseenMentions = hasUnseenMentions(mailbox.aliases, messages)
             updateSeenStatus(
                 messagesUids,
                 threadsUids,
@@ -312,7 +313,8 @@ class MessagesActions @Inject constructor(
 
     private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, threadsUids: List<String>? = null): ToggleResult {
         val messagesUids = messages.getUids()
-        val hasUnseenMentions = hasUnseenMentions(mailbox, messages)
+        val hasUnseenMentions = hasUnseenMentions(mailbox.aliases, messages)
+
         updateSeenStatus(messagesUids, threadsUids, isSeen = false, hasUnseenMentions)
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
@@ -320,15 +322,6 @@ class MessagesActions @Inject constructor(
         if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true, hasUnseenMentions = false)
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
-    }
-
-    private fun hasUnseenMentions(
-        mailbox: Mailbox,
-        messages: List<Message>
-    ): Boolean {
-        val rawAliases = mailbox.aliases
-        val normalizedAliases = rawAliases.map { it.lowercase() }.toSet()
-        return messages.flatMap { it.mentions }.any { mention -> mention.lowercase() in normalizedAliases }
     }
     // End Region
 

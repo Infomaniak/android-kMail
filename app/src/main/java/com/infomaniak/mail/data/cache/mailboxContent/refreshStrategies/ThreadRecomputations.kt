@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesId
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.computeReactionsPerMessageId
 import com.infomaniak.mail.data.models.thread.overrideWith
+import com.infomaniak.mail.utils.ThreadListUtils.hasUnseenMentions
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
@@ -34,8 +35,7 @@ import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmList
 
 object ThreadRecomputations {
-    fun Thread.recomputeThread(realm: MutableRealm? = null, aliases: List<String>? = null) {
-
+    fun Thread.recomputeThread(realm: MutableRealm? = null, aliases: List<String>?) {
         messages.sortBy { it.internalDate }
         // All of the following methods should not be inside of Thread to begin with. At least the input list of messages is
         // extracted once so every other following logic is forced to base its processing on this unique list of messages. We
@@ -90,10 +90,8 @@ object ThreadRecomputations {
     }
 
     private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, aliases: List<String>?) {
-        val normalizedAliases = aliases?.mapTo(mutableSetOf()) { it.lowercase() } ?: emptySet()
-
         allMessages.forEach { message ->
-            processMessage(message, normalizedAliases)
+            processMessage(message)
         }
 
         duplicates.forEach { message ->
@@ -101,6 +99,8 @@ object ThreadRecomputations {
             updateSnoozeStatesBasedOn(message)
         }
 
+        hasUnseenMentions = hasUnseenMentions(aliases?.toList() ?: emptyList(), allMessages)
+        
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = allMessages.first().subject
@@ -108,7 +108,7 @@ object ThreadRecomputations {
         isLastInboxMessageSnoozed = allMessages.isLastInboxMessageSnoozed(folderId)
     }
 
-    private fun Thread.processMessage(message: Message, normalizedAliases: Set<String>) {
+    private fun Thread.processMessage(message: Message) {
         messagesIds += message.messageIds
         if (!message.isSeen) unseenMessagesCount++
         from += message.from
@@ -125,13 +125,10 @@ object ThreadRecomputations {
         }
         if (message.hasAttachable) hasAttachable = true
         if (message.isScheduledDraft) numberOfScheduledDrafts++
-        updateMentionsState(message, normalizedAliases)
         updateSnoozeStatesBasedOn(message)
     }
 
     private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
-        if (hasUnseenMentions || message.mentions.isEmpty()) return
-
         val amIMentioned = message.mentions.any { mention ->
             normalizedAliases.contains(mention.lowercase())
         }
