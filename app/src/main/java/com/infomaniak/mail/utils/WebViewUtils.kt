@@ -25,6 +25,7 @@ import android.view.ViewParent
 import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
+import androidx.appcompat.view.ContextThemeWrapper
 import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
 import com.infomaniak.mail.data.models.javascriptBridge.MessageDisplayJavascriptBridge
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.Companion.MENTIONS_STYLE
@@ -38,7 +39,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayJavasc
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.withMode
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -130,6 +130,17 @@ class WebViewUtils(private val context: Context) {
             val uiMode = if (isDisplayedInDarkMode) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
             val contextWithTheme = context.withMode(uiMode)
             return contextWithTheme.getMentionsStyle(aliases)
+        }
+
+        private fun Context.withMode(mode: Int): Context {
+            val config = Configuration(resources.configuration).apply {
+                uiMode = (uiMode and Configuration.UI_MODE_TYPE_MASK) or mode
+            }
+
+            val configContext = createConfigurationContext(config)
+            return ContextThemeWrapper(configContext, 0).apply {
+                theme.setTo(this@withMode.theme)
+            }
         }
 
         fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean, aliases: List<String>) {

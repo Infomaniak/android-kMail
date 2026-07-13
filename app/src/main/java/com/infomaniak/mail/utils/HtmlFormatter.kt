@@ -18,9 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.content.res.Configuration
 import androidx.annotation.RawRes
-import androidx.appcompat.view.ContextThemeWrapper
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import com.infomaniak.mail.R
@@ -253,17 +251,6 @@ class HtmlFormatter(private val html: String) {
                     PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
                 )
             )
-        }
-
-        fun Context.withMode(mode: Int): Context {
-            val config = Configuration(resources.configuration).apply {
-                uiMode = (uiMode and Configuration.UI_MODE_TYPE_MASK) or mode
-            }
-
-            val configContext = createConfigurationContext(config)
-            return ContextThemeWrapper(configContext, 0).apply {
-                theme.setTo(this@withMode.theme)
-            }
         }
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
