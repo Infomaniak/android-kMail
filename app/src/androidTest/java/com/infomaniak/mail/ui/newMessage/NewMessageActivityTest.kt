@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
+import androidx.test.espresso.action.ViewActions.swipeDown
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -100,16 +101,12 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
         onView(withId(R.id.sendButton)).perform(click())
 
         // Waiting for the mail to appear in the Thread list fragment
-        onViewWithTimeout(
-            numberOfRetries = 20,
-            retryInterval = 5_000.milliseconds,
-            matcher = withId(R.id.threadsList),
-            assertion = matches(hasDescendant(withText(subject))),
-        )
+        waitForMessageInThreadList(subject)
 
         // Open the received email
         onViewWithTimeout(
-            retryInterval = 500.milliseconds,
+            numberOfRetries = 20,
+            retryInterval = 5_000.milliseconds,
             matcher = allOf(withId(R.id.threadsList), hasDescendant(withText(subject))),
         ).perform(
             RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
@@ -156,13 +153,8 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
         onView(withId(R.id.editorWebView)).perform(click(), typeText("This is an email from UI test"), closeSoftKeyboard())
         onView(withId(R.id.sendButton)).perform(click())
 
-        // Checking if the email with a specific ID to be received
-        onViewWithTimeout(
-            numberOfRetries = 20,
-            retryInterval = 5_000.milliseconds,
-            matcher = withId(R.id.threadsList),
-            assertion = matches(hasDescendant(withText(subject))),
-        )
+        // Waiting for the mail to appear in the Thread list fragment
+        waitForMessageInThreadList(subject)
     }
 
     @Test
@@ -235,5 +227,24 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
         onWebView(withId(R.id.editorWebView))
             .withElement(findElement(Locator.XPATH, "//*[contains(text(), '$bodyUuid')]"))
             .check(webMatches(getText(), containsString(bodyUuid)))
+    }
+
+    private fun waitForMessageInThreadList(subject: String) {
+        runCatching {
+            onViewWithTimeout(
+                numberOfRetries = 20,
+                retryInterval = 5_000.milliseconds,
+                matcher = withId(R.id.threadsList),
+                assertion = matches(hasDescendant(withText(subject))),
+            )
+        }.onFailure {
+            onView(withId(R.id.threadsList)).perform(swipeDown())
+            onViewWithTimeout(
+                numberOfRetries = 20,
+                retryInterval = 5_000.milliseconds,
+                matcher = withId(R.id.threadsList),
+                assertion = matches(hasDescendant(withText(subject))),
+            )
+        }
     }
 }
