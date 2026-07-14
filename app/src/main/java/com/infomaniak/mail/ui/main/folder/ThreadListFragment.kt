@@ -151,6 +151,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
     private var isFirstTimeRefreshingThreads = true
+    private var shouldAutoLoadOldPage = false
 
     override val searchViewModel: SearchViewModel by activityViewModels()
     override val substituteClassName: String = javaClass.name
@@ -648,6 +649,11 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
             beforeUpdateAdapter = { threads ->
                 threadListViewModel.currentThreadsCount = threads.count()
+                if (threads.count() == 0) {
+                    // We don't need to show load more because we will automatically load more threads
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
+                    binding.swipeRefreshLayout.isRefreshing = true
+                }
                 SentryLog.i(
                     "UI",
                     "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.displayForSentry()})",
@@ -671,6 +677,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             .observe(viewLifecycleOwner) { isDownloading ->
                 if (isDownloading) {
                     showLoadingTimer.start()
+                } else if (shouldAutoLoadOldPage) {
+                    shouldAutoLoadOldPage = false
+                    mainViewModel.getOnePageOfOldMessages()
                 } else {
                     showLoadingTimer.cancel()
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -756,11 +765,19 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private fun observeLoadMoreTriggers() = with(mainViewModel) {
         Utils.waitInitMediator(currentFilter, currentFolderLive).observe(viewLifecycleOwner) { (filter, folder) ->
             runCatchingRealm {
-                val shouldDisplayLoadMore = filter == ThreadFilter.ALL
-                        && folder.cursor != null
-                        && folder.oldMessagesUidsToFetch.isNotEmpty()
-                        && folder.threads.isNotEmpty()
-                threadListAdapter.updateLoadMore(shouldDisplayLoadMore)
+                val hasMoreOldMessages = filter == ThreadFilter.ALL &&
+                        folder.cursor != null &&
+                        folder.oldMessagesUidsToFetch.isNotEmpty()
+
+                if (hasMoreOldMessages) {
+                    shouldAutoLoadOldPage = folder.threads.isEmpty()
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = folder.threads.isNotEmpty())
+                }
+
+                if (shouldAutoLoadOldPage && !downloadThreadsStatusManager.isDownloading.value) {
+                    shouldAutoLoadOldPage = false
+                    getOnePageOfOldMessages()
+                }
             }
         }
     }
