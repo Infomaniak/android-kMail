@@ -649,11 +649,6 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
             beforeUpdateAdapter = { threads ->
                 threadListViewModel.currentThreadsCount = threads.count()
-                if (threads.count() == 0) {
-                    // We don't need to show load more because we will automatically load more threads
-                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
-                    binding.swipeRefreshLayout.isRefreshing = true
-                }
                 SentryLog.i(
                     "UI",
                     "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.displayForSentry()})",
@@ -666,6 +661,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             deletedItemsIndices = ::removeMultiSelectItems
 
             afterUpdateAdapter = { threads ->
+                if (threads.isEmpty()) {
+                    // We don't need to show load more because we will automatically load more threads
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
+                }
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) currentFilter.value = ThreadFilter.ALL
                 if (hasSwitchedToAnotherFolder()) scrollToTop()
             }
@@ -678,6 +677,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 if (isDownloading) {
                     showLoadingTimer.start()
                 } else if (shouldAutoLoadOldPage) {
+                    binding.swipeRefreshLayout.isRefreshing = true
                     shouldAutoLoadOldPage = false
                     mainViewModel.getOnePageOfOldMessages()
                 } else {
