@@ -13,6 +13,7 @@ function getBlockParent(node) {
 };
 
 function getTextBeforeCaret(stripMentions = true) {
+    const anchorMention = "a[data-ik-mention-ref]"
     const selection = globalThis.getSelection();
     if (!selection || selection.rangeCount === 0) return "";
 
@@ -34,7 +35,7 @@ function getTextBeforeCaret(stripMentions = true) {
     const endElement = range.endContainer.nodeType === Node.ELEMENT_NODE
             ? range.endContainer
             : range.endContainer.parentElement;
-    const activeMention = endElement?.closest?.("a[data-ik-mention-ref]");
+    const activeMention = endElement?.closest?.(anchorMention);
 
     if (stripMentions && activeMention && block.contains(activeMention)) {
         preRange.setEndAfter(activeMention); // include full mention, then replace it with space
@@ -44,7 +45,7 @@ function getTextBeforeCaret(stripMentions = true) {
 
     const fragment = preRange.cloneContents();
     if (stripMentions) {
-        fragment.querySelectorAll("a[data-ik-mention-ref]").forEach((mention) => mention.replaceWith(" "));
+        fragment.querySelectorAll(anchorMention).forEach((mention) => mention.replaceWith(" "));
     }
 
     return fragment.textContent;
