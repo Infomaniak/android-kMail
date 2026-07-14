@@ -34,7 +34,6 @@ import androidx.work.Configuration
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
-import com.facebook.stetho.Stetho
 import com.infomaniak.core.auth.AccessTokenUsageInterceptor
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.auth.models.user.User
@@ -180,8 +179,6 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     }
 
     private fun configureDebugMode() {
-        Stetho.initializeWithDefaults(this)
-
         StrictMode.setVmPolicy(
             StrictMode.VmPolicy.Builder().apply {
                 detectActivityLeaks()
