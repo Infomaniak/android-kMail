@@ -67,6 +67,13 @@
                         android:lines="1" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/iconEuria"
+                        style="@style/IconButton"
+                        android:layout_marginEnd="@dimen/threadHorizontalMargin"
+                        android:contentDescription="@string/askEuriaTitle"
+                        app:icon="@drawable/ic_euria" />
+
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/iconFavorite"
                         style="@style/IconButton"
                         android:layout_marginEnd="@dimen/threadHorizontalMargin"
