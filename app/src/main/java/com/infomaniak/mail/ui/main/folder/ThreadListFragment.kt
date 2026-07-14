@@ -772,6 +772,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 if (hasMoreOldMessages) {
                     shouldAutoLoadOldPage = folder.threads.isEmpty()
                     threadListAdapter.updateLoadMore(shouldDisplayLoadMore = folder.threads.isNotEmpty())
+                } else {
+                    shouldAutoLoadOldPage = false
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
                 }
 
                 if (shouldAutoLoadOldPage && !downloadThreadsStatusManager.isDownloading.value) {
