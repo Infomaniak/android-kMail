@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import androidx.annotation.StringRes
 import com.infomaniak.mail.R
 
 sealed class ScheduleConfig {

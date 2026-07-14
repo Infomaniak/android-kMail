@@ -851,8 +851,8 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.bindRequestResponseAlert(message: Message, reminder: Date, isReminderExpired: Boolean) {
         requestResponseAlert.setActionsVisibility(shouldDisplayAction = false)
-        val senderNames = message.from.map { it.name.ifBlank { it.email } }
-        val formatNamesList = formatNamesList(context, senderNames)
+        val fromNames = message.extractFromNames()
+        val formatNamesList = formatNamesList(context, fromNames)
 
         val pluralsRes = if (isReminderExpired) R.plurals.reminderAfterHeaderTitle else R.plurals.reminderBeforeHeaderTitle
         val formattedDate = reminder.format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME)
@@ -891,7 +891,7 @@ class ThreadAdapter(
         reminderAlert.setDescription(
             context.getString(
                 R.string.callIfNoResponseHeaderTitle,
-                reminderDate.format(FORMAT_DATE_DAY_MONTH),
+                reminderDate.format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
             ),
         )
 
@@ -911,14 +911,14 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.bindEndReminderAlert(message: Message, reminderDate: Date) {
         endReminderAlert.setActionsVisibility(shouldDisplayAction = true)
-        val recipientsNames = message.allRecipients.map { it.name.ifBlank { it.email } }
-        val formatNamesList = formatNamesList(context, recipientsNames)
+        val fromNames = message.extractFromNames()
+        val formatNamesList = formatNamesList(context, fromNames)
 
         endReminderAlert.setDescription(
             context.getString(
                 R.string.reminderNoResponseHeaderTitle,
                 formatNamesList,
-                reminderDate.format(FORMAT_DATE_DAY_MONTH),
+                reminderDate.format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
             ),
         )
 

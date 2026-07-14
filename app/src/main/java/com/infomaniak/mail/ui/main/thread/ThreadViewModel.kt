@@ -797,11 +797,8 @@ class ThreadViewModel @Inject constructor(
                 messageId
             )
 
-            if (apiResponse.isSuccess()) {
-                snackbarManager.postValue(appContext.getString(successResId))
-            } else {
-                snackbarManager.postValue(appContext.getString(failureResId))
-            }
+            val snackbarStringResId = if (apiResponse.isSuccess()) successResId else failureResId
+            snackbarManager.postValue(appContext.getString(snackbarStringResId))
         }
     }
 

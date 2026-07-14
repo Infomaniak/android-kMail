@@ -45,5 +45,9 @@ class KSuiteChipManager(private val container: ViewGroup) {
 
 /** Keep the entries order, it's used by the attribute (or change also the attributes order in attrs.xml) */
 enum class TrailingContent {
-    None, Chevron, Description, KSuitePersoChip, KSuiteProChip,
+    None,
+    Chevron,
+    Description,
+    KSuitePersoChip,
+    KSuiteProChip,
 }

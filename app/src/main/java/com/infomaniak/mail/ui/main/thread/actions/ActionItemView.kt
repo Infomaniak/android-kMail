@@ -109,8 +109,8 @@ class ActionItemView @JvmOverloads constructor(
         binding.title.text = text
     }
 
-    fun removeIcon() = with(binding) {
-        icon.isGone = true
+    fun removeIcon() {
+        binding.icon.isGone = true
     }
 
     private fun setTitleColor(color: ColorStateList) = binding.title.setTextColor(color)
@@ -144,7 +144,6 @@ class ActionItemView @JvmOverloads constructor(
             }
         }
     }
-
 
     private fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {
         return getDimensionPixelSize(index, NOT_SET).takeIf { it != NOT_SET }

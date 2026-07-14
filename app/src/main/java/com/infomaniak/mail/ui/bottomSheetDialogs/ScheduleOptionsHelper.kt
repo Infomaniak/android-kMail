@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2026 Infomaniak Network SA
+ * Copyright (C) 2025-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,9 @@ import com.infomaniak.core.common.utils.tomorrow
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.*
+import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Afternoon
+import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Evening
+import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Morning
 import com.infomaniak.mail.ui.bottomSheetDialogs.RelativeDay.NextMonday
 import com.infomaniak.mail.ui.bottomSheetDialogs.RelativeDay.Today
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.LaterThisMorning
@@ -144,7 +146,10 @@ enum class ScheduleOption(
     ThisEvening(Today, Evening, R.string.thisEvening, R.drawable.ic_evening_schedule, MatomoName.ThisEvening),
     TomorrowMorning(
         RelativeDay.Tomorrow,
-        Morning, R.string.tomorrowMorning, R.drawable.ic_morning_schedule, MatomoName.TomorrowMorning
+        Morning,
+        R.string.tomorrowMorning,
+        R.drawable.ic_morning_schedule,
+        MatomoName.TomorrowMorning
     ),
     NextMondayMorning(NextMonday, Morning, R.string.nextMonday, R.drawable.ic_arrow_return, MatomoName.NextMonday),
     MondayMorning(
@@ -167,14 +172,16 @@ enum class ScheduleOption(
     private fun minimalDisplayTime() = date().time - HIDE_INTERVAL.inWholeMilliseconds
 }
 
-enum class RelativeDay(val getDate: () -> Date) {
+private enum class RelativeDay(val getDate: () -> Date) {
     Today({ Date() }),
     Tomorrow({ Date().tomorrow() }),
     NextMonday({ Date().getNextMonday() }),
 }
 
-enum class HourOfTheDay(val hourOfTheDay: Int) {
-    Morning(8), Afternoon(14), Evening(18),
+private enum class HourOfTheDay(val hourOfTheDay: Int) {
+    Morning(8),
+    Afternoon(14),
+    Evening(18),
 }
 
 /**
@@ -183,7 +190,7 @@ enum class HourOfTheDay(val hourOfTheDay: Int) {
  *
  * @param scheduleOptions The available schedule options that can be displayed to the user during each period
  */
-enum class WeekPeriod(vararg val scheduleOptions: ScheduleOption) {
+private enum class WeekPeriod(vararg val scheduleOptions: ScheduleOption) {
     Weekday(LaterThisMorning, ThisAfternoon, ThisEvening, TomorrowMorning, NextMondayMorning),
     Weekend(MondayMorning, MondayAfternoon);
 
