@@ -100,7 +100,7 @@ object ThreadRecomputations {
         }
 
         hasUnseenMentions = hasUnseenMentions(aliases?.toList() ?: emptyList(), allMessages)
-        
+
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = allMessages.first().subject
@@ -126,13 +126,6 @@ object ThreadRecomputations {
         if (message.hasAttachable) hasAttachable = true
         if (message.isScheduledDraft) numberOfScheduledDrafts++
         updateSnoozeStatesBasedOn(message)
-    }
-
-    private fun Thread.updateMentionsState(message: Message, normalizedAliases: Set<String>) {
-        val amIMentioned = message.mentions.any { mention ->
-            normalizedAliases.contains(mention.lowercase())
-        }
-        hasUnseenMentions = amIMentioned && !message.isSeen
     }
 
     private fun Thread.updateSnoozeStatesBasedOn(message: Message) {
