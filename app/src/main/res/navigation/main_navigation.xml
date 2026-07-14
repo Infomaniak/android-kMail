@@ -518,7 +518,11 @@
     <fragment
         android:id="@+id/contactCardFragment"
         android:name="com.infomaniak.core.ui.compose.contactcard.ContactCardFragment"
-        android:label="ContactCardFragment" />
+        android:label="ContactCardFragment">
+        <argument
+            android:name="userId"
+            app:argType="integer" />
+    </fragment>
 
     <fragment
         android:id="@+id/dataManagementMatomoSettingFragment"

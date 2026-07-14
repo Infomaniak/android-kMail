@@ -84,7 +84,7 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
             }
         },
         onOpenContactCard = { user ->
-            if (user.id == AccountUtils.currentUserId) openContactCard()
+            if (user.id == AccountUtils.currentUserId) openContactCard(user.id)
         },
     )
 
@@ -141,8 +141,11 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         }
     }
 
-    private fun openContactCard() {
-        findNavController().navigate(R.id.contactCardFragment)
+    private fun openContactCard(userId: Int) {
+        findNavController().navigate(
+            R.id.contactCardFragment,
+            Bundle().apply { putInt("userId", userId) },
+        )
         dismiss()
     }
 }
