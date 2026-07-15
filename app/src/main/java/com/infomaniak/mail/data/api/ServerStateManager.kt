@@ -46,7 +46,7 @@ class ServerStateManager @Inject constructor() {
 
     private fun <T> handleResponse(
         response: ApiResponse<T>,
-        onAvailabilityChanged: (Boolean) -> Unit
+        onAvailabilityChanged: (Boolean) -> Unit,
     ): ApiResponse<T> = response.also {
         onAvailabilityChanged(it.error?.exception !is ServerErrorException)
         updateServerAvailability()

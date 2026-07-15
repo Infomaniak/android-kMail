@@ -629,15 +629,15 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     }
 
     private fun observeNetworkAndServerStatus() {
-        threadListViewModel.availableService.observe(viewLifecycleOwner) { availableService ->
+        threadListViewModel.serviceAvailabilityState.observe(viewLifecycleOwner) { availabilityState ->
             TransitionManager.beginDelayedTransition(binding.root)
 
-            when (availableService) {
+            when (availabilityState) {
                 is AvailableService.DisplayUnavailableService -> {
                     binding.networkWarning.isGone = false
-                    binding.networkWarning.text = getString(availableService.title)
+                    binding.networkWarning.text = getString(availabilityState.title)
 
-                    val drawable = getDrawable(binding.root.context, availableService.icon)
+                    val drawable = getDrawable(binding.root.context, availabilityState.icon)
                     binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
                     binding.updatedAt.isGone = true
@@ -645,7 +645,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 }
                 is AvailableService.AllAvailable -> {
                     binding.networkWarning.isGone = true
-                    binding.updatedAt.isGone = false
+                    binding.updatedAt.isVisible = true
                 }
             }
         }

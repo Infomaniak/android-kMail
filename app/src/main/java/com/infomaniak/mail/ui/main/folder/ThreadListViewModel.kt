@@ -22,7 +22,6 @@ import android.text.format.DateUtils
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.data.api.ServerStateManager
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -64,7 +63,7 @@ class ThreadListViewModel @Inject constructor(
     var currentFolderCursor: String? = null
     var currentThreadsCount: Int? = null
 
-    val availableService =
+    val serviceAvailabilityState =
         networkManager.isNetworkAvailable.combine(serverStateManager.isServerAvailable) { isNetworkAvailable, isServerAvailable ->
             when {
                 !isNetworkAvailable -> AvailableService.DisplayUnavailableService.NetworkNotAvailable

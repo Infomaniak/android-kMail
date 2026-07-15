@@ -19,16 +19,17 @@ package com.infomaniak.mail.ui.main.folder
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.infomaniak.mail.R
 
 sealed interface AvailableService {
     sealed class DisplayUnavailableService(@StringRes val title: Int, @DrawableRes val icon: Int) : AvailableService {
         data object NetworkNotAvailable : DisplayUnavailableService(
-            com.infomaniak.mail.R.string.noNetwork,
-            com.infomaniak.mail.R.drawable.ic_no_network
+            R.string.noNetwork,
+            R.drawable.ic_no_network
         )
         data object ServerNotAvailable : DisplayUnavailableService(
-            com.infomaniak.mail.R.string.serverUnavailable,
-            com.infomaniak.mail.R.drawable.ic_cloud_slash
+            R.string.serverUnavailable,
+            R.drawable.ic_cloud_slash
         )
     }
 
