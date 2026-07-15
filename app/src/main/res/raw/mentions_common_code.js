@@ -45,6 +45,7 @@ function getTextBeforeCaret(stripMentions = true) {
 
     const fragment = preRange.cloneContents();
     if (stripMentions) {
+        // Replace all the existing mentions with a space to ignore them when extracting the query
         fragment.querySelectorAll(anchorMention).forEach((mention) => mention.replaceWith(" "));
     }
 
