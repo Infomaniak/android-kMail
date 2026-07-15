@@ -21,7 +21,6 @@ import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
-import com.infomaniak.core.legacy.InfomaniakCore
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.mail.data.api.ApiRepository
@@ -78,8 +77,6 @@ class MailActionsManagerTest {
         mockLocalStorageUtils()
 
         every { coroutineWorker.applicationContext } returns context
-
-        initializeConstants()
     }
 
     @Test
@@ -160,11 +157,6 @@ class MailActionsManagerTest {
         val mock = spyk<LocalStorageUtils>(recordPrivateCalls = true)
         every { mock["getDraftUploadDir"](any<Context>(), any<String>(), any<Int>(), any<Int>()) } returns File("")
         every { LocalStorageUtils.deleteDraftUploadDir(any(), any(), any(), any(), any()) } returns Unit
-    }
-
-    private fun initializeConstants() {
-        InfomaniakCore.appVersionName = "0.0.0"
-        InfomaniakCore.appId = "0"
     }
 
     private fun getMailActionManager(mailboxContentRealm: Realm?): MailActionsManager {

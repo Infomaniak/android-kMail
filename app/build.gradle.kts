@@ -159,8 +159,8 @@ sentry {
 }
 
 dependencies {
-    implementation(core.infomaniak.core.appversionchecker)
     implementation(core.infomaniak.core.applock)
+    implementation(core.infomaniak.core.appversionchecker)
     implementation(core.infomaniak.core.auth)
     implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.bugtracker)
