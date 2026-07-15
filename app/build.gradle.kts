@@ -188,6 +188,7 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.materialthemefromxml)
     implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.view)
+    implementation(core.infomaniak.core.ui.view.primarypalette)
     implementation(libs.realm.models)
 
     implementation(project(":Core:Legacy"))
