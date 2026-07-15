@@ -19,6 +19,8 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.exceptions.ServerErrorException
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,19 +28,32 @@ import okhttp3.OkHttpClient
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class ServerStateManager @Inject constructor() {
     private val _isServerAvailable = MutableStateFlow(true)
     val isServerAvailable: StateFlow<Boolean> = _isServerAvailable.asStateFlow()
 
+    private var mailboxAvailable = true
+    private var folderAvailable = true
 
-    suspend fun getMailboxes(okHttpClient: OkHttpClient? = null) = handleResponse(ApiRepository.getMailboxes(okHttpClient))
-    suspend fun getFolders(mailboxUuid: String) = handleResponse(ApiRepository.getFolders(mailboxUuid))
+    suspend fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
+        return handleResponse(ApiRepository.getMailboxes(okHttpClient)) { mailboxAvailable = it }
+    }
 
-    private fun <T> handleResponse(response: ApiResponse<T>): ApiResponse<T> {
-        _isServerAvailable.value = response.error?.exception !is ServerErrorException
-        return response
+    suspend fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> {
+        return handleResponse(ApiRepository.getFolders(mailboxUuid)) { folderAvailable = it }
+    }
+
+    private fun <T> handleResponse(
+        response: ApiResponse<T>,
+        onAvailabilityChanged: (Boolean) -> Unit
+    ): ApiResponse<T> = response.also {
+        onAvailabilityChanged(it.error?.exception !is ServerErrorException)
+        updateServerAvailability()
+    }
+
+    private fun updateServerAvailability() {
+        _isServerAvailable.value = mailboxAvailable && folderAvailable
     }
 }
 
