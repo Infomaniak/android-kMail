@@ -100,6 +100,8 @@ class ContactAdapter(
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
             if (isForMentions) {
                 background = resources.getDrawable(R.drawable.background_mentions, context.theme)
+            } else {
+                setBackgroundColor(resources.getColor(R.color.newMessageBackgroundColor, context.theme))
             }
         }
 
