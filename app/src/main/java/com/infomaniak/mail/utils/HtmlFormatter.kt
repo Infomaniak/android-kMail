@@ -305,7 +305,7 @@ class HtmlFormatter(private val html: String) {
         }
 
         fun Context.getRemoveElementsByIdScript(): String {
-            return loadScript(R.raw.remove_mentions_scripts)
+            return loadScript(R.raw.remove_elements_by_id_script)
         }
     }
 }
