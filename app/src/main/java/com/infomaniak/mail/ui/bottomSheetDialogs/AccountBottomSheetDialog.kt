@@ -115,6 +115,11 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         showEasterEggHalloween()
     }
 
+    override fun onResume() {
+        super.onResume()
+        accountsAdapter.animateCurrentUserQrCode(binding.recyclerViewAccount)
+    }
+
     private fun logoutCurrentUser() = appScope.launch(ioDispatcher) {
         trackAccountEvent(MatomoName.LogOutConfirm)
         logoutUser(user = AccountUtils.currentUser!!)

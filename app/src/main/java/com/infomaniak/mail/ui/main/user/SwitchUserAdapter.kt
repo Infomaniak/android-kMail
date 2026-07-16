@@ -17,10 +17,14 @@
  */
 package com.infomaniak.mail.ui.main.user
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.google.android.material.color.MaterialColors
@@ -85,6 +89,24 @@ class SwitchUserAdapter(
     fun initializeAccounts(newList: List<User>) {
         accounts = newList
         notifyDataSetChanged()
+    }
+
+    fun animateCurrentUserQrCode(recyclerView: RecyclerView) {
+        recyclerView.post {
+            for (i in 0 until recyclerView.childCount) {
+                val child = recyclerView.getChildAt(i)
+                val viewHolder = recyclerView.getChildViewHolder(child) as? SwitchUserAccountViewHolder ?: continue
+                val position = viewHolder.bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION && accounts.getOrNull(position)?.id == currentUserId) {
+                    ObjectAnimator.ofFloat(viewHolder.binding.qrcode, View.ROTATION_Y, 180f, 360f).apply {
+                        duration = 800
+                        interpolator = DecelerateInterpolator()
+                        start()
+                    }
+                    break
+                }
+            }
+        }
     }
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : ViewHolder(binding.root)
