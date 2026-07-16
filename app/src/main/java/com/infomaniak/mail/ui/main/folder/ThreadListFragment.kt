@@ -674,15 +674,19 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private fun observeDownloadState() {
         downloadThreadsStatusManager.isDownloading
             .observe(viewLifecycleOwner) { isDownloading ->
-                if (isDownloading) {
-                    showLoadingTimer.start()
-                } else if (shouldAutoLoadOldPage) {
-                    showRefreshLayout()
-                    shouldAutoLoadOldPage = false
-                    mainViewModel.getOnePageOfOldMessages()
-                } else {
-                    showLoadingTimer.cancel()
-                    binding.swipeRefreshLayout.isRefreshing = false
+                when {
+                    isDownloading -> {
+                        showLoadingTimer.start()
+                    }
+                    shouldAutoLoadOldPage -> {
+                        showRefreshLayout()
+                        shouldAutoLoadOldPage = false
+                        mainViewModel.getOnePageOfOldMessages()
+                    }
+                    else -> {
+                        showLoadingTimer.cancel()
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
                 }
             }
     }
@@ -770,8 +774,9 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                         folder.oldMessagesUidsToFetch.isNotEmpty()
 
                 if (hasMoreOldMessages) {
-                    shouldAutoLoadOldPage = folder.threads.isEmpty()
-                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = folder.threads.isNotEmpty())
+                    val isFolderEmpty = folder.threads.isEmpty()
+                    shouldAutoLoadOldPage = isFolderEmpty
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = !isFolderEmpty)
                 } else {
                     shouldAutoLoadOldPage = false
                     threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
