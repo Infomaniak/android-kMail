@@ -217,6 +217,7 @@
     <string name="contentDescriptionIconFolderSelected">Pasta selecionada</string>
     <string name="contentDescriptionIconForward">Encaminhado</string>
     <string name="contentDescriptionIconNewMail">Novo</string>
+    <string name="contentDescriptionIconQr">Ícone de código QR</string>
     <string name="contentDescriptionIconReply">Resposta</string>
     <string name="contentDescriptionIconStorage">Estado do armazenamento</string>
     <string name="contentDescriptionOpenMailActions">Abrir ações do e-mail</string>

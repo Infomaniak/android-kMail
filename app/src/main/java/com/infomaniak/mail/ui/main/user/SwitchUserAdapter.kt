@@ -23,9 +23,12 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.android.material.color.MaterialColors
 import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewHolder
+import com.google.android.material.R as RMaterial
 
 @SuppressLint("NotifyDataSetChanged")
 class SwitchUserAdapter(
@@ -63,8 +66,16 @@ class SwitchUserAdapter(
 
     private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
         val isCurrentUser = accounts[position].id == currentUserId
-        checkmark.isVisible = isCurrentUser
         qrcode.isVisible = isCurrentUser
+        qrcode.background.alpha = (0.1 * 255).toInt()
+        val context = accountCardview.context
+        accountCardview.setCardBackgroundColor(
+            if (isCurrentUser) {
+                MaterialColors.getColor(accountCardview, RMaterial.attr.colorPrimaryContainer)
+            } else {
+                context.getColor(R.color.backgroundColorSecondary)
+            }
+        )
     }
 
     private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])

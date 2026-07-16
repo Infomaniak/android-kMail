@@ -217,6 +217,7 @@
     <string name="contentDescriptionIconFolderSelected">Επιλεγμένος φάκελος</string>
     <string name="contentDescriptionIconForward">Προωθήθηκε</string>
     <string name="contentDescriptionIconNewMail">Νέο</string>
+    <string name="contentDescriptionIconQr">Εικονίδιο κωδικού QR</string>
     <string name="contentDescriptionIconReply">Απάντηση</string>
     <string name="contentDescriptionIconStorage">Κατάσταση αποθήκευσης</string>
     <string name="contentDescriptionOpenMailActions">Άνοιγμα ενεργειών μηνύματος</string>
