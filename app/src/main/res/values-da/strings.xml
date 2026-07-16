@@ -217,7 +217,7 @@
     <string name="contentDescriptionIconFolderSelected">Mappe valgt</string>
     <string name="contentDescriptionIconForward">Videresendt</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
-    <string name="contentDescriptionIconQr">QR-kode-ikon</string>
+    <string name="contentDescriptionIconQr">Åbn kontaktkort</string>
     <string name="contentDescriptionIconReply">Svar</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>
     <string name="contentDescriptionOpenMailActions">Åbn mailhandlinger</string>

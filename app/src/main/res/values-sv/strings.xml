@@ -217,7 +217,7 @@
     <string name="contentDescriptionIconFolderSelected">Mapp vald</string>
     <string name="contentDescriptionIconForward">Vidarebefordrad</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
-    <string name="contentDescriptionIconQr">Ikon för QR-kod</string>
+    <string name="contentDescriptionIconQr">Öppna kontaktkort</string>
     <string name="contentDescriptionIconReply">Svara</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>
     <string name="contentDescriptionOpenMailActions">Öppna e-poståtgärder</string>

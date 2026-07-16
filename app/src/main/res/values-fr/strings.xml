@@ -217,7 +217,7 @@
     <string name="contentDescriptionIconFolderSelected">Dossier sélectionné</string>
     <string name="contentDescriptionIconForward">Transféré</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
-    <string name="contentDescriptionIconQr">Icône QR Code</string>
+    <string name="contentDescriptionIconQr">Ouvrir la fiche contact</string>
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>

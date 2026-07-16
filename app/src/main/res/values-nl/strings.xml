@@ -217,7 +217,7 @@
     <string name="contentDescriptionIconFolderSelected">Map geselecteerd</string>
     <string name="contentDescriptionIconForward">Doorgestuurd</string>
     <string name="contentDescriptionIconNewMail">Nieuw</string>
-    <string name="contentDescriptionIconQr">QR-code-icoon</string>
+    <string name="contentDescriptionIconQr">Open contactkaart</string>
     <string name="contentDescriptionIconReply">Antwoord</string>
     <string name="contentDescriptionIconStorage">Opslagstatus</string>
     <string name="contentDescriptionOpenMailActions">E-mailacties openen</string>
