@@ -697,6 +697,7 @@ class MainViewModel @Inject constructor(
         deleteFolderResultTrigger.postValue(Unit)
 
         if (apiResponse.isSuccess()) {
+            folderController.deleteFolder(folderId, mailbox)
             updateFolders(mailbox)
         } else {
             snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
