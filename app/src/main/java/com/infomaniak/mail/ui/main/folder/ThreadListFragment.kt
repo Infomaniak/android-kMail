@@ -677,7 +677,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 if (isDownloading) {
                     showLoadingTimer.start()
                 } else if (shouldAutoLoadOldPage) {
-                    binding.swipeRefreshLayout.isRefreshing = true
+                    showRefreshLayout()
                     shouldAutoLoadOldPage = false
                     mainViewModel.getOnePageOfOldMessages()
                 } else {
