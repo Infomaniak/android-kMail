@@ -94,13 +94,13 @@ class SearchUtils @Inject constructor(
         }
     }
 
-    fun convertLocalMessagesToSearchThreads(searchMessages: List<Message>): List<Thread> {
+    fun convertLocalMessagesToSearchThreads(searchMessages: List<Message>, aliases: List<String>?): List<Thread> {
         val cachedNamedFolders = mutableMapOf<String, NamedFolder>()
         return searchMessages.map { message ->
             message.toThread().apply {
                 uid = "search-${message.uid}"
                 isFromSearch = true
-                recomputeThread()
+                recomputeThread(aliases = aliases)
                 sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }
         }
@@ -114,7 +114,11 @@ class SearchUtils @Inject constructor(
      * @param remoteThreads The list of API Threads that need to be processed.
      * @param filterFolder The selected Folder on which we filter the Search.
      */
-    suspend fun convertRemoteThreadsToSearchThreads(remoteThreads: List<Thread>, filterFolder: Folder?): List<Thread> {
+    suspend fun convertRemoteThreadsToSearchThreads(
+        remoteThreads: List<Thread>,
+        filterFolder: Folder?,
+        aliases: List<String>?
+    ): List<Thread> {
         val cachedNamedFolders = mutableMapOf<String, NamedFolder>()
         return remoteThreads.map { remoteThread ->
             currentCoroutineContext().ensureActive()
@@ -122,6 +126,7 @@ class SearchUtils @Inject constructor(
             remoteThread.apply {
                 isFromSearch = true
                 setFolderId(filterFolder)
+                recomputeThread(aliases = aliases)
                 keepOldMessagesData(filterFolder, mailboxContentRealm())
                 sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }

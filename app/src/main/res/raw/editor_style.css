@@ -11,3 +11,12 @@ body {
     margin: 0;
     padding: 0 16px 0;
 }
+
+a[data-ik-mention-ref] {
+    /* We add the style of the mentions here because the inline style gets deleted when we do backspace in between two mentions */
+    padding: 0 4px;
+    border-radius: 100px;
+    color: var(--mail-content-mention-text-color, #333);
+    background-color: var(--mail-content-mention-background-color, #f1f1f1);
+    font-weight: var(--mail-content-mention-font-weight, inherit);
+}

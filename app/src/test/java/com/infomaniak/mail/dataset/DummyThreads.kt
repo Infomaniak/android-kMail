@@ -45,6 +45,6 @@ private fun threadOf(vararg messages: Message): Thread {
         messages.takeLast(messages.count() - 1).forEach { message ->
             addMessageWithConditions(message, mailboxContentRealm())
         }
-        recomputeThread()
+        recomputeThread(aliases = emptyList())
     }
 }

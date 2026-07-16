@@ -55,7 +55,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:fillViewport="true"
-            app:layout_constraintBottom_toTopOf="@id/externalBanner"
+            app:layout_constraintBottom_toTopOf="@id/mentionAutoComplete"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
             <LinearLayout
@@ -417,6 +417,24 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
+        <!--The adapter has 10 items, but we need to only show 3 and scroll for the rest. We had to add a maxHeight
+          because there was a flash the first time the adapter was created that showed the 10 items and then showed only the 3-->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mentionAutoComplete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_mentions"
+            android:elevation="10dp"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/externalBanner"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="@dimen/mentionsMaxHeight"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_contact"
+            tools:visibility="visible" />
+
         <LinearLayout
             android:id="@+id/externalBanner"
             android:layout_width="match_parent"
@@ -425,8 +443,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/editorToolbar"
-            app:layout_constraintTop_toBottomOf="@+id/compositionNestedScrollView"
+            app:layout_constraintTop_toBottomOf="@id/mentionAutoComplete"
             tools:visibility="visible">
 
             <LinearLayout

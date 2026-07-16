@@ -73,6 +73,9 @@ class RecipientFieldView @JvmOverloads constructor(
     private var contactAdapter: ContactAdapter
     private var contactChipAdapter: ContactChipAdapter
 
+    val isCollapsed: Boolean
+        get() = isSelfCollapsed
+
     override var isEncryptionActivated: Boolean = false
         set(value) {
             field = value
@@ -325,7 +328,7 @@ class RecipientFieldView @JvmOverloads constructor(
         chipsRecyclerView.isGone = isCollapsed || contactChipAdapter.isEmpty()
     }
 
-    private fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
+    fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
         val isTextInputAccessible = !isCollapsed || contactChipAdapter.isEmpty()
 
         singleChip.root.apply {
@@ -397,7 +400,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun addRecipient(email: String, name: String) {
+    fun addRecipient(email: String, name: String?) {
         val recipient = Recipient.createValidRecipientOrNull(email = email, name = name)
 
         if (recipient == null) {

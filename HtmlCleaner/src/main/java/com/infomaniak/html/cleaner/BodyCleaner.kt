@@ -17,10 +17,12 @@
  */
 
 /**
- * This file comes from https://github.com/thundernest/k-9/tree/main/app/html-cleaner
+ * This file comes from
+ * https://github.com/thunderbird/thunderbird-android/blob/main/library/html-cleaner/src/main/kotlin/app/k9mail/html/cleaner/BodyCleaner.kt
  */
 package com.infomaniak.html.cleaner
 
+import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import org.jsoup.nodes.Document
 import org.jsoup.safety.Cleaner
 import org.jsoup.safety.Safelist
@@ -48,7 +50,7 @@ internal class BodyCleaner {
                 "wbr",
             )
             .addAttributes(":all", "class", "dir", "id", "style")
-            .addAttributes("a", "name")
+            .addAttributes("a", "name", MENTION_ATTRIBUTE)
             // Allow all URI schemes in links.
             // Removing all protocols makes the list of protocols empty, which means allow all protocols.
             .removeProtocols("a", "href", "ftp", "http", "https", "mailto")
@@ -98,6 +100,14 @@ internal class BodyCleaner {
     fun clean(dirtyDocument: Document): Document {
         val cleanedDocument = cleaner.clean(dirtyDocument)
 
+        // `contenteditable` isn't in the allowlist, so it gets removed during cleaning.
+        // Re-add contenteditable="false" on mention anchors so they stay non-editable.
+        cleanedDocument.select("a").forEach { anchor ->
+            if (anchor.hasAttr(MENTION_ATTRIBUTE)) {
+                anchor.attr("contenteditable", "false")
+            }
+        }
+
         // Cleaner.clean() nests two bodies inside one-another. To fix this, unwrap one of them so we don't end up with nested bodies
         val body = cleanedDocument.body()
         val hasNestedBodies = body.childNodeSize() == 1
@@ -115,3 +125,4 @@ internal class BodyCleaner {
         }
     }
 }
+

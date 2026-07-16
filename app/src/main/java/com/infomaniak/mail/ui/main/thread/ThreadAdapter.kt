@@ -92,6 +92,7 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.WebViewDisplayCallbacks
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.getAttributeColor
@@ -116,6 +117,7 @@ class ThreadAdapter(
     private val isSpamFilterActivated: () -> Boolean = { false },
     private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
+    private val aliases: () -> List<String>,
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
@@ -357,8 +359,8 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
         val isThemeTheSame = isThemeTheSameForMessageUid(messageUid)
-        bodyWebView.toggleWebViewTheme(isThemeTheSame)
-        fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
+        bodyWebView.toggleWebViewTheme(isThemeTheSame, aliases())
+        fullMessageWebView.toggleWebViewTheme(isThemeTheSame, aliases())
         toggleFrameLayoutsTheme(isThemeTheSame)
     }
 
@@ -419,10 +421,15 @@ class ThreadAdapter(
     private fun WebView.processMailDisplay(styledBody: String, uid: String, isForPrinting: Boolean): String {
         val isDisplayedInDark =
             context.isNightModeEnabled() && isThemeTheSameForMessageUid(uid) && !isForPrinting
+        val aliases = aliases()
         return if (isForPrinting) {
-            webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, (items.first() as MessageUi).message))
+            webViewUtils.processHtmlForPrint(
+                html = styledBody,
+                printData = HtmlFormatter.PrintData(context, (items.first() as MessageUi).message),
+                aliases = aliases
+            )
         } else {
-            webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark)
+            webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark, aliases)
         }
     }
 
@@ -1087,6 +1094,9 @@ class ThreadAdapter(
             navigateToNewMessageActivity = threadAdapterCallbacks?.navigateToNewMessageActivity,
             onPageFinished = { onExpandedMessageLoaded(message.uid) },
             onWebViewFinishedLoading = { threadAdapterCallbacks?.onBodyWebViewFinishedLoading?.invoke() },
+            onMentionContactClicked = { email, displayName ->
+                threadAdapterCallbacks?.onMentionContactClicked?.invoke(email, displayName)
+            },
         )
 
         // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
@@ -1362,6 +1372,7 @@ class ThreadAdapter(
     data class ThreadAdapterCallbacks(
         var onBodyWebViewFinishedLoading: (() -> Unit)? = null,
         var onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)? = null,
+        var onMentionContactClicked: ((email: String, displayName: String?) -> Unit)? = null,
         var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
         var onDraftClicked: ((message: Message) -> Unit)? = null,
         var onAttachmentClicked: ((attachment: Attachable) -> Unit)? = null,
@@ -1449,6 +1460,7 @@ class ThreadAdapter(
             navigateToNewMessageActivity: ((Uri) -> Unit)?,
             onPageFinished: () -> Unit,
             onWebViewFinishedLoading: () -> Unit,
+            onMentionContactClicked: ((email: String, displayName: String?) -> Unit)? = null,
         ) {
 
             fun promptUserForDistantImages() {
@@ -1460,18 +1472,24 @@ class ThreadAdapter(
                     attachments = message.attachments,
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
-                    onBlockedResourcesDetected = ::promptUserForDistantImages,
-                    navigateToNewMessageActivity = navigateToNewMessageActivity,
-                    onPageFinished = onPageFinished,
-                    onWebViewFinishedLoading = onWebViewFinishedLoading,
+                    callbacks = WebViewDisplayCallbacks(
+                        onBlockedResourcesDetected = ::promptUserForDistantImages,
+                        navigateToNewMessageActivity = navigateToNewMessageActivity,
+                        onPageFinished = onPageFinished,
+                        onWebViewFinishedLoading = onWebViewFinishedLoading,
+                        onMentionContactClicked = onMentionContactClicked,
+                    )
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initDisplayWebViewClientAndBridge(
                     attachments = message.attachments,
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
-                    onBlockedResourcesDetected = ::promptUserForDistantImages,
-                    navigateToNewMessageActivity = navigateToNewMessageActivity,
-                    onWebViewFinishedLoading = onWebViewFinishedLoading,
+                    callbacks = WebViewDisplayCallbacks(
+                        onBlockedResourcesDetected = ::promptUserForDistantImages,
+                        navigateToNewMessageActivity = navigateToNewMessageActivity,
+                        onWebViewFinishedLoading = onWebViewFinishedLoading,
+                        onMentionContactClicked = onMentionContactClicked,
+                    )
                 )
             }
         }

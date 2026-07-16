@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.infomaniak.html.cleaner
 
-function reportOverScroll(clientWidth, scrollWidth, messageUid) {
-    globalThis.kmail.reportOverScroll(clientWidth, scrollWidth, messageUid);
-}
-
-function reportError(error, scriptFirstLine, messageUid) {
-    globalThis.kmail.reportError(error.name, error.message, error.stack, scriptFirstLine, messageUid);
-}
-
-function webviewFinishedLoading() {
-    globalThis.kmail.webviewFinishedLoading();
-}
-
-function openMentionContact(email, name) {
-    globalThis.kmail.openMentionContact(email, name)
+object InfomaniakAllowedAttributes {
+    const val MENTION_ATTRIBUTE = "data-ik-mention-ref"
 }

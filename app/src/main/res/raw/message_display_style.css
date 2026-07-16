@@ -3,3 +3,7 @@ body {
     margin: 16px;
     padding: 0;
 }
+
+a[data-ik-mention-ref]:active {
+    opacity: 0.75;
+}

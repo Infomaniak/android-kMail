@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesId
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.computeReactionsPerMessageId
 import com.infomaniak.mail.data.models.thread.overrideWith
+import com.infomaniak.mail.utils.ThreadListUtils.hasUnseenMentions
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
@@ -34,8 +35,7 @@ import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmList
 
 object ThreadRecomputations {
-    fun Thread.recomputeThread(realm: MutableRealm? = null) {
-
+    fun Thread.recomputeThread(realm: MutableRealm? = null, aliases: List<String>?) {
         messages.sortBy { it.internalDate }
         // All of the following methods should not be inside of Thread to begin with. At least the input list of messages is
         // extracted once so every other following logic is forced to base its processing on this unique list of messages. We
@@ -61,7 +61,7 @@ object ThreadRecomputations {
 
         resetThread()
 
-        updateThread(lastMessage, allMessages)
+        updateThread(lastMessage, allMessages, aliases)
 
         recomputeMessagesWithContent(allMessages)
 
@@ -81,6 +81,7 @@ object ThreadRecomputations {
         isAnswered = false
         isForwarded = false
         hasAttachable = false
+        hasUnseenMentions = false
         numberOfScheduledDrafts = 0
         snoozeState = null
         snoozeEndDate = null
@@ -88,35 +89,9 @@ object ThreadRecomputations {
         isLastInboxMessageSnoozed = false
     }
 
-    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>) {
-
-        fun Thread.updateSnoozeStatesBasedOn(message: Message) {
-            message.snoozeState?.let {
-                snoozeState = it
-                snoozeEndDate = message.snoozeEndDate
-                snoozeUuid = message.snoozeUuid
-            }
-        }
-
+    private fun Thread.updateThread(lastMessage: Message, allMessages: RealmList<Message>, aliases: List<String>?) {
         allMessages.forEach { message ->
-            messagesIds += message.messageIds
-            if (!message.isSeen) unseenMessagesCount++
-            from += message.from
-            to += message.to
-            if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
-            if (message.isFavorite) isFavorite = true
-            if (message.isAnswered) {
-                isAnswered = true
-                isForwarded = false
-            }
-            if (message.isForwarded) {
-                isForwarded = true
-                isAnswered = false
-            }
-            if (message.hasAttachable) hasAttachable = true
-            if (message.isScheduledDraft) numberOfScheduledDrafts++
-
-            updateSnoozeStatesBasedOn(message)
+            processMessage(message)
         }
 
         duplicates.forEach { message ->
@@ -124,11 +99,41 @@ object ThreadRecomputations {
             updateSnoozeStatesBasedOn(message)
         }
 
+        hasUnseenMentions = hasUnseenMentions(aliases?.toList() ?: emptyList(), allMessages)
+
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = allMessages.first().subject
 
         isLastInboxMessageSnoozed = allMessages.isLastInboxMessageSnoozed(folderId)
+    }
+
+    private fun Thread.processMessage(message: Message) {
+        messagesIds += message.messageIds
+        if (!message.isSeen) unseenMessagesCount++
+        from += message.from
+        to += message.to
+        if (message.isDraft && !message.isScheduledMessage) hasDrafts = true
+        if (message.isFavorite) isFavorite = true
+        if (message.isAnswered) {
+            isAnswered = true
+            isForwarded = false
+        }
+        if (message.isForwarded) {
+            isForwarded = true
+            isAnswered = false
+        }
+        if (message.hasAttachable) hasAttachable = true
+        if (message.isScheduledDraft) numberOfScheduledDrafts++
+        updateSnoozeStatesBasedOn(message)
+    }
+
+    private fun Thread.updateSnoozeStatesBasedOn(message: Message) {
+        message.snoozeState?.let {
+            snoozeState = it
+            snoozeEndDate = message.snoozeEndDate
+            snoozeUuid = message.snoozeUuid
+        }
     }
 
     /**

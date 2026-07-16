@@ -222,6 +222,7 @@
     <string name="contentDescriptionIconFavorite">Jest w ulubionych</string>
     <string name="contentDescriptionIconFolderSelected">Folder wybrany</string>
     <string name="contentDescriptionIconForward">Przekazane dalej</string>
+    <string name="contentDescriptionIconMention">Zostałeś wspomniany.</string>
     <string name="contentDescriptionIconNewMail">Nowe</string>
     <string name="contentDescriptionIconReply">Odpowiedź</string>
     <string name="contentDescriptionIconStorage">Status pamięci</string>

@@ -255,13 +255,13 @@ fun WebView.initDisplayWebViewClientAndBridge(
     attachments: List<Attachment>,
     messageUid: String,
     shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: () -> Unit,
-    navigateToNewMessageActivity: ((Uri) -> Unit)?,
-    onPageFinished: (() -> Unit)? = null,
-    onWebViewFinishedLoading: () -> Unit,
+    callbacks: WebViewDisplayCallbacks,
 ): MessageDisplayWebViewClient {
 
-    WebViewUtils.initMessageDisplayJavascriptBridge(onWebViewFinishedLoading)
+    WebViewUtils.initMessageDisplayJavascriptBridge(
+        onWebViewFinishedLoading = callbacks.onWebViewFinishedLoading,
+        onMentionContactClicked = callbacks.onMentionContactClicked,
+    )
     addJavascriptInterface(WebViewUtils.messageDisplayJsBridge, "kmail")
 
     val cidDictionary = attachments.toCidDictionary()
@@ -271,16 +271,20 @@ fun WebView.initDisplayWebViewClientAndBridge(
         cidDictionary,
         messageUid,
         shouldLoadDistantResources,
-        onBlockedResourcesDetected,
-        navigateToNewMessageActivity,
-        onPageFinished,
+        callbacks.onBlockedResourcesDetected,
+        callbacks.navigateToNewMessageActivity,
+        callbacks.onPageFinished,
     ).also {
         webViewClient = it
     }
 }
 
-fun WebView.initEditorWebviewBridge(onInlineImagesDeleted: (List<String>) -> Unit) {
-    val editorJsBridge = EditorJavascriptBridge(onInlineImagesDeleted)
+fun WebView.initEditorWebviewBridge(
+    onInlineImagesDeleted: (List<String>) -> Unit,
+    onMentionQueryChanged: (String) -> Unit,
+    onMentionsDeleted: (List<String>) -> Unit,
+) {
+    val editorJsBridge = EditorJavascriptBridge(onInlineImagesDeleted, onMentionQueryChanged, onMentionsDeleted)
     addJavascriptInterface(editorJsBridge, "kmail")
 }
 
@@ -310,6 +314,14 @@ private fun List<Attachment>.toCidDictionary(): Map<String, Attachment> {
         }
     }
 }
+
+data class WebViewDisplayCallbacks(
+    val onBlockedResourcesDetected: () -> Unit,
+    val navigateToNewMessageActivity: ((Uri) -> Unit)?,
+    val onPageFinished: (() -> Unit)? = null,
+    val onWebViewFinishedLoading: () -> Unit,
+    val onMentionContactClicked: ((String, String?) -> Unit)? = null,
+)
 //endregion
 
 //region API
@@ -511,7 +523,11 @@ fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit)
     }
 }
 
-fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()
+private fun String.normalizeSpaces(): String = replace(Regex("\\s+"), " ")
+
+fun CharSequence.toSearchableForm(): String = toString().removeAccents().normalizeSpaces().lowercase()
+
+fun CharSequence.standardize(): String = toSearchableForm().trim()
 
 inline val AndroidViewModel.appContext: Context get() = getApplication()
 

@@ -216,6 +216,7 @@
     <string name="contentDescriptionIconFavorite">Är favorit</string>
     <string name="contentDescriptionIconFolderSelected">Mapp vald</string>
     <string name="contentDescriptionIconForward">Vidarebefordrad</string>
+    <string name="contentDescriptionIconMention">Du har blivit omnämnd.</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
     <string name="contentDescriptionIconReply">Svara</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>

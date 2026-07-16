@@ -367,7 +367,7 @@ class RefreshController @Inject constructor(
             val refreshStrategy = folder.refreshStrategy
             val impactedFolders = ImpactedFolders()
             impactedFolders += handleDeletedUids(scope, activities.deletedShortUids, mailbox, folder.id, refreshStrategy)
-            impactedFolders += handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy)
+            impactedFolders += handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy, mailbox)
 
             inboxUnreadCount = updateFoldersUnreadCount(impactedFolders)
 
@@ -565,7 +565,7 @@ class RefreshController @Inject constructor(
                 val upToDateFolder = getUpToDateFolderBlocking(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
 
-                return@write handleAddedMessagesBlocking(scope, upToDateFolder, messages, isConversationMode)
+                return@write handleAddedMessagesBlocking(scope, upToDateFolder, messages, isConversationMode, mailbox)
             }
         } ?: emptySet()
     }
@@ -613,7 +613,7 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             currentFolderRefreshStrategy.addFolderToImpactedFolders(thread.folderId, impactedFolders)
-            currentFolderRefreshStrategy.processDeletedThread(thread, realm = this)
+            currentFolderRefreshStrategy.processDeletedThread(thread, realm = this, mailbox = mailbox)
         }
 
         if (currentFolderRefreshStrategy.shouldQueryFolderThreadsOnDeletedUid()) {
@@ -630,6 +630,7 @@ class RefreshController @Inject constructor(
         messageFlags: List<MessageFlags>,
         folderId: String,
         refreshStrategy: RefreshStrategy,
+        mailbox: Mailbox
     ): ImpactedFolders {
         val threads = mutableSetOf<Thread>()
         messageFlags.forEach { flags ->
@@ -650,7 +651,7 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             refreshStrategy.addFolderToImpactedFolders(thread.folderId, impactedFolders)
-            thread.recomputeThread(realm = this)
+            thread.recomputeThread(realm = this, aliases = mailbox.aliases)
         }
 
         return impactedFolders
@@ -663,6 +664,7 @@ class RefreshController @Inject constructor(
         folder: Folder,
         remoteMessages: List<Message>,
         isConversationMode: Boolean,
+        mailbox: Mailbox?,
     ): Set<Thread> {
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
@@ -687,7 +689,7 @@ class RefreshController @Inject constructor(
         impactedThreadsManaged.forEach {
             scope.ensureActive()
 
-            it.recomputeThread(realm = this)
+            it.recomputeThread(realm = this, aliases = mailbox?.aliases)
             impactedThreadsUnmanaged.add(it.copyFromRealm(depth = 0u))
         }
 

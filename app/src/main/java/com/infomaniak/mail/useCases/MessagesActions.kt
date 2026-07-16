@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.ThreadListUtils.hasUnseenMentions
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
@@ -279,20 +280,32 @@ class MessagesActions @Inject constructor(
 
         val messagesUids = messages.getUids()
 
-        updateSeenStatus(messagesUids, threadsUids, isSeen = true)
+        updateSeenStatus(messagesUids, threadsUids, isSeen = true, hasUnseenMentions = false)
 
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = false)
+        if (apiResponses.atLeastOneFailed()) {
+            val hasUnseenMentions = hasUnseenMentions(mailbox.aliases, messages)
+            updateSeenStatus(
+                messagesUids,
+                threadsUids,
+                isSeen = false,
+                hasUnseenMentions = hasUnseenMentions
+            )
+        }
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
     }
 
-    suspend fun updateSeenStatus(messagesUids: List<String>, threadsUids: List<String>? = null, isSeen: Boolean) {
-
+    suspend fun updateSeenStatus(
+        messagesUids: List<String>,
+        threadsUids: List<String>? = null,
+        isSeen: Boolean,
+        hasUnseenMentions: Boolean
+    ) {
         mailboxContentRealm().write {
             if (threadsUids != null) {
-                ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+                ThreadController.updateSeenStatusAndMentions(threadsUids, isSeen, hasUnseenMentions, realm = this)
             }
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
         }
@@ -300,12 +313,13 @@ class MessagesActions @Inject constructor(
 
     private suspend fun markAsUnseen(messages: List<Message>, mailbox: Mailbox, threadsUids: List<String>? = null): ToggleResult {
         val messagesUids = messages.getUids()
+        val hasUnseenMentions = hasUnseenMentions(mailbox.aliases, messages)
 
-        updateSeenStatus(messagesUids, threadsUids, isSeen = false)
+        updateSeenStatus(messagesUids, threadsUids, isSeen = false, hasUnseenMentions)
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
-        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true)
+        if (apiResponses.atLeastOneFailed()) updateSeenStatus(messagesUids, threadsUids, isSeen = true, hasUnseenMentions = false)
 
         return ToggleResult(messages = messages, apiResponses = apiResponses)
     }

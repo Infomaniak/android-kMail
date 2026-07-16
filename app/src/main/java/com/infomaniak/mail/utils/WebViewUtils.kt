@@ -19,45 +19,49 @@ package com.infomaniak.mail.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.view.MotionEvent
 import android.view.ViewParent
 import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
-import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.javascriptBridge.EditorJavascriptBridge
+import androidx.appcompat.view.ContextThemeWrapper
+import com.infomaniak.lib.richhtmleditor.looselyEscapeAsStringLiteralForJs
 import com.infomaniak.mail.data.models.javascriptBridge.MessageDisplayJavascriptBridge
+import com.infomaniak.mail.ui.newMessage.NewMessageFragment.Companion.MENTIONS_STYLE
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionClickHandlerScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayJavascriptBridge
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMessageDisplayStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
-import com.infomaniak.mail.utils.extensions.loadCss
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.math.abs
 
-class WebViewUtils(context: Context) {
+class WebViewUtils(private val context: Context) {
 
     private val customDarkMode by lazy { context.getCustomDarkMode() }
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
     private val messageDisplayStyle by lazy { context.getMessageDisplayStyle() }
     private val printMailStyle by lazy { context.getPrintMailStyle() }
-
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
+    private val mentionClickHandlerScript by lazy { context.getMentionClickHandlerScript() }
     private val messageDisplayJsBridgeScript by lazy { context.getMessageDisplayJavascriptBridge() }
 
     fun processHtmlForPrint(
         html: String,
         printData: HtmlFormatter.PrintData,
+        aliases: List<String>,
     ): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode = false)
+        addCommonDisplayContent(isDisplayedInDarkMode = false, aliases)
         registerIsForPrint(printData)
         registerCss(printMailStyle)
         return@with inject()
@@ -66,20 +70,23 @@ class WebViewUtils(context: Context) {
     fun processHtmlForDisplay(
         html: String,
         isDisplayedInDarkMode: Boolean,
+        aliases: List<String>,
     ): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
+        addCommonDisplayContent(isDisplayedInDarkMode, aliases)
+        registerScript(mentionClickHandlerScript)
         return@with inject()
     }
 
-    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean) {
-        if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
+    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, aliases: List<String>) {
+        registerScript(messageDisplayJsBridgeScript)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
         registerCss(messageDisplayStyle)
+        registerCss(getDynamicMentionsStyle(context, aliases, isDisplayedInDarkMode))
+        if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
-        registerScript(messageDisplayJsBridgeScript)
         registerBodyEncapsulation()
         registerBreakLongWords()
     }
@@ -88,10 +95,15 @@ class WebViewUtils(context: Context) {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
         lateinit var messageDisplayJsBridge: MessageDisplayJavascriptBridge // TODO: Avoid excessive memory consumption with injection
-        lateinit var editorJsBridge: EditorJavascriptBridge
 
-        fun initMessageDisplayJavascriptBridge(onWebViewFinishedLoading: () -> Unit) {
-            messageDisplayJsBridge = MessageDisplayJavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
+        fun initMessageDisplayJavascriptBridge(
+            onWebViewFinishedLoading: () -> Unit,
+            onMentionContactClicked: ((String, String?) -> Unit)? = null,
+        ) {
+            messageDisplayJsBridge = MessageDisplayJavascriptBridge(
+                onWebViewFinishedLoading = onWebViewFinishedLoading,
+                onMentionContactClicked = onMentionContactClicked,
+            )
         }
 
         private fun WebSettings.setupCommonWebViewSettings() {
@@ -114,25 +126,65 @@ class WebViewUtils(context: Context) {
             setupCommonWebViewSettings()
         }
 
-        fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
+        fun getDynamicMentionsStyle(context: Context, aliases: List<String>, isDisplayedInDarkMode: Boolean): String {
+            val uiMode = if (isDisplayedInDarkMode) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
+            val contextWithTheme = context.withMode(uiMode)
+            return contextWithTheme.getMentionsStyle(aliases)
+        }
+
+        private fun Context.withMode(mode: Int): Context {
+            val config = Configuration(resources.configuration).apply {
+                uiMode = (uiMode and Configuration.UI_MODE_TYPE_MASK) or mode
+            }
+
+            val configContext = createConfigurationContext(config)
+            return ContextThemeWrapper(configContext, 0).apply {
+                theme.setTo(this@withMode.theme)
+            }
+        }
+
+        fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean, aliases: List<String>) {
             enableAlgorithmicDarkening(isThemeTheSame)
             if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
+
+            val mentionsCss = getDynamicMentionsStyle(context, aliases, isThemeTheSame)
+            addCss(mentionsCss, MENTIONS_STYLE)
         }
 
         private fun WebView.addBackgroundJs() {
-            val css = context.loadCss(R.raw.custom_dark_mode)
-            evaluateJavascript(
-                """ var style = document.createElement('style')
-                document.head.appendChild(style)
-                style.id = "$DARK_BACKGROUND_STYLE_ID"
-                style.innerHTML = `$css`
-            """.trimIndent(),
-                null,
-            )
+            val customDarkMode = context.getCustomDarkMode()
+            addCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         }
 
+        fun WebView.addCss(css: String, id: String? = null) {
+            val escapedStringLiteralId = id?.let { looselyEscapeAsStringLiteralForJs(it) }
+            val removePreviousIdScript = getRemovePreviousElementByIdScript(escapedStringLiteralId)
+            val setId = escapedStringLiteralId?.let { "style.id = ${it};" } ?: ""
+
+            val escapedStringLiteralCss = looselyEscapeAsStringLiteralForJs(css)
+            val addCssJs = """
+                var style = document.createElement('style');
+                style.textContent = $escapedStringLiteralCss;
+                $setId
+        
+                document.head.appendChild(style);
+                """.trimIndent()
+
+            val code = removePreviousIdScript + "\n" + addCssJs
+
+            evaluateJavascript(code, null)
+        }
+
+        private fun getRemovePreviousElementByIdScript(escapedId: String?): String = escapedId?.let {
+            """
+            var previousElement = document.getElementById($it)
+            if (previousElement) previousElement.remove()
+            """.trimIndent()
+        } ?: ""
+
         private fun WebView.removeBackgroundJs() {
-            val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
+            val escapedId = looselyEscapeAsStringLiteralForJs(DARK_BACKGROUND_STYLE_ID)
+            val removeBackgroundStyleScript = getRemovePreviousElementByIdScript(escapedId)
             evaluateJavascript(removeBackgroundStyleScript, null)
         }
 

@@ -56,7 +56,7 @@ interface RefreshStrategy {
      */
     fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders)
 
-    fun processDeletedThread(thread: Thread, realm: MutableRealm)
+    fun processDeletedThread(thread: Thread, realm: MutableRealm, mailbox: Mailbox?)
 
     fun shouldQueryFolderThreadsOnDeletedUid(): Boolean
 

@@ -27,6 +27,7 @@ import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.common.utils.isYesterday
 import com.infomaniak.core.legacy.utils.capitalizeFirstChar
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.isLastWeek
 import com.infomaniak.mail.utils.extensions.toDate
@@ -42,6 +43,16 @@ object ThreadListUtils {
             isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
             isThisYear() -> format("MMMM").capitalizeFirstChar()
             else -> format("MMMM yyyy").capitalizeFirstChar()
+        }
+    }
+
+    fun hasUnseenMentions(
+        aliases: List<String>,
+        messages: List<Message>
+    ): Boolean {
+        val normalizedAliases = aliases.map { it.lowercase() }.toSet()
+        return messages.any { message ->
+            !message.isSeen && message.mentions.any { mention -> mention.lowercase() in normalizedAliases }
         }
     }
 }

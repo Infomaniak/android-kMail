@@ -20,10 +20,12 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
+import com.infomaniak.html.cleaner.InfomaniakAllowedAttributes.MENTION_ATTRIBUTE
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_CONTAINER_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
@@ -31,6 +33,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import androidx.appcompat.R as RAndroid
+import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
 
@@ -190,6 +193,11 @@ class HtmlFormatter(private val html: String) {
         private val DETECT_BUT_DO_NOT_BREAK = setOf(' ')
         private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
 
+        const val MENTIONS_STYLE = "padding: 0 4px; border-radius: 100px; " +
+                "color: var(--mail-content-mention-text-color, #333); " +
+                "background-color: var(--mail-content-mention-background-color, #f1f1f1); " +
+                "font-weight: var(--mail-content-mention-font-weight, inherit)"
+
         private fun Context.loadScript(
             @RawRes scriptResId: Int,
             customVariablesDeclaration: List<Pair<String, Any>> = emptyList(),
@@ -210,7 +218,9 @@ class HtmlFormatter(private val html: String) {
             }
         }
 
-        fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
+        fun Context.getCustomDarkMode(): String {
+            return loadCss(R.raw.custom_dark_mode)
+        }
 
         fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
@@ -225,6 +235,23 @@ class HtmlFormatter(private val html: String) {
             R.raw.editor_style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary))
         )
+
+        fun Context.getMentionsStyle(aliases: List<String>): String {
+            val selectors = aliases.joinToString(", ") { alias ->
+                "a[${MENTION_ATTRIBUTE}='$alias']"
+            }
+            return loadMentionsTemplate().format(selectors)
+        }
+
+        private fun Context.loadMentionsTemplate(): String {
+            return loadCss(
+                R.raw.mentions_style,
+                listOf(
+                    PRIMARY_COLOR_CODE to getAttributeColor(RAndroid.attr.colorPrimary),
+                    PRIMARY_CONTAINER_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+                )
+            )
+        }
 
         fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
@@ -257,6 +284,28 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getSetAiContentScript(): String {
             return loadScript(R.raw.set_ai_content_script)
+        }
+
+        fun Context.getMentionDeletionObserverScript(): String = loadScript(R.raw.mention_deletion_observer)
+
+        fun Context.getCommonMentionsCodeScript(): String = loadScript(R.raw.mentions_common_code)
+
+        fun Context.getEditorMentionsDetectorScript(): String = loadScript(R.raw.editor_mentions_detector)
+
+        fun Context.getMentionClickHandlerScript(): String {
+            return loadScript(R.raw.message_display_mention_click_handler)
+        }
+
+        fun Context.getInsertMentionScript(): String {
+            return loadScript(R.raw.insert_mention)
+        }
+
+        fun Context.getEditorMentionClickHandlerScript(): String {
+            return loadScript(R.raw.editor_mention_click_handler)
+        }
+
+        fun Context.getRemoveElementsByIdScript(): String {
+            return loadScript(R.raw.remove_elements_by_id_script)
         }
     }
 }
