@@ -24,13 +24,13 @@ const defineSelectionRange = (block, range, editor, stripMentions) => {
         selectionRange.selectNodeContents(editor);
     }
 
-    // Get the last element of the range, if it is a text context get the parent element
+    // Get the last element of the range, if it is a text content get the parent element
     const endElement = range.endContainer.nodeType === Node.ELEMENT_NODE
             ? range.endContainer
             : range.endContainer.parentElement;
 
     // Find if the closest element to endElement that is a mentionAnchor, returns itself if the endElement it's a mention anchor
-    const activeMention = endElement?.closest?.(MENTION_ANCHOR_SELECTOR);
+    const activeMention = endElement.closest(MENTION_ANCHOR_SELECTOR);
 
     // In the case we want to strip mentions and there is an active mention, we make sure the mention is included in the range.
     if (stripMentions && activeMention && block.contains(activeMention)) {
