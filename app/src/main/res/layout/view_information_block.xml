@@ -28,7 +28,8 @@
         android:id="@+id/constraintLayoutContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginStandardMedium">
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandardMedium">
 
         <FrameLayout
             android:id="@+id/iconContainer"
