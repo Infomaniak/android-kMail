@@ -151,6 +151,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
     private var isFirstTimeRefreshingThreads = true
+    private var shouldAutoLoadOldPage = false
 
     override val searchViewModel: SearchViewModel by activityViewModels()
     override val substituteClassName: String = javaClass.name
@@ -660,6 +661,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             deletedItemsIndices = ::removeMultiSelectItems
 
             afterUpdateAdapter = { threads ->
+                if (threads.isEmpty()) {
+                    // We don't need to show load more because we will automatically load more threads
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
+                }
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) currentFilter.value = ThreadFilter.ALL
                 if (hasSwitchedToAnotherFolder()) scrollToTop()
             }
@@ -669,11 +674,19 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private fun observeDownloadState() {
         downloadThreadsStatusManager.isDownloading
             .observe(viewLifecycleOwner) { isDownloading ->
-                if (isDownloading) {
-                    showLoadingTimer.start()
-                } else {
-                    showLoadingTimer.cancel()
-                    binding.swipeRefreshLayout.isRefreshing = false
+                when {
+                    isDownloading -> {
+                        showLoadingTimer.start()
+                    }
+                    shouldAutoLoadOldPage -> {
+                        showRefreshLayout()
+                        shouldAutoLoadOldPage = false
+                        mainViewModel.getOnePageOfOldMessages()
+                    }
+                    else -> {
+                        showLoadingTimer.cancel()
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
                 }
             }
     }
@@ -756,11 +769,23 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
     private fun observeLoadMoreTriggers() = with(mainViewModel) {
         Utils.waitInitMediator(currentFilter, currentFolderLive).observe(viewLifecycleOwner) { (filter, folder) ->
             runCatchingRealm {
-                val shouldDisplayLoadMore = filter == ThreadFilter.ALL
-                        && folder.cursor != null
-                        && folder.oldMessagesUidsToFetch.isNotEmpty()
-                        && folder.threads.isNotEmpty()
-                threadListAdapter.updateLoadMore(shouldDisplayLoadMore)
+                val hasMoreOldMessages = filter == ThreadFilter.ALL &&
+                        folder.cursor != null &&
+                        folder.oldMessagesUidsToFetch.isNotEmpty()
+
+                if (hasMoreOldMessages) {
+                    val isFolderEmpty = folder.threads.isEmpty()
+                    shouldAutoLoadOldPage = isFolderEmpty
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = !isFolderEmpty)
+                } else {
+                    shouldAutoLoadOldPage = false
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
+                }
+
+                if (shouldAutoLoadOldPage && !downloadThreadsStatusManager.isDownloading.value) {
+                    shouldAutoLoadOldPage = false
+                    getOnePageOfOldMessages()
+                }
             }
         }
     }
