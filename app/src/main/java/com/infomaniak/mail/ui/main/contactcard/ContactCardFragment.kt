@@ -21,20 +21,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.auth.models.user.Card
 import com.infomaniak.core.ui.compose.contactcard.ContactCardScreen
+import com.infomaniak.core.ui.compose.contactcard.ContactCardTopBarState
 import com.infomaniak.core.ui.compose.contactcard.R
 import com.infomaniak.core.ui.compose.contactcard.shareContactCard
 import com.infomaniak.core.ui.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.components.compose.MailTopAppBar
+import com.infomaniak.mail.ui.components.compose.TopAppBarButton
+import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.core.common.R as RCore
 import com.infomaniak.mail.R as RMail
 
 @AndroidEntryPoint
@@ -52,6 +64,7 @@ class ContactCardFragment : Fragment() {
                         onBack = { findNavController().popBackStack() },
                         onShare = ::shareCard,
                         confirmDelete = ::confirmDelete,
+                        topBar = { state -> MailContactCardTopBar(state) },
                     )
                 }
             }
@@ -71,6 +84,43 @@ class ContactCardFragment : Fragment() {
             displayLoader = false,
             positiveButtonText = RMail.string.actionDelete,
             onPositiveButtonClicked = { onConfirmed() },
+        )
+    }
+}
+
+@Composable
+private fun MailContactCardTopBar(state: ContactCardTopBarState) {
+    when (state) {
+        is ContactCardTopBarState.Editor -> MailTopAppBar(
+            navigationIcon = {
+                TextButton(onClick = state.onCancel) {
+                    Text(
+                        text = stringResource(RCore.string.buttonCancel),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            },
+            actions = {
+                TextButton(onClick = state.onSave) {
+                    Text(
+                        text = stringResource(RCore.string.buttonSave),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            },
+        )
+        is ContactCardTopBarState.Preview -> MailTopAppBar(
+            navigationIcon = { TopAppBarButtons.Close(onClick = state.onClose) },
+            actions = {
+                TopAppBarButton(
+                    icon = ImageVector.vectorResource(RMail.drawable.ic_param_dots),
+                    contentDescResId = R.string.buttonMore,
+                    onClick = state.onMore,
+                )
+            },
+        )
+        is ContactCardTopBarState.Default -> MailTopAppBar(
+            navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
         )
     }
 }
