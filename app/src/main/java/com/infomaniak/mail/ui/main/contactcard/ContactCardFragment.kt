@@ -28,11 +28,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.auth.models.user.Card
 import com.infomaniak.core.ui.compose.contactcard.ContactCardScreen
+import com.infomaniak.core.ui.compose.contactcard.R
 import com.infomaniak.core.ui.compose.contactcard.shareContactCard
 import com.infomaniak.core.ui.compose.materialthemefromxml.MaterialThemeFromXml
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import com.infomaniak.mail.R as RMail
 
+@AndroidEntryPoint
 class ContactCardFragment : Fragment() {
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
@@ -42,6 +51,7 @@ class ContactCardFragment : Fragment() {
                     ContactCardScreen(
                         onBack = { findNavController().popBackStack() },
                         onShare = ::shareCard,
+                        confirmDelete = ::confirmDelete,
                     )
                 }
             }
@@ -52,5 +62,15 @@ class ContactCardFragment : Fragment() {
         lifecycleScope.launch {
             requireContext().shareContactCard(card)
         }
+    }
+
+    private fun confirmDelete(onConfirmed: () -> Unit) {
+        descriptionDialog.show(
+            title = getString(R.string.deleteAlertTitle),
+            description = getString(R.string.deleteAlertDescription),
+            displayLoader = false,
+            positiveButtonText = RMail.string.actionDelete,
+            onPositiveButtonClicked = { onConfirmed() },
+        )
     }
 }
