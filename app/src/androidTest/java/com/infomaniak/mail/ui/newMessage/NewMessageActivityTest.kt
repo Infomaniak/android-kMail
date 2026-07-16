@@ -105,8 +105,8 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
 
         // Open the received email
         onViewWithTimeout(
-            numberOfRetries = 20,
-            retryInterval = 5_000.milliseconds,
+            numberOfRetries = NUMBER_RETRIES_REFRESH_MAILS,
+            retryInterval = RETRY_REFRESH_MAILS_INTERVAL_MILLIS.milliseconds,
             matcher = allOf(withId(R.id.threadsList), hasDescendant(withText(subject))),
         ).perform(
             RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
@@ -232,19 +232,24 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
     private fun waitForMessageInThreadList(subject: String) {
         runCatching {
             onViewWithTimeout(
-                numberOfRetries = 20,
-                retryInterval = 5_000.milliseconds,
+                numberOfRetries = NUMBER_RETRIES_REFRESH_MAILS,
+                retryInterval = RETRY_REFRESH_MAILS_INTERVAL_MILLIS.milliseconds,
                 matcher = withId(R.id.threadsList),
                 assertion = matches(hasDescendant(withText(subject))),
             )
         }.onFailure {
             onView(withId(R.id.threadsList)).perform(swipeDown())
             onViewWithTimeout(
-                numberOfRetries = 20,
-                retryInterval = 5_000.milliseconds,
+                numberOfRetries = NUMBER_RETRIES_REFRESH_MAILS,
+                retryInterval = RETRY_REFRESH_MAILS_INTERVAL_MILLIS.milliseconds,
                 matcher = withId(R.id.threadsList),
                 assertion = matches(hasDescendant(withText(subject))),
             )
         }
+    }
+
+    companion object {
+        private const val NUMBER_RETRIES_REFRESH_MAILS = 20
+        private const val RETRY_REFRESH_MAILS_INTERVAL_MILLIS = 5_000
     }
 }
