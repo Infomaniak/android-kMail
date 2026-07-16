@@ -74,7 +74,7 @@ class SwitchUserAdapter(
         qrcode.background.alpha = (0.1 * 255).toInt()
         accountCardview.isSelected = isCurrentUser
         accountCardview.setCardBackgroundColor(
-            if (isCurrentUser) {
+            if (isCurrentUser && accounts.size > 1) {
                 MaterialColors.getColor(accountCardview, RMaterial.attr.colorPrimaryContainer)
             } else {
                 accountCardview.context.getColor(R.color.backgroundColorSecondary)
