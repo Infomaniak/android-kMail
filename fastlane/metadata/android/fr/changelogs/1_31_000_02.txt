@@ -1,0 +1,3 @@
+- Ajout des mentions de contacts dans les emails
+- Ajout d'un téléchargement automatique de messages anciens lorsque la liste est vide suite à une action
+- Diverses corrections
