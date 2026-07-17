@@ -42,6 +42,7 @@ class AiPromptFragment : Fragment() {
 
     private var binding: ViewAiPromptBinding by safeBinding()
     private val aiViewModel: AiViewModel by activityViewModels()
+
     private val newMessageFragment by lazy { parentFragment as NewMessageFragment }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

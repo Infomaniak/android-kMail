@@ -49,7 +49,7 @@ class EuriaPromptBottomSheet : EdgeToEdgeBottomSheetDialog() {
         binding.aiPromptView.bind(
             prompt = aiViewModel.aiPrompt,
             placeholder = getString(R.string.aiPromptAnswer),
-            onCloseClick = { dismiss() },
+            onCloseClick = ::dismiss,
             onGenerateClick = {
                 setBackNavigationResult(OPEN_AI_REPLY_PROPOSITION, navigationArgs.messageUid)
             },
