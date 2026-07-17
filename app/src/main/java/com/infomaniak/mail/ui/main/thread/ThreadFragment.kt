@@ -930,6 +930,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(OPEN_AI_REPLY_PROPOSITION) { messageUid: String ->
+            aiViewModel.aiPropositionStatusLiveData.value = null
             safeNavigate(
                 resId = R.id.aiPropositionFragment, args = AiPropositionFragmentArgs(
                     isSubjectBlank = true,
