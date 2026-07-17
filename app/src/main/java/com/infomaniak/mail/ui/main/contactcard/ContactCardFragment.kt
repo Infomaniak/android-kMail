@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButton
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
+import com.infomaniak.mail.ui.theme.MailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,7 +60,7 @@ class ContactCardFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                MaterialThemeFromXml {
+                MailTheme {
                     ContactCardScreen(
                         onBack = { findNavController().popBackStack() },
                         onShare = ::shareCard,
