@@ -63,14 +63,16 @@ class ThreadListViewModel @Inject constructor(
     var currentFolderCursor: String? = null
     var currentThreadsCount: Int? = null
 
-    val serviceAvailabilityState =
-        networkManager.isNetworkAvailable.combine(serverStateManager.isServerAvailable) { isNetworkAvailable, isServerAvailable ->
-            when {
-                !isNetworkAvailable -> AvailableService.DisplayUnavailableService.NetworkNotAvailable
-                !isServerAvailable -> AvailableService.DisplayUnavailableService.ServerNotAvailable
-                else -> AvailableService.AllAvailable
-            }
+    val serviceAvailabilityState = combine(
+        networkManager.isNetworkAvailable,
+        serverStateManager.isServerAvailable
+    ) { isNetworkAvailable, isServerAvailable ->
+        when {
+            !isNetworkAvailable -> AvailableService.DisplayUnavailableService.NetworkNotAvailable
+            !isServerAvailable -> AvailableService.DisplayUnavailableService.ServerNotAvailable
+            else -> AvailableService.AllAvailable
         }
+    }
 
     fun startUpdatedAtJob() {
         updatedAtJob?.cancel()

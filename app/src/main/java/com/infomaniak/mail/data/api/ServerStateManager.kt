@@ -21,27 +21,31 @@ import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.exceptions.ServerErrorException
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ServerStateManager @Inject constructor() {
-    private val _isServerAvailable = MutableStateFlow(true)
-    val isServerAvailable: StateFlow<Boolean> = _isServerAvailable.asStateFlow()
 
-    private var mailboxAvailable = true
-    private var folderAvailable = true
+    private val mailboxAvailabilityFlow = MutableStateFlow(true)
+    private val folderAvailabilityFlow = MutableStateFlow(true)
+
+    val isServerAvailable: Flow<Boolean> = combine(
+        mailboxAvailabilityFlow,
+        folderAvailabilityFlow
+    ) { isMailboxAvailable, isFolderAvailable -> isMailboxAvailable && isFolderAvailable }.distinctUntilChanged()
 
     suspend fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
-        return handleResponse(ApiRepository.getMailboxes(okHttpClient)) { mailboxAvailable = it }
+        return handleResponse(ApiRepository.getMailboxes(okHttpClient)) { mailboxAvailabilityFlow.value = it }
     }
 
     suspend fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> {
-        return handleResponse(ApiRepository.getFolders(mailboxUuid)) { folderAvailable = it }
+        return handleResponse(ApiRepository.getFolders(mailboxUuid)) { folderAvailabilityFlow.value = it }
     }
 
     private fun <T> handleResponse(
@@ -49,11 +53,5 @@ class ServerStateManager @Inject constructor() {
         onAvailabilityChanged: (Boolean) -> Unit,
     ): ApiResponse<T> = response.also {
         onAvailabilityChanged(it.error?.exception !is ServerErrorException)
-        updateServerAvailability()
-    }
-
-    private fun updateServerAvailability() {
-        _isServerAvailable.value = mailboxAvailable && folderAvailable
     }
 }
-
