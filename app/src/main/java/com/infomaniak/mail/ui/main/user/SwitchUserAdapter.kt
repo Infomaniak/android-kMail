@@ -71,7 +71,7 @@ class SwitchUserAdapter(
     private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
         val isCurrentUser = accounts[position].id == currentUserId
         qrcode.isVisible = isCurrentUser && onOpenContactCard != null
-        qrcode.background.alpha = (0.1 * 255).toInt()
+        qrcodeImage.background.alpha = (0.1 * 255).toInt()
         accountCardview.isSelected = isCurrentUser
         accountCardview.setCardBackgroundColor(
             if (isCurrentUser && accounts.size > 1) {

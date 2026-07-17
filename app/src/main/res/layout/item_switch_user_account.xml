@@ -73,19 +73,27 @@
                 app:layout_constraintTop_toBottomOf="@id/userName"
                 tools:text="myriam.rais@infomaniak.com" />
 
-            <ImageView
+            <FrameLayout
                 android:id="@+id/qrcode"
-                android:layout_width="@dimen/largeIconSize"
-                android:layout_height="@dimen/largeIconSize"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
-                android:background="@drawable/bg_reminder_icon"
-                android:contentDescription="@string/contentDescriptionIconQr"
-                android:padding="@dimen/marginStandardSmall"
-                android:src="@drawable/ic_qrcode"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="@id/userAvatar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/userAvatar"
-                app:tint="?android:attr/colorPrimary" />
+                app:layout_constraintTop_toTopOf="@id/userAvatar">
+
+                <ImageView
+                    android:id="@+id/qrcodeImage"
+                    android:layout_width="@dimen/largeIconSize"
+                    android:layout_height="@dimen/largeIconSize"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_reminder_icon"
+                    android:contentDescription="@string/contentDescriptionIconQr"
+                    android:padding="@dimen/marginStandardSmall"
+                    android:src="@drawable/ic_qrcode"
+                    app:tint="?android:attr/colorPrimary" />
+
+            </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

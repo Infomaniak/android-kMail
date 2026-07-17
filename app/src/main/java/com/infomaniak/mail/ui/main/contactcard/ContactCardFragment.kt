@@ -58,6 +58,11 @@ class ContactCardFragment : Fragment() {
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -81,7 +86,7 @@ class ContactCardFragment : Fragment() {
 
     private fun shareCard(card: Card) {
         lifecycleScope.launch {
-            requireContext().shareContactCard(card)
+            requireActivity().shareContactCard(card)
         }
     }
 

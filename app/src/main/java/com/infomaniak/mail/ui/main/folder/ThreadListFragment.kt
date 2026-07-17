@@ -131,6 +131,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import kotlin.math.abs
+import com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialogArgs
 import com.infomaniak.core.legacy.R as RCore
 import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
@@ -522,7 +523,10 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
             }
 
             override fun onSingleTapUp(e: MotionEvent): Boolean {
-                safeNavigate(resId = R.id.accountBottomSheetDialog)
+                safeNavigate(
+                    resId = R.id.accountBottomSheetDialog,
+                    args = AccountBottomSheetDialogArgs(showContactCard = true).toBundle(),
+                )
                 return true
             }
 
