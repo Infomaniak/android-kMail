@@ -29,6 +29,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
@@ -46,6 +47,10 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.reply.setOnClickListener {
+            setBackNavigationResult(OPEN_AI_REPLY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, false))
+        }
+        
         binding.summary.setOnClickListener {
             trackBottomSheetThreadActionsEvent(MatomoName.Summarize)
             setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, isAlreadySummarized))

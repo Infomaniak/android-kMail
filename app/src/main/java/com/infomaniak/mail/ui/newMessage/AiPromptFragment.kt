@@ -19,62 +19,41 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.withStarted
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.core.ui.view.utils.toPx
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.databinding.FragmentAiPromptBinding
+import com.infomaniak.mail.databinding.ViewAiPromptBinding
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.ime
-import com.infomaniak.mail.utils.extensions.systemBars
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
 class AiPromptFragment : Fragment() {
 
-    @Inject
-    lateinit var localSettings: LocalSettings
-
-    private var binding: FragmentAiPromptBinding by safeBinding()
+    private var binding: ViewAiPromptBinding by safeBinding()
     private val aiViewModel: AiViewModel by activityViewModels()
-
     private val newMessageFragment by lazy { parentFragment as NewMessageFragment }
 
-    private val promptTextWatcher by lazy {
-        object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-            override fun afterTextChanged(s: Editable?) = onPromptChanged(s)
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentAiPromptBinding.inflate(inflater, container, false).also { binding = it }.root
+        return ViewAiPromptBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.applyWindowInsetsListener { root, insets ->
             val imeBottomInsets = insets.ime().bottom
             root.setMargins(bottom = imeBottomInsets)
-            binding.aiCardLayout.setMargins(bottom = if (imeBottomInsets == 0) insets.systemBars().bottom else 0)
         }
         setUi()
     }
@@ -84,78 +63,40 @@ class AiPromptFragment : Fragment() {
         setCorrectSheetMargins()
     }
 
-    private fun setUi() = with(binding) {
+    private fun setUi() = with(binding.root) {
         setCorrectSheetMargins()
+        focusPrompt()
 
-        prompt.showKeyboard()
-        initPromptTextAndPlaceholder()
-        closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
-
-        generateButton.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                newMessageFragment.navigateToPropositionFragment()
-            }
-        }
-
-        // When the app is recreated or the prompt is opened when coming back from AiPropositionFragment,
-        // the enabled state of the button is not recomputed when using `onPromptChanged()`. This means
-        // that the button may remain disabled even though it should be enabled based on the current
-        // prompt. `onPromptChanged()` is not enough which is why it's done in `doAfterTextChanged()`.
-        prompt.doAfterTextChanged(::updateButtonEnabledState)
+        bind(
+            prompt = aiViewModel.aiPrompt,
+            placeholder = getPromptPlaceholder(),
+            onCloseClick = { newMessageFragment.closeAiPrompt() },
+            onGenerateClick = {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    newMessageFragment.navigateToPropositionFragment()
+                }
+            },
+            onPromptChanged = { aiViewModel.aiPrompt = it },
+        )
     }
 
     private fun setCorrectSheetMargins() = with(binding.root) {
-        val m3BottomSheetMaxWidthPx = resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width)
-        val m3BottomSheetHorizontalMarginPx = 56.toPx(this)
-
-        val screenWidth = resources.displayMetrics.widthPixels
-        val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
-        val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
-
+        val maxWidthPx = resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width)
+        val horizontalMarginPx = 56.toPx(this)
+        val horizontalMargin = if (resources.displayMetrics.widthPixels > maxWidthPx) horizontalMarginPx else 0
         setMarginsRelative(start = horizontalMargin, end = horizontalMargin)
     }
 
-    private fun initPromptTextAndPlaceholder() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-        viewLifecycleOwner.withStarted {
-            with(binding.prompt) {
-                setText(aiViewModel.aiPrompt)
-                setSelection(length())
-
-                val isReplying = aiViewModel.previousMessageBodyPlainText != null
-                val placeholder = if (isReplying) getReplyPlaceholder() else getPlaceholderFromScratch()
-                hint = placeholder
-            }
+    private fun getPromptPlaceholder(): String {
+        val isReplying = aiViewModel.previousMessageBodyPlainText != null
+        return if (isReplying) {
+            getString(R.string.aiPromptAnswer)
+        } else {
+            getString(R.string.aiPromptPlaceholder, getString(promptExamples.random()))
         }
     }
 
-    private fun getReplyPlaceholder(): String = getString(R.string.aiPromptAnswer)
-
-    private fun getPlaceholderFromScratch(): String {
-        val promptExample = getString(promptExamples.random())
-        return getString(R.string.aiPromptPlaceholder, promptExample)
-    }
-
-    private fun updateButtonEnabledState(prompt: Editable?) {
-        binding.generateButton.isEnabled = prompt?.isNotEmpty() == true
-    }
-
-    override fun onResume() {
-        super.onResume()
-        binding.prompt.addTextChangedListener(promptTextWatcher)
-    }
-
-    override fun onPause() {
-        binding.prompt.removeTextChangedListener(promptTextWatcher)
-        super.onPause()
-    }
-
-    private fun onPromptChanged(prompt: Editable?) {
-        aiViewModel.aiPrompt = prompt.toString()
-    }
-
     companion object {
-        private const val NO_MARGIN = 0
-
         private val promptExamples = listOf(
             R.string.aiPromptExample1,
             R.string.aiPromptExample2,
