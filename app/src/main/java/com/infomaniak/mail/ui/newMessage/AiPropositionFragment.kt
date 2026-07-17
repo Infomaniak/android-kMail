@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -59,6 +60,7 @@ import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
+import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
@@ -82,6 +84,7 @@ class AiPropositionFragment : Fragment() {
     private val navigationArgs: AiPropositionFragmentArgs by navArgs()
 
     private var currentRequestJob: Job? = null
+    lateinit var mailbox: Mailbox
 
     private val refinePopupMenu by lazy {
         SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton, ::onMenuItemClicked)
@@ -109,6 +112,8 @@ class AiPropositionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initMailbox()
+
         handleEdgeToEdge()
         handleBackDispatcher()
         setUi()
@@ -130,6 +135,16 @@ class AiPropositionFragment : Fragment() {
 
     private fun handleBackDispatcher() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { trackDismissalAndPopBack() }
+    }
+
+    private fun initMailbox() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            mailbox = if (navigationArgs.messageUid.isBlank()) {
+                newMessageViewModel.currentMailbox()
+            } else {
+                mainViewModel.currentMailbox.value ?: return@launch
+            }
+        }
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -238,9 +253,8 @@ class AiPropositionFragment : Fragment() {
         } else {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
-            val mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return@with
             lifecycleScope.launch {
-                currentRequestJob = performShortcut(shortcut, mailboxUuid)
+                currentRequestJob = performShortcut(shortcut, mailbox.uuid)
             }
         }
     }
@@ -263,22 +277,20 @@ class AiPropositionFragment : Fragment() {
     private fun generateNewAiProposition() {
 
         lifecycleScope.launch {
-            var currentMailboxUuid: String
             var allRecipients: List<Recipient>
-            if (navigationArgs.messageUid.isNotBlank()) {
-                currentMailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return@launch
+            if (navigationArgs.messageUid.isBlank()) {
+                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
+            } else {
                 val message = messageController.getMessage(navigationArgs.messageUid)
                 val recipients = message?.getRecipientsForReplyTo()
-                allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty()
-            } else {
-                currentMailboxUuid = newMessageViewModel.currentMailbox().uuid
-                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
+                allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
+                aiViewModel.previousMessageBodyPlainText = message?.body?.value?.htmlToText()
             }
 
             val formattedRecipientsString = allRecipients
                 .joinToString(separator = ", ") { it.name }
                 .takeIf { it.isNotBlank() }
-            currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
+            currentRequestJob = aiViewModel.generateNewAiProposition(mailbox.uuid, formattedRecipientsString)
         }
 
     }
