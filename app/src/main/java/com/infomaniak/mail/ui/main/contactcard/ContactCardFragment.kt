@@ -41,6 +41,7 @@ import com.infomaniak.core.ui.compose.contactcard.R
 import com.infomaniak.core.ui.compose.contactcard.shareContactCard
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
+import com.infomaniak.mail.ui.components.compose.MailTopAppBarTitle
 import com.infomaniak.mail.ui.components.compose.TopAppBarButton
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
 import com.infomaniak.mail.ui.theme.LocalMailThemeColors
@@ -99,6 +100,8 @@ class ContactCardFragment : Fragment() {
 private fun MailContactCardTopBar(state: ContactCardTopBarState) {
     when (state) {
         is ContactCardTopBarState.Editor -> MailTopAppBar(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
             navigationIcon = {
                 TextButton(onClick = state.onCancel) {
                     Text(
@@ -117,6 +120,7 @@ private fun MailContactCardTopBar(state: ContactCardTopBarState) {
             },
         )
         is ContactCardTopBarState.Preview -> MailTopAppBar(
+            title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
             navigationIcon = { TopAppBarButtons.Close(onClick = state.onClose) },
             actions = {
                 TopAppBarButton(
@@ -127,6 +131,7 @@ private fun MailContactCardTopBar(state: ContactCardTopBarState) {
             },
         )
         is ContactCardTopBarState.Default -> MailTopAppBar(
+            title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
             navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
         )
     }
