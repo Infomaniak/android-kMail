@@ -34,15 +34,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.auth.models.user.Card
+import com.infomaniak.core.ui.compose.contactcard.ContactCardDefaults
 import com.infomaniak.core.ui.compose.contactcard.ContactCardScreen
 import com.infomaniak.core.ui.compose.contactcard.ContactCardTopBarState
 import com.infomaniak.core.ui.compose.contactcard.R
 import com.infomaniak.core.ui.compose.contactcard.shareContactCard
-import com.infomaniak.core.ui.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButton
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
+import com.infomaniak.mail.ui.theme.LocalMailThemeColors
 import com.infomaniak.mail.ui.theme.MailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -61,11 +62,16 @@ class ContactCardFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MailTheme {
+                    val mailColors = LocalMailThemeColors.current
                     ContactCardScreen(
                         onBack = { findNavController().popBackStack() },
                         onShare = ::shareCard,
                         confirmDelete = ::confirmDelete,
                         topBar = { state -> MailContactCardTopBar(state) },
+                        colors = ContactCardDefaults.colors(
+                            waveBackground = mailColors.onboardingSecondaryBackground,
+                            background = mailColors.backgroundHeaderColor,
+                        ),
                     )
                 }
             }
