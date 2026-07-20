@@ -78,6 +78,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/contentDescriptionIconQr"
                 app:layout_constraintBottom_toBottomOf="@id/userAvatar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/userAvatar">
@@ -88,7 +89,7 @@
                     android:layout_height="@dimen/largeIconSize"
                     android:layout_gravity="center"
                     android:background="@drawable/bg_reminder_icon"
-                    android:contentDescription="@string/contentDescriptionIconQr"
+                    android:importantForAccessibility="no"
                     android:padding="@dimen/marginStandardSmall"
                     android:src="@drawable/ic_qrcode"
                     app:tint="?android:attr/colorPrimary" />
