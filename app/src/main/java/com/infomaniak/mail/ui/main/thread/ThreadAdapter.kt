@@ -207,6 +207,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
                 NotifyType.AcknowledgeRebind -> bindAcknowledge(item)
+                NotifyType.ReminderRebind -> bindReminder(item.message)
                 NotifyType.AiSummaryStateChanged -> holder.bindAiAction(item.message, AiAction.SUMMARY)
                 NotifyType.AiTranslateStateChanged -> holder.bindAiAction(item.message, AiAction.TRANSLATE)
                 is NotifyType.MessagesCollapseStateChanged -> {
@@ -1351,6 +1352,7 @@ class ThreadAdapter(
         data object OnlyRebindEmojiReactions : NotifyType
         data object UnsubscribeRebind : NotifyType
         data object AcknowledgeRebind : NotifyType
+        data object ReminderRebind : NotifyType
         data object UpdatePermissions : NotifyType
         data object AiSummaryStateChanged : NotifyType
         data object AiTranslateStateChanged : NotifyType
@@ -1398,6 +1400,7 @@ class ThreadAdapter(
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
                 MessageDiffAspect.Unsubscribe.areDifferent(oldItem, newItem) -> NotifyType.UnsubscribeRebind
                 MessageDiffAspect.Acknowledge.areDifferent(oldItem, newItem) -> NotifyType.AcknowledgeRebind
+                MessageDiffAspect.Reminder.areDifferent(oldItem, newItem) -> NotifyType.ReminderRebind
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
@@ -1437,7 +1440,7 @@ class ThreadAdapter(
             object MessageDiffAspect {
                 val entries: List<DiffAspect<MessageUi>>
                     get() = listOf(
-                        EmojiReactions, Calendar, AnythingElse, Unsubscribe, Acknowledge
+                        EmojiReactions, Calendar, Reminder, AnythingElse, Unsubscribe, Acknowledge
                     )
 
                 data object EmojiReactions : DiffAspect<MessageUi>({
@@ -1458,6 +1461,11 @@ class ThreadAdapter(
                     data object Attendees : DiffAspect<CalendarEventResponse>({ attendeesAreTheSame(it) })
                     data object AnythingElse : DiffAspect<CalendarEventResponse>({ everythingButAttendeesIsTheSame(it) })
                 }
+
+                data object Reminder : DiffAspect<MessageUi>({
+                    message.reminder?.uuid == it.message.reminder?.uuid &&
+                            message.reminder?.date == it.message.reminder?.date
+                })
 
                 data object Unsubscribe : DiffAspect<MessageUi>({ unsubscribeState == it.unsubscribeState })
 
