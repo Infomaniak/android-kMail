@@ -205,19 +205,19 @@ object ApiRepository : ApiRepositoryCore() {
     suspend fun disableReminder(
         mailboxUuid: String,
         folderId: String,
-        messageId: String,
+        messageId: Int,
         reminderUuid: String
-    ): ApiResponse<Unit> {
+    ): ApiResponse<String> {
         return callApi(ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid), DELETE)
     }
 
     suspend fun modifyReminder(
         mailboxUuid: String,
         folderId: String,
-        messageId: String,
+        messageId: Int,
         reminderUuid: String,
         delayMinutes: Int
-    ): ApiResponse<Unit> {
+    ): ApiResponse<String> {
         return callApi(
             ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid),
             PUT,
@@ -228,9 +228,9 @@ object ApiRepository : ApiRepositoryCore() {
     suspend fun addReminder(
         mailboxUuid: String,
         folderId: String,
-        messageId: String,
+        messageId: Int,
         delayMinutes: Int
-    ): ApiResponse<Unit> {
+    ): ApiResponse<String> {
         return callApi(
             ApiRoutes.addReminder(mailboxUuid, folderId, messageId),
             POST,

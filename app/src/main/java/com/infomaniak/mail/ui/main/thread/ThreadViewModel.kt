@@ -781,7 +781,7 @@ class ThreadViewModel @Inject constructor(
         message: Message,
         successResId: Int,
         failureResId: Int,
-        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: String) -> ApiResponse<Unit>
+        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: Int) -> ApiResponse<String>
     ) {
         val messageId = message.messageId
 
@@ -794,7 +794,7 @@ class ThreadViewModel @Inject constructor(
             val apiResponse = apiAction(
                 mailbox().uuid,
                 message.folderId,
-                messageId
+                message.shortUid,
             )
 
             val snackbarStringResId = if (apiResponse.isSuccess()) successResId else failureResId

@@ -311,11 +311,11 @@ object ApiRoutes {
     }
 
     //region reminder
-    fun reminder(mailboxUuid: String, folderId: String, messageId: String, reminderUuid: String): String {
+    fun reminder(mailboxUuid: String, folderId: String, messageId: Int, reminderUuid: String): String {
         return "${mailMailbox(mailboxUuid)}/folder/$folderId/message/$messageId/reminder/$reminderUuid"
     }
 
-    fun addReminder(mailboxUuid: String, folderId: String, messageId: String): String {
+    fun addReminder(mailboxUuid: String, folderId: String, messageId: Int): String {
         return "${mailMailbox(mailboxUuid)}/folder/$folderId/message/$messageId/reminder"
     }
     //endregion
