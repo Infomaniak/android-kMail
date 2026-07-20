@@ -69,8 +69,10 @@ class SwitchUserViewModel @Inject constructor(
             RealmDatabase.backupPreviousRealms()
             myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user
-            AccountUtils.currentMailboxId =
-                mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: -5 // AppSettings.DEFAULT_ID
+            AccountUtils.currentMailboxId = mailboxController
+                .getPrimaryValidMailbox(user.id)
+                ?.mailboxId
+                ?: -5 // AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()
         }
     }
