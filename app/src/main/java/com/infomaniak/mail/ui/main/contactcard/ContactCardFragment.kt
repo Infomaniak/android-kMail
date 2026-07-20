@@ -27,9 +27,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -104,40 +106,93 @@ class ContactCardFragment : Fragment() {
 @Composable
 private fun MailContactCardTopBar(state: ContactCardTopBarState) {
     when (state) {
-        is ContactCardTopBarState.Editor -> MailTopAppBar(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
-            navigationIcon = {
-                TextButton(onClick = state.onCancel) {
-                    Text(
-                        text = stringResource(RCore.string.buttonCancel),
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            },
-            actions = {
-                TextButton(onClick = state.onSave) {
-                    Text(
-                        text = stringResource(RCore.string.buttonSave),
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            },
-        )
-        is ContactCardTopBarState.Preview -> MailTopAppBar(
-            title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
-            navigationIcon = { TopAppBarButtons.Close(onClick = state.onClose) },
-            actions = {
-                TopAppBarButton(
-                    icon = ImageVector.vectorResource(RMail.drawable.ic_param_dots),
-                    contentDescResId = R.string.buttonMore,
-                    onClick = state.onMore,
+        is ContactCardTopBarState.Editor -> MailContactCardTopBarEditor(state)
+        is ContactCardTopBarState.Preview -> MailContactCardTopBarPreview(state)
+        is ContactCardTopBarState.Default -> MailContactCardTopBarDefault(state)
+    }
+}
+
+@Composable
+private fun MailContactCardTopBarEditor(state: ContactCardTopBarState.Editor) {
+    MailTopAppBar(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
+        navigationIcon = {
+            TextButton(onClick = state.onCancel) {
+                Text(
+                    text = stringResource(RCore.string.buttonCancel),
+                    color = MaterialTheme.colorScheme.primary,
                 )
-            },
+            }
+        },
+        actions = {
+            TextButton(onClick = state.onSave) {
+                Text(
+                    text = stringResource(RCore.string.buttonSave),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        },
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MailContactCardTopBarEditorPreview() {
+    MailTheme {
+        MailContactCardTopBarEditor(
+            ContactCardTopBarState.Editor(
+                onCancel = {},
+                onSave = {},
+            ),
         )
-        is ContactCardTopBarState.Default -> MailTopAppBar(
-            title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
-            navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
+    }
+}
+
+@Composable
+private fun MailContactCardTopBarPreview(state: ContactCardTopBarState.Preview) {
+    MailTopAppBar(
+        title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
+        navigationIcon = { TopAppBarButtons.Close(onClick = state.onClose) },
+        actions = {
+            TopAppBarButton(
+                icon = ImageVector.vectorResource(RMail.drawable.ic_param_dots),
+                contentDescResId = R.string.buttonMore,
+                onClick = state.onMore,
+            )
+        },
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MailContactCardTopBarPreviewPreview() {
+    MailTheme {
+        MailContactCardTopBarPreview(
+            ContactCardTopBarState.Preview(
+                onClose = {},
+                onMore = {},
+            ),
+        )
+    }
+}
+
+@Composable
+private fun MailContactCardTopBarDefault(state: ContactCardTopBarState.Default) {
+    MailTopAppBar(
+        title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
+        navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MailContactCardTopBarDefaultPreview() {
+    MailTheme {
+        MailContactCardTopBarDefault(
+            ContactCardTopBarState.Default(
+                onBack = {},
+            ),
         )
     }
 }
