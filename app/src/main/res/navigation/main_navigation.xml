@@ -752,6 +752,9 @@
             android:name="showContactCard"
             android:defaultValue="true"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_accountBottomSheetDialog_to_contactCardFragment"
+            app:destination="@id/contactCardFragment" />
     </dialog>
 
     <fragment

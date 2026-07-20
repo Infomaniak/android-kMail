@@ -22,7 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.context
@@ -153,10 +153,7 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
     }
 
     private fun openContactCard(userId: Int) {
-        findNavController().navigate(
-            R.id.contactCardFragment,
-            Bundle().apply { putInt("userId", userId) },
-        )
+        safelyNavigate(AccountBottomSheetDialogDirections.actionAccountBottomSheetDialogToContactCardFragment(userId))
         dismiss()
     }
 }
