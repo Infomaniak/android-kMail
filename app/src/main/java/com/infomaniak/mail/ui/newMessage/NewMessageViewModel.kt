@@ -149,7 +149,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -625,6 +627,22 @@ class NewMessageViewModel @Inject constructor(
         }
 
         isEncryptionActivated.postValue(isEncrypted)
+
+        scheduleDate?.let { dateString ->
+            SimpleDateFormat(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR, Locale.getDefault())
+                .parse(dateString)
+                ?.time
+                ?.let { epoch ->
+                    scheduleConfig.postValue(ScheduleConfig.Scheduled(epoch))
+                }
+        }
+
+        reminderDelta?.let { minutes ->
+            reminderConfig.postValue(ReminderConfig.Delayed(minutes, isCustom = false))
+        }
+        shouldRemindRecipient?.let {
+            this@NewMessageViewModel.shouldRemindRecipient.postValue(it)
+        }
     }
 
     fun setQuotesButtonVisibility(isVisible: Boolean) {
