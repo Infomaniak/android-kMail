@@ -476,6 +476,7 @@ class NewMessageFragment : Fragment() {
             onAction2 {
                 newMessageViewModel.reminderConfig.value = ReminderConfig.None
                 newMessageViewModel.shouldRemindRecipient.value = true
+                newMessageViewModel.setReminderDelay(0)
             }
         }
 

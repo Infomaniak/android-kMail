@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.ReminderDraftInfo
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
@@ -46,7 +47,7 @@ import com.infomaniak.mail.data.models.message.EmojiReactionAuthor
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Headers
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.ReminderInfo
+import com.infomaniak.mail.data.models.message.ReminderMessageInfo
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
@@ -237,7 +238,8 @@ object RealmDatabase {
             Folder::class,
             Thread::class,
             Message::class,
-            ReminderInfo::class,
+            ReminderMessageInfo::class,
+            ReminderDraftInfo::class,
             Headers::class,
             Draft::class,
             Recipient::class,

@@ -57,7 +57,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.ReminderInfo
+import com.infomaniak.mail.data.models.message.ReminderMessageInfo
 import com.infomaniak.mail.data.models.message.SplitBody
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.DefaultDispatcher
@@ -877,7 +877,7 @@ class ThreadViewModel @Inject constructor(
             successResId = R.string.snackbarModifyReminderSuccess,
             failureResId = R.string.snackbarModifyReminderFailure,
             onSuccess = {
-                val newReminder = ReminderInfo().apply {
+                val newReminder = ReminderMessageInfo().apply {
                     uuid = reminderUuid
                     date = Date(System.currentTimeMillis() + (delayMinutes * 60_000L)).toRealmInstant()
                 }

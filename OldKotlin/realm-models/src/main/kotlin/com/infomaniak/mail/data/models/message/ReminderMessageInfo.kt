@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-class ReminderInfo : EmbeddedRealmObject {
+class ReminderMessageInfo : EmbeddedRealmObject {
     @SerialName("date")
     var date: RealmInstant? = null
     @SerialName("uuid")

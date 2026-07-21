@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.ui.newMessage
 
+import android.R.id.message
 import android.app.Application
 import android.content.ClipDescription
 import android.content.Intent
@@ -72,6 +73,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.draft.ReminderDraftInfo
 import com.infomaniak.mail.data.models.extensions.action
 import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.data.models.extensions.getDefaultSignatureWithFallback
@@ -81,6 +83,7 @@ import com.infomaniak.mail.data.models.extensions.setUploadStatus
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.ReminderMessageInfo
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -110,6 +113,7 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.htmlToText
+import com.infomaniak.mail.utils.extensions.toRealmInstant
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -637,10 +641,11 @@ class NewMessageViewModel @Inject constructor(
                 }
         }
 
-        reminderDelta?.let { minutes ->
+        reminder?.reminderDelta?.let { minutes ->
             reminderConfig.postValue(ReminderConfig.Delayed(minutes, isCustom = false))
         }
-        shouldRemindRecipient?.let {
+
+        reminder?.shouldRemindRecipient?.let {
             this@NewMessageViewModel.shouldRemindRecipient.postValue(it)
         }
     }
@@ -970,11 +975,11 @@ class NewMessageViewModel @Inject constructor(
         mailboxContentRealm().write {
             DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
                 if (reminderDelayMinutes > 0) {
-                    draft.reminderDelta = reminderDelayMinutes
-                    draft.shouldRemindRecipient = shouldRemindRecipient.value ?: true
+                    val reminder = draft.reminder ?: ReminderDraftInfo().also { draft.reminder = it }
+                    reminder.reminderDelta = reminderDelayMinutes
+                    reminder.shouldRemindRecipient = shouldRemindRecipient.value ?: true
                 } else {
-                    draft.reminderDelta = null
-                    draft.shouldRemindRecipient = null
+                    draft.reminder = null
                 }
             }
         }

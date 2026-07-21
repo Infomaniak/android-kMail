@@ -141,7 +141,7 @@ class Message : RealmObject, Snoozable {
         set
     var mentions = realmListOf<String>()
     @SerialName("reminder")
-    var reminder: ReminderInfo? = null
+    var reminder: ReminderMessageInfo? = null
     //endregion
 
     //region Local data (Transient)
