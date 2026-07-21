@@ -414,11 +414,6 @@ class DraftSendOptionsFragment : Fragment() {
         newMessageViewModel.reminderConfig.value = pendingReminderConfig
         newMessageViewModel.shouldRemindRecipient.value = pendingShouldRemindRecipient
 
-        val scheduleDate = (pendingScheduleConfig as? ScheduleConfig.Scheduled)?.let { Date(it.epochMillis) }
-        newMessageViewModel.setScheduleDate(scheduleDate)
-        val reminderDelay = (pendingReminderConfig as? ReminderConfig.Delayed)?.delayMinutes ?: 0
-        newMessageViewModel.setReminderDelay(reminderDelay)
-
         if (pendingScheduleConfig is ScheduleConfig.Scheduled) {
             pendingLastSelectedScheduleEpochMillis?.let { localSettings.lastSelectedScheduleEpochMillis = it }
         }

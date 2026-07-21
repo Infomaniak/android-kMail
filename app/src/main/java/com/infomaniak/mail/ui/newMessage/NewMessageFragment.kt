@@ -330,7 +330,7 @@ class NewMessageFragment : Fragment() {
     private fun setupBackActionHandler() {
 
         fun scheduleDraft(timestamp: Long) {
-            newMessageViewModel.setScheduleDate(Date(timestamp))
+            newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(timestamp)
             tryToSendEmail(isScheduled = true)
         }
 
@@ -467,7 +467,6 @@ class NewMessageFragment : Fragment() {
             onAction1 { navigateToScheduleSendBottomSheet() }
             onAction2 {
                 newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
-                newMessageViewModel.setScheduleDate(null)
             }
         }
 
@@ -476,7 +475,6 @@ class NewMessageFragment : Fragment() {
             onAction2 {
                 newMessageViewModel.reminderConfig.value = ReminderConfig.None
                 newMessageViewModel.shouldRemindRecipient.value = true
-                newMessageViewModel.setReminderDelay(0)
             }
         }
 
@@ -1018,11 +1016,9 @@ class NewMessageFragment : Fragment() {
         val scheduleConfig = newMessageViewModel.scheduleConfig.value
         return if (scheduleConfig is ScheduleConfig.Scheduled) {
             if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()) {
-                newMessageViewModel.setScheduleDate(Date(scheduleConfig.epochMillis))
                 true
             } else {
                 newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
-                newMessageViewModel.resetScheduledDate()
                 false
             }
         } else {
@@ -1031,14 +1027,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun processReminderConfig(): Boolean {
-        val reminderConfig = newMessageViewModel.reminderConfig.value
-        return if (reminderConfig is ReminderConfig.Delayed) {
-            newMessageViewModel.setReminderDelay(reminderConfig.delayMinutes)
-            true
-        } else {
-            newMessageViewModel.setReminderDelay(0)
-            false
-        }
+        return newMessageViewModel.reminderConfig.value is ReminderConfig.Delayed
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
@@ -1110,7 +1099,7 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(trackConfirmEvent)
                 hasConfirmed = true
             },
-            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
+            onCancel = { if (isScheduled) newMessageViewModel.scheduleConfig.value = ScheduleConfig.None },
             onDismiss = { isSendingCanceled.complete(!hasConfirmed) },
         )
 

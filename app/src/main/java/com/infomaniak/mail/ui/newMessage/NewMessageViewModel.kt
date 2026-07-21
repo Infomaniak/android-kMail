@@ -962,32 +962,6 @@ class NewMessageViewModel @Inject constructor(
         }.cancellable().onFailure(Sentry::captureException)
     }
 
-    fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
-        val localUuid = draftLocalUuid ?: return@launch
-        mailboxContentRealm().write {
-            DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
-                draft.scheduleDate = date?.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
-            }
-        }
-    }
-
-    fun resetScheduledDate() = setScheduleDate(date = null)
-
-    fun setReminderDelay(reminderDelayMinutes: Int) = viewModelScope.launch(ioDispatcher) {
-        val localUuid = draftLocalUuid ?: return@launch
-        mailboxContentRealm().write {
-            DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
-                if (reminderDelayMinutes > 0) {
-                    val reminder = draft.reminder ?: ReminderDraftInfo().also { draft.reminder = it }
-                    reminder.reminderDelta = reminderDelayMinutes
-                    reminder.shouldRemindRecipient = shouldRemindRecipient.value ?: true
-                } else {
-                    draft.reminder = null
-                }
-            }
-        }
-    }
-
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
@@ -1081,6 +1055,18 @@ class NewMessageViewModel @Inject constructor(
         if (draftAction == DraftAction.SEND) delay = localSettings.cancelDelay
 
         ackRequest = localSettings.askEmailAcknowledgement
+
+        scheduleDate = getCurrentScheduleDate()
+
+        val currentReminderDelta = getCurrentReminderDelta()
+        reminder = if (currentReminderDelta != null) {
+            ReminderDraftInfo().apply {
+                reminderDelta = currentReminderDelta
+                shouldRemindRecipient = this@NewMessageViewModel.shouldRemindRecipient.value ?: true
+            }
+        } else {
+            null
+        }
 
         updateDraftAttachmentsWithLiveData(
             uiAttachments = attachmentsLiveData.valueOrEmpty(),
