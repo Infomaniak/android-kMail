@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesId
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.computeReactionsPerMessageId
 import com.infomaniak.mail.data.models.thread.overrideWith
+import com.infomaniak.mail.utils.ThreadListUtils.hasReminders
 import com.infomaniak.mail.utils.ThreadListUtils.hasUnseenMentions
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -82,6 +83,7 @@ object ThreadRecomputations {
         isForwarded = false
         hasAttachable = false
         hasUnseenMentions = false
+        hasReminders = false
         numberOfScheduledDrafts = 0
         snoozeState = null
         snoozeEndDate = null
@@ -100,6 +102,7 @@ object ThreadRecomputations {
         }
 
         hasUnseenMentions = hasUnseenMentions(aliases?.toList() ?: emptyList(), allMessages)
+        hasReminders = hasReminders(allMessages)
 
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
