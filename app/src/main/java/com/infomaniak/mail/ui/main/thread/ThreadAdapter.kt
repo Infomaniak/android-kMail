@@ -924,7 +924,7 @@ class ThreadAdapter(
 
         reminderAlert.setDescription(
             context.getString(
-                R.string.callIfNoResponseHeaderTitle,
+                R.string.callIfNoResponseHeaderTitleWithDate,
                 reminderDate.format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
             ),
         )

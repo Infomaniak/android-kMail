@@ -182,6 +182,7 @@
     <string name="calendarNotInvited">Δεν είστε προσκεκλημένος</string>
     <string name="calendarOrganizerName">%s (Διοργανωτής)</string>
     <string name="callIfNoResponseHeaderTitle">Υπενθύμιση αν δεν υπάρχει απάντηση: %s μετά την αποστολή</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Θύμισέ μου αν δεν υπάρχει απάντηση: %s</string>
     <string name="ccTitle">Κοινοποίηση:</string>
     <string name="comingSoon">Έρχεται σύντομα…</string>
     <string name="commercialFolder">Προσφορές</string>

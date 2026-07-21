@@ -186,6 +186,7 @@
     <string name="calendarNotInvited">You are not invited</string>
     <string name="calendarOrganizerName">%s (Organizer)</string>
     <string name="callIfNoResponseHeaderTitle">Remind me if there is no response: %s after sending</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Remind me if there is no response: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
