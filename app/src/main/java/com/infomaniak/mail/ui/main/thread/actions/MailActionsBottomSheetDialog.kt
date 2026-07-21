@@ -28,8 +28,10 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.extensions.kSuite
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
@@ -215,13 +217,18 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.askEuria.isVisible = isVisible
     }
 
-    fun setReminderUi(isFromDraft: Boolean, from: List<Recipient>, aliases: List<String>?) = with(binding) {
+    fun setReminderUi(
+        isFromDraft: Boolean,
+        from: List<Recipient>,
+        aliases: List<String>?,
+        featureFlags: Mailbox.FeatureFlagSet?,
+    ) = with(binding) {
         if (aliases == null) {
             reminder.isVisible = false
             return@with
         }
         val isFromAlias = from.any { sender -> sender.email in aliases }
-        binding.reminder.isVisible = !isFromDraft && isFromAlias
+        binding.reminder.isVisible = !isFromDraft && isFromAlias && featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) == true
     }
 
     interface OnActionClick {

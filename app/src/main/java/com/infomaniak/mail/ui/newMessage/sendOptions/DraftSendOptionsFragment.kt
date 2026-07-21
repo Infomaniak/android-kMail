@@ -35,6 +35,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
@@ -136,6 +137,18 @@ class DraftSendOptionsFragment : Fragment() {
         restoreStateFromViewModel()
 
         saveButton.setOnClickListener { saveOptions() }
+
+        newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
+            val isReminderEnabled = featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) ?: false
+            reminderLayout.isVisible = isReminderEnabled
+            reminderTopDivider.isVisible = isReminderEnabled
+            dividerBottomReminderOptions.isVisible = isReminderEnabled
+            if (!isReminderEnabled) {
+                reminderIfNoAnswer.isChecked = false
+                setReminderOptionsVisible(isVisible = false)
+                removeReminderOptionsSelection()
+            }
+        }
     }
 
     private fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {

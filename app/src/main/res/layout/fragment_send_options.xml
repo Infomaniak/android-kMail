@@ -57,12 +57,14 @@
             android:paddingBottom="@dimen/marginStandardMedium">
 
             <View
+                android:id="@+id/reminderTopDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:background="@drawable/divider" />
 
             <LinearLayout
+                android:id="@+id/reminderLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">

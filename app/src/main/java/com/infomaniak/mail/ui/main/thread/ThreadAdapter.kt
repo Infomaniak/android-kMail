@@ -64,6 +64,8 @@ import com.infomaniak.mail.data.models.extensions.isInSpamFolder
 import com.infomaniak.mail.data.models.extensions.isMe
 import com.infomaniak.mail.data.models.extensions.isPendingAcknowledgementForMe
 import com.infomaniak.mail.data.models.extensions.isReplyAuthorized
+import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
@@ -120,6 +122,7 @@ class ThreadAdapter(
     private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val aliases: () -> List<String>,
+    private val featureFlags: () -> Mailbox.FeatureFlagSet? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
@@ -874,6 +877,8 @@ class ThreadAdapter(
         reminderAlert.isGone = true
         endReminderAlert.isGone = true
         requestResponseAlert.isGone = true
+
+        if (featureFlags()?.contains(FeatureFlag.RESPONSE_REQUIRED) != true) return
 
         if (message.isScheduledDraft && message.reminder != null) {
             bindScheduledDraftReminderAlert(message)

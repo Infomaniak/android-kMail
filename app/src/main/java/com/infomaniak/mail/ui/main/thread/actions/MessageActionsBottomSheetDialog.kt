@@ -130,7 +130,12 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setMarkUnreadUi(isFromDraft)
             setReportPhishingUi(isFromDraft)
             setAskEuriaUi(isVisible = true)
-            setReminderUi(isFromDraft = isFromDraft, message.from, mainViewModel.currentMailbox.value?.aliases)
+            setReminderUi(
+                isFromDraft = isFromDraft,
+                from = message.from,
+                aliases = mainViewModel.currentMailbox.value?.aliases,
+                featureFlags = mainViewModel.currentMailbox.value?.featureFlags,
+            )
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
