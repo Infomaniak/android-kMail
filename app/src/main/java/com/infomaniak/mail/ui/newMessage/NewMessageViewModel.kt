@@ -596,6 +596,9 @@ class NewMessageViewModel @Inject constructor(
             isEncrypted = isEncrypted,
             encryptionPassword = encryptionKey ?: "",
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
+            scheduleDate = scheduleDate,
+            reminderDelta = reminder?.reminderDelta,
+            shouldRemindRecipient = reminder?.shouldRemindRecipient,
         )
     }
 
@@ -1187,6 +1190,16 @@ class NewMessageViewModel @Inject constructor(
         SentryDebug.addDraftBreadcrumbs(draft = this, step)
     }
 
+    private fun getCurrentScheduleDate(): String? {
+        return (scheduleConfig.value as? ScheduleConfig.Scheduled)?.let { schedule ->
+            Date(schedule.epochMillis).format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
+        }
+    }
+
+    private fun getCurrentReminderDelta(): Int? {
+        return (reminderConfig.value as? ReminderConfig.Delayed)?.delayMinutes
+    }
+
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
             draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() &&
@@ -1198,7 +1211,10 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
-                .mapTo(mutableSetOf()) { it.localUuid }
+                        .mapTo(mutableSetOf()) { it.localUuid } &&
+                    draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
+                    draftSnapshot.reminderDelta == getCurrentReminderDelta() &&
+                    draftSnapshot.shouldRemindRecipient == shouldRemindRecipient.value
         } ?: false
     }
 
@@ -1316,6 +1332,9 @@ class NewMessageViewModel @Inject constructor(
         var isEncrypted: Boolean,
         var encryptionPassword: String,
         val attachmentsLocalUuids: Set<String>,
+        val scheduleDate: String?,
+        val reminderDelta: Int?,
+        val shouldRemindRecipient: Boolean?,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
