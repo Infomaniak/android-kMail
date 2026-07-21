@@ -90,6 +90,7 @@ import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.configureOnTouchListener
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
+import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
@@ -873,6 +874,12 @@ class ThreadAdapter(
         reminderAlert.isGone = true
         endReminderAlert.isGone = true
         requestResponseAlert.isGone = true
+
+        if (message.isScheduledDraft && message.reminder != null) {
+            bindScheduledDraftReminderAlert(message)
+            return
+        }
+
         message.reminder?.date?.toDate()?.let { reminderDate ->
             val now = Date()
             val isExpired = reminderDate.before(now)
@@ -880,6 +887,27 @@ class ThreadAdapter(
                 message.from.any { it.isMe() } -> bindSenderReminderAlert(message, reminderDate, isExpired)
                 message.allRecipients.any { it.isMe() } -> bindRecipientReminderAlert(message, reminderDate, isExpired)
             }
+        }
+    }
+
+    private fun ItemMessageBinding.bindScheduledDraftReminderAlert(message: Message) {
+        val delayMinutes = message.reminder?.delta ?: return
+
+        reminderAlert.setActionsVisibility(shouldDisplayAction = true)
+        reminderAlert.setDescription(
+            context.getString(R.string.callIfNoResponseHeaderTitle, context.formatDelayText(delayMinutes)),
+        )
+
+        alertsGroup.isVisible = true
+        reminderAlert.isVisible = true
+
+        reminderAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
+        }
+
+        reminderAlert.onAction2 {
+            threadAdapterCallbacks?.onDisableReminderClicked?.invoke(message)
         }
     }
 
@@ -1464,7 +1492,10 @@ class ThreadAdapter(
 
                 data object Reminder : DiffAspect<MessageUi>({
                     message.reminder?.uuid == it.message.reminder?.uuid &&
-                            message.reminder?.date == it.message.reminder?.date
+                            message.reminder?.date == it.message.reminder?.date &&
+                            message.reminder?.delta == it.message.reminder?.delta &&
+                            message.reminder?.display == it.message.reminder?.display &&
+                            message.reminderAction == it.message.reminderAction
                 })
 
                 data object Unsubscribe : DiffAspect<MessageUi>({ unsubscribeState == it.unsubscribeState })

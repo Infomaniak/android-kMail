@@ -27,10 +27,10 @@ import kotlinx.serialization.UseSerializers
 
 @Serializable
 class ReminderDraftInfo : EmbeddedRealmObject {
-    @SerialName("reminder_delta")
+    @SerialName("delta")
     var reminderDelta: Int? = null
 
-    @SerialName("reminder_display")
+    @SerialName("display")
     var shouldRemindRecipient: Boolean? = null
 
     companion object

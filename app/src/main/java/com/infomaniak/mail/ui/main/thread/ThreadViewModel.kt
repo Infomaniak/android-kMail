@@ -785,7 +785,7 @@ class ThreadViewModel @Inject constructor(
         successResId: Int,
         failureResId: Int,
         onSuccess: suspend () -> Unit = {},
-        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: Int) -> ApiResponse<String>
+        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: Int) -> ApiResponse<*>
     ) {
         val messageId = message.messageId
 
@@ -838,8 +838,10 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun disableReminder(message: Message) {
+        val reminderAction = message.reminderAction
         val reminderUuid = message.reminder?.uuid
-        if (reminderUuid.isNullOrBlank()) {
+
+        if (reminderAction.isNullOrBlank() && reminderUuid.isNullOrBlank()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarDisableReminderFailure))
             return
         }
@@ -852,22 +854,29 @@ class ThreadViewModel @Inject constructor(
                 mailboxContentRealm().write {
                     MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
                         localMessage?.reminder = null
+                        localMessage?.reminderAction = null
                     }
                 }
             },
         ) { mailboxUuid, folderId, messageId ->
-            ApiRepository.disableReminder(
-                mailboxUuid = mailboxUuid,
-                folderId = folderId,
-                messageId = messageId,
-                reminderUuid = reminderUuid
-            )
+            if (!reminderAction.isNullOrBlank()) {
+                ApiRepository.disableScheduledDraftReminder(reminderAction)
+            } else {
+                ApiRepository.disableReminder(
+                    mailboxUuid = mailboxUuid,
+                    folderId = folderId,
+                    messageId = messageId,
+                    reminderUuid = reminderUuid!!,
+                )
+            }
         }
     }
 
     fun modifyReminder(message: Message, delayMinutes: Int) {
+        val reminderAction = message.reminderAction
         val reminderUuid = message.reminder?.uuid
-        if (reminderUuid.isNullOrBlank()) {
+
+        if (reminderAction.isNullOrBlank() && reminderUuid.isNullOrBlank()) {
             snackbarManager.postValue(appContext.getString(R.string.snackbarModifyReminderFailure))
             return
         }
@@ -877,24 +886,33 @@ class ThreadViewModel @Inject constructor(
             successResId = R.string.snackbarModifyReminderSuccess,
             failureResId = R.string.snackbarModifyReminderFailure,
             onSuccess = {
-                val newReminder = ReminderMessageInfo().apply {
-                    uuid = reminderUuid
-                    date = Date(System.currentTimeMillis() + (delayMinutes * 60_000L)).toRealmInstant()
-                }
                 mailboxContentRealm().write {
                     MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                        localMessage?.reminder = newReminder
+                        val current = localMessage?.reminder
+                        localMessage?.reminder = ReminderMessageInfo().apply {
+                            uuid = reminderUuid ?: current?.uuid
+                            if (current?.delta != null || message.isScheduledDraft) {
+                                delta = delayMinutes
+                                display = current?.display
+                            } else {
+                                date = Date(System.currentTimeMillis() + (delayMinutes * 60_000L)).toRealmInstant()
+                            }
+                        }
                     }
                 }
             },
         ) { mailboxUuid, folderId, messageId ->
-            ApiRepository.modifyReminder(
-                mailboxUuid = mailboxUuid,
-                folderId = folderId,
-                messageId = messageId,
-                reminderUuid = reminderUuid,
-                delayMinutes = delayMinutes
-            )
+            if (!reminderAction.isNullOrBlank()) {
+                ApiRepository.modifyScheduledDraftReminder(reminderAction, delayMinutes)
+            } else {
+                ApiRepository.modifyReminder(
+                    mailboxUuid = mailboxUuid,
+                    folderId = folderId,
+                    messageId = messageId,
+                    reminderUuid = reminderUuid!!,
+                    delayMinutes = delayMinutes,
+                )
+            }
         }
     }
     //endregion

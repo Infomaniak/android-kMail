@@ -85,6 +85,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -211,6 +212,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid), DELETE)
     }
 
+    suspend fun disableScheduledDraftReminder(reminderAction: String): ApiResponse<JsonElement> {
+        return callApi(ApiRoutes.resource(reminderAction), DELETE)
+    }
+
     suspend fun modifyReminder(
         mailboxUuid: String,
         folderId: String,
@@ -220,6 +225,14 @@ object ApiRepository : ApiRepositoryCore() {
     ): ApiResponse<String> {
         return callApi(
             ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid),
+            PUT,
+            mapOf("reminder_delta" to delayMinutes)
+        )
+    }
+
+    suspend fun modifyScheduledDraftReminder(reminderAction: String, delayMinutes: Int): ApiResponse<JsonElement> {
+        return callApi(
+            ApiRoutes.resource(reminderAction),
             PUT,
             mapOf("reminder_delta" to delayMinutes)
         )
