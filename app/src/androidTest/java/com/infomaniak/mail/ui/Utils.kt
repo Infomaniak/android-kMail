@@ -25,6 +25,7 @@ import android.net.Uri
 import android.view.View
 import androidx.core.content.FileProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
@@ -67,7 +68,9 @@ object Utils {
                     check(assertion)
                 }
             }.onFailure { exception ->
-                if (i < numberOfRetries && exception is AssertionFailedError) Thread.sleep(retryInterval.inWholeMilliseconds)
+                if (i < numberOfRetries - 1 && (exception is AssertionFailedError || exception is NoMatchingViewException)) {
+                    Thread.sleep(retryInterval.inWholeMilliseconds)
+                }
             }
         }
 
