@@ -22,6 +22,7 @@ enum class FeatureFlag(val apiName: String) {
     AI("ai-mail-composer"),
     BIMI("bimi"),
     ENCRYPTION("mail-compose-encrypted"),
+    RESPONSE_REQUIRED("mail-response-required-flag"),
     SCHEDULE_DRAFTS("schedule-send-draft"),
     SNOOZE("mail-snooze"),
     EMOJI_REACTION("mail-emoji-reaction"),
