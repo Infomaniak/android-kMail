@@ -521,6 +521,7 @@
     <string name="selectDateDialogTitle">Επιλέξτε ημερομηνία</string>
     <string name="selectSignatureNone">Χωρίς υπογραφή</string>
     <string name="selectTimeDialogTitle">Επιλέξτε ώρα</string>
+    <string name="selectionReminderMeOnly">Μόνο εγώ</string>
     <string name="selectionReminderRecipientsAndMe">Οι παραλήπτες και εγώ</string>
     <string name="send">Αποστολή</string>
     <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>

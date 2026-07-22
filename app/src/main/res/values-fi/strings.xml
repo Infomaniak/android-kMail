@@ -521,6 +521,7 @@
     <string name="selectDateDialogTitle">Valitse päivämäärä</string>
     <string name="selectSignatureNone">Ei allekirjoitusta</string>
     <string name="selectTimeDialogTitle">Valitse aika</string>
+    <string name="selectionReminderMeOnly">Vain minä</string>
     <string name="selectionReminderRecipientsAndMe">Vastaanottajat ja minä</string>
     <string name="send">Lähetä</string>
     <string name="sendConfirmationAction">Lähetä vahvistus</string>
