@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Potwierdzenie przeczytania zostało wysłane do nadawcy.</string>
     <string name="actionArchive">Archiwizuj</string>
     <string name="actionBlockSender">Zablokuj nadawcę</string>
+    <string name="actionCallIfNoResponse">Przypomnij mi, jeśli nie będzie odpowiedzi po wysłaniu</string>
     <string name="actionCancelSnooze">Anuluj uśpienie</string>
     <string name="actionDelete">Usuń</string>
     <string name="actionEditMenu">Edytuj menu</string>
@@ -142,6 +143,7 @@
     <string name="buttonCopyPassword">Kopiuj hasło</string>
     <string name="buttonCreate">Utwórz</string>
     <string name="buttonCreateFolder">Dodaj folder</string>
+    <string name="buttonCustomReminder">Niestandardowe przypomnienie</string>
     <string name="buttonCustomSchedule">Niestandardowy harmonogram</string>
     <string name="buttonDownload">Pobierz</string>
     <string name="buttonDownloadAll">Pobierz wszystko</string>
@@ -497,6 +499,7 @@
     <string name="readMore">Czytaj więcej</string>
     <string name="recentSearchesTitle">Ostatnie wyszukiwania</string>
     <string name="refreshTokenError">Zostałeś/aś rozłączony/a</string>
+    <string name="reminderVisibilityTitle">Widoczność przypomnienia</string>
     <string name="renameFolder">Zmień nazwę folderu</string>
     <string name="reportDisplayProblemDescription">Czy wyrażasz zgodę na udostępnienie swoich danych naszym deweloperom, aby mogli Ci pomóc w rozwiązaniu problemu?</string>
     <string name="reportDisplayProblemTitle">Zgłoś problem z wyświetlaniem</string>
@@ -533,8 +536,10 @@
     <string name="selectDateDialogTitle">Wybierz datę</string>
     <string name="selectSignatureNone">Brak podpisu</string>
     <string name="selectTimeDialogTitle">Wybierz godzinę</string>
+    <string name="selectionReminderRecipientsAndMe">Odbiorcy i ja</string>
     <string name="send">Wyślij</string>
     <string name="sendConfirmationAction">Wyślij potwierdzenie</string>
+    <string name="sendOptions">Opcje wysyłania</string>
     <string name="sentFolder">Wysłane wiadomości</string>
     <string name="settingsAccentColor">Kolor akcentu</string>
     <string name="settingsAccentColorDescription">Wybierz kolor akcentu dla aplikacji</string>

@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Um recibo de leitura foi enviado ao remetente.</string>
     <string name="actionArchive">Arquivar</string>
     <string name="actionBlockSender">Bloquear remetente</string>
+    <string name="actionCallIfNoResponse">Lembrar-me se não houver resposta após enviar</string>
     <string name="actionCancelSnooze">Cancelar lembrete</string>
     <string name="actionDelete">Eliminar</string>
     <string name="actionEditMenu">Editar menu</string>
@@ -136,6 +137,7 @@
     <string name="buttonCopyPassword">Copiar palavra-passe</string>
     <string name="buttonCreate">Criar</string>
     <string name="buttonCreateFolder">Adicionar uma pasta</string>
+    <string name="buttonCustomReminder">Lembrete personalizado</string>
     <string name="buttonCustomSchedule">Programação personalizada</string>
     <string name="buttonDownload">Transferir</string>
     <string name="buttonDownloadAll">Transferir tudo</string>
@@ -475,6 +477,7 @@
     <string name="readMore">Saber mais</string>
     <string name="recentSearchesTitle">Pesquisas recentes</string>
     <string name="refreshTokenError">Foi desligado</string>
+    <string name="reminderVisibilityTitle">Visibilidade do lembrete</string>
     <string name="renameFolder">Renomear pasta</string>
     <string name="reportDisplayProblemDescription">Aceita partilhar os seus dados com os nossos programadores para que o ajudem com o seu problema?</string>
     <string name="reportDisplayProblemTitle">Reportar um problema de exibição</string>
@@ -507,8 +510,10 @@
     <string name="selectDateDialogTitle">Selecionar data</string>
     <string name="selectSignatureNone">Sem assinatura</string>
     <string name="selectTimeDialogTitle">Selecionar hora</string>
+    <string name="selectionReminderRecipientsAndMe">Os destinatários e eu</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar a confirmação</string>
+    <string name="sendOptions">Opções de envio</string>
     <string name="sentFolder">Mensagens enviadas</string>
     <string name="settingsAccentColor">Cor de destaque</string>
     <string name="settingsAccentColorDescription">Escolha a cor de destaque da aplicação</string>

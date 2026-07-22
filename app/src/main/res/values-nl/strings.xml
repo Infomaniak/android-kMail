@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Een leesbewijs is naar de afzender verzonden.</string>
     <string name="actionArchive">Archiveren</string>
     <string name="actionBlockSender">Afzender blokkeren</string>
+    <string name="actionCallIfNoResponse">Herinner me eraan als er geen reactie komt na het verzenden</string>
     <string name="actionCancelSnooze">Snooze annuleren</string>
     <string name="actionDelete">Verwijderen</string>
     <string name="actionEditMenu">Menu bewerken</string>
@@ -136,6 +137,7 @@
     <string name="buttonCopyPassword">Wachtwoord kopiëren</string>
     <string name="buttonCreate">Maken</string>
     <string name="buttonCreateFolder">Een map toevoegen</string>
+    <string name="buttonCustomReminder">Aangepaste herinnering</string>
     <string name="buttonCustomSchedule">Aangepast schema</string>
     <string name="buttonDownload">Downloaden</string>
     <string name="buttonDownloadAll">Alles downloaden</string>
@@ -475,6 +477,7 @@
     <string name="readMore">Meer informatie</string>
     <string name="recentSearchesTitle">Recente zoekopdrachten</string>
     <string name="refreshTokenError">U bent uitgelogd</string>
+    <string name="reminderVisibilityTitle">Zichtbaarheid van de herinnering</string>
     <string name="renameFolder">De map hernoemen</string>
     <string name="reportDisplayProblemDescription">Gaat u akkoord om uw gegevens te delen met onze ontwikkelaars zodat zij u kunnen helpen met uw probleem?</string>
     <string name="reportDisplayProblemTitle">Een weergaveprobleem melden</string>
@@ -507,8 +510,10 @@
     <string name="selectDateDialogTitle">Datum selecteren</string>
     <string name="selectSignatureNone">Geen handtekening</string>
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
+    <string name="selectionReminderRecipientsAndMe">Ontvangers en mij</string>
     <string name="send">Verzenden</string>
     <string name="sendConfirmationAction">De bevestiging verzenden</string>
+    <string name="sendOptions">Verzendopties</string>
     <string name="sentFolder">Verzonden berichten</string>
     <string name="settingsAccentColor">Accentkleur</string>
     <string name="settingsAccentColorDescription">Kies de accentkleur voor de applicatie</string>

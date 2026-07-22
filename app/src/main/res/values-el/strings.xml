@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Μια απόδειξη ανάγνωσης στάλθηκε στον αποστολέα.</string>
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
+    <string name="actionCallIfNoResponse">Υπενθύμισέ μου αν δεν υπάρξει απάντηση μετά την αποστολή</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
     <string name="actionDelete">Διαγραφή</string>
     <string name="actionEditMenu">Επεξεργασία μενού</string>
@@ -136,6 +137,7 @@
     <string name="buttonCopyPassword">Αντιγραφή κωδικού πρόσβασης</string>
     <string name="buttonCreate">Δημιουργία</string>
     <string name="buttonCreateFolder">Προσθήκη φακέλου</string>
+    <string name="buttonCustomReminder">Προσαρμοσμένη υπενθύμιση</string>
     <string name="buttonCustomSchedule">Προσαρμοσμένο πρόγραμμα</string>
     <string name="buttonDownload">Λήψη</string>
     <string name="buttonDownloadAll">Λήψη όλων</string>
@@ -475,6 +477,7 @@
     <string name="readMore">Διαβάστε περισσότερα</string>
     <string name="recentSearchesTitle">Πρόσφατες αναζητήσεις</string>
     <string name="refreshTokenError">Έχετε αποσυνδεθεί</string>
+    <string name="reminderVisibilityTitle">Ορατότητα υπενθύμισης</string>
     <string name="renameFolder">Μετονομασία φακέλου</string>
     <string name="reportDisplayProblemDescription">Συμφωνείτε να μοιραστείτε τα δεδομένα σας με τους προγραμματιστές μας ώστε να σας βοηθήσουν με το πρόβλημά σας;</string>
     <string name="reportDisplayProblemTitle">Αναφορά προβλήματος εμφάνισης</string>
@@ -507,8 +510,10 @@
     <string name="selectDateDialogTitle">Επιλέξτε ημερομηνία</string>
     <string name="selectSignatureNone">Χωρίς υπογραφή</string>
     <string name="selectTimeDialogTitle">Επιλέξτε ώρα</string>
+    <string name="selectionReminderRecipientsAndMe">Οι παραλήπτες και εγώ</string>
     <string name="send">Αποστολή</string>
     <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>
+    <string name="sendOptions">Επιλογές αποστολής</string>
     <string name="sentFolder">Απεσταλμένα μηνύματα</string>
     <string name="settingsAccentColor">Χρώμα έμφασης</string>
     <string name="settingsAccentColorDescription">Επιλέξτε το χρώμα έμφασης για την εφαρμογή</string>

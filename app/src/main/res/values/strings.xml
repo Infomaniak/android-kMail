@@ -27,6 +27,7 @@
     <string name="acknowledgementMessageSent">A read receipt has been sent to the sender.</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
+    <string name="actionCallIfNoResponse">Remind me if there is no response after sending</string>
     <string name="actionCancelSnooze">Cancel snooze</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
@@ -140,6 +141,7 @@
     <string name="buttonCopyPassword">Copy password</string>
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateFolder">Add a folder</string>
+    <string name="buttonCustomReminder">Custom reminder</string>
     <string name="buttonCustomSchedule">Custom schedule</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
@@ -479,6 +481,7 @@
     <string name="readMore">Read more</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>
+    <string name="reminderVisibilityTitle">Reminder visibility</string>
     <string name="renameFolder">Rename the folder</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
     <string name="reportDisplayProblemTitle">Report a display problem</string>
@@ -511,8 +514,10 @@
     <string name="selectDateDialogTitle">Select date</string>
     <string name="selectSignatureNone">No signature</string>
     <string name="selectTimeDialogTitle">Select time</string>
+    <string name="selectionReminderRecipientsAndMe">Recipients and I</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send the confirmation</string>
+    <string name="sendOptions">Send options</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent colour</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>

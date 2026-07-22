@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Vastaanottokuittaus on lähetetty lähettäjälle.</string>
     <string name="actionArchive">Arkistoi</string>
     <string name="actionBlockSender">Estä lähettäjä</string>
+    <string name="actionCallIfNoResponse">Muistuta minua, jos vastausta ei tule lähettämisen jälkeen</string>
     <string name="actionCancelSnooze">Peruuta torkku</string>
     <string name="actionDelete">Poista</string>
     <string name="actionEditMenu">Muokkaa valikkoa</string>
@@ -136,6 +137,7 @@
     <string name="buttonCopyPassword">Kopioi salasana</string>
     <string name="buttonCreate">Luo</string>
     <string name="buttonCreateFolder">Lisää kansio</string>
+    <string name="buttonCustomReminder">Mukautettu muistutus</string>
     <string name="buttonCustomSchedule">Mukautettu aikataulu</string>
     <string name="buttonDownload">Lataa</string>
     <string name="buttonDownloadAll">Lataa kaikki</string>
@@ -475,6 +477,7 @@
     <string name="readMore">Lue lisää</string>
     <string name="recentSearchesTitle">Viimeisimmät haut</string>
     <string name="refreshTokenError">Sinut on kirjattu ulos</string>
+    <string name="reminderVisibilityTitle">Muistutuksen näkyvyys</string>
     <string name="renameFolder">Nimeä kansio uudelleen</string>
     <string name="reportDisplayProblemDescription">Suostutko jakamaan tietojasi kehittäjiemme kanssa, jotta he voivat auttaa sinua ongelmassasi?</string>
     <string name="reportDisplayProblemTitle">Ilmoita näyttöongelmasta</string>
@@ -507,8 +510,10 @@
     <string name="selectDateDialogTitle">Valitse päivämäärä</string>
     <string name="selectSignatureNone">Ei allekirjoitusta</string>
     <string name="selectTimeDialogTitle">Valitse aika</string>
+    <string name="selectionReminderRecipientsAndMe">Vastaanottajat ja minä</string>
     <string name="send">Lähetä</string>
     <string name="sendConfirmationAction">Lähetä vahvistus</string>
+    <string name="sendOptions">Lähetysvalinnat</string>
     <string name="sentFolder">Lähetetyt viestit</string>
     <string name="settingsAccentColor">Korostusväri</string>
     <string name="settingsAccentColorDescription">Valitse sovelluksen korostusväri</string>

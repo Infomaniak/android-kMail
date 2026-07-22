@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Ett läskvitto har skickats till avsändaren.</string>
     <string name="actionArchive">Arkivera</string>
     <string name="actionBlockSender">Blockera avsändare</string>
+    <string name="actionCallIfNoResponse">Påminn mig om jag inte får svar efter att ha skickat</string>
     <string name="actionCancelSnooze">Avbryt vänteläge</string>
     <string name="actionDelete">Ta bort</string>
     <string name="actionEditMenu">Redigera meny</string>
@@ -136,6 +137,7 @@
     <string name="buttonCopyPassword">Kopiera lösenord</string>
     <string name="buttonCreate">Skapa</string>
     <string name="buttonCreateFolder">Lägg till en mapp</string>
+    <string name="buttonCustomReminder">Anpassad påminnelse</string>
     <string name="buttonCustomSchedule">Anpassat schema</string>
     <string name="buttonDownload">Ladda ner</string>
     <string name="buttonDownloadAll">Ladda ner alla</string>
@@ -475,6 +477,7 @@
     <string name="readMore">Läs mer</string>
     <string name="recentSearchesTitle">Senaste sökningar</string>
     <string name="refreshTokenError">Du har kopplats bort</string>
+    <string name="reminderVisibilityTitle">Påminnelsens synlighet</string>
     <string name="renameFolder">Byt namn på mappen</string>
     <string name="reportDisplayProblemDescription">Samtycker du till att dela dina data med våra utvecklare så att de kan hjälpa dig med ditt problem?</string>
     <string name="reportDisplayProblemTitle">Rapportera ett visningsproblem</string>
@@ -507,8 +510,10 @@
     <string name="selectDateDialogTitle">Välj datum</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Välj tid</string>
+    <string name="selectionReminderRecipientsAndMe">Mottagare och mig</string>
     <string name="send">Skicka</string>
     <string name="sendConfirmationAction">Skicka bekräftelsen</string>
+    <string name="sendOptions">Skicka-alternativ</string>
     <string name="sentFolder">Skickade meddelanden</string>
     <string name="settingsAccentColor">Accentfärg</string>
     <string name="settingsAccentColorDescription">Välj accentfärg för applikationen</string>
