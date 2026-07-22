@@ -82,9 +82,8 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -92,6 +91,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
+import com.infomaniak.mail.ui.newMessage.sendOptions.DraftSendOptionsFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
@@ -145,6 +145,7 @@ import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -233,6 +234,9 @@ class NewMessageFragment : Fragment() {
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
 
+    private val isScheduled: Boolean
+        get() = newMessageViewModel.scheduleConfig.value is ScheduleConfig.Scheduled
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
@@ -320,7 +324,7 @@ class NewMessageFragment : Fragment() {
     private fun setupBackActionHandler() {
 
         fun scheduleDraft(timestamp: Long) {
-            newMessageViewModel.setScheduleDate(Date(timestamp))
+            newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(timestamp)
             tryToSendEmail(isScheduled = true)
         }
 
@@ -920,28 +924,56 @@ class NewMessageFragment : Fragment() {
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
         scheduleButton.setOnClickListener {
             if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
-                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
+                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledReminderUnavailable))
                 } else {
                     navigateToScheduleSendBottomSheet()
                 }
             }
         }
 
-        sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() }
+        onSendButtonClicked(mailbox)
+    }
+
+    private fun onSendButtonClicked(mailbox: Mailbox) {
+        binding.sendButton.setOnClickListener {
+            if (!checkMailboxStorage(mailbox)) return@setOnClickListener
+
+            val isSendingWithScheduled = processScheduleConfig()
+            val isSendingWithReminder = processReminderConfig()
+
+            tryToSendEmail(isSendingWithScheduled, isSendingWithReminder)
+        }
+    }
+
+    private fun processScheduleConfig(): Boolean {
+        val scheduleConfig = newMessageViewModel.scheduleConfig.value
+        return if (scheduleConfig is ScheduleConfig.Scheduled) {
+            if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()) {
+                true
+            } else {
+                newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    private fun processReminderConfig(): Boolean {
+        return newMessageViewModel.reminderConfig.value is ReminderConfig.Delayed
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
-            resId = R.id.scheduleSendBottomSheetDialog,
-            args = ScheduleSendBottomSheetDialogArgs(
+            resId = R.id.sendOptionsFragment,
+            args = DraftSendOptionsFragmentArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
@@ -949,19 +981,25 @@ class NewMessageFragment : Fragment() {
         )
     }
 
-    private fun tryToSendEmail(isScheduled: Boolean = false) {
+    private fun tryToSendEmail(isScheduled: Boolean = false, isReminder: Boolean = false) {
 
         fun setSnackbarActivityResult() {
             val resultIntent = Intent()
             resultIntent.putExtra(
                 MainActivity.DRAFT_ACTION_KEY,
-                if (isScheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
+                when {
+                    isScheduled -> DraftAction.SCHEDULE.name
+                    else -> DraftAction.SEND.name
+                },
             )
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
 
         fun sendEmail() {
-            newMessageViewModel.draftAction = if (isScheduled) DraftAction.SCHEDULE else DraftAction.SEND
+            newMessageViewModel.draftAction = when {
+                isScheduled -> DraftAction.SCHEDULE
+                else -> DraftAction.SEND
+            }
             setSnackbarActivityResult()
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
@@ -1000,7 +1038,7 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(trackConfirmEvent)
                 hasConfirmed = true
             },
-            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
+            onCancel = { if (isScheduled) newMessageViewModel.scheduleConfig.value = ScheduleConfig.None },
             onDismiss = { isSendingCanceled.complete(!hasConfirmed) },
         )
 
