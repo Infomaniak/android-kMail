@@ -58,6 +58,10 @@ class ItemSettingView @JvmOverloads constructor(
                     icon.isGone = it == null
                 }
 
+                getColorStateList(R.styleable.ItemSettingView_iconColor)?.let { color ->
+                    icon.imageTintList = color
+                }
+
                 getString(R.styleable.ItemSettingView_subtitle).let {
                     subtitle.apply {
                         text = it
@@ -98,6 +102,12 @@ class ItemSettingView @JvmOverloads constructor(
         binding.subtitle.apply {
             text = subtitle
             isVisible = true
+        }
+    }
+
+    fun removeSubtitle() {
+        binding.subtitle.apply {
+            isGone = true
         }
     }
 
