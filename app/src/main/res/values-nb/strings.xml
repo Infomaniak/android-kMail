@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Legg til mappe</string>
     <string name="buttonCustomReminder">Egendefinert påminnelse</string>
     <string name="buttonCustomSchedule">Egendefinert timeplan</string>
+    <string name="buttonDisable">Deaktiver</string>
     <string name="buttonDownload">Last ned</string>
     <string name="buttonDownloadAll">Last ned alle</string>
     <string name="buttonFeedback">Tilbakemelding</string>
@@ -180,6 +181,7 @@
     <string name="calendarAllDayLong">Hele dagen</string>
     <string name="calendarNotInvited">Du er ikke invitert</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>
+    <string name="callIfNoResponseHeaderTitle">Påminn meg hvis det ikke er svar: %s etter sending</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
@@ -242,6 +244,10 @@
     <string name="createFolderName">Navn på mappen</string>
     <string name="datePickerTitle">Velg dato og tid</string>
     <string name="dateTitle">Dato:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dager</item>
+    </plurals>
     <string name="deleteAccountWarning">Sletting av kontoen din vil være endelig. Du vil ikke kunne reaktivere kontoen din.</string>
     <string name="deleteFolderDialogDescription">Innholdet i mappen %s vil bli permanent slettet uten å gå via papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slett mappe</string>
@@ -282,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Berørte mottakere</string>
     <string name="encryptedMessagePasswordLabel">Del dette passordet via privat melding. Du vil ikke kunne kopiere det etter at du har sendt det.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Kryptering er deaktivert</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Planlagt sending og påminnelser er ikke tilgjengelig for krypterte meldinger</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Planlagte e-poster er ikke tilgjengelig for krypterte meldinger</string>
     <string name="encryptedMessageUpdatePasswordButton">Endre passord</string>
     <string name="encryptedPasswordProtectionTitle">Passordbeskyttelse</string>
@@ -370,6 +377,10 @@
     <string name="genericMessageTranslated">Melding oversatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services kreves</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
     <string name="inboxFolder">Innboks</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagringsplass er nesten full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagringsplass er full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>

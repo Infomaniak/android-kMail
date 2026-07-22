@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Aggiungi una cartella</string>
     <string name="buttonCustomReminder">Promemoria personalizzato</string>
     <string name="buttonCustomSchedule">Programma personalizzato</string>
+    <string name="buttonDisable">Disattiva</string>
     <string name="buttonDownload">Scarica</string>
     <string name="buttonDownloadAll">Scarica tutti</string>
     <string name="buttonFeedback">Feedback</string>
@@ -180,6 +181,7 @@
     <string name="calendarAllDayLong">Tutta la giornata</string>
     <string name="calendarNotInvited">Non fai parte degli invitati</string>
     <string name="calendarOrganizerName">%s (Organizzatore)</string>
+    <string name="callIfNoResponseHeaderTitle">Ricordami se non c’è risposta: %s dopo l’invio</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Prossimamente…</string>
     <string name="commercialFolder">Promozioni</string>
@@ -242,6 +244,10 @@
     <string name="createFolderName">Nome della cartella</string>
     <string name="datePickerTitle">Scegli una data e un’ora</string>
     <string name="dateTitle">Data:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d giorno</item>
+        <item quantity="other">%d giorni</item>
+    </plurals>
     <string name="deleteAccountWarning">La cancellazione dell’account sarà definitiva. Non sarà possibile riattivare l’account.</string>
     <string name="deleteFolderDialogDescription">Il contenuto della cartella %s verrà eliminato definitivamente senza passare per il cestino.</string>
     <string name="deleteFolderDialogTitle">Eliminare la cartella</string>
@@ -282,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Destinatari interessati</string>
     <string name="encryptedMessagePasswordLabel">Condividi questa password tramite messaggio privato. Non sarà possibile copiarla una volta inviata.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">La crittografia è stata disattivata</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">L’invio programmato e i promemoria non sono disponibili per i messaggi crittografati</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Email programmate non disponibili per i messaggi criptati</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifica della password</string>
     <string name="encryptedPasswordProtectionTitle">Protezione con password</string>
@@ -370,6 +377,10 @@
     <string name="genericMessageTranslated">Messaggio tradotto</string>
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="groupContactsTitle">Gruppo: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d ora</item>
+        <item quantity="other">%d ore</item>
+    </plurals>
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="kSuiteProQuotasAlertDescription">Lo spazio di archiviazione della posta è quasi esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Lo spazio di archiviazione della posta è esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>

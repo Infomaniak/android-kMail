@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Adicionar uma pasta</string>
     <string name="buttonCustomReminder">Lembrete personalizado</string>
     <string name="buttonCustomSchedule">Programação personalizada</string>
+    <string name="buttonDisable">Desativar</string>
     <string name="buttonDownload">Transferir</string>
     <string name="buttonDownloadAll">Transferir tudo</string>
     <string name="buttonFeedback">Feedback</string>
@@ -180,6 +181,7 @@
     <string name="calendarAllDayLong">O dia todo</string>
     <string name="calendarNotInvited">Não foi convidado</string>
     <string name="calendarOrganizerName">%s (Organizador)</string>
+    <string name="callIfNoResponseHeaderTitle">Lembrar-me se não houver resposta: %s após o envio</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Brevemente…</string>
     <string name="commercialFolder">Promoções</string>
@@ -242,6 +244,10 @@
     <string name="createFolderName">Nome da pasta</string>
     <string name="datePickerTitle">Escolher uma data e hora</string>
     <string name="dateTitle">Data:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dia</item>
+        <item quantity="other">%d dias</item>
+    </plurals>
     <string name="deleteAccountWarning">A eliminação da sua conta será definitiva. Não poderá reativar a sua conta.</string>
     <string name="deleteFolderDialogDescription">O conteúdo da pasta %s será eliminado permanentemente sem passar pelo lixo.</string>
     <string name="deleteFolderDialogTitle">Eliminar pasta</string>
@@ -282,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Destinatários afetados</string>
     <string name="encryptedMessagePasswordLabel">Partilhe esta palavra-passe por mensagem privada. Não a poderá copiar após o envio.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">A encriptação foi desativada</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">O envio agendado e os lembretes não estão disponíveis para mensagens cifradas</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">O envio programado não está disponível para mensagens encriptadas</string>
     <string name="encryptedMessageUpdatePasswordButton">Alterar palavra-passe</string>
     <string name="encryptedPasswordProtectionTitle">Proteção por palavra-passe</string>
@@ -370,6 +377,10 @@
     <string name="genericMessageTranslated">Mensagem traduzida</string>
     <string name="googlePlayServicesAreRequired">Os Google Play Services são necessários</string>
     <string name="groupContactsTitle">Grupo: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
     <string name="inboxFolder">Caixa de entrada</string>
     <string name="kSuiteProQuotasAlertDescription">O espaço de armazenamento do seu Mail está quase cheio. Atualize para armazenamento ilimitado e desbloqueie novas funcionalidades.</string>
     <string name="kSuiteProQuotasAlertFullDescription">O espaço de armazenamento do seu Mail está cheio. Atualize para armazenamento ilimitado e desbloqueie novas funcionalidades.</string>
