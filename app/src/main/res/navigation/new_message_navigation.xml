@@ -102,11 +102,11 @@
             app:argType="com.infomaniak.mail.utils.extensions.AttachmentExt$AttachmentIntentType" />
     </dialog>
 
-    <dialog
-        android:id="@+id/scheduleSendBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog"
-        android:label="ScheduleSendBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_schedule_options">
+    <fragment
+        android:id="@+id/sendOptionsFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.sendOptions.DraftSendOptionsFragment"
+        android:label="SendOptionsFragment"
+        tools:layout="@layout/fragment_send_options">
         <argument
             android:name="lastSelectedScheduleEpochMillis"
             android:defaultValue="0L"
@@ -122,7 +122,7 @@
         <argument
             android:name="isAdmin"
             app:argType="boolean" />
-    </dialog>
+    </fragment>
 
     <dialog
         android:id="@+id/encryptionActionsBottomSheetDialog"
