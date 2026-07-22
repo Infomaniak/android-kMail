@@ -19,7 +19,9 @@ package com.infomaniak.mail.utils.extensions
 
 import android.content.res.ColorStateList
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.infomaniak.core.common.observe
@@ -54,6 +56,10 @@ private fun View.applyColor(buttonState: SendingButtonState) {
     }
 
     if (this is ExtendedFloatingActionButton) this.backgroundTintList = ColorStateList.valueOf(color)
+}
+
+fun View.applyContentPaddingStart(value: Int) {
+    (this as? ViewGroup)?.getChildAt(0)?.updatePaddingRelative(start = value)
 }
 
 enum class SendingButtonState {

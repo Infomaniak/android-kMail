@@ -97,4 +97,12 @@ class SettingRadioGroupView @JvmOverloads constructor(
     fun onItemCheckedListener(listener: ((id: Int, value: String?, enum: Enum<*>?) -> Unit)?) {
         onItemCheckedListener = listener
     }
+
+    fun clearCheck() {
+        if (checkedId != View.NO_ID) {
+            (findViewById(checkedId) as? RadioCheckable)?.uncheck()
+            checkedId = View.NO_ID
+            checkedValue = null
+        }
+    }
 }
