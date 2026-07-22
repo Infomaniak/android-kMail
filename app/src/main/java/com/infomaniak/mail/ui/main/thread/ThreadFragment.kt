@@ -374,6 +374,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             areMessagesCollapsibles = { threadViewModel.messagesAreCollapsiblesFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             aliases = { mainViewModel.currentMailbox.value?.aliases?.toList() ?: emptyList() },
+            featureFlags = { mainViewModel.currentMailbox.value?.featureFlags },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
