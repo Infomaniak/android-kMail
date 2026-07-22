@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/newMessageBackgroundColor"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.newMessage.sendOptions.DraftSendOptionsFragment">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/toolbarLoweredColor"
+        android:minHeight="?attr/actionBarSize"
+        android:touchscreenBlocksFocus="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationContentDescription="@string/contentDescriptionButtonBack"
+        app:navigationIcon="@drawable/ic_chevron_left"
+        app:navigationIconTint="@color/iconColor"
+        app:title="@string/sendOptions"
+        app:titleCentered="true" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/saveButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:id="@+id/optionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/marginStandardMedium">
+
+            <View
+                android:id="@+id/reminderTopDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:background="@drawable/divider" />
+
+            <LinearLayout
+                android:id="@+id/reminderLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                    android:id="@+id/reminderIfNoAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_alarm_clock"
+                    app:iconColor="?attr/colorPrimary"
+                    app:itemAction="toggle"
+                    app:title="@string/actionCallIfNoResponse" />
+
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                    android:id="@+id/reminderVisibility"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:subtitle="@string/selectionReminderRecipientsAndMe"
+                    app:title="@string/reminderVisibilityTitle"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/dividerTopReminderOptions"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:background="@drawable/divider"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/reminderOptionsWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+                    android:id="@+id/optionsDelays"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:ignoreDividers="true">
+
+                    <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                        android:id="@+id/hours24"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:value="1440"
+                        tools:text="24 hours" />
+
+                    <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                        android:id="@+id/days3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:value="4320"
+                        tools:text="3 days" />
+
+                    <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                        android:id="@+id/days7"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:value="10080"
+                        tools:text="7 days" />
+
+                </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                    android:id="@+id/customDelayReminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:title="@string/buttonCustomReminder"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/dividerBottomReminderOptions"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:background="@drawable/divider" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/scheduleSending"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_schedule_send"
+                app:iconColor="?attr/colorPrimary"
+                app:itemAction="toggle"
+                app:title="@string/scheduleSendingTitle" />
+
+            <View
+                android:id="@+id/dividerTopScheduleOptions"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:background="@drawable/divider"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/scheduleOptionsWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+                    android:id="@+id/scheduleOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:ignoreDividers="true">
+
+                    <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                        android:id="@+id/lastScheduleOption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:text="@string/lastSelectedSchedule"
+                        tools:visibility="visible" />
+
+                </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                    android:id="@+id/customScheduleOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:title="@string/buttonCustomSchedule"
+                    tools:visibility="visible" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/saveButton"
+        style="@style/TextButtonPrimary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
+        android:text="@string/buttonSave"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
