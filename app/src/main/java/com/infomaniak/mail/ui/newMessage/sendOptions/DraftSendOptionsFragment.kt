@@ -73,17 +73,12 @@ class DraftSendOptionsFragment : Fragment() {
     private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
     private var pendingReminderConfig: ReminderConfig = ReminderConfig.None
     private var pendingLastSelectedScheduleEpochMillis: Long? = null
-    private var hasLastScheduleOption = false
 
     private val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
     private val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
     private val currentlyScheduledEpochMillis: Long? by lazy {
         navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L }
     }
-
-    private val lastScheduleOption get() = binding.lastScheduleOption
-    private val scheduleOptionsContainer get() = binding.scheduleOptions
-    private val customScheduleOption get() = binding.customScheduleOption
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSendOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -98,7 +93,7 @@ class DraftSendOptionsFragment : Fragment() {
         ScheduleOptionsHelper(
             context = requireContext(),
             lastScheduleOption = lastScheduleOption,
-            scheduleOptionsContainer = scheduleOptionsContainer,
+            scheduleOptionsContainer = binding.scheduleOptions,
             customScheduleOption = customScheduleOption,
             lastSelectedEpoch = lastSelectedEpoch,
             currentlyScheduledEpochMillis = currentlyScheduledEpochMillis,
@@ -108,7 +103,6 @@ class DraftSendOptionsFragment : Fragment() {
             createScheduleOptionItem = ::createScheduleOptionItem,
             bindLastScheduleOptionDescription = ::bindLastScheduleOptionDescription,
         ).setup()
-        hasLastScheduleOption = lastSelectedEpoch != null
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
 
         setReminderOptionsVisible(isVisible = false)
@@ -270,7 +264,6 @@ class DraftSendOptionsFragment : Fragment() {
     private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
         TransitionManager.beginDelayedTransition(scheduleOptionsWrapper.parent as ViewGroup)
         dividerTopScheduleOptions.isVisible = isVisible
-        lastScheduleOption.isVisible = isVisible && hasLastScheduleOption
         scheduleOptionsWrapper.isVisible = isVisible
     }
 
@@ -300,7 +293,7 @@ class DraftSendOptionsFragment : Fragment() {
         when {
             savedSchedule.isCustom -> applyCustomSchedule(epoch)
             matchedOption != null -> scheduleOptions.check(matchedOption.id)
-            hasLastScheduleOption && lastScheduleOption.associatedValue == scheduleStr -> {
+            lastSelectedEpoch != null && lastScheduleOption.associatedValue == scheduleStr -> {
                 scheduleOptions.check(lastScheduleOption.id)
             }
             else -> applyCustomSchedule(epoch)
