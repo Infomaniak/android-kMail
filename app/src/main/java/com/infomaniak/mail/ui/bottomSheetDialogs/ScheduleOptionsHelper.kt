@@ -81,7 +81,10 @@ class ScheduleOptionsHelper(
 
         if (lastSelectedDate?.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES) == true && lastSelectedDate.isNotAlreadySelected()) {
             lastScheduleOption.isVisible = true
-            bindLastScheduleOptionDescription(context.dayOfWeekDateWithoutYear(date = lastSelectedDate))
+            val formattedDate = context.dayOfWeekDateWithoutYear(date = lastSelectedDate)
+            bindLastScheduleOptionDescription(formattedDate)
+        } else {
+            lastScheduleOption.isVisible = false
         }
     }
 
