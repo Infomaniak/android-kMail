@@ -141,6 +141,7 @@ object MatomoMail : Matomo {
         CustomFolder("customFolder"),
         CustomFolders("customFolders"),
         CustomSchedule("customSchedule"),
+        CustomReminder("customReminder"),
         CustomScheduleConfirm("customScheduleConfirm"),
         DailyLimitReachedUpgrade("dailyLimitReachedUpgrade"),
         Delete("delete"),
