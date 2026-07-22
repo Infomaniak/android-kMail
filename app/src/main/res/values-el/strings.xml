@@ -728,6 +728,14 @@
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="tryAgain">Παρακαλώ, δοκιμάστε ξανά.</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
+    <plurals name="unitDays">
+        <item quantity="one">Ημέρα</item>
+        <item quantity="other">Ημέρες</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Ώρα</item>
+        <item quantity="other">Ώρες</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>
     <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>

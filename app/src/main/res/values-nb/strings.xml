@@ -728,6 +728,14 @@
     <string name="trashFolder">Papirkurv</string>
     <string name="tryAgain">Vennligst prøv igjen.</string>
     <string name="unblockButton">Opphev blokkering</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dager</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Time</item>
+        <item quantity="other">Timer</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Ukjent avsender</string>
     <string name="unknownDialogTitleRecipient">Ukjent mottaker</string>
     <string name="unknownRecipientTitle">(ukjent)</string>

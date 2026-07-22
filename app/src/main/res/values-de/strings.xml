@@ -728,6 +728,14 @@
     <string name="trashFolder">Papierkorb</string>
     <string name="tryAgain">Bitte versuchen Sie es erneut.</string>
     <string name="unblockButton">Entsperren</string>
+    <plurals name="unitDays">
+        <item quantity="one">Tag</item>
+        <item quantity="other">Tage</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Stunde</item>
+        <item quantity="other">Stunden</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Unbekannter Spediteur</string>
     <string name="unknownDialogTitleRecipient">Unbekannter Empfänger</string>
     <string name="unknownRecipientTitle">(unbekannt)</string>

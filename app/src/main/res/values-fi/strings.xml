@@ -728,6 +728,14 @@
     <string name="trashFolder">Roskakori</string>
     <string name="tryAgain">Yritä uudelleen.</string>
     <string name="unblockButton">Poista esto</string>
+    <plurals name="unitDays">
+        <item quantity="one">Päivä</item>
+        <item quantity="other">Päivää</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Tunti</item>
+        <item quantity="other">Tuntia</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Tuntematon lähettäjä</string>
     <string name="unknownDialogTitleRecipient">Tuntematon vastaanottaja</string>
     <string name="unknownRecipientTitle">(tuntematon)</string>

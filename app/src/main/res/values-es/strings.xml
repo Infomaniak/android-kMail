@@ -728,6 +728,14 @@
     <string name="trashFolder">Papelera</string>
     <string name="tryAgain">Por favor, inténtelo de nuevo.</string>
     <string name="unblockButton">Desbloquear</string>
+    <plurals name="unitDays">
+        <item quantity="one">Día</item>
+        <item quantity="other">Días</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Hora</item>
+        <item quantity="other">Horas</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Expedidor desconocido</string>
     <string name="unknownDialogTitleRecipient">Destinatario desconocido</string>
     <string name="unknownRecipientTitle">(desconocido)</string>
