@@ -146,6 +146,7 @@ class Draft : RealmObject {
         REPLY_ALL,
         FORWARD,
         NEW_MAIL,
+        FOLLOW_UP,
     }
 
     companion object {

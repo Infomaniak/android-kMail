@@ -76,6 +76,19 @@ class DraftInitManager @Inject constructor(
                     SentryDebug.addDraftBreadcrumbs(this, step = "set previousMessage when reply/replyAll/Forward")
                 }
             }
+            DraftMode.FOLLOW_UP -> {
+                val mailboxUuid = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
+                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
+                    attachments += attachment.apply {
+                        resource = previousMessage.attachments.find { it.name == name }?.resource
+                        setUploadStatus(AttachmentUploadStatus.UPLOADED)
+                    }
+                    SentryDebug.addDraftBreadcrumbs(this, step = "set previousMessage when reply/replyAll/Forward")
+                }
+
+                to = previousMessage.to.toRealmList()
+                cc = previousMessage.cc.toRealmList()
+            }
             DraftMode.NEW_MAIL -> Unit
         }
     }
@@ -88,6 +101,7 @@ class DraftInitManager @Inject constructor(
             DraftMode.REPLY, DraftMode.REPLY_ALL -> replyForwardFooterManager.createReplyFooter(previousMessage)
             DraftMode.FORWARD -> replyForwardFooterManager.createForwardFooter(previousMessage, attachments)
             DraftMode.NEW_MAIL -> null
+            DraftMode.FOLLOW_UP -> replyForwardFooterManager.createForwardFooter(previousMessage, attachments)
         }
     }
 
@@ -194,6 +208,7 @@ class DraftInitManager @Inject constructor(
         val prefix = when (draftMode) {
             DraftMode.REPLY, DraftMode.REPLY_ALL -> if (subject.isReply()) "" else PREFIX_REPLY
             DraftMode.FORWARD -> if (subject.isForward()) "" else PREFIX_FORWARD
+            DraftMode.FOLLOW_UP -> ""
             DraftMode.NEW_MAIL -> error("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
         }
 
