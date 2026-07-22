@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.common.extensions.isNightModeEnabled
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME
 import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.common.utils.FormatData
 import com.infomaniak.core.common.utils.format
@@ -90,6 +91,7 @@ import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.configureOnTouchListener
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
+import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
@@ -119,6 +121,7 @@ class ThreadAdapter(
     private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val aliases: () -> List<String>,
+    private val featureFlags: () -> Mailbox.FeatureFlagSet? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
@@ -207,6 +210,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
                 NotifyType.AcknowledgeRebind -> bindAcknowledge(item)
+                NotifyType.ReminderRebind -> bindReminder(item.message)
                 NotifyType.AiSummaryStateChanged -> holder.bindAiAction(item.message, AiAction.SUMMARY)
                 NotifyType.AiTranslateStateChanged -> holder.bindAiAction(item.message, AiAction.TRANSLATE)
                 is NotifyType.MessagesCollapseStateChanged -> {
@@ -769,6 +773,7 @@ class ThreadAdapter(
 
         bindUnsubscribe(messageUi)
         bindAcknowledge(messageUi)
+        bindReminder(message)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -829,6 +834,141 @@ class ThreadAdapter(
         scheduleAlert.onAction2 {
             trackMessageBannerEvent(MatomoName.ModifySchedule)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
+        }
+    }
+
+    private fun formatNamesList(context: Context, names: List<String>): String {
+        return when (names.size) {
+            0 -> ""
+            1 -> names[0]
+            2 -> "${names[0]} ${context.getString(R.string.linkingWord)} ${names[1]}"
+            else -> {
+                val allButLast = names.dropLast(1).joinToString(", ")
+                "$allButLast ${context.getString(R.string.linkingWord)} ${names.last()}"
+            }
+        }
+    }
+
+    private fun ItemMessageBinding.bindRecipientReminderAlert(message: Message, reminder: Date, isReminderExpired: Boolean) {
+        requestResponseAlert.setActionsVisibility(shouldDisplayAction = false)
+        val fromNames = message.extractFromNames()
+        val formatNamesList = formatNamesList(context, fromNames)
+
+        val pluralsRes = if (isReminderExpired) R.plurals.reminderAfterHeaderTitle else R.plurals.reminderBeforeHeaderTitle
+        val formattedDate = reminder.format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME)
+        requestResponseAlert.apply {
+            isVisible = true
+            setDescription(
+                context.resources.getQuantityString(
+                    pluralsRes,
+                    message.from.size,
+                    formatNamesList,
+                    formattedDate,
+                )
+            )
+        }
+    }
+
+    private fun ItemMessageBinding.bindReminder(message: Message) {
+        reminderAlert.isGone = true
+        endReminderAlert.isGone = true
+        requestResponseAlert.isGone = true
+
+        if (featureFlags()?.contains(FeatureFlag.RESPONSE_REQUIRED) != true) return
+
+        if (message.isScheduledDraft && message.reminder != null) {
+            bindScheduledDraftReminderAlert(message)
+            return
+        }
+
+        message.reminder?.date?.toDate()?.let { reminderDate ->
+            val now = Date()
+            val isExpired = reminderDate.before(now)
+            when {
+                message.from.any { it.isMe() } -> bindSenderReminderAlert(message, reminderDate, isExpired)
+                message.allRecipients.any { it.isMe() } -> bindRecipientReminderAlert(message, reminderDate, isExpired)
+            }
+        }
+    }
+
+    private fun ItemMessageBinding.bindScheduledDraftReminderAlert(message: Message) {
+        val delayMinutes = message.reminder?.delta ?: return
+
+        reminderAlert.setActionsVisibility(shouldDisplayAction = true)
+        reminderAlert.setDescription(
+            context.getString(R.string.callIfNoResponseHeaderTitle, context.formatDelayText(delayMinutes)),
+        )
+
+        alertsGroup.isVisible = true
+        reminderAlert.isVisible = true
+
+        reminderAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
+        }
+
+        reminderAlert.onAction2 {
+            threadAdapterCallbacks?.onDisableReminderClicked?.invoke(message)
+        }
+    }
+
+    private fun ItemMessageBinding.bindSenderReminderAlert(message: Message, reminderDate: Date, isExpired: Boolean) {
+        if (isExpired) bindActiveReminderAlert(message, reminderDate) else bindExpiredReminderAlert(message, reminderDate)
+    }
+
+    private fun ItemMessageBinding.bindActiveReminderAlert(message: Message, reminderDate: Date) {
+        endReminderAlert.setActionsVisibility(shouldDisplayAction = true)
+        val fromNames = message.extractFromNames()
+        val formatNamesList = formatNamesList(context, fromNames)
+
+        endReminderAlert.setDescription(
+            context.getString(
+                R.string.reminderNoResponseHeaderTitle,
+                formatNamesList,
+                reminderDate.format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
+            ),
+        )
+
+        alertsGroup.isVisible = true
+        endReminderAlert.isVisible = true
+
+        endReminderAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.FollowUp)
+            threadAdapterCallbacks?.onFollowUpClicked?.invoke(message)
+        }
+
+        endReminderAlert.onAction2 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onAddReminderClicked?.invoke(message)
+        }
+
+        endReminderAlert.onAction3 {
+            trackMessageBannerEvent(MatomoName.DeleteDraft)
+            threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message)
+        }
+    }
+
+    private fun ItemMessageBinding.bindExpiredReminderAlert(message: Message, reminderDate: Date) {
+        reminderAlert.setActionsVisibility(shouldDisplayAction = true)
+
+        reminderAlert.setDescription(
+            context.getString(
+                R.string.callIfNoResponseHeaderTitleWithDate,
+                reminderDate.format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
+            ),
+        )
+
+        alertsGroup.isVisible = true
+        reminderAlert.isVisible = true
+
+        reminderAlert.onAction1 {
+            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
+        }
+
+        reminderAlert.onAction2 {
+            // TODO: add matomo
+            threadAdapterCallbacks?.onDisableReminderClicked?.invoke(message)
         }
     }
 
@@ -1247,6 +1387,7 @@ class ThreadAdapter(
         data object OnlyRebindEmojiReactions : NotifyType
         data object UnsubscribeRebind : NotifyType
         data object AcknowledgeRebind : NotifyType
+        data object ReminderRebind : NotifyType
         data object UpdatePermissions : NotifyType
         data object AiSummaryStateChanged : NotifyType
         data object AiTranslateStateChanged : NotifyType
@@ -1294,6 +1435,7 @@ class ThreadAdapter(
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
                 MessageDiffAspect.Unsubscribe.areDifferent(oldItem, newItem) -> NotifyType.UnsubscribeRebind
                 MessageDiffAspect.Acknowledge.areDifferent(oldItem, newItem) -> NotifyType.AcknowledgeRebind
+                MessageDiffAspect.Reminder.areDifferent(oldItem, newItem) -> NotifyType.ReminderRebind
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
@@ -1333,7 +1475,7 @@ class ThreadAdapter(
             object MessageDiffAspect {
                 val entries: List<DiffAspect<MessageUi>>
                     get() = listOf(
-                        EmojiReactions, Calendar, AnythingElse, Unsubscribe, Acknowledge
+                        EmojiReactions, Calendar, Reminder, AnythingElse, Unsubscribe, Acknowledge
                     )
 
                 data object EmojiReactions : DiffAspect<MessageUi>({
@@ -1354,6 +1496,14 @@ class ThreadAdapter(
                     data object Attendees : DiffAspect<CalendarEventResponse>({ attendeesAreTheSame(it) })
                     data object AnythingElse : DiffAspect<CalendarEventResponse>({ everythingButAttendeesIsTheSame(it) })
                 }
+
+                data object Reminder : DiffAspect<MessageUi>({
+                    message.reminder?.uuid == it.message.reminder?.uuid &&
+                            message.reminder?.date == it.message.reminder?.date &&
+                            message.reminder?.delta == it.message.reminder?.delta &&
+                            message.reminder?.display == it.message.reminder?.display &&
+                            message.reminderAction == it.message.reminderAction
+                })
 
                 data object Unsubscribe : DiffAspect<MessageUi>({ unsubscribeState == it.unsubscribeState })
 
@@ -1384,6 +1534,7 @@ class ThreadAdapter(
         var onAttachmentOptionsClicked: ((attachment: Attachable) -> Unit)? = null,
         var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
         var onReplyClicked: ((Message) -> Unit)? = null,
+        var onFollowUpClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
         var onSuperCollapsedBlockClicked: (() -> Unit)? = null,
@@ -1407,6 +1558,9 @@ class ThreadAdapter(
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
         var getAiState: (() -> AiStateMap)? = null,
+        var onDisableReminderClicked: ((Message) -> Unit)? = null,
+        var onModifyReminderClicked: ((Message) -> Unit)? = null,
+        var onAddReminderClicked: ((Message) -> Unit)? = null,
         val getFeatureFlags: (() -> Mailbox.FeatureFlagSet?)? = null,
         var onAskEuriaClicked: ((message: Message) -> Unit)? = null,
     )
