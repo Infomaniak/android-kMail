@@ -1204,6 +1204,7 @@ class ThreadAdapter(
             setOnClickListener { threadAdapterCallbacks?.onAskEuriaClicked?.invoke(message) }
         }
         sendingProgressText.isVisible = message.isScheduledMessage
+        iconReminder.isVisible = message.reminder != null && !isExpanded
 
         recipient.text = if (isExpanded) getAllRecipientsFormatted(message) else context.formatSubject(message.subject)
         recipientChevron.isVisible = isExpanded
