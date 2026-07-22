@@ -44,6 +44,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.observe
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
@@ -117,6 +119,7 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
+import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -143,6 +146,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
+import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -303,6 +307,8 @@ class NewMessageFragment : Fragment() {
         }
 
         observeFeatureFlagUpdates()
+        observeSchedule()
+        observeReminder()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -456,6 +462,20 @@ class NewMessageFragment : Fragment() {
             },
         )
 
+        scheduleAlert.apply {
+            onAction1 { navigateToScheduleSendBottomSheet() }
+            onAction2 {
+                newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+            }
+        }
+
+        reminderAlert.apply {
+            onAction1 { navigateToScheduleSendBottomSheet() }
+            onAction2 {
+                newMessageViewModel.reminderConfig.value = ReminderConfig.None
+            }
+        }
+
         recipientFieldsManager.setupAutoCompletionFields()
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
@@ -478,6 +498,45 @@ class NewMessageFragment : Fragment() {
         scrim.setOnClickListener {
             scrim.isClickable = false
             aiManager.closeAiPrompt()
+        }
+    }
+
+    private fun observeSchedule() {
+        newMessageViewModel.scheduleConfig.observe(viewLifecycleOwner) { config ->
+            when (config) {
+                is ScheduleConfig.Scheduled -> {
+                    val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    binding.scheduleAlert.apply {
+                        setDescription(getString(R.string.scheduledEmailHeader, date))
+                        isVisible = true
+                    }
+                    binding.divider7.isVisible = true
+                }
+                ScheduleConfig.None -> {
+                    binding.scheduleAlert.isVisible = false
+                    binding.divider7.isVisible = false
+                }
+            }
+        }
+    }
+
+    private fun observeReminder() {
+        newMessageViewModel.reminderConfig.observe(viewLifecycleOwner) { config ->
+            when (config) {
+                is ReminderConfig.Delayed -> {
+                    val dateText = requireContext().formatDelayText(config.delayMinutes)
+
+                    binding.reminderAlert.apply {
+                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, dateText))
+                        isVisible = true
+                    }
+                    binding.divider6.isVisible = true
+                }
+                is ReminderConfig.None -> {
+                    binding.reminderAlert.isVisible = false
+                    binding.divider6.isVisible = false
+                }
+            }
         }
     }
 
@@ -838,7 +897,8 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
             val isRemindersEnabled = featureFlags.contains(FeatureFlag.RESPONSE_REQUIRED)
-            binding.scheduleButton.isVisible = isScheduledDraftsEnabled || isRemindersEnabled
+            binding.sendOptionsButton.isVisible = isScheduledDraftsEnabled || isRemindersEnabled 
+
 
             val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
 
@@ -927,7 +987,7 @@ class NewMessageFragment : Fragment() {
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener {
+        sendOptionsButton.setOnClickListener {
             if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
                     snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledReminderUnavailable))
