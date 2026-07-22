@@ -80,6 +80,11 @@ class SettingRadioButtonView @JvmOverloads constructor(
         binding.text.text = newText
     }
 
+    fun setDescription(newDescription: String) {
+        binding.description.isVisible = newDescription.isNotBlank()
+        if (newDescription.isNotBlank()) binding.description.text = newDescription
+    }
+
     fun setCheckMarkColor(@ColorInt color: Int) {
         binding.checkMark.setColorFilter(color)
     }
