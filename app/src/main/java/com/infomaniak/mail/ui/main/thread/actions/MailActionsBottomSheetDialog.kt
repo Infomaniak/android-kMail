@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
-import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import kotlinx.coroutines.runBlocking
@@ -46,7 +45,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     abstract val shouldCloseMultiSelection: Boolean
     protected abstract val substituteClassName: String
-
 
     private var onClickListener: OnActionClick = object : OnActionClick {
 
