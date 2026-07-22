@@ -490,7 +490,10 @@ class NewMessageFragment : Fragment() {
 
         reminderAlert.apply {
             onAction1 { navigateToScheduleSendBottomSheet() }
-            onAction2 { newMessageViewModel.setReminderConfig(ReminderConfig.None) }
+            onAction2 {
+                newMessageViewModel.setReminderConfig(ReminderConfig.None)
+                newMessageViewModel.setShouldRemindRecipient(true)
+            }
         }
 
         recipientFieldsManager.setupAutoCompletionFields()
