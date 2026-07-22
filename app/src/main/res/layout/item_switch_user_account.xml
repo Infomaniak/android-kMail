@@ -88,7 +88,7 @@
                     android:layout_width="@dimen/largeIconSize"
                     android:layout_height="@dimen/largeIconSize"
                     android:layout_gravity="center"
-                    android:background="@drawable/bg_reminder_icon"
+                    android:background="@drawable/bg_qr"
                     android:importantForAccessibility="no"
                     android:padding="@dimen/marginStandardSmall"
                     android:src="@drawable/ic_qrcode"
