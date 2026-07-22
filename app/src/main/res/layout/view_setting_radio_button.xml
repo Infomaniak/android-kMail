@@ -33,12 +33,29 @@
         android:importantForAccessibility="no"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/text"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        tools:text="Simple messages" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimary"
+            tools:text="Simple messages" />
+
+        <TextView
+            android:id="@+id/description"
+            style="@style/BodySmall.Tertiary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:text="Simple description of the option"
+            tools:visibility="visible" />
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/checkMark"
