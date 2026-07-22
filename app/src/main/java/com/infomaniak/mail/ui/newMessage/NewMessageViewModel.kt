@@ -73,6 +73,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.draft.ReminderDraftInfo
 import com.infomaniak.mail.data.models.extensions.action
 import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.data.models.extensions.getCacheFile
@@ -153,7 +154,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 
@@ -654,6 +657,9 @@ class NewMessageViewModel @Inject constructor(
             isEncrypted = isEncrypted,
             encryptionPassword = encryptionKey ?: "",
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
+            scheduleDate = scheduleDate,
+            reminderDelta = reminder?.reminderDelta,
+            shouldRemindRecipient = reminder?.shouldRemindRecipient ?: true,
         )
     }
 
@@ -689,6 +695,21 @@ class NewMessageViewModel @Inject constructor(
         }
 
         isEncryptionActivated.postValue(isEncrypted)
+
+        scheduleDate?.let { dateString ->
+            SimpleDateFormat(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR, Locale.getDefault())
+                .parse(dateString)
+                ?.time
+                ?.let { epoch ->
+                    setScheduleConfig(ScheduleConfig.Scheduled(epoch))
+                }
+        }
+
+        reminder?.reminderDelta?.let { minutes ->
+            setReminderConfig(ReminderConfig.Delayed(minutes, isCustom = false))
+        }
+
+        reminder?.shouldRemindRecipient?.let { setShouldRemindRecipient(it) }
     }
 
     fun setQuotesButtonVisibility(isVisible: Boolean) {
@@ -999,17 +1020,6 @@ class NewMessageViewModel @Inject constructor(
         }.cancellable().onFailure(Sentry::captureException)
     }
 
-    fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
-        val localUuid = draftLocalUuid ?: return@launch
-        draftRealm().write {
-            DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
-                draft.scheduleDate = date?.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
-            }
-        }
-    }
-
-    fun resetScheduledDate() = setScheduleDate(date = null)
-
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
@@ -1102,9 +1112,21 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
-        if (draftAction == DraftAction.SEND) delay = localSettings.cancelDelay
-
         ackRequest = localSettings.askEmailAcknowledgement
+
+        scheduleDate = getCurrentScheduleDate()
+
+        if (draftAction == DraftAction.SEND && scheduleDate == null) delay = localSettings.cancelDelay
+
+        val currentReminderDelta = getCurrentReminderDelta()
+        reminder = if (currentReminderDelta != null) {
+            ReminderDraftInfo().apply {
+                reminderDelta = currentReminderDelta
+                shouldRemindRecipient = this@NewMessageViewModel.shouldRemindRecipient.value ?: true
+            }
+        } else {
+            null
+        }
 
         updateDraftAttachmentsWithLiveData(
             uiAttachments = attachmentsLiveData.valueOrEmpty(),
@@ -1214,6 +1236,16 @@ class NewMessageViewModel @Inject constructor(
         SentryDebug.addDraftBreadcrumbs(draft = this, step)
     }
 
+    private fun getCurrentScheduleDate(): String? {
+        return (scheduleConfig.value as? ScheduleConfig.Scheduled)?.let { schedule ->
+            Date(schedule.epochMillis).format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
+        }
+    }
+
+    private fun getCurrentReminderDelta(): Int? {
+        return (reminderConfig.value as? ReminderConfig.Delayed)?.delayMinutes
+    }
+
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
             draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() &&
@@ -1225,7 +1257,10 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
-                .mapTo(mutableSetOf()) { it.localUuid }
+                .mapTo(mutableSetOf()) { it.localUuid } &&
+                    draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
+                    draftSnapshot.reminderDelta == getCurrentReminderDelta() &&
+                    draftSnapshot.shouldRemindRecipient == shouldRemindRecipient.value
         } ?: false
     }
 
@@ -1367,6 +1402,9 @@ class NewMessageViewModel @Inject constructor(
         var isEncrypted: Boolean,
         var encryptionPassword: String,
         val attachmentsLocalUuids: Set<String>,
+        val scheduleDate: String?,
+        val reminderDelta: Int?,
+        val shouldRemindRecipient: Boolean?,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
