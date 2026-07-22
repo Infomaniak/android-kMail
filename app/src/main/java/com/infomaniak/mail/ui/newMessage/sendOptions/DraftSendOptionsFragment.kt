@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
+import com.infomaniak.mail.ui.alertDialogs.SelectVisibilityReminderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionUtils
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
@@ -71,6 +72,9 @@ class DraftSendOptionsFragment : Fragment() {
     lateinit var customReminderPickerDialog: CustomReminderPickerDialog
 
     @Inject
+    lateinit var selectVisibilityDialog: SelectVisibilityReminderDialog
+
+    @Inject
     lateinit var localSettings: LocalSettings
 
     private val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
@@ -79,6 +83,12 @@ class DraftSendOptionsFragment : Fragment() {
         navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L }
     }
 
+    private var shouldRemindRecipient: Boolean
+        get() = newMessageViewModel.shouldRemindRecipient.value
+        set(value) {
+            newMessageViewModel.setShouldRemindRecipient(value)
+        }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSendOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -86,10 +96,12 @@ class DraftSendOptionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
         customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        selectVisibilityDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
         setupScheduleOptions()
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
 
+        updateReminderVisibilitySubtitle()
         setReminderOptionsVisible(isVisible = false)
         setScheduleOptionsVisible(isVisible = false)
 
@@ -205,6 +217,7 @@ class DraftSendOptionsFragment : Fragment() {
         }
 
         customDelayReminder.setOnClickListener { onCustomDelayReminderClicked() }
+        reminderVisibility.setOnClickListener { showVisibilityReminderPicker() }
     }
 
     private fun setReminderOptionsVisible(isVisible: Boolean) {
@@ -215,11 +228,15 @@ class DraftSendOptionsFragment : Fragment() {
     private fun removeReminderOptionsSelection() {
         binding.optionsDelays.clearCheck()
         newMessageViewModel.setReminderConfig(ReminderConfig.None)
+        shouldRemindRecipient = true
+        updateReminderVisibilitySubtitle()
     }
 
     private fun defaultReminderSelection() = with(binding) {
         optionsDelays.check(R.id.hours24)
         newMessageViewModel.setReminderConfig(ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false))
+        shouldRemindRecipient = true
+        updateReminderVisibilitySubtitle()
     }
 
     private fun defaultScheduleSelection() = with(binding) {
@@ -390,4 +407,22 @@ class DraftSendOptionsFragment : Fragment() {
         )
     }
 
+    private fun showVisibilityReminderPicker() {
+        selectVisibilityDialog.show(
+            selectRecipientsAndMe = shouldRemindRecipient,
+            onVisibilitySelected = { isRecipientsAndMe ->
+                shouldRemindRecipient = isRecipientsAndMe
+                updateReminderVisibilitySubtitle()
+            },
+        )
+    }
+
+    private fun updateReminderVisibilitySubtitle() = with(binding) {
+        val subtitleRes = if (shouldRemindRecipient) {
+            R.string.selectionReminderRecipientsAndMe
+        } else {
+            R.string.selectionReminderMeOnly
+        }
+        reminderVisibility.setSubtitle(subtitleRes)
+    }
 }
