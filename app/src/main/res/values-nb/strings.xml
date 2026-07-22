@@ -182,6 +182,7 @@
     <string name="calendarNotInvited">Du er ikke invitert</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>
     <string name="callIfNoResponseHeaderTitle">Påminn meg hvis det ikke er svar: %s etter sending</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Påminn meg hvis det ikke er svar: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
@@ -222,6 +223,7 @@
     <string name="contentDescriptionIconForward">Videresendt</string>
     <string name="contentDescriptionIconMention">Du har blitt nevnt.</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
+    <string name="contentDescriptionIconReminder">Er en påminnelse</string>
     <string name="contentDescriptionIconReply">Svar</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>
     <string name="contentDescriptionOpenMailActions">Åpne e-posthandlinger</string>
@@ -242,6 +244,7 @@
     <string name="contextMenuPhoneNumberDial">Ring</string>
     <string name="contextMenuPhoneNumberSms">Skriv en SMS</string>
     <string name="createFolderName">Navn på mappen</string>
+    <string name="createReminderBottomSheetTitle">Legg til en påminnelse</string>
     <string name="datePickerTitle">Velg dato og tid</string>
     <string name="dateTitle">Dato:</string>
     <plurals name="daysBeforeSendingReminder">
@@ -488,6 +491,19 @@
     <string name="readMore">Les mer</string>
     <string name="recentSearchesTitle">Nylige søk</string>
     <string name="refreshTokenError">Du har blitt koblet fra</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s har ventet på svar siden %2$s</item>
+        <item quantity="other">%1$s har ventet på svar siden %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s avventer svar innen %2$s</item>
+        <item quantity="other">%1$s avventer svar innen %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Utsett påminnelsen</string>
+    <string name="reminderFollowUpButton">Følg opp</string>
+    <string name="reminderFollowUpPlaceholderText">Hei,\nEr det mulig å få tilbakemelding om dette emnet?\nPå forhånd takk.</string>
+    <string name="reminderMarkAsDoneButton">Merk som fullført</string>
+    <string name="reminderNoResponseHeaderTitle">Påminnelse: ingen respons fra %1$s på denne e-posten siden %2$s</string>
     <string name="reminderVisibilityTitle">Påminnelsens synlighet</string>
     <string name="renameFolder">Gi nytt navn til mappen</string>
     <string name="reportDisplayProblemDescription">Godtar du å dele dataene dine med utviklerne våre slik at de kan hjelpe deg med problemet?</string>
@@ -609,11 +625,15 @@
     <string name="shareEmail">Del e-post</string>
     <string name="snackbarAcknowledgementFailure">Kunne ikke sende</string>
     <string name="snackbarAcknowledgementSuccess">Lesebekreftelse sendt</string>
+    <string name="snackbarAddReminderFailure">Kunne ikke legge til påminnelsen</string>
+    <string name="snackbarAddReminderSuccess">Påminnelse lagt til</string>
     <string name="snackbarAdminDisabledMessageSending">En administrator har deaktivert sending av meldinger</string>
     <string name="snackbarBlockUserConfirmation">Avsender er nå blokkert</string>
     <string name="snackbarCalendarChoiceSent">Svar tatt i betraktning</string>
     <string name="snackbarContactSaved">Ny kontakt registrert</string>
     <string name="snackbarDeletedConversation">Samtalen finnes ikke lenger</string>
+    <string name="snackbarDisableReminderFailure">Kunne ikke deaktivere påminnelsen</string>
+    <string name="snackbarDisableReminderSuccess">Påminnelsen ble deaktivert</string>
     <string name="snackbarDisplayProblemReported">Visningsproblem rapportert</string>
     <string name="snackbarDownloadInProgress">Nedlasting pågår…</string>
     <string name="snackbarDraftDeleted">Utkast slettet</string>
@@ -627,6 +647,8 @@
     <string name="snackbarMessageDeletedPermanently">Melding slettet</string>
     <string name="snackbarMessageMoved">Melding flyttet til %s</string>
     <string name="snackbarMessageMovedToSpam">Melding flyttet til spam og bruker blokkert</string>
+    <string name="snackbarModifyReminderFailure">Kunne ikke endre påminnelsen</string>
+    <string name="snackbarModifyReminderSuccess">Påminnelse endret</string>
     <string name="snackbarMoveCancelled">Flytting avbrutt</string>
     <string name="snackbarPasswordCopied">Passord kopiert</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopiert til utklippstavlen</string>

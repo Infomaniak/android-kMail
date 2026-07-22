@@ -182,6 +182,7 @@
     <string name="calendarNotInvited">Não foi convidado</string>
     <string name="calendarOrganizerName">%s (Organizador)</string>
     <string name="callIfNoResponseHeaderTitle">Lembrar-me se não houver resposta: %s após o envio</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Lembrar-me se não houver resposta: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Brevemente…</string>
     <string name="commercialFolder">Promoções</string>
@@ -222,6 +223,7 @@
     <string name="contentDescriptionIconForward">Encaminhado</string>
     <string name="contentDescriptionIconMention">Você foi mencionado.</string>
     <string name="contentDescriptionIconNewMail">Novo</string>
+    <string name="contentDescriptionIconReminder">É um lembrete</string>
     <string name="contentDescriptionIconReply">Resposta</string>
     <string name="contentDescriptionIconStorage">Estado do armazenamento</string>
     <string name="contentDescriptionOpenMailActions">Abrir ações do e-mail</string>
@@ -242,6 +244,7 @@
     <string name="contextMenuPhoneNumberDial">Marcar</string>
     <string name="contextMenuPhoneNumberSms">Escrever uma SMS</string>
     <string name="createFolderName">Nome da pasta</string>
+    <string name="createReminderBottomSheetTitle">Adicionar um lembrete</string>
     <string name="datePickerTitle">Escolher uma data e hora</string>
     <string name="dateTitle">Data:</string>
     <plurals name="daysBeforeSendingReminder">
@@ -488,6 +491,19 @@
     <string name="readMore">Saber mais</string>
     <string name="recentSearchesTitle">Pesquisas recentes</string>
     <string name="refreshTokenError">Foi desligado</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s aguarda uma resposta desde %2$s</item>
+        <item quantity="other">%1$s aguardam uma resposta desde %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s aguarda uma resposta até %2$s</item>
+        <item quantity="other">%1$s aguardam uma resposta até %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Adiar o lembrete</string>
+    <string name="reminderFollowUpButton">Relançar</string>
+    <string name="reminderFollowUpPlaceholderText">Olá,\nÉ possível obter algum feedback sobre este assunto?\nObrigado desde já.</string>
+    <string name="reminderMarkAsDoneButton">Marcar como concluído</string>
+    <string name="reminderNoResponseHeaderTitle">Lembrete: nenhuma resposta de %1$s a este email desde %2$s</string>
     <string name="reminderVisibilityTitle">Visibilidade do lembrete</string>
     <string name="renameFolder">Renomear pasta</string>
     <string name="reportDisplayProblemDescription">Aceita partilhar os seus dados com os nossos programadores para que o ajudem com o seu problema?</string>
@@ -609,11 +625,15 @@
     <string name="shareEmail">Partilhar e-mail</string>
     <string name="snackbarAcknowledgementFailure">Falha no envio</string>
     <string name="snackbarAcknowledgementSuccess">Confirmação de leitura enviada</string>
+    <string name="snackbarAddReminderFailure">Não foi possível adicionar o lembrete</string>
+    <string name="snackbarAddReminderSuccess">Lembrete adicionado</string>
     <string name="snackbarAdminDisabledMessageSending">Um administrador desabilitou o envio de mensagens</string>
     <string name="snackbarBlockUserConfirmation">Remetente bloqueado</string>
     <string name="snackbarCalendarChoiceSent">Resposta considerada</string>
     <string name="snackbarContactSaved">Novo contacto guardado com sucesso</string>
     <string name="snackbarDeletedConversation">A conversa já não existe</string>
+    <string name="snackbarDisableReminderFailure">Não foi possível desativar o lembrete</string>
+    <string name="snackbarDisableReminderSuccess">Lembrete desativado com sucesso</string>
     <string name="snackbarDisplayProblemReported">Problema de exibição reportado</string>
     <string name="snackbarDownloadInProgress">Transferência em curso…</string>
     <string name="snackbarDraftDeleted">Rascunho eliminado</string>
@@ -627,6 +647,8 @@
     <string name="snackbarMessageDeletedPermanently">Mensagem eliminada</string>
     <string name="snackbarMessageMoved">Mensagem movida para %s</string>
     <string name="snackbarMessageMovedToSpam">Mensagem movida para spam e utilizador bloqueado</string>
+    <string name="snackbarModifyReminderFailure">Falha ao modificar o lembrete</string>
+    <string name="snackbarModifyReminderSuccess">Lembrete alterado</string>
     <string name="snackbarMoveCancelled">Movimento cancelado</string>
     <string name="snackbarPasswordCopied">Palavra-passe copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado</string>

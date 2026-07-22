@@ -182,6 +182,7 @@
     <string name="calendarNotInvited">No estás invitado</string>
     <string name="calendarOrganizerName">%s (Organizador)</string>
     <string name="callIfNoResponseHeaderTitle">Recordarme si no hay respuesta: %s después del envío</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Recuérdame si no hay respuesta: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Próximamente…</string>
     <string name="commercialFolder">Promociones</string>
@@ -222,6 +223,7 @@
     <string name="contentDescriptionIconForward">Reenviado</string>
     <string name="contentDescriptionIconMention">Has sido mencionado.</string>
     <string name="contentDescriptionIconNewMail">Nuevo</string>
+    <string name="contentDescriptionIconReminder">Es un recordatorio</string>
     <string name="contentDescriptionIconReply">Respuesta</string>
     <string name="contentDescriptionIconStorage">Estado de almacenamiento</string>
     <string name="contentDescriptionOpenMailActions">Acciones de mensajes abiertos</string>
@@ -242,6 +244,7 @@
     <string name="contextMenuPhoneNumberDial">Marcar</string>
     <string name="contextMenuPhoneNumberSms">Escribir un SMS</string>
     <string name="createFolderName">Nombre de la carpeta</string>
+    <string name="createReminderBottomSheetTitle">Añadir un recordatorio</string>
     <string name="datePickerTitle">Elige una fecha y hora</string>
     <string name="dateTitle">Fecha:</string>
     <plurals name="daysBeforeSendingReminder">
@@ -488,6 +491,19 @@
     <string name="readMore">Seguir leyendo</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
     <string name="refreshTokenError">Ha sido desconectado</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s espera una respuesta desde %2$s</item>
+        <item quantity="other">%1$s esperan una respuesta desde %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s espera una respuesta antes de %2$s</item>
+        <item quantity="other">%1$s esperan una respuesta antes de %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Posponer el recordatorio</string>
+    <string name="reminderFollowUpButton">Relanzar</string>
+    <string name="reminderFollowUpPlaceholderText">Hola,\n¿Es posible obtener algún comentario sobre este tema?\nGracias de antemano.</string>
+    <string name="reminderMarkAsDoneButton">Marcar como hecho</string>
+    <string name="reminderNoResponseHeaderTitle">Recordatorio: sin respuesta de %1$s a este correo electrónico desde el %2$s</string>
     <string name="reminderVisibilityTitle">Visibilidad del recordatorio</string>
     <string name="renameFolder">Cambiar el nombre de la carpeta</string>
     <string name="reportDisplayProblemDescription">¿Aceptas compartir tus datos con nuestros desarrolladores para que puedan ayudarte con tu problema?</string>
@@ -609,11 +625,15 @@
     <string name="shareEmail">Compartir correo electrónico</string>
     <string name="snackbarAcknowledgementFailure">Error al enviar</string>
     <string name="snackbarAcknowledgementSuccess">Recibo de lectura enviado</string>
+    <string name="snackbarAddReminderFailure">Error al añadir el recordatorio</string>
+    <string name="snackbarAddReminderSuccess">Recordatorio añadido</string>
     <string name="snackbarAdminDisabledMessageSending">Un administrador ha deshabilitado el envío de mensajes</string>
     <string name="snackbarBlockUserConfirmation">El remitente está bloqueado</string>
     <string name="snackbarCalendarChoiceSent">Respuesta tenida en cuenta</string>
     <string name="snackbarContactSaved">Nuevo contacto registrado correctamente</string>
     <string name="snackbarDeletedConversation">La conversación ya no existe</string>
+    <string name="snackbarDisableReminderFailure">No se ha podido desactivar el recordatorio</string>
+    <string name="snackbarDisableReminderSuccess">Recordatorio desactivado correctamente</string>
     <string name="snackbarDisplayProblemReported">Problema de visualización notificado</string>
     <string name="snackbarDownloadInProgress">Descarga en proceso…</string>
     <string name="snackbarDraftDeleted">Borrador suprimido</string>
@@ -627,6 +647,8 @@
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
     <string name="snackbarMessageMovedToSpam">Mensaje movido a spam y usuario bloqueado</string>
+    <string name="snackbarModifyReminderFailure">Error al modificar el recordatorio</string>
+    <string name="snackbarModifyReminderSuccess">Recordatorio modificado</string>
     <string name="snackbarMoveCancelled">Desplazamiento cancelado</string>
     <string name="snackbarPasswordCopied">Contraseña copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado en el portapapeles</string>
