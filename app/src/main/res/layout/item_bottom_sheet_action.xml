@@ -36,14 +36,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/marginStandardMedium">
+        android:padding="@dimen/marginStandardMedium">
 
         <ImageView
             android:id="@+id/icon"
             android:layout_width="@dimen/standardIconSize"
             android:layout_height="@dimen/standardIconSize"
             android:layout_gravity="center_vertical"
-            android:layout_marginVertical="@dimen/marginStandardMedium"
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:contentDescription="@string/contentDescriptionSchedule"
             app:tint="@color/primary_color_disabled"
