@@ -143,6 +143,7 @@
     <string name="buttonCreateFolder">Add a folder</string>
     <string name="buttonCustomReminder">Custom reminder</string>
     <string name="buttonCustomSchedule">Custom schedule</string>
+    <string name="buttonDisable">Disable</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedback">Feedback</string>
@@ -184,6 +185,7 @@
     <string name="calendarAllDayLong">All day long</string>
     <string name="calendarNotInvited">You are not invited</string>
     <string name="calendarOrganizerName">%s (Organizer)</string>
+    <string name="callIfNoResponseHeaderTitle">Remind me if there is no response: %s after sending</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
@@ -246,6 +248,10 @@
     <string name="createFolderName">Name of the folder</string>
     <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
     <string name="deleteFolderDialogDescription">The contents of the folder %s will be permanently deleted without going through the trash.</string>
     <string name="deleteFolderDialogTitle">Delete folder</string>
@@ -286,6 +292,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Recipients concerned</string>
     <string name="encryptedMessagePasswordLabel">Share this password by private message. You won’t be able to copy it once you’ve sent it.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Encryption has been disabled</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Scheduled and reminder emails not available for encrypted messages</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Scheduled emails not available for encrypted messages</string>
     <string name="encryptedMessageUpdatePasswordButton">Change password</string>
     <string name="encryptedPasswordProtectionTitle">Password protection</string>
@@ -374,6 +381,10 @@
     <string name="genericMessageTranslated">Message translated</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="groupContactsTitle">Group: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
     <string name="inboxFolder">Inbox</string>
     <string name="kSuiteProQuotasAlertDescription">Your Mail storage space is almost full. Upgrade to unlimited storage and unlock new features.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Your Mail storage space is full. Upgrade to unlimited storage and unlock new features.</string>

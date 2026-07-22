@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Lisää kansio</string>
     <string name="buttonCustomReminder">Mukautettu muistutus</string>
     <string name="buttonCustomSchedule">Mukautettu aikataulu</string>
+    <string name="buttonDisable">Poista käytöstä</string>
     <string name="buttonDownload">Lataa</string>
     <string name="buttonDownloadAll">Lataa kaikki</string>
     <string name="buttonFeedback">Palaute</string>
@@ -180,6 +181,7 @@
     <string name="calendarAllDayLong">Koko päivä</string>
     <string name="calendarNotInvited">Et ole kutsuttu</string>
     <string name="calendarOrganizerName">%s (Järjestäjä)</string>
+    <string name="callIfNoResponseHeaderTitle">Muistuta, jos vastausta ei kuulu: %s lähettämisen jälkeen</string>
     <string name="ccTitle">Kopio:</string>
     <string name="comingSoon">Tulossa pian…</string>
     <string name="commercialFolder">Tarjoukset</string>
@@ -242,6 +244,10 @@
     <string name="createFolderName">Kansion nimi</string>
     <string name="datePickerTitle">Valitse päivämäärä ja aika</string>
     <string name="dateTitle">Päivämäärä:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
     <string name="deleteAccountWarning">Tilisi poistaminen on lopullista. Et voi enää aktivoida tiliäsi uudelleen.</string>
     <string name="deleteFolderDialogDescription">Kansion %s sisältö poistetaan pysyvästi ilman siirtämistä roskakoriin.</string>
     <string name="deleteFolderDialogTitle">Poista kansio</string>
@@ -282,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Asianomaiset vastaanottajat</string>
     <string name="encryptedMessagePasswordLabel">Jaa tämä salasana yksityisviestillä. Et voi kopioida sitä enää lähetyksen jälkeen.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Salaus on poistettu käytöstä</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Ajastettu lähetys ja muistutukset eivät ole käytettävissä salatuille viesteille</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Ajastettu lähetys ei ole käytettävissä salatuille viesteille</string>
     <string name="encryptedMessageUpdatePasswordButton">Muuta salasanaa</string>
     <string name="encryptedPasswordProtectionTitle">Salasanasuojaus</string>
@@ -370,6 +377,10 @@
     <string name="genericMessageTranslated">Viesti käännetty</string>
     <string name="googlePlayServicesAreRequired">Google Play Services vaaditaan</string>
     <string name="groupContactsTitle">Ryhmä: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d tunti</item>
+        <item quantity="other">%d tuntia</item>
+    </plurals>
     <string name="inboxFolder">Saapuneet</string>
     <string name="kSuiteProQuotasAlertDescription">Mail-tallennustilasi on melkein täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Mail-tallennustilasi on täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>

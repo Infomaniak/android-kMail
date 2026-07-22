@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
     <string name="buttonCustomReminder">Benutzerdefinierte Erinnerung</string>
     <string name="buttonCustomSchedule">Benutzerdefinierter Zeitplan</string>
+    <string name="buttonDisable">Deaktivieren</string>
     <string name="buttonDownload">Herunterladen</string>
     <string name="buttonDownloadAll">Alle herunterladen</string>
     <string name="buttonFeedback">Rückmeldung</string>
@@ -180,6 +181,7 @@
     <string name="calendarAllDayLong">Gesamter Tag</string>
     <string name="calendarNotInvited">Sie zählen nicht zu den eingeladenen Personen</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>
+    <string name="callIfNoResponseHeaderTitle">Erinnern, wenn keine Antwort: %s nach dem Senden</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Demnächst…</string>
     <string name="commercialFolder">Werbeaktionen</string>
@@ -242,6 +244,10 @@
     <string name="createFolderName">Name des Ordners</string>
     <string name="datePickerTitle">Wählen Sie ein Datum und eine Uhrzeit</string>
     <string name="dateTitle">Datum:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
+    </plurals>
     <string name="deleteAccountWarning">Die Löschung Ihres Kontos ist endgültig. Sie werden nicht in der Lage sein, Ihr Konto zu reaktivieren.</string>
     <string name="deleteFolderDialogDescription">Der Inhalt des Ordners %s wird dauerhaft gelöscht, ohne den Papierkorb zu durchlaufen.</string>
     <string name="deleteFolderDialogTitle">Löschen Sie den Ordner</string>
@@ -282,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Betroffene Adressaten</string>
     <string name="encryptedMessagePasswordLabel">Teilen Sie dieses Passwort per privater Nachricht mit. Sie können es nicht mehr kopieren, sobald Sie es gesendet haben.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Die Verschlüsselung wurde deaktiviert</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Geplanter Versand und Erinnerungen sind für verschlüsselte Nachrichten nicht verfügbar</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Geplante E-Mails für verschlüsselte Nachrichten nicht verfügbar</string>
     <string name="encryptedMessageUpdatePasswordButton">Passwort ändern</string>
     <string name="encryptedPasswordProtectionTitle">Passwortschutz</string>
@@ -370,6 +377,10 @@
     <string name="genericMessageTranslated">Nachricht übersetzt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d Stunde</item>
+        <item quantity="other">%d Stunden</item>
+    </plurals>
     <string name="inboxFolder">Posteingang</string>
     <string name="kSuiteProQuotasAlertDescription">Der Speicherplatz in Ihrer Mail ist bald voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Der Speicherplatz in Ihrer Mail ist voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>

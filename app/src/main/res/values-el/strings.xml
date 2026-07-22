@@ -139,6 +139,7 @@
     <string name="buttonCreateFolder">Προσθήκη φακέλου</string>
     <string name="buttonCustomReminder">Προσαρμοσμένη υπενθύμιση</string>
     <string name="buttonCustomSchedule">Προσαρμοσμένο πρόγραμμα</string>
+    <string name="buttonDisable">Απενεργοποίηση</string>
     <string name="buttonDownload">Λήψη</string>
     <string name="buttonDownloadAll">Λήψη όλων</string>
     <string name="buttonFeedback">Σχόλια</string>
@@ -180,6 +181,7 @@
     <string name="calendarAllDayLong">Όλη την ημέρα</string>
     <string name="calendarNotInvited">Δεν είστε προσκεκλημένος</string>
     <string name="calendarOrganizerName">%s (Διοργανωτής)</string>
+    <string name="callIfNoResponseHeaderTitle">Υπενθύμιση αν δεν υπάρχει απάντηση: %s μετά την αποστολή</string>
     <string name="ccTitle">Κοινοποίηση:</string>
     <string name="comingSoon">Έρχεται σύντομα…</string>
     <string name="commercialFolder">Προσφορές</string>
@@ -242,6 +244,10 @@
     <string name="createFolderName">Όνομα φακέλου</string>
     <string name="datePickerTitle">Επιλέξτε ημερομηνία και ώρα</string>
     <string name="dateTitle">Ημερομηνία:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d μέρα</item>
+        <item quantity="other">%d μέρες</item>
+    </plurals>
     <string name="deleteAccountWarning">Η διαγραφή του λογαριασμού σας θα είναι οριστική. Δεν θα μπορείτε να τον επανενεργοποιήσετε.</string>
     <string name="deleteFolderDialogDescription">Το περιεχόμενο του φακέλου %s θα διαγραφεί οριστικά χωρίς να μεταφερθεί στον κάδο απορριμμάτων.</string>
     <string name="deleteFolderDialogTitle">Διαγραφή φακέλου</string>
@@ -282,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Σχετικοί παραλήπτες</string>
     <string name="encryptedMessagePasswordLabel">Μοιραστείτε αυτόν τον κωδικό μέσω ιδιωτικού μηνύματος. Δεν θα μπορείτε να τον αντιγράψετε μετά την αποστολή.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Η κρυπτογράφηση απενεργοποιήθηκε</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Η προγραμματισμένη αποστολή και οι υπενθυμίσεις δεν είναι διαθέσιμες για κρυπτογραφημένα μηνύματα</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Τα προγραμματισμένα email δεν είναι διαθέσιμα για κρυπτογραφημένα μηνύματα</string>
     <string name="encryptedMessageUpdatePasswordButton">Αλλαγή κωδικού</string>
     <string name="encryptedPasswordProtectionTitle">Προστασία με κωδικό πρόσβασης</string>
@@ -370,6 +377,10 @@
     <string name="genericMessageTranslated">Μήνυμα μεταφρασμένο</string>
     <string name="googlePlayServicesAreRequired">Απαιτούνται οι Υπηρεσίες Google Play</string>
     <string name="groupContactsTitle">Ομάδα: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d ώρα</item>
+        <item quantity="other">%d ώρες</item>
+    </plurals>
     <string name="inboxFolder">Εισερχόμενα</string>
     <string name="kSuiteProQuotasAlertDescription">Ο χώρος αποθήκευσης του Mail σας είναι σχεδόν πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Ο χώρος αποθήκευσης του Mail σας είναι πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
