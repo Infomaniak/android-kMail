@@ -41,6 +41,7 @@ import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDia
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionUtils
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.ui.newMessage.ReminderConfig
 import com.infomaniak.mail.ui.newMessage.ReminderPreset
@@ -115,7 +116,9 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
+    private fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+        binding.customScheduleOption.trailingContent = trailingContentFor(kSuite)
+    }
 
     private fun onLastScheduleOptionClicked() {
         newMessageViewModel.setScheduleConfig(lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None)
@@ -138,8 +141,8 @@ class DraftSendOptionsFragment : Fragment() {
         ScheduleOptionUtils.getAvailableScheduleOptions(currentlyScheduledEpochMillis).forEach { scheduleOption ->
             scheduleOptions.addView(createScheduleOptionItem(scheduleOption))
         }
-
         customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
+        setupCustomScheduleOptionTrailing(currentKSuite)
     }
 
     private fun setupToggles() = with(binding) {
@@ -176,6 +179,8 @@ class DraftSendOptionsFragment : Fragment() {
         days3.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 3, 3))
         days7.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 7, 7))
 
+        customDelayReminder.trailingContent = trailingContentFor(currentKSuite)
+
         val paddingStartValue = resources.getDimensionPixelSize(R.dimen.startPaddingWithoutIcon)
         (optionsDelays.children + customDelayReminder).forEach { view -> view.applyContentPaddingStart(paddingStartValue) }
 
@@ -190,6 +195,14 @@ class DraftSendOptionsFragment : Fragment() {
                 }
             )
         }
+
+        customDelayReminder.setOnClickListener { onCustomDelayReminderClicked() }
+    }
+
+    private fun trailingContentFor(kSuite: KSuite?): TrailingContent = when (kSuite) {
+        KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+        KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+        else -> TrailingContent.Chevron
     }
 
     private fun setReminderOptionsVisible(isVisible: Boolean) {
@@ -308,6 +321,8 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
+    private fun onCustomDelayReminderClicked() = executeIfAuthorized { showCustomDelayReminderDatePicker() }
+
     private fun resetCustomDelayReminder() = with(binding) {
         customDelayReminder.setCheckMark(displayCheckMark = false)
         customDelayReminder.removeSubtitle()
@@ -359,4 +374,9 @@ class DraftSendOptionsFragment : Fragment() {
             },
         )
     }
+
+    private fun showCustomDelayReminderDatePicker() {
+        // TODO
+    }
+
 }
