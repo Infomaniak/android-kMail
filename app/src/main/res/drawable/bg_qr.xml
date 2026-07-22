@@ -16,6 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/colorPrimaryContainer" />
+    <solid android:color="?attr/colorPrimary" />
     <corners android:radius="4dp" />
 </shape>
