@@ -39,7 +39,6 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
-import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.ui.newMessage.AiViewModel
 import com.infomaniak.mail.utils.SharedUtils
