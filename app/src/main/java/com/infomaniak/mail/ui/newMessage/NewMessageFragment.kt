@@ -473,6 +473,7 @@ class NewMessageFragment : Fragment() {
             onAction1 { navigateToScheduleSendBottomSheet() }
             onAction2 {
                 newMessageViewModel.reminderConfig.value = ReminderConfig.None
+                newMessageViewModel.shouldRemindRecipient.value = true
             }
         }
 

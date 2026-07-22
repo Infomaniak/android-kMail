@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
+import com.infomaniak.mail.ui.alertDialogs.SelectVisibilityReminderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionsHelper
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
@@ -73,10 +74,14 @@ class DraftSendOptionsFragment : Fragment() {
     lateinit var customReminderPickerDialog: CustomReminderPickerDialog
 
     @Inject
+    lateinit var selectVisibilityDialog: SelectVisibilityReminderDialog
+
+    @Inject
     lateinit var localSettings: LocalSettings
 
     private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
     private var pendingReminderConfig: ReminderConfig = ReminderConfig.None
+    private var pendingShouldRemindRecipient: Boolean = true
     private var pendingLastSelectedScheduleEpochMillis: Long? = null
 
     private val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
@@ -92,6 +97,7 @@ class DraftSendOptionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
         customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        selectVisibilityDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
         pendingLastSelectedScheduleEpochMillis = lastSelectedEpoch
 
@@ -114,6 +120,9 @@ class DraftSendOptionsFragment : Fragment() {
 
         setReminderOptionsVisible(isVisible = false)
         setScheduleOptionsVisible(isVisible = false)
+
+        pendingShouldRemindRecipient = newMessageViewModel.shouldRemindRecipient.value ?: true
+        updateReminderVisibilitySubtitle()
 
         setupToggles()
         setupScheduleSelection()
@@ -234,6 +243,7 @@ class DraftSendOptionsFragment : Fragment() {
         }
 
         customDelayReminder.setOnClickListener { onCustomDelayReminderClicked() }
+        reminderVisibility.setOnClickListener { showVisibilityReminderPicker() }
     }
 
     private fun trailingContentFor(kSuite: KSuite?): TrailingContent = when (kSuite) {
@@ -254,11 +264,15 @@ class DraftSendOptionsFragment : Fragment() {
         binding.customDelayReminder.setCheckMark(displayCheckMark = false)
         binding.customDelayReminder.removeSubtitle()
         pendingReminderConfig = ReminderConfig.None
+        pendingShouldRemindRecipient = true
+        updateReminderVisibilitySubtitle()
     }
 
     private fun defaultReminderSelection() = with(binding) {
         optionsDelays.check(R.id.hours24)
         pendingReminderConfig = ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false)
+        pendingShouldRemindRecipient = true
+        updateReminderVisibilitySubtitle()
     }
 
     private fun defaultScheduleSelection() = with(binding) {
@@ -328,8 +342,10 @@ class DraftSendOptionsFragment : Fragment() {
         if (savedReminder !is ReminderConfig.Delayed) return@with
 
         pendingReminderConfig = savedReminder
+        pendingShouldRemindRecipient = newMessageViewModel.shouldRemindRecipient.value ?: true
         reminderIfNoAnswer.isChecked = true
         setReminderOptionsVisible(isVisible = true)
+        updateReminderVisibilitySubtitle()
 
 
         if (savedReminder.isCustom) {
@@ -381,6 +397,25 @@ class DraftSendOptionsFragment : Fragment() {
         )
     }
 
+    private fun showVisibilityReminderPicker() {
+        selectVisibilityDialog.show(
+            selectRecipientsAndMe = pendingShouldRemindRecipient,
+            onVisibilitySelected = { isRecipientsAndMe ->
+                pendingShouldRemindRecipient = isRecipientsAndMe
+                updateReminderVisibilitySubtitle()
+            },
+        )
+    }
+
+    private fun updateReminderVisibilitySubtitle() = with(binding) {
+        val subtitleRes = if (pendingShouldRemindRecipient) {
+            R.string.selectionReminderRecipientsAndMe
+        } else {
+            R.string.selectionReminderMeOnly
+        }
+        reminderVisibility.setSubtitle(subtitleRes)
+    }
+
     private fun applyCustomDateSelectionUi(
         timestamp: Long,
         optionView: ItemSettingView,
@@ -396,6 +431,7 @@ class DraftSendOptionsFragment : Fragment() {
     private fun saveOptions() {
         newMessageViewModel.scheduleConfig.value = pendingScheduleConfig
         newMessageViewModel.reminderConfig.value = pendingReminderConfig
+        newMessageViewModel.shouldRemindRecipient.value = pendingShouldRemindRecipient
 
         if (pendingScheduleConfig is ScheduleConfig.Scheduled) {
             pendingLastSelectedScheduleEpochMillis?.let { localSettings.lastSelectedScheduleEpochMillis = it }
