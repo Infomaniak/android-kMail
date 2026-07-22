@@ -222,8 +222,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         from: List<Recipient>,
         aliases: List<String>?,
         featureFlags: Mailbox.FeatureFlagSet?,
+        isLastMessageOfThread: Boolean,
     ) = with(binding) {
-        if (aliases == null) {
+        if (aliases == null || !isLastMessageOfThread) {
             reminder.isVisible = false
             return@with
         }
