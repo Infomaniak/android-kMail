@@ -81,6 +81,10 @@ class MailboxController @Inject constructor(
         return getFirstValidMailbox(userId, mailboxInfoRealm)
     }
 
+    suspend fun getPrimaryValidMailbox(userId: Int): Mailbox? {
+        return getPrimaryValidMailbox(userId, mailboxInfoRealm)
+    }
+
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
         return getMailboxQuery(objectId, mailboxInfoRealm).asFlow()
     }
@@ -164,6 +168,7 @@ class MailboxController @Inject constructor(
         private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
         private val isLocked = "${Mailbox.isLockedPropertyName} == true"
+        private val isPrimary = "${Mailbox::isPrimary.name} == true"
         private val isKSuitePerso = "${Mailbox::isKSuitePerso.name} == true"
 
         private fun getMailboxesQuery(
@@ -213,6 +218,10 @@ class MailboxController @Inject constructor(
         private fun getMyKSuiteMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
             return realm.query<Mailbox>("${checkHasUserId(userId)} AND $isKSuitePerso")
         }
+
+        private fun getPrimaryValidMailboxQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+            return realm.query<Mailbox>("${checkHasUserId(userId)} AND $isPrimary AND NOT $isLocked")
+        }
         //endregion
 
         //region Get data
@@ -250,6 +259,10 @@ class MailboxController @Inject constructor(
 
         suspend fun getFirstValidMailbox(userId: Int, realm: TypedRealm): Mailbox? {
             return getValidMailboxesQuery(userId, realm).findFirstSuspend()
+        }
+
+        suspend fun getPrimaryValidMailbox(userId: Int, realm: TypedRealm): Mailbox? {
+            return getPrimaryValidMailboxQuery(userId, realm).findFirstSuspend() ?: getFirstValidMailbox(userId, realm)
         }
         //endregion
     }

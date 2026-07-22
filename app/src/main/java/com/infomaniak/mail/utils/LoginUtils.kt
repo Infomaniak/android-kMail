@@ -159,7 +159,7 @@ class LoginUtils @Inject constructor(
     private suspend fun loginSuccess(user: User) {
         trackAccountEvent(MatomoName.LoggedIn)
         ioDispatcher {
-            mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+            mailboxController.getPrimaryValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
         }
         AccountUtils.reloadApp?.invoke()
     }
