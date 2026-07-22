@@ -101,6 +101,10 @@ class ItemSettingView @JvmOverloads constructor(
         }
     }
 
+    fun setCheckMark(displayCheckMark: Boolean) {
+        binding.checkMark.isVisible = displayCheckMark
+    }
+
     fun toggleMailboxBlockedState(mustBlock: Boolean) = with(binding) {
         warning.isVisible = mustBlock
         chevron.isGone = mustBlock
