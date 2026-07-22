@@ -525,6 +525,7 @@
     <string name="selectDateDialogTitle">Select date</string>
     <string name="selectSignatureNone">No signature</string>
     <string name="selectTimeDialogTitle">Select time</string>
+    <string name="selectionReminderMeOnly">Me only</string>
     <string name="selectionReminderRecipientsAndMe">Recipients and I</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send the confirmation</string>
