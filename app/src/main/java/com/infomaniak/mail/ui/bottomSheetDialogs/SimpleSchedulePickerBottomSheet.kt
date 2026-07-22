@@ -29,6 +29,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
@@ -83,6 +84,14 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
     }
 
+    protected open fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+        binding.customScheduleOption.trailingContent = when (kSuite) {
+            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+            else -> TrailingContent.Chevron
+        }
+    }
+
     protected fun setupScheduleOptions() = with(binding) {
         val lastDate = ScheduleOptionUtils.getLastScheduleOptionDate(lastSelectedEpoch, currentlyScheduledEpochMillis)
         if (lastDate != null) {
@@ -103,6 +112,7 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         scheduleOptions.children.firstOrNull()?.let { firstItem ->
             setupFirstScheduleOptionDivider(firstItem, shouldDisplayDivider)
         }
+        setupCustomScheduleOptionTrailing(currentKSuite)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
