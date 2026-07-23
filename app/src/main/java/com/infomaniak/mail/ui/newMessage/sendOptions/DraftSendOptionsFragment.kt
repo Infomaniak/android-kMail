@@ -124,7 +124,9 @@ class DraftSendOptionsFragment : Fragment() {
         newMessageViewModel.setScheduleConfig(lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None)
     }
 
-    private fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
+    private fun onCustomScheduleOptionClicked() {
+        executeIfAuthorized(MatomoName.ScheduledCustomDate.value) { showCustomScheduleDatePicker() }
+    }
 
     private fun setupScheduleOptions() = with(binding) {
         val lastDate = ScheduleOptionUtils.getLastScheduleOptionDate(lastSelectedEpoch, currentlyScheduledEpochMillis)
@@ -321,7 +323,8 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun onCustomDelayReminderClicked() = executeIfAuthorized { showCustomDelayReminderDatePicker() }
+    private fun onCustomDelayReminderClicked() =
+        executeIfAuthorized(MatomoName.ReminderCustomDelta.value) { showCustomDelayReminderDatePicker() }
 
     private fun resetCustomDelayReminder() = with(binding) {
         customDelayReminder.setCheckMark(displayCheckMark = false)
@@ -353,11 +356,8 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun executeIfAuthorized(onAuthorized: () -> Unit) {
-        val kSuite = currentKSuite
-        val matomoName = MatomoName.ScheduledCustomDate.value
-
-        when (kSuite) {
+    private fun executeIfAuthorized(matomoName: String, onAuthorized: () -> Unit) {
+        when (val kSuite = currentKSuite) {
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
             KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
