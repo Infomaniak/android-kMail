@@ -39,8 +39,8 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionsHelper
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionsHelper
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView

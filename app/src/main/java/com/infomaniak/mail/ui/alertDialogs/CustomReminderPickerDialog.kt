@@ -62,7 +62,7 @@ class CustomReminderPickerDialog @Inject constructor(
 
     private fun setupPickers() = with(binding) {
         numberPicker.minValue = 1
-        numberPicker.maxValue = timeUnits[0].maxValue
+        numberPicker.maxValue = timeUnits[unitPicker.value].maxValue
         numberPicker.wrapSelectorWheel = true
 
         unitPicker.minValue = 0
@@ -119,8 +119,8 @@ class CustomReminderPickerDialog @Inject constructor(
             val maxValue: Int,
             val multiplierInMinutes: Int
         ) {
-            HOURS(R.plurals.unitHours, MAX_HOURS, 60),
-            DAYS(R.plurals.unitDays, MAX_DAYS, 24 * 60)
+            Hours(R.plurals.unitHours, MAX_HOURS, 60),
+            Days(R.plurals.unitDays, MAX_DAYS, 24 * 60)
         }
     }
 }
