@@ -32,6 +32,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.folder
@@ -48,6 +49,7 @@ import com.infomaniak.mail.ui.main.search.SearchViewModel
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_ACTIONS_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REMINDER_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setBlockUserUi
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.setSpamUi
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
@@ -100,6 +102,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
+    @Inject
+    lateinit var threadController: ThreadController
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
@@ -129,6 +134,13 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setMarkUnreadUi(isFromDraft)
             setReportPhishingUi(isFromDraft)
             setAskEuriaUi(isVisible = true)
+            setReminderUi(
+                isFromDraft = isFromDraft,
+                from = message.from,
+                aliases = mainViewModel.currentMailbox.value?.aliases,
+                featureFlags = mainViewModel.currentMailbox.value?.featureFlags,
+                isLastMessageOfThread = isLastMessageOfThread(message),
+            )
 
             observeReportPhishingResult()
             observePotentialBlockedSenders()
@@ -261,6 +273,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUid)
             }
 
+            override fun onReminder() {
+                // TODO: matomo
+                setBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET, messageUid)
+            }
+
             override fun onSnooze() = Unit
 
             override fun onModifySnooze() = Unit
@@ -352,6 +369,14 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
             //endregion
         })
+    }
+
+    private suspend fun isLastMessageOfThread(message: Message): Boolean {
+        val thread = threadController.getThread(navigationArgs.threadUid) ?: return false
+        val currentIndex = thread.messages.indexOfFirst { it.uid == message.uid }
+        if (currentIndex == -1) return false
+        val messagesAfter = thread.messages.drop(currentIndex + 1)
+        return messagesAfter.isEmpty() || messagesAfter.all { it.isDraft }
     }
 
     companion object {
