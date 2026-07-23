@@ -177,8 +177,10 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
-    private val isScheduledDraftsEnabledLive by lazy {
-        newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.SCHEDULE_DRAFTS) }.distinctUntilChanged()
+    private val isScheduledDraftsOrRemindersEnabledLive by lazy {
+        newMessageViewModel.featureFlagsLive.map {
+            it.contains(FeatureFlag.SCHEDULE_DRAFTS) || it.contains(FeatureFlag.RESPONSE_REQUIRED)
+        }.distinctUntilChanged()
     }
     private val areMentionsAvailableLive by lazy {
         newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.MENTIONS) }.distinctUntilChanged()
@@ -845,8 +847,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeFeatureFlagUpdates() {
-        isScheduledDraftsEnabledLive.observe(viewLifecycleOwner) { isScheduledDraftsEnabled ->
-            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+        isScheduledDraftsOrRemindersEnabledLive.observe(viewLifecycleOwner) { isEnabled ->
+            binding.scheduleButton.isVisible = isEnabled
         }
 
         areMentionsAvailableLive.observe(viewLifecycleOwner) { areMentionsAvailable ->
