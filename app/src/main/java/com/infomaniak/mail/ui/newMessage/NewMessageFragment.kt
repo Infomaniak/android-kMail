@@ -658,7 +658,8 @@ class NewMessageFragment : Fragment() {
     private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
         when (newMessageViewModel.draftMode()) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.REPLY_ALL,
+            DraftMode.FOLLOW_UP -> focusBodyField()
             DraftMode.FORWARD -> focusToField()
             DraftMode.NEW_MAIL -> if (isToFieldEmpty) focusToField() else focusBodyField()
         }

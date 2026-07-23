@@ -109,6 +109,10 @@ class ActionItemView @JvmOverloads constructor(
         binding.title.text = text
     }
 
+    fun removeIcon() {
+        binding.icon.isGone = true
+    }
+
     private fun setTitleColor(color: ColorStateList) = binding.title.setTextColor(color)
 
     fun setDescription(text: String) {

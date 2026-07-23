@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.ui.newMessage
 
+import android.R.id.message
 import android.app.Application
 import android.content.ClipDescription
 import android.content.Intent
@@ -82,6 +83,7 @@ import com.infomaniak.mail.data.models.extensions.setUploadStatus
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.ReminderMessageInfo
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -111,6 +113,7 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.htmlToText
+import com.infomaniak.mail.utils.extensions.toRealmInstant
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -445,7 +448,7 @@ class NewMessageViewModel @Inject constructor(
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
-            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
+            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD, DraftMode.FOLLOW_UP -> {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
@@ -460,6 +463,15 @@ class NewMessageViewModel @Inject constructor(
                         }
                     }
             }
+        }
+
+        if (draftMode == DraftMode.FOLLOW_UP) {
+            initialBody = BodyContentPayload.bodyOf(
+                BodyContentPayload(
+                    appContext.getString(R.string.reminderFollowUpPlaceholderText),
+                    BodyContentType.TEXT_PLAIN_WITHOUT_HTML
+                )
+            )
         }
 
         val signature: Signature
@@ -1186,7 +1198,7 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
-                .mapTo(mutableSetOf()) { it.localUuid } &&
+                        .mapTo(mutableSetOf()) { it.localUuid } &&
                     draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
                     draftSnapshot.reminderDelta == getCurrentReminderDelta() &&
                     draftSnapshot.shouldRemindRecipient == shouldRemindRecipient.value

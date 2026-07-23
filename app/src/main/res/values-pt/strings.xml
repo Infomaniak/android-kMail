@@ -292,7 +292,6 @@
     <string name="encryptedMessagePasswordLabel">Partilhe esta palavra-passe por mensagem privada. Não a poderá copiar após o envio.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">A encriptação foi desativada</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">O envio agendado e os lembretes não estão disponíveis para mensagens cifradas</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">O envio programado não está disponível para mensagens encriptadas</string>
     <string name="encryptedMessageUpdatePasswordButton">Alterar palavra-passe</string>
     <string name="encryptedPasswordProtectionTitle">Proteção por palavra-passe</string>
     <string name="encryptedProtectionAdDescription">Proteja a sua mensagem contra acesso não autorizado com a encriptação Infomaniak.</string>
@@ -306,6 +305,7 @@
     <string name="encryptedStatePanelIncomplete">É necessária uma palavra-passe para finalizar o envio.</string>
     <string name="encryptedStatePanelStatePartialLabel">Parcial</string>
     <string name="encryptedStatePanelTitle">Encriptação</string>
+    <string name="encryptionDisabledByScheduledOrReminder">A encriptação não está disponível se o envio agendado ou o lembrete estiver ativo</string>
     <string name="enterPasswordTitle">Introduzir palavra-passe</string>
     <string name="errorAlreadyLinkedMailbox">Este endereço de e-mail já está associado à sua conta</string>
     <string name="errorAtLeastOneRecipient">É necessário pelo menos um destinatário</string>
