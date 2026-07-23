@@ -1201,7 +1201,7 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
-                .mapTo(mutableSetOf()) { it.localUuid } &&
+                        .mapTo(mutableSetOf()) { it.localUuid } &&
                     draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
                     draftSnapshot.reminderDelta == getCurrentReminderDelta() &&
                     draftSnapshot.shouldRemindRecipient == shouldRemindRecipient.value
