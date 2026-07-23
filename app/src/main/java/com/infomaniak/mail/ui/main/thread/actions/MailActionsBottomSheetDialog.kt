@@ -28,7 +28,10 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.extensions.kSuite
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
@@ -60,6 +63,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onReadUnread() = Unit
         override fun onMove() = Unit
         override fun onAddReaction() = Unit
+        override fun onReminder() = Unit
         override fun onSnooze() = Unit
         override fun onModifySnooze() = Unit
         override fun onCancelSnooze() = Unit
@@ -91,6 +95,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         // Not a setClosingOnClickListener because we need to send a setBackNavigationResult,
         // and setClosingOnClickListener closes before we had time to set the result
         addReaction.setOnClickListener { onClickListener.onAddReaction() }
+        reminder.setOnClickListener { onClickListener.onReminder() }
         snooze.setOnClickListener { onClickListener.onSnooze() }
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
@@ -212,6 +217,21 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.askEuria.isVisible = isVisible
     }
 
+    fun setReminderUi(
+        isFromDraft: Boolean,
+        from: List<Recipient>,
+        aliases: List<String>?,
+        featureFlags: Mailbox.FeatureFlagSet?,
+        isLastMessageOfThread: Boolean,
+    ) = with(binding) {
+        if (aliases == null || !isLastMessageOfThread) {
+            reminder.isVisible = false
+            return@with
+        }
+        val isFromAlias = from.any { sender -> sender.email in aliases }
+        binding.reminder.isVisible = !isFromDraft && isFromAlias && featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) == true
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
@@ -221,6 +241,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onReadUnread()
         fun onMove()
         fun onAddReaction()
+        fun onReminder()
         fun onSnooze()
         fun onModifySnooze()
         fun onCancelSnooze()
