@@ -521,6 +521,7 @@
     <string name="selectDateDialogTitle">Välj datum</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Välj tid</string>
+    <string name="selectionReminderMeOnly">Bara jag</string>
     <string name="selectionReminderRecipientsAndMe">Mottagare och mig</string>
     <string name="send">Skicka</string>
     <string name="sendConfirmationAction">Skicka bekräftelsen</string>

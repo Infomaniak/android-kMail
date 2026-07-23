@@ -521,6 +521,7 @@
     <string name="selectDateDialogTitle">Selecionar data</string>
     <string name="selectSignatureNone">Sem assinatura</string>
     <string name="selectTimeDialogTitle">Selecionar hora</string>
+    <string name="selectionReminderMeOnly">Só eu</string>
     <string name="selectionReminderRecipientsAndMe">Os destinatários e eu</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar a confirmação</string>
