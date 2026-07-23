@@ -219,7 +219,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
 
         initializeMultiselection()
 
-        observeNetworkStatus()
+        observeNetworkAndServerStatus()
         observeCurrentThreads()
         observeDownloadState()
         observeFilter()
@@ -628,14 +628,24 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
         }
     }
 
-    private fun observeNetworkStatus() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(State.STARTED) {
-                mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
-                    TransitionManager.beginDelayedTransition(binding.root)
-                    binding.noNetwork.isGone = isNetworkAvailable
-                    binding.updatedAt.isGone = !isNetworkAvailable
-                    if (!isNetworkAvailable) updateThreadsVisibility()
+    private fun observeNetworkAndServerStatus() {
+        threadListViewModel.serviceAvailabilityState.observe(viewLifecycleOwner) { availabilityState ->
+            TransitionManager.beginDelayedTransition(binding.root)
+
+            when (availabilityState) {
+                is AvailableService.DisplayUnavailableService -> {
+                    binding.networkWarning.isGone = false
+                    binding.networkWarning.text = getString(availabilityState.title)
+
+                    val drawable = getDrawable(binding.root.context, availabilityState.icon)
+                    binding.networkWarning.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+
+                    binding.updatedAt.isGone = true
+                    updateThreadsVisibility()
+                }
+                is AvailableService.AllAvailable -> {
+                    binding.networkWarning.isGone = true
+                    binding.updatedAt.isVisible = true
                 }
             }
         }

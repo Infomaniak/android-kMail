@@ -510,6 +510,7 @@
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar la confirmación</string>
     <string name="sentFolder">Mensajes enviados</string>
+    <string name="serverUnavailable">Servidores no disponibles</string>
     <string name="settingsAccentColor">Color de acento</string>
     <string name="settingsAccentColorDescription">Elija el color de acento para la aplicación</string>
     <string name="settingsAccountManagementTitle">Gestión de cuentas</string>

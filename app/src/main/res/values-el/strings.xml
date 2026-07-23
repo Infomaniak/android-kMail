@@ -510,6 +510,7 @@
     <string name="send">Αποστολή</string>
     <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>
     <string name="sentFolder">Απεσταλμένα μηνύματα</string>
+    <string name="serverUnavailable">Οι διακομιστές δεν είναι διαθέσιμοι</string>
     <string name="settingsAccentColor">Χρώμα έμφασης</string>
     <string name="settingsAccentColorDescription">Επιλέξτε το χρώμα έμφασης για την εφαρμογή</string>
     <string name="settingsAccountManagementTitle">Διαχείριση λογαριασμού</string>
