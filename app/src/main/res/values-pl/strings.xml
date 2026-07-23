@@ -224,6 +224,7 @@
     <string name="contentDescriptionIconForward">Przekazane dalej</string>
     <string name="contentDescriptionIconMention">Zostałeś wspomniany.</string>
     <string name="contentDescriptionIconNewMail">Nowe</string>
+    <string name="contentDescriptionIconQr">Otwórz kartę kontaktu</string>
     <string name="contentDescriptionIconReply">Odpowiedź</string>
     <string name="contentDescriptionIconStorage">Status pamięci</string>
     <string name="contentDescriptionOpenMailActions">Otwórz akcje wiadomości</string>
