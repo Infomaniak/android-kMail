@@ -633,7 +633,8 @@ class NewMessageViewModel @Inject constructor(
         }
 
         reminder?.reminderDelta?.let { minutes ->
-            reminderConfig.postValue(ReminderConfig.Delayed(minutes, isCustom = false))
+            val isCustom = !ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
+            reminderConfig.postValue(ReminderConfig.Delayed(minutes, isCustom = isCustom))
         }
 
         reminder?.shouldRemindRecipient?.let {
