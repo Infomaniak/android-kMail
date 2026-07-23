@@ -182,6 +182,7 @@
     <string name="calendarNotInvited">Et ole kutsuttu</string>
     <string name="calendarOrganizerName">%s (Järjestäjä)</string>
     <string name="callIfNoResponseHeaderTitle">Muistuta, jos vastausta ei kuulu: %s lähettämisen jälkeen</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Muistuta minua, jos vastausta ei tule: %s</string>
     <string name="ccTitle">Kopio:</string>
     <string name="comingSoon">Tulossa pian…</string>
     <string name="commercialFolder">Tarjoukset</string>
@@ -222,6 +223,7 @@
     <string name="contentDescriptionIconForward">Välitetty</string>
     <string name="contentDescriptionIconMention">Sinut on mainittu.</string>
     <string name="contentDescriptionIconNewMail">Uusi</string>
+    <string name="contentDescriptionIconReminder">On muistutus</string>
     <string name="contentDescriptionIconReply">Vastaus</string>
     <string name="contentDescriptionIconStorage">Tallennustilan tila</string>
     <string name="contentDescriptionOpenMailActions">Avaa sähköpostin toiminnot</string>
@@ -242,6 +244,7 @@
     <string name="contextMenuPhoneNumberDial">Soita</string>
     <string name="contextMenuPhoneNumberSms">Kirjoita tekstiviesti</string>
     <string name="createFolderName">Kansion nimi</string>
+    <string name="createReminderBottomSheetTitle">Lisää muistutus</string>
     <string name="datePickerTitle">Valitse päivämäärä ja aika</string>
     <string name="dateTitle">Päivämäärä:</string>
     <plurals name="daysBeforeSendingReminder">
@@ -488,6 +491,19 @@
     <string name="readMore">Lue lisää</string>
     <string name="recentSearchesTitle">Viimeisimmät haut</string>
     <string name="refreshTokenError">Sinut on kirjattu ulos</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s on odottanut vastausta %2$s lähtien</item>
+        <item quantity="other">%1$s ovat odottaneet vastausta %2$s lähtien</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s odottaa vastausta %2$s mennessä</item>
+        <item quantity="other">%1$s odottavat vastausta %2$s mennessä</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Lykkää muistutusta</string>
+    <string name="reminderFollowUpButton">Seuraa</string>
+    <string name="reminderFollowUpPlaceholderText">Hei,\nOnko mahdollista saada palautetta tästä aiheesta?\nKiitos etukäteen.</string>
+    <string name="reminderMarkAsDoneButton">Merkitse valmiiksi</string>
+    <string name="reminderNoResponseHeaderTitle">Muistutus: ei vastausta %1$s:ltä tähän sähköpostiin lähtien %2$s</string>
     <string name="reminderVisibilityTitle">Muistutuksen näkyvyys</string>
     <string name="renameFolder">Nimeä kansio uudelleen</string>
     <string name="reportDisplayProblemDescription">Suostutko jakamaan tietojasi kehittäjiemme kanssa, jotta he voivat auttaa sinua ongelmassasi?</string>
@@ -609,11 +625,15 @@
     <string name="shareEmail">Jaa sähköposti</string>
     <string name="snackbarAcknowledgementFailure">Lähetys epäonnistui</string>
     <string name="snackbarAcknowledgementSuccess">Vastaanottokuittaus lähetetty</string>
+    <string name="snackbarAddReminderFailure">Muistutuksen lisääminen epäonnistui</string>
+    <string name="snackbarAddReminderSuccess">Muistutus lisätty</string>
     <string name="snackbarAdminDisabledMessageSending">Järjestelmänvalvoja on poistanut viestinlähetyksen käytöstä</string>
     <string name="snackbarBlockUserConfirmation">Lähettäjä on nyt estetty</string>
     <string name="snackbarCalendarChoiceSent">Vastaus otettu huomioon</string>
     <string name="snackbarContactSaved">Uusi yhteystieto rekisteröity onnistuneesti</string>
     <string name="snackbarDeletedConversation">Keskustelua ei ole enää olemassa</string>
+    <string name="snackbarDisableReminderFailure">Muistutusta ei voitu poistaa käytöstä</string>
+    <string name="snackbarDisableReminderSuccess">Muistutus poistettu onnistuneesti käytöstä</string>
     <string name="snackbarDisplayProblemReported">Näyttöongelma ilmoitettu</string>
     <string name="snackbarDownloadInProgress">Lataus käynnissä…</string>
     <string name="snackbarDraftDeleted">Luonnos poistettu</string>
@@ -627,6 +647,8 @@
     <string name="snackbarMessageDeletedPermanently">Viesti poistettu</string>
     <string name="snackbarMessageMoved">Viesti siirretty kohteeseen %s</string>
     <string name="snackbarMessageMovedToSpam">Viesti siirretty roskapostiksi ja käyttäjä estetty</string>
+    <string name="snackbarModifyReminderFailure">Muistutuksen muokkaaminen epäonnistui</string>
+    <string name="snackbarModifyReminderSuccess">Muistutus muutettu</string>
     <string name="snackbarMoveCancelled">Siirto peruutettu</string>
     <string name="snackbarPasswordCopied">Salasana kopioitu</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero kopioitu leikepöydälle</string>

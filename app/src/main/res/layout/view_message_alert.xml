@@ -56,28 +56,21 @@
         android:layout_marginTop="@dimen/marginStandardVerySmall"
         android:gravity="center_vertical"
         app:alignItems="center"
+        app:dividerDrawableVertical="@drawable/divider_vertical"
         app:flexDirection="row"
         app:flexWrap="wrap"
         app:justifyContent="flex_start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/description"
-        app:layout_constraintTop_toBottomOf="@id/description">
+        app:layout_constraintTop_toBottomOf="@id/description"
+        app:showDividerVertical="middle">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/action1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="@string/alertBlockedImagesDisplayContent" />
-
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/divider"
-            android:layout_width="1dp"
-            android:layout_height="12sp"
-            android:layout_marginVertical="@dimen/alternativeMargin"
-            android:visibility="gone"
-            app:dividerColor="@color/dividerColor"
-            tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/action2"
@@ -86,6 +79,13 @@
             android:visibility="gone"
             tools:text="Toujours afficher pour cet expéditeur"
             tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:text="Action 3" />
 
     </com.google.android.flexbox.FlexboxLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -182,6 +182,7 @@
     <string name="calendarNotInvited">Sie zählen nicht zu den eingeladenen Personen</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>
     <string name="callIfNoResponseHeaderTitle">Erinnern, wenn keine Antwort: %s nach dem Senden</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Mich erinnern, wenn keine Antwort erfolgt: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Demnächst…</string>
     <string name="commercialFolder">Werbeaktionen</string>
@@ -222,6 +223,7 @@
     <string name="contentDescriptionIconForward">Weitergeleitet</string>
     <string name="contentDescriptionIconMention">Du wurdest erwähnt.</string>
     <string name="contentDescriptionIconNewMail">Neu</string>
+    <string name="contentDescriptionIconReminder">Ist eine Erinnerung</string>
     <string name="contentDescriptionIconReply">Antwort</string>
     <string name="contentDescriptionIconStorage">Speicherstatus</string>
     <string name="contentDescriptionOpenMailActions">Mail-Aktionen öffnen</string>
@@ -242,6 +244,7 @@
     <string name="contextMenuPhoneNumberDial">Wählen</string>
     <string name="contextMenuPhoneNumberSms">Eine SMS schreiben</string>
     <string name="createFolderName">Name des Ordners</string>
+    <string name="createReminderBottomSheetTitle">Erinnerung hinzufügen</string>
     <string name="datePickerTitle">Wählen Sie ein Datum und eine Uhrzeit</string>
     <string name="dateTitle">Datum:</string>
     <plurals name="daysBeforeSendingReminder">
@@ -488,6 +491,19 @@
     <string name="readMore">Mehr erfahren</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden abgemeldet</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s wartet seit %2$s auf eine Antwort</item>
+        <item quantity="other">%1$s warten seit %2$s auf eine Antwort</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s erwartet eine Antwort bis %2$s</item>
+        <item quantity="other">%1$s erwarten eine Antwort bis %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Erinnerung verschieben</string>
+    <string name="reminderFollowUpButton">Nachfassen</string>
+    <string name="reminderFollowUpPlaceholderText">Hallo,\nIst es möglich, ein Feedback zu diesem Thema zu erhalten?\nVielen Dank im Voraus.</string>
+    <string name="reminderMarkAsDoneButton">Als erledigt markieren</string>
+    <string name="reminderNoResponseHeaderTitle">Erinnerung: keine Antwort von %1$s auf diese E-Mail seit dem %2$s</string>
     <string name="reminderVisibilityTitle">Sichtbarkeit der Erinnerung</string>
     <string name="renameFolder">Benennen Sie den Ordner um</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>
@@ -609,11 +625,15 @@
     <string name="shareEmail">E-Mail austauschen</string>
     <string name="snackbarAcknowledgementFailure">Senden fehlgeschlagen</string>
     <string name="snackbarAcknowledgementSuccess">Lesebestätigung gesendet</string>
+    <string name="snackbarAddReminderFailure">Fehler beim Hinzufügen der Erinnerung</string>
+    <string name="snackbarAddReminderSuccess">Erinnerung hinzugefügt</string>
     <string name="snackbarAdminDisabledMessageSending">Ein Administrator hat den Nachrichtenversand deaktiviert</string>
     <string name="snackbarBlockUserConfirmation">Absender ist jetzt blockiert</string>
     <string name="snackbarCalendarChoiceSent">Antwort berücksichtigt</string>
     <string name="snackbarContactSaved">Neuer Kontakt erfolgreich registriert</string>
     <string name="snackbarDeletedConversation">Unterhaltung existiert nicht mehr</string>
+    <string name="snackbarDisableReminderFailure">Erinnerung konnte nicht deaktiviert werden</string>
+    <string name="snackbarDisableReminderSuccess">Erinnerung erfolgreich deaktiviert</string>
     <string name="snackbarDisplayProblemReported">Anzeigeproblem gemeldet</string>
     <string name="snackbarDownloadInProgress">Download läuft…</string>
     <string name="snackbarDraftDeleted">Entwurf gelöscht</string>
@@ -627,6 +647,8 @@
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMessageMovedToSpam">Nachricht in den Spam verschoben und Benutzer blockiert</string>
+    <string name="snackbarModifyReminderFailure">Ändern der Erinnerung fehlgeschlagen</string>
+    <string name="snackbarModifyReminderSuccess">Erinnerung geändert</string>
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>
     <string name="snackbarPasswordCopied">Passwort kopiert</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer in die Zwischenablage kopiert</string>

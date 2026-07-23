@@ -186,6 +186,7 @@
     <string name="calendarNotInvited">You are not invited</string>
     <string name="calendarOrganizerName">%s (Organizer)</string>
     <string name="callIfNoResponseHeaderTitle">Remind me if there is no response: %s after sending</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Remind me if there is no response: %s</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
@@ -226,6 +227,7 @@
     <string name="contentDescriptionIconForward">Forwarded</string>
     <string name="contentDescriptionIconMention">You have been mentioned.</string>
     <string name="contentDescriptionIconNewMail">New</string>
+    <string name="contentDescriptionIconReminder">Is a reminder</string>
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>
@@ -246,6 +248,7 @@
     <string name="contextMenuPhoneNumberDial">Dial</string>
     <string name="contextMenuPhoneNumberSms">Write an SMS</string>
     <string name="createFolderName">Name of the folder</string>
+    <string name="createReminderBottomSheetTitle">Add a reminder</string>
     <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
     <plurals name="daysBeforeSendingReminder">
@@ -492,6 +495,19 @@
     <string name="readMore">Read more</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s is awaiting a reply since %2$s</item>
+        <item quantity="other">%1$s are awaiting a reply since %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s is awaiting a reply by %2$s</item>
+        <item quantity="other">%1$s are awaiting a reply by %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Delay the reminder</string>
+    <string name="reminderFollowUpButton">Follow up</string>
+    <string name="reminderFollowUpPlaceholderText">Hello,\nIs it possible to get some feedback on this subject?\nThank you in advance.</string>
+    <string name="reminderMarkAsDoneButton">Mark as done</string>
+    <string name="reminderNoResponseHeaderTitle">Reminder: no response from %1$s to this email since %2$s</string>
     <string name="reminderVisibilityTitle">Reminder visibility</string>
     <string name="renameFolder">Rename the folder</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
@@ -613,11 +629,15 @@
     <string name="shareEmail">Share email</string>
     <string name="snackbarAcknowledgementFailure">Failed to send</string>
     <string name="snackbarAcknowledgementSuccess">Read receipt sent</string>
+    <string name="snackbarAddReminderFailure">Failed to add reminder</string>
+    <string name="snackbarAddReminderSuccess">Reminder added</string>
     <string name="snackbarAdminDisabledMessageSending">An administrator has disabled message sending</string>
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarCalendarChoiceSent">Response taken into account</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>
     <string name="snackbarDeletedConversation">Conversation no longer exists</string>
+    <string name="snackbarDisableReminderFailure">Failed to disable reminder</string>
+    <string name="snackbarDisableReminderSuccess">Reminder successfully disabled</string>
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarDownloadInProgress">Download in progress…</string>
     <string name="snackbarDraftDeleted">Draft deleted</string>
@@ -631,6 +651,8 @@
     <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
     <string name="snackbarMessageMovedToSpam">Message moved to Spam and user blocked</string>
+    <string name="snackbarModifyReminderFailure">Failed to modify reminder</string>
+    <string name="snackbarModifyReminderSuccess">Reminder modified</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>
     <string name="snackbarPasswordCopied">Password copied</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Number copied to clipboard</string>

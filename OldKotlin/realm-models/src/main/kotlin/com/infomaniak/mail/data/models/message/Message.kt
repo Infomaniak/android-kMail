@@ -140,6 +140,10 @@ class Message : RealmObject, Snoozable {
         @InternalModelProperties
         set
     var mentions = realmListOf<String>()
+    @SerialName("reminder")
+    var reminder: ReminderMessageInfo? = null
+    @SerialName("reminder_action")
+    var reminderAction: String? = null
     //endregion
 
     //region Local data (Transient)
@@ -300,6 +304,10 @@ class Message : RealmObject, Snoozable {
     }
 
     fun isOrphan(): Boolean = threads.isEmpty() && threadsDuplicatedIn.isEmpty()
+
+    fun extractFromNames(): List<String> {
+        return from.map { it.name.ifBlank { it.email } }
+    }
 
     // Be careful when using this method because some folders might contain messages from other folders than itself. This
     // operation should only happen in very specific situations like computing the shortUid of a Message from its uid.
