@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Se ha enviado una confirmación de lectura al remitente.</string>
     <string name="actionArchive">Archivar</string>
     <string name="actionBlockSender">Bloquear remitente</string>
+    <string name="actionCallIfNoResponse">Recordarme si no hay respuesta después de enviar</string>
     <string name="actionCancelSnooze">Cancelar el aplazamiento</string>
     <string name="actionDelete">Borrar</string>
     <string name="actionEditMenu">Menú Edición</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Copiar contraseña</string>
     <string name="buttonCreate">Cree</string>
     <string name="buttonCreateFolder">Añadir una carpeta</string>
+    <string name="buttonCustomReminder">Recordatorio personalizado</string>
     <string name="buttonCustomSchedule">Horario personalizado</string>
+    <string name="buttonDisable">Desactivar</string>
     <string name="buttonDownload">Descargar</string>
     <string name="buttonDownloadAll">Descargar todo</string>
     <string name="buttonFeedback">Comentarios</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">Todo el día</string>
     <string name="calendarNotInvited">No estás invitado</string>
     <string name="calendarOrganizerName">%s (Organizador)</string>
+    <string name="callIfNoResponseHeaderTitle">Recordarme si no hay respuesta: %s después del envío</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Próximamente…</string>
     <string name="commercialFolder">Promociones</string>
@@ -240,6 +244,10 @@
     <string name="createFolderName">Nombre de la carpeta</string>
     <string name="datePickerTitle">Elige una fecha y hora</string>
     <string name="dateTitle">Fecha:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
     <string name="deleteAccountWarning">La eliminación de su cuenta será definitiva. No podrá reactivar su cuenta.</string>
     <string name="deleteFolderDialogDescription">El contenido de la carpeta %s se borrará definitivamente sin pasar por la papelera.</string>
     <string name="deleteFolderDialogTitle">Eliminar la carpeta</string>
@@ -280,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Beneficiarios afectados</string>
     <string name="encryptedMessagePasswordLabel">Comparte esta contraseña por mensaje privado. No podrás copiarla una vez que la hayas enviado.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Se ha desactivado el cifrado</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">El envío programado y los recordatorios no están disponibles para mensajes cifrados</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Los correos electrónicos programados no están disponibles para los mensajes cifrados</string>
     <string name="encryptedMessageUpdatePasswordButton">Cambiar contraseña</string>
     <string name="encryptedPasswordProtectionTitle">Protección mediante contraseña</string>
@@ -368,6 +377,10 @@
     <string name="genericMessageTranslated">Mensaje traducido</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="groupContactsTitle">Grupo: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
     <string name="inboxFolder">Bandeja de entrada</string>
     <string name="kSuiteProQuotasAlertDescription">Tu espacio de almacenamiento de Mail está casi lleno. Modifica tu oferta para conseguir almacenamiento ilimitado y desbloquear nuevas funciones.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Tu espacio de almacenamiento de Mail está lleno. Modifica tu oferta para conseguir almacenamiento ilimitado y desbloquear nuevas funciones.</string>
@@ -475,6 +488,7 @@
     <string name="readMore">Seguir leyendo</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
     <string name="refreshTokenError">Ha sido desconectado</string>
+    <string name="reminderVisibilityTitle">Visibilidad del recordatorio</string>
     <string name="renameFolder">Cambiar el nombre de la carpeta</string>
     <string name="reportDisplayProblemDescription">¿Aceptas compartir tus datos con nuestros desarrolladores para que puedan ayudarte con tu problema?</string>
     <string name="reportDisplayProblemTitle">Informar de un problema de visualización</string>
@@ -507,8 +521,10 @@
     <string name="selectDateDialogTitle">Seleccione la fecha</string>
     <string name="selectSignatureNone">Sin firma</string>
     <string name="selectTimeDialogTitle">Seleccionar la hora</string>
+    <string name="selectionReminderRecipientsAndMe">Los destinatarios y yo</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar la confirmación</string>
+    <string name="sendOptions">Opciones de envío</string>
     <string name="sentFolder">Mensajes enviados</string>
     <string name="settingsAccentColor">Color de acento</string>
     <string name="settingsAccentColorDescription">Elija el color de acento para la aplicación</string>

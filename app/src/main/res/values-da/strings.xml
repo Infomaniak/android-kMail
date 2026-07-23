@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">En kvittering for læsning er blevet sendt til afsenderen.</string>
     <string name="actionArchive">Arkivér</string>
     <string name="actionBlockSender">Bloker afsender</string>
+    <string name="actionCallIfNoResponse">Påmind mig, hvis der ikke kommer svar efter afsendelse</string>
     <string name="actionCancelSnooze">Annuller udsættelse</string>
     <string name="actionDelete">Slet</string>
     <string name="actionEditMenu">Rediger menu</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Kopiér adgangskode</string>
     <string name="buttonCreate">Opret</string>
     <string name="buttonCreateFolder">Tilføj en mappe</string>
+    <string name="buttonCustomReminder">Brugerdefineret påmindelse</string>
     <string name="buttonCustomSchedule">Tilpasset tidsplan</string>
+    <string name="buttonDisable">Deaktiver</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download alle</string>
     <string name="buttonFeedback">Feedback</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">Hele dagen</string>
     <string name="calendarNotInvited">Du er ikke inviteret</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>
+    <string name="callIfNoResponseHeaderTitle">Påmind mig, hvis der ikke er svar: %s efter afsendelse</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Tilbud</string>
@@ -240,6 +244,10 @@
     <string name="createFolderName">Navn på mappen</string>
     <string name="datePickerTitle">Vælg en dato og et tidspunkt</string>
     <string name="dateTitle">Dato:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dage</item>
+    </plurals>
     <string name="deleteAccountWarning">Sletningen af din konto vil være endelig. Du vil ikke kunne genaktivere din konto.</string>
     <string name="deleteFolderDialogDescription">Indholdet af mappen %s vil blive slettet permanent uden at gå gennem papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slet mappe</string>
@@ -280,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Berørte modtagere</string>
     <string name="encryptedMessagePasswordLabel">Del denne adgangskode via privat besked. Du vil ikke kunne kopiere den, når du har sendt den.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Kryptering er blevet deaktiveret</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Planlagt afsendelse og påmindelser er ikke tilgængelige for krypterede beskeder</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Planlagte e-mails er ikke tilgængelige for krypterede beskeder</string>
     <string name="encryptedMessageUpdatePasswordButton">Skift adgangskode</string>
     <string name="encryptedPasswordProtectionTitle">Adgangskodebeskyttelse</string>
@@ -368,6 +377,10 @@
     <string name="genericMessageTranslated">Besked oversat</string>
     <string name="googlePlayServicesAreRequired">Google Play Services er påkrævet</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
     <string name="inboxFolder">Indbakke</string>
     <string name="kSuiteProQuotasAlertDescription">Din mail-lagerplads er næsten fuld. Opgrader til ubegrænset lagerplads og lås nye funktioner op.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din mail-lagerplads er fuld. Opgrader til ubegrænset lagerplads og lås nye funktioner op.</string>
@@ -475,6 +488,7 @@
     <string name="readMore">Læs mere</string>
     <string name="recentSearchesTitle">Seneste søgninger</string>
     <string name="refreshTokenError">Du er blevet afbrudt</string>
+    <string name="reminderVisibilityTitle">Påmindelsens synlighed</string>
     <string name="renameFolder">Omdøb mappen</string>
     <string name="reportDisplayProblemDescription">Er du enig i at dele dine data med vores udviklere, så de kan hjælpe dig med dit problem?</string>
     <string name="reportDisplayProblemTitle">Rapportér et visningsproblem</string>
@@ -507,8 +521,10 @@
     <string name="selectDateDialogTitle">Vælg dato</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Vælg tidspunkt</string>
+    <string name="selectionReminderRecipientsAndMe">Modtagere og mig</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send bekræftelsen</string>
+    <string name="sendOptions">Sendevalg</string>
     <string name="sentFolder">Sendte beskeder</string>
     <string name="settingsAccentColor">Accentfarve</string>
     <string name="settingsAccentColorDescription">Vælg accentfarven til applikationen</string>

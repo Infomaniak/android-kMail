@@ -58,6 +58,10 @@ class ItemSettingView @JvmOverloads constructor(
                     icon.isGone = it == null
                 }
 
+                getColorStateList(R.styleable.ItemSettingView_iconColor)?.let { color ->
+                    icon.imageTintList = color
+                }
+
                 getString(R.styleable.ItemSettingView_subtitle).let {
                     subtitle.apply {
                         text = it
@@ -99,6 +103,16 @@ class ItemSettingView @JvmOverloads constructor(
             text = subtitle
             isVisible = true
         }
+    }
+
+    fun removeSubtitle() {
+        binding.subtitle.apply {
+            isGone = true
+        }
+    }
+
+    fun setCheckMark(displayCheckMark: Boolean) {
+        binding.checkMark.isVisible = displayCheckMark
     }
 
     fun toggleMailboxBlockedState(mustBlock: Boolean) = with(binding) {

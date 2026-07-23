@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Lesebekreftelse er sendt til avsenderen.</string>
     <string name="actionArchive">Arkiver</string>
     <string name="actionBlockSender">Blokker avsender</string>
+    <string name="actionCallIfNoResponse">Påminn meg hvis det ikke kommer svar etter sending</string>
     <string name="actionCancelSnooze">Avbryt utsettelse</string>
     <string name="actionDelete">Slett</string>
     <string name="actionEditMenu">Rediger meny</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Kopier passord</string>
     <string name="buttonCreate">Opprett</string>
     <string name="buttonCreateFolder">Legg til mappe</string>
+    <string name="buttonCustomReminder">Egendefinert påminnelse</string>
     <string name="buttonCustomSchedule">Egendefinert timeplan</string>
+    <string name="buttonDisable">Deaktiver</string>
     <string name="buttonDownload">Last ned</string>
     <string name="buttonDownloadAll">Last ned alle</string>
     <string name="buttonFeedback">Tilbakemelding</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">Hele dagen</string>
     <string name="calendarNotInvited">Du er ikke invitert</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>
+    <string name="callIfNoResponseHeaderTitle">Påminn meg hvis det ikke er svar: %s etter sending</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
@@ -240,6 +244,10 @@
     <string name="createFolderName">Navn på mappen</string>
     <string name="datePickerTitle">Velg dato og tid</string>
     <string name="dateTitle">Dato:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dager</item>
+    </plurals>
     <string name="deleteAccountWarning">Sletting av kontoen din vil være endelig. Du vil ikke kunne reaktivere kontoen din.</string>
     <string name="deleteFolderDialogDescription">Innholdet i mappen %s vil bli permanent slettet uten å gå via papirkurven.</string>
     <string name="deleteFolderDialogTitle">Slett mappe</string>
@@ -280,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Berørte mottakere</string>
     <string name="encryptedMessagePasswordLabel">Del dette passordet via privat melding. Du vil ikke kunne kopiere det etter at du har sendt det.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Kryptering er deaktivert</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Planlagt sending og påminnelser er ikke tilgjengelig for krypterte meldinger</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Planlagte e-poster er ikke tilgjengelig for krypterte meldinger</string>
     <string name="encryptedMessageUpdatePasswordButton">Endre passord</string>
     <string name="encryptedPasswordProtectionTitle">Passordbeskyttelse</string>
@@ -368,6 +377,10 @@
     <string name="genericMessageTranslated">Melding oversatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services kreves</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
     <string name="inboxFolder">Innboks</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagringsplass er nesten full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagringsplass er full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
@@ -475,6 +488,7 @@
     <string name="readMore">Les mer</string>
     <string name="recentSearchesTitle">Nylige søk</string>
     <string name="refreshTokenError">Du har blitt koblet fra</string>
+    <string name="reminderVisibilityTitle">Påminnelsens synlighet</string>
     <string name="renameFolder">Gi nytt navn til mappen</string>
     <string name="reportDisplayProblemDescription">Godtar du å dele dataene dine med utviklerne våre slik at de kan hjelpe deg med problemet?</string>
     <string name="reportDisplayProblemTitle">Rapporter et visningsproblem</string>
@@ -507,8 +521,10 @@
     <string name="selectDateDialogTitle">Velg dato</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Velg tid</string>
+    <string name="selectionReminderRecipientsAndMe">Mottakere og meg</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send bekreftelsen</string>
+    <string name="sendOptions">Sendevalg</string>
     <string name="sentFolder">Sendte meldinger</string>
     <string name="settingsAccentColor">Aksentfarge</string>
     <string name="settingsAccentColorDescription">Velg aksentfargen for applikasjonen</string>

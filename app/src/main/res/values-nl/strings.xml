@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Een leesbewijs is naar de afzender verzonden.</string>
     <string name="actionArchive">Archiveren</string>
     <string name="actionBlockSender">Afzender blokkeren</string>
+    <string name="actionCallIfNoResponse">Herinner me eraan als er geen reactie komt na het verzenden</string>
     <string name="actionCancelSnooze">Snooze annuleren</string>
     <string name="actionDelete">Verwijderen</string>
     <string name="actionEditMenu">Menu bewerken</string>
@@ -136,7 +137,9 @@
     <string name="buttonCopyPassword">Wachtwoord kopiëren</string>
     <string name="buttonCreate">Maken</string>
     <string name="buttonCreateFolder">Een map toevoegen</string>
+    <string name="buttonCustomReminder">Aangepaste herinnering</string>
     <string name="buttonCustomSchedule">Aangepast schema</string>
+    <string name="buttonDisable">Uitschakelen</string>
     <string name="buttonDownload">Downloaden</string>
     <string name="buttonDownloadAll">Alles downloaden</string>
     <string name="buttonFeedback">Feedback</string>
@@ -178,6 +181,7 @@
     <string name="calendarAllDayLong">De hele dag</string>
     <string name="calendarNotInvited">U bent niet uitgenodigd</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>
+    <string name="callIfNoResponseHeaderTitle">Herinner me als er geen reactie is: %s na verzending</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Binnenkort…</string>
     <string name="commercialFolder">Promoties</string>
@@ -240,6 +244,10 @@
     <string name="createFolderName">Naam van de map</string>
     <string name="datePickerTitle">Kies een datum en tijd</string>
     <string name="dateTitle">Datum:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dagen</item>
+    </plurals>
     <string name="deleteAccountWarning">Het verwijderen van uw account is definitief. U kunt uw account niet opnieuw activeren.</string>
     <string name="deleteFolderDialogDescription">De inhoud van de map %s wordt definitief verwijderd zonder via de prullenbak te gaan.</string>
     <string name="deleteFolderDialogTitle">Map verwijderen</string>
@@ -280,6 +288,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Betrokken ontvangers</string>
     <string name="encryptedMessagePasswordLabel">Deel dit wachtwoord via een privébericht. U kunt het niet meer kopiëren zodra u het heeft verzonden.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Versleuteling is uitgeschakeld</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Geplande verzending en herinneringen zijn niet beschikbaar voor versleutelde berichten</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Geplande e-mails niet beschikbaar voor versleutelde berichten</string>
     <string name="encryptedMessageUpdatePasswordButton">Wachtwoord wijzigen</string>
     <string name="encryptedPasswordProtectionTitle">Wachtwoordbeveiliging</string>
@@ -368,6 +377,10 @@
     <string name="genericMessageTranslated">Bericht vertaald</string>
     <string name="googlePlayServicesAreRequired">Google Play Services zijn vereist</string>
     <string name="groupContactsTitle">Groep: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d uur</item>
+        <item quantity="other">%d uur</item>
+    </plurals>
     <string name="inboxFolder">Inbox</string>
     <string name="kSuiteProQuotasAlertDescription">Uw Mail-opslagruimte is bijna vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Uw Mail-opslagruimte is vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>
@@ -475,6 +488,7 @@
     <string name="readMore">Meer informatie</string>
     <string name="recentSearchesTitle">Recente zoekopdrachten</string>
     <string name="refreshTokenError">U bent uitgelogd</string>
+    <string name="reminderVisibilityTitle">Zichtbaarheid van de herinnering</string>
     <string name="renameFolder">De map hernoemen</string>
     <string name="reportDisplayProblemDescription">Gaat u akkoord om uw gegevens te delen met onze ontwikkelaars zodat zij u kunnen helpen met uw probleem?</string>
     <string name="reportDisplayProblemTitle">Een weergaveprobleem melden</string>
@@ -507,8 +521,10 @@
     <string name="selectDateDialogTitle">Datum selecteren</string>
     <string name="selectSignatureNone">Geen handtekening</string>
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
+    <string name="selectionReminderRecipientsAndMe">Ontvangers en mij</string>
     <string name="send">Verzenden</string>
     <string name="sendConfirmationAction">De bevestiging verzenden</string>
+    <string name="sendOptions">Verzendopties</string>
     <string name="sentFolder">Verzonden berichten</string>
     <string name="settingsAccentColor">Accentkleur</string>
     <string name="settingsAccentColorDescription">Kies de accentkleur voor de applicatie</string>
