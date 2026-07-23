@@ -292,7 +292,6 @@
     <string name="encryptedMessagePasswordLabel">Comparte esta contraseña por mensaje privado. No podrás copiarla una vez que la hayas enviado.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Se ha desactivado el cifrado</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">El envío programado y los recordatorios no están disponibles para mensajes cifrados</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Los correos electrónicos programados no están disponibles para los mensajes cifrados</string>
     <string name="encryptedMessageUpdatePasswordButton">Cambiar contraseña</string>
     <string name="encryptedPasswordProtectionTitle">Protección mediante contraseña</string>
     <string name="encryptedProtectionAdDescription">Proteja su mensaje contra el acceso no autorizado con el cifrado Infomaniak.</string>
@@ -306,6 +305,7 @@
     <string name="encryptedStatePanelIncomplete">Se requiere una contraseña para completar la transmisión.</string>
     <string name="encryptedStatePanelStatePartialLabel">Parcial</string>
     <string name="encryptedStatePanelTitle">Cifrado</string>
+    <string name="encryptionDisabledByScheduledOrReminder">El cifrado no está disponible si el envío programado o el recordatorio están activados</string>
     <string name="enterPasswordTitle">Introduzca la contraseña</string>
     <string name="errorAlreadyLinkedMailbox">Esta dirección de correo electrónico ya está vinculada a su cuenta</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>

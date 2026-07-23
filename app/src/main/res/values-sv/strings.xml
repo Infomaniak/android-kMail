@@ -292,7 +292,6 @@
     <string name="encryptedMessagePasswordLabel">Dela detta lösenord via privat meddelande. Du kommer inte att kunna kopiera det när du väl har skickat det.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Krypteringen har inaktiverats</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Schemalagd sändning och påminnelser är inte tillgängliga för krypterade meddelanden</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Schemalagda e-postmeddelanden är inte tillgängliga för krypterade meddelanden</string>
     <string name="encryptedMessageUpdatePasswordButton">Ändra lösenord</string>
     <string name="encryptedPasswordProtectionTitle">Lösenordsskydd</string>
     <string name="encryptedProtectionAdDescription">Skydda ditt meddelande från obehörig åtkomst med Infomaniak-kryptering.</string>
@@ -306,6 +305,7 @@
     <string name="encryptedStatePanelIncomplete">Ett lösenord krävs för att slutföra sändningen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Delvis</string>
     <string name="encryptedStatePanelTitle">Kryptering</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Kryptering är inte tillgänglig om schemalagd sändning eller påminnelse är aktiverad</string>
     <string name="enterPasswordTitle">Ange lösenord</string>
     <string name="errorAlreadyLinkedMailbox">Denna e-postadress är redan länkad till ditt konto</string>
     <string name="errorAtLeastOneRecipient">Minst en mottagare krävs</string>
