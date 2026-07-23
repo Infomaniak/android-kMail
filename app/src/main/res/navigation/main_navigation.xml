@@ -516,6 +516,15 @@
         tools:layout="@layout/fragment_account_management_settings" />
 
     <fragment
+        android:id="@+id/contactCardFragment"
+        android:name="com.infomaniak.mail.ui.main.contactcard.ContactCardFragment"
+        android:label="ContactCardFragment">
+        <argument
+            android:name="userId"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
         android:id="@+id/dataManagementMatomoSettingFragment"
         android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementMatomoSettingFragment"
         android:label="DataManagementMatomoSettingFragment"
