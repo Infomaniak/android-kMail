@@ -292,7 +292,6 @@
     <string name="encryptedMessagePasswordLabel">Del denne adgangskode via privat besked. Du vil ikke kunne kopiere den, når du har sendt den.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Kryptering er blevet deaktiveret</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Planlagt afsendelse og påmindelser er ikke tilgængelige for krypterede beskeder</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Planlagte e-mails er ikke tilgængelige for krypterede beskeder</string>
     <string name="encryptedMessageUpdatePasswordButton">Skift adgangskode</string>
     <string name="encryptedPasswordProtectionTitle">Adgangskodebeskyttelse</string>
     <string name="encryptedProtectionAdDescription">Beskyt din besked mod uautoriseret adgang med Infomaniak-kryptering.</string>
@@ -306,6 +305,7 @@
     <string name="encryptedStatePanelIncomplete">En adgangskode er påkrævet for at færdiggøre afsendelsen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Delvis</string>
     <string name="encryptedStatePanelTitle">Kryptering</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Kryptering er ikke tilgængelig, hvis planlagt afsendelse eller påmindelse er aktiveret</string>
     <string name="enterPasswordTitle">Indtast adgangskode</string>
     <string name="errorAlreadyLinkedMailbox">Denne e-mailadresse er allerede knyttet til din konto</string>
     <string name="errorAtLeastOneRecipient">Mindst én modtager er påkrævet</string>
