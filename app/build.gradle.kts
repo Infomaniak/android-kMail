@@ -180,6 +180,7 @@ dependencies {
     implementation(core.infomaniak.core.sentry)
     implementation(core.infomaniak.core.twofactorauth.back.withuserdb)
     implementation(core.infomaniak.core.twofactorauth.front)
+    implementation(core.infomaniak.core.ui.compose.contactcard)
     implementation(core.infomaniak.core.ui)
     implementation(core.infomaniak.core.ui.compose.basicbutton)
     implementation(core.infomaniak.core.ui.compose.basics)
