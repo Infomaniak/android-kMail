@@ -122,15 +122,27 @@ class DraftSendOptionsFragment : Fragment() {
 
         saveButton.setOnClickListener { saveOptions() }
 
+        observeFeatureFlagUpdates()
+    }
+
+    private fun observeFeatureFlagUpdates() = with(binding) {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
-            val isReminderEnabled = featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) ?: false
-            reminderLayout.isVisible = isReminderEnabled
-            reminderTopDivider.isVisible = isReminderEnabled
-            dividerBottomReminderOptions.isVisible = isReminderEnabled
-            if (!isReminderEnabled) {
+            val isScheduledDraftsEnabled = featureFlags?.contains(FeatureFlag.SCHEDULE_DRAFTS) ?: false
+            val isRemindersEnabled = featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) ?: false
+            reminderLayout.isVisible = isRemindersEnabled
+            reminderTopDivider.isVisible = isRemindersEnabled
+            dividerBottomReminderOptions.isVisible = isRemindersEnabled
+            if (!isRemindersEnabled) {
                 reminderIfNoAnswer.isChecked = false
                 setReminderOptionsVisible(isVisible = false)
                 removeReminderOptionsSelection()
+            }
+            scheduleSending.isVisible = isScheduledDraftsEnabled
+            dividerTopScheduleOptions.isVisible = isScheduledDraftsEnabled
+            if (!isScheduledDraftsEnabled) {
+                scheduleSending.isChecked = false
+                setScheduleOptionsVisible(isVisible = false)
+                removeScheduleOptionsSelection()
             }
         }
     }
