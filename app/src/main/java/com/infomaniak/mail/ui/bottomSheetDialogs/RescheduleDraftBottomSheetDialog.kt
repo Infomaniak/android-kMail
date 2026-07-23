@@ -30,9 +30,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottomSheet() {
+class RescheduleDraftBottomSheetDialog @Inject constructor() : SimpleSchedulePickerBottomSheet() {
 
-    private val navigationArgs: ScheduleSendBottomSheetDialogArgs by navArgs()
+    private val navigationArgs: RescheduleDraftBottomSheetDialogArgs by navArgs()
 
     override val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
 

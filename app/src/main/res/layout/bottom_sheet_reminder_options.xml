@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2024-2025 Infomaniak Network SA
+  ~ Copyright (C) 2026 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog">
+    tools:context=".ui.bottomSheetDialogs.ReminderBottomSheetDialog">
 
     <TextView
         android:id="@+id/title"
@@ -30,30 +30,18 @@
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
         android:layout_marginBottom="@dimen/marginStandardMedium"
         android:gravity="center_horizontal"
-        tools:text="@string/scheduleSendingTitle" />
-
-    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/lastScheduleOption"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:icon="@drawable/ic_last_schedule_selected"
-        app:title="@string/lastSelectedSchedule"
-        app:visibleDivider="false"
-        tools:visibility="visible" />
+        tools:text="@string/reminderBottomSheetTitle" />
 
     <LinearLayout
-        android:id="@+id/scheduleOptions"
+        android:id="@+id/reminderOptions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
     <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/customScheduleOption"
+        android:id="@+id/customReminderOption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:icon="@drawable/ic_pen"
-        app:iconTint="?attr/colorPrimary"
-        app:title="@string/buttonCustomSchedule" />
+        app:title="@string/buttonCustomReminder" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>

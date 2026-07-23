@@ -187,6 +187,18 @@
                 android:contentDescription="@string/contentDescriptionOpenMailActions"
                 app:icon="@drawable/ic_param_dots" />
 
+            <ImageView
+                android:id="@+id/iconReminder"
+                android:layout_width="@dimen/largeIconSize"
+                android:layout_height="@dimen/largeIconSize"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:background="@drawable/bg_reminder_icon"
+                android:contentDescription="@string/contentDescriptionIconReminder"
+                android:padding="4dp"
+                android:src="@drawable/ic_alarm_clock"
+                android:visibility="visible"
+                app:tint="?attr/colorPrimary" />
+
             <TextView
                 android:id="@+id/sendingProgressText"
                 android:layout_width="wrap_content"
@@ -397,6 +409,15 @@
             app:layout_constraintTop_toBottomOf="@id/messageDetails">
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/requestResponseAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Laura is awaiting a response before Thursday, May 17 at 12:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/scheduleAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -405,6 +426,29 @@
                 app:action2="@string/buttonModify"
                 app:icon="@drawable/ic_schedule_send"
                 tools:description="Cet e-mail sera envoyé à cette date : mercredi 30 juillet 2024 à 09:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/reminderAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/buttonReschedule"
+                app:action2="@string/buttonDisable"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Me rappeler si pas de réponse : mercredi 30 juillet 2024 à 09:00"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/endReminderAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/reminderFollowUpButton"
+                app:action2="@string/buttonReschedule"
+                app:action3="@string/reminderMarkAsDoneButton"
+                app:icon="@drawable/ic_alarm_clock"
+                tools:description="Rappel : aucune réponse de Laura à cet e-mail depuis le 16 mai."
                 tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
