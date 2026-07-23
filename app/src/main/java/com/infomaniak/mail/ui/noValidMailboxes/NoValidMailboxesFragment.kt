@@ -30,6 +30,7 @@ import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialogArgs
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
 import com.infomaniak.mail.ui.main.menuDrawer.InvalidMailboxesAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,7 +68,10 @@ class NoValidMailboxesFragment : Fragment() {
 
         changeAccountButton.setOnClickListener {
             trackNoValidMailboxesEvent(MatomoName.SwitchAccount)
-            safeNavigate(resId = R.id.accountBottomSheetDialog)
+            safeNavigate(
+                resId = R.id.accountBottomSheetDialog,
+                args = AccountBottomSheetDialogArgs(showContactCard = false).toBundle(),
+            )
         }
     }
 
