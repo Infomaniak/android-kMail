@@ -75,6 +75,7 @@ class ContactCardFragment : Fragment() {
                         onBack = { findNavController().popBackStack() },
                         onShare = ::shareCard,
                         confirmDelete = ::confirmDelete,
+                        confirmValidationError = ::confirmValidationError,
                         topBar = { state -> MailContactCardTopBar(state) },
                         colors = ContactCardDefaults.colors(
                             waveBackground = mailColors.onboardingSecondaryBackground,
@@ -98,6 +99,16 @@ class ContactCardFragment : Fragment() {
             description = getString(R.string.deleteAlertDescription),
             displayLoader = false,
             positiveButtonText = RMail.string.actionDelete,
+            onPositiveButtonClicked = { onConfirmed() },
+        )
+    }
+
+    private fun confirmValidationError(onConfirmed: () -> Unit) {
+        descriptionDialog.show(
+            title = getString(R.string.alertTitle),
+            description = getString(R.string.alertDescription),
+            displayLoader = false,
+            positiveButtonText = android.R.string.ok,
             onPositiveButtonClicked = { onConfirmed() },
         )
     }
