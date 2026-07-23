@@ -218,6 +218,7 @@
     <string name="contentDescriptionIconForward">Προωθήθηκε</string>
     <string name="contentDescriptionIconMention">Έχετε αναφερθεί.</string>
     <string name="contentDescriptionIconNewMail">Νέο</string>
+    <string name="contentDescriptionIconQr">Άνοιγμα κάρτας επαφής</string>
     <string name="contentDescriptionIconReply">Απάντηση</string>
     <string name="contentDescriptionIconStorage">Κατάσταση αποθήκευσης</string>
     <string name="contentDescriptionOpenMailActions">Άνοιγμα ενεργειών μηνύματος</string>

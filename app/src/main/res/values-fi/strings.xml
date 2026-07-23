@@ -218,6 +218,7 @@
     <string name="contentDescriptionIconForward">Välitetty</string>
     <string name="contentDescriptionIconMention">Sinut on mainittu.</string>
     <string name="contentDescriptionIconNewMail">Uusi</string>
+    <string name="contentDescriptionIconQr">Avaa yhteystietokortti</string>
     <string name="contentDescriptionIconReply">Vastaus</string>
     <string name="contentDescriptionIconStorage">Tallennustilan tila</string>
     <string name="contentDescriptionOpenMailActions">Avaa sähköpostin toiminnot</string>
