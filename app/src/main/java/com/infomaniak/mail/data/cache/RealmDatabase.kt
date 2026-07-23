@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.ReminderDraftInfo
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
@@ -204,7 +205,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 5L
         const val MAILBOX_INFO_SCHEMA_VERSION = 19L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 39L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 40L
         //endregion
 
         //region Configurations names
@@ -236,6 +237,7 @@ object RealmDatabase {
             Folder::class,
             Thread::class,
             Message::class,
+            ReminderDraftInfo::class,
             Headers::class,
             Draft::class,
             Recipient::class,
