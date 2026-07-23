@@ -295,6 +295,7 @@ object MatomoMail : Matomo {
         SaveToKDrive("saveToKDrive"),
         ScheduleDraft("scheduleDraft"),
         ScheduledCustomDate("scheduledCustomDate"),
+        ReminderCustomDelta("reminderCustomDelta"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
         Seconds10("seconds10"),
         Seconds15("seconds15"),
