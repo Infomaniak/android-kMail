@@ -36,9 +36,46 @@ jobs:
       - name: Clean gradle cache
         run: ./gradlew clean
 
-      - name: Run UI tests
+      - name: Run UI tests with adb screenrecord
         run: |
-          ./gradlew ui-testStandardDebugAndroidTest
+          VIDEO_DIR="${{ runner.temp }}/ui-test-videos"
+          mkdir -p "$VIDEO_DIR"
+
+          ./gradlew ui-testStandardDebugAndroidTest &
+          TEST_PID=$!
+
+          DEVICE_ID=""
+          for _ in {1..60}; do
+            DEVICE_ID="$(adb devices | awk '/^emulator-[0-9]+\s+device$/{print $1; exit}')"
+            if [ -n "$DEVICE_ID" ]; then
+              break
+            fi
+            if ! kill -0 "$TEST_PID" 2>/dev/null; then
+              break
+            fi
+            sleep 5
+          done
+
+          if [ -n "$DEVICE_ID" ]; then
+            SEGMENT=1
+            while kill -0 "$TEST_PID" 2>/dev/null; do
+              REMOTE_FILE="/sdcard/ui-test-segment-${SEGMENT}.mp4"
+              LOCAL_FILE="$VIDEO_DIR/ui-test-segment-${SEGMENT}.mp4"
+
+              adb -s "$DEVICE_ID" shell rm -f "$REMOTE_FILE" || true
+              adb -s "$DEVICE_ID" shell screenrecord --bit-rate 2000000 "$REMOTE_FILE" || true
+              adb -s "$DEVICE_ID" pull "$REMOTE_FILE" "$LOCAL_FILE" || true
+              adb -s "$DEVICE_ID" shell rm -f "$REMOTE_FILE" || true
+
+              SEGMENT=$((SEGMENT + 1))
+            done
+          fi
+
+          set +e
+          wait "$TEST_PID"
+          TEST_EXIT=$?
+          set -e
+          exit "$TEST_EXIT"
 
       - name: Upload Test Report
         if: failure()
@@ -47,6 +84,22 @@ jobs:
           name: ui-test-report
           path: app/build/reports/androidTests/managedDevice/debug/flavors/standard/allDevices
 
+      - name: Upload Test Videos (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-videos
+          path: ${{ runner.temp }}/ui-test-videos
+          if-no-files-found: warn
+
+      - name: Clean uploaded test videos
+        if: always()
+        run: |
+          rm -rf "${{ runner.temp }}/ui-test-videos"
+          if [ -d "$HOME/.gradle/managedDevices" ]; then
+            find "$HOME/.gradle/managedDevices" -type d -name videos -exec rm -rf {} +
+          fi
+
       - name: Notify KChat
         if: failure()
         env:
@@ -54,7 +107,7 @@ jobs:
         run: |
            RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-           MESSAGE=":rotating_light: *Official Communication from CI JinPing*\n\nAn act of software disharmony has been detected.\n\nRepository: ${{ github.repository }}\nWorkflow run: $RUN_URL\n\nThe Central Committee requires immediate correction.\nThe failing tests have been documented.\nResistance is futile. Green pipeline is mandatory."
+           MESSAGE=":rotating_light: *Official Communication from CI JinPing*\n\nAn act of software disharmony has been detected.\n\nRepository: ${{ github.repository }}\nWorkflow run: $RUN_URL\n\nThe Central Committee requires immediate correction.\nThe failing tests have been documented.\nResistance is futile. Green pipeline is mandatory.\n\n:movie_camera: *Camera video surveillance available*"
 
            curl -s -X POST "$KCHAT_TESTS_WEBHOOK_URL" \
              -H "Content-Type: application/json" \
