@@ -28,6 +28,8 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
+import com.infomaniak.mail.ui.main.thread.actions.KSuiteChipManager
+import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
 
 class ItemSettingView @JvmOverloads constructor(
     context: Context,
@@ -37,7 +39,15 @@ class ItemSettingView @JvmOverloads constructor(
 
     private val binding by lazy { ViewItemSettingBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private val kSuiteChipManager by lazy { KSuiteChipManager(binding.trailingChipContainer) }
+
     private var action: Action = Action.NONE
+
+    var trailingContent = TrailingContent.None
+        set(value) {
+            field = value
+            setTrailingContentUi(value)
+        }
 
     var isChecked
         get() = binding.toggle.isChecked
@@ -118,6 +128,28 @@ class ItemSettingView @JvmOverloads constructor(
     fun toggleMailboxBlockedState(mustBlock: Boolean) = with(binding) {
         warning.isVisible = mustBlock
         chevron.isGone = mustBlock
+    }
+
+    fun setMyKSuiteChipVisibility(isVisible: Boolean) {
+        trailingContent = when {
+            isVisible -> TrailingContent.KSuitePersoChip
+            action == Action.CHEVRON -> TrailingContent.Chevron
+            else -> TrailingContent.None
+        }
+    }
+
+    private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
+        val hasChip = kSuiteChipManager.displayChipFor(trailingContent)
+        trailingChipContainer.isVisible = hasChip
+
+        when (trailingContent) {
+            TrailingContent.KSuitePersoChip, TrailingContent.KSuiteProChip -> {
+                chevron.isGone = true
+                checkMark.isGone = true
+            }
+            TrailingContent.Chevron -> chevron.isVisible = true
+            else -> Unit
+        }
     }
 
     private enum class Action {

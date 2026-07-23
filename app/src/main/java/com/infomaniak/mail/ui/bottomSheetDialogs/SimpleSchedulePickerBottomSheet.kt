@@ -26,6 +26,7 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 
 abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
@@ -60,6 +61,14 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
     }
 
+    protected open fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
+        binding.customScheduleOption.trailingContent = when (kSuite) {
+            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+            else -> TrailingContent.Chevron
+        }
+    }
+
     protected fun setupScheduleOptions() {
         ScheduleOptionsHelper(
             context = requireContext(),
@@ -73,6 +82,7 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
             onCustomScheduleOptionClicked = ::onCustomScheduleOptionClicked,
             createScheduleOptionItem = ::createScheduleOptionItem,
             bindLastScheduleOptionDescription = ::bindLastScheduleOptionDescription,
+            setupCustomScheduleOptionTrailing = ::setupCustomScheduleOptionTrailing,
             setupFirstScheduleOptionDivider = ::setupFirstScheduleOptionDivider,
         ).setup()
     }

@@ -60,6 +60,7 @@ class ScheduleOptionsHelper(
     private val onCustomScheduleOptionClicked: () -> Unit,
     private val createScheduleOptionItem: (ScheduleOption) -> View,
     private val bindLastScheduleOptionDescription: (String) -> Unit,
+    private val setupCustomScheduleOptionTrailing: (KSuite?) -> Unit,
     private val setupFirstScheduleOptionDivider: ((View, Boolean) -> Unit)? = null,
 ) {
 
@@ -74,6 +75,8 @@ class ScheduleOptionsHelper(
         scheduleOptionsContainer.children.firstOrNull()?.let { firstItem ->
             setupFirstScheduleOptionDivider?.invoke(firstItem, shouldDisplayDivider)
         }
+
+        setupCustomScheduleOptionTrailing(currentKSuite)
     }
 
     private fun computeLastScheduleOption() {
