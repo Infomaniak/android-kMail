@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import com.infomaniak.core.ui.compose.basics.Typography
@@ -32,14 +33,21 @@ fun MailTheme(content: @Composable () -> Unit) {
     MaterialThemeFromXml {
         val cornerSize = dimensionResource(R.dimen.bottomSheetCornerSize)
 
-        ProvideBottomSheetTheme(
-            theme = BottomSheetThemeDefaults.theme(
-                shape = RoundedCornerShape(topStart = cornerSize, topEnd = cornerSize),
-                dragHandleColor = colorResource(R.color.dragHandleColor),
-                titleTextStyle = Typography.bodyMedium,
-                titleColor = colorResource(R.color.primaryTextColor),
-            ),
-            content = content,
+        val mailThemeColors = MailThemeColors(
+            onboardingSecondaryBackground = colorResource(R.color.onboarding_secondary_background),
+            backgroundHeaderColor = colorResource(R.color.backgroundHeaderColor),
         )
+
+        CompositionLocalProvider(LocalMailThemeColors provides mailThemeColors) {
+            ProvideBottomSheetTheme(
+                theme = BottomSheetThemeDefaults.theme(
+                    shape = RoundedCornerShape(topStart = cornerSize, topEnd = cornerSize),
+                    dragHandleColor = colorResource(R.color.dragHandleColor),
+                    titleTextStyle = Typography.bodyMedium,
+                    titleColor = colorResource(R.color.primaryTextColor),
+                ),
+                content = content,
+            )
+        }
     }
 }
