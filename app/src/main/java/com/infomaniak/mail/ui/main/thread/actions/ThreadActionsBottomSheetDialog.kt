@@ -272,6 +272,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUidToReactTo)
         }
 
+        override fun onReminder() = Unit
+
         override fun onSnooze() {
             trackBottomSheetThreadActionsEvent(MatomoName.Snooze)
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(thread.uid))
