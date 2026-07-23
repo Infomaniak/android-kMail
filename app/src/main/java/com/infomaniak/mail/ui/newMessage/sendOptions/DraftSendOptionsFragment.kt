@@ -163,7 +163,9 @@ class DraftSendOptionsFragment : Fragment() {
         pendingLastSelectedScheduleEpochMillis = null
     }
 
-    private fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
+    private fun onCustomScheduleOptionClicked() {
+        executeIfAuthorized(MatomoName.ScheduledCustomDate.value) { showCustomScheduleDatePicker() }
+    }
 
     private fun setupToolbar() = with(binding.toolbar) {
         setNavigationOnClickListener { findNavController().popBackStack() }
@@ -339,13 +341,11 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun onCustomDelayReminderClicked() = executeIfAuthorized { showCustomDelayReminderDatePicker() }
+    private fun onCustomDelayReminderClicked() =
+        executeIfAuthorized(MatomoName.ReminderCustomDelta.value) { showCustomDelayReminderDatePicker() }
 
-    private fun executeIfAuthorized(onAuthorized: () -> Unit) {
-        val kSuite = currentKSuite
-        val matomoName = MatomoName.ScheduledCustomDate.value
-
-        when (kSuite) {
+    private fun executeIfAuthorized(matomoName: String, onAuthorized: () -> Unit) {
+        when (val kSuite = currentKSuite) {
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
             KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
