@@ -143,7 +143,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
-import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -303,7 +302,7 @@ class NewMessageFragment : Fragment() {
             observeCcAndBccVisibility()
         }
 
-        observeScheduledDraftsFeatureFlagUpdates()
+        observeFeatureFlagUpdates()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -835,10 +834,11 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
     }
 
-    private fun observeScheduledDraftsFeatureFlagUpdates() {
+    private fun observeFeatureFlagUpdates() {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
-            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+            val isRemindersEnabled = featureFlags.contains(FeatureFlag.RESPONSE_REQUIRED)
+            binding.scheduleButton.isVisible = isScheduledDraftsEnabled || isRemindersEnabled
 
             val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
 
