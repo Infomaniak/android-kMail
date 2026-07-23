@@ -21,6 +21,8 @@ import android.content.Context
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogCustomReminderPickerBinding
+import com.infomaniak.mail.utils.date.DateFormatUtils.MINUTES_IN_AN_HOUR
+import com.infomaniak.mail.utils.date.DateFormatUtils.MINUTES_IN_A_DAY
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -62,7 +64,7 @@ class CustomReminderPickerDialog @Inject constructor(
 
     private fun setupPickers() = with(binding) {
         numberPicker.minValue = 1
-        numberPicker.maxValue = timeUnits[0].maxValue
+        numberPicker.maxValue = timeUnits[unitPicker.value].maxValue
         numberPicker.wrapSelectorWheel = true
 
         unitPicker.minValue = 0
@@ -119,8 +121,8 @@ class CustomReminderPickerDialog @Inject constructor(
             val maxValue: Int,
             val multiplierInMinutes: Int
         ) {
-            HOURS(R.plurals.unitHours, MAX_HOURS, 60),
-            DAYS(R.plurals.unitDays, MAX_DAYS, 24 * 60)
+            Hours(R.plurals.unitHours, MAX_HOURS, MINUTES_IN_AN_HOUR),
+            Days(R.plurals.unitDays, MAX_DAYS, MINUTES_IN_A_DAY),
         }
     }
 }
