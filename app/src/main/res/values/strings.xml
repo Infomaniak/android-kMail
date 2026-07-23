@@ -732,6 +732,14 @@
     <string name="trashFolder">Trash</string>
     <string name="tryAgain">Please try again.</string>
     <string name="unblockButton">Unblock</string>
+    <plurals name="unitDays">
+        <item quantity="one">Day</item>
+        <item quantity="other">Days</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Hour</item>
+        <item quantity="other">Hours</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Unknown expeditor</string>
     <string name="unknownDialogTitleRecipient">Unknown recipient</string>
     <string name="unknownRecipientTitle">(unknown)</string>

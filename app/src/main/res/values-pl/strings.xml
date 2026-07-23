@@ -786,6 +786,18 @@
     <string name="trashFolder">Kosz</string>
     <string name="tryAgain">Spróbuj ponownie.</string>
     <string name="unblockButton">Odblokuj</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dzień</item>
+        <item quantity="few">Dni</item>
+        <item quantity="many">Dni</item>
+        <item quantity="other">Dni</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Godzina</item>
+        <item quantity="few">Godziny</item>
+        <item quantity="many">Godzin</item>
+        <item quantity="other">Godzin</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Nieznany nadawca</string>
     <string name="unknownDialogTitleRecipient">Nieznany odbiorca</string>
     <string name="unknownRecipientTitle">(nieznany)</string>

@@ -728,6 +728,14 @@
     <string name="trashFolder">Prullenbak</string>
     <string name="tryAgain">Probeer het opnieuw.</string>
     <string name="unblockButton">Deblokkeren</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dagen</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Uur</item>
+        <item quantity="other">Uur</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Onbekende afzender</string>
     <string name="unknownDialogTitleRecipient">Onbekende ontvanger</string>
     <string name="unknownRecipientTitle">(onbekend)</string>

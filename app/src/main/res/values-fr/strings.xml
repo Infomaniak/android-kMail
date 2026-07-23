@@ -728,6 +728,14 @@
     <string name="trashFolder">Corbeille</string>
     <string name="tryAgain">Veuillez réessayer.</string>
     <string name="unblockButton">Débloquer</string>
+    <plurals name="unitDays">
+        <item quantity="one">Jour</item>
+        <item quantity="other">Jours</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Heure</item>
+        <item quantity="other">Heures</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Expéditeur inconnu</string>
     <string name="unknownDialogTitleRecipient">Destinataire inconnu</string>
     <string name="unknownRecipientTitle">(inconnu)</string>

@@ -37,6 +37,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
+import com.infomaniak.mail.ui.alertDialogs.CustomReminderPickerDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionsHelper
@@ -69,6 +70,9 @@ class DraftSendOptionsFragment : Fragment() {
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
 
     @Inject
+    lateinit var customReminderPickerDialog: CustomReminderPickerDialog
+
+    @Inject
     lateinit var localSettings: LocalSettings
 
     private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
@@ -87,6 +91,7 @@ class DraftSendOptionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        customReminderPickerDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
         pendingLastSelectedScheduleEpochMillis = lastSelectedEpoch
 
@@ -365,7 +370,15 @@ class DraftSendOptionsFragment : Fragment() {
     }
 
     private fun showCustomDelayReminderDatePicker() {
-        // TODO
+        customReminderPickerDialog.show(
+            onDelaySelected = { delayMinutes ->
+                trackScheduleSendEvent(MatomoName.CustomReminder)
+                pendingReminderConfig = ReminderConfig.Delayed(delayMinutes, isCustom = true)
+                binding.customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMinutes))
+                binding.customDelayReminder.setCheckMark(displayCheckMark = true)
+                binding.optionsDelays.clearCheck()
+            },
+        )
     }
 
     private fun applyCustomDateSelectionUi(

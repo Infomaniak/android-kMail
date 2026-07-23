@@ -728,6 +728,14 @@
     <string name="trashFolder">Cestino</string>
     <string name="tryAgain">Per favore, riprova.</string>
     <string name="unblockButton">Sbloccare</string>
+    <plurals name="unitDays">
+        <item quantity="one">Giorno</item>
+        <item quantity="other">Giorni</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Ora</item>
+        <item quantity="other">Ore</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Spedizioniere sconosciuto</string>
     <string name="unknownDialogTitleRecipient">Destinatario sconosciuto</string>
     <string name="unknownRecipientTitle">(sconosciuto)</string>

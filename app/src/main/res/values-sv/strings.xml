@@ -728,6 +728,14 @@
     <string name="trashFolder">Papperskorg</string>
     <string name="tryAgain">Försök igen.</string>
     <string name="unblockButton">Avblockera</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dagar</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Timme</item>
+        <item quantity="other">Timmar</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Okänd avsändare</string>
     <string name="unknownDialogTitleRecipient">Okänd mottagare</string>
     <string name="unknownRecipientTitle">(okänd)</string>
