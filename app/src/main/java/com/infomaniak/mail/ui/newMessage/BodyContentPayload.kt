@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSanitizedHtml
+
 /**
  * @param content The string representation of the body in either html or plain text format.
  * @param type The type of representation of [content]. Each type will lead to different processing of the content.
@@ -26,6 +28,11 @@ data class BodyContentPayload(val content: String, val type: BodyContentType) {
     companion object {
         // Add some empty lines in the body, so the body focuses on these lines and not in the signature
         fun emptyBody() = BodyContentPayload(content = "<div><br></div><div><br></div>", type = BodyContentType.HTML_SANITIZED)
+
+        fun bodyOf(body: BodyContentPayload) = BodyContentPayload(
+            content = "<div>${body.toSanitizedHtml()}</div><div><br></div>",
+            type = BodyContentType.HTML_SANITIZED
+        )
     }
 }
 
