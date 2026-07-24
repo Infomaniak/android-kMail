@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,23 +39,35 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
+import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.AiDescriptionAlertDialog
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY_PROPOSITION
+import com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheetArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
+import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.safeArea
+import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -72,11 +84,13 @@ class AiPropositionFragment : Fragment() {
     private var _binding: FragmentAiPropositionBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
     private val navigationArgs: AiPropositionFragmentArgs by navArgs()
 
     private var currentRequestJob: Job? = null
+    lateinit var mailbox: Mailbox
 
     private val refinePopupMenu by lazy {
         SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton, ::onMenuItemClicked)
@@ -93,6 +107,9 @@ class AiPropositionFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     @Inject
+    lateinit var messageController: MessageController
+
+    @Inject
     lateinit var subjectReplacementDialog: AiDescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -101,12 +118,15 @@ class AiPropositionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initMailbox()
+
         handleEdgeToEdge()
         handleBackDispatcher()
         setUi()
 
         if (aiViewModel.aiPropositionStatusLiveData.value == null) generateNewAiProposition()
         observeAiProposition()
+        observeBackNavigationResult()
     }
 
     override fun onDestroyView() {
@@ -122,6 +142,16 @@ class AiPropositionFragment : Fragment() {
 
     private fun handleBackDispatcher() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { trackDismissalAndPopBack() }
+    }
+
+    private fun initMailbox() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            mailbox = if (navigationArgs.messageUid.isBlank()) {
+                newMessageViewModel.currentMailbox()
+            } else {
+                mainViewModel.currentMailbox.value ?: return@launch
+            }
+        }
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -170,6 +200,13 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
+    private fun observeBackNavigationResult() {
+        getBackNavigationResult<String>(OPEN_AI_REPLY_PROPOSITION) { _ ->
+            aiViewModel.aiPropositionStatusLiveData.value = null
+            generateNewAiProposition()
+        }
+    }
+
     private fun setToolbar() = with(binding) {
         changeToolbarColorOnScroll(appBarLayout, nestedScrollView)
         toolbar.setNavigationOnClickListener { trackDismissalAndPopBack() }
@@ -183,6 +220,11 @@ class AiPropositionFragment : Fragment() {
     private fun choosePropositionAndPopBack() = with(aiViewModel) {
 
         fun applyProposition(subject: String?, content: String) {
+            if (navigationArgs.messageUid.isNotBlank()) {
+                navigateToNewMessageActivityWithAiContent(content)
+                return
+            }
+
             trackInsertionType()
             aiOutputToInsert.value = subject to content
             findNavController().popBackStack()
@@ -213,6 +255,18 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
+    private fun navigateToNewMessageActivityWithAiContent(content: String) {
+        safeNavigateToNewMessageActivity(
+            args = NewMessageActivityArgs(
+                draftMode = DraftMode.REPLY_ALL,
+                previousMessageUid = navigationArgs.messageUid,
+                shouldLoadDistantResources = true,
+                aiBody = content,
+            ).toBundle(),
+        )
+        findNavController().popBackStack()
+    }
+
     private fun trackInsertionType() {
         trackAiWriterEvent(
             name = if (navigationArgs.isBodyBlank) MatomoName.InsertProposition else MatomoName.ReplaceProposition,
@@ -225,13 +279,20 @@ class AiPropositionFragment : Fragment() {
         trackAiWriterEvent(shortcut.matomoName)
 
         if (shortcut == Shortcut.MODIFY) {
-            aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
-            findNavController().popBackStack()
+            if (navigationArgs.messageUid.isNotBlank()) {
+                safelyNavigate(
+                    resId = R.id.euriaPromptBottomSheetDialog,
+                    args = EuriaPromptBottomSheetArgs(messageUid = navigationArgs.messageUid).toBundle(),
+                )
+            } else {
+                aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
+                findNavController().popBackStack()
+            }
         } else {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
             lifecycleScope.launch {
-                currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox().uuid)
+                currentRequestJob = performShortcut(shortcut, mailbox.uuid)
             }
         }
     }
@@ -252,13 +313,24 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun generateNewAiProposition() {
-        val formattedRecipientsString = newMessageViewModel.toLiveData.valueOrEmpty()
-            .joinToString(separator = ", ") { it.name }
-            .takeIf { it.isNotBlank() }
+
         lifecycleScope.launch {
-            val currentMailboxUuid = newMessageViewModel.currentMailbox().uuid
-            currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
+            var allRecipients: List<Recipient>
+            if (navigationArgs.messageUid.isBlank()) {
+                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
+            } else {
+                val message = messageController.getMessage(navigationArgs.messageUid)
+                val recipients = message?.getRecipientsForReplyTo()
+                allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
+                aiViewModel.previousMessageBodyPlainText = message?.body?.value?.htmlToText()
+            }
+
+            val formattedRecipientsString = allRecipients
+                .joinToString(separator = ", ") { it.name }
+                .takeIf { it.isNotBlank() }
+            currentRequestJob = aiViewModel.generateNewAiProposition(mailbox.uuid, formattedRecipientsString)
         }
+
     }
 
     private fun observeAiProposition() {

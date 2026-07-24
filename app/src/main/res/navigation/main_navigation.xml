@@ -71,6 +71,25 @@
         <action
             android:id="@+id/action_threadListFragment_to_lockedMailboxBottomSheetDialog"
             app:destination="@id/lockedMailboxBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_aiPropositionFragment"
+            app:destination="@id/aiPropositionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aiPropositionFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.AiPropositionFragment"
+        android:label="AiPropositionFragment"
+        tools:layout="@layout/fragment_ai_proposition">
+        <argument
+            android:name="isSubjectBlank"
+            app:argType="boolean" />
+        <argument
+            android:name="isBodyBlank"
+            app:argType="boolean" />
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
     </fragment>
 
     <activity
@@ -130,6 +149,12 @@
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
             app:nullable="true" />
         <!-- Endregion -->
+
+        <argument
+            android:name="aiBody"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
 
         <argument
             android:name="mailToUri"
@@ -220,6 +245,16 @@
             android:name="isAlreadySummarized"
             android:defaultValue="false"
             app:argType="boolean" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/euriaPromptBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheet"
+        android:label="EuriaPromptBottomSheetDialog"
+        tools:layout="@layout/view_ai_prompt">
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
     </dialog>
 
     <dialog
