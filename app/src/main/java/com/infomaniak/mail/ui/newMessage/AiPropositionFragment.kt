@@ -246,7 +246,7 @@ class AiPropositionFragment : Fragment() {
     private fun navigateToNewMessageActivityWithAiContent(content: String) {
         safeNavigateToNewMessageActivity(
             args = NewMessageActivityArgs(
-                draftMode = DraftMode.REPLY,
+                draftMode = DraftMode.REPLY_ALL,
                 previousMessageUid = navigationArgs.messageUid,
                 shouldLoadDistantResources = true,
                 aiBody = content,
