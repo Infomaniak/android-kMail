@@ -921,6 +921,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_REPLY_BOTTOM_SHEET) { (messageUid, _) ->
+            aiViewModel.resetAiState()
             safeNavigate(
                 resId = R.id.euriaPromptBottomSheetDialog,
                 args = EuriaPromptBottomSheetArgs(

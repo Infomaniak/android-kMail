@@ -73,6 +73,13 @@ class AiViewModel @Inject constructor(
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
+    fun resetAiState() {
+        aiPrompt = ""
+        history.clear()
+        conversationContextId = null
+        aiPropositionStatusLiveData.value = null
+    }
+
     fun generateNewAiProposition(
         currentMailboxUuid: String,
         formattedRecipientsString: String?,
