@@ -48,6 +48,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
@@ -62,6 +63,7 @@ import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.safeArea
+import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -206,6 +208,11 @@ class AiPropositionFragment : Fragment() {
     private fun choosePropositionAndPopBack() = with(aiViewModel) {
 
         fun applyProposition(subject: String?, content: String) {
+            if (navigationArgs.messageUid.isNotBlank()) {
+                navigateToNewMessageActivityWithAiContent(content)
+                return
+            }
+
             trackInsertionType()
             aiOutputToInsert.value = subject to content
             findNavController().popBackStack()
@@ -234,6 +241,18 @@ class AiPropositionFragment : Fragment() {
                 },
             )
         }
+    }
+
+    private fun navigateToNewMessageActivityWithAiContent(content: String) {
+        safeNavigateToNewMessageActivity(
+            args = NewMessageActivityArgs(
+                draftMode = DraftMode.REPLY,
+                previousMessageUid = navigationArgs.messageUid,
+                shouldLoadDistantResources = true,
+                aiBody = content,
+            ).toBundle(),
+        )
+        findNavController().popBackStack()
     }
 
     private fun trackInsertionType() {
