@@ -327,6 +327,8 @@ class NewMessageViewModel @Inject constructor(
         inline get() = savedStateHandle.get<Recipient?>(NewMessageActivityArgs::recipient.name)
     private val shouldLoadDistantResources
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::shouldLoadDistantResources.name) ?: false
+    private val aiBody
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::aiBody.name)
 
     fun arrivedFromExistingDraft() = arrivedFromExistingDraft
     fun draftLocalUuid() = draftLocalUuid
@@ -367,6 +369,17 @@ class NewMessageViewModel @Inject constructor(
 
             dismissNotification()
             markAsRead(currentMailbox(), realm)
+
+            if (isNewMessage) {
+                aiBody?.let { body ->
+                    initialBody = BodyContentPayload.bodyOf(
+                        BodyContentPayload(
+                            body,
+                            BodyContentType.TEXT_PLAIN_WITHOUT_HTML
+                        )
+                    )
+                }
+            }
 
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)

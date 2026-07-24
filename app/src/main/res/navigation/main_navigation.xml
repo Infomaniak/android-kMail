@@ -151,6 +151,12 @@
         <!-- Endregion -->
 
         <argument
+            android:name="aiBody"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+
+        <argument
             android:name="mailToUri"
             android:defaultValue="@null"
             app:argType="android.net.Uri"
