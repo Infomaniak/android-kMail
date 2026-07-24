@@ -39,6 +39,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.ui.view.extension.setMargins
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -55,6 +57,8 @@ import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.AiDescriptionAlertDialog
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY_PROPOSITION
+import com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheetArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
@@ -122,6 +126,7 @@ class AiPropositionFragment : Fragment() {
 
         if (aiViewModel.aiPropositionStatusLiveData.value == null) generateNewAiProposition()
         observeAiProposition()
+        observeBackNavigationResult()
     }
 
     override fun onDestroyView() {
@@ -192,6 +197,13 @@ class AiPropositionFragment : Fragment() {
             trackAiWriterEvent(MatomoName.DismissError)
             TransitionManager.beginDelayedTransition(nestedScrollView, ChangeBounds())
             errorBlock.isGone = true
+        }
+    }
+
+    private fun observeBackNavigationResult() {
+        getBackNavigationResult<String>(OPEN_AI_REPLY_PROPOSITION) { _ ->
+            aiViewModel.aiPropositionStatusLiveData.value = null
+            generateNewAiProposition()
         }
     }
 
@@ -267,8 +279,15 @@ class AiPropositionFragment : Fragment() {
         trackAiWriterEvent(shortcut.matomoName)
 
         if (shortcut == Shortcut.MODIFY) {
-            aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
-            findNavController().popBackStack()
+            if (navigationArgs.messageUid.isNotBlank()) {
+                safelyNavigate(
+                    resId = R.id.euriaPromptBottomSheetDialog,
+                    args = EuriaPromptBottomSheetArgs(messageUid = navigationArgs.messageUid).toBundle(),
+                )
+            } else {
+                aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
+                findNavController().popBackStack()
+            }
         } else {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
