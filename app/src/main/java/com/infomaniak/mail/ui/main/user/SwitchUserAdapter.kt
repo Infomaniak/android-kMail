@@ -17,20 +17,28 @@
  */
 package com.infomaniak.mail.ui.main.user
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.android.material.color.MaterialColors
 import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewHolder
+import com.google.android.material.R as RMaterial
 
 @SuppressLint("NotifyDataSetChanged")
 class SwitchUserAdapter(
     val currentUserId: Int,
     val onChangingUserAccount: ((User) -> Unit),
+    val onOpenContactCard: ((User) -> Unit)? = null,
 ) : Adapter<SwitchUserAccountViewHolder>() {
 
     private var accounts: List<User> = emptyList()
@@ -57,10 +65,21 @@ class SwitchUserAdapter(
         userMailAddress.text = account.email
         updateSelectedUi(position)
         accountCardview.setOnClickListener { selectAccount(position) }
+        qrcode.setOnClickListener { if (account.id == currentUserId) onOpenContactCard?.invoke(account) }
     }
 
     private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
-        checkmark.isVisible = accounts[position].id == currentUserId
+        val isCurrentUser = accounts[position].id == currentUserId
+        qrcode.isVisible = isCurrentUser && onOpenContactCard != null
+        qrcodeImage.background.alpha = (0.1 * 255).toInt()
+        accountCardview.isSelected = isCurrentUser
+        accountCardview.setCardBackgroundColor(
+            if (isCurrentUser && accounts.size > 1) {
+                MaterialColors.getColor(accountCardview, RMaterial.attr.colorPrimaryContainer)
+            } else {
+                accountCardview.context.getColor(R.color.backgroundColorSecondary)
+            }
+        )
     }
 
     private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])
@@ -70,6 +89,24 @@ class SwitchUserAdapter(
     fun initializeAccounts(newList: List<User>) {
         accounts = newList
         notifyDataSetChanged()
+    }
+
+    fun animateCurrentUserQrCode(recyclerView: RecyclerView) {
+        recyclerView.post {
+            for (i in 0 until recyclerView.childCount) {
+                val child = recyclerView.getChildAt(i)
+                val viewHolder = recyclerView.getChildViewHolder(child) as? SwitchUserAccountViewHolder ?: continue
+                val position = viewHolder.bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION && accounts.getOrNull(position)?.id == currentUserId) {
+                    ObjectAnimator.ofFloat(viewHolder.binding.qrcode, View.ROTATION_Y, 180f, 360f).apply {
+                        duration = 800
+                        interpolator = DecelerateInterpolator()
+                        start()
+                    }
+                    break
+                }
+            }
+        }
     }
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : ViewHolder(binding.root)

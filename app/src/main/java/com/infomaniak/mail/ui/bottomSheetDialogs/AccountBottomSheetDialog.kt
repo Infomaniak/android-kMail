@@ -22,7 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -69,20 +71,28 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
 
-    private val accountsAdapter = SwitchUserAdapter(
-        currentUserId = AccountUtils.currentUserId,
-        onChangingUserAccount = { user ->
-            if (user.id == AccountUtils.currentUserId) {
-                ConfettiUtils.onEasterEggConfettiClicked(
-                    container = (activity as? MainActivity)?.getConfettiContainer(),
-                    type = COLORED_SNOW,
-                    matomoValue = "Avatar",
-                )
-            } else {
-                switchUserViewModel.switchAccount(user)
-            }
-        },
-    )
+
+    private val navigationArgs: AccountBottomSheetDialogArgs by navArgs()
+    private val accountsAdapter by lazy {
+        SwitchUserAdapter(
+            currentUserId = AccountUtils.currentUserId,
+            onChangingUserAccount = { user ->
+                if (user.id == AccountUtils.currentUserId) {
+                    ConfettiUtils.onEasterEggConfettiClicked(
+                        container = (activity as? MainActivity)?.getConfettiContainer(),
+                        type = COLORED_SNOW,
+                        matomoValue = "Avatar",
+                    )
+                } else {
+                    switchUserViewModel.switchAccount(user)
+                }
+            },
+            onOpenContactCard = if (navigationArgs.showContactCard) { { user ->
+                if (user.id == AccountUtils.currentUserId) openContactCard(user.id)
+            } } else null,
+        )
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAccountBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -111,6 +121,11 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         showEasterEggHalloween()
     }
 
+    override fun onResume() {
+        super.onResume()
+        accountsAdapter.animateCurrentUserQrCode(binding.recyclerViewAccount)
+    }
+
     private fun logoutCurrentUser() = appScope.launch(ioDispatcher) {
         trackAccountEvent(MatomoName.LogOutConfirm)
         logoutUser(user = AccountUtils.currentUser!!)
@@ -135,5 +150,10 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
             halloween.playAnimation()
         }
+    }
+
+    private fun openContactCard(userId: Int) {
+        safelyNavigate(AccountBottomSheetDialogDirections.actionAccountBottomSheetDialogToContactCardFragment(userId))
+        dismiss()
     }
 }
