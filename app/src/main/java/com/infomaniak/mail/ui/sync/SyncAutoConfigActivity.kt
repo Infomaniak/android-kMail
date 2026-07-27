@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.sync
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
@@ -42,7 +41,6 @@ class SyncAutoConfigActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(binding.root)
         addTwoFactorAuthOverlay()
         setupSnackbar()

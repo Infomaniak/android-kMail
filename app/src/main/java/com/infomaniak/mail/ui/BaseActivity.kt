@@ -19,13 +19,13 @@ package com.infomaniak.mail.ui
 
 import android.os.Bundle
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import com.infomaniak.core.applock.AppLockManager
 import com.infomaniak.core.common.extensions.isNightModeEnabled
 import com.infomaniak.core.inappupdate.BaseInAppUpdateManager.Companion.checkUpdateIsRequired
 import com.infomaniak.core.twofactorauth.front.TwoFactorAuthApprovalAutoManagedBottomSheet
 import com.infomaniak.core.twofactorauth.front.addComposeOverlay
+import com.infomaniak.core.ui.view.edgetoedge.EdgeToEdgeActivity
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
@@ -37,8 +37,10 @@ import dagger.hilt.android.EntryPointAccessors
 import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
-open class BaseActivity : AppCompatActivity() {
-    private val hiltEntryPoint by lazy { EntryPointAccessors.fromActivity(this, ActivityModule.ActivityEntrypointInterface::class.java) }
+open class BaseActivity : EdgeToEdgeActivity() {
+    private val hiltEntryPoint by lazy {
+        EntryPointAccessors.fromActivity(this, ActivityModule.ActivityEntrypointInterface::class.java)
+    }
 
     protected val inAppUpdateManager by lazy { hiltEntryPoint.inAppUpdateManager() }
 
