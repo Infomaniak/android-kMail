@@ -334,7 +334,7 @@ class AiPropositionFragment : Fragment() {
                 allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
             } else {
                 val message = messageController.getMessage(navigationArgs.messageUid)
-                val recipients = message?.getRecipientsForReplyTo()
+                val recipients = message?.getRecipientsForReplyTo(replyAll = true)
                 allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
                 aiViewModel.previousMessageBodyPlainText = message?.body?.value?.htmlToText()
             }

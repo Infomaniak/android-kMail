@@ -46,7 +46,7 @@ class EuriaPromptBottomSheet : EdgeToEdgeBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.aiPromptView.bind(
+        binding.root.bind(
             prompt = aiViewModel.aiPrompt,
             placeholder = getString(R.string.aiPromptAnswer),
             onCloseClick = ::dismiss,
@@ -55,6 +55,6 @@ class EuriaPromptBottomSheet : EdgeToEdgeBottomSheetDialog() {
             },
             onPromptChanged = { aiViewModel.aiPrompt = it },
         )
-        binding.aiPromptView.focusPrompt()
+        binding.root.focusPrompt()
     }
 }
