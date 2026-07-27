@@ -191,6 +191,13 @@ class AiPropositionFragment : Fragment() {
 
         retryButton.setOnClickListener {
             trackAiWriterEvent(MatomoName.Retry)
+            if (comeFromThreadFragment()) {
+                safelyNavigate(
+                    resId = R.id.euriaPromptBottomSheetDialog,
+                    args = EuriaPromptBottomSheetArgs(messageUid = navigationArgs.messageUid).toBundle(),
+                )
+                return@setOnClickListener
+            }
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
                 isOpened = true,
                 shouldResetPrompt = aiViewModel.aiPropositionStatusLiveData.value != PropositionStatus.CONTEXT_TOO_LONG,
@@ -204,6 +211,8 @@ class AiPropositionFragment : Fragment() {
             errorBlock.isGone = true
         }
     }
+
+    private fun comeFromThreadFragment() = navigationArgs.messageUid.isNotBlank()
 
     private fun observeBackNavigationResult() {
         getBackNavigationResult<String>(OPEN_AI_REPLY_PROPOSITION) { _ ->
@@ -225,7 +234,7 @@ class AiPropositionFragment : Fragment() {
     private fun choosePropositionAndPopBack() = with(aiViewModel) {
 
         fun applyProposition(subject: String?, content: String) {
-            if (navigationArgs.messageUid.isNotBlank()) {
+            if (comeFromThreadFragment()) {
                 navigateToNewMessageActivityWithAiContent(subject, content)
                 return
             }
@@ -284,7 +293,7 @@ class AiPropositionFragment : Fragment() {
         trackAiWriterEvent(shortcut.matomoName)
 
         if (shortcut == Shortcut.MODIFY) {
-            if (navigationArgs.messageUid.isNotBlank()) {
+            if (comeFromThreadFragment()) {
                 safelyNavigate(
                     resId = R.id.euriaPromptBottomSheetDialog,
                     args = EuriaPromptBottomSheetArgs(messageUid = navigationArgs.messageUid).toBundle(),
