@@ -70,7 +70,7 @@ class AiViewModel @Inject constructor(
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
     var previousMessageBodyPlainText by aiSharedData::previousMessageBodyPlainText
 
-    val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
+    val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus?>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
     fun resetAiState() {

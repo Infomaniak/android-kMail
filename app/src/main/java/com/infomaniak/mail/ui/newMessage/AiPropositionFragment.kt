@@ -48,6 +48,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.AiDraftCache
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -106,6 +107,9 @@ class AiPropositionFragment : Fragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var aiDraftCache: AiDraftCache
 
     @Inject
     lateinit var messageController: MessageController
@@ -222,7 +226,7 @@ class AiPropositionFragment : Fragment() {
 
         fun applyProposition(subject: String?, content: String) {
             if (navigationArgs.messageUid.isNotBlank()) {
-                navigateToNewMessageActivityWithAiContent(content)
+                navigateToNewMessageActivityWithAiContent(subject, content)
                 return
             }
 
@@ -256,13 +260,13 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
-    private fun navigateToNewMessageActivityWithAiContent(content: String) {
+    private fun navigateToNewMessageActivityWithAiContent(subject: String?, content: String) {
+        aiDraftCache.pendingAiContent = subject to content
         safeNavigateToNewMessageActivity(
             args = NewMessageActivityArgs(
                 draftMode = DraftMode.REPLY_ALL,
                 previousMessageUid = navigationArgs.messageUid,
                 shouldLoadDistantResources = true,
-                aiBody = content,
             ).toBundle(),
         )
         findNavController().popBackStack()

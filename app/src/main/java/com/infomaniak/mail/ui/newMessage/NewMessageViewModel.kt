@@ -54,6 +54,7 @@ import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.AiDraftCache
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -158,6 +159,7 @@ class NewMessageViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val aiSharedData: AiSharedData,
+    private val aiDraftCache: AiDraftCache,
     private val draftController: DraftController,
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
@@ -327,8 +329,6 @@ class NewMessageViewModel @Inject constructor(
         inline get() = savedStateHandle.get<Recipient?>(NewMessageActivityArgs::recipient.name)
     private val shouldLoadDistantResources
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::shouldLoadDistantResources.name) ?: false
-    private val aiBody
-        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::aiBody.name)
 
     fun arrivedFromExistingDraft() = arrivedFromExistingDraft
     fun draftLocalUuid() = draftLocalUuid
@@ -371,13 +371,12 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox(), realm)
 
             if (isNewMessage) {
-                aiBody?.let { body ->
+                aiDraftCache.pendingAiContent?.let { (aiSubject, aiBody) ->
+                    aiSubject?.let { subject -> draft.subject = subject }
                     initialBody = BodyContentPayload.bodyOf(
-                        BodyContentPayload(
-                            body,
-                            BodyContentType.TEXT_PLAIN_WITHOUT_HTML
-                        )
+                        BodyContentPayload(aiBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
                     )
+                    aiDraftCache.pendingAiContent = null
                 }
             }
 
