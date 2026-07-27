@@ -583,6 +583,7 @@ class ThreadAdapter(
                         title = context.getString(R.string.genericMessageTranslated)
                         isButtonVisible = true
                         isButtonEnabled = true
+                        isCloseButtonVisible = false
                         hideButtonProgress(R.string.buttonShowOriginal)
                     }
                     setAnimation(R.raw.euria)
