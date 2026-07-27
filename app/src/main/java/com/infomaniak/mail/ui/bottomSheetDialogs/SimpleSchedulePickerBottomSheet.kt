@@ -22,6 +22,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.core.view.children
+import androidx.core.view.isVisible
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
@@ -60,21 +62,26 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
     }
 
-    protected fun setupScheduleOptions() {
-        ScheduleOptionsHelper(
-            context = requireContext(),
-            lastScheduleOption = binding.lastScheduleOption,
-            scheduleOptionsContainer = binding.scheduleOptions,
-            customScheduleOption = binding.customScheduleOption,
-            lastSelectedEpoch = lastSelectedEpoch,
-            currentlyScheduledEpochMillis = currentlyScheduledEpochMillis,
-            currentKSuite = currentKSuite,
-            onLastScheduleOptionClicked = ::onLastScheduleOptionClicked,
-            onCustomScheduleOptionClicked = ::onCustomScheduleOptionClicked,
-            createScheduleOptionItem = ::createScheduleOptionItem,
-            bindLastScheduleOptionDescription = ::bindLastScheduleOptionDescription,
-            setupFirstScheduleOptionDivider = ::setupFirstScheduleOptionDivider,
-        ).setup()
+    protected fun setupScheduleOptions() = with(binding) {
+        val lastDate = ScheduleOptionUtils.getLastScheduleOptionDate(lastSelectedEpoch, currentlyScheduledEpochMillis)
+        if (lastDate != null) {
+            lastScheduleOption.isVisible = true
+            bindLastScheduleOptionDescription(requireContext().dayOfWeekDateWithoutYear(lastDate))
+            lastScheduleOption.setOnClickListener { onLastScheduleOptionClicked() }
+        } else {
+            lastScheduleOption.isVisible = false
+        }
+
+        ScheduleOptionUtils.getAvailableScheduleOptions(currentlyScheduledEpochMillis).forEach { scheduleOption ->
+            scheduleOptions.addView(createScheduleOptionItem(scheduleOption))
+        }
+
+        customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
+
+        val shouldDisplayDivider = lastScheduleOption.isVisible
+        scheduleOptions.children.firstOrNull()?.let { firstItem ->
+            setupFirstScheduleOptionDivider(firstItem, shouldDisplayDivider)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
