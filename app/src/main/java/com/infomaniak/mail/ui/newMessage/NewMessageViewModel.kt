@@ -98,10 +98,10 @@ import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.MENTIONS_STYLE
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.asPlainText
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
@@ -110,7 +110,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -683,18 +682,6 @@ class NewMessageViewModel @Inject constructor(
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
             aiSharedData.previousMessageBodyPlainText = previousMessageBody?.asPlainText()
         }
-    }
-
-    private suspend fun Body.asPlainText(): String? {
-        // TODO: When the API handles blank characters, remove ifBlank
-        return when (type) {
-            Utils.TEXT_HTML -> {
-                val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
-                val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies)
-                fullBody.htmlToText()
-            }
-            else -> value
-        }.ifBlank { null }
     }
 
     private suspend fun handleSingleSendIntent(draft: Draft, intent: Intent) = with(intent) {

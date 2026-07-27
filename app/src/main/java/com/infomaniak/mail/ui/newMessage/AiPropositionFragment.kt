@@ -63,11 +63,11 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY
 import com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheetArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
+import com.infomaniak.mail.utils.MessageBodyUtils.asPlainText
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
@@ -330,13 +330,13 @@ class AiPropositionFragment : Fragment() {
 
         lifecycleScope.launch {
             var allRecipients: List<Recipient>
-            if (navigationArgs.messageUid.isBlank()) {
-                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
-            } else {
+            if (comeFromThreadFragment()) {
                 val message = messageController.getMessage(navigationArgs.messageUid)
                 val recipients = message?.getRecipientsForReplyTo(replyAll = true)
                 allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
-                aiViewModel.previousMessageBodyPlainText = message?.body?.value?.htmlToText()
+                aiViewModel.previousMessageBodyPlainText = message?.let { message -> message.body?.asPlainText() }
+            } else {
+                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
             }
 
             val formattedRecipientsString = allRecipients
@@ -344,7 +344,6 @@ class AiPropositionFragment : Fragment() {
                 .takeIf { it.isNotBlank() }
             currentRequestJob = aiViewModel.generateNewAiProposition(mailbox.uuid, formattedRecipientsString)
         }
-
     }
 
     private fun observeAiProposition() {
