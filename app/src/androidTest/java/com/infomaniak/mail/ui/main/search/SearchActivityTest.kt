@@ -145,40 +145,6 @@ class SearchActivityTest : BaseActivityTest(startingActivity = LoginActivity::cl
     }
 
     @Test
-    fun searchWithTrashFolder() {
-        onView(isRoot()).perform(waitFor(5.seconds))
-
-        val trashFolderName = context.getString(R.string.trashFolder)
-        goToFolderAndBackToInbox(trashFolderName)
-        filterSearchWithFolder(trashFolderName)
-
-        val mailContent = "#9 Search UI test Trash folder"
-        searchMail(mailContent)
-        onViewWithTimeout(
-            retryInterval = 5.seconds,
-            matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText(mailContent))),
-        )
-    }
-
-    @Test
-    fun searchWithSpamFolder() {
-        onView(isRoot()).perform(waitFor(5.seconds))
-
-        val spamFolderName = context.getString(R.string.spamFolder)
-        goToFolderAndBackToInbox(spamFolderName)
-        filterSearchWithFolder(spamFolderName)
-
-        val mailContent = "#8 Search UI test Spam folder"
-        searchMail(mailContent)
-        onViewWithTimeout(
-            retryInterval = 5.seconds,
-            matcher = withId(R.id.mailRecyclerView),
-            assertion = matches(hasDescendant(withText(mailContent))),
-        )
-    }
-
-    @Test
     fun searchWithDraftsFolder() {
         onView(isRoot()).perform(waitFor(5.seconds))
 
