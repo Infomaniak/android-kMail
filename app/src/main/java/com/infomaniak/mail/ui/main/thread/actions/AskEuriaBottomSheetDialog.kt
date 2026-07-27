@@ -23,21 +23,29 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
+import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMailPremiumBottomSheet
+import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 
 class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetAskEuriaActionsBinding by safeBinding()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val navigationArgs: AskEuriaBottomSheetDialogArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -47,10 +55,6 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.reply.setOnClickListener {
-            setBackNavigationResult(OPEN_AI_REPLY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, false))
-        }
-        
         binding.summary.setOnClickListener {
             trackBottomSheetThreadActionsEvent(MatomoName.Summarize)
             setBackNavigationResult(OPEN_AI_SUMMARY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, isAlreadySummarized))
@@ -59,6 +63,36 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.translate.setOnClickListener {
             trackBottomSheetThreadActionsEvent(MatomoName.Translate)
             setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, AiActionNavigationResult(messageUid, isAlreadyTranslated))
+        }
+
+        setupTrailingContentUi(messageUid)
+    }
+
+    private fun setupTrailingContentUi(messageUid: String) {
+        val mailbox = mainViewModel.currentMailbox.value
+        val kSuite = mailbox?.kSuite
+
+        val matomoName = MatomoName.ReplyWithEuria.value
+        binding.reply.trailingContent = when (kSuite) {
+            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+            else -> TrailingContent.None
+        }
+
+        if (binding.reply.trailingContent != TrailingContent.None) {
+            binding.reply.setOnClickListener {
+                when (kSuite) {
+                    KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
+                    KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
+                    KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
+                    else -> Unit
+                }
+            }
+        } else {
+            binding.reply.setOnClickListener {
+                trackBottomSheetThreadActionsEvent(MatomoName.ReplyWithEuria)
+                setBackNavigationResult(OPEN_AI_REPLY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, false))
+            }
         }
     }
 }

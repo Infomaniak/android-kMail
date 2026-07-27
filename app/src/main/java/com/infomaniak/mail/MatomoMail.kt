@@ -282,6 +282,7 @@ object MatomoMail : Matomo {
         ReplyMaybe("replyMaybe"),
         ReplyNo("replyNo"),
         ReplyYes("replyYes"),
+        ReplyWithEuria("replyWithEuria"),
         ReprogramSchedule("reprogramSchedule"),
         RequestPassword("requestPassword"),
         Restore("restore"),
