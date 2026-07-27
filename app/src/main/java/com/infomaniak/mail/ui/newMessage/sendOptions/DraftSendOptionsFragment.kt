@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionsHelper
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionUtils
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
@@ -90,19 +90,7 @@ class DraftSendOptionsFragment : Fragment() {
         pendingLastSelectedScheduleEpochMillis = lastSelectedEpoch
 
         setupToolbar()
-        ScheduleOptionsHelper(
-            context = requireContext(),
-            lastScheduleOption = lastScheduleOption,
-            scheduleOptionsContainer = binding.scheduleOptions,
-            customScheduleOption = customScheduleOption,
-            lastSelectedEpoch = lastSelectedEpoch,
-            currentlyScheduledEpochMillis = currentlyScheduledEpochMillis,
-            currentKSuite = currentKSuite,
-            onLastScheduleOptionClicked = ::onLastScheduleOptionClicked,
-            onCustomScheduleOptionClicked = ::onCustomScheduleOptionClicked,
-            createScheduleOptionItem = ::createScheduleOptionItem,
-            bindLastScheduleOptionDescription = ::bindLastScheduleOptionDescription,
-        ).setup()
+        setupScheduleOptions()
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
 
         setReminderOptionsVisible(isVisible = false)
@@ -158,6 +146,23 @@ class DraftSendOptionsFragment : Fragment() {
     }
 
     private fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
+
+    private fun setupScheduleOptions() = with(binding) {
+        val lastDate = ScheduleOptionUtils.getLastScheduleOptionDate(lastSelectedEpoch, currentlyScheduledEpochMillis)
+        if (lastDate != null) {
+            lastScheduleOption.isVisible = true
+            lastScheduleOption.setDescription(requireContext().dayOfWeekDateWithoutYear(lastDate))
+            lastScheduleOption.setOnClickListener { onLastScheduleOptionClicked() }
+        } else {
+            lastScheduleOption.isVisible = false
+        }
+
+        ScheduleOptionUtils.getAvailableScheduleOptions(currentlyScheduledEpochMillis).forEach { scheduleOption ->
+            scheduleOptions.addView(createScheduleOptionItem(scheduleOption))
+        }
+
+        customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
+    }
 
     private fun setupToolbar() = with(binding.toolbar) {
         setNavigationOnClickListener { findNavController().popBackStack() }
