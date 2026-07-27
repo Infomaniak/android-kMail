@@ -45,6 +45,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
 
     override val sharedPreferences = context.applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)!!
 
+    var hasAlreadyUsedReplyWithEuria by sharedValue("hasAlreadyUsedReplyWithEuriaKey", false)
     var cancelDelay by sharedValue("cancelDelayKey", 10)
     var emailForwarding by sharedValue("emailForwardingKey", EmailForwarding.IN_BODY)
     var includeMessageInReply by sharedValue("includeMessageInReplyKey", true)

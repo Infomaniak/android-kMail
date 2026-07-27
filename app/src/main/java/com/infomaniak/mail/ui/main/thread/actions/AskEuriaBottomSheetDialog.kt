@@ -28,6 +28,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -40,12 +41,18 @@ import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionV
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetAskEuriaActionsBinding by safeBinding()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    @Inject
+    lateinit var localSettings: LocalSettings
     private val navigationArgs: AskEuriaBottomSheetDialogArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -65,10 +72,10 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
             setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, AiActionNavigationResult(messageUid, isAlreadyTranslated))
         }
 
-        setupTrailingContentUi(messageUid)
+        setupReplyAction(messageUid)
     }
 
-    private fun setupTrailingContentUi(messageUid: String) {
+    private fun setupReplyAction(messageUid: String) {
         val mailbox = mainViewModel.currentMailbox.value
         val kSuite = mailbox?.kSuite
 
@@ -76,7 +83,10 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.reply.trailingContent = when (kSuite) {
             KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
             KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
-            else -> TrailingContent.None
+            else -> {
+                binding.reply.newFeatureBadgeVisible = !localSettings.hasAlreadyUsedReplyWithEuria
+                TrailingContent.None
+            }
         }
 
         if (binding.reply.trailingContent != TrailingContent.None) {
@@ -91,6 +101,8 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
         } else {
             binding.reply.setOnClickListener {
                 trackBottomSheetThreadActionsEvent(MatomoName.ReplyWithEuria)
+                localSettings.hasAlreadyUsedReplyWithEuria = true
+                binding.reply.newFeatureBadgeVisible = false
                 setBackNavigationResult(OPEN_AI_REPLY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, false))
             }
         }

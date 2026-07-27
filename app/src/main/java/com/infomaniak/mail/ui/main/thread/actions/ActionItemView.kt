@@ -55,6 +55,12 @@ class ActionItemView @JvmOverloads constructor(
             setTrailingContentUi(value)
         }
 
+    var newFeatureBadgeVisible: Boolean
+        get() = binding.newFeatureBadge.isVisible
+        set(value) {
+            binding.newFeatureBadge.isVisible = value
+        }
+
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
             with(binding) {
