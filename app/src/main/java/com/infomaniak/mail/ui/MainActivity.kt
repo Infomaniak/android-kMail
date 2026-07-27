@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.core.app.NotificationManagerCompat
@@ -208,8 +207,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
-
-        enableEdgeToEdge()
 
         setContentView(binding.root)
         addTwoFactorAuthOverlay()
