@@ -109,23 +109,11 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun observeFeatureFlagUpdates() = with(binding) {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
-            val isScheduledDraftsEnabled = featureFlags?.contains(FeatureFlag.SCHEDULE_DRAFTS) ?: false
             val isRemindersEnabled = featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) ?: false
             reminderLayout.isVisible = isRemindersEnabled
-            reminderTopDivider.isVisible = isRemindersEnabled
-            dividerBottomReminderOptions.isVisible = isRemindersEnabled
-            if (!isRemindersEnabled) {
-                reminderIfNoAnswer.isChecked = false
-                setReminderOptionsVisible(isVisible = false)
-                removeReminderOptionsSelection()
-            }
+            val isScheduledDraftsEnabled = featureFlags?.contains(FeatureFlag.SCHEDULE_DRAFTS) ?: false
             scheduleSending.isVisible = isScheduledDraftsEnabled
-            dividerTopScheduleOptions.isVisible = isScheduledDraftsEnabled
-            if (!isScheduledDraftsEnabled) {
-                scheduleSending.isChecked = false
-                setScheduleOptionsVisible(isVisible = false)
-                removeScheduleOptionsSelection()
-            }
+            dividerBottomReminderOptions.isVisible = isRemindersEnabled && isScheduledDraftsEnabled
         }
     }
 
@@ -149,12 +137,14 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun setupScheduleOptions() = with(binding) {
         val lastDate = ScheduleOptionUtils.getLastScheduleOptionDate(lastSelectedEpoch, currentlyScheduledEpochMillis)
-        if (lastDate != null) {
-            lastScheduleOption.isVisible = true
-            lastScheduleOption.setDescription(requireContext().dayOfWeekDateWithoutYear(lastDate))
-            lastScheduleOption.setOnClickListener { onLastScheduleOptionClicked() }
-        } else {
-            lastScheduleOption.isVisible = false
+        lastScheduleOption.apply {
+            if (lastDate != null) {
+                isVisible = true
+                setDescription(requireContext().dayOfWeekDateWithoutYear(lastDate))
+                setOnClickListener { onLastScheduleOptionClicked() }
+            } else {
+                isVisible = false
+            }
         }
 
         ScheduleOptionUtils.getAvailableScheduleOptions(currentlyScheduledEpochMillis).forEach { scheduleOption ->
