@@ -216,7 +216,6 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun setReminderOptionsVisible(isVisible: Boolean) {
         TransitionManager.beginDelayedTransition(binding.reminderOptionsWrapper.parent as ViewGroup)
-        binding.dividerTopReminderOptions.isVisible = isVisible
         binding.reminderVisibility.isVisible = isVisible
         binding.reminderOptionsWrapper.isVisible = isVisible
     }
@@ -258,7 +257,6 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
         TransitionManager.beginDelayedTransition(scheduleOptionsWrapper.parent as ViewGroup)
-        dividerTopScheduleOptions.isVisible = isVisible
         scheduleOptionsWrapper.isVisible = isVisible
     }
 
