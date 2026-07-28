@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.IntRange
+import androidx.annotation.StringRes
 import com.infomaniak.core.common.utils.getNextMonday
 import com.infomaniak.core.common.utils.getTimeAtHour
 import com.infomaniak.core.common.utils.isAtLeastXMinutesInTheFuture
@@ -73,8 +76,8 @@ object ScheduleOptionUtils {
 enum class ScheduleOption(
     private val day: RelativeDay,
     private val hour: HourOfTheDay,
-    val titleRes: Int,
-    val iconRes: Int,
+    @StringRes val titleRes: Int,
+    @DrawableRes val iconRes: Int,
     val matomoName: MatomoName,
 ) {
     LaterThisMorning(
@@ -138,7 +141,7 @@ private enum class RelativeDay(val getDate: () -> Date) {
     NextMonday({ Date().getNextMonday() }),
 }
 
-private enum class HourOfTheDay(val hourOfTheDay: Int) {
+private enum class HourOfTheDay(@IntRange(0, 23) val hourOfTheDay: Int) {
     Morning(8),
     Afternoon(14),
     Evening(18),
