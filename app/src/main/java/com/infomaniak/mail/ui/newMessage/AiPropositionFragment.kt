@@ -30,6 +30,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -285,7 +286,7 @@ class AiPropositionFragment : Fragment() {
                 PropositionStatus.RATE_LIMIT_EXCEEDED,
                 PropositionStatus.MISSING_CONTENT -> {
                     sendMissingContentSentry(propositionStatus)
-                    displayError(propositionStatus)
+                    propositionStatus.errorRes?.let { displayError(it) }
                 }
             }
         }
@@ -300,8 +301,8 @@ class AiPropositionFragment : Fragment() {
         setUiVisibilityState(UiState.PROPOSITION)
     }
 
-    private fun displayError(status: PropositionStatus) {
-        binding.errorBlock.description = getString(status.errorRes!!)
+    private fun displayError(@StringRes errorRes: Int) {
+        binding.errorBlock.title = getString(errorRes)
         setUiVisibilityState(UiState.ERROR)
     }
 
