@@ -34,20 +34,22 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/marginStandardMedium">
 
-            <LinearLayout
-                android:id="@+id/reminderLayout"
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/reminderIfNoAnswer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                app:icon="@drawable/ic_alarm_clock"
+                app:iconColor="?attr/colorPrimary"
+                app:itemAction="toggle"
+                app:title="@string/actionCallIfNoResponse" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/reminderIfNoAnswer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_alarm_clock"
-                    app:iconColor="?attr/colorPrimary"
-                    app:itemAction="toggle"
-                    app:title="@string/actionCallIfNoResponse" />
+            <LinearLayout
+                android:id="@+id/reminderOptionsWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/reminderVisibility"
@@ -57,15 +59,6 @@
                     app:subtitle="@string/selectionReminderRecipientsAndMe"
                     app:title="@string/reminderVisibilityTitle"
                     tools:visibility="visible" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/reminderOptionsWrapper"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                tools:visibility="visible">
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
                     android:id="@+id/optionsDelays"
