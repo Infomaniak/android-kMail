@@ -27,7 +27,6 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -83,7 +82,6 @@ class DraftSendOptionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
-        setupToolbar()
         setupScheduleOptions()
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
 
@@ -143,10 +141,6 @@ class DraftSendOptionsFragment : Fragment() {
         }
 
         customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
-    }
-
-    private fun setupToolbar() = with(binding.toolbar) {
-        setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
     private fun setupToggles() = with(binding) {
