@@ -100,7 +100,7 @@ class DraftSendOptionsFragment : Fragment() {
     private fun observeFeatureFlagUpdates() = with(binding) {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isRemindersEnabled = featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) ?: false
-            reminderLayout.isVisible = isRemindersEnabled
+            reminderIfNoAnswer.isVisible = isRemindersEnabled
             val isScheduledDraftsEnabled = featureFlags?.contains(FeatureFlag.SCHEDULE_DRAFTS) ?: false
             scheduleSending.isVisible = isScheduledDraftsEnabled
             dividerBottomReminderOptions.isVisible = isRemindersEnabled && isScheduledDraftsEnabled
@@ -200,7 +200,6 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun setReminderOptionsVisible(isVisible: Boolean) {
         TransitionManager.beginDelayedTransition(binding.reminderOptionsWrapper.parent as ViewGroup)
-        binding.reminderVisibility.isVisible = isVisible
         binding.reminderOptionsWrapper.isVisible = isVisible
     }
 
