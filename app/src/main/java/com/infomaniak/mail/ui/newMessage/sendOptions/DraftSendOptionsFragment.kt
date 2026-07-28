@@ -70,10 +70,6 @@ class DraftSendOptionsFragment : Fragment() {
     @Inject
     lateinit var localSettings: LocalSettings
 
-    private var pendingScheduleConfig: ScheduleConfig = ScheduleConfig.None
-    private var pendingReminderConfig: ReminderConfig = ReminderConfig.None
-    private var pendingLastSelectedScheduleEpochMillis: Long? = null
-
     private val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
     private val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
     private val currentlyScheduledEpochMillis: Long? by lazy {
@@ -87,8 +83,6 @@ class DraftSendOptionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         dateAndTimeScheduleDialog.bindAlertToLifecycle(viewLifecycleOwner)
 
-        pendingLastSelectedScheduleEpochMillis = lastSelectedEpoch
-
         setupToolbar()
         setupScheduleOptions()
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
@@ -101,8 +95,6 @@ class DraftSendOptionsFragment : Fragment() {
         setupReminderOptions()
 
         restoreStateFromViewModel()
-
-        saveButton.setOnClickListener { saveOptions() }
 
         observeFeatureFlagUpdates()
     }
@@ -129,8 +121,7 @@ class DraftSendOptionsFragment : Fragment() {
     private fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
 
     private fun onLastScheduleOptionClicked() {
-        pendingScheduleConfig = lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None
-        pendingLastSelectedScheduleEpochMillis = null
+        newMessageViewModel.scheduleConfig.value = lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None
     }
 
     private fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
@@ -180,8 +171,7 @@ class DraftSendOptionsFragment : Fragment() {
     private fun setupScheduleSelection() = with(binding) {
         scheduleOptions.onItemCheckedListener { _, value, _ ->
             val epoch = value?.toLongOrNull()
-            pendingScheduleConfig = if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None
-            pendingLastSelectedScheduleEpochMillis = null
+            newMessageViewModel.scheduleConfig.value = if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None
             customScheduleOption.setCheckMark(displayCheckMark = false)
             customScheduleOption.removeSubtitle()
         }
@@ -203,7 +193,7 @@ class DraftSendOptionsFragment : Fragment() {
         optionsDelays.onItemCheckedListener { _, value, _ ->
             val minutes = value?.toIntOrNull()
             val isKnownPreset = ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
-            pendingReminderConfig = if (minutes != null && isKnownPreset) {
+            newMessageViewModel.reminderConfig.value = if (minutes != null && isKnownPreset) {
                 ReminderConfig.Delayed(minutes, isCustom = false)
             } else {
                 ReminderConfig.None
@@ -224,12 +214,12 @@ class DraftSendOptionsFragment : Fragment() {
         binding.optionsDelays.clearCheck()
         binding.customDelayReminder.setCheckMark(displayCheckMark = false)
         binding.customDelayReminder.removeSubtitle()
-        pendingReminderConfig = ReminderConfig.None
+        newMessageViewModel.reminderConfig.value = ReminderConfig.None
     }
 
     private fun defaultReminderSelection() = with(binding) {
         optionsDelays.check(R.id.hours24)
-        pendingReminderConfig = ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false)
+        newMessageViewModel.reminderConfig.value = ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false)
     }
 
     private fun defaultScheduleSelection() = with(binding) {
@@ -241,8 +231,7 @@ class DraftSendOptionsFragment : Fragment() {
             val epoch = option.associatedValue?.toLongOrNull()
             if (epoch != null) {
                 scheduleOptions.check(option.id)
-                pendingScheduleConfig = ScheduleConfig.Scheduled(epoch)
-                pendingLastSelectedScheduleEpochMillis = null
+                newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(epoch)
             }
         }
     }
@@ -251,8 +240,7 @@ class DraftSendOptionsFragment : Fragment() {
         scheduleOptions.clearCheck()
         customScheduleOption.setCheckMark(displayCheckMark = false)
         customScheduleOption.removeSubtitle()
-        pendingScheduleConfig = ScheduleConfig.None
-        pendingLastSelectedScheduleEpochMillis = null
+        newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
     }
 
     private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
@@ -274,7 +262,6 @@ class DraftSendOptionsFragment : Fragment() {
         val savedSchedule = newMessageViewModel.scheduleConfig.value as? ScheduleConfig.Scheduled ?: return@with
         val epoch = savedSchedule.epochMillis
 
-        pendingScheduleConfig = savedSchedule
         scheduleSending.isChecked = true
         setScheduleOptionsVisible(isVisible = true)
 
@@ -297,7 +284,6 @@ class DraftSendOptionsFragment : Fragment() {
         val savedReminder = newMessageViewModel.reminderConfig.value ?: ReminderConfig.None
         if (savedReminder !is ReminderConfig.Delayed) return@with
 
-        pendingReminderConfig = savedReminder
         reminderIfNoAnswer.isChecked = true
         setReminderOptionsVisible(isVisible = true)
 
@@ -332,8 +318,8 @@ class DraftSendOptionsFragment : Fragment() {
         dateAndTimeScheduleDialog.show(
             onDateSelected = { timestamp ->
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
-                pendingScheduleConfig = ScheduleConfig.Scheduled(timestamp, isCustom = true)
-                pendingLastSelectedScheduleEpochMillis = timestamp
+                newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(timestamp, isCustom = true)
+                localSettings.lastSelectedScheduleEpochMillis = timestamp
                 applyCustomDateSelectionUi(timestamp, binding.customScheduleOption, binding.scheduleOptions)
             },
         )
@@ -351,14 +337,4 @@ class DraftSendOptionsFragment : Fragment() {
         groupView.clearCheck()
     }
 
-    private fun saveOptions() {
-        newMessageViewModel.scheduleConfig.value = pendingScheduleConfig
-        newMessageViewModel.reminderConfig.value = pendingReminderConfig
-
-        if (pendingScheduleConfig is ScheduleConfig.Scheduled) {
-            pendingLastSelectedScheduleEpochMillis?.let { localSettings.lastSelectedScheduleEpochMillis = it }
-        }
-
-        findNavController().popBackStack()
-    }
 }
