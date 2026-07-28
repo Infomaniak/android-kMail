@@ -26,9 +26,13 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMailPremiumBottomSheet
+import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 
 abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
 
@@ -44,6 +48,23 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
     abstract fun onLastScheduleOptionClicked()
     abstract fun onScheduleOptionClicked(dateItem: ScheduleOption)
     abstract fun onCustomScheduleOptionClicked()
+
+    protected fun handleCustomScheduleOptionClicked(
+        matomoName: String,
+        backNavKey: String,
+        isAdmin: Boolean,
+        onDefaultClicked: () -> Unit = {}
+    ) {
+        when (val kSuite = currentKSuite) {
+            KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
+            KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, isAdmin, matomoName)
+            KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
+            else -> {
+                onDefaultClicked()
+                setBackNavigationResult(backNavKey, true)
+            }
+        }
+    }
 
     protected open fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
         return ActionItemView(requireContext()).apply {
