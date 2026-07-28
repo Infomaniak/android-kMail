@@ -665,7 +665,16 @@ class NewMessageFragment : Fragment() {
         if (newMessageViewModel.signaturesCount > 1) {
             fromMailAddress.apply {
                 icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
-                setOnClickListener { _ -> addressListPopupWindow?.show() }
+                setOnClickListener { _ ->
+                    post {
+                        runCatching {
+                            addressListPopupWindow?.width = width
+                            addressListPopupWindow?.show()
+                        }.onFailure {
+                            Sentry.captureMessage("Binding null in post(), this is not normal", SentryLevel.WARNING)
+                        }
+                    }
+                }
 
                 // Set `isFocusable` here instead of in XML file because setting it in the
                 // XML doesn't trigger the overridden `setFocusable(boolean)` in AvatarView.
