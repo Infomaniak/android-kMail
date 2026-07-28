@@ -34,6 +34,7 @@ import android.widget.PopupWindow
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.doOnLayout
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -429,6 +430,10 @@ class NewMessageFragment : Fragment() {
     private fun initUi() = with(binding) {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
+        binding.fromMailAddress.doOnLayout {
+            addressListPopupWindow?.width = it.width
+        }
+
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(appBarLayout, compositionNestedScrollView)
 
@@ -665,16 +670,7 @@ class NewMessageFragment : Fragment() {
         if (newMessageViewModel.signaturesCount > 1) {
             fromMailAddress.apply {
                 icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
-                setOnClickListener { _ ->
-                    post {
-                        runCatching {
-                            addressListPopupWindow?.width = width
-                            addressListPopupWindow?.show()
-                        }.onFailure {
-                            Sentry.captureMessage("Binding null in post(), this is not normal", SentryLevel.WARNING)
-                        }
-                    }
-                }
+                setOnClickListener { _ -> addressListPopupWindow?.show() }
 
                 // Set `isFocusable` here instead of in XML file because setting it in the
                 // XML doesn't trigger the overridden `setFocusable(boolean)` in AvatarView.
