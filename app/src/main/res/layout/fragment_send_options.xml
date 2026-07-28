@@ -44,7 +44,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/saveButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
@@ -177,17 +177,5 @@
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/saveButton"
-        style="@style/TextButtonPrimary"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginBottom="@dimen/marginStandardMedium"
-        android:text="@string/buttonSave"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
