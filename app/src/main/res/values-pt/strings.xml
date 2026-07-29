@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Marcar como legítimo</string>
     <string name="actionPhishing">Denunciar phishing</string>
     <string name="actionPrint">Imprimir</string>
+    <string name="actionReminder">Lembrar-me</string>
     <string name="actionRename">Renomear</string>
     <string name="actionReply">Responder</string>
     <string name="actionReplyAll">Responder a todos</string>

@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Rapporteren als geen spam</string>
     <string name="actionPhishing">Phishing melden</string>
     <string name="actionPrint">Afdrukken</string>
+    <string name="actionReminder">Herinner me</string>
     <string name="actionRename">Hernoemen</string>
     <string name="actionReply">Beantwoorden</string>
     <string name="actionReplyAll">Allen beantwoorden</string>
