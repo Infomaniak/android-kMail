@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_alarm_clock"
-            app:title="@string/actionSnooze"
+            app:title="@string/actionReminder"
             app:visibleDivider="false"
             tools:visibility="visible" />
 

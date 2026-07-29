@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Rapportera som legitim</string>
     <string name="actionPhishing">Rapportera nätfiske</string>
     <string name="actionPrint">Skriv ut</string>
+    <string name="actionReminder">Påminn mig</string>
     <string name="actionRename">Byt namn</string>
     <string name="actionReply">Svara</string>
     <string name="actionReplyAll">Svara alla</string>
