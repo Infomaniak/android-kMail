@@ -816,24 +816,7 @@ class ThreadViewModel @Inject constructor(
             message = message,
             successResId = R.string.snackbarAddReminderSuccess,
             failureResId = R.string.snackbarAddReminderFailure,
-            onSuccess = { reminderResult ->
-                reminderResult?.let { result ->
-                    mailboxContentRealm().write {
-                        MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                            localMessage?.reminder = ReminderMessageInfo().apply {
-                                uuid = result.uuid
-                                date = result.date
-                            }
-                        }
-                    }
-                }
-                refreshController.refreshThreads(
-                    refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                    mailbox = mailbox(),
-                    folderId = message.folderId,
-                    realm = mailboxContentRealm(),
-                )
-            },
+            onSuccess = { handleReminderUpdatedSuccess(message, it) }
         ) { mailboxUuid, folderId, messageId ->
             ApiRepository.addReminder(
                 mailboxUuid = mailboxUuid,
@@ -857,25 +840,16 @@ class ThreadViewModel @Inject constructor(
             message = message,
             successResId = R.string.snackbarDisableReminderSuccess,
             failureResId = R.string.snackbarDisableReminderFailure,
-            onSuccess = {
-                mailboxContentRealm().write {
-                    MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                        localMessage?.reminder = null
-                        localMessage?.reminderAction = null
-                    }
-                }
-            },
+            onSuccess = { handleReminderDisabledSuccess(message.uid) }
         ) { mailboxUuid, folderId, messageId ->
             when {
                 !reminderAction.isNullOrBlank() -> ApiRepository.disableScheduledDraftReminder(reminderAction)
-                reminderUuid != null -> {
-                    ApiRepository.disableReminder(
-                        mailboxUuid = mailboxUuid,
-                        folderId = folderId,
-                        messageId = messageId,
-                        reminderUuid = reminderUuid,
-                    )
-                }
+                reminderUuid != null -> ApiRepository.disableReminder(
+                    mailboxUuid = mailboxUuid,
+                    folderId = folderId,
+                    messageId = messageId,
+                    reminderUuid = reminderUuid,
+                )
                 else -> ApiResponse<ReminderResult>(result = ApiResponseStatus.ERROR)
             }
         }
@@ -894,24 +868,7 @@ class ThreadViewModel @Inject constructor(
             message = message,
             successResId = R.string.snackbarModifyReminderSuccess,
             failureResId = R.string.snackbarModifyReminderFailure,
-            onSuccess = { reminderResult ->
-                reminderResult?.let { result ->
-                    mailboxContentRealm().write {
-                        MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                            localMessage?.reminder = ReminderMessageInfo().apply {
-                                uuid = result.uuid
-                                date = result.date
-                            }
-                        }
-                    }
-                }
-                refreshController.refreshThreads(
-                    refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                    mailbox = mailbox(),
-                    folderId = message.folderId,
-                    realm = mailboxContentRealm(),
-                )
-            },
+            onSuccess = { handleReminderUpdatedSuccess(message, it) }
         ) { mailboxUuid, folderId, messageId ->
             when {
                 !reminderAction.isNullOrBlank() -> ApiRepository.modifyScheduledDraftReminder(reminderAction, delayMinutes)
@@ -923,6 +880,35 @@ class ThreadViewModel @Inject constructor(
                     delayMinutes = delayMinutes,
                 )
                 else -> ApiResponse<ReminderResult>(result = ApiResponseStatus.ERROR)
+            }
+        }
+    }
+
+    private suspend fun handleReminderUpdatedSuccess(message: Message, reminderResult: ReminderResult?) {
+        reminderResult?.let { result ->
+            mailboxContentRealm().write {
+                MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
+                    localMessage?.reminder = ReminderMessageInfo().apply {
+                        uuid = result.uuid
+                        date = result.date
+                    }
+                }
+            }
+        }
+
+        refreshController.refreshThreads(
+            refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+            mailbox = mailbox(),
+            folderId = message.folderId,
+            realm = mailboxContentRealm(),
+        )
+    }
+
+    private suspend fun handleReminderDisabledSuccess(messageUid: String) {
+        mailboxContentRealm().write {
+            MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
+                localMessage?.reminder = null
+                localMessage?.reminderAction = null
             }
         }
     }
