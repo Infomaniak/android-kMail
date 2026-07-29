@@ -31,23 +31,14 @@ class KSuiteChipManager(private val container: ViewGroup) {
     fun displayChipFor(trailingContent: TrailingContent): Boolean {
         container.removeView(kSuitePersoChipView)
         container.removeView(kSuiteProChipView)
-
-        return when (trailingContent) {
+        val chipView = when (trailingContent) {
             // ComposeView are not compatible with view without lifecycles (ex: PopupWindow in RecipientFieldView).
             // This is causing a crash so to avoid that, we have to programmatically
             // add the Compose view only where it's needed.
-            TrailingContent.KSuitePersoChip -> container.addView(kSuitePersoChipView).let { true }
-            TrailingContent.KSuiteProChip -> container.addView(kSuiteProChipView).let { true }
-            else -> false
+            TrailingContent.KSuitePersoChip -> kSuitePersoChipView
+            TrailingContent.KSuiteProChip -> kSuiteProChipView
+            else -> null
         }
+        return chipView?.also(container::addView) != null
     }
-}
-
-/** Keep the entries order, it's used by the attribute (or change also the attributes order in attrs.xml) */
-enum class TrailingContent {
-    None,
-    Chevron,
-    Description,
-    KSuitePersoChip,
-    KSuiteProChip,
 }
