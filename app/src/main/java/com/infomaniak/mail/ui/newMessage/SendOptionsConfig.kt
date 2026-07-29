@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.date.DateFormatUtils.MINUTES_IN_A_DAY
 
 sealed class ScheduleConfig {
     data object None : ScheduleConfig()
@@ -36,4 +37,3 @@ enum class ReminderPreset(val titleRes: Int, val delayMinutes: Int) {
 }
 
 const val MIN_SELECTABLE_DATE_MINUTES = 5
-const val MINUTES_IN_A_DAY = 1440
