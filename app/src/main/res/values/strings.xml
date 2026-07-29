@@ -40,6 +40,7 @@
     <string name="actionNonSpam">Report as not spam</string>
     <string name="actionPhishing">Report phishing</string>
     <string name="actionPrint">Print</string>
+    <string name="actionReminder">Remind me</string>
     <string name="actionRename">Rename</string>
     <string name="actionReply">Reply</string>
     <string name="actionReplyAll">Reply all</string>
