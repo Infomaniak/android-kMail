@@ -44,7 +44,7 @@ class ActionItemView @JvmOverloads constructor(
 
     private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val kSuiteChipManager by lazy { KSuiteChipManager(binding.trailingContentLayout) }
+    private val kSuiteChipManager by lazy { KSuiteChipManager(context) }
 
     var trailingContent = TrailingContent.None
         set(value) {
@@ -128,7 +128,7 @@ class ActionItemView @JvmOverloads constructor(
 
     private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
         trailingContentLayout.isVisible = true
-        kSuiteChipManager.displayChipFor(trailingContent)
+        kSuiteChipManager.displayChipFor(binding.trailingContentLayout, trailingContent)
 
         when (trailingContent) {
             TrailingContent.None -> trailingContentLayout.isGone = true
