@@ -74,6 +74,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxHostingStatus
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.ReminderResult
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeCancelResponse
@@ -222,7 +223,7 @@ object ApiRepository : ApiRepositoryCore() {
         messageId: Int,
         reminderUuid: String,
         delayMinutes: Int
-    ): ApiResponse<String> {
+    ): ApiResponse<ReminderResult> {
         return callApi(
             ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid),
             PUT,
@@ -243,7 +244,7 @@ object ApiRepository : ApiRepositoryCore() {
         folderId: String,
         messageId: Int,
         delayMinutes: Int
-    ): ApiResponse<String> {
+    ): ApiResponse<ReminderResult> {
         return callApi(
             ApiRoutes.addReminder(mailboxUuid, folderId, messageId),
             POST,
