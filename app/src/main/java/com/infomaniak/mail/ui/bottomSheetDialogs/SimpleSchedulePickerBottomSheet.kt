@@ -67,7 +67,7 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         }
     }
 
-    protected open fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
+    private fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
         return ActionItemView(requireContext()).apply {
             setTitle(scheduleOption.titleRes)
             setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
@@ -76,16 +76,16 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         }
     }
 
-    protected open fun bindLastScheduleOptionDescription(description: String) {
+    private fun bindLastScheduleOptionDescription(description: String) {
         binding.lastScheduleOption.setDescription(description)
     }
 
-    protected open fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) {
+    private fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) {
         (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
     }
 
-    protected open fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
-        binding.customScheduleOption.trailingContent = when (kSuite) {
+    private fun setupCustomScheduleOptionTrailing() {
+        binding.customScheduleOption.trailingContent = when (currentKSuite) {
             KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
             KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
             else -> TrailingContent.Chevron
@@ -112,7 +112,7 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         scheduleOptions.children.firstOrNull()?.let { firstItem ->
             setupFirstScheduleOptionDivider(firstItem, shouldDisplayDivider)
         }
-        setupCustomScheduleOptionTrailing(currentKSuite)
+        setupCustomScheduleOptionTrailing()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

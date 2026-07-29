@@ -116,8 +116,8 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun setupCustomScheduleOptionTrailing(kSuite: KSuite?) {
-        binding.customScheduleOption.trailingContent = trailingContentFor(kSuite)
+    private fun setupCustomScheduleOptionTrailing() {
+        binding.customScheduleOption.trailingContent = trailingContentFor(currentKSuite)
     }
 
     private fun onLastScheduleOptionClicked() {
@@ -143,8 +143,9 @@ class DraftSendOptionsFragment : Fragment() {
         ScheduleOptionUtils.getAvailableScheduleOptions(currentlyScheduledEpochMillis).forEach { scheduleOption ->
             scheduleOptions.addView(createScheduleOptionItem(scheduleOption))
         }
+
         customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
-        setupCustomScheduleOptionTrailing(currentKSuite)
+        setupCustomScheduleOptionTrailing()
     }
 
     private fun setupToggles() = with(binding) {
