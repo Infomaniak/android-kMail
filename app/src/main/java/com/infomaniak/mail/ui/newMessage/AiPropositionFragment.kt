@@ -409,6 +409,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun displayLoadingVisibility() = with(binding) {
+        loadingPlaceholder.text = aiViewModel.aiPrompt
         loadingPlaceholder.isVisible = true
         setGenerationLoaderVisible(true)
 
