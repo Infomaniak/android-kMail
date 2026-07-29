@@ -1500,7 +1500,6 @@ class ThreadAdapter(
                     message.reminder?.uuid == it.message.reminder?.uuid &&
                             message.reminder?.date == it.message.reminder?.date &&
                             message.reminder?.delta == it.message.reminder?.delta &&
-                            message.reminder?.display == it.message.reminder?.display &&
                             message.reminderAction == it.message.reminderAction
                 })
 
