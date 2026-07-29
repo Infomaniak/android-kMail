@@ -35,8 +35,6 @@ class ReminderMessageInfo : EmbeddedRealmObject {
     var uuid: String? = null
     @SerialName("delta")
     var delta: Int? = null
-    @SerialName("display")
-    var display: Boolean? = null
 
     companion object
 }
