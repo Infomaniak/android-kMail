@@ -67,6 +67,6 @@ object DateFormatUtils {
         return resources.getQuantityString(pluralId, quantity, quantity)
     }
 
-    private const val MINUTES_IN_AN_HOUR = 60
-    private const val MINUTES_IN_A_DAY = 24 * MINUTES_IN_AN_HOUR
+    const val MINUTES_IN_AN_HOUR = 60
+    const val MINUTES_IN_A_DAY = 24 * MINUTES_IN_AN_HOUR
 }
