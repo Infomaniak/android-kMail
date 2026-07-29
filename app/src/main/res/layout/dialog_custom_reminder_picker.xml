@@ -16,40 +16,22 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
+    android:gravity="center"
+    android:orientation="horizontal"
     android:paddingHorizontal="@dimen/marginStandard"
     android:paddingVertical="@dimen/marginStandardSmall">
 
-    <LinearLayout
+    <NumberPicker
+        android:id="@+id/numberPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_marginEnd="@dimen/marginStandardMedium" />
 
-        <NumberPicker
-            android:id="@+id/numberPicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/marginStandardMedium" />
-
-        <NumberPicker
-            android:id="@+id/unitPicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/errorMessage"
-        style="@style/Body.Error"
+    <NumberPicker
+        android:id="@+id/unitPicker"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:text="The reminder must be at least 1 hour in the future"
-        tools:visibility="visible" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
