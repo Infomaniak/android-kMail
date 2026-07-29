@@ -149,6 +149,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
@@ -343,7 +344,7 @@ class NewMessageFragment : Fragment() {
     private fun setupBackActionHandler() {
 
         fun scheduleDraft(timestamp: Long) {
-            newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(timestamp)
+            newMessageViewModel.setScheduleConfig(ScheduleConfig.Scheduled(timestamp))
             tryToSendEmail(isScheduled = true)
         }
 
@@ -485,12 +486,12 @@ class NewMessageFragment : Fragment() {
 
         scheduleAlert.apply {
             onAction1 { navigateToScheduleSendBottomSheet() }
-            onAction2 { newMessageViewModel.scheduleConfig.value = ScheduleConfig.None }
+            onAction2 { newMessageViewModel.setScheduleConfig(ScheduleConfig.None) }
         }
 
         reminderAlert.apply {
             onAction1 { navigateToScheduleSendBottomSheet() }
-            onAction2 { newMessageViewModel.reminderConfig.value = ReminderConfig.None }
+            onAction2 { newMessageViewModel.setReminderConfig(ReminderConfig.None) }
         }
 
         recipientFieldsManager.setupAutoCompletionFields()
@@ -1062,7 +1063,7 @@ class NewMessageFragment : Fragment() {
             if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()) {
                 true
             } else {
-                newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+                newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
                 false
             }
         } else {
@@ -1137,7 +1138,7 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(trackConfirmEvent)
                 hasConfirmed = true
             },
-            onCancel = { if (isScheduled) newMessageViewModel.scheduleConfig.value = ScheduleConfig.None },
+            onCancel = { if (isScheduled) newMessageViewModel.setScheduleConfig(ScheduleConfig.None) },
             onDismiss = { isSendingCanceled.complete(!hasConfirmed) },
         )
 

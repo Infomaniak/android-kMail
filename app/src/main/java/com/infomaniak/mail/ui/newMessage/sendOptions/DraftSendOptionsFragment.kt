@@ -53,6 +53,7 @@ import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.update
 import java.util.Date
 import javax.inject.Inject
 
@@ -119,7 +120,7 @@ class DraftSendOptionsFragment : Fragment() {
     private fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
 
     private fun onLastScheduleOptionClicked() {
-        newMessageViewModel.scheduleConfig.value = lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None
+        newMessageViewModel.setScheduleConfig(lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None)
     }
 
     private fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
@@ -165,7 +166,7 @@ class DraftSendOptionsFragment : Fragment() {
     private fun setupScheduleSelection() = with(binding) {
         scheduleOptions.onItemCheckedListener { _, value, _ ->
             val epoch = value?.toLongOrNull()
-            newMessageViewModel.scheduleConfig.value = if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None
+            newMessageViewModel.setScheduleConfig(if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None)
             customScheduleOption.setCheckMark(displayCheckMark = false)
             customScheduleOption.removeSubtitle()
         }
@@ -187,11 +188,13 @@ class DraftSendOptionsFragment : Fragment() {
         optionsDelays.onItemCheckedListener { _, value, _ ->
             val minutes = value?.toIntOrNull()
             val isKnownPreset = ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
-            newMessageViewModel.reminderConfig.value = if (minutes != null && isKnownPreset) {
-                ReminderConfig.Delayed(minutes, isCustom = false)
-            } else {
-                ReminderConfig.None
-            }
+            newMessageViewModel.setReminderConfig(
+                if (minutes != null && isKnownPreset) {
+                    ReminderConfig.Delayed(minutes, isCustom = false)
+                } else {
+                    ReminderConfig.None
+                }
+            )
 
             customDelayReminder.setCheckMark(displayCheckMark = false)
             customDelayReminder.removeSubtitle()
@@ -207,12 +210,12 @@ class DraftSendOptionsFragment : Fragment() {
         binding.optionsDelays.clearCheck()
         binding.customDelayReminder.setCheckMark(displayCheckMark = false)
         binding.customDelayReminder.removeSubtitle()
-        newMessageViewModel.reminderConfig.value = ReminderConfig.None
+        newMessageViewModel.setReminderConfig(ReminderConfig.None)
     }
 
     private fun defaultReminderSelection() = with(binding) {
         optionsDelays.check(R.id.hours24)
-        newMessageViewModel.reminderConfig.value = ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false)
+        newMessageViewModel.setReminderConfig(ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false))
     }
 
     private fun defaultScheduleSelection() = with(binding) {
@@ -224,7 +227,7 @@ class DraftSendOptionsFragment : Fragment() {
             val epoch = option.associatedValue?.toLongOrNull()
             if (epoch != null) {
                 scheduleOptions.check(option.id)
-                newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(epoch)
+                newMessageViewModel.setScheduleConfig(ScheduleConfig.Scheduled(epoch))
             }
         }
     }
@@ -233,7 +236,7 @@ class DraftSendOptionsFragment : Fragment() {
         scheduleOptions.clearCheck()
         customScheduleOption.setCheckMark(displayCheckMark = false)
         customScheduleOption.removeSubtitle()
-        newMessageViewModel.scheduleConfig.value = ScheduleConfig.None
+        newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
     }
 
     private fun setScheduleOptionsVisible(isVisible: Boolean) = with(binding) {
@@ -311,7 +314,7 @@ class DraftSendOptionsFragment : Fragment() {
         dateAndTimeScheduleDialog.show(
             onDateSelected = { timestamp ->
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
-                newMessageViewModel.scheduleConfig.value = ScheduleConfig.Scheduled(timestamp, isCustom = true)
+                newMessageViewModel.setScheduleConfig(ScheduleConfig.Scheduled(timestamp, isCustom = true))
                 localSettings.lastSelectedScheduleEpochMillis = timestamp
                 applyCustomDateSelectionUi(timestamp, binding.customScheduleOption, binding.scheduleOptions)
             },
