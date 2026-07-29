@@ -151,7 +151,7 @@ class AiPropositionFragment : Fragment() {
 
     private fun initMailbox() {
         viewLifecycleOwner.lifecycleScope.launch {
-            mailbox = if (navigationArgs.messageUid.isBlank()) {
+            mailbox = if (isHostedByNewMessageActivity()) {
                 newMessageViewModel.currentMailbox()
             } else {
                 mainViewModel.currentMailbox.value ?: return@launch
@@ -191,18 +191,18 @@ class AiPropositionFragment : Fragment() {
 
         retryButton.setOnClickListener {
             trackAiWriterEvent(MatomoName.Retry)
-            if (comeFromThreadFragment()) {
+            if (isHostedByNewMessageActivity()) {
+                aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
+                    isOpened = true,
+                    shouldResetPrompt = aiViewModel.aiPropositionStatusLiveData.value != PropositionStatus.CONTEXT_TOO_LONG,
+                )
+                findNavController().popBackStack()
+            } else {
                 safelyNavigate(
                     resId = R.id.euriaPromptBottomSheetDialog,
                     args = EuriaPromptBottomSheetArgs(messageUid = navigationArgs.messageUid).toBundle(),
                 )
-                return@setOnClickListener
             }
-            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
-                isOpened = true,
-                shouldResetPrompt = aiViewModel.aiPropositionStatusLiveData.value != PropositionStatus.CONTEXT_TOO_LONG,
-            )
-            findNavController().popBackStack()
         }
 
         errorBlock.setOnCloseListener {
@@ -212,7 +212,7 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
-    private fun comeFromThreadFragment() = navigationArgs.messageUid.isNotBlank()
+    private fun isHostedByNewMessageActivity() = requireActivity() is NewMessageActivity
 
     private fun observeBackNavigationResult() {
         getBackNavigationResult<String>(OPEN_AI_REPLY_PROPOSITION) { _ ->
@@ -234,13 +234,14 @@ class AiPropositionFragment : Fragment() {
     private fun choosePropositionAndPopBack() = with(aiViewModel) {
 
         fun applyProposition(subject: String?, content: String) {
-            if (comeFromThreadFragment()) {
+            if (isHostedByNewMessageActivity()) {
+                aiOutputToInsert.value = subject to content
+            } else {
                 navigateToNewMessageActivityWithAiContent(subject, content)
                 return
             }
 
             trackInsertionType()
-            aiOutputToInsert.value = subject to content
             findNavController().popBackStack()
         }
 
@@ -293,14 +294,14 @@ class AiPropositionFragment : Fragment() {
         trackAiWriterEvent(shortcut.matomoName)
 
         if (shortcut == Shortcut.MODIFY) {
-            if (comeFromThreadFragment()) {
+            if (isHostedByNewMessageActivity()) {
+                aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
+                findNavController().popBackStack()
+            } else {
                 safelyNavigate(
                     resId = R.id.euriaPromptBottomSheetDialog,
                     args = EuriaPromptBottomSheetArgs(messageUid = navigationArgs.messageUid).toBundle(),
                 )
-            } else {
-                aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
-                findNavController().popBackStack()
             }
         } else {
             binding.loadingPlaceholder.text = getLastMessage()
@@ -330,13 +331,13 @@ class AiPropositionFragment : Fragment() {
 
         lifecycleScope.launch {
             var allRecipients: List<Recipient>
-            if (comeFromThreadFragment()) {
+            if (isHostedByNewMessageActivity()) {
+                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
+            } else {
                 val message = messageController.getMessage(navigationArgs.messageUid)
                 val recipients = message?.getRecipientsForReplyTo(replyAll = true)
                 allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
                 aiViewModel.previousMessageBodyPlainText = message?.let { message -> message.body?.asPlainText() }
-            } else {
-                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
             }
 
             val formattedRecipientsString = allRecipients
