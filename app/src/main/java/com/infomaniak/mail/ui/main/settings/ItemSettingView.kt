@@ -128,17 +128,8 @@ class ItemSettingView @JvmOverloads constructor(
         chevron.isGone = mustBlock
     }
 
-    fun setMyKSuiteChipVisibility(isVisible: Boolean) {
-        trailingContent = when {
-            isVisible -> TrailingContent.KSuitePersoChip
-            action == Action.CHEVRON -> TrailingContent.Chevron
-            else -> TrailingContent.None
-        }
-    }
-
     private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
-        val hasChip = kSuiteChipManager.displayChipFor(trailingContent)
-        trailingChipContainer.isVisible = hasChip
+        trailingChipContainer.isVisible = kSuiteChipManager.displayChipFor(trailingContent)
 
         when (trailingContent) {
             TrailingContent.KSuitePersoChip, TrailingContent.KSuiteProChip -> {
