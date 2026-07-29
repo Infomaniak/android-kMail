@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Ilmoita ei-roskapostiksi</string>
     <string name="actionPhishing">Ilmoita kalasteluyrityksestä</string>
     <string name="actionPrint">Tulosta</string>
+    <string name="actionReminder">Muistuta minua</string>
     <string name="actionRename">Nimeä uudelleen</string>
     <string name="actionReply">Vastaa</string>
     <string name="actionReplyAll">Vastaa kaikille</string>

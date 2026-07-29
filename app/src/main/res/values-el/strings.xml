@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Αναφορά ως μη spam</string>
     <string name="actionPhishing">Αναφορά phishing</string>
     <string name="actionPrint">Εκτύπωση</string>
+    <string name="actionReminder">Θύμισέ μου</string>
     <string name="actionRename">Μετονομασία</string>
     <string name="actionReply">Απάντηση</string>
     <string name="actionReplyAll">Απάντηση σε όλους</string>

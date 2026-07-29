@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Segnala come non spam</string>
     <string name="actionPhishing">Segnala phishing</string>
     <string name="actionPrint">Stampa</string>
+    <string name="actionReminder">Ricordarmi</string>
     <string name="actionRename">Rinominare</string>
     <string name="actionReply">Rispondi</string>
     <string name="actionReplyAll">Rispondi a tutti</string>
