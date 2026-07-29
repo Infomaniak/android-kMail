@@ -147,7 +147,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
@@ -1012,27 +1011,19 @@ class NewMessageFragment : Fragment() {
         binding.sendButton.setOnClickListener {
             if (!checkMailboxStorage(mailbox)) return@setOnClickListener
 
-            val isSendingWithScheduled = processScheduleConfig()
+            val isSendingWithScheduled = isMessageWithSchedule()
+            if (!isSendingWithScheduled) newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
             tryToSendEmail(isSendingWithScheduled)
         }
     }
 
-    private fun processScheduleConfig(): Boolean {
+    private fun isMessageWithSchedule(): Boolean {
         val scheduleConfig = newMessageViewModel.scheduleConfig.value
         return if (scheduleConfig is ScheduleConfig.Scheduled) {
-            if (scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()) {
-                true
-            } else {
-                newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
-                false
-            }
+            scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()
         } else {
             false
         }
-    }
-
-    private fun processReminderConfig(): Boolean {
-        return newMessageViewModel.reminderConfig.value is ReminderConfig.Delayed
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
