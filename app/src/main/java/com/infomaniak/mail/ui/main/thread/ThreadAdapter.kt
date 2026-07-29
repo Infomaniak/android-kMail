@@ -122,7 +122,6 @@ class ThreadAdapter(
     private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val aliases: () -> List<String>,
-    private val featureFlags: () -> Mailbox.FeatureFlagSet? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
@@ -135,6 +134,7 @@ class ThreadAdapter(
     //endregion
 
     private val manuallyAllowedMessagesUids = mutableSetOf<String>()
+    private var featureFlags: Mailbox.FeatureFlagSet? = null
 
     private lateinit var recyclerView: RecyclerView
 
@@ -227,6 +227,13 @@ class ThreadAdapter(
             canSendEmails = canSend
             notifyItemRangeChanged(0, itemCount, NotifyType.UpdatePermissions)
         }
+    }
+
+    fun updateFeatureFlags(featureFlags: Mailbox.FeatureFlagSet?) {
+        if (this.featureFlags == featureFlags) return
+
+        this.featureFlags = featureFlags
+        notifyItemRangeChanged(0, itemCount, NotifyType.ReminderRebind)
     }
 
     private fun MessageViewHolder.handleToggleLightModePayload(messageUid: String) = with(threadAdapterState) {
@@ -882,7 +889,7 @@ class ThreadAdapter(
         endReminderAlert.isGone = true
         requestResponseAlert.isGone = true
 
-        if (featureFlags()?.contains(FeatureFlag.RESPONSE_REQUIRED) != true) return
+        if (featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) != true) return
 
         if (message.isScheduledDraft && message.reminder != null) {
             bindScheduledDraftReminderAlert(message)
