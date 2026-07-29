@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Rapportér som ikke spam</string>
     <string name="actionPhishing">Rapportér phishing</string>
     <string name="actionPrint">Udskriv</string>
+    <string name="actionReminder">Påmind mig</string>
     <string name="actionRename">Omdøb</string>
     <string name="actionReply">Besvar</string>
     <string name="actionReplyAll">Besvar alle</string>
