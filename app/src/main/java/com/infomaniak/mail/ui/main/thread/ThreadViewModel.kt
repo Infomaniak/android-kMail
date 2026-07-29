@@ -31,6 +31,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.emojicomponents.data.ReactionDetail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -870,15 +871,17 @@ class ThreadViewModel @Inject constructor(
                 }
             },
         ) { mailboxUuid, folderId, messageId ->
-            if (!reminderAction.isNullOrBlank()) {
-                ApiRepository.disableScheduledDraftReminder(reminderAction)
-            } else {
-                ApiRepository.disableReminder(
-                    mailboxUuid = mailboxUuid,
-                    folderId = folderId,
-                    messageId = messageId,
-                    reminderUuid = reminderUuid!!,
-                )
+            when {
+                !reminderAction.isNullOrBlank() -> ApiRepository.disableScheduledDraftReminder(reminderAction)
+                reminderUuid != null -> {
+                    ApiRepository.disableReminder(
+                        mailboxUuid = mailboxUuid,
+                        folderId = folderId,
+                        messageId = messageId,
+                        reminderUuid = reminderUuid,
+                    )
+                }
+                else -> ApiResponse<ReminderResult>(result = ApiResponseStatus.ERROR)
             }
         }
     }
@@ -915,16 +918,16 @@ class ThreadViewModel @Inject constructor(
                 )
             },
         ) { mailboxUuid, folderId, messageId ->
-            if (!reminderAction.isNullOrBlank()) {
-                ApiRepository.modifyScheduledDraftReminder(reminderAction, delayMinutes)
-            } else {
-                ApiRepository.modifyReminder(
+            when {
+                !reminderAction.isNullOrBlank() -> ApiRepository.modifyScheduledDraftReminder(reminderAction, delayMinutes)
+                reminderUuid != null -> ApiRepository.modifyReminder(
                     mailboxUuid = mailboxUuid,
                     folderId = folderId,
                     messageId = messageId,
-                    reminderUuid = reminderUuid!!,
+                    reminderUuid = reminderUuid,
                     delayMinutes = delayMinutes,
                 )
+                else -> ApiResponse<ReminderResult>(result = ApiResponseStatus.ERROR)
             }
         }
     }
