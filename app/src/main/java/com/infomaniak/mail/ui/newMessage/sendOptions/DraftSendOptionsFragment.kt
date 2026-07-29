@@ -381,8 +381,10 @@ class DraftSendOptionsFragment : Fragment() {
             onDelaySelected = { delayMinutes ->
                 trackScheduleSendEvent(MatomoName.CustomReminder)
                 newMessageViewModel.setReminderConfig(ReminderConfig.Delayed(delayMinutes, isCustom = true))
-                binding.customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMinutes))
-                binding.customDelayReminder.setCheckMark(displayCheckMark = true)
+                binding.customDelayReminder.apply {
+                    setSubtitle(requireContext().formatDelayText(delayMinutes))
+                    setCheckMark(displayCheckMark = true)
+                }
                 binding.optionsDelays.clearCheck()
             },
         )
