@@ -29,7 +29,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-import com.infomaniak.mail.ui.main.thread.actions.TrailingContent
+import com.infomaniak.mail.utils.extensions.setKSuiteTrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
@@ -85,11 +85,7 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
     }
 
     private fun setupCustomScheduleOptionTrailing() {
-        binding.customScheduleOption.trailingContent = when (currentKSuite) {
-            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
-            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
-            else -> TrailingContent.Chevron
-        }
+        binding.customScheduleOption.setKSuiteTrailingContent(currentKSuite)
     }
 
     protected fun setupScheduleOptions() = with(binding) {
