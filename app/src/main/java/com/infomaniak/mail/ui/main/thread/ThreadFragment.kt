@@ -254,6 +254,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
+        observeFeatureFlags()
 
         observePickedEmoji()
 
@@ -374,7 +375,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             areMessagesCollapsibles = { threadViewModel.messagesAreCollapsiblesFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             aliases = { mainViewModel.currentMailbox.value?.aliases?.toList() ?: emptyList() },
-            featureFlags = { mainViewModel.currentMailbox.value?.featureFlags },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
@@ -509,6 +509,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        threadAdapter.updateFeatureFlags(mainViewModel.currentMailbox.value?.featureFlags)
     }
 
     private fun openDraft(message: Message) {
@@ -606,6 +607,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             threadAdapter.updateEmailsPermission(canSend)
             updateQuickActionBarSendingState(canSend)
         }
+    }
+
+    private fun observeFeatureFlags() {
+        mainViewModel.featureFlagsLive.observe(viewLifecycleOwner, threadAdapter::updateFeatureFlags)
     }
 
     private fun updateQuickActionBarSendingState(canSend: Boolean) = with(binding.quickActionBar) {
