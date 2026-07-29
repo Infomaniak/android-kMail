@@ -58,6 +58,7 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.ReminderMessageInfo
+import com.infomaniak.mail.data.models.message.ReminderResult
 import com.infomaniak.mail.data.models.message.SplitBody
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.DefaultDispatcher
@@ -81,7 +82,6 @@ import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
-import com.infomaniak.mail.utils.extensions.toRealmInstant
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
@@ -122,7 +122,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
-import java.util.Date
 import javax.inject.Inject
 
 /* Please note that, for the moment, the logic that uses this list assumes that the items are necessarily messages.
@@ -778,8 +777,8 @@ class ThreadViewModel @Inject constructor(
         message: Message,
         successResId: Int,
         failureResId: Int,
-        onSuccess: suspend () -> Unit = {},
-        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: Int) -> ApiResponse<*>
+        onSuccess: suspend (ReminderResult?) -> Unit = {},
+        apiAction: suspend (mailboxUuid: String, folderId: String, messageId: Int) -> ApiResponse<*>,
     ) {
         val messageId = message.messageId
 
@@ -798,7 +797,10 @@ class ThreadViewModel @Inject constructor(
             val snackbarStringResId = if (apiResponse.isSuccess()) successResId else failureResId
             snackbarManager.postValue(appContext.getString(snackbarStringResId))
 
-            if (apiResponse.isSuccess()) onSuccess()
+            if (apiResponse.isSuccess()) {
+                val reminderResult = apiResponse.data as? ReminderResult
+                onSuccess(reminderResult)
+            }
         }
     }
 
@@ -813,7 +815,17 @@ class ThreadViewModel @Inject constructor(
             message = message,
             successResId = R.string.snackbarAddReminderSuccess,
             failureResId = R.string.snackbarAddReminderFailure,
-            onSuccess = {
+            onSuccess = { reminderResult ->
+                reminderResult?.let { result ->
+                    mailboxContentRealm().write {
+                        MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
+                            localMessage?.reminder = ReminderMessageInfo().apply {
+                                uuid = result.uuid
+                                date = result.date
+                            }
+                        }
+                    }
+                }
                 refreshController.refreshThreads(
                     refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                     mailbox = mailbox(),
@@ -879,21 +891,23 @@ class ThreadViewModel @Inject constructor(
             message = message,
             successResId = R.string.snackbarModifyReminderSuccess,
             failureResId = R.string.snackbarModifyReminderFailure,
-            onSuccess = {
-                mailboxContentRealm().write {
-                    MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
-                        val current = localMessage?.reminder
-                        localMessage?.reminder = ReminderMessageInfo().apply {
-                            uuid = reminderUuid ?: current?.uuid
-                            if (current?.delta != null || message.isScheduledDraft) {
-                                delta = delayMinutes
-                                display = current?.display
-                            } else {
-                                date = Date(System.currentTimeMillis() + (delayMinutes * 60_000L)).toRealmInstant()
+            onSuccess = { reminderResult ->
+                reminderResult?.let { result ->
+                    mailboxContentRealm().write {
+                        MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
+                            localMessage?.reminder = ReminderMessageInfo().apply {
+                                uuid = result.uuid
+                                date = result.date
                             }
                         }
                     }
                 }
+                refreshController.refreshThreads(
+                    refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                    mailbox = mailbox(),
+                    folderId = message.folderId,
+                    realm = mailboxContentRealm(),
+                )
             },
         ) { mailboxUuid, folderId, messageId ->
             if (!reminderAction.isNullOrBlank()) {
