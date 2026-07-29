@@ -17,18 +17,17 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
+import android.content.Context
 import android.view.ViewGroup
 import com.infomaniak.core.ksuite.ksuitepro.views.EvolveChipView
+import com.infomaniak.core.ksuite.myksuite.ui.views.BaseMyKSuiteChipView
 import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuitePlusChipView
 
-class KSuiteChipManager(private val container: ViewGroup) {
+class KSuiteChipManager(context: Context) {
+    private val kSuitePersoChipView: BaseMyKSuiteChipView = MyKSuitePlusChipView(context)
+    private val kSuiteProChipView: EvolveChipView = EvolveChipView(context)
 
-    private val context get() = container.context
-
-    private val kSuitePersoChipView by lazy { MyKSuitePlusChipView(context) }
-    private val kSuiteProChipView by lazy { EvolveChipView(context) }
-
-    fun displayChipFor(trailingContent: TrailingContent): Boolean {
+    fun displayChipFor(container: ViewGroup, trailingContent: TrailingContent): Boolean {
         container.removeView(kSuitePersoChipView)
         container.removeView(kSuiteProChipView)
         val chipView = when (trailingContent) {

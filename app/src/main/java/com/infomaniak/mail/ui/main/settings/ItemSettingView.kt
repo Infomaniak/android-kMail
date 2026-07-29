@@ -39,7 +39,7 @@ class ItemSettingView @JvmOverloads constructor(
 
     private val binding by lazy { ViewItemSettingBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val kSuiteChipManager by lazy { KSuiteChipManager(binding.trailingChipContainer) }
+    private val kSuiteChipManager by lazy { KSuiteChipManager(context) }
 
     private var action: Action = Action.NONE
 
@@ -129,7 +129,7 @@ class ItemSettingView @JvmOverloads constructor(
     }
 
     private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
-        trailingChipContainer.isVisible = kSuiteChipManager.displayChipFor(trailingContent)
+        trailingChipContainer.isVisible = kSuiteChipManager.displayChipFor(binding.trailingChipContainer, trailingContent)
 
         when (trailingContent) {
             TrailingContent.KSuitePersoChip, TrailingContent.KSuiteProChip -> {
