@@ -324,8 +324,9 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun onCustomDelayReminderClicked() =
+    private fun onCustomDelayReminderClicked() {
         executeIfAuthorized(MatomoName.ReminderCustomDelta.value) { showCustomDelayReminderDatePicker() }
+    }
 
     private fun resetCustomDelayReminder() = with(binding) {
         customDelayReminder.setCheckMark(displayCheckMark = false)
