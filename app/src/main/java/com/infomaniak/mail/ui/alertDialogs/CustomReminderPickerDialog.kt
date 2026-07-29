@@ -81,10 +81,7 @@ class CustomReminderPickerDialog @Inject constructor(
             }
         }
 
-        unitPicker.setOnValueChangedListener { _, _, newUnitIndex ->
-            val selectedUnit = timeUnits[newUnitIndex]
-            numberPicker.maxValue = selectedUnit.maxValue
-        }
+        unitPicker.setOnValueChangedListener { _, _, newUnitIndex -> numberPicker.maxValue = timeUnits[newUnitIndex].maxValue }
 
         positiveButton.setOnClickListener {
             numberPicker.clearFocus()
@@ -106,8 +103,7 @@ class CustomReminderPickerDialog @Inject constructor(
 
     private fun getDelayMinutes(): Int {
         val number = binding.numberPicker.value
-        val selectedUnitIndex = binding.unitPicker.value
-        val selectedUnit = timeUnits[selectedUnitIndex]
+        val selectedUnit = timeUnits[binding.unitPicker.value]
 
         return number * selectedUnit.multiplierInMinutes
     }
