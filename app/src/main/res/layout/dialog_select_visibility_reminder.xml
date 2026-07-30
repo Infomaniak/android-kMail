@@ -15,30 +15,24 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.settings.SettingRadioGroupView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/reminderVisibilityGroup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:paddingHorizontal="@dimen/marginStandardMedium"
     android:paddingTop="@dimen/marginStandardMedium">
-    <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
-        android:id="@+id/reminderVisibilityGroup"
+
+    <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+        android:id="@+id/selectionReminderMeOnly"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:text="@string/selectionReminderMeOnly" />
 
-        <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-            android:id="@+id/selectionReminderMeOnly"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:text="@string/selectionReminderMeOnly" />
+    <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+        android:id="@+id/selectionReminderRecipientsAndMe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:text="@string/selectionReminderRecipientsAndMe" />
 
-        <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-            android:id="@+id/selectionReminderRecipientsAndMe"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:text="@string/selectionReminderRecipientsAndMe" />
-
-    </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
-
-</LinearLayout>
+</com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
