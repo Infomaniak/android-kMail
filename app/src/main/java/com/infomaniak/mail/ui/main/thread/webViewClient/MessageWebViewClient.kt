@@ -89,11 +89,11 @@ abstract class MessageWebViewClient(
         const val DATA_SCHEME = "data"
 
         val trustedUrls = listOf(
-            "https://.*?.infomaniak.com".toRegex(),
-            "https://.*?.storage.infomaniak.com".toRegex(),
-            "https://storage-master.infomaniak.ch".toRegex(),
-            "http://infomaniak.statslive.info".toRegex(),
-            "https://static.infomaniak.ch".toRegex(),
+            "https://.*?\\.infomaniak\\.com$".toRegex(),
+            "https://.*?\\.storage\\.infomaniak\\.com$".toRegex(),
+            "https://storage-master\\.infomaniak\\.ch$".toRegex(),
+            "http://infomaniak\\.statslive\\.info$".toRegex(),
+            "https://static\\.infomaniak\\.ch$".toRegex(),
         )
     }
 }
