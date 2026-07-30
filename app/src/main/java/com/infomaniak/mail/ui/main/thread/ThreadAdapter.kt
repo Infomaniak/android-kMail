@@ -885,6 +885,7 @@ class ThreadAdapter(
         reminderAlert.isGone = true
         endReminderAlert.isGone = true
         requestResponseAlert.isGone = true
+        iconReminder.isVisible = message.reminder != null && threadAdapterState.isExpandedMap[message.uid] != true
 
         if (featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) != true) return
 
@@ -901,6 +902,7 @@ class ThreadAdapter(
                 message.allRecipients.any { it.isMe() } -> bindRecipientReminderAlert(message, reminderDate, isExpired)
             }
         }
+        hideAlertGroupIfNoneDisplayed()
     }
 
     private fun ItemMessageBinding.bindScheduledDraftReminderAlert(message: Message) {
