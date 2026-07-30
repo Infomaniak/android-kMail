@@ -953,7 +953,7 @@ class ThreadAdapter(
 
         endReminderAlert.onAction3 {
             trackMessageBannerEvent(MatomoName.DeleteDraft)
-            threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message)
+            threadAdapterCallbacks?.onMarkAsDoneReminderClicked?.invoke(message)
         }
     }
 
@@ -1569,6 +1569,7 @@ class ThreadAdapter(
         var onDisableReminderClicked: ((Message) -> Unit)? = null,
         var onModifyReminderClicked: ((Message) -> Unit)? = null,
         var onAddReminderClicked: ((Message) -> Unit)? = null,
+        var onMarkAsDoneReminderClicked: ((Message) -> Unit)? = null,
         val getFeatureFlags: (() -> Mailbox.FeatureFlagSet?)? = null,
         var onAskEuriaClicked: ((message: Message) -> Unit)? = null,
     )

@@ -252,6 +252,15 @@ object ApiRepository : ApiRepositoryCore() {
             mapOf("reminder_delta" to delayMinutes)
         )
     }
+
+    suspend fun markAsDoneReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: Int,
+        reminderUuid: String
+    ): ApiResponse<ReminderResult> {
+        return callApi(ApiRoutes.markAsDoneReminder(mailboxUuid, folderId, messageId, reminderUuid), PUT)
+    }
     //endregion
 
     //region Spam
