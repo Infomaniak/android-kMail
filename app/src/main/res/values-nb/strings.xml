@@ -646,6 +646,8 @@
     <string name="snackbarEmailSent">E-post sendt</string>
     <string name="snackbarInvalidUrl">Ugyldig URL</string>
     <string name="snackbarLinkCopiedToClipboard">Lenke kopiert til utklippstavlen</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Klarte ikke å merke påminnelsen som utført</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Påminnelse markert som utført</string>
     <string name="snackbarMessageDeletedPermanently">Melding slettet</string>
     <string name="snackbarMessageMoved">Melding flyttet til %s</string>
     <string name="snackbarMessageMovedToSpam">Melding flyttet til spam og bruker blokkert</string>

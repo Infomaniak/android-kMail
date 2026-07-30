@@ -646,6 +646,8 @@
     <string name="snackbarEmailSent">Sähköposti lähetetty</string>
     <string name="snackbarInvalidUrl">Virheellinen URL</string>
     <string name="snackbarLinkCopiedToClipboard">Linkki kopioitu leikepöydälle</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Muistutuksen merkitseminen tehdyksi epäonnistui</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Muistutus merkitty tehdyksi</string>
     <string name="snackbarMessageDeletedPermanently">Viesti poistettu</string>
     <string name="snackbarMessageMoved">Viesti siirretty kohteeseen %s</string>
     <string name="snackbarMessageMovedToSpam">Viesti siirretty roskapostiksi ja käyttäjä estetty</string>

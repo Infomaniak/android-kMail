@@ -860,6 +860,31 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun markAsDoneReminder(message: Message) {
+        val reminderAction = message.reminderAction
+        val reminderUuid = message.reminder?.uuid
+
+        if (reminderAction.isNullOrBlank() && reminderUuid.isNullOrBlank()) {
+            snackbarManager.postValue(appContext.getString(R.string.snackbarMarkAsDoneReminderFailure))
+            return
+        }
+
+        processReminderAction(
+            message = message,
+            successResId = R.string.snackbarMarkAsDoneReminderSuccess,
+            failureResId = R.string.snackbarMarkAsDoneReminderFailure,
+            onSuccess = { handleReminderDisabledSuccess(message) }
+        ) { mailboxUuid, folderId, messageId ->
+            if (reminderUuid != null) ApiRepository.markAsDoneReminder(
+                mailboxUuid,
+                folderId,
+                messageId,
+                reminderUuid
+            ) else ApiResponse<ReminderResult>(result = ApiResponseStatus.ERROR)
+
+        }
+    }
+
     fun modifyReminder(message: Message, delayMinutes: Int) {
         val reminderAction = message.reminderAction
         val reminderUuid = message.reminder?.uuid

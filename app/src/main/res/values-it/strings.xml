@@ -646,6 +646,8 @@
     <string name="snackbarEmailSent">Email inviata</string>
     <string name="snackbarInvalidUrl">URL non valido</string>
     <string name="snackbarLinkCopiedToClipboard">Link copiato negli appunti</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Impossibile contrassegnare il promemoria come completato</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Promemoria contrassegnato come completato</string>
     <string name="snackbarMessageDeletedPermanently">Messaggio cancellato</string>
     <string name="snackbarMessageMoved">Messaggio spostato a %s</string>
     <string name="snackbarMessageMovedToSpam">Messaggio spostato nello spam e utente bloccato</string>

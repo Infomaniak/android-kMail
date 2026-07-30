@@ -646,6 +646,8 @@
     <string name="snackbarEmailSent">E-mail enviado</string>
     <string name="snackbarInvalidUrl">URL inválida</string>
     <string name="snackbarLinkCopiedToClipboard">Ligação copiada</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Não foi possível marcar o lembrete como concluído</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Lembrete marcado como concluído</string>
     <string name="snackbarMessageDeletedPermanently">Mensagem eliminada</string>
     <string name="snackbarMessageMoved">Mensagem movida para %s</string>
     <string name="snackbarMessageMovedToSpam">Mensagem movida para spam e utilizador bloqueado</string>

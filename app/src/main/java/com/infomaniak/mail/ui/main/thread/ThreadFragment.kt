@@ -499,6 +499,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onDisableReminderClicked = ::disableReminder,
                 onModifyReminderClicked = ::modifyReminder,
                 onAddReminderClicked = ::addReminder,
+                onMarkAsDoneReminderClicked = ::markAsDoneReminder,
             ),
         )
 

@@ -646,6 +646,8 @@
     <string name="snackbarEmailSent">E-Mail gesendet</string>
     <string name="snackbarInvalidUrl">Ungültige URL</string>
     <string name="snackbarLinkCopiedToClipboard">Link in die Zwischenablage kopiert</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Fehler beim Markieren der Erinnerung als erledigt</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Erinnerung als erledigt markiert</string>
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMessageMovedToSpam">Nachricht in den Spam verschoben und Benutzer blockiert</string>

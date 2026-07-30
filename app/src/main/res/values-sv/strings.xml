@@ -646,6 +646,8 @@
     <string name="snackbarEmailSent">E-post skickad</string>
     <string name="snackbarInvalidUrl">Ogiltig URL</string>
     <string name="snackbarLinkCopiedToClipboard">Länk kopierad till urklipp</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Det gick inte att markera påminnelsen som utförd</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Påminnelse markerad som klar</string>
     <string name="snackbarMessageDeletedPermanently">Meddelande raderat</string>
     <string name="snackbarMessageMoved">Meddelande flyttat till %s</string>
     <string name="snackbarMessageMovedToSpam">Meddelande flyttat till skräppost och användare blockerad</string>

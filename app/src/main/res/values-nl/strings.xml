@@ -646,6 +646,8 @@
     <string name="snackbarEmailSent">E-mail verzonden</string>
     <string name="snackbarInvalidUrl">Ongeldige URL</string>
     <string name="snackbarLinkCopiedToClipboard">Link gekopieerd naar het klembord</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Markeren van herinnering als voltooid mislukt</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Herinnering gemarkeerd als voltooid</string>
     <string name="snackbarMessageDeletedPermanently">Bericht verwijderd</string>
     <string name="snackbarMessageMoved">Bericht verplaatst naar %s</string>
     <string name="snackbarMessageMovedToSpam">Bericht verplaatst naar spam en gebruiker geblokkeerd</string>
