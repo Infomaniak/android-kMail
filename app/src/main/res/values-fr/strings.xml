@@ -643,6 +643,8 @@
     <string name="snackbarEmailSent">E-mail envoyé</string>
     <string name="snackbarInvalidUrl">URL invalide</string>
     <string name="snackbarLinkCopiedToClipboard">Lien copié dans le presse-papiers</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Impossible de marquer le rappel comme terminé</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Rappel marqué comme terminé</string>
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMessageMovedToSpam">Message déplacé vers Spam et utilisateur bloqué</string>
