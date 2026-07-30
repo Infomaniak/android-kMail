@@ -101,7 +101,6 @@ class DraftSendOptionsFragment : Fragment() {
         setupScheduleOptions()
         lastScheduleOption.associatedValue = lastSelectedEpoch?.toString()
 
-        updateReminderVisibilitySubtitle()
         setReminderOptionsVisible(isVisible = false)
         setScheduleOptionsVisible(isVisible = false)
 
@@ -112,6 +111,13 @@ class DraftSendOptionsFragment : Fragment() {
         observeFeatureFlagUpdates()
         observeScheduleConfig()
         observeReminderConfig()
+        observeShouldRemindRecipient()
+    }
+
+    private fun observeShouldRemindRecipient() {
+        newMessageViewModel.shouldRemindRecipient.observe(viewLifecycleOwner) { shouldRemindRecipient ->
+            updateReminderVisibilitySubtitle(shouldRemindRecipient)
+        }
     }
 
     private fun observeFeatureFlagUpdates() = with(binding) {
@@ -229,14 +235,12 @@ class DraftSendOptionsFragment : Fragment() {
         binding.optionsDelays.clearCheck()
         newMessageViewModel.setReminderConfig(ReminderConfig.None)
         shouldRemindRecipient = true
-        updateReminderVisibilitySubtitle()
     }
 
     private fun defaultReminderSelection() = with(binding) {
         optionsDelays.check(R.id.hours24)
         newMessageViewModel.setReminderConfig(ReminderConfig.Delayed(ReminderPreset.HOURS_24.delayMinutes, isCustom = false))
         shouldRemindRecipient = true
-        updateReminderVisibilitySubtitle()
     }
 
     private fun defaultScheduleSelection() = with(binding) {
@@ -412,12 +416,11 @@ class DraftSendOptionsFragment : Fragment() {
             selectRecipientsAndMe = shouldRemindRecipient,
             onVisibilitySelected = { isRecipientsAndMe ->
                 shouldRemindRecipient = isRecipientsAndMe
-                updateReminderVisibilitySubtitle()
             },
         )
     }
 
-    private fun updateReminderVisibilitySubtitle() = with(binding) {
+    private fun updateReminderVisibilitySubtitle(shouldRemindRecipient: Boolean) = with(binding) {
         val subtitleRes = if (shouldRemindRecipient) {
             R.string.selectionReminderRecipientsAndMe
         } else {
