@@ -43,6 +43,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.observe
@@ -176,6 +177,12 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
+    private val isScheduledDraftsEnabledLive by lazy {
+        newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.SCHEDULE_DRAFTS) }.distinctUntilChanged()
+    }
+    private val areMentionsAvailableLive by lazy {
+        newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.MENTIONS) }.distinctUntilChanged()
+    }
 
     private val filePicker = FilePicker(fragment = this).apply {
         initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
@@ -301,7 +308,7 @@ class NewMessageFragment : Fragment() {
             observeCcAndBccVisibility()
         }
 
-        observeScheduledDraftsFeatureFlagUpdates()
+        observeFeatureFlagUpdates()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -837,13 +844,12 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
     }
 
-    private fun observeScheduledDraftsFeatureFlagUpdates() {
-        newMessageViewModel.featureFlagsLive.distinctUntilChanged().observe(viewLifecycleOwner) { featureFlags ->
-            val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
+    private fun observeFeatureFlagUpdates() {
+        isScheduledDraftsEnabledLive.observe(viewLifecycleOwner) { isScheduledDraftsEnabled ->
             binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+        }
 
-            val areMentionsAvailable = featureFlags.contains(FeatureFlag.MENTIONS)
-
+        areMentionsAvailableLive.observe(viewLifecycleOwner) { areMentionsAvailable ->
             binding.editorWebView.apply {
                 if (areMentionsAvailable) {
                     addScript(commonMentionsCodeScript, COMMON_MENTIONS_SCRIPT)
