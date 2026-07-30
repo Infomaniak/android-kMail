@@ -867,7 +867,7 @@ class ThreadAdapter(
     private fun ItemMessageBinding.bindRecipientReminderAlert(message: Message, reminder: Date, isReminderExpired: Boolean) {
         requestResponseAlert.setActionsVisibility(shouldDisplayAction = false)
         val fromNames = message.extractFromNames()
-        val formatNamesList = formatNamesList(context, fromNames)
+        val formattedNamesList = formatNamesList(context, fromNames)
 
         val pluralsRes = if (isReminderExpired) R.plurals.reminderAfterHeaderTitle else R.plurals.reminderBeforeHeaderTitle
         val formattedDate = reminder.format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME)
@@ -877,7 +877,7 @@ class ThreadAdapter(
                 context.resources.getQuantityString(
                     pluralsRes,
                     message.from.size,
-                    formatNamesList,
+                    formattedNamesList,
                     formattedDate,
                 )
             )
@@ -928,18 +928,18 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.bindSenderReminderAlert(message: Message, reminderDate: Date, isExpired: Boolean) {
-        if (isExpired) bindActiveReminderAlert(message, reminderDate) else bindExpiredReminderAlert(message, reminderDate)
+        if (isExpired) bindExpiredReminderAlert(message, reminderDate) else bindActiveReminderAlert(message, reminderDate)
     }
 
-    private fun ItemMessageBinding.bindActiveReminderAlert(message: Message, reminderDate: Date) {
+    private fun ItemMessageBinding.bindExpiredReminderAlert(message: Message, reminderDate: Date) {
         endReminderAlert.setActionsVisibility(shouldDisplayAction = true)
-        val fromNames = message.extractFromNames()
-        val formatNamesList = formatNamesList(context, fromNames)
+        val recipientNames = message.extractRecipientNames()
+        val formattedNamesList = formatNamesList(context, recipientNames)
 
         endReminderAlert.setDescription(
             context.getString(
                 R.string.reminderNoResponseHeaderTitle,
-                formatNamesList,
+                formattedNamesList,
                 reminderDate.format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
             ),
         )
@@ -963,7 +963,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindExpiredReminderAlert(message: Message, reminderDate: Date) {
+    private fun ItemMessageBinding.bindActiveReminderAlert(message: Message, reminderDate: Date) {
         reminderAlert.setActionsVisibility(shouldDisplayAction = true)
 
         reminderAlert.setDescription(

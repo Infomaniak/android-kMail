@@ -309,6 +309,10 @@ class Message : RealmObject, Snoozable {
         return from.map { it.name.ifBlank { it.email } }
     }
 
+    fun extractRecipientNames(): List<String> {
+        return allRecipients.map { it.name.ifBlank { it.email } }
+    }
+
     // Be careful when using this method because some folders might contain messages from other folders than itself. This
     // operation should only happen in very specific situations like computing the shortUid of a Message from its uid.
     private fun String.toShortUid(): Int = substringBefore('@').toInt()
