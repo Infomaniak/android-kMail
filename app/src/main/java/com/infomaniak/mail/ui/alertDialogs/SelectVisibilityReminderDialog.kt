@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectVisibilityReminderBinding
@@ -39,10 +40,10 @@ class SelectVisibilityReminderDialog @Inject constructor(
 
     private var onVisibilitySelected: ((Boolean) -> Unit)? = null
 
-    private fun initDialog() = with(binding) {
-        MaterialAlertDialogBuilder(activityContext)
+    private fun initDialog(): AlertDialog {
+        return MaterialAlertDialogBuilder(activityContext)
             .setTitle(R.string.reminderVisibilityTitle)
-            .setView(root)
+            .setView(binding.root)
             .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(com.infomaniak.core.legacy.R.string.buttonCancel, null)
             .create()
@@ -72,13 +73,13 @@ class SelectVisibilityReminderDialog @Inject constructor(
         reminderVisibilityGroup.check(defaultSelection)
     }
 
-    private fun setupListeners() = with(binding) {
-        reminderVisibilityGroup.onItemCheckedListener { id, _, _ ->
-            this@SelectVisibilityReminderDialog.isRecipientsAndMeSelected = (id == R.id.selectionReminderRecipientsAndMe)
+    private fun setupListeners() {
+        binding.reminderVisibilityGroup.onItemCheckedListener { id, _, _ ->
+            isRecipientsAndMeSelected = (id == R.id.selectionReminderRecipientsAndMe)
         }
 
         positiveButton.setOnClickListener {
-            onVisibilitySelected?.invoke(this@SelectVisibilityReminderDialog.isRecipientsAndMeSelected)
+            onVisibilitySelected?.invoke(isRecipientsAndMeSelected)
             alertDialog.dismiss()
         }
 
