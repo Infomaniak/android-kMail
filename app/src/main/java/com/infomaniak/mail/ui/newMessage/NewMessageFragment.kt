@@ -41,6 +41,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -837,7 +838,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeScheduledDraftsFeatureFlagUpdates() {
-        newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
+        newMessageViewModel.featureFlagsLive.distinctUntilChanged().observe(viewLifecycleOwner) { featureFlags ->
             val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
             binding.scheduleButton.isVisible = isScheduledDraftsEnabled
 
