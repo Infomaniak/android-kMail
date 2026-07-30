@@ -28,6 +28,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -39,9 +40,7 @@ import com.infomaniak.mail.databinding.FragmentSendOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOptionUtils
-import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.ui.newMessage.ReminderConfig
 import com.infomaniak.mail.ui.newMessage.ReminderPreset
@@ -53,7 +52,6 @@ import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.update
 import java.util.Date
 import javax.inject.Inject
 
@@ -93,9 +91,9 @@ class DraftSendOptionsFragment : Fragment() {
         setupScheduleSelection()
         setupReminderOptions()
 
-        restoreStateFromViewModel()
-
         observeFeatureFlagUpdates()
+        observeScheduleConfig()
+        observeReminderConfig()
     }
 
     private fun observeFeatureFlagUpdates() = with(binding) {
@@ -151,7 +149,6 @@ class DraftSendOptionsFragment : Fragment() {
             } else {
                 defaultReminderSelection()
             }
-            setReminderOptionsVisible(isVisible = reminderIfNoAnswer.isChecked)
         }
         scheduleSending.setOnClickListener {
             if (!scheduleSending.isChecked) {
@@ -159,7 +156,6 @@ class DraftSendOptionsFragment : Fragment() {
             } else {
                 defaultScheduleSelection()
             }
-            setScheduleOptionsVisible(isVisible = scheduleSending.isChecked)
         }
     }
 
@@ -167,8 +163,6 @@ class DraftSendOptionsFragment : Fragment() {
         scheduleOptions.onItemCheckedListener { _, value, _ ->
             val epoch = value?.toLongOrNull()
             newMessageViewModel.setScheduleConfig(if (epoch != null) ScheduleConfig.Scheduled(epoch) else ScheduleConfig.None)
-            customScheduleOption.setCheckMark(displayCheckMark = false)
-            customScheduleOption.removeSubtitle()
         }
 
         val paddingStartValue = resources.getDimensionPixelSize(R.dimen.startPaddingWithoutIcon)
@@ -195,9 +189,6 @@ class DraftSendOptionsFragment : Fragment() {
                     ReminderConfig.None
                 }
             )
-
-            customDelayReminder.setCheckMark(displayCheckMark = false)
-            customDelayReminder.removeSubtitle()
         }
     }
 
@@ -208,8 +199,6 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun removeReminderOptionsSelection() {
         binding.optionsDelays.clearCheck()
-        binding.customDelayReminder.setCheckMark(displayCheckMark = false)
-        binding.customDelayReminder.removeSubtitle()
         newMessageViewModel.setReminderConfig(ReminderConfig.None)
     }
 
@@ -234,8 +223,6 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun removeScheduleOptionsSelection() = with(binding) {
         scheduleOptions.clearCheck()
-        customScheduleOption.setCheckMark(displayCheckMark = false)
-        customScheduleOption.removeSubtitle()
         newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
     }
 
@@ -244,57 +231,95 @@ class DraftSendOptionsFragment : Fragment() {
         scheduleOptionsWrapper.isVisible = isVisible
     }
 
-    private fun restoreStateFromViewModel() {
-        restoreScheduleState()
-        restoreReminderState()
+    private fun observeScheduleConfig() {
+        newMessageViewModel.scheduleConfig.observe(viewLifecycleOwner) { scheduleConfig ->
+            renderScheduleConfig(scheduleConfig)
+        }
     }
 
-    private fun restoreScheduleState() = with(binding) {
+    private fun observeReminderConfig() {
+        newMessageViewModel.reminderConfig.observe(viewLifecycleOwner) { reminderConfig ->
+            renderReminderConfig(reminderConfig)
+        }
+    }
+
+    private fun renderScheduleConfig(scheduleConfig: ScheduleConfig) = with(binding) {
         fun applyCustomSchedule(epoch: Long) {
             customScheduleOption.setSubtitle(requireContext().dayOfWeekDateWithoutYear(Date(epoch)))
             customScheduleOption.setCheckMark(displayCheckMark = true)
         }
 
-        val savedSchedule = newMessageViewModel.scheduleConfig.value as? ScheduleConfig.Scheduled ?: return@with
-        val epoch = savedSchedule.epochMillis
+        when (scheduleConfig) {
+            is ScheduleConfig.Scheduled -> {
+                scheduleSending.isChecked = true
+                setScheduleOptionsVisible(isVisible = true)
 
-        scheduleSending.isChecked = true
-        setScheduleOptionsVisible(isVisible = true)
+                val epoch = scheduleConfig.epochMillis
+                val scheduleStr = epoch.toString()
+                val matchedOption = scheduleOptions.children
+                    .filterIsInstance<SettingRadioButtonView>()
+                    .firstOrNull { it.associatedValue == scheduleStr }
 
-        val scheduleStr = epoch.toString()
-        val matchedOption = scheduleOptions.children
-            .filterIsInstance<SettingRadioButtonView>()
-            .firstOrNull { it.associatedValue == scheduleStr }
-
-        when {
-            savedSchedule.isCustom -> applyCustomSchedule(epoch)
-            matchedOption != null -> scheduleOptions.check(matchedOption.id)
-            lastSelectedEpoch != null && lastScheduleOption.associatedValue == scheduleStr -> {
-                scheduleOptions.check(lastScheduleOption.id)
+                when {
+                    scheduleConfig.isCustom -> {
+                        scheduleOptions.clearCheck()
+                        applyCustomSchedule(epoch)
+                    }
+                    matchedOption != null -> {
+                        customScheduleOption.setCheckMark(displayCheckMark = false)
+                        customScheduleOption.removeSubtitle()
+                        scheduleOptions.check(matchedOption.id)
+                    }
+                    lastSelectedEpoch != null && lastScheduleOption.associatedValue == scheduleStr -> {
+                        customScheduleOption.setCheckMark(displayCheckMark = false)
+                        customScheduleOption.removeSubtitle()
+                        scheduleOptions.check(lastScheduleOption.id)
+                    }
+                    else -> {
+                        scheduleOptions.clearCheck()
+                        applyCustomSchedule(epoch)
+                    }
+                }
             }
-            else -> applyCustomSchedule(epoch)
+            ScheduleConfig.None -> {
+                scheduleSending.isChecked = false
+                setScheduleOptionsVisible(isVisible = false)
+                scheduleOptions.clearCheck()
+                customScheduleOption.setCheckMark(displayCheckMark = false)
+                customScheduleOption.removeSubtitle()
+            }
         }
     }
 
-    private fun restoreReminderState() = with(binding) {
-        val savedReminder = newMessageViewModel.reminderConfig.value ?: ReminderConfig.None
-        if (savedReminder !is ReminderConfig.Delayed) return@with
+    private fun renderReminderConfig(reminderConfig: ReminderConfig) = with(binding) {
+        when (reminderConfig) {
+            is ReminderConfig.Delayed -> {
+                reminderIfNoAnswer.isChecked = true
+                setReminderOptionsVisible(isVisible = true)
 
-        reminderIfNoAnswer.isChecked = true
-        setReminderOptionsVisible(isVisible = true)
-
-
-        if (savedReminder.isCustom) {
-            customDelayReminder.setSubtitle(requireContext().formatDelayText(savedReminder.delayMinutes))
-            customDelayReminder.setCheckMark(displayCheckMark = true)
-        } else {
-            val targetId = when (savedReminder.delayMinutes) {
-                ReminderPreset.HOURS_24.delayMinutes -> R.id.hours24
-                ReminderPreset.DAYS_3.delayMinutes -> R.id.days3
-                ReminderPreset.DAYS_7.delayMinutes -> R.id.days7
-                else -> null
+                if (reminderConfig.isCustom) {
+                    customDelayReminder.setSubtitle(requireContext().formatDelayText(reminderConfig.delayMinutes))
+                    customDelayReminder.setCheckMark(displayCheckMark = true)
+                    optionsDelays.clearCheck()
+                } else {
+                    customDelayReminder.setCheckMark(displayCheckMark = false)
+                    customDelayReminder.removeSubtitle()
+                    val targetId = when (reminderConfig.delayMinutes) {
+                        ReminderPreset.HOURS_24.delayMinutes -> R.id.hours24
+                        ReminderPreset.DAYS_3.delayMinutes -> R.id.days3
+                        ReminderPreset.DAYS_7.delayMinutes -> R.id.days7
+                        else -> null
+                    }
+                    targetId?.let { optionsDelays.check(it) } ?: optionsDelays.clearCheck()
+                }
             }
-            targetId?.let { optionsDelays.check(it) }
+            ReminderConfig.None -> {
+                reminderIfNoAnswer.isChecked = false
+                setReminderOptionsVisible(isVisible = false)
+                optionsDelays.clearCheck()
+                customDelayReminder.setCheckMark(displayCheckMark = false)
+                customDelayReminder.removeSubtitle()
+            }
         }
     }
 
@@ -316,21 +341,7 @@ class DraftSendOptionsFragment : Fragment() {
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
                 newMessageViewModel.setScheduleConfig(ScheduleConfig.Scheduled(timestamp, isCustom = true))
                 localSettings.lastSelectedScheduleEpochMillis = timestamp
-                applyCustomDateSelectionUi(timestamp, binding.customScheduleOption, binding.scheduleOptions)
             },
         )
     }
-
-    private fun applyCustomDateSelectionUi(
-        timestamp: Long,
-        optionView: ItemSettingView,
-        groupView: SettingRadioGroupView
-    ) {
-        val formattedDate = requireContext().dayOfWeekDateWithoutYear(date = Date(timestamp))
-
-        optionView.setSubtitle(formattedDate)
-        optionView.setCheckMark(displayCheckMark = true)
-        groupView.clearCheck()
-    }
-
 }
