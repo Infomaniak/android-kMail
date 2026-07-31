@@ -1192,6 +1192,10 @@ class ThreadAdapter(
             isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
             setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
+        askEuriaButton.apply {
+            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
+            setOnClickListener { threadAdapterCallbacks?.onAskEuriaClicked?.invoke(message) }
+        }
         sendingProgressText.isVisible = message.isScheduledMessage
 
         recipient.text = if (isExpanded) getAllRecipientsFormatted(message) else context.formatSubject(message.subject)
@@ -1404,6 +1408,7 @@ class ThreadAdapter(
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
         var getAiState: (() -> AiStateMap)? = null,
+        var onAskEuriaClicked: ((message: Message) -> Unit)? = null,
     )
 
     enum class DisplayType(val layout: Int) {

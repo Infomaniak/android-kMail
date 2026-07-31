@@ -176,6 +176,14 @@
                 tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/askEuriaButton"
+                style="@style/IconButton"
+                android:contentDescription="@string/askEuriaTitle"
+                android:visibility="gone"
+                app:icon="@drawable/ic_euria"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/replyButton"
                 style="@style/IconButton"
                 android:contentDescription="@string/actionReply"
