@@ -181,9 +181,9 @@ class DraftSendOptionsFragment : Fragment() {
 
         optionsDelays.onItemCheckedListener { _, value, _ ->
             val minutes = value?.toIntOrNull()
-            val isKnownPreset = ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
+            val isValidPreset = ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
             newMessageViewModel.setReminderConfig(
-                if (minutes != null && isKnownPreset) {
+                config = if (minutes != null && isValidPreset) {
                     ReminderConfig.Delayed(minutes, isCustom = false)
                 } else {
                     ReminderConfig.None
@@ -244,50 +244,51 @@ class DraftSendOptionsFragment : Fragment() {
     }
 
     private fun renderScheduleConfig(scheduleConfig: ScheduleConfig) = with(binding) {
-        fun applyCustomSchedule(epoch: Long) {
-            customScheduleOption.setSubtitle(requireContext().dayOfWeekDateWithoutYear(Date(epoch)))
-            customScheduleOption.setCheckMark(displayCheckMark = true)
-        }
-
         when (scheduleConfig) {
             is ScheduleConfig.Scheduled -> {
                 scheduleSending.isChecked = true
                 setScheduleOptionsVisible(isVisible = true)
-
-                val epoch = scheduleConfig.epochMillis
-                val scheduleStr = epoch.toString()
-                val matchedOption = scheduleOptions.children
-                    .filterIsInstance<SettingRadioButtonView>()
-                    .firstOrNull { it.associatedValue == scheduleStr }
-
-                when {
-                    scheduleConfig.isCustom -> {
-                        scheduleOptions.clearCheck()
-                        applyCustomSchedule(epoch)
-                    }
-                    matchedOption != null -> {
-                        customScheduleOption.setCheckMark(displayCheckMark = false)
-                        customScheduleOption.removeSubtitle()
-                        scheduleOptions.check(matchedOption.id)
-                    }
-                    lastSelectedEpoch != null && lastScheduleOption.associatedValue == scheduleStr -> {
-                        customScheduleOption.setCheckMark(displayCheckMark = false)
-                        customScheduleOption.removeSubtitle()
-                        scheduleOptions.check(lastScheduleOption.id)
-                    }
-                    else -> {
-                        scheduleOptions.clearCheck()
-                        applyCustomSchedule(epoch)
-                    }
-                }
+                handleScheduledConfig(scheduleConfig)
             }
             ScheduleConfig.None -> {
                 scheduleSending.isChecked = false
                 setScheduleOptionsVisible(isVisible = false)
                 scheduleOptions.clearCheck()
-                customScheduleOption.setCheckMark(displayCheckMark = false)
-                customScheduleOption.removeSubtitle()
+                resetCustomScheduleOption()
             }
+        }
+    }
+
+    private fun resetCustomScheduleOption() = with(binding) {
+        customScheduleOption.setCheckMark(displayCheckMark = false)
+        customScheduleOption.removeSubtitle()
+    }
+
+    private fun checkStandardScheduleOption(optionId: Int) {
+        resetCustomScheduleOption()
+        binding.scheduleOptions.check(optionId)
+    }
+
+    private fun applyCustomSchedule(epoch: Long) = with(binding) {
+        scheduleOptions.clearCheck()
+        customScheduleOption.setSubtitle(requireContext().dayOfWeekDateWithoutYear(Date(epoch)))
+        customScheduleOption.setCheckMark(displayCheckMark = true)
+    }
+
+    private fun handleScheduledConfig(config: ScheduleConfig.Scheduled) = with(binding) {
+        val epoch = config.epochMillis
+        val scheduleStr = epoch.toString()
+        val matchedOption = scheduleOptions.children
+            .filterIsInstance<SettingRadioButtonView>()
+            .firstOrNull { it.associatedValue == scheduleStr }
+
+        when {
+            config.isCustom -> applyCustomSchedule(epoch)
+            matchedOption != null -> checkStandardScheduleOption(matchedOption.id)
+            lastSelectedEpoch != null && lastScheduleOption.associatedValue == scheduleStr -> {
+                checkStandardScheduleOption(lastScheduleOption.id)
+            }
+            else -> applyCustomSchedule(epoch)
         }
     }
 
@@ -296,30 +297,44 @@ class DraftSendOptionsFragment : Fragment() {
             is ReminderConfig.Delayed -> {
                 reminderIfNoAnswer.isChecked = true
                 setReminderOptionsVisible(isVisible = true)
-
-                if (reminderConfig.isCustom) {
-                    customDelayReminder.setSubtitle(requireContext().formatDelayText(reminderConfig.delayMinutes))
-                    customDelayReminder.setCheckMark(displayCheckMark = true)
-                    optionsDelays.clearCheck()
-                } else {
-                    customDelayReminder.setCheckMark(displayCheckMark = false)
-                    customDelayReminder.removeSubtitle()
-                    val targetId = when (reminderConfig.delayMinutes) {
-                        ReminderPreset.HOURS_24.delayMinutes -> R.id.hours24
-                        ReminderPreset.DAYS_3.delayMinutes -> R.id.days3
-                        ReminderPreset.DAYS_7.delayMinutes -> R.id.days7
-                        else -> null
-                    }
-                    targetId?.let { optionsDelays.check(it) } ?: optionsDelays.clearCheck()
-                }
+                handleDelayedConfig(reminderConfig)
             }
             ReminderConfig.None -> {
                 reminderIfNoAnswer.isChecked = false
                 setReminderOptionsVisible(isVisible = false)
                 optionsDelays.clearCheck()
-                customDelayReminder.setCheckMark(displayCheckMark = false)
-                customDelayReminder.removeSubtitle()
+                resetCustomDelayReminder()
             }
+        }
+    }
+
+    private fun resetCustomDelayReminder() = with(binding) {
+        customDelayReminder.setCheckMark(displayCheckMark = false)
+        customDelayReminder.removeSubtitle()
+    }
+
+    private fun applyCustomReminder(delayMinutes: Int) = with(binding) {
+        optionsDelays.clearCheck()
+        customDelayReminder.setSubtitle(requireContext().formatDelayText(delayMinutes))
+        customDelayReminder.setCheckMark(displayCheckMark = true)
+    }
+
+    private fun checkStandardReminderOption(optionId: Int?) {
+        resetCustomDelayReminder()
+        if (optionId != null) binding.optionsDelays.check(optionId) else binding.optionsDelays.clearCheck()
+    }
+
+    private fun handleDelayedConfig(config: ReminderConfig.Delayed) {
+        if (config.isCustom) {
+            applyCustomReminder(config.delayMinutes)
+        } else {
+            val targetId = when (config.delayMinutes) {
+                ReminderPreset.HOURS_24.delayMinutes -> R.id.hours24
+                ReminderPreset.DAYS_3.delayMinutes -> R.id.days3
+                ReminderPreset.DAYS_7.delayMinutes -> R.id.days7
+                else -> null
+            }
+            checkStandardReminderOption(targetId)
         }
     }
 
