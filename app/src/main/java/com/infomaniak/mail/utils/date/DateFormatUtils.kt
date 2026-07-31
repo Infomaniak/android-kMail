@@ -32,8 +32,11 @@ object DateFormatUtils {
     private const val FORMAT_DATE_12_HOUR = "hh:mm a"
     private const val FORMAT_DATE_WITH_YEAR = "d MMM yyyy"
     private const val FORMAT_DATE_WITHOUT_YEAR = "d MMM"
+    private const val FORMAT_DATE_SHORT_NUMERIC = "dd/MM/yy"
 
     fun Context.formatTime(date: Date): String = date.format(localHourFormat())
+
+    fun shortDateWithoutYear(date: Date): String = date.format(FORMAT_DATE_WITHOUT_YEAR)
 
     fun Context.fullDateWithoutYear(date: Date): String = formatDateTime(date, FORMAT_DATE_WITHOUT_YEAR, localHourFormat())
 
@@ -42,6 +45,8 @@ object DateFormatUtils {
     fun Context.dayOfWeekDateWithoutYear(date: Date): String = formatDateTime(date, FORMAT_DATE_DAY_MONTH, localHourFormat())
 
     fun Context.dayOfWeekDateWithYear(date: Date): String = formatDateTime(date, FORMAT_DATE_DAY_MONTH_YEAR, localHourFormat())
+
+    fun shortNumericDate(date: Date): String = date.format(FORMAT_DATE_SHORT_NUMERIC)
 
     private fun Context.formatDateTime(date: Date, dateFormat: String, timeFormat: String) = getString(
         R.string.messageDetailsDateAt,

@@ -27,8 +27,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
-import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
-import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithoutYear
+import com.infomaniak.mail.utils.date.DateFormatUtils.shortDateWithoutYear
+import com.infomaniak.mail.utils.date.DateFormatUtils.shortNumericDate
 import java.time.format.FormatStyle
 import java.util.Date
 
@@ -37,13 +37,9 @@ object MailDateFormatUtils {
     fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
         return when {
             isToday() -> formatTime(this)
-            isYesterday() -> getString(
-                R.string.messageDetailsDateAt,
-                getString(R.string.messageDetailsYesterday),
-                formatTime(this),
-            )
-            isThisYear() -> fullDateWithoutYear(this)
-            else -> fullDateWithYear(this)
+            isYesterday() -> getString(R.string.messageDetailsYesterday)
+            isThisYear() -> shortDateWithoutYear(this)
+            else -> shortNumericDate(this)
         }
     }
 
