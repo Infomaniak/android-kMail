@@ -51,7 +51,6 @@ internal class BodyCleaner {
             )
             .addAttributes(":all", "class", "dir", "id", "style")
             .addAttributes("a", "name", MENTION_ATTRIBUTE)
-            .addProtocols("a", "href", "ftp", "http", "https", "mailto")
             .addAttributes("area", "alt", "coords", "href", "shape")
             .addProtocols("area", "href", "http", "https")
             .addAttributes("body", "alink", "background", "bgcolor", "lang", "link", "text", "vlink")
