@@ -810,10 +810,8 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun setMessageForReminder(messageUid: String) = viewModelScope.launch {
-        messageController.getMessage(messageUid)?.let { message ->
-            currentReminderAction = ReminderAction.Add(message)
-        }
+    suspend fun setMessageForReminder(messageUid: String): Boolean {
+        return messageController.getMessage(messageUid)?.let { currentReminderAction = ReminderAction.Add(it); true } ?: false
     }
 
     fun addReminder(message: Message, delayMinutes: Int) {
