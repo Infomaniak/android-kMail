@@ -22,5 +22,6 @@ import javax.inject.Singleton
 
 @Singleton
 class AiDraftCache @Inject constructor() {
-    var pendingAiContent: Pair<String?, String>? = null
+    var pendingAiSubject: String? = null
+    var pendingAiContent: String? = null
 }

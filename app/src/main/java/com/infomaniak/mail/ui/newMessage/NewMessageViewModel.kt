@@ -370,11 +370,12 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox(), realm)
 
             if (isNewMessage) {
-                aiDraftCache.pendingAiContent?.let { (aiSubject, aiBody) ->
-                    aiSubject?.let { subject -> draft.subject = subject }
+                aiDraftCache.pendingAiContent?.let { pendingAiContent ->
+                    aiDraftCache.pendingAiSubject?.let { subject -> draft.subject = subject }
                     initialBody = BodyContentPayload.bodyOf(
-                        BodyContentPayload(aiBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
+                        BodyContentPayload(pendingAiContent, BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
                     )
+                    aiDraftCache.pendingAiSubject = null
                     aiDraftCache.pendingAiContent = null
                 }
             }

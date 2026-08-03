@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.ui.newMessage
 
+import android.R.id.message
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.ChangeBounds
@@ -271,7 +272,8 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun navigateToNewMessageActivityWithAiContent(subject: String?, content: String) {
-        aiDraftCache.pendingAiContent = subject to content
+        aiDraftCache.pendingAiSubject = subject
+        aiDraftCache.pendingAiContent = content
         safeNavigateToNewMessageActivity(
             args = NewMessageActivityArgs(
                 draftMode = DraftMode.REPLY_ALL,
@@ -337,7 +339,6 @@ class AiPropositionFragment : Fragment() {
                 val message = messageController.getMessage(navigationArgs.messageUid)
                 val recipients = message?.getRecipientsForReplyTo(replyAll = true)
                 allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
-                aiViewModel.previousMessageBodyPlainText = message?.let { message -> message.body?.asPlainText() }
             }
 
             val formattedRecipientsString = allRecipients
