@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.webViewClient
 
 import android.content.Context
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -68,7 +69,7 @@ abstract class MessageWebViewClient(
 
         val shouldLoadResource = _shouldLoadDistantResources
                 || url?.scheme.equals(DATA_SCHEME, ignoreCase = true)
-                || trustedUrls.any { it.find(url.toString()) != null }
+                || url.isTrustedRemoteResource()
 
         return if (shouldLoadResource) {
             super.shouldInterceptRequest(view, request)
@@ -88,12 +89,17 @@ abstract class MessageWebViewClient(
         const val CID_SCHEME = "cid"
         const val DATA_SCHEME = "data"
 
-        val trustedUrls = listOf(
-            "https://.*?\\.infomaniak\\.com/".toRegex(),
-            "https://.*?\\.storage\\.infomaniak\\.com/".toRegex(),
-            "https://storage-master\\.infomaniak\\.ch/".toRegex(),
-            "http://infomaniak\\.statslive\\.info/".toRegex(),
-            "https://static\\.infomaniak\\.ch/".toRegex(),
-        )
+        fun Uri.isTrustedRemoteResource(): Boolean {
+            val normalizedHost = host?.lowercase() ?: return false
+            if (scheme.equals("http", ignoreCase = true) && normalizedHost == "infomaniak.statslive.info") return true
+            if (!scheme.equals("https", ignoreCase = true)) return false
+
+            return normalizedHost == "static.infomaniak.ch" ||
+                    normalizedHost == "storage-master.infomaniak.ch" ||
+                    normalizedHost == "infomaniak.com" ||
+                    normalizedHost.endsWith(".infomaniak.com") ||
+                    normalizedHost == "storage.infomaniak.com" ||
+                    normalizedHost.endsWith(".storage.infomaniak.com")
+        }
     }
 }
