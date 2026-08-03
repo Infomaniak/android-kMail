@@ -342,7 +342,7 @@ class AiPropositionFragment : Fragment() {
             }
 
             val formattedRecipientsString = allRecipients
-                .joinToString(separator = ", ") { it.name }
+                .joinToString(separator = ", ") { it.name.ifBlank { it.email } }
                 .takeIf { it.isNotBlank() }
             currentRequestJob = aiViewModel.generateNewAiProposition(mailbox.uuid, formattedRecipientsString)
         }
