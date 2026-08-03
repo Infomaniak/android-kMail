@@ -61,6 +61,7 @@ fun Attachable.getCacheFile(
     mailboxId: Int = AccountUtils.currentMailboxId,
 ): File = when (this) {
     is Attachment -> {
+        sanitize()
         val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, extractPathFromResource(), userId, mailboxId)
         File(cacheFolder, name)
     }
