@@ -41,7 +41,7 @@ fun String.toSafeFileName(): String {
     return if (normalizedName.utf8Size <= MAX_FILE_NAME_SIZE_BYTES) normalizedName else computeTruncatedFileName(normalizedName)
 }
 
-fun File.resolveContainedPath(untrustedPath: String): File {
+fun File.resolveContainedPath(untrustedPath: String): File? = runCatching {
     if (File(untrustedPath).isAbsolute) throw SecurityException("Absolute paths are not allowed")
 
     val canonicalRoot = canonicalFile
@@ -50,6 +50,9 @@ fun File.resolveContainedPath(untrustedPath: String): File {
         throw SecurityException("Resolved path escapes its allowed root")
     }
     return resolvedFile
+}.getOrElse {
+    Sentry.captureException(it)
+    null
 }
 
 fun File.resolveContainedFileName(untrustedName: String): File? {

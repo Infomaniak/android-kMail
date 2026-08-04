@@ -62,8 +62,8 @@ object AttachmentExt {
     const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
     //region Intent
-    private fun Attachment.saveToDriveIntent(context: Context): Intent {
-        val fileFromCache = getCacheFile(context)
+    private fun Attachment.saveToDriveIntent(context: Context): Intent? {
+        val fileFromCache = getCacheFile(context) ?: return null
         val lastModifiedDate = fileFromCache.lastModified()
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), fileFromCache)
 
@@ -76,8 +76,8 @@ object AttachmentExt {
         }
     }
 
-    private fun Attachment.openWithIntent(context: Context): Intent {
-        val file = getUploadLocalFile() ?: getCacheFile(context)
+    private fun Attachment.openWithIntent(context: Context): Intent? {
+        val file = getUploadLocalFile() ?: getCacheFile(context) ?: return null
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), file)
 
         return Intent().apply {
@@ -114,7 +114,7 @@ object AttachmentExt {
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         snackbarManager: SnackbarManager,
     ) {
-        if (openWithIntent(context).hasSupportedApplications(context)) {
+        if (openWithIntent(context)?.hasSupportedApplications(context) == true) {
             executeIntent(context, OPEN_WITH, navigateToDownloadProgressDialog)
         } else {
             snackbarManager.setValue(context.getString(RCore.string.errorNoSupportingAppFound))

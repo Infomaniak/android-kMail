@@ -55,7 +55,7 @@ object LocalStorageUtils {
         attachmentPath: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
-    ): File {
+    ): File? {
         val cacheRoot = generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId)
         return cacheRoot.resolveContainedPath(attachmentPath)
     }
@@ -76,7 +76,10 @@ object LocalStorageUtils {
         val attachment = runCatching {
             localAttachment.resource?.let { ApiRepository.downloadAttachment(it) }
         }.cancellable().getOrNull()
-        return attachment?.saveAttachmentTo(localAttachment.getCacheFile(context)) == true
+
+        val cacheFile = localAttachment.getCacheFile(context) ?: return false
+
+        return attachment?.saveAttachmentTo(cacheFile) == true
     }
 
     /**
@@ -150,7 +153,7 @@ object LocalStorageUtils {
         hashedFileName: String,
         inputStream: InputStream,
     ): File? {
-        val file = attachmentsUploadDir.resolveContainedFileName(hashedFileName)
+        val file = attachmentsUploadDir.resolveContainedFileName(hashedFileName) ?: return null
         val isSuccess = runCatching {
             FileOutputStream(file).use(inputStream::copyTo)
             true
