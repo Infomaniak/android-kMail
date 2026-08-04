@@ -87,7 +87,7 @@ class FileNameUtilsTest {
     fun maliciousFileName_staysInsideExpectedDirectory() = withTemporaryDirectory { root ->
         val file = root.resolveContainedFileName("....//../../secret.txt")
 
-        assertEquals(root.canonicalFile, file.parentFile)
+        assertEquals(root.canonicalFile, file?.parentFile)
     }
 
     private fun assertSecurityException(block: () -> Unit) {
