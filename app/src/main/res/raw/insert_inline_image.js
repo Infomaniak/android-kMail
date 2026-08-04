@@ -35,9 +35,18 @@
         if (selection && selection.rangeCount > 0) {
             var range = selection.getRangeAt(0);
             range.deleteContents();
+
+            var brBefore = document.createElement("br");
+            range.insertNode(brBefore);
+
+            range.setStartAfter(brBefore);
             range.insertNode(img);
 
+            var brAfter = document.createElement("br");
             range.setStartAfter(img);
+            range.insertNode(brAfter);
+
+            range.setStartAfter(brAfter);
             range.collapse(true);
             selection.removeAllRanges();
             selection.addRange(range);
