@@ -368,6 +368,8 @@
     <string name="genericMessageTranslated">Nachricht übersetzt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <string name="importFilesButton">Dateien</string>
+    <string name="importPhotosButton">Fotos</string>
     <string name="inboxFolder">Posteingang</string>
     <string name="kSuiteProQuotasAlertDescription">Der Speicherplatz in Ihrer Mail ist bald voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Der Speicherplatz in Ihrer Mail ist voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>

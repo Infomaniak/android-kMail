@@ -368,6 +368,8 @@
     <string name="genericMessageTranslated">Bericht vertaald</string>
     <string name="googlePlayServicesAreRequired">Google Play Services zijn vereist</string>
     <string name="groupContactsTitle">Groep: %s</string>
+    <string name="importFilesButton">Bestanden</string>
+    <string name="importPhotosButton">Foto’s</string>
     <string name="inboxFolder">Inbox</string>
     <string name="kSuiteProQuotasAlertDescription">Uw Mail-opslagruimte is bijna vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Uw Mail-opslagruimte is vol. Upgrade naar onbeperkte opslag en ontgrendel nieuwe functies.</string>

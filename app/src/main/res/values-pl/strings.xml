@@ -382,6 +382,8 @@
     <string name="genericMessageTranslated">Wiadomość przetłumaczona</string>
     <string name="googlePlayServicesAreRequired">Wymagane są Usługi Google Play</string>
     <string name="groupContactsTitle">Grupa: %s</string>
+    <string name="importFilesButton">Pliki</string>
+    <string name="importPhotosButton">Zdjęcia</string>
     <string name="inboxFolder">Skrzynka odbiorcza</string>
     <string name="kSuiteProQuotasAlertDescription">Miejsce do przechowywania Twojej poczty jest prawie pełne. Przejdź na nieograniczoną przestrzeń i odblokuj nowe funkcje.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Miejsce do przechowywania Twojej poczty jest pełne. Przejdź na nieograniczoną przestrzeń i odblokuj nowe funkcje.</string>
