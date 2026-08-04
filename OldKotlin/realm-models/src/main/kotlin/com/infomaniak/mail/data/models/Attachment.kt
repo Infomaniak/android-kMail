@@ -73,11 +73,7 @@ class Attachment : EmbeddedRealmObject, Attachable {
         this.mimeType = mimeType
         this.uploadLocalUri = uri
 
-        return this.also { sanitize() }
-    }
-
-    fun sanitize() {
-        name = name.replace("../", "")
+        return this
     }
 
     companion object

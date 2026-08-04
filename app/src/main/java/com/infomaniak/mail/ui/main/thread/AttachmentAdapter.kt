@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
+import com.infomaniak.mail.data.models.extensions.safeName
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -55,7 +56,7 @@ class AttachmentAdapter(
 
         if (shouldDisplayCloseButton) {
             attachmentCloseButton.apply {
-                contentDescription = context.getString(R.string.contentDescriptionButtonDelete, attachment.name)
+                contentDescription = context.getString(R.string.contentDescriptionButtonDelete, attachment.safeName)
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
 

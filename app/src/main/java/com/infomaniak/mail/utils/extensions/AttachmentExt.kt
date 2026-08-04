@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.data.models.extensions.isInlineCachedFile
 import com.infomaniak.mail.data.models.extensions.safeMimeType
+import com.infomaniak.mail.data.models.extensions.safeName
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
@@ -123,7 +124,7 @@ object AttachmentExt {
     fun Attachment.createDownloadDialogNavArgs(intentType: AttachmentIntentType): Bundle {
         return DownloadAttachmentProgressDialogArgs(
             attachmentLocalUuid = localUuid,
-            attachmentName = name,
+            attachmentName = safeName,
             attachmentType = getFileTypeFromMimeType(),
             intentType = intentType,
         ).toBundle()

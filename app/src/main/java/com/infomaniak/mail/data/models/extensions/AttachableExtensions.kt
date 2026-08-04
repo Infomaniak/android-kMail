@@ -29,11 +29,15 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.resolveContainedFileName
+import com.infomaniak.mail.utils.toSafeFileName
 import java.io.File
 
 val Attachable.downloadUrl get() = ApiRoutes.resource(resource!!)
 
-val Attachable.safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
+val Attachable.safeName get() = name.toSafeFileName()
+
+val Attachable.safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) safeName.guessMimeType() else mimeType
 
 fun Attachable.getFileTypeFromMimeType(): AttachmentType = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
@@ -61,9 +65,8 @@ fun Attachable.getCacheFile(
     mailboxId: Int = AccountUtils.currentMailboxId,
 ): File = when (this) {
     is Attachment -> {
-        sanitize()
         val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, extractPathFromResource(), userId, mailboxId)
-        File(cacheFolder, name)
+        cacheFolder.resolveContainedFileName(safeName)
     }
     is SwissTransferFile -> File("")
 }

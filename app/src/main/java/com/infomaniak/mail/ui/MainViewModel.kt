@@ -85,6 +85,7 @@ import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.toSafeFileName
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
@@ -856,7 +857,7 @@ class MainViewModel @Inject constructor(
             val userBearerToken = AccountUtils.currentUser?.apiToken?.accessToken
             DownloadManagerUtils.launchDownload(
                 url = downloadUrl,
-                name = filename,
+                name = filename.toSafeFileName(),
                 userAgent = HttpUtils.getUserAgent,
                 userBearerToken = userBearerToken,
                 onError = { resourceStringId ->

@@ -64,6 +64,7 @@ import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.extensions.computeFirstAndLastName
 import com.infomaniak.mail.data.models.extensions.getJsonRequestBody
+import com.infomaniak.mail.data.models.extensions.safeName
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
@@ -613,7 +614,7 @@ object ApiRepository : ApiRepositoryCore() {
         @OptIn(ManualAuthorizationRequired::class)
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
-            .addUnsafeNonAscii("x-ws-attachment-filename", attachment.name)
+            .addUnsafeNonAscii("x-ws-attachment-filename", attachment.safeName)
             .add("x-ws-attachment-mime-type", attachment.mimeType)
             .add("x-ws-attachment-disposition", "attachment")
             .build()

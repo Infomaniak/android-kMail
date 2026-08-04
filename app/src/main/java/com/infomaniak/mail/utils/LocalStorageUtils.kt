@@ -56,7 +56,8 @@ object LocalStorageUtils {
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
-        return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
+        val cacheRoot = generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId)
+        return cacheRoot.resolveContainedPath(attachmentPath)
     }
 
     suspend fun downloadThenSaveAttachmentToCacheDir(context: Context, localAttachment: Attachment): Boolean {
@@ -128,7 +129,7 @@ object LocalStorageUtils {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
             val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
             attachmentsUploadDir.mkdirs()
-            val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
+            val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_${fileName.toSafeFileName()}"
 
             return@use getFileToUpload(context, uri, snackbarManager, attachmentsUploadDir, hashedFileName, inputStream)
         } ?: run {
@@ -149,7 +150,7 @@ object LocalStorageUtils {
         hashedFileName: String,
         inputStream: InputStream,
     ): File? {
-        val file = File(attachmentsUploadDir, hashedFileName)
+        val file = attachmentsUploadDir.resolveContainedFileName(hashedFileName)
         val isSuccess = runCatching {
             FileOutputStream(file).use(inputStream::copyTo)
             true

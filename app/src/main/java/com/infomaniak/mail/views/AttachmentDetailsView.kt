@@ -30,6 +30,7 @@ import com.infomaniak.core.ui.view.extension.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.extensions.getFileTypeFromMimeType
+import com.infomaniak.mail.data.models.extensions.safeName
 import com.infomaniak.mail.databinding.ViewAttachmentDetailsBinding
 import com.infomaniak.core.legacy.R as RCore
 
@@ -65,7 +66,7 @@ class AttachmentDetailsView @JvmOverloads constructor(
     }
 
     fun setDetails(attachment: Attachable) = with(binding) {
-        fileName.text = attachment.name
+        fileName.text = attachment.safeName
         fileSize.text = context.formatShortFileSize(attachment.size)
         icon.load(attachment.getFileTypeFromMimeType().icon)
     }
