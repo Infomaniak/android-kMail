@@ -24,7 +24,7 @@ import java.text.Normalizer
 
 /**  Android’s filesystems limit each path component to 255 UTF-8 bytes.
  * 240 leaves 15 bytes for prefixes/suffixes.
- * The upload prefix (Int.hashCode() plus ) needs at most 12 bytes, yielding at most 252 bytes.
+ * The upload prefix (an Int hash code plus an underscore) needs at most 12 bytes, yielding at most 252 bytes.
  * The remaining 3 bytes are conservative headroom. */
 private const val MAX_FILE_NAME_SIZE_BYTES = 240
 private const val MAX_PRESERVED_EXTENSION_SIZE_BYTES = 32
@@ -49,7 +49,8 @@ fun File.resolveContainedPath(untrustedPath: String): File? = runCatching {
     if (resolvedFile != canonicalRoot && !resolvedFile.toPath().startsWith(canonicalRoot.toPath())) {
         throw SecurityException("Resolved path escapes its allowed root")
     }
-    return resolvedFile
+
+    return@runCatching resolvedFile
 }.getOrElse {
     Sentry.captureException(it)
     null
