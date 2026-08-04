@@ -67,6 +67,11 @@ class Attachment : EmbeddedRealmObject, Attachable {
     val disposition: AttachmentDisposition?
         get() = enumValueOfOrNull<AttachmentDisposition>(_disposition)
 
+    fun markAsInline(contentId: String) {
+        _disposition = AttachmentDisposition.INLINE.name
+        this.contentId = contentId
+    }
+
     fun initLocalValues(name: String, size: Long, mimeType: String, uri: String): Attachment {
         this.name = name
         this.size = size

@@ -610,13 +610,17 @@ object ApiRepository : ApiRepositoryCore() {
         mailbox: Mailbox,
         userApiToken: String,
     ): ApiResponse<Attachment>? {
+        val attachmentDisposition = attachment.disposition?.name?.lowercase() ?: "attachment"
+
         @OptIn(ManualAuthorizationRequired::class)
-        val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
+        val headersBuilder = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .addUnsafeNonAscii("x-ws-attachment-filename", attachment.name)
             .add("x-ws-attachment-mime-type", attachment.mimeType)
-            .add("x-ws-attachment-disposition", "attachment")
-            .build()
+            .add("x-ws-attachment-disposition", attachmentDisposition)
+        attachment.contentId?.let { headersBuilder.add("x-ws-attachment-content-id", it) }
+        val headers = headersBuilder.build()
+
         val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
             .headers(headers)
             .post(attachmentFile.asRequestBody(attachment.mimeType.toMediaType()))
