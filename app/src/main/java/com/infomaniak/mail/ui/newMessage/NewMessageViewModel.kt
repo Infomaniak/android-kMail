@@ -150,6 +150,7 @@ import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -225,6 +226,7 @@ class NewMessageViewModel @Inject constructor(
 
     //region Attachments
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
+    val importInlineAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     //endRegion
 
@@ -812,6 +814,14 @@ class NewMessageViewModel @Inject constructor(
         importAttachmentsResult.postValue(result)
 
         return newAttachments
+    }
+
+    fun prepareInlineAttachments(attachments: List<Attachment>): List<Attachment> {
+        attachments.forEach { attachment ->
+            val contentId = attachment.contentId?.takeIf(String::isNotBlank) ?: "${UUID.randomUUID()}@infomaniak.com"
+            attachment.markAsInline(contentId)
+        }
+        return attachments
     }
 
     private suspend fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean> {

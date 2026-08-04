@@ -106,6 +106,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionClickHa
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionsDetectorScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertInlineImageScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
@@ -116,10 +117,13 @@ import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
+import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -169,6 +173,7 @@ class NewMessageFragment : Fragment() {
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
+    private val insertInlineImageScript by lazy { requireContext().getInsertInlineImageScript() }
     private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
     private val mentionClickHandlerScript by lazy { requireContext().getEditorMentionClickHandlerScript() }
     private val removeElementsByIdScript by lazy { requireContext().getRemoveElementsByIdScript() }
@@ -186,6 +191,9 @@ class NewMessageFragment : Fragment() {
 
     private val filePicker = FilePicker(fragment = this).apply {
         initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
+    }
+    private val photoPicker = FilePicker(fragment = this).apply {
+        initCallback { uris -> newMessageViewModel.importInlineAttachmentsLiveData.value = uris }
     }
 
     private var addressListPopupWindow: ListPopupWindow? = null
@@ -385,7 +393,7 @@ class NewMessageFragment : Fragment() {
             aiManager = aiManager,
             encryptionManager = encryptionMessageManager,
             openFilePicker = filePicker::open,
-            openPhotoPicker = { filePicker.open("image/*") },
+            openPhotoPicker = { photoPicker.open("image/*") },
         )
 
         encryptionMessageManager.init(
@@ -528,6 +536,7 @@ class NewMessageFragment : Fragment() {
         addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
+        addScript(insertInlineImageScript)
         addScript(mentionClickHandlerScript)
         addScript(removeElementsByIdScript)
 
@@ -802,6 +811,7 @@ class NewMessageFragment : Fragment() {
             if (isFirstTime) {
                 isFirstTime = false
                 observeImportAttachments()
+                observeImportInlineAttachments()
             } else if (attachments.count() > attachmentAdapter.itemCount) {
                 // If we are adding Attachments, directly upload them to save time when sending/saving the Draft.
                 newMessageViewModel.uploadAttachmentsToServer(attachments)
@@ -829,6 +839,40 @@ class NewMessageFragment : Fragment() {
                 attachmentsLiveData.postValue(currentAttachments + newAttachments)
             }
         }
+    }
+
+    private fun observeImportInlineAttachments() = with(newMessageViewModel) {
+        importInlineAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
+            val currentAttachments = attachmentsLiveData.valueOrEmpty()
+            importNewAttachments(currentAttachments, uris) { newAttachments ->
+                val inlineAttachments = prepareInlineAttachments(newAttachments)
+                val updatedAttachments = currentAttachments + inlineAttachments
+                attachmentsLiveData.postValue(updatedAttachments)
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    inlineAttachments.forEach { attachment ->
+                        attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
+                            LocalStorageUtils.saveAttachmentToCacheDir(inputStream, attachment.getCacheFile(requireContext()))
+                        }
+                    }
+                    refreshEditorWebViewClient(updatedAttachments)
+                    inlineAttachments.mapNotNull(Attachment::contentId).forEach { contentId ->
+                        binding.editorWebView.executeJsMethodWhenEditorIsSetup(
+                            JsExecutableMethod("insertInlineImage", contentId),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun refreshEditorWebViewClient(attachments: List<Attachment>) {
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+        binding.editorWebView.initEditorWebviewClient(
+            attachments = attachments,
+            shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
+            onPageFinished = {},
+        )
     }
 
     private fun observeImportAttachmentsResult() = with(newMessageViewModel) {
