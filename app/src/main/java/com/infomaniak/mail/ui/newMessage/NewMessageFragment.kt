@@ -385,6 +385,7 @@ class NewMessageFragment : Fragment() {
             aiManager = aiManager,
             encryptionManager = encryptionMessageManager,
             openFilePicker = filePicker::open,
+            openPhotoPicker = { filePicker.open("image/*") },
         )
 
         encryptionMessageManager.init(
