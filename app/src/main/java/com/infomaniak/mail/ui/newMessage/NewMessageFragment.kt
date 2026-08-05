@@ -79,6 +79,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
 import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getInlineCacheFile
 import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -854,7 +855,8 @@ class NewMessageFragment : Fragment() {
                     withContext(Dispatchers.IO) {
                         inlineAttachments.forEach { attachment ->
                             attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
-                                LocalStorageUtils.saveAttachmentToCacheDir(inputStream, attachment.getCacheFile(requireContext()))
+                                val cacheFile = attachment.getInlineCacheFile(requireContext())
+                                LocalStorageUtils.saveAttachmentToCacheDir(inputStream, cacheFile)
                             }
                         }
                     }
