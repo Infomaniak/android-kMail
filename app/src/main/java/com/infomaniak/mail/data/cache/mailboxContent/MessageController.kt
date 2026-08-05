@@ -185,9 +185,10 @@ class MessageController @Inject constructor(
             } else {
                 ""
             }
+            val isNotHiddenReminder = "(${Message::isReminder.name} == false OR ${Message::displayReminder.name} == true)"
 
             query<Message>(
-                query = "$beginQuery ($containsSubject OR $containsPreview OR $containsBody) ${isNotAnEmoji}",
+                query = "$beginQuery ($containsSubject OR $containsPreview OR $containsBody) $isNotAnEmoji AND $isNotHiddenReminder",
                 searchQuery
             )
         } else {
