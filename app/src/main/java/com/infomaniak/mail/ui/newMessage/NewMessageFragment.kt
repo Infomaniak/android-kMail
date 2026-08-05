@@ -146,10 +146,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -849,9 +851,11 @@ class NewMessageFragment : Fragment() {
                 attachmentsLiveData.postValue(updatedAttachments)
 
                 viewLifecycleOwner.lifecycleScope.launch {
-                    inlineAttachments.forEach { attachment ->
-                        attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
-                            LocalStorageUtils.saveAttachmentToCacheDir(inputStream, attachment.getCacheFile(requireContext()))
+                    withContext(Dispatchers.IO) {
+                        inlineAttachments.forEach { attachment ->
+                            attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
+                                LocalStorageUtils.saveAttachmentToCacheDir(inputStream, attachment.getCacheFile(requireContext()))
+                            }
                         }
                     }
                     refreshEditorWebViewClient(updatedAttachments)
