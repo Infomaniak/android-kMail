@@ -73,3 +73,14 @@ suspend fun Attachable.getCacheFile(
     }
     is SwissTransferFile -> File("")
 }
+
+fun Attachment.getInlineCacheFile(
+    context: Context,
+    userId: Int = AccountUtils.currentUserId,
+    mailboxId: Int = AccountUtils.currentMailboxId,
+): File {
+    val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, extractPathFromResource(), userId, mailboxId)
+    val extension = name.substringAfterLast('.', "")
+    val uniqueName = if (extension.isNotEmpty()) "$localUuid.$extension" else localUuid
+    return File(cacheFolder, uniqueName)
+}
