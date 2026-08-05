@@ -69,6 +69,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
@@ -972,9 +973,9 @@ class NewMessageFragment : Fragment() {
         super.onStop()
     }
 
-    private fun onDeleteAttachment(position: Int) {
+    private fun onDeleteAttachment(attachable: Attachable) {
         trackAttachmentActionsEvent(MatomoName.Delete)
-        newMessageViewModel.deleteAttachment(position)
+        if (attachable is Attachment) newMessageViewModel.deleteAttachment(attachable)
     }
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {

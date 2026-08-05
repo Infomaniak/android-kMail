@@ -877,21 +877,23 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.isDisplayedAsExternal) trackExternalEvent(MatomoName.DeleteRecipient)
     }
 
-    fun deleteAttachment(position: Int) = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteAttachment(attachmentToDelete: Attachment) = viewModelScope.launch(ioCoroutineContext) {
         runCatching {
             val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
-            val attachment = attachments[position]
-            attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
+            val attachment = attachments.findSpecificAttachment(attachmentToDelete)
+            attachment?.let {
+                it.getUploadLocalFile()?.delete()
+                LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, it.localUuid)
 
-            mailboxContentRealm().write {
-                DraftController.updateDraftBlocking(draftLocalUuid!!, realm = this) {
-                    it.attachments.findSpecificAttachment(attachment)?.let(::delete)
+                mailboxContentRealm().write {
+                    DraftController.updateDraftBlocking(draftLocalUuid!!, realm = this) { draft ->
+                        draft.attachments.findSpecificAttachment(it)?.let(::delete)
+                    }
                 }
-            }
 
-            attachments.removeAt(position)
-            attachmentsLiveData.postValue(attachments)
+                attachments.remove(it)
+                attachmentsLiveData.postValue(attachments)
+            }
         }
     }
 
