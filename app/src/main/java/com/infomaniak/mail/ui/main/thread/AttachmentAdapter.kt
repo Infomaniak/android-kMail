@@ -30,7 +30,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 
 class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
-    private val onDelete: ((position: Int) -> Unit)? = null,
+    private val onDelete: ((attachable: Attachable) -> Unit)? = null,
     private val onAttachmentClicked: ((Attachable) -> Unit)? = null,
     private val onAttachmentOptionsClicked: ((Attachable) -> Unit)? = null,
 ) : Adapter<AttachmentViewHolder>() {
@@ -67,7 +67,7 @@ class AttachmentAdapter(
                         attachments.removeAt(index)
                         notifyItemRemoved(index)
 
-                        onDelete?.invoke(index)
+                        onDelete?.invoke(attachment)
                     }
                 }
             }
