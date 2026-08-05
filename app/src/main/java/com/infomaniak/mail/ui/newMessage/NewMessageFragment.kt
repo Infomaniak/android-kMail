@@ -77,6 +77,8 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
@@ -113,17 +115,15 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getRemoveElementsByIdScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
+import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
-import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.data.models.extensions.getCacheFile
-import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -836,7 +836,7 @@ class NewMessageFragment : Fragment() {
         importAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
             val currentAttachments = attachmentsLiveData.valueOrEmpty()
             importNewAttachments(currentAttachments, uris) { newAttachments ->
-                attachmentsLiveData.postValue(currentAttachments + newAttachments)
+                attachmentsLiveData.postValue(attachmentsLiveData.valueOrEmpty() + newAttachments)
             }
         }
     }
@@ -846,7 +846,7 @@ class NewMessageFragment : Fragment() {
             val currentAttachments = attachmentsLiveData.valueOrEmpty()
             importNewAttachments(currentAttachments, uris) { newAttachments ->
                 val inlineAttachments = prepareInlineAttachments(newAttachments)
-                val updatedAttachments = currentAttachments + inlineAttachments
+                val updatedAttachments = attachmentsLiveData.valueOrEmpty() + inlineAttachments
                 attachmentsLiveData.postValue(updatedAttachments)
 
                 viewLifecycleOwner.lifecycleScope.launch {
