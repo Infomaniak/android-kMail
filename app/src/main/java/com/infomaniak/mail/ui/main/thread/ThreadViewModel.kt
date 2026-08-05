@@ -873,7 +873,7 @@ class ThreadViewModel @Inject constructor(
                 folderId,
                 messageId,
                 reminderUuid
-            ) else ApiResponse<ReminderResult>(result = ApiResponseStatus.ERROR)
+            ) else ApiResponse<Boolean>(result = ApiResponseStatus.ERROR)
 
         }
     }
