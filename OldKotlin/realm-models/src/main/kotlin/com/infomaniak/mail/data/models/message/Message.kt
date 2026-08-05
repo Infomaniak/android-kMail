@@ -144,6 +144,10 @@ class Message : RealmObject, Snoozable {
     var reminder: ReminderMessageInfo? = null
     @SerialName("reminder_action")
     var reminderAction: String? = null
+    @SerialName("is_reminder")
+    var isReminder: Boolean = false
+    @SerialName("display_reminder")
+    var displayReminder: Boolean = false
     //endregion
 
     //region Local data (Transient)
@@ -208,6 +212,8 @@ class Message : RealmObject, Snoozable {
     val isValidReactionTarget get() = _emojiReactionNotAllowedReason == null
 
     val isReaction get() = emojiReaction != null
+
+    val shouldHideReminder get() = isReminder && !displayReminder
 
     val threads by backlinks(Thread::messages)
 
