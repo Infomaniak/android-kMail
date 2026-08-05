@@ -258,7 +258,7 @@ object ApiRepository : ApiRepositoryCore() {
         folderId: String,
         messageId: Int,
         reminderUuid: String
-    ): ApiResponse<ReminderResult> {
+    ): ApiResponse<Boolean> {
         return callApi(ApiRoutes.markAsDoneReminder(mailboxUuid, folderId, messageId, reminderUuid), PUT)
     }
     //endregion
