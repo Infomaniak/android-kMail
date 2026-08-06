@@ -32,7 +32,7 @@ private const val DEFAULT_FILE_NAME = "attachment"
 private val invalidFileNameCharacters = Regex("[\\\\/:*?\"<>|%\\p{Cc}]")
 
 fun String.toSafeFileName(): String {
-    val normalizedName = Normalizer.normalize(this, Normalizer.Form.NFC)
+    val normalizedName = Normalizer.normalize(this, Normalizer.Form.NFKC)
         .replace(invalidFileNameCharacters, "_")
         .trim()
         .takeUnless { it.isEmpty() || it == "." || it == ".." }

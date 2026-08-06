@@ -53,6 +53,11 @@ class FileNameUtilsTest {
     }
 
     @Test
+    fun unicodePathSeparators_areNormalizedBeforeSanitizing() {
+        assertEquals("_data_secret.txt", "\uFF0Fdata\uFF0Fsecret.txt".toSafeFileName())
+    }
+
+    @Test
     fun longNames_areTruncatedAndKeepTheirExtension() {
         val safeName = "${"é".repeat(200)}.pdf".toSafeFileName()
 
