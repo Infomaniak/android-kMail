@@ -31,7 +31,7 @@ data class DefaultMessageFlags(
     @SerialName("forwarded")
     val isForwarded: Boolean,
     @SerialName("scheduled")
-    val isScheduledMessage: Boolean,
+    val isMessageWithSendDelay: Boolean,
     @SerialName("seen")
     val isSeen: Boolean,
     @SerialName("acknowledged")

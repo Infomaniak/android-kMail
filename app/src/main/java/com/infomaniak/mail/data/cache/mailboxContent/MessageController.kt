@@ -121,7 +121,7 @@ class MessageController @Inject constructor(
     }
 
     fun getUnscheduledMessages(messages: List<Message>): List<Message> {
-        return messages.filter { message -> !message.isScheduledMessage }
+        return messages.filter { message -> !message.isMessageWithSendDelay }
     }
 
     private suspend fun getMessagesFromThread(thread: Thread, query: String, includeDuplicates: Boolean): List<Message> {
@@ -214,7 +214,7 @@ class MessageController @Inject constructor(
 
     companion object {
         private val isNotDraft = "${Message::isDraft.name} == false"
-        private val isNotScheduledMessage = "${Message::isScheduledMessage.name} == false"
+        private val isNotScheduledMessage = "${Message::isMessageWithSendDelay.name} == false"
 
         //region Queries
         private fun getMessagesQuery(messageUid: String, realm: TypedRealm): RealmQuery<Message> {
