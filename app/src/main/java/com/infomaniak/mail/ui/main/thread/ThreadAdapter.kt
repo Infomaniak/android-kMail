@@ -912,7 +912,7 @@ class ThreadAdapter(
         reminderAlert.isVisible = true
 
         reminderAlert.onAction1 {
-            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            trackMessageBannerEvent(MatomoName.RescheduleActiveReminder)
             threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
         }
 
@@ -942,17 +942,17 @@ class ThreadAdapter(
         endReminderAlert.isVisible = true
 
         endReminderAlert.onAction1 {
-            trackMessageBannerEvent(MatomoName.FollowUp)
+            trackMessageBannerEvent(MatomoName.FollowUpReminder)
             threadAdapterCallbacks?.onFollowUpClicked?.invoke(message)
         }
 
         endReminderAlert.onAction2 {
-            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            trackMessageBannerEvent(MatomoName.RescheduleExpiredReminder)
             threadAdapterCallbacks?.onAddReminderClicked?.invoke(message)
         }
 
         endReminderAlert.onAction3 {
-            trackMessageBannerEvent(MatomoName.DeleteDraft)
+            trackMessageBannerEvent(MatomoName.MarkAsDoneReminder)
             threadAdapterCallbacks?.onMarkAsDoneReminderClicked?.invoke(message)
         }
     }
@@ -971,12 +971,12 @@ class ThreadAdapter(
         reminderAlert.isVisible = true
 
         reminderAlert.onAction1 {
-            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            trackMessageBannerEvent(MatomoName.RescheduleActiveReminder)
             threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
         }
 
         reminderAlert.onAction2 {
-            // TODO: add matomo
+            trackMessageBannerEvent(MatomoName.RemoveReminder)
             threadAdapterCallbacks?.onDisableReminderClicked?.invoke(message)
         }
     }
