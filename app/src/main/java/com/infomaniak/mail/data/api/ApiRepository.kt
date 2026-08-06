@@ -64,7 +64,6 @@ import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.extensions.computeFirstAndLastName
 import com.infomaniak.mail.data.models.extensions.getJsonRequestBody
-import com.infomaniak.mail.data.models.extensions.safeName
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
@@ -84,6 +83,7 @@ import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
+import com.infomaniak.mail.utils.toSafeFileName
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -614,7 +614,7 @@ object ApiRepository : ApiRepositoryCore() {
         @OptIn(ManualAuthorizationRequired::class)
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
-            .addUnsafeNonAscii("x-ws-attachment-filename", attachment.safeName)
+            .addUnsafeNonAscii("x-ws-attachment-filename", attachment.name.toSafeFileName())
             .add("x-ws-attachment-mime-type", attachment.mimeType)
             .add("x-ws-attachment-disposition", "attachment")
             .build()

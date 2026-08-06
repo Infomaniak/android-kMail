@@ -111,7 +111,6 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
-import com.infomaniak.mail.utils.toSafeFileName
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
@@ -818,19 +817,18 @@ class NewMessageViewModel @Inject constructor(
     private suspend fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean> {
 
         val (fileName, fileSize) = getFileNameAndSize(uri) ?: return null to false
-        val safeFileName = fileName.toSafeFileName()
         val attachment = Attachment()
 
         return LocalStorageUtils.saveAttachmentToUploadDir(
             context = appContext,
             uri = uri,
-            fileName = safeFileName,
+            fileName = fileName,
             draftLocalUuid = draftLocalUuid!!,
             attachmentLocalUuid = attachment.localUuid,
             snackbarManager = snackbarManager,
         )?.let { file ->
             Pair(
-                attachment.initLocalValues(safeFileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
+                attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
                 fileSize > availableSpace,
             )
         } ?: (null to false)
