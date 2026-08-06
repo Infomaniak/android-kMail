@@ -178,7 +178,7 @@ class MessagesActions @Inject constructor(
     }
 
     suspend fun getMessagesFromThreadsToSpamOrHam(threads: Set<Thread>): List<Message> {
-        return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = false) }
+        return threads.flatMap { messageController.getMessagesWithoutSendDelayFromThread(it, includeDuplicates = false) }
     }
 
     suspend fun activateSpamFilter(mailbox: Mailbox) {
