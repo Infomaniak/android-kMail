@@ -173,8 +173,8 @@ class MessagesActions @Inject constructor(
         val destinationFolderRole = if (messagesFolderRoles.contains(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
 
-        val unscheduleMessages = messageController.getUnscheduledMessages(messages)
-        return moveMessagesTo(destinationFolder, mailbox, unscheduleMessages)
+        val messagesWithoutSendDelay = messageController.getMessagesWithoutSendDelay(messages)
+        return moveMessagesTo(destinationFolder, mailbox, messagesWithoutSendDelay)
     }
 
     suspend fun getMessagesFromThreadsToSpamOrHam(threads: Set<Thread>): List<Message> {
