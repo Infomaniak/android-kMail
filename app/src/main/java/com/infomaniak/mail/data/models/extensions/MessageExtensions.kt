@@ -137,7 +137,7 @@ fun Message.updateFlags(flags: DefaultMessageFlags) {
     isFavorite = flags.isFavorite
     isAnswered = flags.isAnswered
     isForwarded = flags.isForwarded
-    isScheduledMessage = flags.isScheduledMessage
+    isMessageWithSendDelay = flags.isMessageWithSendDelay
 
     if (flags.isSeen && snoozeState == SnoozeState.Unsnoozed) {
         snoozeState = null
