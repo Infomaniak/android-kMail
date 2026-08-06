@@ -482,8 +482,12 @@ class NewMessageFragment : Fragment() {
         }
 
         reminderAlert.apply {
-            onAction1 { navigateToScheduleSendBottomSheet() }
+            onAction1 {
+                trackNewMessageEvent(MatomoName.RescheduleReminderBanner)
+                navigateToScheduleSendBottomSheet()
+            }
             onAction2 {
+                trackNewMessageEvent(MatomoName.DeactivateReminderBanner)
                 newMessageViewModel.setReminderConfig(ReminderConfig.None)
                 newMessageViewModel.setShouldRemindRecipient(true)
             }
@@ -1003,6 +1007,7 @@ class NewMessageFragment : Fragment() {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
                     snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledReminderUnavailable))
                 } else {
+                    trackNewMessageEvent(MatomoName.OpenSendOptionsPanel)
                     navigateToScheduleSendBottomSheet()
                 }
             }
