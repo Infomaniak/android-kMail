@@ -32,6 +32,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import io.realm.kotlin.TypedRealm
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -81,7 +82,11 @@ val Thread.folder
     }
 
 fun Thread.getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): RealmList<Message> {
-    return if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) messagesWithContent else messages
+    return if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) {
+        messagesWithContent
+    } else {
+        messages.filterNot { it.shouldHideReminder && it.isScheduledDraft }.toRealmList()
+    }
 }
 
 fun Thread.addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
