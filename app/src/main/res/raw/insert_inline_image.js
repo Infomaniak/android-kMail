@@ -44,10 +44,14 @@
             if (isInsideEditor) {
                 range.deleteContents();
 
-                var brBefore = document.createElement("br");
-                range.insertNode(brBefore);
+                var brBefore1 = document.createElement("br");
+                var brBefore2 = document.createElement("br");
 
-                range.setStartAfter(brBefore);
+                range.insertNode(brBefore1);
+                range.setStartAfter(brBefore1);
+                range.insertNode(brBefore2);
+
+                range.setStartAfter(brBefore2);
                 range.insertNode(img);
 
                 var brAfter = document.createElement("br");
