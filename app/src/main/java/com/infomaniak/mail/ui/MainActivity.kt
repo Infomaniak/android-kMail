@@ -608,6 +608,7 @@ class MainActivity : BaseActivity() {
                 .collect { shouldDisplayReviewDialog ->
                     if (shouldDisplayReviewDialog) {
                         trackInAppReviewEvent(MatomoName.PresentAlert)
+                        inAppReviewManager.onReviewDialogShown()
                         when (askForAppReview()) {
                             ReviewAlertDialog.DialogAction.Positive -> inAppReviewManager.onUserWantsToReview()
                             ReviewAlertDialog.DialogAction.Negative -> {
@@ -622,7 +623,6 @@ class MainActivity : BaseActivity() {
         inAppReviewManager.init(
             countdownBehavior = BaseInAppReviewManager.Behavior.LifecycleBased,
             appReviewThreshold = DEFAULT_APP_REVIEW_LAUNCHES,
-            maxAppReviewThreshold = MAX_APP_REVIEW_LAUNCHES,
             onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
             onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
         )
@@ -731,6 +731,5 @@ class MainActivity : BaseActivity() {
         const val EXTRA_SHOW_ADMIN_DISABLED_SENDING_SNACKBAR = "show_admin_disabled_sending_snackbar"
 
         private const val DEFAULT_APP_REVIEW_LAUNCHES = 50
-        private const val MAX_APP_REVIEW_LAUNCHES = 500
     }
 }
