@@ -43,7 +43,9 @@ object ThreadRecomputations {
         // avoid side effects and unnecessary coupling
         val allMessages = messages
 
-        val lastCurrentFolderMessage = allMessages.lastOrNull { it.folderId == folderId }
+        val lastCurrentFolderMessage = allMessages.lastOrNull {
+            it.folderId == folderId && !(it.shouldHideReminder && it.isScheduledDraft)
+        }
         val lastMessage = if (isFromSearch) {
             // In the search, some threads (such as threads from the snooze folder) won't have any messages with the same folderId
             // as the thread folderId. This is an expected behavior and we don't want to delete it in this case. We just need to
