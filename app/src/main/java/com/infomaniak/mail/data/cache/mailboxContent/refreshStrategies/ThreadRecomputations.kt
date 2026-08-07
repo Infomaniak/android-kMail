@@ -127,7 +127,7 @@ object ThreadRecomputations {
             isAnswered = false
         }
         if (message.hasAttachable) hasAttachable = true
-        if (message.isScheduledDraft) numberOfScheduledDrafts++
+        if (message.isScheduledDraft && !message.shouldHideReminder) numberOfScheduledDrafts++
         updateSnoozeStatesBasedOn(message)
     }
 
