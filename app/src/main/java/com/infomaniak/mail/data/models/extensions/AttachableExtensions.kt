@@ -38,7 +38,7 @@ val Attachable.safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) name
 
 fun Attachable.getFileTypeFromMimeType(): AttachmentType = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
-fun Attachable.hasUsableCache(
+suspend fun Attachable.hasUsableCache(
     context: Context,
     file: File? = null,
     userId: Int = AccountUtils.currentUserId,
@@ -51,12 +51,12 @@ fun Attachable.hasUsableCache(
     is SwissTransferFile -> false
 }
 
-fun Attachable.isInlineCachedFile(context: Context): Boolean = when (this) {
+suspend fun Attachable.isInlineCachedFile(context: Context): Boolean = when (this) {
     is Attachment -> getCacheFile(context)?.exists() == true && disposition == AttachmentDisposition.INLINE
     is SwissTransferFile -> false
 }
 
-fun Attachable.getCacheFile(
+suspend fun Attachable.getCacheFile(
     context: Context,
     userId: Int = AccountUtils.currentUserId,
     mailboxId: Int = AccountUtils.currentMailboxId,

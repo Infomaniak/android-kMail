@@ -61,7 +61,7 @@ object AttachmentExt {
     const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
     //region Intent
-    private fun Attachment.saveToDriveIntent(context: Context): Intent? {
+    private suspend fun Attachment.saveToDriveIntent(context: Context): Intent? {
         val fileFromCache = getCacheFile(context) ?: return null
         val lastModifiedDate = fileFromCache.lastModified()
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), fileFromCache)
@@ -75,7 +75,7 @@ object AttachmentExt {
         }
     }
 
-    private fun Attachment.openWithIntent(context: Context): Intent? {
+    private suspend fun Attachment.openWithIntent(context: Context): Intent? {
         val file = getUploadLocalFile() ?: getCacheFile(context) ?: return null
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), file)
 
@@ -86,7 +86,7 @@ object AttachmentExt {
         }
     }
 
-    fun Attachment.getIntentOrGoToAppStore(context: Context, intentType: AttachmentIntentType) = when (intentType) {
+    suspend fun Attachment.getIntentOrGoToAppStore(context: Context, intentType: AttachmentIntentType) = when (intentType) {
         OPEN_WITH -> openWithIntent(context)
         SAVE_TO_DRIVE -> if (canSaveOnKDrive(context)) {
             saveToDriveIntent(context)
@@ -96,7 +96,7 @@ object AttachmentExt {
         }
     }
 
-    fun Attachment.executeIntent(
+    suspend fun Attachment.executeIntent(
         context: Context,
         intentType: AttachmentIntentType,
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
@@ -108,7 +108,7 @@ object AttachmentExt {
         }
     }
 
-    fun Attachment.openAttachment(
+    suspend fun Attachment.openAttachment(
         context: Context,
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         snackbarManager: SnackbarManager,

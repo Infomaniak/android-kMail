@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -43,6 +44,7 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -87,19 +89,23 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         if (attachment is Attachment) {
             openWithItem.setClosingOnClickListener {
                 trackAttachmentActionsEvent(MatomoName.OpenFromBottomsheet)
-                attachment.openAttachment(
-                    context = context,
-                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                    snackbarManager = snackbarManager,
-                )
+                lifecycleScope.launch {
+                    attachment.openAttachment(
+                        context = context,
+                        navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                        snackbarManager = snackbarManager,
+                    )
+                }
             }
             kDriveItem.setClosingOnClickListener {
                 trackAttachmentActionsEvent(MatomoName.SaveToKDrive)
-                attachment.executeIntent(
-                    context = context,
-                    intentType = AttachmentIntentType.SAVE_TO_DRIVE,
-                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                )
+                lifecycleScope.launch {
+                    attachment.executeIntent(
+                        context = context,
+                        intentType = AttachmentIntentType.SAVE_TO_DRIVE,
+                        navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                    )
+                }
             }
         }
 

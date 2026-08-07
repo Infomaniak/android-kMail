@@ -49,9 +49,14 @@ abstract class MessageWebViewClient(
         if (url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
             val cid = url.schemeSpecificPart
             return cidDictionary[cid]?.let { attachment ->
-                val cacheFile = attachment.getCacheFile(context) ?: return@runCatchingRealm null
+                val (cacheFile, hasUsableCache) = runBlocking {
+                    val file = attachment.getCacheFile(context)
+                    return@runBlocking file to attachment.hasUsableCache(context, file)
+                }
 
-                val data = if (attachment.hasUsableCache(context, cacheFile)) {
+                if (cacheFile == null) return@runCatchingRealm null
+
+                val data = if (hasUsableCache) {
                     cacheFile.inputStream()
                 } else {
                     runCatching {

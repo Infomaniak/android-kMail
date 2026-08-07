@@ -35,6 +35,7 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -77,7 +78,7 @@ class DownloadAttachmentViewModel @Inject constructor(
 
     override fun onCleared() = runCatchingRealm {
         // If we end up with an incomplete cached Attachment, we delete it
-        attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() }
+        viewModelScope.launch { attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() } }
         super.onCleared()
     }.getOrDefault(Unit)
 }
