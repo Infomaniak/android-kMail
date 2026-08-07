@@ -25,7 +25,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getInlineCacheFile
 import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
@@ -49,7 +51,11 @@ abstract class MessageWebViewClient(
         if (url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
             val cid = url.schemeSpecificPart
             return cidDictionary[cid]?.let { attachment ->
-                val cacheFile = attachment.getCacheFile(context)
+                val cacheFile = if (attachment.disposition == AttachmentDisposition.INLINE) {
+                    attachment.getInlineCacheFile(context).takeIf { it.exists() } ?: attachment.getCacheFile(context)
+                } else {
+                    attachment.getCacheFile(context)
+                }
 
                 val data = if (attachment.hasUsableCache(context, cacheFile)) {
                     cacheFile.inputStream()
