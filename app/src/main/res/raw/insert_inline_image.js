@@ -20,6 +20,10 @@
         if (document.activeElement !== document.body) document.body.focus();
     }
 
+    function getEditor() {
+        return document.getElementById("editor");
+    }
+
     globalThis.insertInlineImage = function(contentId) {
         if (!contentId) return;
 
@@ -31,28 +35,33 @@
         img.style.maxWidth = "100%";
         img.style.height = "auto";
 
+        var editor = getEditor();
         var selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
             var range = selection.getRangeAt(0);
-            range.deleteContents();
+            var isInsideEditor = editor.contains(range.commonAncestorContainer);
 
-            var brBefore = document.createElement("br");
-            range.insertNode(brBefore);
+            if (isInsideEditor) {
+                range.deleteContents();
 
-            range.setStartAfter(brBefore);
-            range.insertNode(img);
+                var brBefore = document.createElement("br");
+                range.insertNode(brBefore);
 
-            var brAfter = document.createElement("br");
-            range.setStartAfter(img);
-            range.insertNode(brAfter);
+                range.setStartAfter(brBefore);
+                range.insertNode(img);
 
-            range.setStartAfter(brAfter);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            return;
+                var brAfter = document.createElement("br");
+                range.setStartAfter(img);
+                range.insertNode(brAfter);
+
+                range.setStartAfter(brAfter);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                return;
+            }
         }
 
-        document.body.appendChild(img);
+        editor.appendChild(img);
     };
 })();
