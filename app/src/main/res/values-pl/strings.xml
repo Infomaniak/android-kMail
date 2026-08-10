@@ -640,6 +640,7 @@
     <string name="snackbarMoveCancelled">Przeniesienie anulowane</string>
     <string name="snackbarPasswordCopied">Hasło skopiowane</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numer skopiowany do schowka</string>
+    <string name="snackbarReactionSent">Reakcja %s wysłana</string>
     <string name="snackbarReportPhishingConfirmation">Pomyślnie zgłoszono</string>
     <string name="snackbarRestorationLaunched">Uruchamianie przywracania</string>
     <string name="snackbarSaveInDraft">Twoja wiadomość została zapisana w wersjach roboczych.</string>

@@ -168,6 +168,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val UNSCHEDULE_DRAFT_URL_KEY = "unscheduleDraftUrlKey"
         const val CANCEL_RESOURCE_URL_KEY = "cancelResourceUrlKey"
         const val IS_SUCCESS = "isSuccess"
+        const val TRACKED_DRAFT_EMOJI_KEY = "trackedDraftEmojiKey"
 
         const val EMOJI_SENT_STATUS = "emojiSentStatusKey"
         const val ALL_EMOJI_SENT_STATUS = "allEmojiSentStatusKey"

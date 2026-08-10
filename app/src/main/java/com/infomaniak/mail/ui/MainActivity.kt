@@ -360,7 +360,12 @@ class MainActivity : BaseActivity() {
                     // Waits 2s after cancel delay to guarantee the send action is committed
                     actionsViewModel.refreshFoldersAfterSendDelay(localSettings.cancelDelay + 2, mailbox)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
-                    showSentDraftSnackbar(cancelResourceUrl)
+
+                    showSentDraftSnackbar(
+                        cancelResourceUrl,
+                        isReaction = draftAction.toEnumOrThrow<DraftAction>() == DraftAction.SEND_REACTION,
+                        emoji = getString(DraftsActionsWorker.TRACKED_DRAFT_EMOJI_KEY),
+                    )
                 }
                 DraftAction.SCHEDULE -> {
                     val scheduleDate = getString(DraftsActionsWorker.SCHEDULED_DRAFT_DATE_KEY)
@@ -398,21 +403,23 @@ class MainActivity : BaseActivity() {
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
-    private fun showSentDraftSnackbar(cancelResourceUrl: String?) {
+    private fun showSentDraftSnackbar(cancelResourceUrl: String?, isReaction: Boolean, emoji: String? = null) {
         showSendingSnackbarTimer.cancel()
-        if (cancelResourceUrl == null) {
-            snackbarManager.setValue(getString(R.string.snackbarEmailSent))
-        } else {
-            val mailbox = mainViewModel.currentMailbox.value ?: return
+        when {
+            isReaction -> snackbarManager.setValue(getString(R.string.snackbarReactionSent, emoji ?: ""))
+            cancelResourceUrl == null -> snackbarManager.setValue(getString(R.string.snackbarEmailSent))
+            else -> {
+                val mailbox = mainViewModel.currentMailbox.value ?: return
 
-            snackbarManager.setValue(
-                title = getString(R.string.snackbarEmailSent),
-                buttonTitle = RCore.string.buttonCancel,
-                customBehavior = { actionsViewModel.unsendMessage(cancelResourceUrl, mailbox) },
-                // Snackbar displays for 2 seconds less than actual cancel delay
-                // to ensure the user sees the snackbar disappear before the action is committed
-                length = max(0, (localSettings.cancelDelay - 2) * 1000)
-            )
+                snackbarManager.setValue(
+                    title = getString(R.string.snackbarEmailSent),
+                    buttonTitle = RCore.string.buttonCancel,
+                    customBehavior = { actionsViewModel.unsendMessage(cancelResourceUrl, mailbox) },
+                    // Snackbar displays for 2 seconds less than actual cancel delay
+                    // to ensure the user sees the snackbar disappear before the action is committed
+                    length = max(0, (localSettings.cancelDelay - 2) * 1000)
+                )
+            }
         }
     }
 
