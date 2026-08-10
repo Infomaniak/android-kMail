@@ -254,6 +254,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
+        observeFeatureFlags()
 
         observePickedEmoji()
 
@@ -508,6 +509,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        threadAdapter.updateFeatureFlags(mainViewModel.currentMailbox.value?.featureFlags)
     }
 
     private fun openDraft(message: Message) {
@@ -605,6 +607,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             threadAdapter.updateEmailsPermission(canSend)
             updateQuickActionBarSendingState(canSend)
         }
+    }
+
+    private fun observeFeatureFlags() {
+        mainViewModel.featureFlagsLive.observe(viewLifecycleOwner, threadAdapter::updateFeatureFlags)
     }
 
     private fun updateQuickActionBarSendingState(canSend: Boolean) = with(binding.quickActionBar) {
