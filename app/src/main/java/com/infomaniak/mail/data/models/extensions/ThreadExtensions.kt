@@ -82,11 +82,10 @@ val Thread.folder
     }
 
 fun Thread.getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): RealmList<Message> {
-    val shouldHideReminder: (Message) -> Boolean = { it.shouldHideReminder && (it.isScheduledDraft || isFromSearch) }
-    return if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) {
-        messagesWithContent.filterNot(shouldHideReminder).toRealmList()
+    return if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings) || isFromSearch) {
+        messagesWithContent
     } else {
-        messages.filterNot(shouldHideReminder).toRealmList()
+        messages
     }
 }
 
