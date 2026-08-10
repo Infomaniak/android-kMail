@@ -87,25 +87,19 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setupListeners(attachment: Attachable) = with(binding) {
         if (attachment is Attachment) {
-            openWithItem.setClosingOnClickListener {
-                trackAttachmentActionsEvent(MatomoName.OpenFromBottomsheet)
-                lifecycleScope.launch {
-                    attachment.openAttachment(
-                        context = context,
-                        navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                        snackbarManager = snackbarManager,
-                    )
-                }
+            openWithItem.setOnClickSuspend(MatomoName.OpenFromBottomsheet) {
+                attachment.openAttachment(
+                    context = context,
+                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                    snackbarManager = snackbarManager,
+                )
             }
-            kDriveItem.setClosingOnClickListener {
-                trackAttachmentActionsEvent(MatomoName.SaveToKDrive)
-                lifecycleScope.launch {
-                    attachment.executeIntent(
-                        context = context,
-                        intentType = AttachmentIntentType.SAVE_TO_DRIVE,
-                        navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                    )
-                }
+            kDriveItem.setOnClickSuspend(MatomoName.SaveToKDrive) {
+                attachment.executeIntent(
+                    context = context,
+                    intentType = AttachmentIntentType.SAVE_TO_DRIVE,
+                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                )
             }
         }
 
@@ -126,5 +120,15 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun scheduleDownloadAndPopBack(downloadUrl: String, filename: String) {
         mainViewModel.scheduleDownload(downloadUrl, filename)
         findNavController().popBackStack()
+    }
+
+    private fun ActionItemView.setOnClickSuspend(matomoTracker: MatomoName, block: suspend () -> Unit) {
+        setOnClickListener {
+            trackAttachmentActionsEvent(matomoTracker)
+            lifecycleScope.launch {
+                block()
+                findNavController().popBackStack()
+            }
+        }
     }
 }
