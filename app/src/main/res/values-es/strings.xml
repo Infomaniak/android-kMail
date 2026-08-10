@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Notificar como no spam</string>
     <string name="actionPhishing">Informar sobre phishing</string>
     <string name="actionPrint">Imprimir</string>
+    <string name="actionReminder">Recordarme</string>
     <string name="actionRename">Renombrar</string>
     <string name="actionReply">Responder</string>
     <string name="actionReplyAll">Responder a todos</string>
@@ -292,7 +293,6 @@
     <string name="encryptedMessagePasswordLabel">Comparte esta contraseña por mensaje privado. No podrás copiarla una vez que la hayas enviado.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Se ha desactivado el cifrado</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">El envío programado y los recordatorios no están disponibles para mensajes cifrados</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Los correos electrónicos programados no están disponibles para los mensajes cifrados</string>
     <string name="encryptedMessageUpdatePasswordButton">Cambiar contraseña</string>
     <string name="encryptedPasswordProtectionTitle">Protección mediante contraseña</string>
     <string name="encryptedProtectionAdDescription">Proteja su mensaje contra el acceso no autorizado con el cifrado Infomaniak.</string>
@@ -306,6 +306,7 @@
     <string name="encryptedStatePanelIncomplete">Se requiere una contraseña para completar la transmisión.</string>
     <string name="encryptedStatePanelStatePartialLabel">Parcial</string>
     <string name="encryptedStatePanelTitle">Cifrado</string>
+    <string name="encryptionDisabledByScheduledOrReminder">El cifrado no está disponible si el envío programado o el recordatorio están activados</string>
     <string name="enterPasswordTitle">Introduzca la contraseña</string>
     <string name="errorAlreadyLinkedMailbox">Esta dirección de correo electrónico ya está vinculada a su cuenta</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
@@ -645,6 +646,8 @@
     <string name="snackbarEmailSent">Correo electrónico enviado</string>
     <string name="snackbarInvalidUrl">URL no válida</string>
     <string name="snackbarLinkCopiedToClipboard">Enlace copiado en el portapapeles</string>
+    <string name="snackbarMarkAsDoneReminderFailure">No se pudo marcar el recordatorio como completado</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Recordatorio marcado como completado</string>
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
     <string name="snackbarMessageMovedToSpam">Mensaje movido a spam y usuario bloqueado</string>

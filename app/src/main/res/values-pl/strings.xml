@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Zgłoś jako nie spam</string>
     <string name="actionPhishing">Zgłoś phishing</string>
     <string name="actionPrint">Drukuj</string>
+    <string name="actionReminder">Przypomnij mi</string>
     <string name="actionRename">Zmień nazwę</string>
     <string name="actionReply">Odpowiedz</string>
     <string name="actionReplyAll">Odpowiedz wszystkim</string>
@@ -302,7 +303,6 @@
     <string name="encryptedMessagePasswordLabel">Udostępnij to hasło w prywatnej wiadomości. Nie będziesz mógł/ mogła go skopiować po wysłaniu.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Szyfrowanie zostało wyłączone</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Zaplanowane wysyłanie i przypomnienia nie są dostępne dla zaszyfrowanych wiadomości</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Planowane wiadomości nie są dostępne dla zaszyfrowanych wiadomości</string>
     <string name="encryptedMessageUpdatePasswordButton">Zmień hasło</string>
     <string name="encryptedPasswordProtectionTitle">Ochrona hasłem</string>
     <string name="encryptedProtectionAdDescription">Chroń swoją wiadomość przed nieautoryzowanym dostępem dzięki szyfrowaniu Infomaniak.</string>
@@ -316,6 +316,7 @@
     <string name="encryptedStatePanelIncomplete">Wymagane jest hasło, aby zakończyć wysyłkę.</string>
     <string name="encryptedStatePanelStatePartialLabel">Częściowo</string>
     <string name="encryptedStatePanelTitle">Szyfrowanie</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Szyfrowanie jest niedostępne, jeśli zaplanowane wysyłanie lub przypomnienie jest włączone</string>
     <string name="enterPasswordTitle">Wprowadź hasło</string>
     <string name="errorAlreadyLinkedMailbox">Ten adres e-mail jest już powiązany z Twoim kontem</string>
     <string name="errorAtLeastOneRecipient">Wymagany jest co najmniej jeden odbiorca</string>
@@ -679,6 +680,8 @@
     <string name="snackbarEmailSent">E-mail wysłany</string>
     <string name="snackbarInvalidUrl">Nieprawidłowy URL</string>
     <string name="snackbarLinkCopiedToClipboard">Link skopiowany do schowka</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Nie udało się oznaczyć przypomnienia jako wykonane</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Przypomnienie oznaczone jako wykonane</string>
     <string name="snackbarMessageDeletedPermanently">Wiadomość usunięta</string>
     <string name="snackbarMessageMoved">Wiadomość przeniesiona do %s</string>
     <string name="snackbarMessageMovedToSpam">Wiadomość przeniesiona do spamu i użytkownik zablokowany</string>

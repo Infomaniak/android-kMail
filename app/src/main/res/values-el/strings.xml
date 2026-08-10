@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Αναφορά ως μη spam</string>
     <string name="actionPhishing">Αναφορά phishing</string>
     <string name="actionPrint">Εκτύπωση</string>
+    <string name="actionReminder">Θύμισέ μου</string>
     <string name="actionRename">Μετονομασία</string>
     <string name="actionReply">Απάντηση</string>
     <string name="actionReplyAll">Απάντηση σε όλους</string>
@@ -292,7 +293,6 @@
     <string name="encryptedMessagePasswordLabel">Μοιραστείτε αυτόν τον κωδικό μέσω ιδιωτικού μηνύματος. Δεν θα μπορείτε να τον αντιγράψετε μετά την αποστολή.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Η κρυπτογράφηση απενεργοποιήθηκε</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Η προγραμματισμένη αποστολή και οι υπενθυμίσεις δεν είναι διαθέσιμες για κρυπτογραφημένα μηνύματα</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Τα προγραμματισμένα email δεν είναι διαθέσιμα για κρυπτογραφημένα μηνύματα</string>
     <string name="encryptedMessageUpdatePasswordButton">Αλλαγή κωδικού</string>
     <string name="encryptedPasswordProtectionTitle">Προστασία με κωδικό πρόσβασης</string>
     <string name="encryptedProtectionAdDescription">Προστατέψτε το μήνυμά σας από μη εξουσιοδοτημένη πρόσβαση με την κρυπτογράφηση Infomaniak.</string>
@@ -306,6 +306,7 @@
     <string name="encryptedStatePanelIncomplete">Απαιτείται κωδικός για την ολοκλήρωση της αποστολής.</string>
     <string name="encryptedStatePanelStatePartialLabel">Μερικό</string>
     <string name="encryptedStatePanelTitle">Κρυπτογράφηση</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Η κρυπτογράφηση δεν είναι διαθέσιμη αν η προγραμματισμένη αποστολή ή η υπενθύμιση είναι ενεργοποιημένη</string>
     <string name="enterPasswordTitle">Εισαγωγή κωδικού πρόσβασης</string>
     <string name="errorAlreadyLinkedMailbox">Αυτή η διεύθυνση email είναι ήδη συνδεδεμένη με τον λογαριασμό σας</string>
     <string name="errorAtLeastOneRecipient">Απαιτείται τουλάχιστον ένας παραλήπτης</string>
@@ -645,6 +646,8 @@
     <string name="snackbarEmailSent">Το email εστάλη</string>
     <string name="snackbarInvalidUrl">Μη έγκυρο URL</string>
     <string name="snackbarLinkCopiedToClipboard">Ο σύνδεσμος αντιγράφηκε στο πρόχειρο</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Αποτυχία σήμανσης της υπενθύμισης ως ολοκληρωμένης</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Υπενθύμιση επισημάνθηκε ως ολοκληρωμένη</string>
     <string name="snackbarMessageDeletedPermanently">Το μήνυμα διαγράφηκε</string>
     <string name="snackbarMessageMoved">Το μήνυμα μετακινήθηκε στο %s</string>
     <string name="snackbarMessageMovedToSpam">Το μήνυμα μεταφέρθηκε στα spam και ο χρήστης εμποδίστηκε</string>
