@@ -931,9 +931,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
-        newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleButton.isEnabled = it
-            sendButton.isEnabled = it
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(newMessageViewModel.isSendingAllowed, newMessageViewModel.isSending) { isAllowed, isSending ->
+                isAllowed && !isSending
+            }.collect { isEnabled ->
+                scheduleButton.isEnabled = isEnabled
+                sendButton.isEnabled = isEnabled
+            }
         }
 
         scheduleButton.setOnClickListener {
@@ -978,14 +982,22 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
+        if (newMessageViewModel.isSending.value) return
+
+        newMessageViewModel.setSending(true)
+
         viewLifecycleOwner.lifecycleScope.launch {
-            if (isSubjectBlank() && showSubjectDialog(isScheduled)) return@launch
+            try {
+                if (isSubjectBlank() && showSubjectDialog(isScheduled)) return@launch
 
-            val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
-            val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
+                val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
+                val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
 
-            if (shouldShowAttachmentReminder && showAttachmentDialog(isScheduled)) return@launch
-            sendEmail()
+                if (shouldShowAttachmentReminder && showAttachmentDialog(isScheduled)) return@launch
+                sendEmail()
+            } finally {
+                newMessageViewModel.setSending(false)
+            }
         }
     }
 
