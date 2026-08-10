@@ -521,6 +521,7 @@
     <string name="selectDateDialogTitle">Datum selecteren</string>
     <string name="selectSignatureNone">Geen handtekening</string>
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
+    <string name="selectionReminderMeOnly">Alleen ik</string>
     <string name="selectionReminderRecipientsAndMe">Ontvangers en mij</string>
     <string name="send">Verzenden</string>
     <string name="sendConfirmationAction">De bevestiging verzenden</string>

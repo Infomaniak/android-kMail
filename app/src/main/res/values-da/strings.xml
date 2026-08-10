@@ -521,6 +521,7 @@
     <string name="selectDateDialogTitle">Vælg dato</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Vælg tidspunkt</string>
+    <string name="selectionReminderMeOnly">Kun mig</string>
     <string name="selectionReminderRecipientsAndMe">Modtagere og mig</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send bekræftelsen</string>
