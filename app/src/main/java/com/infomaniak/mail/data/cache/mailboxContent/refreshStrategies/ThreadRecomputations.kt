@@ -182,7 +182,7 @@ object ThreadRecomputations {
             val targetMessageIds = message.inReplyTo ?: ""
             val isHiddenEmojiReaction = message.isReaction && isTargetMessageInThread(targetMessageIds, threadMessageIds)
             val isHiddenReminder = message.shouldHideReminder
-                    && (isTargetMessageInThread(targetMessageIds, threadMessageIds) || message.isScheduledDraft)
+                    && (isTargetMessageInThread(targetMessageIds, threadMessageIds) || message.isScheduledDraft || isFromSearch)
             if (isHiddenEmojiReaction.not() && isHiddenReminder.not()) messagesWithContent += message
         }
     }
