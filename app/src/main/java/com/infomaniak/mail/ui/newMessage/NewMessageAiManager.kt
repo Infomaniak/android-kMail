@@ -230,6 +230,7 @@ class NewMessageAiManager @Inject constructor(
 
     private suspend fun getAiPropositionFragmentDirection(): NavDirections {
         val isSubjectBlank = fragment.isSubjectBlank()
+        newMessageViewModel.subject = if (isSubjectBlank) "" else binding.subjectTextField.text.toString()
 
         val isBodyBlank = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"").isBlank()
         return NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(

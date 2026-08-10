@@ -18,8 +18,10 @@
 package com.infomaniak.mail.data.models.ai
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 open class AiMessage(var content: String, val type: String) {
-    val vars = mutableMapOf<String, String>()
+    @Transient
+    val vars = mutableMapOf<String, Any?>()
 }

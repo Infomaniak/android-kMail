@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.ai.AiResult
 import com.infomaniak.mail.data.models.ai.AssistantMessage
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.CONTEXT_TOO_LONG
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.ERROR
@@ -90,11 +91,19 @@ class AiViewModel @Inject constructor(
     }
 
     fun generateNewAiProposition(
-        formattedRecipientsString: String?,
+        from: Recipient,
+        to: List<Recipient>,
+        cc: List<Recipient>,
+        bcc: List<Recipient>,
+        subject: String,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         fun addVars(message: AiMessage) {
-            formattedRecipientsString?.let { message.vars["recipient"] = it }
+            message.vars["from"] = from
+            message.vars["to"] = to
+            message.vars["cc"] = cc
+            message.vars["bcc"] = bcc
+            message.vars["subject"] = subject
         }
 
         history.clear()
@@ -120,6 +129,10 @@ class AiViewModel @Inject constructor(
         return splitBodyAndSubject(match, proposition)
     }
 
+    fun makeFrom(email: String, name: String): Recipient = Recipient().apply {
+        this.email = email
+        this.name = name
+    }
     private suspend fun requireMailboxUuid(): String = mailboxUuidFlow.filterNotNull().first()
 
     private fun splitBodyAndSubject(match: MatchResult?, proposition: String): Pair<String?, String> {

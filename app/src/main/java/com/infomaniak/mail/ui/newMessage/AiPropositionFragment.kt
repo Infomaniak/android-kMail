@@ -51,6 +51,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.AiDraftCache
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
@@ -61,6 +62,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY
 import com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheetArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
+import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -112,6 +114,9 @@ class AiPropositionFragment : Fragment() {
 
     @Inject
     lateinit var subjectReplacementDialog: AiDescriptionAlertDialog
+
+    @Inject
+    lateinit var draftInitManager: DraftInitManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPropositionBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -312,24 +317,40 @@ class AiPropositionFragment : Fragment() {
             .create()
     }
 
-    private fun generateNewAiProposition() {
+    private fun generateNewAiProposition() = lifecycleScope.launch {
+        val from: Recipient = aiViewModel.makeFrom(
+            email = mailbox?.email ?: "",
+            name = mailbox?.signatures?.firstOrNull()?.senderName ?: (mailbox?.mailboxName ?: ""),
+        )
+        val to: List<Recipient>
+        val cc: List<Recipient>
+        val bcc: List<Recipient>
+        val subject: String
 
-        lifecycleScope.launch {
-            val allRecipients = if (isHostedByNewMessageActivity()) {
+        if (isHostedByNewMessageActivity()) {
                 // we are generating the proposition from a new message composition
-                newMessageViewModel.toLiveData.valueOrEmpty()
-            } else {
+            to = newMessageViewModel.toLiveData.valueOrEmpty()
+            cc = newMessageViewModel.ccLiveData.valueOrEmpty()
+            bcc = newMessageViewModel.bccLiveData.valueOrEmpty()
+            subject = newMessageViewModel.subject
+        } else {
                 // we are generating the proposition from replyWithEuria in the threadFragment
                 val message = messageController.getMessage(navigationArgs.messageUid) ?: return@launch
-                val (to, cc) = message.getRecipientsForReplyTo(replyAll = true)
-                to + cc
-            }
-
-            val formattedRecipientsString = allRecipients
-                .joinToString(separator = ", ") { it.name.ifBlank { it.email } }
-                .takeIf { it.isNotBlank() }
-            currentRequestJob = aiViewModel.generateNewAiProposition(formattedRecipientsString)
+            val (replyTo, replyCc) = message.getRecipientsForReplyTo(replyAll = true)
+            to = replyTo
+            cc = replyCc
+            bcc = emptyList()
+            subject = draftInitManager.formatSubject(DraftMode.REPLY_ALL, message.subject)
         }
+
+        currentRequestJob = aiViewModel.generateNewAiProposition(
+            currentMailboxUuid = mailbox?.uuid ?: return@launch,
+            from = from,
+            to = to,
+            cc = cc,
+            bcc = bcc,
+            subject = subject,
+        )
     }
 
     private fun observeAiProposition() {

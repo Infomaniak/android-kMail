@@ -192,6 +192,7 @@ class NewMessageViewModel @Inject constructor(
     val ccLiveData = MutableLiveData<UiRecipients>()
     val bccLiveData = MutableLiveData<UiRecipients>()
     val attachmentsLiveData = MutableLiveData<List<Attachment>>()
+    var subject: String = ""
     inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
