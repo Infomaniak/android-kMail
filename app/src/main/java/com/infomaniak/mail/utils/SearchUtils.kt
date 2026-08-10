@@ -100,6 +100,7 @@ class SearchUtils @Inject constructor(
             message.toThread().apply {
                 uid = "search-${message.uid}"
                 isFromSearch = true
+                removeHiddenReminders()
                 recomputeThread(aliases = aliases)
                 sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }.takeIf { it.messagesWithContent.isNotEmpty() }
@@ -126,11 +127,16 @@ class SearchUtils @Inject constructor(
             remoteThread.apply {
                 isFromSearch = true
                 setFolderId(filterFolder)
+                removeHiddenReminders()
                 recomputeThread(aliases = aliases)
                 keepOldMessagesData(filterFolder, mailboxContentRealm())
                 sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }
         }.filter { it.messagesWithContent.isNotEmpty() }
+    }
+
+    private fun Thread.removeHiddenReminders() {
+        messages.removeAll { it.shouldHideReminder }
     }
 
     private fun Thread.setFolderId(filterFolder: Folder?) {
