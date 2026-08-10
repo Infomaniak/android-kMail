@@ -74,7 +74,7 @@ suspend fun Attachable.getCacheFile(
     is SwissTransferFile -> File("")
 }
 
-fun Attachment.getInlineCacheFile(
+suspend fun Attachment.getInlineCacheFile(
     context: Context,
     userId: Int = AccountUtils.currentUserId,
     mailboxId: Int = AccountUtils.currentMailboxId,
