@@ -545,26 +545,28 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun onAttachableClicked(attachable: Attachable) {
         when (attachable) {
-            is Attachment -> {
-                trackAttachmentActionsEvent(MatomoName.Open)
-                lifecycleScope.launch {
-                    attachable.openAttachment(
-                        context = requireContext(),
-                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                            navigateToDownloadProgressDialog(
-                                attachment = attachment,
-                                attachmentIntentType = attachmentIntentType,
-                                currentClassName = ThreadFragment::class.java.name,
-                            )
-                        },
-                        snackbarManager = snackbarManager,
-                    )
-                }
-            }
+            is Attachment -> openAttachment(attachable)
             is SwissTransferFile -> {
                 trackAttachmentActionsEvent(MatomoName.OpenSwissTransfer)
                 downloadSwissTransferFile(swissTransferFile = attachable)
             }
+        }
+    }
+
+    private fun openAttachment(attachable: Attachment) {
+        trackAttachmentActionsEvent(MatomoName.Open)
+        lifecycleScope.launch {
+            attachable.openAttachment(
+                context = requireContext(),
+                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                    navigateToDownloadProgressDialog(
+                        attachment = attachment,
+                        attachmentIntentType = attachmentIntentType,
+                        currentClassName = ThreadFragment::class.java.name,
+                    )
+                },
+                snackbarManager = snackbarManager,
+            )
         }
     }
 
