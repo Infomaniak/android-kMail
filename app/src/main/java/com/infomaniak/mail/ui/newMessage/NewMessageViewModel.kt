@@ -256,6 +256,12 @@ class NewMessageViewModel @Inject constructor(
     private val _currentMentions = MutableStateFlow<List<String>>(emptyList())
     val currentMentions: StateFlow<List<String>> = _currentMentions.asStateFlow()
 
+    private val _scheduleConfig = MutableStateFlow<ScheduleConfig>(ScheduleConfig.None)
+    val scheduleConfig: StateFlow<ScheduleConfig> = _scheduleConfig.asStateFlow()
+
+    private val _reminderConfig = MutableStateFlow<ReminderConfig>(ReminderConfig.None)
+    val reminderConfig: StateFlow<ReminderConfig> = _reminderConfig.asStateFlow()
+
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
@@ -1231,6 +1237,14 @@ class NewMessageViewModel @Inject constructor(
             updatedMentions
         }
 
+    }
+
+    fun setScheduleConfig(config: ScheduleConfig) {
+        _scheduleConfig.value = config
+    }
+
+    fun setReminderConfig(config: ReminderConfig) {
+        _reminderConfig.value = config
     }
 
     enum class ImportationResult {
