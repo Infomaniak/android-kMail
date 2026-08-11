@@ -82,9 +82,12 @@ class AiPromptFragment : Fragment() {
     }
 
     private fun setCorrectSheetMargins() = with(binding.root) {
-        val maxWidthPx = resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width)
-        val horizontalMarginPx = 56.toPx(this)
-        val horizontalMargin = if (resources.displayMetrics.widthPixels > maxWidthPx) horizontalMarginPx else 0
+        val m3BottomSheetMaxWidthPx = resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width)
+        val m3BottomSheetHorizontalMarginPx = 56.toPx(this)
+
+        val screenWidth = resources.displayMetrics.widthPixels
+        val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
+        val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
         setMarginsRelative(start = horizontalMargin, end = horizontalMargin)
     }
 
@@ -98,6 +101,7 @@ class AiPromptFragment : Fragment() {
     }
 
     companion object {
+        private const val NO_MARGIN = 0
         private val promptExamples = listOf(
             R.string.aiPromptExample1,
             R.string.aiPromptExample2,
