@@ -318,9 +318,10 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun generateNewAiProposition() = lifecycleScope.launch {
+        val selectedSignature = newMessageViewModel.fromLiveData.value?.signature
         val from: Recipient = aiViewModel.makeFrom(
-            email = mailbox?.email ?: "",
-            name = mailbox?.signatures?.firstOrNull()?.senderName ?: (mailbox?.mailboxName ?: ""),
+            email = selectedSignature?.senderEmail ?: mailbox?.email.orEmpty(),
+            name = selectedSignature?.senderName ?: mailbox?.mailboxName.orEmpty(),
         )
         val to: List<Recipient>
         val cc: List<Recipient>
