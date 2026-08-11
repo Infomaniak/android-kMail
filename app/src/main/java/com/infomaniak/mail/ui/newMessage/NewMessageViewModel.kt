@@ -373,7 +373,7 @@ class NewMessageViewModel @Inject constructor(
                 aiDraftCache.pendingAiContent?.let { pendingAiContent ->
                     aiDraftCache.pendingAiSubject?.let { subject -> draft.subject = subject }
                     initialBody = BodyContentPayload.bodyOf(
-                        BodyContentPayload(pendingAiContent, BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
+                        BodyContentPayload(pendingAiContent, BodyContentType.TEXT_PLAIN_WITH_HTML)
                     )
                     aiDraftCache.pendingAiSubject = null
                     aiDraftCache.pendingAiContent = null
