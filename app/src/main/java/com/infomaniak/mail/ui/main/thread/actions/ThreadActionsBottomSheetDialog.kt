@@ -79,6 +79,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
+
+    override val substituteClassName: String by lazy {
+        if (navigationArgs.isFromSearch) {
+            SearchFragment::class.java.name
+        } else {
+            ThreadListFragment::class.java.name
+        }
+    }
+
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
 
     private var folderRole: FolderRole? = null
@@ -134,14 +143,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         observePotentialBlockedUsers()
         observeReportPhishingResult()
-    }
-
-    override val substituteClassName: String by lazy {
-        if (navigationArgs.isFromSearch) {
-            SearchFragment::class.java.name
-        } else {
-            ThreadListFragment::class.java.name
-        }
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
