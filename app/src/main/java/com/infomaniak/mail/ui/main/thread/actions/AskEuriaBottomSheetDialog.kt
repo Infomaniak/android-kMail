@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
@@ -42,9 +43,7 @@ import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
-import com.infomaniak.mail.utils.openKSuiteProBottomSheet
-import com.infomaniak.mail.utils.openMailPremiumBottomSheet
-import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
+import com.infomaniak.mail.utils.openKSuiteUpsellOrElse
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -98,12 +97,13 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.reply.setOnClickListener {
-            when (kSuite) {
-                KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
-                KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
-                KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
-                else -> handleStandardReplyAction(messageUid)
-            }
+            openKSuiteUpsellOrElse(
+                kSuite = kSuite,
+                isAdmin = mailbox?.isAdmin ?: false,
+                matomoName = matomoName,
+                substituteClassName = ThreadListFragment::class.java.name,
+                onAvailable = { handleStandardReplyAction(messageUid) }
+            )
         }
     }
 
