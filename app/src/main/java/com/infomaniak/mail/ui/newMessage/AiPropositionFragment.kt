@@ -272,8 +272,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun navigateToNewMessageActivityWithAiContent(subject: String?, content: String) {
-        aiDraftCache.pendingAiSubject = subject
-        aiDraftCache.pendingAiContent = content
+        aiDraftCache.setAiDraft(subject, content)
         safeNavigateToNewMessageActivity(
             args = NewMessageActivityArgs(
                 draftMode = DraftMode.REPLY_ALL,

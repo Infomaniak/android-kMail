@@ -375,8 +375,7 @@ class NewMessageViewModel @Inject constructor(
                     initialBody = BodyContentPayload.bodyOf(
                         BodyContentPayload(pendingAiContent, BodyContentType.TEXT_PLAIN_WITH_HTML)
                     )
-                    aiDraftCache.pendingAiSubject = null
-                    aiDraftCache.pendingAiContent = null
+                    aiDraftCache.reset()
                 }
             }
 

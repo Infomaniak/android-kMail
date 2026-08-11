@@ -23,5 +23,18 @@ import javax.inject.Singleton
 @Singleton
 class AiDraftCache @Inject constructor() {
     var pendingAiSubject: String? = null
+        private set
     var pendingAiContent: String? = null
+        private set
+
+    fun setAiDraft(subject: String?, content: String?) {
+        pendingAiSubject = subject
+        pendingAiContent = content
+    }
+
+    fun reset() {
+        pendingAiSubject = null
+        pendingAiContent = null
+    }
+
 }
