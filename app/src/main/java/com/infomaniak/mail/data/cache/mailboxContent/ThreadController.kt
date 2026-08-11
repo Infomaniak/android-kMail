@@ -285,6 +285,10 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
                     if (apiResponse.isSuccess()) {
                         apiResponse.data?.also { remoteMessage ->
+
+                            val freshLocalMessage = MessageController.getMessageBlocking(localMessage.uid, realm = this)
+                            if (freshLocalMessage?.isFullyDownloaded() == true) return@also
+
                             val swissTransferFiles = swissTransferContainer?.let { container ->
                                 SwissTransferContainerController.upsertSwissTransferContainer(container, realm = this)
                                 container.swissTransferFiles
