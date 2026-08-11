@@ -87,23 +87,25 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
         val kSuite = mailbox?.kSuite
 
         val matomoName = MatomoName.ReplyWithEuria.value
-        binding.reply.trailingContent = when (kSuite) {
-            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
-            KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
-            else -> {
-                binding.reply.newFeatureBadgeVisible = !localSettings.hasAlreadyUsedReplyWithEuria
-                TrailingContent.None
+        binding.reply.apply {
+            trailingContent = when (kSuite) {
+                KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+                KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
+                else -> {
+                    newFeatureBadgeVisible = !localSettings.hasAlreadyUsedReplyWithEuria
+                    TrailingContent.None
+                }
             }
-        }
 
-        binding.reply.setOnClickListener {
-            openKSuiteUpsellOrElse(
-                kSuite = kSuite,
-                isAdmin = mailbox?.isAdmin ?: false,
-                matomoName = matomoName,
-                substituteClassName = ThreadListFragment::class.java.name,
-                onAvailable = { handleStandardReplyAction(messageUid) }
-            )
+            setOnClickListener {
+                openKSuiteUpsellOrElse(
+                    kSuite = kSuite,
+                    isAdmin = mailbox?.isAdmin ?: false,
+                    matomoName = matomoName,
+                    substituteClassName = ThreadListFragment::class.java.name,
+                    onAvailable = { handleStandardReplyAction(messageUid) }
+                )
+            }
         }
     }
 
