@@ -41,16 +41,17 @@ class AiPromptView @JvmOverloads constructor(
         onPromptChanged: (String) -> Unit,
     ) = with(binding) {
 
-        this.prompt.setText(prompt)
-        this.prompt.setSelection(this.prompt.text?.length ?: 0)
-        this.prompt.hint = placeholder
-
         closeButton.setOnClickListener { onCloseClick() }
         generateButton.setOnClickListener { onGenerateClick() }
 
-        this.prompt.doAfterTextChanged { text ->
-            generateButton.isEnabled = text?.isNotEmpty() == true
-            onPromptChanged.invoke(text?.toString().orEmpty())
+        this.prompt.apply {
+            setText(prompt)
+            setSelection(text?.length ?: 0)
+            hint = placeholder
+            doAfterTextChanged { text ->
+                generateButton.isEnabled = text?.isNotEmpty() == true
+                onPromptChanged.invoke(text?.toString().orEmpty())
+            }
         }
 
         generateButton.isEnabled = this.prompt.text?.isNotEmpty() == true
