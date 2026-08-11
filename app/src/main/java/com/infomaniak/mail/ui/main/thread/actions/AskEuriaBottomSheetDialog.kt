@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -32,28 +33,35 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
+import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetAskEuriaActionsBinding by safeBinding()
+    private val navigationArgs: AskEuriaBottomSheetDialogArgs by navArgs()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
-    private val navigationArgs: AskEuriaBottomSheetDialogArgs by navArgs()
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAskEuriaActionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -89,23 +97,39 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
             }
         }
 
-        if (binding.reply.trailingContent != TrailingContent.None) {
-            binding.reply.setOnClickListener {
-                when (kSuite) {
-                    KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
-                    KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
-                    KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
-                    else -> Unit
-                }
-            }
-        } else {
-            binding.reply.setOnClickListener {
-                trackBottomSheetThreadActionsEvent(MatomoName.ReplyWithEuria)
-                localSettings.hasAlreadyUsedReplyWithEuria = true
-                binding.reply.newFeatureBadgeVisible = false
-                setBackNavigationResult(OPEN_AI_REPLY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, false))
+        binding.reply.setOnClickListener {
+            when (kSuite) {
+                KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
+                KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
+                KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
+                else -> handleStandardReplyAction(messageUid)
             }
         }
+    }
+
+    private fun handleStandardReplyAction(messageUid: String) {
+        lifecycleScope.launch {
+            val message = mainViewModel.getMessage(messageUid)
+            val hasNoReplyRecipients = message?.let {
+                SharedUtils.hasNoReplyRecipients(it, isReplyAll = true)
+            } ?: false
+
+            if (message != null) {
+                descriptionDialog.replyWithConfirmationPopup(
+                    hasNoReplyRecipients = hasNoReplyRecipients,
+                    onPositiveButtonClicked = ::executeReplyAction
+                )
+            } else {
+                executeReplyAction()
+            }
+        }
+    }
+
+    private fun executeReplyAction(messageUid: String = navigationArgs.messageUid) {
+        trackBottomSheetThreadActionsEvent(MatomoName.ReplyWithEuria)
+        localSettings.hasAlreadyUsedReplyWithEuria = true
+        binding.reply.newFeatureBadgeVisible = false
+        setBackNavigationResult(OPEN_AI_REPLY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, false))
     }
 }
 
