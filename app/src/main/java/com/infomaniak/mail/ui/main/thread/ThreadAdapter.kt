@@ -917,7 +917,7 @@ class ThreadAdapter(
         reminderAlert.isVisible = true
 
         reminderAlert.onAction1 {
-            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            trackMessageBannerEvent(MatomoName.RescheduleActiveReminder)
             threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
         }
 
@@ -952,12 +952,12 @@ class ThreadAdapter(
         }
 
         endReminderAlert.onAction2 {
-            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            trackMessageBannerEvent(MatomoName.RescheduleExpiredReminder)
             threadAdapterCallbacks?.onAddReminderClicked?.invoke(message)
         }
 
         endReminderAlert.onAction3 {
-            trackMessageBannerEvent(MatomoName.DeleteDraft)
+            trackMessageBannerEvent(MatomoName.MarkAsDoneReminder)
             threadAdapterCallbacks?.onMarkAsDoneReminderClicked?.invoke(message)
         }
     }
@@ -976,7 +976,7 @@ class ThreadAdapter(
         reminderAlert.isVisible = true
 
         reminderAlert.onAction1 {
-            trackMessageBannerEvent(MatomoName.ReprogramReminder)
+            trackMessageBannerEvent(MatomoName.RescheduleActiveReminder)
             threadAdapterCallbacks?.onModifyReminderClicked?.invoke(message)
         }
 
