@@ -515,7 +515,13 @@ class ThreadViewModel @Inject constructor(
     fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
-            val (deleted, failed) = ThreadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
+            val realm = mailboxContentRealm()
+            val messagesToFetch = messages.filter { message ->
+                MessageController.getMessageBlocking(message.uid, realm)?.isFullyDownloaded() != true
+            }
+            if (messagesToFetch.isEmpty()) return@launch
+
+            val (deleted, failed) = ThreadController.fetchMessagesHeavyData(messagesToFetch, realm)
             if (deleted.isNotEmpty() || failed.isNotEmpty()) {
 
                 // TODO: A race condition exists between the two notify in the ThreadAdapter.
