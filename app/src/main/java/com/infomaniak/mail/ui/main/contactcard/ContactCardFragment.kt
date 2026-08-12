@@ -120,6 +120,7 @@ private fun MailContactCardTopBar(state: ContactCardTopBarState) {
         is ContactCardTopBarState.Editor -> MailContactCardTopBarEditor(state)
         is ContactCardTopBarState.Preview -> MailContactCardTopBarPreview(state)
         is ContactCardTopBarState.Default -> MailContactCardTopBarDefault(state)
+        is ContactCardTopBarState.Onboarding -> MailContactCardTopBarOnboarding(state)
     }
 }
 
@@ -202,6 +203,25 @@ private fun MailContactCardTopBarDefaultPreview() {
     MailTheme {
         MailContactCardTopBarDefault(
             ContactCardTopBarState.Default(
+                onBack = {},
+            ),
+        )
+    }
+}
+
+@Composable
+private fun MailContactCardTopBarOnboarding(state: ContactCardTopBarState.Onboarding) {
+    MailTopAppBar(
+        navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MailContactCardTopBarOnboardingPreview() {
+    MailTheme {
+        MailContactCardTopBarOnboarding(
+            ContactCardTopBarState.Onboarding(
                 onBack = {},
             ),
         )
