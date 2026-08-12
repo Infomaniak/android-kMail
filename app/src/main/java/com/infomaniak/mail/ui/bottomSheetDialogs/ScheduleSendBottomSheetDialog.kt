@@ -23,9 +23,7 @@ import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.openKSuiteProBottomSheet
-import com.infomaniak.mail.utils.openMailPremiumBottomSheet
-import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
+import com.infomaniak.mail.utils.openKSuiteUpsellOrElse
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -58,15 +56,15 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
     override fun onCustomScheduleOptionClicked() {
         val kSuite = currentKSuite
         val matomoName = MatomoName.ScheduledCustomDate.value
-        when (kSuite) {
-            KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
-            KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
-            KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
-            else -> {
+        openKSuiteUpsellOrElse(
+            kSuite = kSuite,
+            isAdmin = navigationArgs.isAdmin,
+            matomoName = matomoName,
+            onFeatureAvailable = {
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
                 setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)
             }
-        }
+        )
     }
 
     companion object {
