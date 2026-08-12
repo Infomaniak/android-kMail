@@ -66,17 +66,11 @@ fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData, user: User): MyKSuiteD
     )
 }
 
-fun Fragment.openKSuiteProBottomSheet(
-    kSuite: KSuite,
-    isAdmin: Boolean,
-    matomoTrackerName: String,
-    substituteClassName: String? = null,
-) {
+fun Fragment.openKSuiteProBottomSheet(kSuite: KSuite, isAdmin: Boolean, matomoTrackerName: String) {
     trackKSuiteProBottomSheetEvent(matomoTrackerName)
     safelyNavigate(
         resId = R.id.kSuiteProBottomSheetDialog,
         args = KSuiteProBottomSheetDialogArgs(kSuite, isAdmin).toBundle(),
-        substituteClassName = substituteClassName,
     )
 }
 
@@ -89,8 +83,8 @@ fun Activity.openKSuiteProBottomSheet(navController: NavController, kSuite: KSui
     )
 }
 
-fun Fragment.openMailPremiumBottomSheet(matomoTrackerName: String, substituteClassName: String? = null) {
-    if (isAtInitialDestination(substituteClassName)) openMailPremiumBottomSheet(findNavController(), matomoTrackerName)
+fun Fragment.openMailPremiumBottomSheet(matomoTrackerName: String) {
+    if (isAtInitialDestination()) openMailPremiumBottomSheet(findNavController(), matomoTrackerName)
 }
 
 fun openMailPremiumBottomSheet(navController: NavController, matomoTrackerName: String) {
@@ -110,22 +104,12 @@ fun Fragment.openKSuiteUpsellOrElse(
     isAdmin: Boolean,
     matomoName: String,
     substituteClassName: String? = null,
-    shouldDismiss: Boolean = false,
-    onAvailable: () -> Unit,
+    onFeatureAvailable: () -> Unit,
 ) {
     when (kSuite) {
-        KSuite.Perso.Free -> {
-            if (shouldDismiss) findNavController().popBackStack()
-            openMyKSuiteUpgradeBottomSheet(matomoName, substituteClassName)
-        }
-        KSuite.Pro.Free -> {
-            if (shouldDismiss) findNavController().popBackStack()
-            openKSuiteProBottomSheet(kSuite, isAdmin, matomoName, substituteClassName)
-        }
-        KSuite.StarterPack -> {
-            if (shouldDismiss) findNavController().popBackStack()
-            openMailPremiumBottomSheet(matomoName, substituteClassName)
-        }
-        else -> onAvailable()
+        KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName, substituteClassName)
+        KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, isAdmin, matomoName)
+        KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
+        else -> onFeatureAvailable()
     }
 }

@@ -102,7 +102,7 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
                     isAdmin = mailbox?.isAdmin ?: false,
                     matomoName = MatomoName.ReplyWithEuria.value,
                     substituteClassName = ThreadListFragment::class.java.name,
-                    onAvailable = { handleStandardReplyAction(messageUid) }
+                    onFeatureAvailable = { handleStandardReplyAction(messageUid) }
                 )
             }
         }
