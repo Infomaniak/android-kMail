@@ -362,8 +362,7 @@ class MainActivity : BaseActivity() {
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
                     val mailbox = mainViewModel.currentMailbox.value ?: return
 
-                    // Waits 2s after cancel delay to guarantee the send action is committed
-                    actionsViewModel.refreshFoldersAfterSendDelay(localSettings.cancelDelay + 2, mailbox)
+                    actionsViewModel.refreshFoldersAfterSend(localSettings.cancelDelay, mailbox)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
                     showSentDraftSnackbar(cancelResourceUrl)
                 }

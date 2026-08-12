@@ -56,5 +56,7 @@ object ThreadListUtils {
         }
     }
 
-    fun hasReminders(messages: List<Message>): Boolean = messages.any { message -> message.reminder != null }
+    fun hasReminders(messages: List<Message>): Boolean = messages.any { message ->
+        message.reminder != null && !message.shouldHideReminder
+    }
 }
