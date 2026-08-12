@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.ui.newMessage
 
-import android.R.id.message
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.ChangeBounds
@@ -52,7 +51,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.AiDraftCache
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -64,7 +62,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY
 import com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheetArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
-import com.infomaniak.mail.utils.MessageBodyUtils.asPlainText
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -93,7 +90,7 @@ class AiPropositionFragment : Fragment() {
     private val navigationArgs: AiPropositionFragmentArgs by navArgs()
 
     private var currentRequestJob: Job? = null
-    lateinit var mailbox: Mailbox
+    private var mailbox: Mailbox? = null
 
     private val refinePopupMenu by lazy {
         SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton, ::onMenuItemClicked)
@@ -308,7 +305,8 @@ class AiPropositionFragment : Fragment() {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
             lifecycleScope.launch {
-                currentRequestJob = performShortcut(shortcut, mailbox.uuid)
+                val uuid = mailbox?.uuid ?: return@launch
+                currentRequestJob = performShortcut(shortcut, uuid)
             }
         }
     }
@@ -331,19 +329,18 @@ class AiPropositionFragment : Fragment() {
     private fun generateNewAiProposition() {
 
         lifecycleScope.launch {
-            var allRecipients: List<Recipient>
-            if (isHostedByNewMessageActivity()) {
-                allRecipients = newMessageViewModel.toLiveData.valueOrEmpty()
+            val allRecipients = if (isHostedByNewMessageActivity()) {
+                newMessageViewModel.toLiveData.valueOrEmpty()
             } else {
                 val message = messageController.getMessage(navigationArgs.messageUid)
                 val recipients = message?.getRecipientsForReplyTo(replyAll = true)
-                allRecipients = recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
+                recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
             }
 
             val formattedRecipientsString = allRecipients
                 .joinToString(separator = ", ") { it.name.ifBlank { it.email } }
                 .takeIf { it.isNotBlank() }
-            currentRequestJob = aiViewModel.generateNewAiProposition(mailbox.uuid, formattedRecipientsString)
+            currentRequestJob = aiViewModel.generateNewAiProposition(mailbox?.uuid ?: return@launch, formattedRecipientsString)
         }
     }
 
