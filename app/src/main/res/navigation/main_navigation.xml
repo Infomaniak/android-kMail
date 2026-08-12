@@ -239,6 +239,11 @@
             android:name="isAlreadySummarized"
             android:defaultValue="false"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_askEuriaBottomSheetDialog_to_euriaPromptBottomSheetDialog"
+            app:destination="@id/euriaPromptBottomSheetDialog"
+            app:popUpTo="@id/askEuriaBottomSheetDialog"
+            app:popUpToInclusive="true" />
     </dialog>
 
     <dialog

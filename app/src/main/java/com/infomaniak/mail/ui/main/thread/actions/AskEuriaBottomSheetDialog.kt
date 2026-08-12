@@ -24,11 +24,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
@@ -36,11 +38,11 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_REPLY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
+import com.infomaniak.mail.ui.newMessage.AiViewModel
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.openKSuiteUpsellOrElse
@@ -55,6 +57,7 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
     private val navigationArgs: AskEuriaBottomSheetDialogArgs by navArgs()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val aiViewModel: AiViewModel by activityViewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -130,7 +133,11 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
         trackBottomSheetThreadActionsEvent(MatomoName.ReplyWithEuria)
         localSettings.hasAlreadyUsedReplyWithEuria = true
         binding.reply.newFeatureBadgeVisible = false
-        setBackNavigationResult(OPEN_AI_REPLY_BOTTOM_SHEET, AiActionNavigationResult(messageUid, false))
+        aiViewModel.resetAiState()
+        safelyNavigate(
+            resId = R.id.action_askEuriaBottomSheetDialog_to_euriaPromptBottomSheetDialog,
+            args = EuriaPromptBottomSheetArgs(messageUid = messageUid).toBundle(),
+        )
     }
 }
 

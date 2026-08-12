@@ -117,7 +117,6 @@ import com.infomaniak.mail.ui.main.thread.actions.AskEuriaBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.EmojiReactionsViewModel
-import com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheetArgs
 import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
@@ -497,7 +496,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 getAiState = { aiActionsViewModel.aiStateMap.value },
                 onAskEuriaClicked = { message ->
                     trackMessageActionsEvent(MatomoName.AskEuriaQuickAction)
-                    navigateToAskEuriaBottomSheet(message.uid) },
+                    navigateToAskEuriaBottomSheet(message.uid)
+                },
             ),
         )
 
@@ -921,16 +921,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             } else {
                 aiActionsViewModel.doAiAction(messageUid, AiAction.TRANSLATE)
             }
-        }
-
-        getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_REPLY_BOTTOM_SHEET) { (messageUid, _) ->
-            aiViewModel.resetAiState()
-            safeNavigate(
-                resId = R.id.euriaPromptBottomSheetDialog,
-                args = EuriaPromptBottomSheetArgs(
-                    messageUid = messageUid
-                ).toBundle(),
-            )
         }
 
         getBackNavigationResult(OPEN_AI_REPLY_PROPOSITION) { messageUid: String ->
@@ -1417,7 +1407,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
         const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
-        const val OPEN_AI_REPLY_BOTTOM_SHEET = "openAiReplyPromptBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
         const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"
         const val OPEN_AI_REPLY_PROPOSITION = "openAiReplyProposition"
