@@ -328,7 +328,7 @@ object MatomoMail : Matomo {
         Summarize("summarize"),
         Translate("translate"),
         AskEuria("askEuria"),
-        AskEuriaShortCut("askEuriaShortCut"),
+        AskEuriaQuickAction("askEuriaQuickAction"),
         Switch("switch"),
         SwitchAccount("switchAccount"),
         SwitchColor("switchColor"),

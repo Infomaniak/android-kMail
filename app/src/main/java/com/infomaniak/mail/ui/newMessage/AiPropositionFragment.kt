@@ -262,7 +262,7 @@ class AiPropositionFragment : Fragment() {
                 },
                 onNegativeButtonClicked = {
                     trackAiWriterEvent(MatomoName.KeepSubject)
-                    applyProposition(null, content)
+                    applyProposition(subject = null, content)
                 },
             )
         }

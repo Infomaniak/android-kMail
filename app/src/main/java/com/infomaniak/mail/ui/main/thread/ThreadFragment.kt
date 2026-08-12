@@ -496,7 +496,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
                 getAiState = { aiActionsViewModel.aiStateMap.value },
                 onAskEuriaClicked = { message ->
-                    trackMessageActionsEvent(MatomoName.AskEuriaShortCut)
+                    trackMessageActionsEvent(MatomoName.AskEuriaQuickAction)
                     navigateToAskEuriaBottomSheet(message.uid) },
             ),
         )

@@ -86,7 +86,6 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
         val mailbox = mainViewModel.currentMailbox.value
         val kSuite = mailbox?.kSuite
 
-        val matomoName = MatomoName.ReplyWithEuria.value
         binding.reply.apply {
             trailingContent = when (kSuite) {
                 KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
@@ -101,7 +100,7 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
                 openKSuiteUpsellOrElse(
                     kSuite = kSuite,
                     isAdmin = mailbox?.isAdmin ?: false,
-                    matomoName = matomoName,
+                    matomoName = MatomoName.ReplyWithEuria.value,
                     substituteClassName = ThreadListFragment::class.java.name,
                     onAvailable = { handleStandardReplyAction(messageUid) }
                 )

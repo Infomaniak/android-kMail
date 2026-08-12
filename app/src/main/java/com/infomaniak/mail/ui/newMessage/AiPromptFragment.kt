@@ -88,6 +88,7 @@ class AiPromptFragment : Fragment() {
         val screenWidth = resources.displayMetrics.widthPixels
         val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
         val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
+        
         setMarginsRelative(start = horizontalMargin, end = horizontalMargin)
     }
 
