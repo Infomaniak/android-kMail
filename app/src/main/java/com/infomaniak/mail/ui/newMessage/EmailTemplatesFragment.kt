@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MailTemplate
@@ -64,7 +65,11 @@ class EmailTemplatesFragment : Fragment() {
     }
 
     private fun onTemplateClicked(template: MailTemplate) {
-        // TODO: Display template content in a webview with an insert button
+        findNavController().navigate(
+            EmailTemplatesFragmentDirections.actionEmailTemplatesFragmentToEmailTemplateViewerFragment(
+                template.id
+            )
+        )
     }
 
     private fun String.toPlainTextPreview(): String {

@@ -88,7 +88,21 @@
         android:id="@+id/emailTemplatesFragment"
         android:name="com.infomaniak.mail.ui.newMessage.EmailTemplatesFragment"
         android:label="EmailTemplatesFragment"
-        tools:layout="@layout/fragment_email_templates" />
+        tools:layout="@layout/fragment_email_templates">
+        <action
+            android:id="@+id/action_emailTemplatesFragment_to_emailTemplateViewerFragment"
+            app:destination="@id/emailTemplateViewerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/emailTemplateViewerFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.EmailTemplateViewerFragment"
+        android:label="EmailTemplateViewerFragment"
+        tools:layout="@layout/fragment_email_template_viewer">
+        <argument
+            android:name="templateId"
+            app:argType="integer" />
+    </fragment>
 
     <dialog
         android:id="@+id/aiDiscoveryBottomSheetDialog"
