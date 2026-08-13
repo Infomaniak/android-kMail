@@ -31,8 +31,10 @@
             android:id="@+id/optionsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:divider="@drawable/divider_with_padding"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/marginStandardMedium" />
+            android:paddingBottom="@dimen/marginStandardMedium"
+            android:showDividers="middle" />
 
     </androidx.core.widget.NestedScrollView>
 

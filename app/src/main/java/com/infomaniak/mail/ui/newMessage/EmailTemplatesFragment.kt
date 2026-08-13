@@ -25,7 +25,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.MailTemplate
 import com.infomaniak.mail.databinding.FragmentEmailTemplatesBinding
+import com.infomaniak.mail.ui.main.settings.ItemSettingView
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.Companion.toSanitizedHtml
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -39,6 +44,31 @@ class EmailTemplatesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        // TODO: Populate templates list and handle clicks
+        populateTemplates(MailTemplate.mocks)
+    }
+
+    private fun populateTemplates(templates: List<MailTemplate>) = with(binding) {
+        templates.forEach { template ->
+            optionsContainer.addView(createTemplateItem(template))
+        }
+    }
+
+    private fun createTemplateItem(template: MailTemplate): ItemSettingView {
+        return ItemSettingView(requireContext()).apply {
+            setTitle(template.title.ifBlank { getString(R.string.emailTemplateNoTitle) })
+            val preview = template.body.toPlainTextPreview()
+            if (preview.isNotEmpty()) setSubtitle(preview)
+            showChevron()
+            setOnClickListener { onTemplateClicked(template) }
+        }
+    }
+
+    private fun onTemplateClicked(template: MailTemplate) {
+        // TODO: Display template content in a webview with an insert button
+    }
+
+    private fun String.toPlainTextPreview(): String {
+        val sanitized = BodyContentPayload(this, BodyContentType.HTML_UNSANITIZED).toSanitizedHtml()
+        return jsoupParseWithLog(sanitized).text().trim()
     }
 }
