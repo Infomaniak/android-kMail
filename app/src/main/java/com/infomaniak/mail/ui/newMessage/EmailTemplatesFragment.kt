@@ -56,7 +56,7 @@ class EmailTemplatesFragment : Fragment() {
 
     private fun createTemplateItem(template: MailTemplate): ItemSettingView {
         return ItemSettingView(requireContext()).apply {
-            setTitle(template.title.ifBlank { getString(R.string.emailTemplateNoTitle) })
+            setTitle(template.title)
             val preview = template.body.toPlainTextPreview()
             if (preview.isNotEmpty()) setSubtitle(preview)
             showChevron()

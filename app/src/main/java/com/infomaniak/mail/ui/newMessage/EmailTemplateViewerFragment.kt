@@ -75,6 +75,7 @@ class EmailTemplateViewerFragment : Fragment() {
     }
 
     private fun onInsertClicked(template: MailTemplate) {
+        newMessageViewModel.setPlaceholderVisibility(false)
         newMessageViewModel.editorBodyInitializer.postValue(
             BodyContentPayload(template.body, BodyContentType.HTML_UNSANITIZED)
         )
