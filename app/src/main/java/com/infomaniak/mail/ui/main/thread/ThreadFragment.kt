@@ -1398,6 +1398,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
         const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"
+        const val OPEN_EMAIL_TEMPLATES_BOTTOM_SHEET = "openEmailTemplatesBottomSheet"
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"

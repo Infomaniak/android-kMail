@@ -18,12 +18,17 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.BottomSheetMoreOptionsBinding
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_EMAIL_TEMPLATES_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
@@ -33,6 +38,11 @@ class MoreOptionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMoreOptionsBinding by safeBinding()
     override val multiselectionViewModel: MultiselectionViewModel by activityViewModels()
+    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+
+    private val isScheduledDraftsEnabledLive by lazy {
+        newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.SCHEDULE_DRAFTS) }.distinctUntilChanged()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetMoreOptionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -41,7 +51,22 @@ class MoreOptionsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.sendOptions.setOnClickListener {/* TODO: Complete when send options are implemented */ }
-        binding.sendOptions.setOnClickListener {/* TODO: Complete when send options are implemented */ }
+        observeFeatureFlagUpdates()
+
+        binding.scheduleSend.isEnabled = newMessageViewModel.isSendingAllowed.value == true
+
+        // TODO: Open sendOptionsFragment instead of ScheduleSendBottomSheet when the new send options are implemented
+        binding.scheduleSend.setOnClickListener { setBackNavigationResult(OPEN_SCHEDULE_SEND_BOTTOM_SHEET, true) }
+        binding.emailTemplates.setOnClickListener { setBackNavigationResult(OPEN_EMAIL_TEMPLATES_BOTTOM_SHEET, true) }
+    }
+
+    private fun observeFeatureFlagUpdates() {
+        isScheduledDraftsEnabledLive.observe(viewLifecycleOwner) { isScheduledDraftsEnabled ->
+            binding.scheduleSend.isVisible = isScheduledDraftsEnabled
+        }
+    }
+
+    companion object {
+        const val OPEN_SCHEDULE_SEND_BOTTOM_SHEET = "openScheduleSendBottomSheet"
     }
 }
