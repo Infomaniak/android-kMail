@@ -252,6 +252,7 @@
     <string name="draftPrefix">(Concept)</string>
     <string name="editSendDescription">Dit bericht wordt naar uw concepten verplaatst om te worden verzonden wanneer u maar wilt.</string>
     <string name="editSendTitle">Verzenden bewerken</string>
+    <string name="emailTemplatesTitle">E-mailsjablonen</string>
     <string name="emailWithoutSubjectDescription">U staat op het punt een bericht zonder onderwerp te verzenden. Wilt u doorgaan?</string>
     <string name="emailWithoutSubjectTitle">Leeg onderwerp</string>
     <string name="emptyStateFolderDescription">Er is hier niets te zien.</string>
@@ -411,6 +412,7 @@
     <string name="messageTranslatedTitle">Vertaald in %s</string>
     <string name="mondayAfternoon">Maandagmiddag</string>
     <string name="mondayMorning">Maandagochtend</string>
+    <string name="moreOptionsButtonContentDescription">Meer opties</string>
     <string name="moveInSpamButton">Naar Spam verplaatsen</string>
     <string name="moveSearchFieldPlaceholder">Een map zoeken</string>
     <plurals name="multipleSelectionCount">
@@ -509,6 +511,7 @@
     <string name="selectTimeDialogTitle">Tijd selecteren</string>
     <string name="send">Verzenden</string>
     <string name="sendConfirmationAction">De bevestiging verzenden</string>
+    <string name="sendOptions">Verzendopties</string>
     <string name="sentFolder">Verzonden berichten</string>
     <string name="serverUnavailable">Servers niet beschikbaar</string>
     <string name="settingsAccentColor">Accentkleur</string>

@@ -252,6 +252,7 @@
     <string name="draftPrefix">(Πρόχειρο)</string>
     <string name="editSendDescription">Αυτό το μήνυμα θα μετακινηθεί στα πρόχειρα ώστε να σταλεί όποτε θέλετε.</string>
     <string name="editSendTitle">Επεξεργασία αποστολής</string>
+    <string name="emailTemplatesTitle">Πρότυπα email</string>
     <string name="emailWithoutSubjectDescription">Πρόκειται να στείλετε μήνυμα χωρίς θέμα. Θέλετε να συνεχίσετε;</string>
     <string name="emailWithoutSubjectTitle">Κενό θέμα</string>
     <string name="emptyStateFolderDescription">Δεν υπάρχει τίποτα εδώ.</string>
@@ -411,6 +412,7 @@
     <string name="messageTranslatedTitle">Μεταφράστηκε σε %s</string>
     <string name="mondayAfternoon">Δευτέρα απόγευμα</string>
     <string name="mondayMorning">Δευτέρα πρωί</string>
+    <string name="moreOptionsButtonContentDescription">Περισσότερες επιλογές</string>
     <string name="moveInSpamButton">Μετακίνηση στα Spam</string>
     <string name="moveSearchFieldPlaceholder">Αναζήτηση φακέλου</string>
     <plurals name="multipleSelectionCount">
@@ -509,6 +511,7 @@
     <string name="selectTimeDialogTitle">Επιλέξτε ώρα</string>
     <string name="send">Αποστολή</string>
     <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>
+    <string name="sendOptions">Επιλογές αποστολής</string>
     <string name="sentFolder">Απεσταλμένα μηνύματα</string>
     <string name="serverUnavailable">Οι διακομιστές δεν είναι διαθέσιμοι</string>
     <string name="settingsAccentColor">Χρώμα έμφασης</string>

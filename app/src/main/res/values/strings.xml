@@ -256,6 +256,7 @@
     <string name="draftPrefix">(Draft)</string>
     <string name="editSendDescription">This message will be moved to your drafts to be sent whenever you want.</string>
     <string name="editSendTitle">Edit Send</string>
+    <string name="emailTemplatesTitle">Email templates</string>
     <string name="emailWithoutSubjectDescription">You are about to send a message without a subject. Do you want to continue?</string>
     <string name="emailWithoutSubjectTitle">Empty subject</string>
     <string name="emptyStateFolderDescription">There is nothing to see here.</string>
@@ -415,6 +416,7 @@
     <string name="messageTranslatedTitle">Translated in %s</string>
     <string name="mondayAfternoon">Monday afternoon</string>
     <string name="mondayMorning">Monday morning</string>
+    <string name="moreOptionsButtonContentDescription">More options</string>
     <string name="moveInSpamButton">Move in Spam</string>
     <string name="moveSearchFieldPlaceholder">Search a folder</string>
     <plurals name="multipleSelectionCount">
@@ -513,9 +515,10 @@
     <string name="selectTimeDialogTitle">Select time</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send the confirmation</string>
+    <string name="sendOptions">Send options</string>
     <string name="sentFolder">Sent messages</string>
-    <string name="settingsAccentColor">Accent colour</string>
     <string name="serverUnavailable">Servers unavailable</string>
+    <string name="settingsAccentColor">Accent colour</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
     <string name="settingsAccountManagementTitle">Account management</string>
     <string name="settingsAppLock">App lock</string>

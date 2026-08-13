@@ -252,6 +252,7 @@
     <string name="draftPrefix">(Rascunho)</string>
     <string name="editSendDescription">Esta mensagem será movida para os seus rascunhos para ser enviada quando quiser.</string>
     <string name="editSendTitle">Editar envio</string>
+    <string name="emailTemplatesTitle">Modelos de e-mail</string>
     <string name="emailWithoutSubjectDescription">Está prestes a enviar uma mensagem sem assunto. Deseja continuar?</string>
     <string name="emailWithoutSubjectTitle">Assunto vazio</string>
     <string name="emptyStateFolderDescription">Não há nada para ver aqui.</string>
@@ -411,6 +412,7 @@
     <string name="messageTranslatedTitle">Traduzido em %s</string>
     <string name="mondayAfternoon">Segunda-feira à tarde</string>
     <string name="mondayMorning">Segunda-feira de manhã</string>
+    <string name="moreOptionsButtonContentDescription">Mais opções</string>
     <string name="moveInSpamButton">Mover para Spam</string>
     <string name="moveSearchFieldPlaceholder">Procurar uma pasta</string>
     <plurals name="multipleSelectionCount">
@@ -509,6 +511,7 @@
     <string name="selectTimeDialogTitle">Selecionar hora</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar a confirmação</string>
+    <string name="sendOptions">Opções de envio</string>
     <string name="sentFolder">Mensagens enviadas</string>
     <string name="serverUnavailable">Servidores indisponíveis</string>
     <string name="settingsAccentColor">Cor de destaque</string>

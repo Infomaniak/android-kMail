@@ -252,6 +252,7 @@
     <string name="draftPrefix">(Utkast)</string>
     <string name="editSendDescription">Detta meddelande kommer att flyttas till dina utkast för att skickas när du vill.</string>
     <string name="editSendTitle">Redigera sändning</string>
+    <string name="emailTemplatesTitle">E-postmallar</string>
     <string name="emailWithoutSubjectDescription">Du är på väg att skicka ett meddelande utan ämne. Vill du fortsätta?</string>
     <string name="emailWithoutSubjectTitle">Tomt ämne</string>
     <string name="emptyStateFolderDescription">Det finns inget att se här.</string>
@@ -411,6 +412,7 @@
     <string name="messageTranslatedTitle">Översatt i %s</string>
     <string name="mondayAfternoon">Måndag eftermiddag</string>
     <string name="mondayMorning">Måndag morgon</string>
+    <string name="moreOptionsButtonContentDescription">Fler alternativ</string>
     <string name="moveInSpamButton">Flytta till Spam</string>
     <string name="moveSearchFieldPlaceholder">Sök efter en mapp</string>
     <plurals name="multipleSelectionCount">
@@ -509,6 +511,7 @@
     <string name="selectTimeDialogTitle">Välj tid</string>
     <string name="send">Skicka</string>
     <string name="sendConfirmationAction">Skicka bekräftelsen</string>
+    <string name="sendOptions">Skicka-alternativ</string>
     <string name="sentFolder">Skickade meddelanden</string>
     <string name="serverUnavailable">Servrar otillgängliga</string>
     <string name="settingsAccentColor">Accentfärg</string>
