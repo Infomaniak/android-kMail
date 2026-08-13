@@ -47,6 +47,9 @@
         <action
             android:id="@+id/action_newMessageFragment_to_encryptionActionsBottomSheetDialog"
             app:destination="@id/encryptionActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_newMessageFragment_to_moreOptionsBottomSheetDialog"
+            app:destination="@id/moreOptionsBottomSheetDialog" />
 
         <argument
             android:name="userId"
@@ -101,6 +104,12 @@
             android:name="intentType"
             app:argType="com.infomaniak.mail.utils.extensions.AttachmentExt$AttachmentIntentType" />
     </dialog>
+
+    <dialog
+        android:id="@+id/moreOptionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.newMessage.MoreOptionsBottomSheetDialog"
+        android:label="MoreOptionsBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_more_options" />
 
     <dialog
         android:id="@+id/scheduleSendBottomSheetDialog"

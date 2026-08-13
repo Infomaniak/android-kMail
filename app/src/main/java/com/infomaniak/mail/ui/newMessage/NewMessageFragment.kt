@@ -845,9 +845,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeFeatureFlagUpdates() {
-        isScheduledDraftsEnabledLive.observe(viewLifecycleOwner) { isScheduledDraftsEnabled ->
-            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
-        }
+        // isScheduledDraftsEnabledLive.observe(viewLifecycleOwner) { isScheduledDraftsEnabled -> // TODO
+        //     binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+        // }
+        binding.moreOptionsButton.isVisible = true
 
         areMentionsAvailableLive.observe(viewLifecycleOwner) { areMentionsAvailable ->
             binding.editorWebView.apply {
@@ -932,22 +933,25 @@ class NewMessageFragment : Fragment() {
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleButton.isEnabled = it
+            // scheduleButton.isEnabled = it // TODO
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener {
-            if (checkMailboxStorage(mailbox)) {
-                if (newMessageViewModel.isEncryptionActivated.value == true) {
-                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
-                } else {
-                    navigateToScheduleSendBottomSheet()
-                }
-            }
-        }
+        // scheduleButton.setOnClickListener { // TODO
+        //     if (checkMailboxStorage(mailbox)) {
+        //         if (newMessageViewModel.isEncryptionActivated.value == true) {
+        //             snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
+        //         } else {
+        //             navigateToScheduleSendBottomSheet()
+        //         }
+        //     }
+        // }
+        moreOptionsButton.setOnClickListener { navigateToMoreOptionsBottomSheet() }
 
         sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() }
     }
+
+    private fun navigateToMoreOptionsBottomSheet() = safelyNavigate(resId = R.id.moreOptionsBottomSheetDialog, args = Bundle())
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()

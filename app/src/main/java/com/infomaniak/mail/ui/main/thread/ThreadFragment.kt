@@ -1257,6 +1257,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         )
     }
 
+    private fun navigateToMoreOptionsBottomSheet() {
+        safeNavigate(
+            resId = R.id.moreOptionsBottomSheetDialog,
+            args = Bundle(),
+        )
+    }
+
     private fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?) {
         twoPaneFragment.navigateToSnoozeBottomSheet(snoozeScheduleType, threadViewModel.threadLive.value?.snoozeEndDate)
     }
