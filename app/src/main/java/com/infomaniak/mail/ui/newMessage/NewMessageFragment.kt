@@ -90,6 +90,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.C
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_EMAIL_TEMPLATES_BOTTOM_SHEET
 import com.infomaniak.mail.ui.newMessage.MoreOptionsBottomSheetDialog.Companion.OPEN_SCHEDULE_SEND_BOTTOM_SHEET
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
@@ -347,6 +348,8 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
 
         getBackNavigationResult<Boolean>(OPEN_SCHEDULE_SEND_BOTTOM_SHEET) { openScheduleSendBottomSheet() }
+
+        getBackNavigationResult<Boolean>(OPEN_EMAIL_TEMPLATES_BOTTOM_SHEET) { navigateToEmailTemplates() }
     }
 
     private fun openScheduleSendBottomSheet() {
@@ -952,6 +955,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun navigateToMoreOptionsBottomSheet() = safelyNavigate(resId = R.id.moreOptionsBottomSheetDialog, args = Bundle())
+
+    private fun navigateToEmailTemplates() = safelyNavigate(resId = R.id.emailTemplatesFragment)
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()

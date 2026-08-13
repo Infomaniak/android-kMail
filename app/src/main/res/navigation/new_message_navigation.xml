@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_newMessageFragment_to_moreOptionsBottomSheetDialog"
             app:destination="@id/moreOptionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_newMessageFragment_to_emailTemplatesFragment"
+            app:destination="@id/emailTemplatesFragment" />
 
         <argument
             android:name="userId"
@@ -80,6 +83,12 @@
         android:name="com.infomaniak.mail.ui.newMessage.encryption.EncryptionPasswordFragment"
         android:label="EncryptionPasswordFragment"
         tools:layout="@layout/fragment_encryption_password" />
+
+    <fragment
+        android:id="@+id/emailTemplatesFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.EmailTemplatesFragment"
+        android:label="EmailTemplatesFragment"
+        tools:layout="@layout/fragment_email_templates" />
 
     <dialog
         android:id="@+id/aiDiscoveryBottomSheetDialog"
