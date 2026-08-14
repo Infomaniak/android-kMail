@@ -26,5 +26,5 @@ data class SendDraftResult(
     val scheduledMessageEtop: String,
 
     @SerialName("cancel_resource")
-    val cancelResourceUrl: String?,
+    val cancelResourceUrl: String? = null,
 )
