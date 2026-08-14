@@ -238,9 +238,11 @@ class NewMessageViewModel @Inject constructor(
     private val _isSending = MutableStateFlow(false)
     val isSending: StateFlow<Boolean> = _isSending.asStateFlow()
 
-    fun setSending(value: Boolean) {
-        _isSending.value = value
+    fun finishSending() {
+        _isSending.value = false
     }
+
+    fun tryStartSending(): Boolean = _isSending.compareAndSet(expect = false, update = true)
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()

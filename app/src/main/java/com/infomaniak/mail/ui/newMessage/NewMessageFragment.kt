@@ -982,21 +982,19 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (newMessageViewModel.isSending.value) return
-
-        newMessageViewModel.setSending(true)
+        if (!newMessageViewModel.tryStartSending()) return
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                if (isSubjectBlank() && showSubjectDialog(isScheduled)) return@launch
+                if (isSubjectBlank() && shouldCancelForEmptySubject(isScheduled)) return@launch
 
                 val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
                 val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
 
-                if (shouldShowAttachmentReminder && showAttachmentDialog(isScheduled)) return@launch
+                if (shouldShowAttachmentReminder && shouldCancelForAttachmentReminder(isScheduled)) return@launch
                 sendEmail()
             } finally {
-                newMessageViewModel.setSending(false)
+                newMessageViewModel.finishSending()
             }
         }
     }
@@ -1031,7 +1029,7 @@ class NewMessageFragment : Fragment() {
         return isSendingCanceled.await()
     }
 
-    private suspend fun showSubjectDialog(isScheduled: Boolean) = showConfirmationDialog(
+    private suspend fun shouldCancelForEmptySubject(isScheduled: Boolean) = showConfirmationDialog(
         titleRes = R.string.emailWithoutSubjectTitle,
         descriptionRes = R.string.emailWithoutSubjectDescription,
         trackEvent = MatomoName.SendWithoutSubject,
@@ -1039,7 +1037,7 @@ class NewMessageFragment : Fragment() {
         isScheduled = isScheduled,
     )
 
-    private suspend fun showAttachmentDialog(isScheduled: Boolean) = showConfirmationDialog(
+    private suspend fun shouldCancelForAttachmentReminder(isScheduled: Boolean) = showConfirmationDialog(
         titleRes = R.string.attachmentsReminderTitle,
         descriptionRes = R.string.attachmentsReminderDescription,
         trackEvent = MatomoName.SendWithoutAttachment,
