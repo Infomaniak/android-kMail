@@ -56,6 +56,7 @@ import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.REMOTE_DRAFT_UU
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.RESULT_DRAFT_ACTION_KEY
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.RESULT_USER_ID_KEY
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.SCHEDULED_DRAFT_DATE_KEY
+import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.TRACKED_DRAFT_EMOJI_KEY
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.UNSCHEDULE_DRAFT_URL_KEY
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -108,6 +109,7 @@ class MailActionsManager(
         var trackedUnscheduledDraftUrl: String? = null
         var isTrackedDraftSuccess: Boolean? = null
         var trackedUnSendDraftUrl: String? = null
+        var trackedDraftEmoji: String? = null
 
         val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
         SentryLog.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
@@ -131,6 +133,7 @@ class MailActionsManager(
             if (isTargetDraft) {
                 trackedDraftAction = draft.action
                 trackedScheduledDraftDate = draft.scheduleDate
+                trackedDraftEmoji = draft.emojiReaction
             }
 
             runCatching {
@@ -220,6 +223,7 @@ class MailActionsManager(
             trackedScheduledDraftDate,
             trackedUnscheduledDraftUrl,
             trackedUnSendDraftUrl,
+            trackedDraftEmoji,
             emojiSendResults,
         )
     }
@@ -234,6 +238,7 @@ class MailActionsManager(
         trackedScheduledDraftDate: String?,
         trackedUnscheduledDraftUrl: String?,
         trackedUnsendDraftUrl: String?,
+        trackedDraftEmoji: String?,
         emojiSendResults: List<EmojiSendResult>,
     ): ListenableWorker.Result {
 
@@ -265,6 +270,7 @@ class MailActionsManager(
                     SCHEDULED_DRAFT_DATE_KEY to trackedScheduledDraftDate,
                     UNSCHEDULE_DRAFT_URL_KEY to trackedUnscheduledDraftUrl,
                     CANCEL_RESOURCE_URL_KEY to trackedUnsendDraftUrl,
+                    TRACKED_DRAFT_EMOJI_KEY to trackedDraftEmoji,
                 )
             } else {
                 emptyData

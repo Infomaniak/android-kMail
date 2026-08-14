@@ -514,8 +514,8 @@
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send the confirmation</string>
     <string name="sentFolder">Sent messages</string>
-    <string name="settingsAccentColor">Accent colour</string>
     <string name="serverUnavailable">Servers unavailable</string>
+    <string name="settingsAccentColor">Accent colour</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
     <string name="settingsAccountManagementTitle">Account management</string>
     <string name="settingsAppLock">App lock</string>
@@ -618,6 +618,7 @@
     <string name="snackbarMoveCancelled">Move cancelled</string>
     <string name="snackbarPasswordCopied">Password copied</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Number copied to clipboard</string>
+    <string name="snackbarReactionSent">Reaction %s sent</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
     <string name="snackbarRestorationLaunched">Launching the restoration</string>
     <string name="snackbarSaveInDraft">Your message has been saved in drafts.</string>
