@@ -18,6 +18,11 @@ dependencyResolutionManagement {
         mavenCentral()
 //        mavenLocal() // Only used when we want to use a local version of a library (./gradlew publishToMavenLocal)
     }
+    versionCatalogs {
+        create("oldKotlinCatalog") {
+            from(files("gradle/libs.versions.toml"))
+        }
+    }
 }
 
 include(":realm-models")

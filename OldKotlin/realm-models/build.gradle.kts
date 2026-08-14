@@ -4,11 +4,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
  * Don't change the order in this `plugins` block, it will mess things up.
  */
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.realm.kotlin)
-    alias(libs.plugins.kotlin.parcelize)
+    alias(oldKotlinCatalog.plugins.android.library)
+    alias(oldKotlinCatalog.plugins.kotlin.android)
+    alias(oldKotlinCatalog.plugins.kotlin.serialization)
+    alias(oldKotlinCatalog.plugins.realm.kotlin)
+    alias(oldKotlinCatalog.plugins.kotlin.parcelize)
 }
 
 group = "com.infomaniak.mail"
@@ -33,10 +33,9 @@ android {
 kotlin.compilerOptions.jvmTarget = JvmTarget.valueOf("JVM_${javaVersion.name.substringAfter("VERSION_")}")
 
 dependencies {
-
-    api(libs.realm.kotlin.base)
-    api(libs.kotlinx.serialization.json)
-    api(libs.androidx.annotation)
-    implementation(libs.sentry.android)
+    api(oldKotlinCatalog.realm.kotlin.base)
+    api(oldKotlinCatalog.kotlinx.serialization.json)
+    api(oldKotlinCatalog.androidx.annotation)
+    implementation(oldKotlinCatalog.sentry.android)
     api(project(":emoji-reaction-models"))
 }

@@ -4,8 +4,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
  * Don't change the order in this `plugins` block, it will mess things up.
  */
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(oldKotlinCatalog.plugins.android.library)
+    alias(oldKotlinCatalog.plugins.kotlin.android)
 }
 
 group = "com.infomaniak.mail"
