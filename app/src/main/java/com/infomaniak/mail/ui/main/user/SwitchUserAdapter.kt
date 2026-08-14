@@ -37,8 +37,9 @@ import com.google.android.material.R as RMaterial
 @SuppressLint("NotifyDataSetChanged")
 class SwitchUserAdapter(
     val currentUserId: Int,
+    val shouldShowContactCard: Boolean,
     val onChangingUserAccount: ((User) -> Unit),
-    val onOpenContactCard: ((User) -> Unit)? = null,
+    val onOpenContactCard: (User) -> Unit,
 ) : Adapter<SwitchUserAccountViewHolder>() {
 
     private var accounts: List<User> = emptyList()
@@ -65,12 +66,14 @@ class SwitchUserAdapter(
         userMailAddress.text = account.email
         updateSelectedUi(position)
         accountCardview.setOnClickListener { selectAccount(position) }
-        qrcode.setOnClickListener { if (account.id == currentUserId) onOpenContactCard?.invoke(account) }
+        qrcode.setOnClickListener {
+            if (shouldShowContactCard && account.id == currentUserId) onOpenContactCard(account)
+        }
     }
 
     private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
         val isCurrentUser = accounts[position].id == currentUserId
-        qrcode.isVisible = isCurrentUser && onOpenContactCard != null
+        qrcode.isVisible = isCurrentUser && shouldShowContactCard
         qrcodeImage.background.alpha = (0.1 * 255).toInt()
         accountCardview.isSelected = isCurrentUser
         accountCardview.setCardBackgroundColor(

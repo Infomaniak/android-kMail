@@ -22,9 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -71,11 +71,11 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
 
     private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
 
-
     private val navigationArgs: AccountBottomSheetDialogArgs by navArgs()
     private val accountsAdapter by lazy {
         SwitchUserAdapter(
             currentUserId = AccountUtils.currentUserId,
+            shouldShowContactCard = navigationArgs.showContactCard,
             onChangingUserAccount = { user ->
                 if (user.id == AccountUtils.currentUserId) {
                     ConfettiUtils.onEasterEggConfettiClicked(
@@ -87,12 +87,9 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
                     switchUserViewModel.switchAccount(user)
                 }
             },
-            onOpenContactCard = if (navigationArgs.showContactCard) { { user ->
-                if (user.id == AccountUtils.currentUserId) openContactCard(user.id)
-            } } else null,
+            onOpenContactCard = { user -> if (user.id == AccountUtils.currentUserId) openContactCard(user.id) },
         )
     }
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAccountBinding.inflate(inflater, container, false).also { binding = it }.root
