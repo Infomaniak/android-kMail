@@ -128,7 +128,8 @@ object AccountUtils : CredentialManager() {
             if (remoteUser.id == currentUserId) {
                 remoteUser.organizations = arrayListOf()
                 requestCurrentUser()?.let { localUser ->
-                    setUserToken(remoteUser, localUser.apiToken)
+                    val remoteUserWithLocalContactCard = remoteUser.copy(card = localUser.card)
+                    setUserToken(remoteUserWithLocalContactCard, localUser.apiToken)
                 }
             }
         }

@@ -240,7 +240,7 @@
             android:layout_marginEnd="@dimen/marginStandard"
             android:layout_marginBottom="@dimen/marginStandard"
             android:text="@string/buttonNewMessage"
-            app:icon="@drawable/ic_pencil"
+            app:icon="@drawable/ic_pencil_filled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

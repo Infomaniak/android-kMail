@@ -24,11 +24,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import com.infomaniak.core.ui.compose.basics.Typography
 import com.infomaniak.core.ui.compose.preview.PreviewAllWindows
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.theme.MailTheme
@@ -36,16 +39,18 @@ import com.infomaniak.mail.ui.theme.MailTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MailTopAppBar(
+    title: @Composable () -> Unit = {},
     navigationIcon: @Composable () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
+    containerColor: Color = MaterialTheme.colorScheme.background
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = containerColor,
             navigationIconContentColor = MaterialTheme.colorScheme.primary,
             actionIconContentColor = MaterialTheme.colorScheme.primary
         ),
-        title = {},
+        title = title,
         navigationIcon = navigationIcon,
         actions = actions
     )
@@ -79,13 +84,22 @@ object TopAppBarButtons {
     )
 }
 
+@Composable
+fun MailTopAppBarTitle(text: String) {
+    Text(
+        text = text,
+        style = Typography.h1,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+}
+
 @PreviewAllWindows
 @Composable
 private fun BrandTopAppBarPreview() {
     MailTheme {
         MailTopAppBar(
             navigationIcon = {
-                TopAppBarButtons.Close {  }
+                TopAppBarButtons.Close { }
             }
         )
     }

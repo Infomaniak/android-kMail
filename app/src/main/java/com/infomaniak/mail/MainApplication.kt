@@ -49,6 +49,7 @@ import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.network.networking.HttpClientConfig
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import com.infomaniak.core.twofactorauth.back.TwoFactorAuthManager
+import com.infomaniak.core.ui.compose.contactcard.ContactCardMatomo
 import com.infomaniak.core.ui.showToast
 import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
@@ -156,6 +157,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         configureAppReloading()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
+        configureMatomoTracking()
 
         applicationScope.launch {
             DeviceInfoUpdateManager.scheduleWorkerOnDeviceInfoUpdate<DeviceInfoUpdateWorker>()
@@ -191,6 +193,10 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         )
 
         MatomoMail.addTrackingCallbackForDebugLog()
+    }
+
+    private fun configureMatomoTracking() {
+        ContactCardMatomo.init(MatomoMail)
     }
 
     /**

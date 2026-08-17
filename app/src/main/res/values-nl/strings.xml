@@ -218,6 +218,7 @@
     <string name="contentDescriptionIconForward">Doorgestuurd</string>
     <string name="contentDescriptionIconMention">Je bent vermeld.</string>
     <string name="contentDescriptionIconNewMail">Nieuw</string>
+    <string name="contentDescriptionIconQr">Open contactkaart</string>
     <string name="contentDescriptionIconReply">Antwoord</string>
     <string name="contentDescriptionIconStorage">Opslagstatus</string>
     <string name="contentDescriptionOpenMailActions">E-mailacties openen</string>
