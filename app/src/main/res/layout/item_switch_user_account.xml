@@ -75,8 +75,8 @@
 
             <FrameLayout
                 android:id="@+id/qrcode"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="@dimen/qrCodeIconBackgroundSize"
+                android:layout_height="@dimen/qrCodeIconBackgroundSize"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/contentDescriptionIconQr"
                 app:layout_constraintBottom_toBottomOf="@id/userAvatar"

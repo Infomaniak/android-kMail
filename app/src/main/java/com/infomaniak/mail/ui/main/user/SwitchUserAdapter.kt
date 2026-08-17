@@ -85,8 +85,6 @@ class SwitchUserAdapter(
         )
     }
 
-    private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])
-
     override fun getItemCount(): Int = accounts.count()
 
     fun initializeAccounts(newList: List<User>) {
@@ -111,6 +109,8 @@ class SwitchUserAdapter(
             }
         }
     }
+
+    private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : ViewHolder(binding.root)
 }

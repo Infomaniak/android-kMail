@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.contactcard
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,20 +28,20 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.auth.models.user.Card
 import com.infomaniak.core.ui.compose.contactcard.ContactCardDefaults
 import com.infomaniak.core.ui.compose.contactcard.ContactCardScreen
 import com.infomaniak.core.ui.compose.contactcard.ContactCardTopBarState
+import com.infomaniak.core.ui.compose.contactcard.ContactCardViewModel
 import com.infomaniak.core.ui.compose.contactcard.R
-import com.infomaniak.core.ui.compose.contactcard.shareContactCard
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.MailTopAppBarTitle
@@ -49,13 +50,14 @@ import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
 import com.infomaniak.mail.ui.theme.LocalMailThemeColors
 import com.infomaniak.mail.ui.theme.MailTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.infomaniak.core.common.R as RCore
 import com.infomaniak.mail.R as RMail
 
 @AndroidEntryPoint
 class ContactCardFragment : Fragment() {
+
+    private val contactCardViewModel: ContactCardViewModel by viewModels()
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -74,6 +76,7 @@ class ContactCardFragment : Fragment() {
                     ContactCardScreen(
                         onBack = { findNavController().popBackStack() },
                         onShare = ::shareCard,
+                        viewModel = contactCardViewModel,
                         confirmDelete = ::confirmDelete,
                         confirmValidationError = ::confirmValidationError,
                         topBar = { state -> MailContactCardTopBar(state) },
@@ -88,8 +91,17 @@ class ContactCardFragment : Fragment() {
     }
 
     private fun shareCard(card: Card) {
-        lifecycleScope.launch {
-            requireActivity().shareContactCard(card)
+        contactCardViewModel.shareCardData(card) { file ->
+            val authority = "${requireContext().packageName}.core.contactcard.provider"
+            val uri = FileProvider.getUriForFile(requireContext(), authority, file)
+            val intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "text/vcard"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            startActivity(Intent.createChooser(intent, getString(R.string.contactCardShareChooserTitle)))
         }
     }
 
@@ -103,13 +115,13 @@ class ContactCardFragment : Fragment() {
         )
     }
 
-    private fun confirmValidationError(onConfirmed: () -> Unit) {
+    private fun confirmValidationError() {
         descriptionDialog.show(
             title = getString(R.string.alertTitle),
             description = getString(R.string.alertDescription),
             displayLoader = false,
             positiveButtonText = android.R.string.ok,
-            onPositiveButtonClicked = { onConfirmed() },
+            onPositiveButtonClicked = { },
         )
     }
 }
@@ -148,19 +160,6 @@ private fun MailContactCardTopBarEditor(state: ContactCardTopBarState.Editor) {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun MailContactCardTopBarEditorPreview() {
-    MailTheme {
-        MailContactCardTopBarEditor(
-            ContactCardTopBarState.Editor(
-                onCancel = {},
-                onSave = {},
-            ),
-        )
-    }
-}
-
 @Composable
 private fun MailContactCardTopBarPreview(state: ContactCardTopBarState.Preview) {
     MailTopAppBar(
@@ -176,6 +175,34 @@ private fun MailContactCardTopBarPreview(state: ContactCardTopBarState.Preview) 
     )
 }
 
+@Composable
+private fun MailContactCardTopBarDefault(state: ContactCardTopBarState.Default) {
+    MailTopAppBar(
+        title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
+        navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
+    )
+}
+
+@Composable
+private fun MailContactCardTopBarOnboarding(state: ContactCardTopBarState.Onboarding) {
+    MailTopAppBar(
+        navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MailContactCardTopBarEditorPreview() {
+    MailTheme {
+        MailContactCardTopBarEditor(
+            ContactCardTopBarState.Editor(
+                onCancel = {},
+                onSave = {},
+            ),
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun MailContactCardTopBarPreviewPreview() {
@@ -189,14 +216,6 @@ private fun MailContactCardTopBarPreviewPreview() {
     }
 }
 
-@Composable
-private fun MailContactCardTopBarDefault(state: ContactCardTopBarState.Default) {
-    MailTopAppBar(
-        title = { MailTopAppBarTitle(stringResource(R.string.contactCardTitle)) },
-        navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun MailContactCardTopBarDefaultPreview() {
@@ -207,13 +226,6 @@ private fun MailContactCardTopBarDefaultPreview() {
             ),
         )
     }
-}
-
-@Composable
-private fun MailContactCardTopBarOnboarding(state: ContactCardTopBarState.Onboarding) {
-    MailTopAppBar(
-        navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
-    )
 }
 
 @Preview(showBackground = true)
