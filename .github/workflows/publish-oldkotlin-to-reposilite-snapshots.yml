@@ -25,18 +25,19 @@ jobs:
       run:
         working-directory: OldKotlin
     steps:
-      - name: Normalize version (append -SNAPSHOT if missing)
-        run: |
-          VERSION="${{ inputs.version }}"
-          if [[ "$VERSION" != *-SNAPSHOT ]]; then
-            VERSION="$VERSION-SNAPSHOT"
-          fi
-          echo "SNAPSHOT_VERSION=$VERSION" >> $GITHUB_ENV
-
       - name: Checkout the code
         uses: actions/checkout@v5.0.0
         with:
           token: ${{ github.token }}
+
+      - name: Normalize version (append -SNAPSHOT if missing)
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$VERSION" != *-SNAPSHOT ]]; then
+            VERSION="$VERSION-SNAPSHOT"
+          fi
+          echo "SNAPSHOT_VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew

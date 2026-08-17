@@ -25,15 +25,19 @@ jobs:
     runs-on: [ self-hosted, Android ]
     steps:
       - name: Check acknowledgement
-        run: test "${{ github.event.inputs.acknowledgement }}" = "Yes" || (echo "Acknowledgement missing" && exit 1)
+        env:
+          ACKNOWLEDGEMENT: ${{ github.event.inputs.acknowledgement }}
+        run: test "$ACKNOWLEDGEMENT" = "Yes" || (echo "Acknowledgement missing" && exit 1)
       # Guard against publishing a "release" that's actually a snapshot (e.g. "1.2.3-SNAPSHOT"):
       # PublishingConventionPlugin would silently route it to the snapshots repository instead of failing.
       - name: Validate version format
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
-            echo "Version '${{ inputs.version }}' is not a valid release version (expected x.x.x, e.g. 1.2.3)"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version '$VERSION' is not a valid release version (expected x.x.x, e.g. 1.2.3)"
             exit 1
-          }
+          fi
 
   publish:
     name: Build and publish
