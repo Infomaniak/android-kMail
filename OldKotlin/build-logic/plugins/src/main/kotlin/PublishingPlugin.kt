@@ -31,7 +31,19 @@ class PublishingPlugin : Plugin<Project> {
         }
 
         group = "com.infomaniak.mail.oldkotlin"
+        // Fall back to "unspecified" so that regular tasks (compile, assemble, tests…) keep working
+        // without -Poldkotlin.version. Publishing tasks fail eagerly below, since publishing with an
+        // "unspecified" version would silently produce an unusable artifact.
         version = getPropertyValue("oldkotlin.version") ?: "unspecified"
+
+        tasks.withType<AbstractPublishToMaven>().configureEach {
+            doFirst {
+                check(version.toString() != "unspecified") {
+                    "Missing version: pass -Poldkotlin.version=<version> (e.g. 1.0.1, or 1.0.1-SNAPSHOT " +
+                        "to publish to the snapshots repository) when publishing OldKotlin modules."
+                }
+            }
+        }
 
         extensions.configure<LibraryExtension> {
             publishing {
