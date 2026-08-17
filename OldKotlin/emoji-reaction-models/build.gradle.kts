@@ -6,10 +6,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(oldKotlinCatalog.plugins.android.library)
     alias(oldKotlinCatalog.plugins.kotlin.android)
+    alias(oldKotlinCatalog.plugins.oldkotlin.publishing)
 }
-
-group = "com.infomaniak.mail"
-version = "1.0.0"
 
 val javaVersion: JavaVersion = JavaVersion.VERSION_17
 

@@ -1,0 +1,91 @@
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+name: Publish OldKotlin to Reposilite
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (x.x.x)'
+        required: true
+        type: string
+      acknowledgement:
+        description: |
+          WARNING: Publishing a version to Reposilite is irrevocable.
+          Do you confirm (Yes/no):
+          1. You have successfully tested publishing a snapshot (with a Gradle CLEAN) just before changing the version
+          2. The version is CORRECT, and is NOT a SNAPSHOT
+          3. You are not drunk or otherwise too tired
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  check-acknowledgement:
+    runs-on: [ self-hosted, Android ]
+    steps:
+      - name: Check acknowledgement
+        run: test "${{ github.event.inputs.acknowledgement }}" = "Yes" || (echo "Acknowledgement missing" && exit 1)
+      # Guard against publishing a "release" that's actually a snapshot (e.g. "1.2.3-SNAPSHOT"):
+      # PublishingConventionPlugin would silently route it to the snapshots repository instead of failing.
+      - name: Validate version format
+        run: |
+          echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
+            echo "Version '${{ inputs.version }}' is not a valid release version (expected x.x.x, e.g. 1.2.3)"
+            exit 1
+          }
+
+  publish:
+    name: Build and publish
+    needs: check-acknowledgement
+    runs-on: [ self-hosted, Android ]
+    # OldKotlin is a self-contained Gradle build (own settings.gradle.kts, own gradlew) that
+    # doesn't depend on the rest of the monorepo (:app, Core, etc.). Running everything from this
+    # directory keeps the root build (and its Sentry/env.properties requirements) out of scope.
+    defaults:
+      run:
+        working-directory: OldKotlin
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v5.0.0
+        with:
+          token: ${{ github.token }}
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Perform a Gradle clean
+        run: ./gradlew clean
+
+      - name: Publish the artifacts
+        run: >
+          ./gradlew publishAllPublicationsToReposiliteRepository -Poldkotlin.version=${{ inputs.version }}
+
+      - name: List published libraries
+        id: modules
+        run: |
+          {
+            echo 'list<<EOF'
+            ./gradlew -q listPublishedModules -Poldkotlin.version=${{ inputs.version }}
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Notify KChat
+        if: ${{ env.KCHAT_TESTS_WEBHOOK_URL != '' }}
+        env:
+          KCHAT_TESTS_WEBHOOK_URL: ${{ secrets.KCHAT_TESTS_WEBHOOK_URL }}
+        run: |
+          LIBS=$(echo "${{ steps.modules.outputs.list }}" | sed -E 's#^(.*)$#implementation("\1")#')
+          TEXT=$(printf ':rocket: *OldKotlin %s* is now available on Reposilite!\n:package: Available libraries:\n```\n%s\n```\n:link: https://maven.infomaniak.app/#/releases/com/infomaniak/mail/oldkotlin' \
+            "${{ inputs.version }}" "$LIBS")
+          curl -s -X POST "$KCHAT_TESTS_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg text "$TEXT" '{text: $text}')"
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx5g -Dfile.encoding=UTF-8"
+  reposiliteUsername: ${{ secrets.REPOSILITE_USERNAME }}
+  reposilitePassword: ${{ secrets.REPOSILITE_PASSWORD }}
+  GPG_key_id: ${{ secrets.GPG_KEY_ID }}
+  GPG_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+  GPG_private_password: ${{ secrets.GPG_PRIVATE_PASSWORD }}

@@ -9,10 +9,8 @@ plugins {
     alias(oldKotlinCatalog.plugins.kotlin.serialization)
     alias(oldKotlinCatalog.plugins.realm.kotlin)
     alias(oldKotlinCatalog.plugins.kotlin.parcelize)
+    alias(oldKotlinCatalog.plugins.oldkotlin.publishing)
 }
-
-group = "com.infomaniak.mail"
-version = "1.0.0"
 
 val javaVersion: JavaVersion = JavaVersion.VERSION_17
 
