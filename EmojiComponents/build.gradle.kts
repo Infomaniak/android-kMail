@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.compose.ui.android)
 
     implementation(core.androidx.core.ktx)
-    api(libs.emoji.reaction.models)
+    api(libs.infomaniak.emoji.reaction.models)
 
     implementation(platform(core.compose.bom))
     implementation(core.compose.runtime)

@@ -60,14 +60,14 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Notify KChat
-        if: ${{ env.KCHAT_TESTS_WEBHOOK_URL != '' }}
+        if: ${{ env.KCHAT_MAIL_WEBHOOK_URL != '' }}
         env:
-          KCHAT_TESTS_WEBHOOK_URL: ${{ secrets.KCHAT_TESTS_WEBHOOK_URL }}
+          KCHAT_MAIL_WEBHOOK_URL: ${{ secrets.KCHAT_MAIL_WEBHOOK_URL }}
         run: |
           LIBS=$(echo "${{ steps.modules.outputs.list }}" | sed -E 's#^(.*)$#implementation("\1")#')
           TEXT=$(printf ':android: *OldKotlin snapshot %s* is available on Reposilite Snapshots!\n:package: Available libraries:\n```\n%s\n```\n:link: https://maven.infomaniak.app/#/snapshots/com/infomaniak/mail/oldkotlin' \
             "${{ env.SNAPSHOT_VERSION }}" "$LIBS")
-          curl -s -X POST "$KCHAT_TESTS_WEBHOOK_URL" \
+          curl -s -X POST "$KCHAT_MAIL_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d "$(jq -n --arg text "$TEXT" '{text: $text}')"
 
