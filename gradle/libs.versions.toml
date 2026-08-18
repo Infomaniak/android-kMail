@@ -29,7 +29,7 @@ compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = 
 desugar-jdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJDK" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 dragdropswipe-recyclerview = { module = "com.github.infomaniak:DragDropSwipeRecyclerview", version.ref = "dragDropSwipeRecyclerView" }
-emoji-reaction-models = { module = "com.infomaniak.mail:emoji-reaction-models", version.ref = "oldKotlinModules" }
+emoji-reaction-models = { module = "com.infomaniak.mail.oldkotlin:emoji-reaction-models", version.ref = "oldKotlinModules" }
 emoji2-emojipicker = { module = "androidx.emoji2:emoji2-emojipicker", version.ref = "emoji2" }
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
@@ -40,7 +40,7 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
-realm-models = { module = "com.infomaniak.mail:realm-models", version.ref = "oldKotlinModules" }
+realm-models = { module = "com.infomaniak.mail.oldkotlin:realm-models", version.ref = "oldKotlinModules" }
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }

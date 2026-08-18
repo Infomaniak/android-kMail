@@ -9,6 +9,7 @@ realmKotlin = "3.2.9"
 sentry = "8.27.1"
 
 [libraries]
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 androidx-annotation = { module = "androidx.annotation:annotation", version = "1.10.0" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 realm-kotlin-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realmKotlin" }
@@ -20,3 +21,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "kotlin-parcelize" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }
+oldkotlin-publishing = { id = "com.infomaniak.mail.oldkotlin.plugins.publishing" }
+

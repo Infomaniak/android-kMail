@@ -1,0 +1,80 @@
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+name: Publish OldKotlin to Reposilite Snapshots
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Snapshot version to publish (e.g. 0.1.0)'
+        required: true
+        type: string
+      perform-a-gradle-clean:
+        description: "Perform a Gradle clean"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: [ self-hosted, Android ]
+    # OldKotlin is a self-contained Gradle build (own settings.gradle.kts, own gradlew) that
+    # doesn't depend on the rest of the monorepo (:app, Core, etc.). Running everything from this
+    # directory keeps the root build (and its Sentry/env.properties requirements) out of scope.
+    defaults:
+      run:
+        working-directory: OldKotlin
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v5.0.0
+        with:
+          token: ${{ github.token }}
+
+      - name: Normalize version (append -SNAPSHOT if missing)
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$VERSION" != *-SNAPSHOT ]]; then
+            VERSION="$VERSION-SNAPSHOT"
+          fi
+          echo "SNAPSHOT_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Perform a Gradle clean, as requested
+        if: ${{ github.event.inputs.perform-a-gradle-clean == 'true' }}
+        run: ./gradlew clean
+
+      - name: Publish the snapshots
+        run: >
+          ./gradlew publishAllPublicationsToReposiliteRepository -Poldkotlin.version=${{ env.SNAPSHOT_VERSION }}
+
+      - name: List published libraries
+        id: modules
+        run: |
+          {
+            echo 'list<<EOF'
+            ./gradlew -q listPublishedModules -Poldkotlin.version=${{ env.SNAPSHOT_VERSION }}
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Notify KChat
+        if: ${{ env.KCHAT_TESTS_WEBHOOK_URL != '' }}
+        env:
+          KCHAT_TESTS_WEBHOOK_URL: ${{ secrets.KCHAT_TESTS_WEBHOOK_URL }}
+        run: |
+          LIBS=$(echo "${{ steps.modules.outputs.list }}" | sed -E 's#^(.*)$#implementation("\1")#')
+          TEXT=$(printf ':android: *OldKotlin snapshot %s* is available on Reposilite Snapshots!\n:package: Available libraries:\n```\n%s\n```\n:link: https://maven.infomaniak.app/#/snapshots/com/infomaniak/mail/oldkotlin' \
+            "${{ env.SNAPSHOT_VERSION }}" "$LIBS")
+          curl -s -X POST "$KCHAT_TESTS_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg text "$TEXT" '{text: $text}')"
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx5g -Dfile.encoding=UTF-8"
+  reposiliteUsername: ${{ secrets.REPOSILITE_USERNAME }}
+  reposilitePassword: ${{ secrets.REPOSILITE_PASSWORD }}
+  GPG_key_id: ${{ secrets.GPG_KEY_ID }}
+  GPG_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+  GPG_private_password: ${{ secrets.GPG_PRIVATE_PASSWORD }}
