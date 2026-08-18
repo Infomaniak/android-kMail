@@ -49,6 +49,9 @@ import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -72,6 +75,13 @@ class AiViewModel @Inject constructor(
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus?>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
+    private val mailboxUuidFlow = MutableStateFlow<String?>(null)
+
+    fun setMailboxUuid(mailboxUuid: String) {
+        mailboxUuidFlow.value = mailboxUuid
+    }
+
+    private suspend fun requireMailboxUuid(): String = mailboxUuidFlow.filterNotNull().first()
 
     fun resetAiState() {
         aiPrompt = ""
@@ -81,7 +91,6 @@ class AiViewModel @Inject constructor(
     }
 
     fun generateNewAiProposition(
-        currentMailboxUuid: String,
         formattedRecipientsString: String?,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
@@ -99,7 +108,7 @@ class AiViewModel @Inject constructor(
         val apiResponse = ApiRepository.startNewConversation(
             contextMessage,
             userMessage,
-            currentMailboxUuid,
+            requireMailboxUuid(),
         )
 
         ensureActive()
@@ -152,13 +161,14 @@ class AiViewModel @Inject constructor(
         PROMPT_TOO_LONG
     }
 
-    fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
-        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxUuid)
+    fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
+        val mailboxUuid = requireMailboxUuid()
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, mailboxUuid)
         ensureActive()
 
         val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
         if (hasConversationExpired) {
-            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxUuid)
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), mailboxUuid)
             ensureActive()
         }
 

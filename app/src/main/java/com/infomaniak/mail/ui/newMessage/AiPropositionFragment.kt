@@ -53,7 +53,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.getRecipientsForReplyTo
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -90,7 +89,6 @@ class AiPropositionFragment : Fragment() {
     private val navigationArgs: AiPropositionFragmentArgs by navArgs()
 
     private var currentRequestJob: Job? = null
-    private var mailbox: Mailbox? = null
 
     private val refinePopupMenu by lazy {
         SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton, ::onMenuItemClicked)
@@ -121,7 +119,6 @@ class AiPropositionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initMailbox()
 
         handleEdgeToEdge()
         handleBackDispatcher()
@@ -145,16 +142,6 @@ class AiPropositionFragment : Fragment() {
 
     private fun handleBackDispatcher() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { trackDismissalAndPopBack() }
-    }
-
-    private fun initMailbox() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            mailbox = if (isHostedByNewMessageActivity()) {
-                newMessageViewModel.currentMailbox()
-            } else {
-                mainViewModel.currentMailbox.value ?: return@launch
-            }
-        }
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -305,8 +292,7 @@ class AiPropositionFragment : Fragment() {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
             lifecycleScope.launch {
-                val uuid = mailbox?.uuid ?: return@launch
-                currentRequestJob = performShortcut(shortcut, uuid)
+                currentRequestJob = performShortcut(shortcut)
             }
         }
     }
@@ -340,7 +326,7 @@ class AiPropositionFragment : Fragment() {
             val formattedRecipientsString = allRecipients
                 .joinToString(separator = ", ") { it.name.ifBlank { it.email } }
                 .takeIf { it.isNotBlank() }
-            currentRequestJob = aiViewModel.generateNewAiProposition(mailbox?.uuid ?: return@launch, formattedRecipientsString)
+            currentRequestJob = aiViewModel.generateNewAiProposition(formattedRecipientsString)
         }
     }
 
