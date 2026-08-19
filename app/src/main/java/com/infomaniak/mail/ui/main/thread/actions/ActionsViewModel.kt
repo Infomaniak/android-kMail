@@ -56,6 +56,7 @@ import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -657,13 +658,13 @@ class ActionsViewModel @Inject constructor(
         return result
     }
 
-    fun unsnoozeThreads(threads: List<Thread>, mailbox: Mailbox?) {
+    suspend fun unsnoozeThreads(threads: List<Thread>, mailbox: Mailbox?): BatchSnoozeResult {
         if (mailbox == null) {
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-            return
+            return BatchSnoozeResult.Error.Unknown
         }
 
-        viewModelScope.launch(ioCoroutineContext) {
+        return viewModelScope.async(ioCoroutineContext) {
             val result = messagesActions.unsnoozeThreads(threads, mailbox)
 
             if (result is BatchSnoozeResult.Success) {
@@ -678,7 +679,8 @@ class ActionsViewModel @Inject constructor(
                 is BatchSnoozeResult.Error -> getUnsnoozeErrorMessage(result)
             }
             snackbarManager.postValue(message)
-        }
+            return@async result
+        }.await()
     }
 
     private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {
