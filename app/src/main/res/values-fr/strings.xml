@@ -253,6 +253,7 @@
     <string name="draftPrefix">(Brouillon)</string>
     <string name="editSendDescription">Ce message sera déplacé dans vos brouillons pour être envoyé quand vous le souhaitez.</string>
     <string name="editSendTitle">Modifier l’envoi</string>
+    <string name="emailTemplatesTitle">Modèles d’e-mail</string>
     <string name="emailWithoutSubjectDescription">Vous êtes sur le point d’envoyer un message sans objet. Voulez-vous continuer ?</string>
     <string name="emailWithoutSubjectTitle">Objet vide</string>
     <string name="emptyStateFolderDescription">Il n’y a rien à voir par ici.</string>
@@ -412,6 +413,7 @@
     <string name="messageTranslatedTitle">Traduit en %s</string>
     <string name="mondayAfternoon">Lundi après-midi</string>
     <string name="mondayMorning">Lundi matin</string>
+    <string name="moreOptionsButtonContentDescription">Plus d’options</string>
     <string name="moveInSpamButton">Déplacer dans Spam</string>
     <string name="moveSearchFieldPlaceholder">Rechercher un dossier</string>
     <plurals name="multipleSelectionCount">
@@ -510,6 +512,7 @@
     <string name="selectTimeDialogTitle">Sélectionner l’heure</string>
     <string name="send">Envoyer</string>
     <string name="sendConfirmationAction">Envoyer la confirmation</string>
+    <string name="sendOptions">Options d’envoi</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="serverUnavailable">Serveurs indisponibles</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>

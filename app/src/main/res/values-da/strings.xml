@@ -253,6 +253,7 @@
     <string name="draftPrefix">(Kladde)</string>
     <string name="editSendDescription">Denne besked vil blive flyttet til dine kladder for at blive sendt, når du vil.</string>
     <string name="editSendTitle">Rediger afsendelse</string>
+    <string name="emailTemplatesTitle">E-mailskabeloner</string>
     <string name="emailWithoutSubjectDescription">Du er ved at sende en besked uden emne. Vil du fortsætte?</string>
     <string name="emailWithoutSubjectTitle">Tomt emne</string>
     <string name="emptyStateFolderDescription">Der er intet at se her.</string>
@@ -412,6 +413,7 @@
     <string name="messageTranslatedTitle">Oversat i %s</string>
     <string name="mondayAfternoon">Mandag eftermiddag</string>
     <string name="mondayMorning">Mandag morgen</string>
+    <string name="moreOptionsButtonContentDescription">Flere valgmuligheder</string>
     <string name="moveInSpamButton">Flyt til Spam</string>
     <string name="moveSearchFieldPlaceholder">Søg efter en mappe</string>
     <plurals name="multipleSelectionCount">
@@ -510,6 +512,7 @@
     <string name="selectTimeDialogTitle">Vælg tidspunkt</string>
     <string name="send">Send</string>
     <string name="sendConfirmationAction">Send bekræftelsen</string>
+    <string name="sendOptions">Sendevalg</string>
     <string name="sentFolder">Sendte beskeder</string>
     <string name="serverUnavailable">Servere utilgængelige</string>
     <string name="settingsAccentColor">Accentfarve</string>

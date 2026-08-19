@@ -53,6 +53,8 @@
             style="@style/BodySmall.Tertiary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:visibility="gone"
             tools:text="@string/settingsDefault"
             tools:visibility="visible" />

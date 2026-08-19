@@ -253,6 +253,7 @@
     <string name="draftPrefix">(Borrador)</string>
     <string name="editSendDescription">Este mensaje se moverá a tus borradores para que puedas enviarlo cuando lo desees.</string>
     <string name="editSendTitle">Editar envío</string>
+    <string name="emailTemplatesTitle">Plantillas de correo electrónico</string>
     <string name="emailWithoutSubjectDescription">Está a punto de enviar un mensaje sin asunto. ¿Desea continuar?</string>
     <string name="emailWithoutSubjectTitle">Asunto vacío</string>
     <string name="emptyStateFolderDescription">Aquí no hay nada que ver.</string>
@@ -412,6 +413,7 @@
     <string name="messageTranslatedTitle">Traducido en %s</string>
     <string name="mondayAfternoon">Lunes por la tarde</string>
     <string name="mondayMorning">Lunes mañana</string>
+    <string name="moreOptionsButtonContentDescription">Más opciones</string>
     <string name="moveInSpamButton">Mover en Spam</string>
     <string name="moveSearchFieldPlaceholder">Buscar un fichero</string>
     <plurals name="multipleSelectionCount">
@@ -510,6 +512,7 @@
     <string name="selectTimeDialogTitle">Seleccionar la hora</string>
     <string name="send">Enviar</string>
     <string name="sendConfirmationAction">Enviar la confirmación</string>
+    <string name="sendOptions">Opciones de envío</string>
     <string name="sentFolder">Mensajes enviados</string>
     <string name="serverUnavailable">Servidores no disponibles</string>
     <string name="settingsAccentColor">Color de acento</string>

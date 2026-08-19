@@ -90,6 +90,8 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.C
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_EMAIL_TEMPLATES_BOTTOM_SHEET
+import com.infomaniak.mail.ui.newMessage.MoreOptionsBottomSheetDialog.Companion.OPEN_SCHEDULE_SEND_BOTTOM_SHEET
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
@@ -177,9 +179,6 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
-    private val isScheduledDraftsEnabledLive by lazy {
-        newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.SCHEDULE_DRAFTS) }.distinctUntilChanged()
-    }
     private val areMentionsAvailableLive by lazy {
         newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.MENTIONS) }.distinctUntilChanged()
     }
@@ -347,6 +346,23 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT, ::scheduleDraft)
 
         getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
+
+        getBackNavigationResult<Boolean>(OPEN_SCHEDULE_SEND_BOTTOM_SHEET) { openScheduleSendBottomSheet() }
+
+        getBackNavigationResult<Boolean>(OPEN_EMAIL_TEMPLATES_BOTTOM_SHEET) { navigateToEmailTemplates() }
+    }
+
+    private fun openScheduleSendBottomSheet() {
+        lifecycleScope.launch {
+            val mailbox = newMessageViewModel.currentMailbox()
+            if (checkMailboxStorage(mailbox)) {
+                if (newMessageViewModel.isEncryptionActivated.value == true) {
+                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
+                } else {
+                    navigateToScheduleSendBottomSheet()
+                }
+            }
+        }
     }
 
     private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {
@@ -845,9 +861,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeFeatureFlagUpdates() {
-        isScheduledDraftsEnabledLive.observe(viewLifecycleOwner) { isScheduledDraftsEnabled ->
-            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
-        }
+        binding.moreOptionsButton.isVisible = true
 
         areMentionsAvailableLive.observe(viewLifecycleOwner) { areMentionsAvailable ->
             binding.editorWebView.apply {
@@ -932,22 +946,17 @@ class NewMessageFragment : Fragment() {
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener {
-            if (checkMailboxStorage(mailbox)) {
-                if (newMessageViewModel.isEncryptionActivated.value == true) {
-                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
-                } else {
-                    navigateToScheduleSendBottomSheet()
-                }
-            }
-        }
+        moreOptionsButton.setOnClickListener { navigateToMoreOptionsBottomSheet() }
 
         sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() }
     }
+
+    private fun navigateToMoreOptionsBottomSheet() = safelyNavigate(resId = R.id.moreOptionsBottomSheetDialog, args = Bundle())
+
+    private fun navigateToEmailTemplates() = safelyNavigate(resId = R.id.emailTemplatesFragment)
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()

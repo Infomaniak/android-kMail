@@ -47,6 +47,12 @@
         <action
             android:id="@+id/action_newMessageFragment_to_encryptionActionsBottomSheetDialog"
             app:destination="@id/encryptionActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_newMessageFragment_to_moreOptionsBottomSheetDialog"
+            app:destination="@id/moreOptionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_newMessageFragment_to_emailTemplatesFragment"
+            app:destination="@id/emailTemplatesFragment" />
 
         <argument
             android:name="userId"
@@ -78,6 +84,26 @@
         android:label="EncryptionPasswordFragment"
         tools:layout="@layout/fragment_encryption_password" />
 
+    <fragment
+        android:id="@+id/emailTemplatesFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.EmailTemplatesFragment"
+        android:label="EmailTemplatesFragment"
+        tools:layout="@layout/fragment_email_templates">
+        <action
+            android:id="@+id/action_emailTemplatesFragment_to_emailTemplateViewerFragment"
+            app:destination="@id/emailTemplateViewerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/emailTemplateViewerFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.EmailTemplateViewerFragment"
+        android:label="EmailTemplateViewerFragment"
+        tools:layout="@layout/fragment_email_template_viewer">
+        <argument
+            android:name="templateId"
+            app:argType="integer" />
+    </fragment>
+
     <dialog
         android:id="@+id/aiDiscoveryBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AiDiscoveryBottomSheetDialog"
@@ -101,6 +127,12 @@
             android:name="intentType"
             app:argType="com.infomaniak.mail.utils.extensions.AttachmentExt$AttachmentIntentType" />
     </dialog>
+
+    <dialog
+        android:id="@+id/moreOptionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.newMessage.MoreOptionsBottomSheetDialog"
+        android:label="MoreOptionsBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_more_options" />
 
     <dialog
         android:id="@+id/scheduleSendBottomSheetDialog"

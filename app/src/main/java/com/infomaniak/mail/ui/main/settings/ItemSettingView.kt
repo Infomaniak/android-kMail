@@ -87,6 +87,11 @@ class ItemSettingView @JvmOverloads constructor(
         binding.title.text = title
     }
 
+    fun showChevron() = with(binding) {
+        action = Action.CHEVRON
+        chevron.isVisible = true
+    }
+
     fun setSubtitle(@StringRes subtitle: Int) {
         binding.subtitle.apply {
             setText(subtitle)

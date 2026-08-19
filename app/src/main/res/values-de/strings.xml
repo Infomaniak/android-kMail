@@ -253,6 +253,7 @@
     <string name="draftPrefix">(Entwurf)</string>
     <string name="editSendDescription">Diese Nachricht wird in Ihre Entwürfe verschoben, damit Sie sie senden können, wann immer Sie möchten.</string>
     <string name="editSendTitle">Senden bearbeiten</string>
+    <string name="emailTemplatesTitle">E-Mail-Vorlagen</string>
     <string name="emailWithoutSubjectDescription">Sie sind dabei, eine Nachricht ohne Betreff zu senden. Möchten Sie fortfahren?</string>
     <string name="emailWithoutSubjectTitle">Leeres Thema</string>
     <string name="emptyStateFolderDescription">Hier gibt es nichts zu sehen.</string>
@@ -412,6 +413,7 @@
     <string name="messageTranslatedTitle">Übersetzt in %s</string>
     <string name="mondayAfternoon">Montagnachmittag</string>
     <string name="mondayMorning">Montagmorgen</string>
+    <string name="moreOptionsButtonContentDescription">Weitere Optionen</string>
     <string name="moveInSpamButton">Einzug von Spam</string>
     <string name="moveSearchFieldPlaceholder">Einen Ordner suchen</string>
     <plurals name="multipleSelectionCount">
@@ -510,6 +512,7 @@
     <string name="selectTimeDialogTitle">Zeit auswählen</string>
     <string name="send">Senden Sie</string>
     <string name="sendConfirmationAction">Senden Sie die Bestätigung</string>
+    <string name="sendOptions">Sendeoptionen</string>
     <string name="sentFolder">Gesendete Nachrichten</string>
     <string name="serverUnavailable">Server nicht verfügbar</string>
     <string name="settingsAccentColor">Akzentfarbe</string>
