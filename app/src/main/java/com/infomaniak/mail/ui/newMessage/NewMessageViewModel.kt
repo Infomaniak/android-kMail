@@ -369,16 +369,6 @@ class NewMessageViewModel @Inject constructor(
             dismissNotification()
             markAsRead(currentMailbox(), realm)
 
-            if (isNewMessage) {
-                aiDraftCache.pendingAiContent?.let { pendingAiContent ->
-                    aiDraftCache.pendingAiSubject?.let { subject -> draft.subject = subject }
-                    initialBody = BodyContentPayload.bodyOf(
-                        BodyContentPayload(pendingAiContent, BodyContentType.TEXT_PLAIN_WITH_HTML)
-                    )
-                    aiDraftCache.reset()
-                }
-            }
-
             realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.initLiveData(signatures)
 
@@ -392,17 +382,42 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun processBodyAndInitializeEditorContent(draft: Draft) {
+        // If there is an AI proposition coming from reply with euria we need to process it and add it to the editor
+        var aiPropositionBody: BodyContentPayload? = null
+        if (isNewMessage) {
+            aiDraftCache.pendingAiContent?.let { pendingAiContent ->
+                aiDraftCache.pendingAiSubject?.let { subject -> draft.subject = subject }
+                aiPropositionBody = BodyContentPayload.bodyOf(
+                    BodyContentPayload(pendingAiContent, BodyContentType.TEXT_PLAIN_WITH_HTML)
+                )
+                aiDraftCache.reset()
+            }
+        }
+
         val sanitizedBody = initialBody.toSanitizedHtml()
         initEditorElementsVisibility(sanitizedBody)
 
         val sanitizedSignature = initialSignature?.toSanitizedHtml()
         val sanitizedBodyWithoutQuotes = sanitizedBody.mergeWithSignature(sanitizedSignature)
         val sanitizedBodyContentWithoutQuotes = BodyContentPayload(sanitizedBodyWithoutQuotes, BodyContentType.HTML_SANITIZED)
+
         /**
          * We load the body into the editor without its quotes to improve performances. We load them only if the user expands the
          * quotes section. Anyhow, the quotes will always be added before executing the draft action inside [addMissingQuotes].
+         * We add the AI proposition to the editor (if there is one) but we don't add it to the snapshot, since it should create a
+         * draft if the user closes the editor without editing this text.
          */
-        editorBodyInitializer.postValue(sanitizedBodyContentWithoutQuotes)
+        if (aiPropositionBody != null) {
+            val sanitizedAiPropositionBody = aiPropositionBody.toSanitizedHtml()
+            val sanitizedAiPropositionBodyWithoutQuotes = sanitizedAiPropositionBody.mergeWithSignature(sanitizedSignature)
+            val sanitizedAiPropositionBodyContentWithoutQuotes = BodyContentPayload(
+                sanitizedAiPropositionBodyWithoutQuotes,
+                BodyContentType.HTML_SANITIZED
+            )
+            editorBodyInitializer.postValue(sanitizedAiPropositionBodyContentWithoutQuotes)
+        } else {
+            editorBodyInitializer.postValue(sanitizedBodyContentWithoutQuotes)
+        }
 
         val sanitizedBodyWithQuotes = sanitizedBodyWithoutQuotes.mergeWithQuotes(initialSanitizedQuote)
 
