@@ -156,7 +156,7 @@ class LoginFragment : Fragment() {
     }
 
     private suspend fun connectSelectedAccounts(accounts: List<ExternalAccount>, skippedIds: Set<Long>) {
-        startLoadingLoginButtons()
+        startLoadingLoginButton()
         val accountsToLogin = accounts.filterSelectedAccounts(skippedIds)
         val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
         loginUsers(loginResult)
@@ -199,7 +199,7 @@ class LoginFragment : Fragment() {
 
     @VisibleForTesting
     fun openLoginWebView() {
-        startLoadingLoginButtons()
+        startLoadingLoginButton()
         trackAccountEvent(MatomoName.OpenLoginWebview)
         loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
     }
@@ -213,9 +213,8 @@ class LoginFragment : Fragment() {
         resetLoginButtons()
     }
 
-    private fun startLoadingLoginButtons() {
+    private fun startLoadingLoginButton() {
         isLoginButtonLoading = true
-        isSignUpButtonLoading = true
     }
 
     private fun resetLoginButtons() {
