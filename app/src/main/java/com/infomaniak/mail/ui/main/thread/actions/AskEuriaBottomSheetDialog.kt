@@ -93,11 +93,7 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
             trailingContent = when (kSuite) {
                 KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
                 KSuite.Pro.Free, KSuite.StarterPack -> TrailingContent.KSuiteProChip
-                else -> if (localSettings.hasAlreadyUsedReplyWithEuria) {
-                    TrailingContent.None
-                } else {
-                    TrailingContent.New
-                }
+                else -> if (localSettings.hasAlreadyUsedReplyWithEuria) TrailingContent.None else TrailingContent.New
             }
 
             setOnClickListener {
