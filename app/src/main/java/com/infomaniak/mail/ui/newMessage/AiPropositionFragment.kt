@@ -63,6 +63,7 @@ import com.infomaniak.mail.ui.main.thread.actions.EuriaPromptBottomSheetArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.DraftInitManager
+import com.infomaniak.mail.utils.MessageBodyUtils.asPlainText
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -116,6 +117,9 @@ class AiPropositionFragment : Fragment() {
     lateinit var subjectReplacementDialog: AiDescriptionAlertDialog
 
     @Inject
+    lateinit var aiSharedData: AiSharedData
+
+    @Inject
     lateinit var draftInitManager: DraftInitManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -129,7 +133,8 @@ class AiPropositionFragment : Fragment() {
         handleBackDispatcher()
         setUi()
 
-        if (aiViewModel.aiPropositionStatusLiveData.value == null) generateNewAiProposition()
+        generateAiPropositionIfNeeded()
+
         observeAiProposition()
         observeBackNavigationResult()
     }
@@ -143,6 +148,18 @@ class AiPropositionFragment : Fragment() {
     override fun onDestroy() {
         currentRequestJob?.cancel()
         super.onDestroy()
+    }
+
+    private fun generateAiPropositionIfNeeded() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (!isHostedByNewMessageActivity()) {
+                // Add previous message context to reply with euria
+                val previousMessageUid = navigationArgs.messageUid
+                aiSharedData.previousMessageBodyPlainText = messageController.getMessage(previousMessageUid)?.body?.asPlainText()
+            }
+
+            if (aiViewModel.aiPropositionStatusLiveData.value == null) generateNewAiProposition()
+        }
     }
 
     private fun handleBackDispatcher() {
