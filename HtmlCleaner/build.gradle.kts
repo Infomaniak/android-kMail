@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.library")
-    id("kotlin-android")
 }
 
 val appCompileSdk = rootProject.ext["appCompileSdk"] as Int
@@ -29,8 +28,14 @@ android {
     }
 }
 
-kotlin.compilerOptions.jvmTarget = JvmTarget.valueOf("JVM_${javaVersion.name.substringAfter("VERSION_")}")
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xjspecify-annotations=strict")
+        jvmTarget = JvmTarget.valueOf("JVM_${javaVersion.name.substringAfter("VERSION_")}")
+    }
+}
 
 dependencies {
     api(libs.jsoup)
+    implementation(libs.jspecify)
 }

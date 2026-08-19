@@ -1,11 +1,12 @@
 buildscript {
     dependencies {
         classpath(libs.google.services)
+        classpath(core.kotlin.gradle.plugin)
     }
 
     extra.apply {
-        set("appCompileSdk", 36) // Ensure any extra configChanges are added into Activities' manifests.
-        set("appTargetSdk", 35)
+        set("appCompileSdk", 37) // Ensure any extra configChanges are added into Activities' manifests.
+        set("appTargetSdk", 36)
         set("appMinSdk", 27)
         set("legacyMinSdk", 27) // Duplicated from `Core/Legacy/build.gradle` : `legacyMinSdk = 27`
         set("javaVersion", JavaVersion.VERSION_17)
@@ -14,7 +15,6 @@ buildscript {
 
 plugins {
     alias(core.plugins.compose.compiler) apply false
-    alias(core.plugins.kotlin.android) apply false
     alias(core.plugins.kotlin.serialization) apply false
     alias(core.plugins.ksp) apply false
     alias(core.plugins.android.application) apply false
