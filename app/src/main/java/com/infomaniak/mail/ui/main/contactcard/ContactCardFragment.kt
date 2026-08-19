@@ -37,6 +37,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.auth.models.user.Card
+import com.infomaniak.core.ui.compose.basics.Typography
 import com.infomaniak.core.ui.compose.contactcard.ContactCardDefaults
 import com.infomaniak.core.ui.compose.contactcard.ContactCardScreen
 import com.infomaniak.core.ui.compose.contactcard.ContactCardTopBarState
@@ -145,7 +146,7 @@ private fun MailContactCardTopBarEditor(state: ContactCardTopBarState.Editor) {
             TextButton(onClick = state.onCancel) {
                 Text(
                     text = stringResource(RCore.string.buttonCancel),
-                    color = MaterialTheme.colorScheme.primary,
+                    style = Typography.buttonPrimary,
                 )
             }
         },
@@ -153,7 +154,7 @@ private fun MailContactCardTopBarEditor(state: ContactCardTopBarState.Editor) {
             TextButton(onClick = state.onSave) {
                 Text(
                     text = stringResource(RCore.string.buttonSave),
-                    color = MaterialTheme.colorScheme.primary,
+                    style = Typography.buttonPrimary,
                 )
             }
         },
@@ -186,7 +187,7 @@ private fun MailContactCardTopBarDefault(state: ContactCardTopBarState.Default) 
 @Composable
 private fun MailContactCardTopBarOnboarding(state: ContactCardTopBarState.Onboarding) {
     MailTopAppBar(
-        navigationIcon = { TopAppBarButtons.Back(onClick = state.onBack) },
+        navigationIcon = { TopAppBarButtons.Close(onClick = state.onBack) },
     )
 }
 
