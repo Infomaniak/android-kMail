@@ -316,11 +316,13 @@ class AiPropositionFragment : Fragment() {
 
         lifecycleScope.launch {
             val allRecipients = if (isHostedByNewMessageActivity()) {
+                // we are generating the proposition from a new message composition
                 newMessageViewModel.toLiveData.valueOrEmpty()
             } else {
-                val message = messageController.getMessage(navigationArgs.messageUid)
-                val recipients = message?.getRecipientsForReplyTo(replyAll = true)
-                recipients?.first.orEmpty() + recipients?.second.orEmpty() // to + cc
+                // we are generating the proposition from replyWithEuria in the threadFragment
+                val message = messageController.getMessage(navigationArgs.messageUid) ?: return@launch
+                val (to, cc) = message.getRecipientsForReplyTo(replyAll = true)
+                to + cc
             }
 
             val formattedRecipientsString = allRecipients
