@@ -148,7 +148,7 @@ class ActionsViewModel @Inject constructor(
         mailbox: Mailbox,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val messagesToMarkAsSpam = messageController.getUnscheduledMessages(messages)
+        val messagesToMarkAsSpam = messageController.getMessagesWithoutSendDelay(messages)
         handleToggleSpamMessages(messagesToMarkAsSpam, parentFolderId, mailbox, displaySnackbar)
     }
 
