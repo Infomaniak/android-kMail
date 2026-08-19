@@ -101,7 +101,19 @@ class SharedUtils @Inject constructor(
     private class SignatureException(message: String?, cause: Throwable) : Exception(message, cause)
 
     companion object {
-        private val noReplyMailRegex = listOf("do-not-reply", "no-reply", "noreply", "postmaster", "catchall").joinToString("|")
+        private val noReplyMailRegex = listOf(
+            "do-not-reply",
+            "donotreply",
+            "no-reply",
+            "no_reply",
+            "noreply",
+            "ne-pas-repondre",
+            "ne_pas_repondre",
+            "nepasrepondre",
+            "postmaster",
+            "catchall",
+            "notification"
+        ).joinToString("|")
 
         fun hasNoReplyRecipients(message: Message, isReplyAll: Boolean): Boolean {
             val pattern = Regex(noReplyMailRegex, RegexOption.IGNORE_CASE)
