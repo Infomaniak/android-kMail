@@ -20,3 +20,8 @@ a[data-ik-mention-ref] {
     background-color: var(--mail-content-mention-background-color, #f1f1f1);
     font-weight: var(--mail-content-mention-font-weight, inherit);
 }
+
+img {
+    max-width: 100%;
+    height: auto;
+}

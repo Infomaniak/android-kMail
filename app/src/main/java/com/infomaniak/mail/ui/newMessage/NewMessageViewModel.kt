@@ -150,6 +150,7 @@ import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -224,6 +225,7 @@ class NewMessageViewModel @Inject constructor(
 
     //region Attachments
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
+    val importInlineAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     //endRegion
 
@@ -800,6 +802,14 @@ class NewMessageViewModel @Inject constructor(
         return newAttachments
     }
 
+    fun prepareInlineAttachments(attachments: List<Attachment>): List<Attachment> {
+        attachments.forEach { attachment ->
+            val contentId = attachment.contentId?.takeIf(String::isNotBlank) ?: "${UUID.randomUUID()}@infomaniak.com"
+            attachment.markAsInline(contentId)
+        }
+        return attachments
+    }
+
     private suspend fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean> {
 
         val (fileName, fileSize) = getFileNameAndSize(uri) ?: return null to false
@@ -853,21 +863,23 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.isDisplayedAsExternal) trackExternalEvent(MatomoName.DeleteRecipient)
     }
 
-    fun deleteAttachment(position: Int) = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteAttachment(attachmentToDelete: Attachment) = viewModelScope.launch(ioCoroutineContext) {
         runCatching {
             val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
-            val attachment = attachments[position]
-            attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
+            val attachment = attachments.findSpecificAttachment(attachmentToDelete)
+            attachment?.let {
+                it.getUploadLocalFile()?.delete()
+                LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, it.localUuid)
 
-            mailboxContentRealm().write {
-                DraftController.updateDraftBlocking(draftLocalUuid!!, realm = this) {
-                    it.attachments.findSpecificAttachment(attachment)?.let(::delete)
+                mailboxContentRealm().write {
+                    DraftController.updateDraftBlocking(draftLocalUuid!!, realm = this) { draft ->
+                        draft.attachments.findSpecificAttachment(it)?.let(::delete)
+                    }
                 }
-            }
 
-            attachments.removeAt(position)
-            attachmentsLiveData.postValue(attachments)
+                attachments.remove(it)
+                attachmentsLiveData.postValue(attachments)
+            }
         }
     }
 

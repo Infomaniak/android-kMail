@@ -69,6 +69,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag
@@ -77,6 +78,9 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getInlineCacheFile
+import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
@@ -106,12 +110,14 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionClickHa
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getEditorMentionsDetectorScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getIncludeQuotesScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertInlineImageScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getInsertMentionScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionDeletionObserverScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getRemoveElementsByIdScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
+import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -141,10 +147,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -169,6 +177,7 @@ class NewMessageFragment : Fragment() {
     private val fixStyle by lazy { requireContext().getFixStyleScript() }
     private val setAiContentScript by lazy { requireContext().getSetAiContentScript() }
     private val getEditorBodyScript by lazy { requireContext().getEditorBodyScript() }
+    private val insertInlineImageScript by lazy { requireContext().getInsertInlineImageScript() }
     private val insertMentionScript by lazy { requireContext().getInsertMentionScript() }
     private val mentionClickHandlerScript by lazy { requireContext().getEditorMentionClickHandlerScript() }
     private val removeElementsByIdScript by lazy { requireContext().getRemoveElementsByIdScript() }
@@ -186,6 +195,9 @@ class NewMessageFragment : Fragment() {
 
     private val filePicker = FilePicker(fragment = this).apply {
         initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
+    }
+    private val photoPicker = FilePicker(fragment = this).apply {
+        initCallback { uris -> newMessageViewModel.importInlineAttachmentsLiveData.value = uris }
     }
 
     private var addressListPopupWindow: ListPopupWindow? = null
@@ -385,6 +397,7 @@ class NewMessageFragment : Fragment() {
             aiManager = aiManager,
             encryptionManager = encryptionMessageManager,
             openFilePicker = filePicker::open,
+            openPhotoPicker = { photoPicker.open("image/*") },
         )
 
         encryptionMessageManager.init(
@@ -525,6 +538,7 @@ class NewMessageFragment : Fragment() {
         addScript(fixStyle)
         addScript(editorJsBridgeScript)
         addScript(deletedInlineImagesObserverScript)
+        addScript(insertInlineImageScript)
         addScript(mentionClickHandlerScript)
         addScript(removeElementsByIdScript)
 
@@ -799,6 +813,7 @@ class NewMessageFragment : Fragment() {
             if (isFirstTime) {
                 isFirstTime = false
                 observeImportAttachments()
+                observeImportInlineAttachments()
             } else if (attachments.count() > attachmentAdapter.itemCount) {
                 // If we are adding Attachments, directly upload them to save time when sending/saving the Draft.
                 newMessageViewModel.uploadAttachmentsToServer(attachments)
@@ -823,9 +838,46 @@ class NewMessageFragment : Fragment() {
         importAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
             val currentAttachments = attachmentsLiveData.valueOrEmpty()
             importNewAttachments(currentAttachments, uris) { newAttachments ->
-                attachmentsLiveData.postValue(currentAttachments + newAttachments)
+                attachmentsLiveData.postValue(attachmentsLiveData.valueOrEmpty() + newAttachments)
             }
         }
+    }
+
+    private fun observeImportInlineAttachments() = with(newMessageViewModel) {
+        importInlineAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
+            val currentAttachments = attachmentsLiveData.valueOrEmpty()
+            importNewAttachments(currentAttachments, uris) { newAttachments ->
+                val inlineAttachments = prepareInlineAttachments(newAttachments)
+                val updatedAttachments = attachmentsLiveData.valueOrEmpty() + inlineAttachments
+                attachmentsLiveData.postValue(updatedAttachments)
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        inlineAttachments.forEach { attachment ->
+                            attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
+                                val cacheFile = attachment.getInlineCacheFile(requireContext())
+                                LocalStorageUtils.saveAttachmentToCacheDir(inputStream, cacheFile)
+                            }
+                        }
+                    }
+                    refreshEditorWebViewClient(updatedAttachments)
+                    inlineAttachments.mapNotNull(Attachment::contentId).forEach { contentId ->
+                        binding.editorWebView.executeJsMethodWhenEditorIsSetup(
+                            JsExecutableMethod("insertInlineImage", contentId),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun refreshEditorWebViewClient(attachments: List<Attachment>) {
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+        binding.editorWebView.initEditorWebviewClient(
+            attachments = attachments,
+            shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
+            onPageFinished = {},
+        )
     }
 
     private fun observeImportAttachmentsResult() = with(newMessageViewModel) {
@@ -925,9 +977,9 @@ class NewMessageFragment : Fragment() {
         super.onStop()
     }
 
-    private fun onDeleteAttachment(position: Int) {
+    private fun onDeleteAttachment(attachable: Attachable) {
         trackAttachmentActionsEvent(MatomoName.Delete)
-        newMessageViewModel.deleteAttachment(position)
+        if (attachable is Attachment) newMessageViewModel.deleteAttachment(attachable)
     }
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {

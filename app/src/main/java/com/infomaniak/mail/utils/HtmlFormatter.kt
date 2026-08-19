@@ -300,6 +300,10 @@ class HtmlFormatter(private val html: String) {
             return loadScript(R.raw.insert_mention)
         }
 
+        fun Context.getInsertInlineImageScript(): String {
+            return loadScript(R.raw.insert_inline_image)
+        }
+
         fun Context.getEditorMentionClickHandlerScript(): String {
             return loadScript(R.raw.editor_mention_click_handler)
         }

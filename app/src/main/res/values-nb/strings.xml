@@ -369,6 +369,8 @@
     <string name="genericMessageTranslated">Melding oversatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services kreves</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
+    <string name="importFilesButton">Filer</string>
+    <string name="importPhotosButton">Bilder</string>
     <string name="inboxFolder">Innboks</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagringsplass er nesten full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagringsplass er full. Oppgrader til ubegrenset lagring og lås opp nye funksjoner.</string>

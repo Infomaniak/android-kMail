@@ -28,6 +28,7 @@ import com.infomaniak.mail.MatomoMail.trackEditorActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
+import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.launch
@@ -44,6 +45,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     private inline val encryptionManager: EncryptionMessageManager get() = _encryptionManager!!
 
     private var _openFilePicker: (() -> Unit)? = null
+    private var _openPhotoPicker: (() -> Unit)? = null
 
     fun initValues(
         newMessageViewModel: NewMessageViewModel,
@@ -52,6 +54,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         aiManager: NewMessageAiManager,
         encryptionManager: EncryptionMessageManager,
         openFilePicker: () -> Unit,
+        openPhotoPicker: () -> Unit,
     ) {
         super.initValues(
             newMessageViewModel = newMessageViewModel,
@@ -63,6 +66,14 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         _aiManager = aiManager
         _encryptionManager = encryptionManager
         _openFilePicker = openFilePicker
+        _openPhotoPicker = openPhotoPicker
+    }
+
+    private fun onMenuItemClicked(itemId: Int) {
+        when (itemId) {
+            R.id.attachmentPhotoLibrary -> _openPhotoPicker?.invoke()
+            R.id.attachmentFile -> _openFilePicker?.invoke()
+        }
     }
 
     private fun extractUrl(text: String): String {
@@ -74,7 +85,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     fun observeEditorFormatActions() = with(binding) {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
-                EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
+                EditorAction.ATTACHMENT -> showAttachmentTypeSelector()
                 EditorAction.LINK -> handleLink()
                 EditorAction.AI -> aiManager.openAiPrompt()
                 EditorAction.BOLD -> editorWebView.toggleBold()
@@ -85,6 +96,10 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                 EditorAction.ENCRYPTION -> encryptionManager.toggleEncryption()
             }
         }
+    }
+
+    private fun showAttachmentTypeSelector() {
+        SimpleIconPopupMenu(context, R.menu.attachment_menu, binding.editorAttachment, ::onMenuItemClicked).show()
     }
 
     private fun handleLink() = with(binding) {

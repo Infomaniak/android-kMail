@@ -25,13 +25,16 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.getInlineCacheFile
 import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
+import java.io.File
 
 abstract class MessageWebViewClient(
     private val context: Context,
@@ -48,36 +51,47 @@ abstract class MessageWebViewClient(
 
         if (url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
             val cid = url.schemeSpecificPart
-            return cidDictionary[cid]?.let { attachment ->
-                val cacheFile = attachment.getCacheFile(context)
+            val attachment = cidDictionary[cid] ?: return@runCatchingRealm emptyResource
 
-                val data = if (attachment.hasUsableCache(context, cacheFile)) {
-                    cacheFile.inputStream()
-                } else {
-                    runCatching {
-                        val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
-                        runBlocking { ApiRepository.downloadAttachment(resource) }
-                    }.getOrNull()?.body?.byteStream()?.readBytes()?.let {
-                        LocalStorageUtils.saveAttachmentToCacheDir(it.inputStream(), cacheFile)
-                        it.inputStream()
-                    }
+            val cacheFile = getCacheFile(attachment)
+
+            val data = if (attachment.hasUsableCache(context, cacheFile)) {
+                cacheFile.inputStream()
+            } else {
+                val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
+
+                runCatching {
+                    runBlocking { ApiRepository.downloadAttachment(resource) }
+                }.getOrNull()?.body?.byteStream()?.readBytes()?.let { bytes ->
+                    LocalStorageUtils.saveAttachmentToCacheDir(bytes.inputStream(), cacheFile)
+                    bytes.inputStream()
                 }
+            }
 
-                WebResourceResponse(attachment.mimeType, Utils.UTF_8, data)
-            } ?: emptyResource
+            return WebResourceResponse(attachment.mimeType, Utils.UTF_8, data)
         }
 
-        val shouldLoadResource = _shouldLoadDistantResources
-                || url?.scheme.equals(DATA_SCHEME, ignoreCase = true)
-                || url.isTrustedRemoteResource()
-
-        return if (shouldLoadResource) {
+        return if (shouldLoadResource(url)) {
             super.shouldInterceptRequest(view, request)
         } else {
             onBlockedResourcesDetected?.invoke()
             emptyResource
         }
     }.getOrDefault(super.shouldInterceptRequest(view, request))
+
+    private fun getCacheFile(attachment: Attachment): File {
+        return if (attachment.disposition == AttachmentDisposition.INLINE) {
+            attachment.getInlineCacheFile(context).takeIf { it.exists() } ?: attachment.getCacheFile(context)
+        } else {
+            attachment.getCacheFile(context)
+        }
+    }
+
+    private fun shouldLoadResource(url: Uri): Boolean {
+        return _shouldLoadDistantResources
+                || url.scheme.equals(DATA_SCHEME, ignoreCase = true)
+                || url.isTrustedRemoteResource()
+    }
 
     fun unblockDistantResources() {
         _shouldLoadDistantResources = true
