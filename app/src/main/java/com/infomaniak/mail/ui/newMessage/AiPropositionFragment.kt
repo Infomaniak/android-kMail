@@ -319,24 +319,21 @@ class AiPropositionFragment : Fragment() {
 
     private fun generateNewAiProposition() = lifecycleScope.launch {
         val selectedSignature = newMessageViewModel.fromLiveData.value?.signature
-        val from: Recipient = aiViewModel.makeFrom(
-            email = selectedSignature?.senderEmail ?: mailbox?.email.orEmpty(),
-            name = selectedSignature?.senderName ?: mailbox?.mailboxName.orEmpty(),
-        )
+        val from: Recipient? = aiViewModel.makeFrom(email = selectedSignature?.senderEmail, name = selectedSignature?.senderName)
         val to: List<Recipient>
         val cc: List<Recipient>
         val bcc: List<Recipient>
         val subject: String
 
         if (isHostedByNewMessageActivity()) {
-                // we are generating the proposition from a new message composition
+            // we are generating the proposition from a new message composition
             to = newMessageViewModel.toLiveData.valueOrEmpty()
             cc = newMessageViewModel.ccLiveData.valueOrEmpty()
             bcc = newMessageViewModel.bccLiveData.valueOrEmpty()
             subject = newMessageViewModel.subject
         } else {
-                // we are generating the proposition from replyWithEuria in the threadFragment
-                val message = messageController.getMessage(navigationArgs.messageUid) ?: return@launch
+            // we are generating the proposition from replyWithEuria in the threadFragment
+            val message = messageController.getMessage(navigationArgs.messageUid) ?: return@launch
             val (replyTo, replyCc) = message.getRecipientsForReplyTo(replyAll = true)
             to = replyTo
             cc = replyCc
@@ -345,7 +342,6 @@ class AiPropositionFragment : Fragment() {
         }
 
         currentRequestJob = aiViewModel.generateNewAiProposition(
-            currentMailboxUuid = mailbox?.uuid ?: return@launch,
             from = from,
             to = to,
             cc = cc,

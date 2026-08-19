@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.ai.AssistantMessage
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.CONTEXT_TOO_LONG
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.ERROR
@@ -76,11 +77,11 @@ class AiViewModel @Inject constructor(
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus?>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
-    
-    private val mailboxUuidFlow = MutableStateFlow<String?>(null)
 
-    fun setMailboxUuid(mailboxUuid: String) {
-        mailboxUuidFlow.value = mailboxUuid
+    private val mailboxFlow = MutableStateFlow<Mailbox?>(null)
+
+    fun setMailbox(mailbox: Mailbox) {
+        mailboxFlow.value = mailbox
     }
 
     fun resetAiState() {
@@ -91,7 +92,7 @@ class AiViewModel @Inject constructor(
     }
 
     fun generateNewAiProposition(
-        from: Recipient,
+        from: Recipient?,
         to: List<Recipient>,
         cc: List<Recipient>,
         bcc: List<Recipient>,
@@ -99,7 +100,9 @@ class AiViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         fun addVars(message: AiMessage) {
-            message.vars["from"] = from
+            if (from != null) {
+                message.vars["from"] = from
+            }
             message.vars["to"] = to
             message.vars["cc"] = cc
             message.vars["bcc"] = bcc
@@ -116,7 +119,7 @@ class AiViewModel @Inject constructor(
         val apiResponse = ApiRepository.startNewConversation(
             contextMessage,
             userMessage,
-            requireMailboxUuid(),
+            requireMailbox().uuid,
         )
 
         ensureActive()
@@ -129,11 +132,16 @@ class AiViewModel @Inject constructor(
         return splitBodyAndSubject(match, proposition)
     }
 
-    fun makeFrom(email: String, name: String): Recipient = Recipient().apply {
-        this.email = email
-        this.name = name
+    fun makeFrom(email: String?, name: String?): Recipient? {
+        val (finalEmail, finalName) = if (email.isNullOrEmpty() || name.isNullOrEmpty()) {
+            mailboxFlow.value?.email to mailboxFlow.value?.mailboxName
+        } else {
+            email to name
+        }
+        return if (finalEmail != null) Recipient.createValidRecipient(finalEmail, finalName) else null
     }
-    private suspend fun requireMailboxUuid(): String = mailboxUuidFlow.filterNotNull().first()
+
+    private suspend fun requireMailbox(): Mailbox = mailboxFlow.filterNotNull().first()
 
     private fun splitBodyAndSubject(match: MatchResult?, proposition: String): Pair<String?, String> {
         val content = match?.groups?.get("content")?.value ?: return null to proposition
@@ -176,7 +184,7 @@ class AiViewModel @Inject constructor(
     }
 
     fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
-        val mailboxUuid = requireMailboxUuid()
+        val mailboxUuid = requireMailbox().uuid
         var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, mailboxUuid)
         ensureActive()
 

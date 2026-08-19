@@ -117,9 +117,9 @@ class NewMessageAiManager @Inject constructor(
 
     private fun onAiPromptOpened(resetPrompt: Boolean) = with(binding) {
         viewLifecycleOwner.lifecycleScope.launch {
-            aiViewModel.setMailboxUuid(newMessageViewModel.currentMailbox().uuid)
+            aiViewModel.setMailbox(newMessageViewModel.currentMailbox())
         }
-        
+
         if (resetPrompt) {
             aiViewModel.apply {
                 aiPrompt = ""

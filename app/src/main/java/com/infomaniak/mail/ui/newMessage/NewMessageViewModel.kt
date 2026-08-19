@@ -164,7 +164,6 @@ class NewMessageViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
-    private val messageController: MessageController,
     private val addressBookController: AddressBookController,
     private val contactGroupController: ContactGroupController,
     private val notificationManagerCompat: NotificationManagerCompat,

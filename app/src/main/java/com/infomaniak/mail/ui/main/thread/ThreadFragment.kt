@@ -925,7 +925,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         getBackNavigationResult(OPEN_AI_REPLY_PROPOSITION) { messageUid: String ->
             aiViewModel.aiPropositionStatusLiveData.value = null
-            mainViewModel.currentMailbox.value?.let { aiViewModel.setMailboxUuid(it.uuid) }
+            mainViewModel.currentMailbox.value?.let { aiViewModel.setMailbox(it) }
             safeNavigate(
                 resId = R.id.aiPropositionFragment, args = AiPropositionFragmentArgs(
                     isSubjectBlank = true,
