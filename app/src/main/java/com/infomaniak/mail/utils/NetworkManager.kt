@@ -34,7 +34,7 @@ class NetworkManager @Inject constructor() {
      * A StateFlow that emits the current network availability status.
      * It starts collecting immediately and keeps the latest value in memory.
      */
-    val isNetworkAvailable: StateFlow<Boolean> = NetworkAvailability().isNetworkAvailable
+    val isNetworkAvailable: StateFlow<Boolean> = NetworkAvailability.isNetworkAvailable
         .onEach { available ->
             SentryLog.d("NetworkManager", if (available) "Online" else "Offline")
         }
