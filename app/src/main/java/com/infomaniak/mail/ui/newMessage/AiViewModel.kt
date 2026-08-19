@@ -75,13 +75,12 @@ class AiViewModel @Inject constructor(
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus?>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
+    
     private val mailboxUuidFlow = MutableStateFlow<String?>(null)
 
     fun setMailboxUuid(mailboxUuid: String) {
         mailboxUuidFlow.value = mailboxUuid
     }
-
-    private suspend fun requireMailboxUuid(): String = mailboxUuidFlow.filterNotNull().first()
 
     fun resetAiState() {
         aiPrompt = ""
@@ -120,6 +119,8 @@ class AiViewModel @Inject constructor(
         // The method get on MatchGroupCollection is not available on API25
         return splitBodyAndSubject(match, proposition)
     }
+
+    private suspend fun requireMailboxUuid(): String = mailboxUuidFlow.filterNotNull().first()
 
     private fun splitBodyAndSubject(match: MatchResult?, proposition: String): Pair<String?, String> {
         val content = match?.groups?.get("content")?.value ?: return null to proposition
