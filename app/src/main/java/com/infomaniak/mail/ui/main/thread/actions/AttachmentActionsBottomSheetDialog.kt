@@ -92,6 +92,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     context = context,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
                     snackbarManager = snackbarManager,
+                    popBackIfNeeded = findNavController()::popBackStack,
                 )
             }
             kDriveItem.setOnClickSuspend(MatomoName.SaveToKDrive) {
@@ -99,6 +100,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     context = context,
                     intentType = AttachmentIntentType.SAVE_TO_DRIVE,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                    popBackIfNeeded = findNavController()::popBackStack,
                 )
             }
         }
@@ -125,10 +127,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun ActionItemView.setOnClickSuspend(matomoTracker: MatomoName, block: suspend () -> Unit) {
         setOnClickListener {
             trackAttachmentActionsEvent(matomoTracker)
-            lifecycleScope.launch {
-                block()
-                findNavController().popBackStack()
-            }
+            lifecycleScope.launch { block() }
         }
     }
 }

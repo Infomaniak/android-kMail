@@ -100,10 +100,13 @@ object AttachmentExt {
         context: Context,
         intentType: AttachmentIntentType,
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
+        popBackIfNeeded: (() -> Unit)? = null,
     ) {
         if (hasUsableCache(context, getUploadLocalFile()) || isInlineCachedFile(context)) {
             getIntentOrGoToAppStore(context, intentType)?.let(context::startActivity)
+            popBackIfNeeded?.invoke()
         } else {
+            popBackIfNeeded?.invoke()
             navigateToDownloadProgressDialog(this, intentType)
         }
     }
@@ -112,10 +115,12 @@ object AttachmentExt {
         context: Context,
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         snackbarManager: SnackbarManager,
+        popBackIfNeeded: (() -> Unit)? = null,
     ) {
         if (openWithIntent(context)?.hasSupportedApplications(context) == true) {
-            executeIntent(context, OPEN_WITH, navigateToDownloadProgressDialog)
+            executeIntent(context, OPEN_WITH, navigateToDownloadProgressDialog, popBackIfNeeded)
         } else {
+            popBackIfNeeded?.invoke()
             snackbarManager.setValue(context.getString(RCore.string.errorNoSupportingAppFound))
         }
     }
