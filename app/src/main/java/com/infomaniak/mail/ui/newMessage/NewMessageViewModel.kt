@@ -54,6 +54,7 @@ import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.AiDraftCache
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -97,10 +98,10 @@ import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.MENTIONS_STYLE
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
+import com.infomaniak.mail.utils.MessageBodyUtils.asPlainText
 import com.infomaniak.mail.utils.MessageBodyUtils.isHtmlBlank
 import com.infomaniak.mail.utils.MessageBodyUtils.splitSignatureAndQuoteFromBody
 import com.infomaniak.mail.utils.SentryDebug
@@ -109,7 +110,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -158,12 +158,12 @@ class NewMessageViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val aiSharedData: AiSharedData,
+    private val aiDraftCache: AiDraftCache,
     private val draftController: DraftController,
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
-    private val messageController: MessageController,
     private val addressBookController: AddressBookController,
     private val contactGroupController: ContactGroupController,
     private val notificationManagerCompat: NotificationManagerCompat,
@@ -191,6 +191,7 @@ class NewMessageViewModel @Inject constructor(
     val ccLiveData = MutableLiveData<UiRecipients>()
     val bccLiveData = MutableLiveData<UiRecipients>()
     val attachmentsLiveData = MutableLiveData<List<Attachment>>()
+    var subject: String = ""
     inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
@@ -381,17 +382,42 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun processBodyAndInitializeEditorContent(draft: Draft) {
+        // If there is an AI proposition coming from reply with euria we need to process it and add it to the editor
+        var aiPropositionBody: BodyContentPayload? = null
+        if (isNewMessage) {
+            aiDraftCache.pendingAiContent?.let { pendingAiContent ->
+                aiDraftCache.pendingAiSubject?.let { subject -> draft.subject = subject }
+                aiPropositionBody = BodyContentPayload.bodyOf(
+                    BodyContentPayload(pendingAiContent, BodyContentType.TEXT_PLAIN_WITH_HTML)
+                )
+                aiDraftCache.reset()
+            }
+        }
+
         val sanitizedBody = initialBody.toSanitizedHtml()
         initEditorElementsVisibility(sanitizedBody)
 
         val sanitizedSignature = initialSignature?.toSanitizedHtml()
         val sanitizedBodyWithoutQuotes = sanitizedBody.mergeWithSignature(sanitizedSignature)
         val sanitizedBodyContentWithoutQuotes = BodyContentPayload(sanitizedBodyWithoutQuotes, BodyContentType.HTML_SANITIZED)
+
         /**
          * We load the body into the editor without its quotes to improve performances. We load them only if the user expands the
          * quotes section. Anyhow, the quotes will always be added before executing the draft action inside [addMissingQuotes].
+         * We add the AI proposition to the editor (if there is one) but we don't add it to the snapshot, since it should create a
+         * draft if the user closes the editor without editing this text.
          */
-        editorBodyInitializer.postValue(sanitizedBodyContentWithoutQuotes)
+        if (aiPropositionBody != null) {
+            val sanitizedAiPropositionBody = aiPropositionBody.toSanitizedHtml()
+            val sanitizedAiPropositionBodyWithoutQuotes = sanitizedAiPropositionBody.mergeWithSignature(sanitizedSignature)
+            val sanitizedAiPropositionBodyContentWithoutQuotes = BodyContentPayload(
+                sanitizedAiPropositionBodyWithoutQuotes,
+                BodyContentType.HTML_SANITIZED
+            )
+            editorBodyInitializer.postValue(sanitizedAiPropositionBodyContentWithoutQuotes)
+        } else {
+            editorBodyInitializer.postValue(sanitizedBodyContentWithoutQuotes)
+        }
 
         val sanitizedBodyWithQuotes = sanitizedBodyWithoutQuotes.mergeWithQuotes(initialSanitizedQuote)
 
@@ -671,18 +697,6 @@ class NewMessageViewModel @Inject constructor(
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
             aiSharedData.previousMessageBodyPlainText = previousMessageBody?.asPlainText()
         }
-    }
-
-    private suspend fun Body.asPlainText(): String? {
-        // TODO: When the API handles blank characters, remove ifBlank
-        return when (type) {
-            Utils.TEXT_HTML -> {
-                val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
-                val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies)
-                fullBody.htmlToText()
-            }
-            else -> value
-        }.ifBlank { null }
     }
 
     private suspend fun handleSingleSendIntent(draft: Draft, intent: Intent) = with(intent) {

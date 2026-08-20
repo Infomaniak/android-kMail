@@ -57,8 +57,8 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:ellipsize="end"
-            android:textColor="@color/primary_text_color_disabled"
             android:maxLines="2"
+            android:textColor="@color/primary_text_color_disabled"
             tools:text="@string/restoreEmailsTitle" />
 
         <FrameLayout
@@ -85,6 +85,20 @@
                 android:src="@drawable/ic_chevron_right"
                 android:visibility="gone" />
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/newFeatureBadge"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/bg_new_feature_badge"
+            android:paddingHorizontal="@dimen/marginStandardSmall"
+            android:paddingVertical="2dp"
+            android:text="@string/contentDescriptionIconNewMail"
+            android:textColor="?attr/colorOnPrimary"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </LinearLayout>

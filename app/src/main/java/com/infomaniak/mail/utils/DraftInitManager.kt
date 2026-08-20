@@ -184,7 +184,7 @@ class DraftInitManager @Inject constructor(
         return score
     }
 
-    private fun formatSubject(draftMode: DraftMode, previousSubject: String?): String {
+    fun formatSubject(draftMode: DraftMode, previousSubject: String?): String {
 
         fun String.isReply(): Boolean = this in Regex(REGEX_REPLY, RegexOption.IGNORE_CASE)
         fun String.isForward(): Boolean = this in Regex(REGEX_FORWARD, RegexOption.IGNORE_CASE)

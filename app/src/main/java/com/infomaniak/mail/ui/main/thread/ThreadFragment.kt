@@ -125,6 +125,8 @@ import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
+import com.infomaniak.mail.ui.newMessage.AiPropositionFragmentArgs
+import com.infomaniak.mail.ui.newMessage.AiViewModel
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -221,6 +223,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val aiViewModel: AiViewModel by activityViewModels()
     private val aiActionsViewModel: AiActionsViewModel by viewModels()
     private val actionsViewModel: ActionsViewModel by activityViewModels()
     private val emojiReactionsViewModel: EmojiReactionsViewModel by viewModels()
@@ -491,6 +494,11 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
                 getAiState = { aiActionsViewModel.aiStateMap.value },
+                onAskEuriaClicked = { message ->
+                    trackMessageActionsEvent(MatomoName.AskEuriaQuickAction)
+                    navigateToAskEuriaBottomSheet(message.uid)
+                },
+                getFeatureFlags = { mainViewModel.featureFlagsLive.value },
             ),
         )
 
@@ -914,6 +922,18 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             } else {
                 aiActionsViewModel.doAiAction(messageUid, AiAction.TRANSLATE)
             }
+        }
+
+        getBackNavigationResult(OPEN_AI_REPLY_PROPOSITION) { messageUid: String ->
+            aiViewModel.aiPropositionStatusLiveData.value = null
+            mainViewModel.currentMailbox.value?.let { aiViewModel.setMailbox(it) }
+            safeNavigate(
+                resId = R.id.aiPropositionFragment, args = AiPropositionFragmentArgs(
+                    isSubjectBlank = true,
+                    isBodyBlank = true,
+                    messageUid = messageUid
+                ).toBundle()
+            )
         }
     }
 
@@ -1391,6 +1411,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
         const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"
+        const val OPEN_AI_REPLY_PROPOSITION = "openAiReplyProposition"
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"

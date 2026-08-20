@@ -98,3 +98,18 @@ fun openMailPremiumBottomSheet(navController: NavController, matomoTrackerName: 
     )
     navController.openMyKSuiteUpgradeBottomSheet(app = mailPremium)
 }
+
+fun Fragment.openKSuiteUpsellOrElse(
+    kSuite: KSuite?,
+    isAdmin: Boolean,
+    matomoName: String,
+    substituteClassName: String? = null,
+    onFeatureAvailable: () -> Unit,
+) {
+    when (kSuite) {
+        KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName, substituteClassName)
+        KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, isAdmin, matomoName)
+        KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
+        else -> onFeatureAvailable()
+    }
+}

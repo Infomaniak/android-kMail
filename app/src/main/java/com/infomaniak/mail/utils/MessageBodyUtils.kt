@@ -107,6 +107,16 @@ object MessageBodyUtils {
         )
     }
 
+    // TODO: When the API handles blank characters, remove ifBlank
+    suspend fun Body.asPlainText(): String? = when (type) {
+        Utils.TEXT_HTML -> {
+            val splitBodyContent = splitContentAndQuote(this).content
+            val fullBody = mergeSplitBodyAndSubBodies(splitBodyContent, subBodies)
+            fullBody.htmlToText()
+        }
+        else -> value
+    }.ifBlank { null }
+
     private fun CoroutineScope.splitContentAndQuotes(htmlDocument: Document): Pair<String, MutableList<String>> {
         val quotes = mutableListOf<String>()
 

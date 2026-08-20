@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.ai
+package com.infomaniak.mail.data.cache
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
+import javax.inject.Inject
+import javax.inject.Singleton
 
-@Serializable
-open class AiMessage(var content: String, val type: String) {
-    @Transient
-    val vars = mutableMapOf<String, Any?>()
+@Singleton
+class AiDraftCache @Inject constructor() {
+    var pendingAiSubject: String? = null
+        private set
+    var pendingAiContent: String? = null
+        private set
+
+    fun setAiDraft(subject: String?, content: String?) {
+        pendingAiSubject = subject
+        pendingAiContent = content
+    }
+
+    fun reset() {
+        pendingAiSubject = null
+        pendingAiContent = null
+    }
+
 }

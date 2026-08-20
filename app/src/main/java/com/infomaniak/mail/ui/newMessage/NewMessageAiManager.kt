@@ -116,6 +116,10 @@ class NewMessageAiManager @Inject constructor(
     }
 
     private fun onAiPromptOpened(resetPrompt: Boolean) = with(binding) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            aiViewModel.setMailbox(newMessageViewModel.currentMailbox())
+        }
+
         if (resetPrompt) {
             aiViewModel.apply {
                 aiPrompt = ""
@@ -226,6 +230,7 @@ class NewMessageAiManager @Inject constructor(
 
     private suspend fun getAiPropositionFragmentDirection(): NavDirections {
         val isSubjectBlank = fragment.isSubjectBlank()
+        newMessageViewModel.subject = if (isSubjectBlank) "" else binding.subjectTextField.text.toString()
 
         val isBodyBlank = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"").isBlank()
         return NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(

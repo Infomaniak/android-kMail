@@ -55,6 +55,12 @@ class ActionItemView @JvmOverloads constructor(
             setTrailingContentUi(value)
         }
 
+    var newFeatureBadgeVisible: Boolean
+        get() = binding.newFeatureBadge.isVisible
+        set(value) {
+            binding.newFeatureBadge.isVisible = value
+        }
+
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
             with(binding) {
@@ -152,12 +158,13 @@ class ActionItemView @JvmOverloads constructor(
                 actionIcon.isGone = true
                 description.isGone = true
             }
+            TrailingContent.New -> newFeatureBadge.isVisible = true
         }
     }
 
     /** Keep the entries order, it's used by the attribute (or change also the attributes order in attrs.xml) */
     enum class TrailingContent {
-        None, Chevron, Description, KSuitePersoChip, KSuiteProChip,
+        None, Chevron, Description, KSuitePersoChip, KSuiteProChip, New
     }
 
     private fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {

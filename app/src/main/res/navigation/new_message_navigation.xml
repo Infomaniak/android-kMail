@@ -70,6 +70,10 @@
         <argument
             android:name="isBodyBlank"
             app:argType="boolean" />
+        <argument
+            android:name="messageUid"
+            android:defaultValue=""
+            app:argType="string" />
     </fragment>
 
     <fragment

@@ -34,6 +34,9 @@ import com.infomaniak.mail.data.models.ai.AiResult
 import com.infomaniak.mail.data.models.ai.AssistantMessage
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
+import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.CONTEXT_TOO_LONG
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.ERROR
@@ -49,6 +52,9 @@ import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -70,16 +76,38 @@ class AiViewModel @Inject constructor(
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
     var previousMessageBodyPlainText by aiSharedData::previousMessageBodyPlainText
 
-    val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
+    val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus?>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
+    private val mailboxFlow = MutableStateFlow<Mailbox?>(null)
+
+    fun setMailbox(mailbox: Mailbox) {
+        mailboxFlow.value = mailbox
+    }
+
+    fun resetAiState() {
+        aiPrompt = ""
+        history.clear()
+        conversationContextId = null
+        aiPropositionStatusLiveData.value = null
+    }
+
     fun generateNewAiProposition(
-        currentMailboxUuid: String,
-        formattedRecipientsString: String?,
+        from: Recipient?,
+        to: List<Recipient>,
+        cc: List<Recipient>,
+        bcc: List<Recipient>,
+        subject: String,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         fun addVars(message: AiMessage) {
-            formattedRecipientsString?.let { message.vars["recipient"] = it }
+            if (from != null) {
+                message.vars["from"] = from
+            }
+            message.vars["to"] = to
+            message.vars["cc"] = cc
+            message.vars["bcc"] = bcc
+            message.vars["subject"] = subject
         }
 
         history.clear()
@@ -92,7 +120,7 @@ class AiViewModel @Inject constructor(
         val apiResponse = ApiRepository.startNewConversation(
             contextMessage,
             userMessage,
-            currentMailboxUuid,
+            requireMailbox().uuid,
         )
 
         ensureActive()
@@ -104,6 +132,17 @@ class AiViewModel @Inject constructor(
         // The method get on MatchGroupCollection is not available on API25
         return splitBodyAndSubject(match, proposition)
     }
+
+    fun makeFrom(email: String?, name: String?): Recipient? {
+        val (finalEmail, finalName) = if (email.isNullOrEmpty() || name.isNullOrEmpty()) {
+            mailboxFlow.value?.email to mailboxFlow.value?.mailboxName
+        } else {
+            email to name
+        }
+        return Recipient.createValidRecipientOrNull(finalEmail, finalName)
+    }
+
+    private suspend fun requireMailbox(): Mailbox = mailboxFlow.filterNotNull().first()
 
     private fun splitBodyAndSubject(match: MatchResult?, proposition: String): Pair<String?, String> {
         val content = match?.groups?.get("content")?.value ?: return null to proposition
@@ -145,13 +184,14 @@ class AiViewModel @Inject constructor(
         PROMPT_TOO_LONG
     }
 
-    fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
-        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxUuid)
+    fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
+        val mailboxUuid = requireMailbox().uuid
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, mailboxUuid)
         ensureActive()
 
         val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
         if (hasConversationExpired) {
-            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxUuid)
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), mailboxUuid)
             ensureActive()
         }
 
