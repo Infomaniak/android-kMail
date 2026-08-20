@@ -96,7 +96,7 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
                 else -> if (localSettings.hasAlreadyUsedReplyWithEuria) TrailingContent.None else TrailingContent.New
             }
 
-            setOnClickListener {
+            setClosingOnClickListener {
                 openKSuiteUpsellOrElse(
                     kSuite = kSuite,
                     isAdmin = mailbox?.isAdmin ?: false,
