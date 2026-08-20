@@ -1,0 +1,3 @@
+- Add the ability to reply to an email with Euria
+- Add virtual contact cards
+- Security and bug fixes
