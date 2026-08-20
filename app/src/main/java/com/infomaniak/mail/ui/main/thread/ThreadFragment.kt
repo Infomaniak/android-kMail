@@ -498,6 +498,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                     trackMessageActionsEvent(MatomoName.AskEuriaQuickAction)
                     navigateToAskEuriaBottomSheet(message.uid)
                 },
+                getFeatureFlags = { mainViewModel.featureFlagsLive.value },
             ),
         )
 

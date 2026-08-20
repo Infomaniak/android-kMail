@@ -53,6 +53,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
@@ -63,6 +64,7 @@ import com.infomaniak.mail.data.models.extensions.isInSpamFolder
 import com.infomaniak.mail.data.models.extensions.isMe
 import com.infomaniak.mail.data.models.extensions.isPendingAcknowledgementForMe
 import com.infomaniak.mail.data.models.extensions.isReplyAuthorized
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
@@ -1193,7 +1195,9 @@ class ThreadAdapter(
             setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
         askEuriaButton.apply {
-            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
+            val featureFlags = threadAdapterCallbacks?.getFeatureFlags?.invoke()
+            val isAiEnabled = featureFlags?.contains(FeatureFlag.AI) == true
+            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage && isAiEnabled
             setOnClickListener { threadAdapterCallbacks?.onAskEuriaClicked?.invoke(message) }
         }
         sendingProgressText.isVisible = message.isScheduledMessage
@@ -1408,6 +1412,7 @@ class ThreadAdapter(
         var onAiBannerClose: ((messageUid: String, aiAction: AiAction) -> Unit)? = null,
         var onShowOriginal: ((messageUid: String) -> Unit)? = null,
         var getAiState: (() -> AiStateMap)? = null,
+        val getFeatureFlags: (() -> Mailbox.FeatureFlagSet?)? = null,
         var onAskEuriaClicked: ((message: Message) -> Unit)? = null,
     )
 
