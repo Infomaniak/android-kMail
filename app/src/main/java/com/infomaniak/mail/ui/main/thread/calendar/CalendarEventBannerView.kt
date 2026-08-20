@@ -23,6 +23,8 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.core.common.utils.FormatData
 import com.infomaniak.core.common.utils.addDays
@@ -46,6 +48,7 @@ import com.infomaniak.mail.utils.extensions.findUser
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
+import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
 import java.util.Date
 import javax.inject.Inject
@@ -125,7 +128,9 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
         addToCalendarButton.setOnClickListener {
             trackCalendarEventEvent(MatomoName.OpenInMyCalendar)
-            attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
+            findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@launch, snackbarManager)
+            }
         }
     }
 

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -90,7 +91,7 @@ class FileNameUtilsTest {
         assertEquals(root.canonicalFile, file?.parentFile)
     }
 
-    private fun withTemporaryDirectory(block: (File) -> Unit) {
+    private fun withTemporaryDirectory(block: suspend (File) -> Unit) = runTest {
         val directory = Files.createTempDirectory("safe-file-name-test").toFile()
         try {
             block(directory)

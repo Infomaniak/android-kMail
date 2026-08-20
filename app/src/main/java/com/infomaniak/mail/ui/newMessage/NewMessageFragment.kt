@@ -452,17 +452,19 @@ class NewMessageFragment : Fragment() {
                 if (it !is Attachment) return@AttachmentAdapter
 
                 trackAttachmentActionsEvent(MatomoName.OpenFromDraft)
-                it.openAttachment(
-                    context = requireContext(),
-                    navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                        navigateToDownloadProgressDialog(
-                            attachment,
-                            attachmentIntentType,
-                            NewMessageFragment::class.java.name,
-                        )
-                    },
-                    snackbarManager = snackbarManager,
-                )
+                lifecycleScope.launch {
+                    it.openAttachment(
+                        context = requireContext(),
+                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                            navigateToDownloadProgressDialog(
+                                attachment,
+                                attachmentIntentType,
+                                NewMessageFragment::class.java.name,
+                            )
+                        },
+                        snackbarManager = snackbarManager,
+                    )
+                }
             },
         )
 

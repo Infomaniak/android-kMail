@@ -26,6 +26,8 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.extensions.getCacheFile
 import com.infomaniak.mail.ui.main.SnackbarManager
 import io.sentry.Sentry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.Response
 import java.io.File
 import java.io.FileOutputStream
@@ -50,7 +52,7 @@ object LocalStorageUtils {
         getEmlCacheDir(context).deleteRecursively()
     }
 
-    fun getAttachmentsCacheDir(
+    suspend fun getAttachmentsCacheDir(
         context: Context,
         attachmentPath: String,
         userId: Int = AccountUtils.currentUserId,
@@ -121,15 +123,15 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), draftLocalUuid)
     }
 
-    fun saveAttachmentToUploadDir(
+    suspend fun saveAttachmentToUploadDir(
         context: Context,
         uri: Uri,
         fileName: String,
         draftLocalUuid: String,
         attachmentLocalUuid: String,
         snackbarManager: SnackbarManager,
-    ): File? {
-        return context.contentResolver.openInputStream(uri)?.use { inputStream ->
+    ): File? = withContext(Dispatchers.IO) {
+        return@withContext context.contentResolver.openInputStream(uri)?.use { inputStream ->
             val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
             attachmentsUploadDir.mkdirs()
             val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_${fileName.toSafeFileName()}"
@@ -145,7 +147,7 @@ object LocalStorageUtils {
         }
     }
 
-    private fun getFileToUpload(
+    private suspend fun getFileToUpload(
         context: Context,
         uri: Uri,
         snackbarManager: SnackbarManager,

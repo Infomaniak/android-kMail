@@ -24,11 +24,13 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToAppStore
+import kotlinx.coroutines.launch
 
 class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
@@ -47,9 +49,11 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
             if (cachedAttachment == null) {
                 popBackStackWithError()
             } else {
-                cachedAttachment.getIntentOrGoToAppStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
-                    setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
-                } ?: run { findNavController().popBackStack() }
+                lifecycleScope.launch {
+                    cachedAttachment.getIntentOrGoToAppStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
+                        setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
+                    } ?: run { findNavController().popBackStack() }
+                }
             }
         }
     }

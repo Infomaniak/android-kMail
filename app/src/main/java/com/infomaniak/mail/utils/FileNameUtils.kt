@@ -18,6 +18,8 @@
 package com.infomaniak.mail.utils
 
 import io.sentry.Sentry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.text.Normalizer
@@ -41,25 +43,28 @@ fun String.toSafeFileName(): String {
     return if (normalizedName.utf8Size <= MAX_FILE_NAME_SIZE_BYTES) normalizedName else computeTruncatedFileName(normalizedName)
 }
 
-fun File.resolveContainedPath(untrustedPath: String): File? = runCatching {
-    if (File(untrustedPath).isAbsolute) throw SecurityException("Absolute paths are not allowed")
+suspend fun File.resolveContainedPath(untrustedPath: String): File? = withContext(Dispatchers.IO) {
+    runCatching {
+        if (File(untrustedPath).isAbsolute) throw SecurityException("Absolute paths are not allowed")
 
-    val canonicalRoot = canonicalFile
-    val resolvedFile = File(canonicalRoot, untrustedPath).canonicalFile
-    if (resolvedFile != canonicalRoot && !resolvedFile.toPath().startsWith(canonicalRoot.toPath())) {
-        throw SecurityException("Resolved path escapes its allowed root")
+        val canonicalRoot = canonicalFile
+        val resolvedFile = File(canonicalRoot, untrustedPath).canonicalFile
+        if (resolvedFile != canonicalRoot && !resolvedFile.toPath().startsWith(canonicalRoot.toPath())) {
+            throw SecurityException("Resolved path escapes its allowed root")
+        }
+
+        return@runCatching resolvedFile
+    }.getOrElse {
+        Sentry.captureException(it)
+        null
     }
-
-    return@runCatching resolvedFile
-}.getOrElse {
-    Sentry.captureException(it)
-    null
 }
 
-fun File.resolveContainedFileName(untrustedName: String): File? {
+suspend fun File.resolveContainedFileName(untrustedName: String): File? = withContext(Dispatchers.IO) {
     val canonicalRoot = canonicalFile
     val resolvedFile = File(canonicalRoot, untrustedName.toSafeFileName()).canonicalFile
-    return if (resolvedFile.parentFile != canonicalRoot) {
+
+    return@withContext if (resolvedFile.parentFile != canonicalRoot) {
         Sentry.captureException(SecurityException("Resolved file escapes its allowed directory"))
         null
     } else {

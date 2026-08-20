@@ -30,6 +30,8 @@ import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.resolveContainedFileName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 val Attachable.downloadUrl get() = ApiRoutes.resource(resource!!)
@@ -38,7 +40,7 @@ val Attachable.safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) name
 
 fun Attachable.getFileTypeFromMimeType(): AttachmentType = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
-fun Attachable.hasUsableCache(
+suspend fun Attachable.hasUsableCache(
     context: Context,
     file: File? = null,
     userId: Int = AccountUtils.currentUserId,
@@ -46,17 +48,21 @@ fun Attachable.hasUsableCache(
 ): Boolean = when (this) {
     is Attachment -> {
         val cachedFile = file ?: getCacheFile(context, userId, mailboxId)
-        cachedFile != null && cachedFile.length() > 0 && cachedFile.canRead()
+        val hasUsableCache = withContext(Dispatchers.IO) { cachedFile != null && cachedFile.length() > 0 && cachedFile.canRead() }
+        hasUsableCache
     }
     is SwissTransferFile -> false
 }
 
-fun Attachable.isInlineCachedFile(context: Context): Boolean = when (this) {
-    is Attachment -> getCacheFile(context)?.exists() == true && disposition == AttachmentDisposition.INLINE
+suspend fun Attachable.isInlineCachedFile(context: Context): Boolean = when (this) {
+    is Attachment -> {
+        val isAlreadyCached = withContext(Dispatchers.IO) { getCacheFile(context)?.exists() == true }
+        isAlreadyCached && disposition == AttachmentDisposition.INLINE
+    }
     is SwissTransferFile -> false
 }
 
-fun Attachable.getCacheFile(
+suspend fun Attachable.getCacheFile(
     context: Context,
     userId: Int = AccountUtils.currentUserId,
     mailboxId: Int = AccountUtils.currentMailboxId,

@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -43,6 +44,7 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -85,20 +87,20 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setupListeners(attachment: Attachable) = with(binding) {
         if (attachment is Attachment) {
-            openWithItem.setClosingOnClickListener {
-                trackAttachmentActionsEvent(MatomoName.OpenFromBottomsheet)
+            openWithItem.setOnClickSuspend(MatomoName.OpenFromBottomsheet) {
                 attachment.openAttachment(
                     context = context,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
                     snackbarManager = snackbarManager,
+                    popBackIfNeeded = findNavController()::popBackStack,
                 )
             }
-            kDriveItem.setClosingOnClickListener {
-                trackAttachmentActionsEvent(MatomoName.SaveToKDrive)
+            kDriveItem.setOnClickSuspend(MatomoName.SaveToKDrive) {
                 attachment.executeIntent(
                     context = context,
                     intentType = AttachmentIntentType.SAVE_TO_DRIVE,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                    popBackIfNeeded = findNavController()::popBackStack,
                 )
             }
         }
@@ -120,5 +122,12 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun scheduleDownloadAndPopBack(downloadUrl: String, filename: String) {
         mainViewModel.scheduleDownload(downloadUrl, filename)
         findNavController().popBackStack()
+    }
+
+    private fun ActionItemView.setOnClickSuspend(matomoTracker: MatomoName, block: suspend () -> Unit) {
+        setOnClickListener {
+            trackAttachmentActionsEvent(matomoTracker)
+            lifecycleScope.launch { block() }
+        }
     }
 }

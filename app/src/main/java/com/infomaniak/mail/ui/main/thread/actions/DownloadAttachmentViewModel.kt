@@ -35,6 +35,8 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,6 +48,7 @@ class DownloadAttachmentViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+    private val cleanupScope = CoroutineScope(ioDispatcher)
 
     private val attachmentLocalUuid
         inline get() = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentLocalUuid.name)!!
@@ -75,9 +78,11 @@ class DownloadAttachmentViewModel @Inject constructor(
         emit(downloadedAttachment)
     }
 
-    override fun onCleared() = runCatchingRealm {
+    override fun onCleared() {
         // If we end up with an incomplete cached Attachment, we delete it
-        attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() }
+        cleanupScope.launch {
+            runCatchingRealm { attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() } }
+        }
         super.onCleared()
-    }.getOrDefault(Unit)
+    }
 }
