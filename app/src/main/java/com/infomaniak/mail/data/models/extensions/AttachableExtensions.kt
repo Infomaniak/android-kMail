@@ -30,6 +30,8 @@ import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.resolveContainedFileName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 val Attachable.downloadUrl get() = ApiRoutes.resource(resource!!)
@@ -46,13 +48,17 @@ suspend fun Attachable.hasUsableCache(
 ): Boolean = when (this) {
     is Attachment -> {
         val cachedFile = file ?: getCacheFile(context, userId, mailboxId)
-        cachedFile != null && cachedFile.length() > 0 && cachedFile.canRead()
+        val hasUsableCache = withContext(Dispatchers.IO) { cachedFile != null && cachedFile.length() > 0 && cachedFile.canRead() }
+        hasUsableCache
     }
     is SwissTransferFile -> false
 }
 
 suspend fun Attachable.isInlineCachedFile(context: Context): Boolean = when (this) {
-    is Attachment -> getCacheFile(context)?.exists() == true && disposition == AttachmentDisposition.INLINE
+    is Attachment -> {
+        val isAlreadyCached = withContext(Dispatchers.IO) { getCacheFile(context)?.exists() == true }
+        isAlreadyCached && disposition == AttachmentDisposition.INLINE
+    }
     is SwissTransferFile -> false
 }
 
