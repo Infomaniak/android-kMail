@@ -49,6 +49,8 @@ internal class BodyCleaner {
                 "var",
                 "wbr",
             )
+            .addProtocols("a", "href", "http", "https", "mailto", "tel", "geo")
+            .removeProtocols("a", "href", "ftp")
             .addAttributes(":all", "class", "dir", "id", "style")
             .addAttributes("a", "name", MENTION_ATTRIBUTE)
             .addAttributes("area", "alt", "coords", "href", "shape")
