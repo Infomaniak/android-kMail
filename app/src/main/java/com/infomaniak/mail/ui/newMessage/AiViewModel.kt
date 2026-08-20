@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.ai.AssistantMessage
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.CONTEXT_TOO_LONG
@@ -138,7 +139,7 @@ class AiViewModel @Inject constructor(
         } else {
             email to name
         }
-        return if (finalEmail != null) Recipient.createValidRecipient(finalEmail, finalName) else null
+        return Recipient.createValidRecipientOrNull(finalEmail, finalName)
     }
 
     private suspend fun requireMailbox(): Mailbox = mailboxFlow.filterNotNull().first()

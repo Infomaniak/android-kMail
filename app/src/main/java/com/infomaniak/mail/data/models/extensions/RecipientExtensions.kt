@@ -33,14 +33,15 @@ fun Recipient.isExternal(externalData: ExternalData): Boolean = with(externalDat
 }
 
 fun Recipient.Companion.createValidRecipientOrNull(
-    email: String,
+    email: String?,
     name: String? = null,
     hasExternalProvider: Boolean? = null
 ): Recipient? {
-    if (!email.isEmail()) return null
-    return createValidRecipient(
-        syntacticallyValidEmail = email,
-        name = name,
-        hasExternalProvider = hasExternalProvider
-    )
+    return email?.takeIf { it.isEmail() }?.let {
+        createValidRecipient(
+            syntacticallyValidEmail = it,
+            name = name,
+            hasExternalProvider = hasExternalProvider
+        )
+    }
 }
