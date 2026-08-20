@@ -55,8 +55,9 @@ object LocalStorageUtils {
         attachmentPath: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
-    ): File {
-        return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
+    ): File? {
+        val cacheRoot = generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId)
+        return cacheRoot.resolveContainedPath(attachmentPath)
     }
 
     suspend fun downloadThenSaveAttachmentToCacheDir(context: Context, localAttachment: Attachment): Boolean {
@@ -75,7 +76,10 @@ object LocalStorageUtils {
         val attachment = runCatching {
             localAttachment.resource?.let { ApiRepository.downloadAttachment(it) }
         }.cancellable().getOrNull()
-        return attachment?.saveAttachmentTo(localAttachment.getCacheFile(context)) == true
+
+        val cacheFile = localAttachment.getCacheFile(context) ?: return false
+
+        return attachment?.saveAttachmentTo(cacheFile) == true
     }
 
     /**
@@ -128,7 +132,7 @@ object LocalStorageUtils {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
             val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
             attachmentsUploadDir.mkdirs()
-            val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
+            val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_${fileName.toSafeFileName()}"
 
             return@use getFileToUpload(context, uri, snackbarManager, attachmentsUploadDir, hashedFileName, inputStream)
         } ?: run {
@@ -149,7 +153,7 @@ object LocalStorageUtils {
         hashedFileName: String,
         inputStream: InputStream,
     ): File? {
-        val file = File(attachmentsUploadDir, hashedFileName)
+        val file = attachmentsUploadDir.resolveContainedFileName(hashedFileName) ?: return null
         val isSuccess = runCatching {
             FileOutputStream(file).use(inputStream::copyTo)
             true

@@ -49,7 +49,7 @@ abstract class MessageWebViewClient(
         if (url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
             val cid = url.schemeSpecificPart
             return cidDictionary[cid]?.let { attachment ->
-                val cacheFile = attachment.getCacheFile(context)
+                val cacheFile = attachment.getCacheFile(context) ?: return@runCatchingRealm null
 
                 val data = if (attachment.hasUsableCache(context, cacheFile)) {
                     cacheFile.inputStream()

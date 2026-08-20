@@ -83,6 +83,7 @@ import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
+import com.infomaniak.mail.utils.toSafeFileName
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -613,7 +614,7 @@ object ApiRepository : ApiRepositoryCore() {
         @OptIn(ManualAuthorizationRequired::class)
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
-            .addUnsafeNonAscii("x-ws-attachment-filename", attachment.name)
+            .addUnsafeNonAscii("x-ws-attachment-filename", attachment.name.toSafeFileName())
             .add("x-ws-attachment-mime-type", attachment.mimeType)
             .add("x-ws-attachment-disposition", "attachment")
             .build()

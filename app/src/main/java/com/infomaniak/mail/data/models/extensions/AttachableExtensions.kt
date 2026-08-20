@@ -29,6 +29,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.resolveContainedFileName
 import java.io.File
 
 val Attachable.downloadUrl get() = ApiRoutes.resource(resource!!)
@@ -45,13 +46,13 @@ fun Attachable.hasUsableCache(
 ): Boolean = when (this) {
     is Attachment -> {
         val cachedFile = file ?: getCacheFile(context, userId, mailboxId)
-        cachedFile.length() > 0 && cachedFile.canRead()
+        cachedFile != null && cachedFile.length() > 0 && cachedFile.canRead()
     }
     is SwissTransferFile -> false
 }
 
 fun Attachable.isInlineCachedFile(context: Context): Boolean = when (this) {
-    is Attachment -> getCacheFile(context).exists() && disposition == AttachmentDisposition.INLINE
+    is Attachment -> getCacheFile(context)?.exists() == true && disposition == AttachmentDisposition.INLINE
     is SwissTransferFile -> false
 }
 
@@ -59,10 +60,10 @@ fun Attachable.getCacheFile(
     context: Context,
     userId: Int = AccountUtils.currentUserId,
     mailboxId: Int = AccountUtils.currentMailboxId,
-): File = when (this) {
+): File? = when (this) {
     is Attachment -> {
         val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, extractPathFromResource(), userId, mailboxId)
-        File(cacheFolder, name)
+        cacheFolder?.resolveContainedFileName(untrustedName = name)
     }
     is SwissTransferFile -> File("")
 }
