@@ -933,9 +933,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
-        newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleButton.isEnabled = it
-            sendButton.isEnabled = it
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(newMessageViewModel.isSendingAllowed, newMessageViewModel.isSending) { isAllowed, isSending ->
+                isAllowed && !isSending
+            }.collect { isEnabled ->
+                scheduleButton.isEnabled = isEnabled
+                sendButton.isEnabled = isEnabled
+            }
         }
 
         scheduleButton.setOnClickListener {
@@ -980,14 +984,20 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
+        if (!newMessageViewModel.tryStartSending()) return
+
         viewLifecycleOwner.lifecycleScope.launch {
-            if (isSubjectBlank() && showSubjectDialog(isScheduled)) return@launch
+            try {
+                if (isSubjectBlank() && shouldCancelForEmptySubject(isScheduled)) return@launch
 
-            val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
-            val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
+                val body = binding.editorWebView.evaluateJs("getEditorBody()").removeSurrounding("\"")
+                val shouldShowAttachmentReminder = newMessageViewModel.shouldShowAttachmentReminder(body)
 
-            if (shouldShowAttachmentReminder && showAttachmentDialog(isScheduled)) return@launch
-            sendEmail()
+                if (shouldShowAttachmentReminder && shouldCancelForAttachmentReminder(isScheduled)) return@launch
+                sendEmail()
+            } finally {
+                newMessageViewModel.finishSending()
+            }
         }
     }
 
@@ -1021,7 +1031,7 @@ class NewMessageFragment : Fragment() {
         return isSendingCanceled.await()
     }
 
-    private suspend fun showSubjectDialog(isScheduled: Boolean) = showConfirmationDialog(
+    private suspend fun shouldCancelForEmptySubject(isScheduled: Boolean) = showConfirmationDialog(
         titleRes = R.string.emailWithoutSubjectTitle,
         descriptionRes = R.string.emailWithoutSubjectDescription,
         trackEvent = MatomoName.SendWithoutSubject,
@@ -1029,7 +1039,7 @@ class NewMessageFragment : Fragment() {
         isScheduled = isScheduled,
     )
 
-    private suspend fun showAttachmentDialog(isScheduled: Boolean) = showConfirmationDialog(
+    private suspend fun shouldCancelForAttachmentReminder(isScheduled: Boolean) = showConfirmationDialog(
         titleRes = R.string.attachmentsReminderTitle,
         descriptionRes = R.string.attachmentsReminderDescription,
         trackEvent = MatomoName.SendWithoutAttachment,

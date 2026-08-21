@@ -233,7 +233,17 @@ class NewMessageViewModel @Inject constructor(
     val encryptionPassword: SingleLiveEvent<String> = SingleLiveEvent("")
     //endregion
 
-    val isSendingAllowed = SingleLiveEvent(false)
+    private val _isSendingAllowed = MutableStateFlow(false)
+    val isSendingAllowed: StateFlow<Boolean> = _isSendingAllowed.asStateFlow()
+
+    private val _isSending = MutableStateFlow(false)
+    val isSending: StateFlow<Boolean> = _isSending.asStateFlow()
+
+    fun finishSending() {
+        _isSending.value = false
+    }
+
+    fun tryStartSending(): Boolean = _isSending.compareAndSet(expect = false, update = true)
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
@@ -899,7 +909,7 @@ class NewMessageViewModel @Inject constructor(
             null -> allRecipients
         }
 
-        isSendingAllowed.value = if (allDraftRecipients.isNotEmpty() && isEncryptionValid) {
+        _isSendingAllowed.value = if (allDraftRecipients.isNotEmpty() && isEncryptionValid) {
             var size = 0L
             var isSizeCorrect = true
             for (attachment in attachments) {
