@@ -437,6 +437,9 @@ class ThreadAdapter(
 
     private fun WebView.setupZoomListeners() {
         configureOnTouchListener(scaledTouchSlop)
+        setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            if (scrollY != 0) scrollTo(0, 0)
+        }
     }
 
     private fun ItemMessageBinding.toggleFrameLayoutsTheme(isThemeTheSame: Boolean) {
