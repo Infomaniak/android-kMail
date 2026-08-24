@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.ContextThemeWrapper
@@ -26,6 +27,7 @@ import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.google.android.material.button.MaterialButton
@@ -135,6 +137,15 @@ class MessageAlertView @JvmOverloads constructor(
 
     fun setIconRes(@DrawableRes resId: Int) {
         binding.icon.setImageResource(resId)
+    }
+
+    fun setWarningStyle(isWarning: Boolean) {
+        val background = if (isWarning) R.color.orangeWarningBackground else android.R.color.transparent
+        val tint = if (isWarning) R.color.orangeWarning else R.color.iconColor
+        with(binding) {
+            root.setBackgroundColor(ContextCompat.getColor(context, background))
+            icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, tint))
+        }
     }
 
     private fun TypedArray.inflateBindingWithCustomStyle(context: Context) {
