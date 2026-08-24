@@ -528,6 +528,7 @@ class NewMessageFragment : Fragment() {
                         config.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds < System.currentTimeMillis()
                     binding.scheduleAlert.apply {
                         setDescription(getString(R.string.scheduledEmailHeader, date))
+                        setWarningStyle(isTooSoon)
                         isVisible = true
                     }
                     binding.divider7.isVisible = !isTooSoon
