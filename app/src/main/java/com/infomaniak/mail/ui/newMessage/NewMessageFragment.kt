@@ -526,8 +526,9 @@ class NewMessageFragment : Fragment() {
                     val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
                     val isTooSoon =
                         config.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds < System.currentTimeMillis()
+                    val stringRes = if (isTooSoon) R.string.scheduledSendTimePassed else R.string.scheduledEmailHeader
                     binding.scheduleAlert.apply {
-                        setDescription(getString(R.string.scheduledEmailHeader, date))
+                        setDescription(getString(stringRes, date))
                         setWarningStyle(isTooSoon)
                         isVisible = true
                     }

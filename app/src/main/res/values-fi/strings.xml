@@ -528,6 +528,7 @@
     <string name="scheduledMessagesFolder">Ajastetut viestit</string>
     <string name="scheduledSendDelayTooShortError">Ajastetun lähetyksen viive liian lyhyt</string>
     <string name="scheduledSendMinimumDelayRequirement">Viestit on ajastettava vähintään 5 minuutin etukäteen. Valitse myöhempi aika tai poista ajastettu lähetys käytöstä</string>
+    <string name="scheduledSendTimePassed">Ajoitettu lähetysaika ylitetty: %s</string>
     <string name="searchAllMessages">Kaikki viestit</string>
     <string name="searchFieldPlaceholder">Hae sähköpostia</string>
     <string name="searchFilterAttachment">Liitteet</string>

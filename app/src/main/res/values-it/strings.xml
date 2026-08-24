@@ -528,6 +528,7 @@
     <string name="scheduledMessagesFolder">Messaggi programmati</string>
     <string name="scheduledSendDelayTooShortError">Ritardo di invio programmato troppo breve</string>
     <string name="scheduledSendMinimumDelayRequirement">I messaggi devono essere programmati con almeno 5 minuti di anticipo. Scegli un orario successivo o disattiva l’invio programmato</string>
+    <string name="scheduledSendTimePassed">Orario di invio pianificato superato: %s</string>
     <string name="searchAllMessages">Tutti i messaggi</string>
     <string name="searchFieldPlaceholder">Ricerca di un’e-mail</string>
     <string name="searchFilterAttachment">Allegati</string>

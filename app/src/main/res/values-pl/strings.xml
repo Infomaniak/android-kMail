@@ -562,6 +562,7 @@
     <string name="scheduledMessagesFolder">Zaplanowane wiadomości</string>
     <string name="scheduledSendDelayTooShortError">Planowane opóźnienie wysyłania zbyt krótkie</string>
     <string name="scheduledSendMinimumDelayRequirement">Wiadomości muszą być planowane z co najmniej 5-minutowym wyprzedzeniem. Wybierz późniejszą godzinę lub wyłącz zaplanowane wysyłanie</string>
+    <string name="scheduledSendTimePassed">Planowany czas wysyłki minął: %s</string>
     <string name="searchAllMessages">Wszystkie wiadomości</string>
     <string name="searchFieldPlaceholder">Wyszukaj wiadomość</string>
     <string name="searchFilterAttachment">Załączniki</string>

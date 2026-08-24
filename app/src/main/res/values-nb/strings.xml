@@ -528,6 +528,7 @@
     <string name="scheduledMessagesFolder">Planlagte meldinger</string>
     <string name="scheduledSendDelayTooShortError">Planlagt sendingsforsinkelse for kort</string>
     <string name="scheduledSendMinimumDelayRequirement">Meldinger må planlegges minst 5 minutter på forhånd. Velg et senere tidspunkt eller deaktiver planlagt sending</string>
+    <string name="scheduledSendTimePassed">Planlagt sendetidspunkt overskredet: %s</string>
     <string name="searchAllMessages">Alle meldinger</string>
     <string name="searchFieldPlaceholder">Søk etter e-post</string>
     <string name="searchFilterAttachment">Vedlegg</string>
