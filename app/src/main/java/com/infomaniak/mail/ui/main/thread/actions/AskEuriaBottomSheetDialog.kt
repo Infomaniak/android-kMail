@@ -36,7 +36,6 @@ import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.databinding.BottomSheetAskEuriaActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.thread.AiActionNavigationResult
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_SUMMARY_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_AI_TRANSLATE_BOTTOM_SHEET
@@ -96,12 +95,11 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
                 else -> if (localSettings.hasAlreadyUsedReplyWithEuria) TrailingContent.None else TrailingContent.New
             }
 
-            setClosingOnClickListener {
+            setOnClickListener {
                 openKSuiteUpsellOrElse(
                     kSuite = kSuite,
                     isAdmin = mailbox?.isAdmin ?: false,
                     matomoName = MatomoName.ReplyWithEuria.value,
-                    substituteClassName = ThreadListFragment::class.java.name,
                     onFeatureAvailable = { handleStandardReplyAction(messageUid) }
                 )
             }
