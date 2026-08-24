@@ -526,6 +526,8 @@
     <string name="scheduleSendingTitle">Προγραμματισμός αποστολής</string>
     <string name="scheduledEmailHeader">Αυτό το email θα σταλεί στις: %s</string>
     <string name="scheduledMessagesFolder">Προγραμματισμένα μηνύματα</string>
+    <string name="scheduledSendDelayTooShortError">Η προγραμματισμένη καθυστέρηση αποστολής είναι πολύ μικρή</string>
+    <string name="scheduledSendMinimumDelayRequirement">Τα μηνύματα πρέπει να προγραμματιστούν τουλάχιστον 5 λεπτά νωρίτερα. Επιλέξτε μια μεταγενέστερη ώρα ή απενεργοποιήστε την προγραμματισμένη αποστολή</string>
     <string name="searchAllMessages">Όλα τα μηνύματα</string>
     <string name="searchFieldPlaceholder">Αναζήτηση email</string>
     <string name="searchFilterAttachment">Συνημμένα</string>

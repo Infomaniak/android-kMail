@@ -526,6 +526,8 @@
     <string name="scheduleSendingTitle">Schemalägg sändning</string>
     <string name="scheduledEmailHeader">Detta e-postmeddelande kommer att skickas detta datum: %s</string>
     <string name="scheduledMessagesFolder">Schemalagda meddelanden</string>
+    <string name="scheduledSendDelayTooShortError">Planerad sändningsfördröjning för kort</string>
+    <string name="scheduledSendMinimumDelayRequirement">Meddelanden måste schemaläggas minst 5 minuter i förväg. Välj en senare tid eller inaktivera schemalagd sändning</string>
     <string name="searchAllMessages">Alla meddelanden</string>
     <string name="searchFieldPlaceholder">Sök e-post</string>
     <string name="searchFilterAttachment">Bilagor</string>

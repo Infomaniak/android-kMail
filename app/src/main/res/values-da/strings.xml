@@ -526,6 +526,8 @@
     <string name="scheduleSendingTitle">Planlæg afsendelse</string>
     <string name="scheduledEmailHeader">Denne e-mail vil blive sendt på denne dato: %s</string>
     <string name="scheduledMessagesFolder">Planlagte beskeder</string>
+    <string name="scheduledSendDelayTooShortError">Planlagt afsendelsesforsinkelse for kort</string>
+    <string name="scheduledSendMinimumDelayRequirement">Beskeder skal planlægges mindst 5 minutter forud. Vælg et senere tidspunkt, eller deaktiver planlagt afsendelse</string>
     <string name="searchAllMessages">Alle beskeder</string>
     <string name="searchFieldPlaceholder">Søg i e-mails</string>
     <string name="searchFilterAttachment">Vedhæftninger</string>

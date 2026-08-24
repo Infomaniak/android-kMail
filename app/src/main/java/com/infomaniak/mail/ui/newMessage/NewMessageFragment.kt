@@ -266,6 +266,7 @@ class NewMessageFragment : Fragment() {
         initManagers()
 
         bindAlertToViewLifecycle(descriptionDialog)
+        bindAlertToViewLifecycle(informationDialog)
 
         initMailbox()
         initUi()
@@ -523,11 +524,13 @@ class NewMessageFragment : Fragment() {
             when (config) {
                 is ScheduleConfig.Scheduled -> {
                     val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    val isTooSoon =
+                        config.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds < System.currentTimeMillis()
                     binding.scheduleAlert.apply {
                         setDescription(getString(R.string.scheduledEmailHeader, date))
                         isVisible = true
                     }
-                    binding.divider7.isVisible = true
+                    binding.divider7.isVisible = !isTooSoon
                 }
                 ScheduleConfig.None -> {
                     binding.scheduleAlert.isVisible = false
@@ -1021,19 +1024,28 @@ class NewMessageFragment : Fragment() {
             if (!checkMailboxStorage(mailbox)) return@setOnClickListener
 
             val isSendingWithScheduled = isMessageWithSchedule()
-            if (!isSendingWithScheduled) newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
+            if (isSendingWithScheduled) {
+                val scheduleConfig = newMessageViewModel.scheduleConfig.value
+                if (scheduleConfig is ScheduleConfig.Scheduled) {
+                    val isScheduleTooSoon =
+                        scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds < System.currentTimeMillis()
+                    if (isScheduleTooSoon) {
+                        informationDialog.show(
+                            title = R.string.scheduledSendDelayTooShortError,
+                            description = getString(R.string.scheduledSendDelayTooShortError, MIN_SELECTABLE_DATE_MINUTES),
+                            confirmButtonText = R.string.buttonClose,
+                        )
+                        return@setOnClickListener
+                    }
+                }
+            } else {
+                newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
+            }
             tryToSendEmail(isSendingWithScheduled)
         }
     }
 
-    private fun isMessageWithSchedule(): Boolean {
-        val scheduleConfig = newMessageViewModel.scheduleConfig.value
-        return if (scheduleConfig is ScheduleConfig.Scheduled) {
-            scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()
-        } else {
-            false
-        }
-    }
+    private fun isMessageWithSchedule(): Boolean = newMessageViewModel.scheduleConfig.value is ScheduleConfig.Scheduled
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()

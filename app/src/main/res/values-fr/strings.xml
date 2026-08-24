@@ -526,6 +526,8 @@
     <string name="scheduleSendingTitle">Programmer l’envoi</string>
     <string name="scheduledEmailHeader">Cet e-mail sera envoyé à cette date : %s</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
+    <string name="scheduledSendDelayTooShortError">Délai d’envoi programmé trop court</string>
+    <string name="scheduledSendMinimumDelayRequirement">Un envoi doit être programmé 5 minutes à l’avance au minimum. Choisissez une heure plus tardive ou désactivez l’envoi programmé</string>
     <string name="searchAllMessages">Tous les messages</string>
     <string name="searchFieldPlaceholder">Rechercher un message</string>
     <string name="searchFilterAttachment">Pièces-jointes</string>

@@ -530,6 +530,8 @@
     <string name="scheduleSendingTitle">Schedule sending</string>
     <string name="scheduledEmailHeader">This email will be sent on this date: %s</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
+    <string name="scheduledSendDelayTooShortError">Scheduled send delay is too short</string>
+    <string name="scheduledSendMinimumDelayRequirement">Messages must be scheduled at least 5 minutes in advance. Please choose a later time or disable scheduled sending</string>
     <string name="searchAllMessages">All messages</string>
     <string name="searchFieldPlaceholder">Search an email</string>
     <string name="searchFilterAttachment">Attachments</string>
