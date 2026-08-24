@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+@file:UseSerializers(RealmInstantSerializer::class)
 
-// The field apiName is also used to store the enum in Realm
-enum class FeatureFlag(val apiName: String) {
-    AI("ai-mail-composer"),
-    BIMI("bimi"),
-    ENCRYPTION("mail-compose-encrypted"),
-    RESPONSE_REQUIRED("mail-response-required-flag"),
-    SCHEDULE_DRAFTS("schedule-send-draft"),
-    SNOOZE("mail-snooze"),
-    EMOJI_REACTION("mail-emoji-reaction"),
-    MENTIONS("mail-composer-uses-mentions"),
+package com.infomaniak.mail.data.models.draft
+
+import com.infomaniak.mail.data.api.RealmInstantSerializer
+import io.realm.kotlin.types.EmbeddedRealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+
+@Serializable
+class ReminderDraftInfo : EmbeddedRealmObject {
+    @SerialName("delta")
+    var reminderDelta: Int? = null
+
+    @SerialName("display")
+    var shouldRemindRecipient: Boolean? = null
+
+    companion object
 }
