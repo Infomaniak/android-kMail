@@ -69,12 +69,15 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 class RefreshController @Inject constructor(
@@ -553,6 +556,9 @@ class RefreshController @Inject constructor(
 
         if (uids.isEmpty()) return emptySet()
 
+        // Wait SENT_FOLDER_FETCH_DELAY seconds to ensure reminder objects are created on the backend.
+        if (folder.role == FolderRole.SENT) delay(SENT_FOLDER_FETCH_DELAY.milliseconds)
+
         val apiResponse = delayApiCallManager.getMessagesByUids(scope, mailbox.uuid, folder.id, uids, okHttpClient)
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
@@ -869,5 +875,6 @@ class RefreshController @Inject constructor(
 
     companion object {
         private val TAG = RefreshController::class.java.simpleName
+        private const val SENT_FOLDER_FETCH_DELAY = 1000L
     }
 }
