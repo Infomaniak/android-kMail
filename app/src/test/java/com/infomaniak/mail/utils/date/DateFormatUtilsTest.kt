@@ -65,4 +65,52 @@ class DateFormatUtilsTest {
 
         assertEquals(expectedText, result)
     }
+
+    @Test
+    fun `formatDelayText returns days when delay is 31 days`() {
+        val delayMinutes = 24 * 60 * 31 // 31 days
+        val expectedText = "31 days"
+
+        every { resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 31, 31) } returns expectedText
+
+        val result = context.formatDelayText(delayMinutes)
+
+        assertEquals(expectedText, result)
+    }
+
+    @Test
+    fun `formatDelayText returns 1 day when delay is exactly 24 hours`() {
+        val delayMinutes = 24 * 60 // 24 hours = 1 day
+        val expectedText = "1 day"
+
+        every { resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 1, 1) } returns expectedText
+
+        val result = context.formatDelayText(delayMinutes)
+
+        assertEquals(expectedText, result)
+    }
+
+    @Test
+    fun `formatDelayText returns 0 days when delay is 0`() {
+        val delayMinutes = 0
+        val expectedText = "0 days"
+
+        every { resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 0, 0) } returns expectedText
+
+        val result = context.formatDelayText(delayMinutes)
+
+        assertEquals(expectedText, result)
+    }
+
+    @Test
+    fun `formatDelayText returns negative hours when delay is negative minutes`() {
+        val delayMinutes = -60 // -1 hour
+        val expectedText = "-1 hour"
+
+        every { resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, -1, -1) } returns expectedText
+
+        val result = context.formatDelayText(delayMinutes)
+
+        assertEquals(expectedText, result)
+    }
 }
