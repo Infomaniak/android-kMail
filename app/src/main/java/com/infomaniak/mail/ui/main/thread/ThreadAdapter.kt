@@ -62,7 +62,6 @@ import com.infomaniak.mail.data.models.extensions.calendarAttachment
 import com.infomaniak.mail.data.models.extensions.displayedName
 import com.infomaniak.mail.data.models.extensions.isInSpamFolder
 import com.infomaniak.mail.data.models.extensions.isMe
-import com.infomaniak.mail.data.models.extensions.isPendingAcknowledgementForMe
 import com.infomaniak.mail.data.models.extensions.isReplyAuthorized
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
@@ -708,13 +707,6 @@ class ThreadAdapter(
                 isUnscheduledDraft -> threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                 else -> {
                     isExpandedMap[message.uid] = true
-                    if (message.isPendingAcknowledgementForMe()) {
-                        threadAdapterCallbacks?.onMessageExpanded?.invoke(
-                            message.hasPendingAcknowledgement,
-                            message.uid,
-                            message.resource
-                        )
-                    }
                     onExpandOrCollapseMessage(message, shouldTrack = true)
                 }
             }
@@ -1399,7 +1391,6 @@ class ThreadAdapter(
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var onUnsubscribeClicked: ((Message) -> Unit)? = null,
         var onAcknowledgeClicked: ((Message) -> Unit)? = null,
-        var onMessageExpanded: ((hasPendingAcknowledgement: Boolean, messageUid: String, resource: String) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
         var activateSpamFilter: (() -> Unit)? = null,
         var unblockMail: ((String) -> Unit)? = null,

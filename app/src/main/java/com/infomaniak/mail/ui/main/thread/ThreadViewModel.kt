@@ -113,7 +113,6 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.invoke
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -121,7 +120,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /* Please note that, for the moment, the logic that uses this list assumes that the items are necessarily messages.
@@ -161,8 +159,6 @@ class ThreadViewModel @Inject constructor(
     ).mapNotNull { it.obj }
 
     private val currentMailboxLive = currentMailboxFlow.asLiveData()
-
-    private val refreshingAcknowledgeMessagesUids = ConcurrentHashMap<String, Job>()
 
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
@@ -275,13 +271,6 @@ class ThreadViewModel @Inject constructor(
                         val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
-                        if (shouldExpand && message.isPendingAcknowledgementForMe()) {
-                            refreshMessageIfNeeded(
-                                message.hasPendingAcknowledgement,
-                                message.uid,
-                                message.resource
-                            )
-                        }
                     }
                 }
 
@@ -805,31 +794,6 @@ class ThreadViewModel @Inject constructor(
             snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementFailure))
             setAcknowledgeState(message, MessageUi.AcknowledgeState.Pending)
         }
-    }
-
-    fun refreshMessageIfNeeded(hasPendingAcknowledgement: Boolean, messageUid: String, resource: String) {
-        if (!hasPendingAcknowledgement) return
-
-        refreshingAcknowledgeMessagesUids[messageUid]?.cancel()
-
-        val job = viewModelScope.launch {
-            try {
-                val apiResponse = ApiRepository.getMessage(resource)
-                val responseMessage = apiResponse.data
-
-                if (apiResponse.isSuccess() && responseMessage != null) {
-                    mailboxContentRealm().write {
-                        MessageController.updateMessageBlocking(messageUid, realm = this) { localMessage ->
-                            localMessage?.acknowledgeStatus = responseMessage.acknowledgeStatus
-                        }
-                    }
-                }
-            } finally {
-                refreshingAcknowledgeMessagesUids.remove(messageUid, coroutineContext.job)
-            }
-        }
-
-        refreshingAcknowledgeMessagesUids[messageUid] = job
     }
 
     private fun setUnsubscribeState(message: Message, state: UnsubscribeState) {

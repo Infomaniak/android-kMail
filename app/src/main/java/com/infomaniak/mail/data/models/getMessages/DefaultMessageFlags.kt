@@ -34,4 +34,6 @@ data class DefaultMessageFlags(
     val isScheduledMessage: Boolean,
     @SerialName("seen")
     val isSeen: Boolean,
+    @SerialName("acknowledged")
+    val isAcknowledged: Boolean,
 ) : MessageFlags
