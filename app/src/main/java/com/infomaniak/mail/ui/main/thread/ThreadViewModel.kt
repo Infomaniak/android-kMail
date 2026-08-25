@@ -782,9 +782,7 @@ class ThreadViewModel @Inject constructor(
         onSuccess: suspend (ReminderResult?) -> Unit = {},
         apiAction: suspend (mailboxUuid: String, folderId: String, messageId: Int) -> ApiResponse<*>,
     ) {
-        val messageId = message.messageId
-
-        if (messageId.isNullOrBlank()) {
+        if (message.messageId.isNullOrBlank()) {
             snackbarManager.postValue(appContext.getString(failureResId))
             return
         }
@@ -807,7 +805,9 @@ class ThreadViewModel @Inject constructor(
     }
 
     suspend fun setMessageForReminder(messageUid: String): Boolean {
-        return messageController.getMessage(messageUid)?.let { currentReminderAction = ReminderAction.Add(it); true } ?: false
+        val message = messageController.getMessage(messageUid) ?: return false
+        currentReminderAction = ReminderAction.Add(message)
+        return true
     }
 
     fun addReminder(message: Message, delayMinutes: Int) {

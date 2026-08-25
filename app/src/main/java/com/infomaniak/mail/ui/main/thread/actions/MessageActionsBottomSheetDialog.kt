@@ -32,7 +32,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.extensions.folder
@@ -102,9 +101,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
-    @Inject
-    lateinit var threadController: ThreadController
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
@@ -139,7 +135,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 from = message.from,
                 aliases = mainViewModel.currentMailbox.value?.aliases,
                 featureFlags = mainViewModel.currentMailbox.value?.featureFlags,
-                isLastMessageOfThread = isLastMessageOfThread(message),
+                isLastMessageOfThread = mainViewModel.isLastMessageOfThread(message, threadUid),
             )
 
             observeReportPhishingResult()
@@ -369,14 +365,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
             //endregion
         })
-    }
-
-    private suspend fun isLastMessageOfThread(message: Message): Boolean {
-        val thread = threadController.getThread(navigationArgs.threadUid) ?: return false
-        val currentIndex = thread.messages.indexOfFirst { it.uid == message.uid }
-        if (currentIndex == -1) return false
-        val messagesAfter = thread.messages.drop(currentIndex + 1)
-        return messagesAfter.isEmpty() || messagesAfter.all { it.isDraft }
     }
 
     companion object {
