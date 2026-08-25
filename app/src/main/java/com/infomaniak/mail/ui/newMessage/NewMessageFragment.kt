@@ -529,7 +529,6 @@ class NewMessageFragment : Fragment() {
                     val stringRes = if (isTooSoon) R.string.scheduledSendTimePassed else R.string.scheduledEmailHeader
                     binding.scheduleAlert.apply {
                         setDescription(getString(stringRes, date))
-                        setWarningStyle(isTooSoon)
                         isVisible = true
                     }
                     binding.divider7.isVisible = !isTooSoon
