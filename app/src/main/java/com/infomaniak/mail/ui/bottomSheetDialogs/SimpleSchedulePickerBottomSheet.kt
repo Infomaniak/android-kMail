@@ -29,6 +29,7 @@ import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+import com.infomaniak.mail.utils.extensions.setKSuiteTrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
@@ -66,7 +67,7 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         }
     }
 
-    protected open fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
+    private fun createScheduleOptionItem(scheduleOption: ScheduleOption): View {
         return ActionItemView(requireContext()).apply {
             setTitle(scheduleOption.titleRes)
             setDescription(context.dayOfWeekDateWithoutYear(date = scheduleOption.date()))
@@ -75,12 +76,16 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         }
     }
 
-    protected open fun bindLastScheduleOptionDescription(description: String) {
+    private fun bindLastScheduleOptionDescription(description: String) {
         binding.lastScheduleOption.setDescription(description)
     }
 
-    protected open fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) {
+    private fun setupFirstScheduleOptionDivider(firstItem: View, shouldDisplayDivider: Boolean) {
         (firstItem as? ActionItemView)?.setDividerVisibility(shouldDisplayDivider)
+    }
+
+    private fun setupCustomScheduleOptionTrailing() {
+        binding.customScheduleOption.setKSuiteTrailingContent(currentKSuite)
     }
 
     protected fun setupScheduleOptions() = with(binding) {
@@ -103,6 +108,7 @@ abstract class SimpleSchedulePickerBottomSheet : EdgeToEdgeBottomSheetDialog() {
         scheduleOptions.children.firstOrNull()?.let { firstItem ->
             setupFirstScheduleOptionDivider(firstItem, shouldDisplayDivider)
         }
+        setupCustomScheduleOptionTrailing()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

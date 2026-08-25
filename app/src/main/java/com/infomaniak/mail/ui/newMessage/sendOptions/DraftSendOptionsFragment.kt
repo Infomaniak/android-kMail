@@ -48,6 +48,7 @@ import com.infomaniak.mail.ui.newMessage.ScheduleConfig
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
 import com.infomaniak.mail.utils.extensions.applyContentPaddingStart
+import com.infomaniak.mail.utils.extensions.setKSuiteTrailingContent
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMailPremiumBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
@@ -115,13 +116,17 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun bindLastScheduleOptionDescription(description: String) = binding.lastScheduleOption.setDescription(description)
+    private fun setupCustomScheduleOptionTrailing() {
+        binding.customScheduleOption.setKSuiteTrailingContent(currentKSuite)
+    }
 
     private fun onLastScheduleOptionClicked() {
         newMessageViewModel.setScheduleConfig(lastSelectedEpoch?.let(ScheduleConfig::Scheduled) ?: ScheduleConfig.None)
     }
 
-    private fun onCustomScheduleOptionClicked() = executeIfAuthorized { showCustomScheduleDatePicker() }
+    private fun onCustomScheduleOptionClicked() {
+        executeIfAuthorized(MatomoName.ScheduledCustomDate.value) { showCustomScheduleDatePicker() }
+    }
 
     private fun setupScheduleOptions() = with(binding) {
         val lastDate = ScheduleOptionUtils.getLastScheduleOptionDate(lastSelectedEpoch, currentlyScheduledEpochMillis)
@@ -140,6 +145,7 @@ class DraftSendOptionsFragment : Fragment() {
         }
 
         customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
+        setupCustomScheduleOptionTrailing()
     }
 
     private fun setupToggles() = with(binding) {
@@ -176,6 +182,8 @@ class DraftSendOptionsFragment : Fragment() {
         days3.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 3, 3))
         days7.setText(resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 7, 7))
 
+        customDelayReminder.setKSuiteTrailingContent(currentKSuite)
+
         val paddingStartValue = resources.getDimensionPixelSize(R.dimen.startPaddingWithoutIcon)
         (optionsDelays.children + customDelayReminder).forEach { view -> view.applyContentPaddingStart(paddingStartValue) }
 
@@ -190,6 +198,8 @@ class DraftSendOptionsFragment : Fragment() {
                 }
             )
         }
+
+        customDelayReminder.setOnClickListener { onCustomDelayReminderClicked() }
     }
 
     private fun setReminderOptionsVisible(isVisible: Boolean) {
@@ -308,6 +318,10 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
+    private fun onCustomDelayReminderClicked() {
+        executeIfAuthorized(MatomoName.ReminderCustomDelta.value) { showCustomDelayReminderDatePicker() }
+    }
+
     private fun resetCustomDelayReminder() = with(binding) {
         customDelayReminder.setCheckMark(displayCheckMark = false)
         customDelayReminder.removeSubtitle()
@@ -338,11 +352,8 @@ class DraftSendOptionsFragment : Fragment() {
         }
     }
 
-    private fun executeIfAuthorized(onAuthorized: () -> Unit) {
-        val kSuite = currentKSuite
-        val matomoName = MatomoName.ScheduledCustomDate.value
-
-        when (kSuite) {
+    private fun executeIfAuthorized(matomoName: String, onAuthorized: () -> Unit) {
+        when (val kSuite = currentKSuite) {
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
             KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
             KSuite.StarterPack -> openMailPremiumBottomSheet(matomoName)
@@ -359,4 +370,9 @@ class DraftSendOptionsFragment : Fragment() {
             },
         )
     }
+
+    private fun showCustomDelayReminderDatePicker() {
+        // TODO
+    }
+
 }
