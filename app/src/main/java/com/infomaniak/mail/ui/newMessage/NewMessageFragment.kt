@@ -524,14 +524,14 @@ class NewMessageFragment : Fragment() {
             when (config) {
                 is ScheduleConfig.Scheduled -> {
                     val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
-                    val isTooSoon =
-                        config.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds < System.currentTimeMillis()
-                    val stringRes = if (isTooSoon) R.string.scheduledSendTimePassed else R.string.scheduledEmailHeader
+                    val minSelectableTime = System.currentTimeMillis() + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
+                    val isScheduleTooSoon = config.epochMillis < minSelectableTime
+                    val stringRes = if (isScheduleTooSoon) R.string.scheduledSendTimePassed else R.string.scheduledEmailHeader
                     binding.scheduleAlert.apply {
                         setDescription(getString(stringRes, date))
                         isVisible = true
                     }
-                    binding.divider7.isVisible = !isTooSoon
+                    binding.divider7.isVisible = true
                 }
                 ScheduleConfig.None -> {
                     binding.scheduleAlert.isVisible = false
@@ -1028,12 +1028,12 @@ class NewMessageFragment : Fragment() {
             if (isSendingWithScheduled) {
                 val scheduleConfig = newMessageViewModel.scheduleConfig.value
                 if (scheduleConfig is ScheduleConfig.Scheduled) {
-                    val isScheduleTooSoon =
-                        scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds < System.currentTimeMillis()
+                    val minSelectableTime = System.currentTimeMillis() + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
+                    val isScheduleTooSoon = scheduleConfig.epochMillis < minSelectableTime
                     if (isScheduleTooSoon) {
                         informationDialog.show(
                             title = R.string.scheduledSendDelayTooShortError,
-                            description = getString(R.string.scheduledSendDelayTooShortError, MIN_SELECTABLE_DATE_MINUTES),
+                            description = getString(R.string.scheduledSendMinimumDelayRequirement),
                             confirmButtonText = R.string.buttonClose,
                         )
                         return@setOnClickListener
