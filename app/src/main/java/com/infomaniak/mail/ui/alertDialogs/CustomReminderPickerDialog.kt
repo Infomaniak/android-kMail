@@ -26,6 +26,7 @@ import com.infomaniak.mail.utils.date.DateFormatUtils.MINUTES_IN_A_DAY
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
+import com.infomaniak.core.legacy.R as RCore
 
 @ActivityScoped
 class CustomReminderPickerDialog @Inject constructor(
@@ -47,7 +48,7 @@ class CustomReminderPickerDialog @Inject constructor(
             .setTitle(R.string.buttonCustomReminder)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
-            .setNegativeButton(com.infomaniak.core.legacy.R.string.buttonCancel, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
     }
 
@@ -71,13 +72,13 @@ class CustomReminderPickerDialog @Inject constructor(
         unitPicker.maxValue = timeUnits.size - 1
         unitPicker.wrapSelectorWheel = false
 
-        updateUnitLabels(numberPicker.value)
+        updateUnitLabelPlural(numberPicker.value)
     }
 
     private fun setupListeners() = with(binding) {
         numberPicker.setOnValueChangedListener { _, oldVal, newVal ->
             if ((oldVal == 1 && newVal > 1) || (oldVal > 1 && newVal == 1)) {
-                updateUnitLabels(newVal)
+                updateUnitLabelPlural(newVal)
             }
         }
 
@@ -93,7 +94,7 @@ class CustomReminderPickerDialog @Inject constructor(
         negativeButton.setOnClickListener { alertDialog.cancel() }
     }
 
-    private fun updateUnitLabels(currentNumber: Int) {
+    private fun updateUnitLabelPlural(currentNumber: Int) {
         val displayedUnits = timeUnits.map {
             activityContext.resources.getQuantityString(it.titleRes, currentNumber)
         }.toTypedArray()
