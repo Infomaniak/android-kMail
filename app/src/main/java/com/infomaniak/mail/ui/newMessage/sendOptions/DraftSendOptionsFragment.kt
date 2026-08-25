@@ -110,6 +110,7 @@ class DraftSendOptionsFragment : Fragment() {
         setupToggles()
         setupScheduleSelection()
         setupReminderOptions()
+        setupAcknowledgment()
 
         observeFeatureFlagUpdates()
         observeScheduleConfig()
@@ -194,6 +195,16 @@ class DraftSendOptionsFragment : Fragment() {
         val paddingStartValue = resources.getDimensionPixelSize(R.dimen.startPaddingWithoutIcon)
         (scheduleOptions.children + reminderVisibility + customScheduleOption).forEach { view ->
             view.applyContentPaddingStart(paddingStartValue)
+        }
+    }
+
+    private fun setupAcknowledgment() = with(binding) {
+        newMessageViewModel.shouldRequestAcknowledgment.observe(viewLifecycleOwner) { isEnabled ->
+            acknowledgment.isChecked = isEnabled
+        }
+        acknowledgment.setOnClickListener {
+            val shouldRequestAcknowledgment = !newMessageViewModel.shouldRequestAcknowledgment.value
+            newMessageViewModel.setShouldRequestAcknowledgment(shouldRequestAcknowledgment)
         }
     }
 
