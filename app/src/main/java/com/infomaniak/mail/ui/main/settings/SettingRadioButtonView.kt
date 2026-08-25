@@ -57,11 +57,11 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 setIcon(iconDrawable)
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
-
-                root.setOnClickListener {
-                    (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) ?: onClickListener?.onClick(root)
-                }
             }
+        }
+
+        binding.root.setOnClickListener {
+            (parent as? OnCheckListener)?.onChecked(id) ?: onClickListener?.onClick(binding.root)
         }
     }
 
@@ -78,6 +78,11 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     fun setText(newText: String) {
         binding.text.text = newText
+    }
+
+    fun setDescription(newDescription: String) {
+        binding.description.isVisible = newDescription.isNotBlank()
+        if (newDescription.isNotBlank()) binding.description.text = newDescription
     }
 
     fun setCheckMarkColor(@ColorInt color: Int) {
