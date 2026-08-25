@@ -26,8 +26,11 @@ import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.ui.view.extension.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSettingRadioButtonBinding
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.Companion.NOT_SET
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.Companion.getDimenOrNull
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import androidx.appcompat.R as RAndroid
 
@@ -57,6 +60,9 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 setIcon(iconDrawable)
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
+
+                val horizontalPadding = getDimenOrNull(R.styleable.SettingRadioButtonView_horizontalPadding)
+                root.setPaddingRelative(start = horizontalPadding)
             }
         }
 

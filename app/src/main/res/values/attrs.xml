@@ -117,6 +117,7 @@
         <attr name="text" />
         <attr name="checkMarkColor" format="color" />
         <attr name="value" format="string" />
+        <attr name="horizontalPadding" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="SettingRadioGroupView">
