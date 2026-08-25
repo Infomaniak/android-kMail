@@ -472,7 +472,7 @@ class ActionsViewModel @Inject constructor(
     ) {
         if (messages.isEmpty()) return
         val roles = folderRoleUtils.getActionFolderRoles(messages)
-        val isFromArchive = roles.all { it == FolderRole.ARCHIVE }
+        val isFromArchive = roles.isNotEmpty() && roles.all { it == FolderRole.ARCHIVE }
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return
 
