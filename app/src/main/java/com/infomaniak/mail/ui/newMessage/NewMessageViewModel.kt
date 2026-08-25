@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.ui.newMessage
 
-import android.R.id.message
 import android.app.Application
 import android.content.ClipDescription
 import android.content.Intent
@@ -85,7 +84,6 @@ import com.infomaniak.mail.data.models.extensions.setUploadStatus
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.ReminderMessageInfo
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -114,8 +112,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.htmlToText
-import com.infomaniak.mail.utils.extensions.toRealmInstant
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -276,6 +272,9 @@ class NewMessageViewModel @Inject constructor(
 
     private val _shouldRemindRecipient = MutableStateFlow(true)
     val shouldRemindRecipient: StateFlow<Boolean> = _shouldRemindRecipient.asStateFlow()
+
+    private val _shouldRequestAcknowledgment = MutableStateFlow(localSettings.askEmailAcknowledgement)
+    val shouldRequestAcknowledgment: StateFlow<Boolean> = _shouldRequestAcknowledgment.asStateFlow()
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -518,6 +517,7 @@ class NewMessageViewModel @Inject constructor(
         var previousMessage: Message? = null
 
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+        setShouldRequestAcknowledgment(localSettings.askEmailAcknowledgement)
         saveNavArgsToSavedState(localUuid)
 
         when (draftMode) {
@@ -672,6 +672,7 @@ class NewMessageViewModel @Inject constructor(
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
             scheduleDate = scheduleDate,
             reminderDraftInfo = reminder,
+            shouldRequestAcknowledgment = ackRequest,
         )
     }
 
@@ -723,6 +724,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         reminder?.shouldRemindRecipient?.let { setShouldRemindRecipient(it) }
+        setShouldRequestAcknowledgment(ackRequest)
     }
 
     fun setQuotesButtonVisibility(isVisible: Boolean) {
@@ -1125,7 +1127,7 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
-        ackRequest = localSettings.askEmailAcknowledgement
+        ackRequest = shouldRequestAcknowledgment.value
 
         scheduleDate = getCurrentScheduleDate()
 
@@ -1270,10 +1272,11 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
-                        .mapTo(mutableSetOf()) { it.localUuid } &&
+                .mapTo(mutableSetOf()) { it.localUuid } &&
                     draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
                     draftSnapshot.reminderDraftInfo?.reminderDelta == getCurrentReminderDelta() &&
-                    draftSnapshot.reminderDraftInfo?.shouldRemindRecipient == shouldRemindRecipient.value
+                    draftSnapshot.reminderDraftInfo?.shouldRemindRecipient == shouldRemindRecipient.value &&
+                    draftSnapshot.shouldRequestAcknowledgment == shouldRequestAcknowledgment.value
         } ?: false
     }
 
@@ -1362,6 +1365,10 @@ class NewMessageViewModel @Inject constructor(
         _shouldRemindRecipient.value = value
     }
 
+    fun setShouldRequestAcknowledgment(value: Boolean) {
+        _shouldRequestAcknowledgment.value = value
+    }
+
     fun setScheduleConfig(config: ScheduleConfig) {
         _scheduleConfig.value = config
     }
@@ -1417,6 +1424,7 @@ class NewMessageViewModel @Inject constructor(
         val attachmentsLocalUuids: Set<String>,
         val scheduleDate: String?,
         val reminderDraftInfo: ReminderDraftInfo?,
+        val shouldRequestAcknowledgment: Boolean,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
