@@ -863,6 +863,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun setupBackActionHandler() {
+        setupScheduleAndDraftHandlers()
+        setupReminderAndSnoozeHandlers()
+        setupAiAndReactionHandlers()
+    }
+
+    private fun setupScheduleAndDraftHandlers() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             val mailbox = mainViewModel.currentMailbox.value
             if (mailbox == null) {
@@ -888,7 +894,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             }
             actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox)
         }
+    }
 
+    private fun setupReminderAndSnoozeHandlers() {
         getBackNavigationResult(REMINDER_RESULT) { delayMinutes: Int ->
             when (val action = threadViewModel.currentReminderAction) {
                 null -> snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
@@ -914,17 +922,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             )
         }
 
-        getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
-            navigateToEmojiPicker(
-                messageUid,
-                emojiPickerObserverTarget = if (twoPaneViewModel.isThreadOpen) {
-                    EmojiPickerObserverTarget.Thread
-                } else {
-                    EmojiPickerObserverTarget.ThreadList
-                }
-            )
-        }
-
         getBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET) { messageUid: String ->
             lifecycleScope.launch {
                 val success = threadViewModel.setMessageForReminder(messageUid)
@@ -936,12 +933,25 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             }
         }
 
-        getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
-            navigateToAskEuriaBottomSheet(messageUid)
-        }
-
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
+        }
+    }
+
+    private fun setupAiAndReactionHandlers() {
+        getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
+            navigateToEmojiPicker(
+                messageUid,
+                emojiPickerObserverTarget = if (twoPaneViewModel.isThreadOpen) {
+                    EmojiPickerObserverTarget.Thread
+                } else {
+                    EmojiPickerObserverTarget.ThreadList
+                }
+            )
+        }
+
+        getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
+            navigateToAskEuriaBottomSheet(messageUid)
         }
 
         getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_SUMMARY_BOTTOM_SHEET) { (messageUid, isAlreadySummarized) ->

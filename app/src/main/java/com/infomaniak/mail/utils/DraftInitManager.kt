@@ -77,7 +77,10 @@ class DraftInitManager @Inject constructor(
                 }
             }
             DraftMode.FOLLOW_UP -> {
-                val mailboxUuid = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
+                val mailboxUuid = mailboxController.getMailbox(
+                    userId = AccountUtils.currentUserId,
+                    mailboxId = AccountUtils.currentMailboxId
+                )?.uuid ?: return
                 ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
                     attachments += attachment.apply {
                         resource = previousMessage.attachments.find { it.name == name }?.resource
