@@ -1068,7 +1068,7 @@ class NewMessageViewModel @Inject constructor(
         reminder = if (currentReminderDelta != null) {
             ReminderDraftInfo().apply {
                 reminderDelta = currentReminderDelta
-                shouldRemindRecipient = this@NewMessageViewModel.shouldRemindRecipient.value ?: true
+                shouldRemindRecipient = this@NewMessageViewModel.shouldRemindRecipient.value
             }
         } else {
             null
