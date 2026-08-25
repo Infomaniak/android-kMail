@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.FolderRole
@@ -909,12 +910,17 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun handleReminderUpdatedSuccess(message: Message, reminderResult: ReminderResult?) {
         reminderResult?.let { result ->
+            val mailbox = mailbox()
             mailboxContentRealm().write {
                 MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
                     localMessage?.reminder = ReminderMessageInfo().apply {
                         uuid = result.uuid
                         date = result.date
                     }
+                }
+
+                MessageController.getMessageBlocking(message.uid, realm = this)?.threads?.forEach { thread ->
+                    thread.recomputeThread(realm = this, aliases = mailbox.aliases)
                 }
             }
         }
@@ -928,10 +934,15 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun handleReminderDisabledSuccess(message: Message) {
+        val mailbox = mailbox()
         mailboxContentRealm().write {
             MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
                 localMessage?.reminder = null
                 localMessage?.reminderAction = null
+            }
+
+            MessageController.getMessageBlocking(message.uid, realm = this)?.threads?.forEach { thread ->
+                thread.recomputeThread(realm = this, aliases = mailbox.aliases)
             }
         }
 
