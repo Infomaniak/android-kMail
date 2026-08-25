@@ -20,19 +20,20 @@
     android:id="@+id/reminderVisibilityGroup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="@dimen/marginStandardMedium"
     android:paddingTop="@dimen/marginStandardMedium">
 
     <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
         android:id="@+id/selectionReminderMeOnly"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:horizontalPadding="@dimen/marginStandard"
         app:text="@string/selectionReminderMeOnly" />
 
     <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
         android:id="@+id/selectionReminderRecipientsAndMe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:horizontalPadding="@dimen/marginStandard"
         app:text="@string/selectionReminderRecipientsAndMe" />
 
 </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
