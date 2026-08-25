@@ -1036,6 +1036,8 @@ class NewMessageFragment : Fragment() {
                             description = getString(R.string.scheduledSendMinimumDelayRequirement),
                             confirmButtonText = R.string.buttonClose,
                         )
+                        val date = Date(scheduleConfig.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                        binding.scheduleAlert.setDescription(getString(R.string.scheduledSendTimePassed, date))
                         return@setOnClickListener
                     }
                 }
