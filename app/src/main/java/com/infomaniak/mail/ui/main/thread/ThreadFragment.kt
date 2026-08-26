@@ -517,7 +517,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        threadAdapter.updateFeatureFlags(mainViewModel.currentMailbox.value?.featureFlags)
     }
 
     private fun openDraft(message: Message) {
