@@ -1120,10 +1120,10 @@ class NewMessageViewModel @Inject constructor(
 
         val currentReminderDelta = getCurrentReminderDelta()
         reminder = if (currentReminderDelta != null) {
-            ReminderDraftInfo().apply {
-                reminderDelta = currentReminderDelta
-                shouldRemindRecipient = this@NewMessageViewModel.shouldRemindRecipient.value
-            }
+            ReminderDraftInfo(
+                reminderDelta = currentReminderDelta,
+                shouldRemindRecipient = shouldRemindRecipient.value,
+            )
         } else {
             null
         }

@@ -26,7 +26,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-class ReminderDraftInfo : EmbeddedRealmObject {
+class ReminderDraftInfo() : EmbeddedRealmObject {
+    constructor(reminderDelta: Int?, shouldRemindRecipient: Boolean?) : this() {
+        this.reminderDelta = reminderDelta
+        this.shouldRemindRecipient = shouldRemindRecipient
+    }
+
+    /** Delta is in minutes */
     @SerialName("delta")
     var reminderDelta: Int? = null
 
