@@ -148,11 +148,9 @@
     <string name="buttonItalic">Πλάγια</string>
     <string name="buttonLoadMore">Φόρτωση περισσότερων συζητήσεων</string>
     <string name="buttonLogInDifferentAccount">Σύνδεση με άλλο λογαριασμό</string>
-    <string name="buttonMaybe">Ίσως</string>
     <string name="buttonModify">Τροποποίηση</string>
     <string name="buttonMore">Περισσότερα</string>
     <string name="buttonNewMessage">Νέο μήνυμα</string>
-    <string name="buttonNo">Όχι</string>
     <string name="buttonOpenMyCalendar">Άνοιγμα στο ημερολόγιό μου</string>
     <string name="buttonRefuse">Απόρριψη</string>
     <string name="buttonReschedule">Επαναπρογραμματισμός</string>
@@ -174,7 +172,6 @@
     <string name="buttonUnselectAll">Κανένα</string>
     <string name="buttonUpgrade">Αναβάθμιση</string>
     <string name="buttonValid">Επικύρωση</string>
-    <string name="buttonYes">Ναι</string>
     <string name="calendarAllDayLong">Όλη την ημέρα</string>
     <string name="calendarNotInvited">Δεν είστε προσκεκλημένος</string>
     <string name="calendarOrganizerName">%s (Διοργανωτής)</string>

@@ -154,11 +154,9 @@
     <string name="buttonItalic">Kursywa</string>
     <string name="buttonLoadMore">Załaduj więcej rozmów</string>
     <string name="buttonLogInDifferentAccount">Zaloguj się innym kontem</string>
-    <string name="buttonMaybe">Może</string>
     <string name="buttonModify">Modyfikuj</string>
     <string name="buttonMore">Więcej</string>
     <string name="buttonNewMessage">Nowa wiadomość</string>
-    <string name="buttonNo">Nie</string>
     <string name="buttonOpenMyCalendar">Otwórz w moim kalendarzu</string>
     <string name="buttonRefuse">Odmów</string>
     <string name="buttonReschedule">Przełóż</string>
@@ -180,7 +178,6 @@
     <string name="buttonUnselectAll">Nic</string>
     <string name="buttonUpgrade">Ulepsz</string>
     <string name="buttonValid">Zatwierdź</string>
-    <string name="buttonYes">Tak</string>
     <string name="calendarAllDayLong">Cały dzień</string>
     <string name="calendarNotInvited">Nie jesteś zaproszony</string>
     <string name="calendarOrganizerName">%s (Organizator)</string>

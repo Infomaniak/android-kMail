@@ -148,11 +148,9 @@
     <string name="buttonItalic">Kursiv</string>
     <string name="buttonLoadMore">Indlæs flere samtaler</string>
     <string name="buttonLogInDifferentAccount">Log ind med en anden konto</string>
-    <string name="buttonMaybe">Måske</string>
     <string name="buttonModify">Ændr</string>
     <string name="buttonMore">Mere</string>
     <string name="buttonNewMessage">Ny besked</string>
-    <string name="buttonNo">Nej</string>
     <string name="buttonOpenMyCalendar">Åbn i min kalender</string>
     <string name="buttonRefuse">Afvis</string>
     <string name="buttonReschedule">Omlæg</string>
@@ -174,7 +172,6 @@
     <string name="buttonUnselectAll">Ingen</string>
     <string name="buttonUpgrade">Opgrader</string>
     <string name="buttonValid">Bekræft</string>
-    <string name="buttonYes">Ja</string>
     <string name="calendarAllDayLong">Hele dagen</string>
     <string name="calendarNotInvited">Du er ikke inviteret</string>
     <string name="calendarOrganizerName">%s (Arrangør)</string>

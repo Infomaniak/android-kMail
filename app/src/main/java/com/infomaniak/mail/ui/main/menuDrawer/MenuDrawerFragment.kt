@@ -79,6 +79,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.core.common.R as RCore
 
 @AndroidEntryPoint
 class MenuDrawerFragment : Fragment() {
@@ -223,8 +224,8 @@ class MenuDrawerFragment : Fragment() {
                     confirmDeleteFolderDialog.show(
                         title = requireContext().getString(R.string.deleteFolderDialogTitle),
                         description = getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName),
-                        positiveButtonText = R.string.buttonYes,
-                        negativeButtonText = R.string.buttonNo,
+                        positiveButtonText = RCore.string.buttonYes,
+                        negativeButtonText = RCore.string.buttonNo,
                         onPositiveButtonClicked = {
                             trackManageFolderEvent(MatomoName.DeleteConfirm)
                             mainViewModel.deleteFolder(folderId)
