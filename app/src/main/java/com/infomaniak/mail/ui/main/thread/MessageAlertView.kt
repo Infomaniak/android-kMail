@@ -127,19 +127,6 @@ class MessageAlertView @JvmOverloads constructor(
         binding.action3.setOnClickListener(listener)
     }
 
-    fun showAction3Progress() {
-        binding.action3.isEnabled = false
-        action3LoadingTimer.start()
-    }
-
-    fun hideAction3Progress(@StringRes text: Int) {
-        action3LoadingTimer.cancel()
-        binding.action3.apply {
-            hideProgressCatching(text)
-            isEnabled = true
-        }
-    }
-
     fun setActionsVisibility(shouldDisplayAction: Boolean) {
         binding.actionsLayout.isVisible = shouldDisplayAction
         val margin = if (shouldDisplayAction) RCore.dimen.marginStandardMedium else RCore.dimen.marginStandardSmall
