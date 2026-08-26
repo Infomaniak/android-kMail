@@ -23,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.trackSettingsCancelPeriod
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentCancelDelaySettingBinding
@@ -50,6 +52,15 @@ class CancelDelaySettingFragment : Fragment() {
         binding.radioGroup.onItemCheckedListener { _, value, _ ->
             val seconds = value?.toInt() ?: return@onItemCheckedListener
             localSettings.cancelDelay = seconds
+            val matomoName = when (seconds) {
+                10 -> MatomoMail.MatomoName.Seconds10
+                15 -> MatomoMail.MatomoName.Seconds15
+                20 -> MatomoMail.MatomoName.Seconds20
+                25 -> MatomoMail.MatomoName.Seconds25
+                30 -> MatomoMail.MatomoName.Seconds30
+                else -> MatomoMail.MatomoName.Disabled
+            }
+            trackSettingsCancelPeriod(name = matomoName)
         }
     }
 
