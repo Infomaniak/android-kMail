@@ -326,7 +326,7 @@
                     android:layout_width="@dimen/standardIconSize"
                     android:layout_height="@dimen/standardIconSize"
                     android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:background="@drawable/bg_reminder_icon"
+                    android:background="@drawable/bg_icon_primary_container"
                     android:contentDescription="@string/contentDescriptionIconReminder"
                     android:padding="4dp"
                     android:src="@drawable/ic_alarm_clock"
