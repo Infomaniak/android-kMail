@@ -362,9 +362,7 @@ class MainActivity : BaseActivity() {
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
                     val mailbox = mainViewModel.currentMailbox.value ?: return
 
-                    if (localSettings.cancelDelay > 0) {
-                        actionsViewModel.refreshFoldersAfterSend(localSettings.cancelDelay, mailbox)
-                    }
+                    actionsViewModel.refreshFoldersAfterSend(localSettings.cancelDelay, mailbox)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
 
                     showSentDraftSnackbar(
