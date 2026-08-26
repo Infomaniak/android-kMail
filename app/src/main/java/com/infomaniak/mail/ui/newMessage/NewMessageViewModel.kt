@@ -616,8 +616,7 @@ class NewMessageViewModel @Inject constructor(
             encryptionPassword = encryptionKey ?: "",
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
             scheduleDate = scheduleDate,
-            reminderDelta = reminder?.reminderDelta,
-            shouldRemindRecipient = reminder?.shouldRemindRecipient ?: true,
+            reminderDraftInfo = reminder,
         )
     }
 
@@ -1205,8 +1204,8 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
                 .mapTo(mutableSetOf()) { it.localUuid } &&
                     draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
-                    draftSnapshot.reminderDelta == getCurrentReminderDelta() &&
-                    draftSnapshot.shouldRemindRecipient == shouldRemindRecipient.value
+                    draftSnapshot.reminderDraftInfo?.reminderDelta == getCurrentReminderDelta() &&
+                    draftSnapshot.reminderDraftInfo?.shouldRemindRecipient == shouldRemindRecipient.value
         } ?: false
     }
 
@@ -1336,8 +1335,7 @@ class NewMessageViewModel @Inject constructor(
         var encryptionPassword: String,
         val attachmentsLocalUuids: Set<String>,
         val scheduleDate: String?,
-        val reminderDelta: Int?,
-        val shouldRemindRecipient: Boolean?,
+        val reminderDraftInfo: ReminderDraftInfo?,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
