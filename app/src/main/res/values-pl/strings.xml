@@ -604,7 +604,6 @@
     <string name="settingsSwipeLeft">Przesunięcie w lewo</string>
     <string name="settingsSwipeRight">Przesunięcie w prawo</string>
     <string name="settingsThemeDescription">Wybór motywu</string>
-    <string name="settingsThemeTitle">Motyw</string>
     <string name="settingsThreadListDensityTitle">Gęstość listy konwersacji</string>
     <string name="settingsThreadModeTitle">Tryb wyświetlania wiadomości</string>
     <string name="settingsThreadModeWarningDescription">Uwaga, zmiana tej opcji spowoduje ponowne pobranie wszystkich wiadomości</string>

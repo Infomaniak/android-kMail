@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Swipe til venstre</string>
     <string name="settingsSwipeRight">Swipe til højre</string>
     <string name="settingsThemeDescription">Temavalg</string>
-    <string name="settingsThemeTitle">Tema</string>
     <string name="settingsThreadListDensityTitle">Samtaleliste tæthed</string>
     <string name="settingsThreadModeTitle">Beskedvisningstilstand</string>
     <string name="settingsThreadModeWarningDescription">Bemærk venligst, at ændring af denne indstilling vil downloade alle dine beskeder igen</string>

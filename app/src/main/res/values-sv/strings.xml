@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Svep åt vänster</string>
     <string name="settingsSwipeRight">Svep åt höger</string>
     <string name="settingsThemeDescription">Temavalg</string>
-    <string name="settingsThemeTitle">Tema</string>
     <string name="settingsThreadListDensityTitle">Konversationslistans täthet</string>
     <string name="settingsThreadModeTitle">Meddelandets visningsläge</string>
     <string name="settingsThreadModeWarningDescription">Observera att ändring av detta alternativ kommer att ladda ner alla dina meddelanden igen</string>

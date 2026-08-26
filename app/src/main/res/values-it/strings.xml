@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Scorrimento del dito a sinistra</string>
     <string name="settingsSwipeRight">Scorrimento del dito a destra</string>
     <string name="settingsThemeDescription">Scelta del tema</string>
-    <string name="settingsThemeTitle">Tema</string>
     <string name="settingsThreadListDensityTitle">Densità dell’elenco delle discussioni</string>
     <string name="settingsThreadModeTitle">Modalità di visualizzazione dei messaggi</string>
     <string name="settingsThreadModeWarningDescription">Si noti che la modifica di questa opzione comporta un nuovo download di tutti i messaggi</string>

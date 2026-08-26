@@ -582,7 +582,6 @@
     <string name="settingsSwipeLeft">Left swipe</string>
     <string name="settingsSwipeRight">Right swipe</string>
     <string name="settingsThemeDescription">Theme choice</string>
-    <string name="settingsThemeTitle">Theme</string>
     <string name="settingsThreadListDensityTitle">Thread list density</string>
     <string name="settingsThreadModeTitle">Message display mode</string>
     <string name="settingsThreadModeWarningDescription">Please note that changing this option will download all your messages again</string>
