@@ -148,11 +148,11 @@ class ActionItemView @JvmOverloads constructor(
         }
     }
 
-    private fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {
-        return getDimensionPixelSize(index, NOT_SET).takeIf { it != NOT_SET }
-    }
-
     companion object {
-        private const val NOT_SET = -1
+        const val NOT_SET = -1
+
+        fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {
+            return getDimensionPixelSize(index, NOT_SET).takeIf { it != NOT_SET }
+        }
     }
 }

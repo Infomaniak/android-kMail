@@ -263,6 +263,9 @@ class NewMessageViewModel @Inject constructor(
     private val _reminderConfig = MutableStateFlow<ReminderConfig>(ReminderConfig.None)
     val reminderConfig: StateFlow<ReminderConfig> = _reminderConfig.asStateFlow()
 
+    private val _shouldRemindRecipient = MutableStateFlow(true)
+    val shouldRemindRecipient: StateFlow<Boolean> = _shouldRemindRecipient.asStateFlow()
+
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
@@ -1250,7 +1253,10 @@ class NewMessageViewModel @Inject constructor(
 
             updatedMentions
         }
+    }
 
+    fun setShouldRemindRecipient(value: Boolean) {
+        _shouldRemindRecipient.value = value
     }
 
     fun setScheduleConfig(config: ScheduleConfig) {
