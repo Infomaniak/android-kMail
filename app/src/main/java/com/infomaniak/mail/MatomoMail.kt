@@ -69,6 +69,7 @@ object MatomoMail : Matomo {
         RestoreEmailsBottomSheet("restoreEmailsBottomSheet"),
         ScheduleSend("scheduleSend"),
         Search("search"),
+        SendOptions("sendOptions"),
         SettingsAccentColor("settingsAccentColor"),
         SettingsAutoAdvance("settingsAutoAdvance"),
         SettingsCancelPeriod("settingsCancelPeriod"),
@@ -484,6 +485,10 @@ object MatomoMail : Matomo {
 
     fun trackSettingsCancelPeriod(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
         trackEvent(MatomoCategory.SettingsCancelPeriod, name, action, value)
+    }
+
+    fun trackSendOptionsEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.SendOptions, name, action, value = value)
     }
 
     fun trackNotificationActionEvent(name: MatomoName) {
