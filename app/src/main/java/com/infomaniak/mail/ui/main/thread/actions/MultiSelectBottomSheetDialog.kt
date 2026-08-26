@@ -131,7 +131,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             val messages = threads.flatMap { it.messages }
             val messagesFolderRoles = folderRoleUtils.getActionFolderRoles(messages)
             val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE ||
-                    messagesFolderRoles.all { it == FolderRole.ARCHIVE }
+                    (messagesFolderRoles.isNotEmpty() && messagesFolderRoles.all { it == FolderRole.ARCHIVE })
             setupMainActions(threads, threadsUids, shouldRead, folderRole, messagesFolderRoles)
             setStateDependentUi(shouldRead, shouldFavorite, isFromArchive, threads)
         }
