@@ -57,6 +57,10 @@ object DateFormatUtils {
     private fun Context.localHourFormat() = if (DateFormat.is24HourFormat(this)) FORMAT_DATE_24_HOUR else FORMAT_DATE_12_HOUR
 
     fun Context.formatDelayText(delayMinutes: Int): String {
+        if (delayMinutes <= 0) {
+            return resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, 0, 0)
+        }
+
         val hours = delayMinutes / MINUTES_IN_AN_HOUR
         val days = delayMinutes / MINUTES_IN_A_DAY
 

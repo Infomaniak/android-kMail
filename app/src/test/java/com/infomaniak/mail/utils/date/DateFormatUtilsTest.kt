@@ -91,11 +91,11 @@ class DateFormatUtilsTest {
     }
 
     @Test
-    fun `formatDelayText returns 0 days when delay is 0`() {
+    fun `formatDelayText returns 0 hour when delay is 0`() {
         val delayMinutes = 0
-        val expectedText = "0 days"
+        val expectedText = "0 hour"
 
-        every { resources.getQuantityString(R.plurals.daysBeforeSendingReminder, 0, 0) } returns expectedText
+        every { resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, 0, 0) } returns expectedText
 
         val result = context.formatDelayText(delayMinutes)
 
@@ -103,11 +103,11 @@ class DateFormatUtilsTest {
     }
 
     @Test
-    fun `formatDelayText returns negative hours when delay is negative minutes`() {
+    fun `formatDelayText returns 0 hour when delay is negative minutes`() {
         val delayMinutes = -60 // -1 hour
-        val expectedText = "-1 hour"
+        val expectedText = "0 hour"
 
-        every { resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, -1, -1) } returns expectedText
+        every { resources.getQuantityString(R.plurals.hoursBeforeSendingReminder, 0, 0) } returns expectedText
 
         val result = context.formatDelayText(delayMinutes)
 
