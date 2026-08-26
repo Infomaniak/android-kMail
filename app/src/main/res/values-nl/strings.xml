@@ -148,11 +148,9 @@
     <string name="buttonItalic">Cursief</string>
     <string name="buttonLoadMore">Meer gesprekken laden</string>
     <string name="buttonLogInDifferentAccount">Inloggen met een ander account</string>
-    <string name="buttonMaybe">Misschien</string>
     <string name="buttonModify">Wijzigen</string>
     <string name="buttonMore">Meer</string>
     <string name="buttonNewMessage">Nieuw bericht</string>
-    <string name="buttonNo">Nee</string>
     <string name="buttonOpenMyCalendar">Openen in mijn agenda</string>
     <string name="buttonRefuse">Weigeren</string>
     <string name="buttonReschedule">Herschikken</string>
@@ -174,7 +172,6 @@
     <string name="buttonUnselectAll">Geen</string>
     <string name="buttonUpgrade">Upgraden</string>
     <string name="buttonValid">Valideren</string>
-    <string name="buttonYes">Ja</string>
     <string name="calendarAllDayLong">De hele dag</string>
     <string name="calendarNotInvited">U bent niet uitgenodigd</string>
     <string name="calendarOrganizerName">%s (Organisator)</string>

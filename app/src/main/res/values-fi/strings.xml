@@ -148,11 +148,9 @@
     <string name="buttonItalic">Kursiivi</string>
     <string name="buttonLoadMore">Lataa lisää keskusteluja</string>
     <string name="buttonLogInDifferentAccount">Kirjaudu sisään toisella tilillä</string>
-    <string name="buttonMaybe">Ehkä</string>
     <string name="buttonModify">Muokkaa</string>
     <string name="buttonMore">Lisää</string>
     <string name="buttonNewMessage">Uusi viesti</string>
-    <string name="buttonNo">Ei</string>
     <string name="buttonOpenMyCalendar">Avaa kalenterissani</string>
     <string name="buttonRefuse">Hylkää</string>
     <string name="buttonReschedule">Aikatauluta uudelleen</string>
@@ -174,7 +172,6 @@
     <string name="buttonUnselectAll">Ei mitään</string>
     <string name="buttonUpgrade">Päivitä</string>
     <string name="buttonValid">Vahvista</string>
-    <string name="buttonYes">Kyllä</string>
     <string name="calendarAllDayLong">Koko päivä</string>
     <string name="calendarNotInvited">Et ole kutsuttu</string>
     <string name="calendarOrganizerName">%s (Järjestäjä)</string>

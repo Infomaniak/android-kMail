@@ -152,11 +152,9 @@
     <string name="buttonItalic">Italic</string>
     <string name="buttonLoadMore">Load more conversations</string>
     <string name="buttonLogInDifferentAccount">Log in with another account</string>
-    <string name="buttonMaybe">Maybe</string>
     <string name="buttonModify">Modify</string>
     <string name="buttonMore">More</string>
     <string name="buttonNewMessage">New message</string>
-    <string name="buttonNo">No</string>
     <string name="buttonOpenMyCalendar">Open in my calendar</string>
     <string name="buttonRefuse">Refuse</string>
     <string name="buttonReschedule">Reschedule</string>
@@ -178,7 +176,6 @@
     <string name="buttonUnselectAll">None</string>
     <string name="buttonUpgrade">Upgrade</string>
     <string name="buttonValid">Validate</string>
-    <string name="buttonYes">Yes</string>
     <string name="calendarAllDayLong">All day long</string>
     <string name="calendarNotInvited">You are not invited</string>
     <string name="calendarOrganizerName">%s (Organizer)</string>
