@@ -561,8 +561,11 @@
     <string name="scheduledEmailHeader">Ta wiadomość zostanie wysłana w tym dniu: %s</string>
     <string name="scheduledMessagesFolder">Zaplanowane wiadomości</string>
     <string name="scheduledSendDelayTooShortError">Planowane opóźnienie wysyłania zbyt krótkie</string>
-    <string name="scheduledSendMinimumDelayRequirement">Wiadomości muszą być planowane z co najmniej 5-minutowym wyprzedzeniem. Wybierz późniejszą godzinę lub wyłącz zaplanowane wysyłanie</string>
-    <string name="scheduledSendTimePassed">Planowany czas wysyłki minął: %s</string>
+    <string name="scheduledSendMinimumDelayRequirement">Wysyłka musi zostać zaplanowana z co najmniej 5-minutowym wyprzedzeniem.</string>
+    <string name="scheduledTimeInvalidError">Nieprawidłowy zaplanowany czas wysyłania</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Nieprawidłowy czas zaplanowanej wysyłki: %s</string>
+    <string name="scheduledTimePassedError">Zaplanowany czas wysyłki przekroczony</string>
+    <string name="scheduledTimePassedErrorWithDate">Zaplanowany czas wysyłki przekroczony: %s</string>
     <string name="searchAllMessages">Wszystkie wiadomości</string>
     <string name="searchFieldPlaceholder">Wyszukaj wiadomość</string>
     <string name="searchFilterAttachment">Załączniki</string>

@@ -266,7 +266,6 @@ class NewMessageFragment : Fragment() {
         initManagers()
 
         bindAlertToViewLifecycle(descriptionDialog)
-        bindAlertToViewLifecycle(informationDialog)
 
         initMailbox()
         initUi()
@@ -526,7 +525,7 @@ class NewMessageFragment : Fragment() {
                     val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
                     val minSelectableTime = System.currentTimeMillis() + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
                     val isScheduleTooSoon = config.epochMillis < minSelectableTime
-                    val stringRes = if (isScheduleTooSoon) R.string.scheduledSendTimePassed else R.string.scheduledEmailHeader
+                    val stringRes = if (isScheduleTooSoon) R.string.scheduledTimePassedError else R.string.scheduledEmailHeader
                     binding.scheduleAlert.apply {
                         setDescription(getString(stringRes, date))
                         isVisible = true
@@ -1024,31 +1023,46 @@ class NewMessageFragment : Fragment() {
         binding.sendButton.setOnClickListener {
             if (!checkMailboxStorage(mailbox)) return@setOnClickListener
             val scheduleConfig = newMessageViewModel.scheduleConfig.value
-            if (scheduleConfig is ScheduleConfig.Scheduled) {
-                if (checkIfInvalidSchedule(scheduleConfig)) return@setOnClickListener
-                tryToSendEmail(isScheduled = true)
-            } else {
-                tryToSendEmail(isScheduled = false)
-            }
+            val isScheduled = scheduleConfig is ScheduleConfig.Scheduled
+            if (isScheduled && checkIfInvalidSchedule(scheduleConfig)) return@setOnClickListener
+            tryToSendEmail(isScheduled = isScheduled)
         }
     }
 
     private fun checkIfInvalidSchedule(scheduleConfig: ScheduleConfig.Scheduled): Boolean {
-        val minSelectableTime = System.currentTimeMillis() + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
+        val now = System.currentTimeMillis()
+        val minSelectableTime = now + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
         val isScheduleTooSoon = scheduleConfig.epochMillis < minSelectableTime
+        val isScheduleInvalid = scheduleConfig.epochMillis < now
+
         if (isScheduleTooSoon) {
-            informationDialog.show(
-                title = R.string.scheduledSendDelayTooShortError,
+            val dialogTitleRes = if (isScheduleInvalid) R.string.scheduledTimeInvalidError else R.string.scheduledTimePassedError
+
+            descriptionDialog.show(
+                title = getString(dialogTitleRes),
                 description = getString(R.string.scheduledSendMinimumDelayRequirement),
-                confirmButtonText = R.string.buttonClose,
+                positiveButtonText = R.string.buttonReschedule,
+                negativeButtonText = R.string.buttonDisable,
+                onPositiveButtonClicked = {
+                    val descriptionBannerRes = if (isScheduleInvalid) {
+                        R.string.scheduledTimeInvalidErrorWithDate
+                    } else {
+                        R.string.scheduledTimePassedErrorWithDate
+                    }
+                    val date = Date(scheduleConfig.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    binding.scheduleAlert.setDescription(getString(descriptionBannerRes, date))
+
+                    navigateToScheduleSendBottomSheet()
+                },
+                onNegativeButtonClicked = {
+                    newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
+                },
             )
-            val date = Date(scheduleConfig.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
-            binding.scheduleAlert.setDescription(getString(R.string.scheduledSendTimePassed, date))
         }
 
         return isScheduleTooSoon
     }
-    
+
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(

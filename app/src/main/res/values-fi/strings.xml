@@ -527,8 +527,11 @@
     <string name="scheduledEmailHeader">Tämä sähköposti lähetetään tänä päivämääränä: %s</string>
     <string name="scheduledMessagesFolder">Ajastetut viestit</string>
     <string name="scheduledSendDelayTooShortError">Ajastetun lähetyksen viive liian lyhyt</string>
-    <string name="scheduledSendMinimumDelayRequirement">Viestit on ajastettava vähintään 5 minuutin etukäteen. Valitse myöhempi aika tai poista ajastettu lähetys käytöstä</string>
-    <string name="scheduledSendTimePassed">Ajoitettu lähetysaika ylitetty: %s</string>
+    <string name="scheduledSendMinimumDelayRequirement">Lähetys on ajastettava vähintään 5 minuuttia etukäteen.</string>
+    <string name="scheduledTimeInvalidError">Virheellinen ajastettu lähetysaika</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Virheellinen ajastettu lähetysaika: %s</string>
+    <string name="scheduledTimePassedError">Ajoitettu lähetysaika ylitetty</string>
+    <string name="scheduledTimePassedErrorWithDate">Ajoitettu lähetysaika ylitetty: %s</string>
     <string name="searchAllMessages">Kaikki viestit</string>
     <string name="searchFieldPlaceholder">Hae sähköpostia</string>
     <string name="searchFilterAttachment">Liitteet</string>

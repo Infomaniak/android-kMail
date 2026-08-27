@@ -527,8 +527,11 @@
     <string name="scheduledEmailHeader">Este e-mail será enviado nesta data: %s</string>
     <string name="scheduledMessagesFolder">Mensagens programadas</string>
     <string name="scheduledSendDelayTooShortError">Atraso de envio agendado demasiado curto</string>
-    <string name="scheduledSendMinimumDelayRequirement">As mensagens devem ser agendadas com pelo menos 5 minutos de antecedência. Escolha uma hora posterior ou desative o envio agendado</string>
-    <string name="scheduledSendTimePassed">Tempo de envio programado excedido: %s</string>
+    <string name="scheduledSendMinimumDelayRequirement">Um envio deve ser agendado com, no mínimo, 5 minutos de antecedência.</string>
+    <string name="scheduledTimeInvalidError">Hora de envio programada inválida</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Hora de envio programada inválida: %s</string>
+    <string name="scheduledTimePassedError">Tempo de envio programado excedido</string>
+    <string name="scheduledTimePassedErrorWithDate">Hora de envio programada ultrapassada: %s</string>
     <string name="searchAllMessages">Todas as mensagens</string>
     <string name="searchFieldPlaceholder">Procurar um e-mail</string>
     <string name="searchFilterAttachment">Anexos</string>
