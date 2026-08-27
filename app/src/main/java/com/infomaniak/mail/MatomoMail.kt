@@ -71,6 +71,7 @@ object MatomoMail : Matomo {
         Search("search"),
         SettingsAccentColor("settingsAccentColor"),
         SettingsAutoAdvance("settingsAutoAdvance"),
+        SettingsCancelPeriod("settingsCancelPeriod"),
         SettingsDataManagement("settingsDataManagement"),
         SettingsDensity("settingsDensity"),
         SettingsDisplayExternalContent("settingsDisplayExternalContent"),
@@ -154,6 +155,7 @@ object MatomoMail : Matomo {
         DetachMailbox("detachMailbox"),
         DetachMailboxConfirm("detachMailboxConfirm"),
         Disable("disable"),
+        Disabled("disabled"),
         DiscoverLater("discoverLater"),
         DiscoverNow("discoverNow"),
         Dislike("dislike"),
@@ -294,6 +296,11 @@ object MatomoMail : Matomo {
         ScheduleDraft("scheduleDraft"),
         ScheduledCustomDate("scheduledCustomDate"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
+        Seconds10("seconds10"),
+        Seconds15("seconds15"),
+        Seconds20("seconds20"),
+        Seconds25("seconds25"),
+        Seconds30("seconds30"),
         SeeAllAttendees("seeAllAttendees"),
         SelectAvatar("selectAvatar"),
         SelectContact("selectContact"),
@@ -459,6 +466,10 @@ object MatomoMail : Matomo {
 
     fun trackSearchEvent(name: MatomoName, value: Boolean? = null) {
         trackEvent(MatomoCategory.Search, name, value = value?.toFloat())
+    }
+
+    fun trackSettingsCancelPeriod(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.SettingsCancelPeriod, name, action, value)
     }
 
     fun trackNotificationActionEvent(name: MatomoName) {
