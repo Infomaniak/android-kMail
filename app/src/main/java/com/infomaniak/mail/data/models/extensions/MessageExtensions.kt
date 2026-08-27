@@ -138,8 +138,9 @@ fun Message.updateFlags(flags: DefaultMessageFlags) {
     isAnswered = flags.isAnswered
     isForwarded = flags.isForwarded
     isMessageWithSendDelay = flags.isMessageWithSendDelay
-
     if (flags.isAcknowledged) acknowledgeStatus = AcknowledgeStatus.Acknowledged
+    isReminder = flags.hasReminder
+    if (!flags.hasReminder) reminder = null
 
     if (flags.isSeen && snoozeState == SnoozeState.Unsnoozed) {
         snoozeState = null

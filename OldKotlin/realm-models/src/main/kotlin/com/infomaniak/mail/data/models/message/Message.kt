@@ -147,7 +147,7 @@ class Message : RealmObject, Snoozable {
     @SerialName("is_reminder")
     var isReminder: Boolean = false
     @SerialName("display_reminder")
-    var displayReminder: Boolean = false
+    var displayReminder: Boolean = true
     //endregion
 
     //region Local data (Transient)
