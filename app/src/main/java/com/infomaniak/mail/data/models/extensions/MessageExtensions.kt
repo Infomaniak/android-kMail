@@ -139,6 +139,8 @@ fun Message.updateFlags(flags: DefaultMessageFlags) {
     isForwarded = flags.isForwarded
     isScheduledMessage = flags.isScheduledMessage
 
+    if (flags.isAcknowledged) acknowledgeStatus = AcknowledgeStatus.Acknowledged
+
     if (flags.isSeen && snoozeState == SnoozeState.Unsnoozed) {
         snoozeState = null
         snoozeEndDate = null
