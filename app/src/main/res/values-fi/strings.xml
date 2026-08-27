@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Vasemmalle pyyhkäisy</string>
     <string name="settingsSwipeRight">Oikealle pyyhkäisy</string>
     <string name="settingsThemeDescription">Teeman valinta</string>
-    <string name="settingsThemeTitle">Teema</string>
     <string name="settingsThreadListDensityTitle">Keskustelulistan tiiviy</string>
     <string name="settingsThreadModeTitle">Viestien näyttötila</string>
     <string name="settingsThreadModeWarningDescription">Huomaa, että tämän asetuksen muuttaminen lataa kaikki viestisi uudelleen</string>

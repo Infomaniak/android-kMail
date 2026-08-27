@@ -166,7 +166,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:title="@string/settingsThemeTitle"
+                app:title="@string/themeTitle"
                 tools:subtitle="@string/settingsOptionSystemTheme" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
@@ -214,9 +214,9 @@
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsCrossAppDeviceId"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="none"
                 app:subtitle="-"
                 app:title="Cross app device ID" />

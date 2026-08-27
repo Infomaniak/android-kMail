@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Deslizar a la izquierda</string>
     <string name="settingsSwipeRight">Deslizar a la derecha</string>
     <string name="settingsThemeDescription">Elección del tema</string>
-    <string name="settingsThemeTitle">Tema</string>
     <string name="settingsThreadListDensityTitle">Densidad de la lista de conversación</string>
     <string name="settingsThreadModeTitle">Modo de visualización de mensajes</string>
     <string name="settingsThreadModeWarningDescription">Ten en cuenta que al cambiar esta opción se descargarán de nuevo todos tus mensajes</string>

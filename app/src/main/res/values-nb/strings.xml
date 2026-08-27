@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Sveip til venstre</string>
     <string name="settingsSwipeRight">Sveip til høyre</string>
     <string name="settingsThemeDescription">Temavalg</string>
-    <string name="settingsThemeTitle">Tema</string>
     <string name="settingsThreadListDensityTitle">Tetthet for samtaleliste</string>
     <string name="settingsThreadModeTitle">Melding visningsmodus</string>
     <string name="settingsThreadModeWarningDescription">Vær oppmerksom på at endring av dette alternativet vil laste ned alle meldingene dine på nytt</string>

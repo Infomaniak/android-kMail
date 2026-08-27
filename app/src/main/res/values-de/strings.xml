@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Links wischen</string>
     <string name="settingsSwipeRight">Rechts wischen</string>
     <string name="settingsThemeDescription">Wahl des Themas</string>
-    <string name="settingsThemeTitle">Design</string>
     <string name="settingsThreadListDensityTitle">Dichte der Fadenliste</string>
     <string name="settingsThreadModeTitle">Modus der Nachrichtenanzeige</string>
     <string name="settingsThreadModeWarningDescription">Achtung: Wenn Sie diese Option ändern, werden alle Ihre Nachrichten erneut heruntergeladen</string>

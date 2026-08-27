@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Veeg naar links</string>
     <string name="settingsSwipeRight">Veeg naar rechts</string>
     <string name="settingsThemeDescription">Themakeuze</string>
-    <string name="settingsThemeTitle">Thema</string>
     <string name="settingsThreadListDensityTitle">Dichtheid van de conversatielijst</string>
     <string name="settingsThreadModeTitle">Weergavemodus van berichten</string>
     <string name="settingsThreadModeWarningDescription">Let op: als u deze optie wijzigt, worden al uw berichten opnieuw gedownload</string>

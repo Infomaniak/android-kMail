@@ -578,7 +578,6 @@
     <string name="settingsSwipeLeft">Σάρωση αριστερά</string>
     <string name="settingsSwipeRight">Σάρωση δεξιά</string>
     <string name="settingsThemeDescription">Επιλογή θέματος</string>
-    <string name="settingsThemeTitle">Θέμα</string>
     <string name="settingsThreadListDensityTitle">Πυκνότητα λίστας συνομιλιών</string>
     <string name="settingsThreadModeTitle">Τρόπος εμφάνισης μηνυμάτων</string>
     <string name="settingsThreadModeWarningDescription">Σημείωση: η αλλαγή αυτής της επιλογής θα ξανακατεβάσει όλα τα μηνύματά σας</string>
