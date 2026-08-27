@@ -349,9 +349,9 @@ class ThreadAdapter(
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) = with(threadAdapterState) {
-        val wasScheduledMessageNowDraft = isExpandedMap[message.uid] != null && message.isDraft && !message.isScheduledMessage
+        val wasMessageWithSendDelayNowDraft = isExpandedMap[message.uid] != null && message.isDraft && !message.isMessageWithSendDelay
 
-        if (isExpandedMap[message.uid] == null || wasScheduledMessageNowDraft) {
+        if (isExpandedMap[message.uid] == null || wasMessageWithSendDelayNowDraft) {
             isExpandedMap[message.uid] = message.shouldBeExpanded(position, items.lastIndex)
         }
 
@@ -458,7 +458,7 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.displayDate.toDate()
 
-        if (message.isDraft && !message.isScheduledMessage) {
+        if (message.isDraft && !message.isMessageWithSendDelay) {
             userAvatar.loadUserAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
                 text = context.getString(R.string.messageIsDraftOption)
@@ -697,7 +697,7 @@ class ThreadAdapter(
 
         binding.messageHeader.setOnClickListener {
             val isExpanded = isExpandedMap[message.uid] == true
-            val isUnscheduledDraft = message.isDraft && !message.isScheduledMessage
+            val isUnscheduledDraft = message.isDraft && !message.isMessageWithSendDelay
 
             when {
                 isExpanded -> {
@@ -1178,24 +1178,24 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) {
         deleteDraftButton.apply {
-            isVisible = message.isDraft && !message.isScheduledMessage
+            isVisible = message.isDraft && !message.isMessageWithSendDelay
             setOnClickListener { threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message) }
         }
         replyButton.apply {
-            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
+            isVisible = isExpanded && !message.isScheduledDraft && !message.isMessageWithSendDelay
             setOnClickListener { threadAdapterCallbacks?.onReplyClicked?.invoke(message) }
         }
         menuButton.apply {
-            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage
+            isVisible = isExpanded && !message.isScheduledDraft && !message.isMessageWithSendDelay
             setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
         askEuriaButton.apply {
             val featureFlags = threadAdapterCallbacks?.getFeatureFlags?.invoke()
             val isAiEnabled = featureFlags?.contains(FeatureFlag.AI) == true
-            isVisible = isExpanded && !message.isScheduledDraft && !message.isScheduledMessage && isAiEnabled
+            isVisible = isExpanded && !message.isScheduledDraft && !message.isMessageWithSendDelay && isAiEnabled
             setOnClickListener { threadAdapterCallbacks?.onAskEuriaClicked?.invoke(message) }
         }
-        sendingProgressText.isVisible = message.isScheduledMessage
+        sendingProgressText.isVisible = message.isMessageWithSendDelay
 
         recipient.text = if (isExpanded) getAllRecipientsFormatted(message) else context.formatSubject(message.subject)
         recipientChevron.isVisible = isExpanded
@@ -1363,7 +1363,7 @@ class ThreadAdapter(
                             message.splitBody == oldMessage.message.splitBody &&
                             message.shouldHideDivider == oldMessage.message.shouldHideDivider &&
                             message.isDraft == oldMessage.message.isDraft &&
-                            message.isScheduledMessage == oldMessage.message.isScheduledMessage
+                            message.isMessageWithSendDelay == oldMessage.message.isMessageWithSendDelay
                 })
 
                 data object Acknowledge : DiffAspect<MessageUi>({

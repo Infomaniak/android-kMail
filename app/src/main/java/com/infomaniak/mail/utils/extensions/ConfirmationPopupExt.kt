@@ -40,7 +40,7 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
             deletedCount = count,
             displayLoader = displayLoader,
             onPositiveButtonClicked = callback,
-            hasScheduleMessages = messagesFolderRoles.contains(FolderRole.SCHEDULED_DRAFTS),
+            hasScheduledDrafts = messagesFolderRoles.contains(FolderRole.SCHEDULED_DRAFTS),
             onCancel = onCancel,
         )
         isDraftFolder -> callback()
@@ -56,10 +56,10 @@ private fun DescriptionAlertDialog.showDeletePermanentlyDialog(
     deletedCount: Int,
     displayLoader: Boolean,
     onPositiveButtonClicked: () -> Unit,
-    hasScheduleMessages: Boolean = false,
+    hasScheduledDrafts: Boolean = false,
     onCancel: (() -> Unit)? = null,
 ) {
-    val description = if (hasScheduleMessages) {
+    val description = if (hasScheduledDrafts) {
         binding.context.resources.getQuantityString(R.plurals.scheduleDeleteConfirmAlertDescription, deletedCount)
     } else {
         binding.context.resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, deletedCount)

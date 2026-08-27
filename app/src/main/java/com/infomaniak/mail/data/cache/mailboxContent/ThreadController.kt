@@ -357,7 +357,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
         private fun Message.getDraftLocalUuidBlocking(realm: TypedRealm): String? {
-            return if (isDraft && !isScheduledMessage) {
+            return if (isDraft && !isMessageWithSendDelay) {
                 DraftController.getDraftByMessageUidBlocking(uid, realm)?.localUuid
             } else {
                 null

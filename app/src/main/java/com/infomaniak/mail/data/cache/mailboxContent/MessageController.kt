@@ -113,15 +113,15 @@ class MessageController @Inject constructor(
 
     suspend fun getMovableMessages(thread: Thread): List<Message> {
         val byFolderId = "${Message::folderId.name} == '${thread.folderId}'"
-        return getMessagesFromThread(thread, "$byFolderId AND $isNotScheduledMessage", includeDuplicates = false)
+        return getMessagesFromThread(thread, "$byFolderId AND $isMessageWithoutSendDelay", includeDuplicates = false)
     }
 
-    suspend fun getUnscheduledMessagesFromThread(thread: Thread, includeDuplicates: Boolean): List<Message> {
-        return getMessagesFromThread(thread, isNotScheduledMessage, includeDuplicates)
+    suspend fun getMessagesWithoutSendDelayFromThread(thread: Thread, includeDuplicates: Boolean): List<Message> {
+        return getMessagesFromThread(thread, isMessageWithoutSendDelay, includeDuplicates)
     }
 
-    fun getUnscheduledMessages(messages: List<Message>): List<Message> {
-        return messages.filter { message -> !message.isScheduledMessage }
+    fun getMessagesWithoutSendDelay(messages: List<Message>): List<Message> {
+        return messages.filter { message -> !message.isMessageWithSendDelay }
     }
 
     private suspend fun getMessagesFromThread(thread: Thread, query: String, includeDuplicates: Boolean): List<Message> {
@@ -214,7 +214,7 @@ class MessageController @Inject constructor(
 
     companion object {
         private val isNotDraft = "${Message::isDraft.name} == false"
-        private val isNotScheduledMessage = "${Message::isScheduledMessage.name} == false"
+        private val isMessageWithoutSendDelay = "${Message::isMessageWithSendDelay.name} == false"
 
         //region Queries
         private fun getMessagesQuery(messageUid: String, realm: TypedRealm): RealmQuery<Message> {

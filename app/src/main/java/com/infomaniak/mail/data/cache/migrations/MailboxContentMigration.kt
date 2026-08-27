@@ -26,7 +26,6 @@ import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 import io.realm.kotlin.types.RealmInstant
 
-
 fun mailboxContentMigration() = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
@@ -36,6 +35,7 @@ fun mailboxContentMigration() = AutomaticSchemaMigration { migrationContext ->
     migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
     migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration()
     migrationContext.initMessagesWithContentToTheOldMessagesListAfterThirtySecondMigration()
+    migrationContext.renameIsScheduledMessageToIsMessageWithSendDelayAfterFortiethMigration()
 }
 
 // Migrate from version #19
@@ -209,6 +209,22 @@ private fun MigrationContext.initMessagesWithContentToTheOldMessagesListAfterThi
                 // Initialize messagesWithContent by copying the existing messages
                 val messages = newThread.getObjectList(propertyName = "messages")
                 newThread.set(propertyName = "messagesWithContent", value = messages)
+            }
+        }
+    }
+}
+//endregion
+
+// Migrate from version #40
+private fun MigrationContext.renameIsScheduledMessageToIsMessageWithSendDelayAfterFortiethMigration() {
+    if (oldRealm.schemaVersion() <= 40L) {
+        enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Rename property without losing its previous value
+                set(
+                    propertyName = "isMessageWithSendDelay",
+                    value = oldObject.getValue<Boolean>(fieldName = "isScheduledMessage")
+                )
             }
         }
     }

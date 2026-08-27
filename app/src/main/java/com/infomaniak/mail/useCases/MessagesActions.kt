@@ -94,7 +94,7 @@ class MessagesActions @Inject constructor(
     }
 
     fun getMessagesToMove(messages: List<Message>, currentFolderId: String?): List<Message> {
-        return messages.filter { message -> message.folderId == currentFolderId && !message.isScheduledMessage }
+        return messages.filter { message -> message.folderId == currentFolderId && !message.isMessageWithSendDelay }
     }
 
     private suspend fun moveMessages(
@@ -173,12 +173,12 @@ class MessagesActions @Inject constructor(
         val destinationFolderRole = if (messagesFolderRoles.contains(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = folderController.getFolder(destinationFolderRole) ?: return null
 
-        val unscheduleMessages = messageController.getUnscheduledMessages(messages)
-        return moveMessagesTo(destinationFolder, mailbox, unscheduleMessages)
+        val messagesWithoutSendDelay = messageController.getMessagesWithoutSendDelay(messages)
+        return moveMessagesTo(destinationFolder, mailbox, messagesWithoutSendDelay)
     }
 
     suspend fun getMessagesFromThreadsToSpamOrHam(threads: Set<Thread>): List<Message> {
-        return threads.flatMap { messageController.getUnscheduledMessagesFromThread(it, includeDuplicates = false) }
+        return threads.flatMap { messageController.getMessagesWithoutSendDelayFromThread(it, includeDuplicates = false) }
     }
 
     suspend fun activateSpamFilter(mailbox: Mailbox) {
