@@ -848,8 +848,8 @@ class ActionsViewModel @Inject constructor(
     fun refreshFoldersAfterSend(sendDelay: Int, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         // Wait for the send action to fully commit before refreshing folders:
         // - If a send delay is set: wait for the delay plus 2 extra seconds to ensure
-        //   the backend has finished sending the message.
-        // - If no delay: wait 4 seconds to ensure reminder objects are created on the backend.
+        //   the backend has finished sending the message before refreshing folders.
+        // - If no delay: wait 4 seconds to ensure the backend has finished sending the message before refreshing the folders.
         val delayBeforeRefresh = if (sendDelay > 0) sendDelay + 2 else 4
         delay((delayBeforeRefresh * 1_000L).milliseconds)
         refreshFoldersAsync(
