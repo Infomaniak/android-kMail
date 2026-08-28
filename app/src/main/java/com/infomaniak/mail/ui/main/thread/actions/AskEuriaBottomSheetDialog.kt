@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.common.observe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
@@ -81,10 +82,13 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
             setBackNavigationResult(OPEN_AI_TRANSLATE_BOTTOM_SHEET, AiActionNavigationResult(messageUid, isAlreadyTranslated))
         }
 
-        setupReplyAction(messageUid)
+        observeCanSendEmail(messageUid)
     }
 
-    private fun setupReplyAction(messageUid: String) {
+    private fun setupReplyAction(messageUid: String, canSend: Boolean) {
+        binding.reply.isEnabled = canSend
+        if (!canSend) return
+
         val mailbox = mainViewModel.currentMailbox.value
         val kSuite = mailbox?.kSuite
 
@@ -133,5 +137,11 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
             resId = R.id.action_askEuriaBottomSheetDialog_to_euriaPromptBottomSheetDialog,
             args = EuriaPromptBottomSheetArgs(messageUid = messageUid).toBundle(),
         )
+    }
+
+    fun observeCanSendEmail(messageUid: String) {
+        mainViewModel.canSendEmailsFlow.observe(viewLifecycleOwner) { canSend ->
+            setupReplyAction(messageUid, canSend)
+        }
     }
 }
