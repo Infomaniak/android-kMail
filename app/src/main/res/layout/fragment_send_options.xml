@@ -35,6 +35,23 @@
             android:paddingBottom="@dimen/marginStandardMedium">
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/acknowledgment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_envelope_circle_check"
+                app:iconColor="?attr/colorPrimary"
+                app:itemAction="toggle"
+                app:title="@string/settingsSendAcknowledgementTitle" />
+
+            <View
+                android:id="@+id/dividerBottomAcknowledgment"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:background="@drawable/divider"
+                android:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/reminderIfNoAnswer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
