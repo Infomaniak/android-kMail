@@ -266,7 +266,7 @@ class NewMessageViewModel @Inject constructor(
     private val _reminderConfig = MutableStateFlow<ReminderConfig>(ReminderConfig.None)
     val reminderConfig: StateFlow<ReminderConfig> = _reminderConfig.asStateFlow()
 
-    private val _shouldRemindRecipient = MutableStateFlow(true)
+    private val _shouldRemindRecipient = MutableStateFlow(DEFAULT_SHOULD_REMIND_RECIPIENT)
     val shouldRemindRecipient: StateFlow<Boolean> = _shouldRemindRecipient.asStateFlow()
 
     private val _shouldRequestAcknowledgment = MutableStateFlow(localSettings.askEmailAcknowledgement)
@@ -1220,7 +1220,7 @@ class NewMessageViewModel @Inject constructor(
                 .mapTo(mutableSetOf()) { it.localUuid } &&
                     draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
                     draftSnapshot.reminderDraftInfo?.reminderDelta == getCurrentReminderDelta() &&
-                    draftSnapshot.reminderDraftInfo?.shouldRemindRecipient == shouldRemindRecipient.value &&
+                    (draftSnapshot.reminderDraftInfo?.shouldRemindRecipient ?: DEFAULT_SHOULD_REMIND_RECIPIENT) == shouldRemindRecipient.value &&
                     draftSnapshot.shouldRequestAcknowledgment == shouldRequestAcknowledgment.value
         } ?: false
     }
@@ -1363,6 +1363,8 @@ class NewMessageViewModel @Inject constructor(
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName
+
+        private const val DEFAULT_SHOULD_REMIND_RECIPIENT = true
 
         private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
