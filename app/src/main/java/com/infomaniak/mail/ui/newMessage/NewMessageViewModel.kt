@@ -475,7 +475,7 @@ class NewMessageViewModel @Inject constructor(
         var previousMessage: Message? = null
 
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
-        setShouldRequestAcknowledgment(localSettings.askEmailAcknowledgement)
+        ackRequest = shouldRequestAcknowledgment.value
         saveNavArgsToSavedState(localUuid)
 
         when (draftMode) {
