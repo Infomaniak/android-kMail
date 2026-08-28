@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Als Nicht-Spam melden</string>
     <string name="actionPhishing">Phishing melden</string>
     <string name="actionPrint">Drucken</string>
+    <string name="actionReminder">Erinnere mich</string>
     <string name="actionRename">Umbenennen</string>
     <string name="actionReply">Antwort</string>
     <string name="actionReplyAll">Alle antworten</string>
@@ -290,7 +291,6 @@
     <string name="encryptedMessagePasswordLabel">Teilen Sie dieses Passwort per privater Nachricht mit. Sie können es nicht mehr kopieren, sobald Sie es gesendet haben.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Die Verschlüsselung wurde deaktiviert</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Geplanter Versand und Erinnerungen sind für verschlüsselte Nachrichten nicht verfügbar</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Geplante E-Mails für verschlüsselte Nachrichten nicht verfügbar</string>
     <string name="encryptedMessageUpdatePasswordButton">Passwort ändern</string>
     <string name="encryptedPasswordProtectionTitle">Passwortschutz</string>
     <string name="encryptedProtectionAdDescription">Schützen Sie Ihre Nachricht mit der Infomaniak-Verschlüsselung vor unbefugtem Zugriff.</string>
@@ -304,6 +304,7 @@
     <string name="encryptedStatePanelIncomplete">Ein Passwort ist erforderlich, um den Versand abzuschliessen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Teilweise</string>
     <string name="encryptedStatePanelTitle">Verschlüsselung</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Verschlüsselung ist nicht verfügbar, wenn der geplante Versand oder die Erinnerung aktiviert ist</string>
     <string name="enterPasswordTitle">Geben Sie das Passwort ein</string>
     <string name="errorAlreadyLinkedMailbox">Diese E-Mail-Adresse ist bereits mit Ihrem Konto verknüpft</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
@@ -642,6 +643,8 @@
     <string name="snackbarEmailSent">E-Mail gesendet</string>
     <string name="snackbarInvalidUrl">Ungültige URL</string>
     <string name="snackbarLinkCopiedToClipboard">Link in die Zwischenablage kopiert</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Fehler beim Markieren der Erinnerung als erledigt</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Erinnerung als erledigt markiert</string>
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMessageMovedToSpam">Nachricht in den Spam verschoben und Benutzer blockiert</string>

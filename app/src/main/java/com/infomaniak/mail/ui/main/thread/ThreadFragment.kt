@@ -87,6 +87,8 @@ import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.PhoneContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForSnoozeDialog
+import com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialog.Companion.REMINDER_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.ReminderBottomSheetDialogArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialogArgs
@@ -107,6 +109,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.DisplayType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.NotifyType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ReminderAction
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
@@ -407,6 +410,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                         }
                     )
                 },
+                onFollowUpClicked = ::followUpDraft,
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
                 onSuperCollapsedBlockClicked = ::expandSuperCollapsedBlock,
@@ -494,6 +498,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onAiBannerClose = { messageUid, aiAction -> aiActionsViewModel.dismissAiAction(messageUid, aiAction) },
                 onShowOriginal = { messageUid -> aiActionsViewModel.dismissAiAction(messageUid, AiAction.TRANSLATE) },
                 getAiState = { aiActionsViewModel.aiStateMap.value },
+                onDisableReminderClicked = ::disableReminder,
+                onModifyReminderClicked = ::modifyReminder,
+                onAddReminderClicked = ::addReminder,
+                onMarkAsDoneReminderClicked = ::markAsDoneReminder,
                 onAskEuriaClicked = { message ->
                     trackMessageActionsEvent(MatomoName.AskEuriaQuickAction)
                     navigateToAskEuriaBottomSheet(message.uid)
@@ -855,6 +863,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun setupBackActionHandler() {
+        setupScheduleAndDraftHandlers()
+        setupReminderAndSnoozeHandlers()
+        setupAiAndReactionHandlers()
+    }
+
+    private fun setupScheduleAndDraftHandlers() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             val mailbox = mainViewModel.currentMailbox.value
             if (mailbox == null) {
@@ -880,6 +894,17 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             }
             actionsViewModel.rescheduleDraft(Date(selectedScheduleEpoch), mailbox)
         }
+    }
+
+    private fun setupReminderAndSnoozeHandlers() {
+        getBackNavigationResult(REMINDER_RESULT) { delayMinutes: Int ->
+            when (val action = threadViewModel.currentReminderAction) {
+                null -> snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
+                is ReminderAction.Add -> threadViewModel.addReminder(action.message, delayMinutes)
+                is ReminderAction.Modify -> threadViewModel.modifyReminder(action.message, delayMinutes)
+            }
+            threadViewModel.clearReminderAction()
+        }
 
         getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
             navigateToSnoozeBottomSheet(snoozeScheduleType)
@@ -897,6 +922,18 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             )
         }
 
+        getBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET) { messageUid: String ->
+            threadViewModel.setMessageForReminder(messageUid) {
+                navigateToReminderBottomSheet(isAddingNewReminder = true)
+            }
+        }
+
+        getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
+            executeSavedSnoozeScheduleType(selectedScheduleEpoch)
+        }
+    }
+
+    private fun setupAiAndReactionHandlers() {
         getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
             navigateToEmojiPicker(
                 messageUid,
@@ -910,10 +947,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         getBackNavigationResult(OPEN_AI_ACTIONS_BOTTOM_SHEET) { messageUid: String ->
             navigateToAskEuriaBottomSheet(messageUid)
-        }
-
-        getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
-            executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
 
         getBackNavigationResult<AiActionNavigationResult>(OPEN_AI_SUMMARY_BOTTOM_SHEET) { (messageUid, isAlreadySummarized) ->
@@ -1272,6 +1305,24 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         navigateToScheduleSendBottomSheet()
     }
 
+    private fun addReminder(message: Message) {
+        threadViewModel.currentReminderAction = ReminderAction.Add(message)
+        navigateToReminderBottomSheet(isAddingNewReminder = true)
+    }
+
+    private fun modifyReminder(message: Message) {
+        threadViewModel.currentReminderAction = ReminderAction.Modify(message)
+        navigateToReminderBottomSheet(isAddingNewReminder = false)
+    }
+
+    private fun followUpDraft(message: Message) {
+        twoPaneViewModel.navigateToNewMessage(
+            draftMode = DraftMode.FOLLOW_UP,
+            previousMessageUid = message.uid,
+            shouldLoadDistantResources = true,
+        )
+    }
+
     private fun navigateToScheduleSendBottomSheet() {
         val mailbox = mainViewModel.currentMailbox.value ?: return
         safeNavigate(
@@ -1281,6 +1332,18 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
+            ).toBundle(),
+        )
+    }
+
+    private fun navigateToReminderBottomSheet(isAddingNewReminder: Boolean) {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
+        safeNavigate(
+            resId = R.id.reminderBottomSheetDialog,
+            args = ReminderBottomSheetDialogArgs(
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
+                isAddingNewReminder = isAddingNewReminder,
             ).toBundle(),
         )
     }
@@ -1416,6 +1479,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         private const val MAXIMUM_SUBJECT_LENGTH = 30
 
         const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
+        const val OPEN_REMINDER_BOTTOM_SHEET = "openReminderBottomSheet"
         const val OPEN_AI_ACTIONS_BOTTOM_SHEET = "openAiActionsBottomSheet"
         const val OPEN_AI_SUMMARY_BOTTOM_SHEET = "openAiSummaryBottomSheet"
         const val OPEN_AI_TRANSLATE_BOTTOM_SHEET = "openAiTranslateBottomSheet"

@@ -74,6 +74,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxHostingStatus
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.ReminderResult
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeCancelResponse
@@ -86,6 +87,7 @@ import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.toSafeFileName
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -199,6 +201,65 @@ object ApiRepository : ApiRepositoryCore() {
     //region acknowledge
     suspend fun acknowledgeMessage(messageResource: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.acknowledge(messageResource), GET)
+    }
+    //endregion
+
+    //region reminder
+    suspend fun disableReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: Int,
+        reminderUuid: String
+    ): ApiResponse<String> {
+        return callApi(ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid), DELETE)
+    }
+
+    suspend fun disableScheduledDraftReminder(reminderAction: String): ApiResponse<JsonElement> {
+        return callApi(ApiRoutes.resource(reminderAction), DELETE)
+    }
+
+    suspend fun modifyReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: Int,
+        reminderUuid: String,
+        delayMinutes: Int
+    ): ApiResponse<ReminderResult> {
+        return callApi(
+            ApiRoutes.reminder(mailboxUuid, folderId, messageId, reminderUuid),
+            PUT,
+            mapOf("reminder_delta" to delayMinutes)
+        )
+    }
+
+    suspend fun modifyScheduledDraftReminder(reminderAction: String, delayMinutes: Int): ApiResponse<JsonElement> {
+        return callApi(
+            ApiRoutes.resource(reminderAction),
+            PUT,
+            mapOf("reminder_delta" to delayMinutes)
+        )
+    }
+
+    suspend fun addReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: Int,
+        delayMinutes: Int
+    ): ApiResponse<ReminderResult> {
+        return callApi(
+            ApiRoutes.addReminder(mailboxUuid, folderId, messageId),
+            POST,
+            mapOf("reminder_delta" to delayMinutes)
+        )
+    }
+
+    suspend fun markAsDoneReminder(
+        mailboxUuid: String,
+        folderId: String,
+        messageId: Int,
+        reminderUuid: String
+    ): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.markAsDoneReminder(mailboxUuid, folderId, messageId, reminderUuid), PUT)
     }
     //endregion
 

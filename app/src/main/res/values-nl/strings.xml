@@ -36,6 +36,7 @@
     <string name="actionNonSpam">Rapporteren als geen spam</string>
     <string name="actionPhishing">Phishing melden</string>
     <string name="actionPrint">Afdrukken</string>
+    <string name="actionReminder">Herinner me</string>
     <string name="actionRename">Hernoemen</string>
     <string name="actionReply">Beantwoorden</string>
     <string name="actionReplyAll">Allen beantwoorden</string>
@@ -290,7 +291,6 @@
     <string name="encryptedMessagePasswordLabel">Deel dit wachtwoord via een privébericht. U kunt het niet meer kopiëren zodra u het heeft verzonden.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Versleuteling is uitgeschakeld</string>
     <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Geplande verzending en herinneringen zijn niet beschikbaar voor versleutelde berichten</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Geplande e-mails niet beschikbaar voor versleutelde berichten</string>
     <string name="encryptedMessageUpdatePasswordButton">Wachtwoord wijzigen</string>
     <string name="encryptedPasswordProtectionTitle">Wachtwoordbeveiliging</string>
     <string name="encryptedProtectionAdDescription">Bescherm uw bericht tegen ongeautoriseerde toegang met Infomaniak-versleuteling.</string>
@@ -304,6 +304,7 @@
     <string name="encryptedStatePanelIncomplete">Een wachtwoord is vereist om de verzending te voltooien.</string>
     <string name="encryptedStatePanelStatePartialLabel">Gedeeltelijk</string>
     <string name="encryptedStatePanelTitle">Versleuteling</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Versleuteling is niet beschikbaar als geplande verzending of herinnering is ingeschakeld</string>
     <string name="enterPasswordTitle">Wachtwoord invoeren</string>
     <string name="errorAlreadyLinkedMailbox">Dit e-mailadres is al gekoppeld aan uw account</string>
     <string name="errorAtLeastOneRecipient">Er is minstens één ontvanger vereist</string>
@@ -642,6 +643,8 @@
     <string name="snackbarEmailSent">E-mail verzonden</string>
     <string name="snackbarInvalidUrl">Ongeldige URL</string>
     <string name="snackbarLinkCopiedToClipboard">Link gekopieerd naar het klembord</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Markeren van herinnering als voltooid mislukt</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Herinnering gemarkeerd als voltooid</string>
     <string name="snackbarMessageDeletedPermanently">Bericht verwijderd</string>
     <string name="snackbarMessageMoved">Bericht verplaatst naar %s</string>
     <string name="snackbarMessageMovedToSpam">Bericht verplaatst naar spam en gebruiker geblokkeerd</string>
