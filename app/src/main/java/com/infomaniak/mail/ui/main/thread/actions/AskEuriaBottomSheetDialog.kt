@@ -47,7 +47,6 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.openKSuiteUpsellOrElse
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -87,10 +86,8 @@ class AskEuriaBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun setupReplyAction(messageUid: String, canSend: Boolean) {
-        if (!canSend) {
-            binding.reply.isEnabled = false
-            return
-        }
+        binding.reply.isEnabled = canSend
+        if (!canSend) return
 
         val mailbox = mainViewModel.currentMailbox.value
         val kSuite = mailbox?.kSuite

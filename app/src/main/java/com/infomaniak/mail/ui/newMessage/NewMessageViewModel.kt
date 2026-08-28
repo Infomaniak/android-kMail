@@ -1018,6 +1018,7 @@ class NewMessageViewModel @Inject constructor(
 
     override fun onCleared() {
         draftLocalUuid?.let { LocalStorageUtils.deleteDraftUploadDir(appContext, draftLocalUuid = it) }
+        aiDraftCache.reset()
         super.onCleared()
     }
 
