@@ -139,6 +139,7 @@ fun Message.updateFlags(flags: DefaultMessageFlags) {
     isForwarded = flags.isForwarded
     isMessageWithSendDelay = flags.isMessageWithSendDelay
     if (flags.isAcknowledged) acknowledgeStatus = AcknowledgeStatus.Acknowledged
+    shouldRefreshReminder = flags.hasReminder
     isReminder = flags.hasReminder
     if (!flags.hasReminder) reminder = null
 
