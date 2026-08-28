@@ -816,7 +816,7 @@ class MainViewModel @Inject constructor(
         val currentIndex = thread.messages.indexOfFirst { it.uid == message.uid }
         if (currentIndex == -1) return false
         val messagesAfter = thread.messages.drop(currentIndex + 1)
-        return messagesAfter.isEmpty() || messagesAfter.all { it.isDraft }
+        return messagesAfter.isEmpty() || messagesAfter.all { it.isDraft || it.isHiddenReminder }
     }
 
     fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
