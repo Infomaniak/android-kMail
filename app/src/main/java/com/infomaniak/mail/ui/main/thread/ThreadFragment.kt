@@ -923,13 +923,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         }
 
         getBackNavigationResult(OPEN_REMINDER_BOTTOM_SHEET) { messageUid: String ->
-            lifecycleScope.launch {
-                val success = threadViewModel.setMessageForReminder(messageUid)
-                if (success) {
-                    navigateToReminderBottomSheet(isAddingNewReminder = true)
-                } else {
-                    snackbarManager.postValue(requireContext().getString(RCore.string.anErrorHasOccurred))
-                }
+            threadViewModel.setMessageForReminder(messageUid) {
+                navigateToReminderBottomSheet(isAddingNewReminder = true)
             }
         }
 
