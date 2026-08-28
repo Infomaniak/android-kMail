@@ -523,8 +523,11 @@ class NewMessageFragment : Fragment() {
             when (config) {
                 is ScheduleConfig.Scheduled -> {
                     val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    val minSelectableTime = System.currentTimeMillis() + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
+                    val isScheduleTooSoon = config.epochMillis < minSelectableTime
+                    val stringRes = if (isScheduleTooSoon) R.string.scheduledTimePassedError else R.string.scheduledEmailHeader
                     binding.scheduleAlert.apply {
-                        setDescription(getString(R.string.scheduledEmailHeader, date))
+                        setDescription(getString(stringRes, date))
                         isVisible = true
                     }
                     binding.divider7.isVisible = true
@@ -1019,20 +1022,45 @@ class NewMessageFragment : Fragment() {
     private fun onSendButtonClicked(mailbox: Mailbox) {
         binding.sendButton.setOnClickListener {
             if (!checkMailboxStorage(mailbox)) return@setOnClickListener
-
-            val isSendingWithScheduled = isMessageWithSchedule()
-            if (!isSendingWithScheduled) newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
-            tryToSendEmail(isSendingWithScheduled)
+            val scheduleConfig = newMessageViewModel.scheduleConfig.value
+            val isScheduled = scheduleConfig is ScheduleConfig.Scheduled
+            if (isScheduled && checkIfInvalidSchedule(scheduleConfig)) return@setOnClickListener
+            tryToSendEmail(isScheduled = isScheduled)
         }
     }
 
-    private fun isMessageWithSchedule(): Boolean {
-        val scheduleConfig = newMessageViewModel.scheduleConfig.value
-        return if (scheduleConfig is ScheduleConfig.Scheduled) {
-            scheduleConfig.epochMillis - MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds >= System.currentTimeMillis()
-        } else {
-            false
+    private fun checkIfInvalidSchedule(scheduleConfig: ScheduleConfig.Scheduled): Boolean {
+        val now = System.currentTimeMillis()
+        val minSelectableTime = now + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
+        val isScheduleTooSoon = scheduleConfig.epochMillis < minSelectableTime
+        val isScheduleInvalid = scheduleConfig.epochMillis < now
+
+        if (isScheduleTooSoon) {
+            val dialogTitleRes = if (isScheduleInvalid) R.string.scheduledTimeInvalidError else R.string.scheduledTimePassedError
+
+            descriptionDialog.show(
+                title = getString(dialogTitleRes),
+                description = getString(R.string.scheduledSendMinimumDelayRequirement),
+                positiveButtonText = R.string.buttonReschedule,
+                negativeButtonText = R.string.buttonDisable,
+                onPositiveButtonClicked = {
+                    val descriptionBannerRes = if (isScheduleInvalid) {
+                        R.string.scheduledTimeInvalidErrorWithDate
+                    } else {
+                        R.string.scheduledTimePassedErrorWithDate
+                    }
+                    val date = Date(scheduleConfig.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    binding.scheduleAlert.setDescription(getString(descriptionBannerRes, date))
+
+                    navigateToScheduleSendBottomSheet()
+                },
+                onNegativeButtonClicked = {
+                    newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
+                },
+            )
         }
+
+        return isScheduleTooSoon
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {

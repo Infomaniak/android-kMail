@@ -526,6 +526,12 @@
     <string name="scheduleSendingTitle">Planlegg sending</string>
     <string name="scheduledEmailHeader">Denne e-posten vil bli sendt denne datoen: %s</string>
     <string name="scheduledMessagesFolder">Planlagte meldinger</string>
+    <string name="scheduledSendDelayTooShortError">Planlagt sendingsforsinkelse for kort</string>
+    <string name="scheduledSendMinimumDelayRequirement">En sending må planlegges minst 5 minutter på forhånd.</string>
+    <string name="scheduledTimeInvalidError">Ugyldig planlagt sendingstidspunkt</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Ugyldig planlagt utsendelsestidspunkt: %s</string>
+    <string name="scheduledTimePassedError">Planlagt sendetidspunkt overskredet</string>
+    <string name="scheduledTimePassedErrorWithDate">Planlagt sendingstidspunkt overskredet: %s</string>
     <string name="searchAllMessages">Alle meldinger</string>
     <string name="searchFieldPlaceholder">Søk etter e-post</string>
     <string name="searchFilterAttachment">Vedlegg</string>

@@ -526,6 +526,12 @@
     <string name="scheduleSendingTitle">Verzending plannen</string>
     <string name="scheduledEmailHeader">Deze e-mail wordt verzonden op: %s</string>
     <string name="scheduledMessagesFolder">Geplande berichten</string>
+    <string name="scheduledSendDelayTooShortError">Geplande verzendvertraging te kort</string>
+    <string name="scheduledSendMinimumDelayRequirement">Een verzending moet minimaal 5 minuten vooraf worden gepland.</string>
+    <string name="scheduledTimeInvalidError">Ongeldig gepland verzendtijdstip</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Ongeldig tijdstip voor geplande verzending: %s</string>
+    <string name="scheduledTimePassedError">Geplande verzendtijd verstreken</string>
+    <string name="scheduledTimePassedErrorWithDate">Geplande verzendtijd overschreden: %s</string>
     <string name="searchAllMessages">Alle berichten</string>
     <string name="searchFieldPlaceholder">E-mail zoeken</string>
     <string name="searchFilterAttachment">Bijlagen</string>

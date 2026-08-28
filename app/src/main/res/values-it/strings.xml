@@ -526,6 +526,12 @@
     <string name="scheduleSendingTitle">Pianifica l’invio</string>
     <string name="scheduledEmailHeader">Questa email verrà inviata in questa data: %s</string>
     <string name="scheduledMessagesFolder">Messaggi programmati</string>
+    <string name="scheduledSendDelayTooShortError">Ritardo di invio programmato troppo breve</string>
+    <string name="scheduledSendMinimumDelayRequirement">Un invio deve essere programmato con almeno 5 minuti di anticipo.</string>
+    <string name="scheduledTimeInvalidError">Ora di invio programmata non valida</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Ora di invio programmata non valida: %s</string>
+    <string name="scheduledTimePassedError">Tempo di invio programmato superato</string>
+    <string name="scheduledTimePassedErrorWithDate">Orario di invio programmato superato: %s</string>
     <string name="searchAllMessages">Tutti i messaggi</string>
     <string name="searchFieldPlaceholder">Ricerca di un’e-mail</string>
     <string name="searchFilterAttachment">Allegati</string>
