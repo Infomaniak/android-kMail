@@ -69,6 +69,7 @@ object MatomoMail : Matomo {
         RestoreEmailsBottomSheet("restoreEmailsBottomSheet"),
         ScheduleSend("scheduleSend"),
         Search("search"),
+        SendOptions("sendOptions"),
         SettingsAccentColor("settingsAccentColor"),
         SettingsAutoAdvance("settingsAutoAdvance"),
         SettingsCancelPeriod("settingsCancelPeriod"),
@@ -144,6 +145,7 @@ object MatomoMail : Matomo {
         CustomReminder("customReminder"),
         CustomScheduleConfirm("customScheduleConfirm"),
         DailyLimitReachedUpgrade("dailyLimitReachedUpgrade"),
+        DeactivateReminderBanner("deactivateReminderBanner"),
         Delete("delete"),
         DeleteClicked("deleteClicked"),
         DeleteConfirm("deleteConfirm"),
@@ -234,6 +236,7 @@ object MatomoMail : Matomo {
         NumberOfBcc("numberOfBcc"),
         NumberOfCc("numberOfCc"),
         NumberOfTo("numberOfTo"),
+        MarkAsDoneReminder("markAsDoneReminder"),
         OneMessagesInThread("oneMessagesInThread"),
         Open("open"),
         OpenAppStore("openPlayStore"),
@@ -257,6 +260,7 @@ object MatomoMail : Matomo {
         OpenNotificationSettings("openNotificationSettings"),
         OpenPasswordView("openPasswordView"),
         OpenRecipientsFields("openRecipientsFields"),
+        OpenSendOptionsPanel("openSendOptionsPanel"),
         OpenSwissTransfer("openSwissTransfer"),
         OpenSyncApp("openSyncApp"),
         Postpone("postpone"),
@@ -281,14 +285,17 @@ object MatomoMail : Matomo {
         ReplaceSubjectConfirm("replaceSubjectConfirm"),
         ReplaceSubjectDialog("replaceSubjectDialog"),
         Reply("reply"),
-        FollowUp("followUp"),
+        RescheduleReminderBanner("rescheduleReminderBanner"),
+        FollowUpReminder("followUpReminder"),
         ReplyAll("replyAll"),
         ReplyMaybe("replyMaybe"),
         ReplyNo("replyNo"),
         ReplyYes("replyYes"),
         ReplyWithEuria("replyWithEuria"),
         ReprogramSchedule("reprogramSchedule"),
-        ReprogramReminder("reprogramReminder"),
+        RescheduleActiveReminder("rescheduleActiveReminder"),
+        RemoveReminder("removeReminder"),
+        RescheduleExpiredReminder("rescheduleExpiredReminder"),
         RequestPassword("requestPassword"),
         Restore("restore"),
         RestoreEmails("restoreEmails"),
@@ -298,7 +305,7 @@ object MatomoMail : Matomo {
         SaveToKDrive("saveToKDrive"),
         ScheduleDraft("scheduleDraft"),
         ScheduledCustomDate("scheduledCustomDate"),
-        ReminderCustomDelta("reminderCustomDelta"),
+        ReminderCustomDate("reminderCustomDate"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
         Seconds10("seconds10"),
         Seconds15("seconds15"),
@@ -308,6 +315,8 @@ object MatomoMail : Matomo {
         SeeAllAttendees("seeAllAttendees"),
         SelectAvatar("selectAvatar"),
         SelectContact("selectContact"),
+        SelectedReminderVisibility("selectedReminderVisibility"),
+        SelectedReminderDelta("selectedReminderDelta"),
         SelectDate("selectDate"),
         SelectRecipient("selectRecipient"),
         SelectUser("selectUser"),
@@ -353,6 +362,8 @@ object MatomoMail : Matomo {
         ThisEvening("thisEvening"),
         ThreadTag("threadTag"),
         TomorrowMorning("tomorrowMorning"),
+        ToggleSchedule("toggleSchedule"),
+        ToggleReminder("toggleReminder"),
         TrashFolder("trashFolder"),
         TrySendingWithDailyLimitReached("trySendingWithDailyLimitReached"),
         TrySendingWithMailboxFull("trySendingWithMailboxFull"),
@@ -474,6 +485,10 @@ object MatomoMail : Matomo {
 
     fun trackSettingsCancelPeriod(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
         trackEvent(MatomoCategory.SettingsCancelPeriod, name, action, value)
+    }
+
+    fun trackSendOptionsEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.SendOptions, name, action, value = value)
     }
 
     fun trackNotificationActionEvent(name: MatomoName) {

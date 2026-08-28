@@ -32,7 +32,10 @@ import com.infomaniak.core.common.observe
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.toFloat
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
+import com.infomaniak.mail.MatomoMail.trackSendOptionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
@@ -173,18 +176,12 @@ class DraftSendOptionsFragment : Fragment() {
 
     private fun setupToggles() = with(binding) {
         reminderIfNoAnswer.setOnClickListener {
-            if (!reminderIfNoAnswer.isChecked) {
-                removeReminderOptionsSelection()
-            } else {
-                defaultReminderSelection()
-            }
+            if (!reminderIfNoAnswer.isChecked) removeReminderOptionsSelection() else defaultReminderSelection()
+            trackSendOptionsEvent(MatomoName.ToggleReminder, value = reminderIfNoAnswer.isChecked.toFloat())
         }
         scheduleSending.setOnClickListener {
-            if (!scheduleSending.isChecked) {
-                removeScheduleOptionsSelection()
-            } else {
-                defaultScheduleSelection()
-            }
+            if (!scheduleSending.isChecked) removeScheduleOptionsSelection() else defaultScheduleSelection()
+            trackSendOptionsEvent(MatomoName.ToggleSchedule, value = scheduleSending.isChecked.toFloat())
         }
     }
 
@@ -213,6 +210,7 @@ class DraftSendOptionsFragment : Fragment() {
         optionsDelays.onItemCheckedListener { _, value, _ ->
             val minutes = value?.toIntOrNull()
             val isValidPreset = ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
+            if (isValidPreset) trackSendOptionsEvent(MatomoName.SelectedReminderDelta)
             newMessageViewModel.setReminderConfig(
                 config = if (minutes != null && isValidPreset) {
                     ReminderConfig.Delayed(minutes, isCustom = false)
@@ -345,7 +343,7 @@ class DraftSendOptionsFragment : Fragment() {
     }
 
     private fun onCustomDelayReminderClicked() {
-        executeIfAuthorized(MatomoName.ReminderCustomDelta.value) { showCustomDelayReminderDatePicker() }
+        executeIfAuthorized(MatomoName.ReminderCustomDate.value) { showCustomDelayReminderDatePicker() }
     }
 
     private fun resetCustomDelayReminder() = with(binding) {
