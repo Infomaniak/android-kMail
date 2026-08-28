@@ -719,6 +719,7 @@ class ThreadAdapter(
                 else -> {
                     isExpandedMap[message.uid] = true
                     onExpandOrCollapseMessage(message, shouldTrack = true)
+                    threadAdapterCallbacks?.onMessageExpanded?.invoke(message)
                 }
             }
         }
@@ -1570,6 +1571,7 @@ class ThreadAdapter(
         var onModifyReminderClicked: ((Message) -> Unit)? = null,
         var onAddReminderClicked: ((Message) -> Unit)? = null,
         var onMarkAsDoneReminderClicked: ((Message) -> Unit)? = null,
+        var onMessageExpanded: ((Message) -> Unit)? = null,
         val getFeatureFlags: (() -> Mailbox.FeatureFlagSet?)? = null,
         var onAskEuriaClicked: ((message: Message) -> Unit)? = null,
     )

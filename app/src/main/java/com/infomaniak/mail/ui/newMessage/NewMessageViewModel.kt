@@ -1220,7 +1220,8 @@ class NewMessageViewModel @Inject constructor(
                 .mapTo(mutableSetOf()) { it.localUuid } &&
                     draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
                     draftSnapshot.reminderDraftInfo?.reminderDelta == getCurrentReminderDelta() &&
-                    (draftSnapshot.reminderDraftInfo?.shouldRemindRecipient ?: DEFAULT_SHOULD_REMIND_RECIPIENT) == shouldRemindRecipient.value &&
+                    (draftSnapshot.reminderDraftInfo?.shouldRemindRecipient
+                        ?: DEFAULT_SHOULD_REMIND_RECIPIENT) == shouldRemindRecipient.value &&
                     draftSnapshot.shouldRequestAcknowledgment == shouldRequestAcknowledgment.value
         } ?: false
     }
