@@ -282,6 +282,7 @@ class ThreadViewModel @Inject constructor(
                         val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isExpandedMap[message.uid] = shouldExpand
                         threadState.isThemeTheSameMap[message.uid] = true
+                        if (shouldExpand) refreshMessageIfNeeded(message)
                     }
                 }
 
@@ -992,6 +993,28 @@ class ThreadViewModel @Inject constructor(
         } else {
             snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementFailure))
             setAcknowledgeState(message, MessageUi.AcknowledgeState.Pending)
+        }
+    }
+
+    private fun refreshMessageIfNeeded(message: Message) {
+        if (!message.shouldRefreshReminder || !message.isFullyDownloaded()) return
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val apiResponse = ApiRepository.getMessage(message.resource)
+            val remoteMessage = apiResponse.data ?: return@launch
+            if (!apiResponse.isSuccess()) return@launch
+
+            updateMessageWithRefetchedData(message.uid, remoteMessage)
+        }
+    }
+
+    private suspend fun updateMessageWithRefetchedData(messageUid: String, remoteMessage: Message) {
+        mailboxContentRealm().write {
+            MessageController.getMessageBlocking(messageUid, realm = this)?.let { localMessage ->
+                remoteMessage.keepLocalValues(localMessage)
+                remoteMessage.shouldRefreshReminder = false
+                MessageController.upsertMessageBlocking(remoteMessage, realm = this)
+            }
         }
     }
 
