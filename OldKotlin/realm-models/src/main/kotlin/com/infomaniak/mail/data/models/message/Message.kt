@@ -216,7 +216,7 @@ class Message : RealmObject, Snoozable {
 
     val isReaction get() = emojiReaction != null
 
-    val isReminderHidden get() = isReminder && !displayReminder
+    val isHiddenReminder get() = isReminder && !displayReminder
 
     val threads by backlinks(Thread::messages)
 
