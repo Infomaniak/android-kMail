@@ -29,6 +29,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.ApiResponseStatus
@@ -804,10 +805,17 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    suspend fun setMessageForReminder(messageUid: String): Boolean {
-        val message = messageController.getMessage(messageUid) ?: return false
-        currentReminderAction = ReminderAction.Add(message)
-        return true
+    fun setMessageForReminder(messageUid: String, onReadyToDisplayBottomSheet: () -> Unit) {
+        viewModelScope.launch {
+            val message = messageController.getMessage(messageUid)
+            if (message == null) {
+                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                return@launch
+            }
+
+            currentReminderAction = ReminderAction.Add(message)
+            onReadyToDisplayBottomSheet()
+        }
     }
 
     fun addReminder(message: Message, delayMinutes: Int) {
