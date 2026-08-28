@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.MatomoMail
-import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackSendOptionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectVisibilityReminderBinding
@@ -83,11 +83,7 @@ class SelectVisibilityReminderDialog @Inject constructor(
         }
 
         positiveButton.setOnClickListener {
-            if (isRecipientsAndMeSelected) {
-                trackSendOptionsEvent(MatomoMail.MatomoName.SelectedReminderVisibility, value = 1f)
-            } else {
-                trackSendOptionsEvent(MatomoMail.MatomoName.SelectedReminderVisibility, value = 0f)
-            }
+            trackSendOptionsEvent(MatomoMail.MatomoName.SelectedReminderVisibility, value = isRecipientsAndMeSelected.toFloat())
             onVisibilitySelected?.invoke(isRecipientsAndMeSelected)
             alertDialog.dismiss()
         }

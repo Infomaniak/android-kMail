@@ -210,7 +210,7 @@ class DraftSendOptionsFragment : Fragment() {
         optionsDelays.onItemCheckedListener { _, value, _ ->
             val minutes = value?.toIntOrNull()
             val isValidPreset = ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
-            if (isValidPreset) trackSendOptionsEvent(MatomoName.SelectedReminderDelta, value = minutes?.toFloat())
+            if (isValidPreset) trackSendOptionsEvent(MatomoName.SelectedReminderDelta)
             newMessageViewModel.setReminderConfig(
                 config = if (minutes != null && isValidPreset) {
                     ReminderConfig.Delayed(minutes, isCustom = false)
