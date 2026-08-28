@@ -502,6 +502,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onModifyReminderClicked = ::modifyReminder,
                 onAddReminderClicked = ::addReminder,
                 onMarkAsDoneReminderClicked = ::markAsDoneReminder,
+                onMessageExpanded = threadViewModel::refreshMessageIfNeeded,
                 onAskEuriaClicked = { message ->
                     trackMessageActionsEvent(MatomoName.AskEuriaQuickAction)
                     navigateToAskEuriaBottomSheet(message.uid)
