@@ -136,7 +136,7 @@ class SearchUtils @Inject constructor(
     }
 
     private fun Thread.removeHiddenReminders() {
-        messages.removeAll { it.shouldHideReminder }
+        messages.removeAll { it.isReminderHidden }
     }
 
     private fun Thread.setFolderId(filterFolder: Folder?) {

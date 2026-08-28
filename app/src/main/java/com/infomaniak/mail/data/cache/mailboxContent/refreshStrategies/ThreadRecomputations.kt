@@ -44,7 +44,7 @@ object ThreadRecomputations {
         val allMessages = messages
 
         val lastCurrentFolderMessage = allMessages.lastOrNull {
-            it.folderId == folderId && !(it.shouldHideReminder && it.isScheduledDraft)
+            it.folderId == folderId && !(it.isReminderHidden && it.isScheduledDraft)
         }
         val lastMessage = if (isFromSearch) {
             // In the search, some threads (such as threads from the snooze folder) won't have any messages with the same folderId
@@ -129,7 +129,7 @@ object ThreadRecomputations {
             isAnswered = false
         }
         if (message.hasAttachable) hasAttachable = true
-        if (message.isScheduledDraft && !message.shouldHideReminder) numberOfScheduledDrafts++
+        if (message.isScheduledDraft && !message.isReminderHidden) numberOfScheduledDrafts++
         updateSnoozeStatesBasedOn(message)
     }
 
@@ -181,7 +181,7 @@ object ThreadRecomputations {
 
             val targetMessageIds = message.inReplyTo ?: ""
             val isHiddenEmojiReaction = message.isReaction && isTargetMessageInThread(targetMessageIds, threadMessageIds)
-            val isHiddenReminder = message.shouldHideReminder
+            val isHiddenReminder = message.isReminderHidden
                     && (isTargetMessageInThread(targetMessageIds, threadMessageIds) || message.isScheduledDraft)
             if (isHiddenEmojiReaction.not() && isHiddenReminder.not()) messagesWithContent += message
         }
