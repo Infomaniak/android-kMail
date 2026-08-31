@@ -501,7 +501,7 @@ class NewMessageViewModel @Inject constructor(
             initialBody = BodyContentPayload.bodyOf(
                 BodyContentPayload(
                     appContext.getString(R.string.reminderFollowUpPlaceholderText),
-                    BodyContentType.TEXT_PLAIN_WITHOUT_HTML
+                    BodyContentType.TEXT_PLAIN_WITH_HTML
                 )
             )
         }
