@@ -144,10 +144,11 @@ class Message : RealmObject, Snoozable {
     var reminder: ReminderMessageInfo? = null
     @SerialName("reminder_action")
     var reminderAction: String? = null
+    // isReminder and displayReminder are provided by the backend only for messages that are hidden in the UI
     @SerialName("is_reminder")
     var isReminder: Boolean = false
     @SerialName("display_reminder")
-    var displayReminder: Boolean = false
+    var displayReminder: Boolean = true
     //endregion
 
     //region Local data (Transient)
@@ -180,6 +181,8 @@ class Message : RealmObject, Snoozable {
     var hasAttachable: Boolean = false
     @Transient
     var emojiReactions: RealmList<EmojiReactionState> = realmListOf()
+    @Transient
+    var shouldRefreshReminder: Boolean = false
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -213,7 +216,7 @@ class Message : RealmObject, Snoozable {
 
     val isReaction get() = emojiReaction != null
 
-    val shouldHideReminder get() = isReminder && !displayReminder
+    val isHiddenReminder get() = isReminder && !displayReminder
 
     val threads by backlinks(Thread::messages)
 
@@ -248,6 +251,7 @@ class Message : RealmObject, Snoozable {
         this.latestCalendarEventResponse = localValues.latestCalendarEventResponse
         this.swissTransferFiles.replaceContent(localValues.swissTransferFiles)
         this.emojiReactions = localValues.emojiReactions
+        this.shouldRefreshReminder = localValues.shouldRefreshReminder
 
         this.shortUid = uid.toShortUid()
         this.hasAttachable = hasAttachments || swissTransferUuid != null
@@ -263,6 +267,7 @@ class Message : RealmObject, Snoozable {
         latestCalendarEventResponse = latestCalendarEventResponse,
         swissTransferFiles = swissTransferFiles,
         emojiReactions = emojiReactions,
+        shouldRefreshReminder = shouldRefreshReminder,
     )
 
     private fun keepHeavyData(message: Message) {
@@ -337,6 +342,7 @@ class Message : RealmObject, Snoozable {
         val latestCalendarEventResponse: CalendarEventResponse? = null,
         val swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
         val emojiReactions: RealmList<EmojiReactionState> = realmListOf(),
+        val shouldRefreshReminder: Boolean = false,
     )
 
     companion object {

@@ -57,6 +57,6 @@ object ThreadListUtils {
     }
 
     fun hasReminders(messages: List<Message>): Boolean = messages.any { message ->
-        message.reminder != null && !message.shouldHideReminder
+        (message.reminder != null || message.shouldRefreshReminder) && !message.isHiddenReminder
     }
 }

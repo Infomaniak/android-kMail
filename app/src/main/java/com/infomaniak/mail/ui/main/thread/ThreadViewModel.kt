@@ -275,14 +275,18 @@ class ThreadViewModel @Inject constructor(
             threadFlow.filterNotNull().onEach { thread ->
                 val featureFlags = featureFlagsFlow.first()
 
+                val displayedMessages = thread.getDisplayedMessages(featureFlags, localSettings)
+
                 // These 2 will always be empty or not all together at the same time.
                 if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
-                    val displayedMessages = thread.getDisplayedMessages(featureFlags, localSettings)
                     displayedMessages.forEachIndexed { index, message ->
-                        val shouldExpand = message.shouldBeExpanded(index, displayedMessages.lastIndex)
-                        threadState.isExpandedMap[message.uid] = shouldExpand
+                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isThemeTheSameMap[message.uid] = true
                     }
+                }
+
+                displayedMessages.forEach { message ->
+                    if (threadState.isExpandedMap[message.uid] == true) refreshMessageIfNeeded(message)
                 }
 
                 if (threadState.isFirstOpening) {
@@ -992,6 +996,28 @@ class ThreadViewModel @Inject constructor(
         } else {
             snackbarManager.postValue(appContext.getString(R.string.snackbarAcknowledgementFailure))
             setAcknowledgeState(message, MessageUi.AcknowledgeState.Pending)
+        }
+    }
+
+    fun refreshMessageIfNeeded(message: Message) {
+        if (!message.shouldRefreshReminder || !message.isFullyDownloaded()) return
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val apiResponse = ApiRepository.getMessage(message.resource)
+            val remoteMessage = apiResponse.data ?: return@launch
+            if (!apiResponse.isSuccess()) return@launch
+
+            updateMessageWithRefetchedData(message.uid, remoteMessage)
+        }
+    }
+
+    private suspend fun updateMessageWithRefetchedData(messageUid: String, remoteMessage: Message) {
+        mailboxContentRealm().write {
+            MessageController.getMessageBlocking(messageUid, realm = this)?.let { localMessage ->
+                remoteMessage.keepLocalValues(localMessage)
+                remoteMessage.shouldRefreshReminder = false
+                MessageController.upsertMessageBlocking(remoteMessage, realm = this)
+            }
         }
     }
 
