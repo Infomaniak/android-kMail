@@ -1,0 +1,26 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M18,12C19.591,12 21.117,12.633 22.242,13.758C23.367,14.883 24,16.409 24,18C24,19.591 23.367,21.117 22.242,22.242C21.117,23.367 19.591,24 18,24C16.409,24 14.883,23.367 13.758,22.242C12.633,21.117 12,19.591 12,18C12,16.409 12.633,14.883 13.758,13.758C14.883,12.633 16.409,12 18,12ZM21.447,14.648C21.115,14.402 20.646,14.47 20.398,14.803L16.672,19.819L15.625,18.238C15.396,17.893 14.931,17.799 14.586,18.027C14.241,18.256 14.146,18.721 14.375,19.066L15.596,20.911C15.703,21.079 15.85,21.222 16.026,21.326C16.206,21.432 16.41,21.492 16.621,21.499C16.832,21.506 17.04,21.459 17.227,21.364C17.41,21.271 17.566,21.135 17.684,20.973L21.603,15.697C21.849,15.365 21.779,14.895 21.447,14.648ZM21.643,3.75C22.252,3.75 22.846,3.975 23.291,4.391C23.738,4.808 24,5.386 24,6V12C24,12.414 23.664,12.75 23.25,12.75C22.836,12.75 22.5,12.414 22.5,12V6.079L14.599,11.923C13.848,12.462 12.934,12.75 12,12.75C11.066,12.75 10.152,12.462 9.401,11.923L9.393,11.917L1.5,6.079V18C1.5,18.182 1.577,18.367 1.732,18.513C1.89,18.66 2.114,18.75 2.357,18.75H10C10.414,18.75 10.75,19.086 10.75,19.5C10.75,19.914 10.414,20.25 10,20.25H2.357C1.748,20.25 1.154,20.025 0.709,19.609C0.262,19.192 0,18.614 0,18V6C0,5.386 0.262,4.808 0.709,4.391C1.154,3.975 1.748,3.75 2.357,3.75H21.643ZM10.28,10.708C10.768,11.057 11.373,11.25 12,11.25C12.627,11.25 13.232,11.057 13.72,10.708L21.098,5.25H2.902L10.28,10.708Z"
+      android:fillColor="#BC0055"/>
+</vector>

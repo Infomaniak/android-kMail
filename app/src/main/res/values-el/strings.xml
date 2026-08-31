@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Μια απόδειξη ανάγνωσης στάλθηκε στον αποστολέα.</string>
     <string name="actionArchive">Αρχειοθέτηση</string>
     <string name="actionBlockSender">Αποκλεισμός αποστολέα</string>
+    <string name="actionCallIfNoResponse">Υπενθύμισέ μου αν δεν υπάρξει απάντηση μετά την αποστολή</string>
     <string name="actionCancelSnooze">Ακύρωση αναβολής</string>
     <string name="actionDelete">Διαγραφή</string>
     <string name="actionEditMenu">Επεξεργασία μενού</string>
@@ -35,6 +36,7 @@
     <string name="actionNonSpam">Αναφορά ως μη spam</string>
     <string name="actionPhishing">Αναφορά phishing</string>
     <string name="actionPrint">Εκτύπωση</string>
+    <string name="actionReminder">Θύμισέ μου</string>
     <string name="actionRename">Μετονομασία</string>
     <string name="actionReply">Απάντηση</string>
     <string name="actionReplyAll">Απάντηση σε όλους</string>
@@ -136,7 +138,9 @@
     <string name="buttonCopyPassword">Αντιγραφή κωδικού πρόσβασης</string>
     <string name="buttonCreate">Δημιουργία</string>
     <string name="buttonCreateFolder">Προσθήκη φακέλου</string>
+    <string name="buttonCustomReminder">Προσαρμοσμένη υπενθύμιση</string>
     <string name="buttonCustomSchedule">Προσαρμοσμένο πρόγραμμα</string>
+    <string name="buttonDisable">Απενεργοποίηση</string>
     <string name="buttonDownload">Λήψη</string>
     <string name="buttonDownloadAll">Λήψη όλων</string>
     <string name="buttonFeedback">Σχόλια</string>
@@ -175,6 +179,8 @@
     <string name="calendarAllDayLong">Όλη την ημέρα</string>
     <string name="calendarNotInvited">Δεν είστε προσκεκλημένος</string>
     <string name="calendarOrganizerName">%s (Διοργανωτής)</string>
+    <string name="callIfNoResponseHeaderTitle">Υπενθύμιση αν δεν υπάρχει απάντηση: %s μετά την αποστολή</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Θύμισέ μου αν δεν υπάρχει απάντηση: %s</string>
     <string name="ccTitle">Κοινοποίηση:</string>
     <string name="comingSoon">Έρχεται σύντομα…</string>
     <string name="commercialFolder">Προσφορές</string>
@@ -216,6 +222,7 @@
     <string name="contentDescriptionIconMention">Έχετε αναφερθεί.</string>
     <string name="contentDescriptionIconNewMail">Νέο</string>
     <string name="contentDescriptionIconQr">Άνοιγμα κάρτας επαφής</string>
+    <string name="contentDescriptionIconReminder">Είναι μια υπενθύμιση</string>
     <string name="contentDescriptionIconReply">Απάντηση</string>
     <string name="contentDescriptionIconStorage">Κατάσταση αποθήκευσης</string>
     <string name="contentDescriptionOpenMailActions">Άνοιγμα ενεργειών μηνύματος</string>
@@ -236,8 +243,13 @@
     <string name="contextMenuPhoneNumberDial">Κλήση</string>
     <string name="contextMenuPhoneNumberSms">Σύνταξη SMS</string>
     <string name="createFolderName">Όνομα φακέλου</string>
+    <string name="createReminderBottomSheetTitle">Προσθήκη υπενθύμισης</string>
     <string name="datePickerTitle">Επιλέξτε ημερομηνία και ώρα</string>
     <string name="dateTitle">Ημερομηνία:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d μέρα</item>
+        <item quantity="other">%d μέρες</item>
+    </plurals>
     <string name="deleteAccountWarning">Η διαγραφή του λογαριασμού σας θα είναι οριστική. Δεν θα μπορείτε να τον επανενεργοποιήσετε.</string>
     <string name="deleteFolderDialogDescription">Το περιεχόμενο του φακέλου %s θα διαγραφεί οριστικά χωρίς να μεταφερθεί στον κάδο απορριμμάτων.</string>
     <string name="deleteFolderDialogTitle">Διαγραφή φακέλου</string>
@@ -278,7 +290,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Σχετικοί παραλήπτες</string>
     <string name="encryptedMessagePasswordLabel">Μοιραστείτε αυτόν τον κωδικό μέσω ιδιωτικού μηνύματος. Δεν θα μπορείτε να τον αντιγράψετε μετά την αποστολή.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Η κρυπτογράφηση απενεργοποιήθηκε</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Τα προγραμματισμένα email δεν είναι διαθέσιμα για κρυπτογραφημένα μηνύματα</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Η προγραμματισμένη αποστολή και οι υπενθυμίσεις δεν είναι διαθέσιμες για κρυπτογραφημένα μηνύματα</string>
     <string name="encryptedMessageUpdatePasswordButton">Αλλαγή κωδικού</string>
     <string name="encryptedPasswordProtectionTitle">Προστασία με κωδικό πρόσβασης</string>
     <string name="encryptedProtectionAdDescription">Προστατέψτε το μήνυμά σας από μη εξουσιοδοτημένη πρόσβαση με την κρυπτογράφηση Infomaniak.</string>
@@ -292,6 +304,7 @@
     <string name="encryptedStatePanelIncomplete">Απαιτείται κωδικός για την ολοκλήρωση της αποστολής.</string>
     <string name="encryptedStatePanelStatePartialLabel">Μερικό</string>
     <string name="encryptedStatePanelTitle">Κρυπτογράφηση</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Η κρυπτογράφηση δεν είναι διαθέσιμη αν η προγραμματισμένη αποστολή ή η υπενθύμιση είναι ενεργοποιημένη</string>
     <string name="enterPasswordTitle">Εισαγωγή κωδικού πρόσβασης</string>
     <string name="errorAlreadyLinkedMailbox">Αυτή η διεύθυνση email είναι ήδη συνδεδεμένη με τον λογαριασμό σας</string>
     <string name="errorAtLeastOneRecipient">Απαιτείται τουλάχιστον ένας παραλήπτης</string>
@@ -366,6 +379,10 @@
     <string name="genericMessageTranslated">Μήνυμα μεταφρασμένο</string>
     <string name="googlePlayServicesAreRequired">Απαιτούνται οι Υπηρεσίες Google Play</string>
     <string name="groupContactsTitle">Ομάδα: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d ώρα</item>
+        <item quantity="other">%d ώρες</item>
+    </plurals>
     <string name="inboxFolder">Εισερχόμενα</string>
     <string name="kSuiteProQuotasAlertDescription">Ο χώρος αποθήκευσης του Mail σας είναι σχεδόν πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Ο χώρος αποθήκευσης του Mail σας είναι πλήρης. Αναβαθμίστε σε απεριόριστο χώρο και ξεκλειδώστε νέες δυνατότητες.</string>
@@ -473,6 +490,20 @@
     <string name="readMore">Διαβάστε περισσότερα</string>
     <string name="recentSearchesTitle">Πρόσφατες αναζητήσεις</string>
     <string name="refreshTokenError">Έχετε αποσυνδεθεί</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s περιμένει απάντηση από %2$s</item>
+        <item quantity="other">%1$s περιμένουν απάντηση από %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s περιμένει απάντηση έως %2$s</item>
+        <item quantity="other">%1$s περιμένουν απάντηση έως %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Αναβολή της υπενθύμισης</string>
+    <string name="reminderFollowUpButton">Παρακολούθηση</string>
+    <string name="reminderFollowUpPlaceholderText">Γεια σας,\nΕίναι δυνατόν να λάβετε κάποια ανατροφοδότηση για αυτό το θέμα;\nΣας ευχαριστώ εκ των προτέρων.</string>
+    <string name="reminderMarkAsDoneButton">Σημείωση ως ολοκληρωμένο</string>
+    <string name="reminderNoResponseHeaderTitle">Υπενθύμιση: καμία απάντηση από %1$s σε αυτό το email από τις %2$s</string>
+    <string name="reminderVisibilityTitle">Ορατότητα υπενθύμισης</string>
     <string name="renameFolder">Μετονομασία φακέλου</string>
     <string name="reportDisplayProblemDescription">Συμφωνείτε να μοιραστείτε τα δεδομένα σας με τους προγραμματιστές μας ώστε να σας βοηθήσουν με το πρόβλημά σας;</string>
     <string name="reportDisplayProblemTitle">Αναφορά προβλήματος εμφάνισης</string>
@@ -495,6 +526,12 @@
     <string name="scheduleSendingTitle">Προγραμματισμός αποστολής</string>
     <string name="scheduledEmailHeader">Αυτό το email θα σταλεί στις: %s</string>
     <string name="scheduledMessagesFolder">Προγραμματισμένα μηνύματα</string>
+    <string name="scheduledSendDelayTooShortError">Η προγραμματισμένη καθυστέρηση αποστολής είναι πολύ μικρή</string>
+    <string name="scheduledSendMinimumDelayRequirement">Μια αποστολή πρέπει να προγραμματιστεί τουλάχιστον 5 λεπτά νωρίτερα.</string>
+    <string name="scheduledTimeInvalidError">Μη έγκυρος προγραμματισμένος χρόνος αποστολής</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Μη έγκυρη ώρα προγραμματισμένης αποστολής: %s</string>
+    <string name="scheduledTimePassedError">Προγραμματισμένος χρόνος αποστολής παρήλθε</string>
+    <string name="scheduledTimePassedErrorWithDate">Ο προγραμματισμένος χρόνος αποστολής ξεπεράστηκε: %s</string>
     <string name="searchAllMessages">Όλα τα μηνύματα</string>
     <string name="searchFieldPlaceholder">Αναζήτηση email</string>
     <string name="searchFilterAttachment">Συνημμένα</string>
@@ -505,8 +542,11 @@
     <string name="selectDateDialogTitle">Επιλέξτε ημερομηνία</string>
     <string name="selectSignatureNone">Χωρίς υπογραφή</string>
     <string name="selectTimeDialogTitle">Επιλέξτε ώρα</string>
+    <string name="selectionReminderMeOnly">Μόνο εγώ</string>
+    <string name="selectionReminderRecipientsAndMe">Οι παραλήπτες και εγώ</string>
     <string name="send">Αποστολή</string>
     <string name="sendConfirmationAction">Αποστολή επιβεβαίωσης</string>
+    <string name="sendOptions">Επιλογές αποστολής</string>
     <string name="sentFolder">Απεσταλμένα μηνύματα</string>
     <string name="serverUnavailable">Οι διακομιστές δεν είναι διαθέσιμοι</string>
     <string name="settingsAccentColor">Χρώμα έμφασης</string>
@@ -590,11 +630,15 @@
     <string name="shareEmail">Κοινοποίηση email</string>
     <string name="snackbarAcknowledgementFailure">Αποτυχία αποστολής</string>
     <string name="snackbarAcknowledgementSuccess">Η απόδειξη ανάγνωσης εστάλη</string>
+    <string name="snackbarAddReminderFailure">Δεν ήταν δυνατή η προσθήκη υπενθύμισης</string>
+    <string name="snackbarAddReminderSuccess">Η υπενθύμιση προστέθηκε</string>
     <string name="snackbarAdminDisabledMessageSending">Ένας διαχειριστής έχει απενεργοποιήσει την αποστολή μηνυμάτων</string>
     <string name="snackbarBlockUserConfirmation">Ο αποστολέας έχει αποκλειστεί</string>
     <string name="snackbarCalendarChoiceSent">Η απάντηση καταχωρήθηκε</string>
     <string name="snackbarContactSaved">Η επαφή καταχωρήθηκε με επιτυχία</string>
     <string name="snackbarDeletedConversation">Η συνομιλία δεν υπάρχει πλέον</string>
+    <string name="snackbarDisableReminderFailure">Δεν ήταν δυνατή η απενεργοποίηση της υπενθύμισης</string>
+    <string name="snackbarDisableReminderSuccess">Η υπενθύμιση απενεργοποιήθηκε με επιτυχία</string>
     <string name="snackbarDisplayProblemReported">Το πρόβλημα εμφάνισης αναφέρθηκε</string>
     <string name="snackbarDownloadInProgress">Η λήψη βρίσκεται σε εξέλιξη…</string>
     <string name="snackbarDraftDeleted">Το πρόχειρο διαγράφηκε</string>
@@ -605,9 +649,13 @@
     <string name="snackbarEmailSent">Το email εστάλη</string>
     <string name="snackbarInvalidUrl">Μη έγκυρο URL</string>
     <string name="snackbarLinkCopiedToClipboard">Ο σύνδεσμος αντιγράφηκε στο πρόχειρο</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Αποτυχία σήμανσης της υπενθύμισης ως ολοκληρωμένης</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Υπενθύμιση επισημάνθηκε ως ολοκληρωμένη</string>
     <string name="snackbarMessageDeletedPermanently">Το μήνυμα διαγράφηκε</string>
     <string name="snackbarMessageMoved">Το μήνυμα μετακινήθηκε στο %s</string>
     <string name="snackbarMessageMovedToSpam">Το μήνυμα μεταφέρθηκε στα spam και ο χρήστης εμποδίστηκε</string>
+    <string name="snackbarModifyReminderFailure">Αποτυχία τροποποίησης της υπενθύμισης</string>
+    <string name="snackbarModifyReminderSuccess">Η υπενθύμιση τροποποιήθηκε</string>
     <string name="snackbarMoveCancelled">Η μετακίνηση ακυρώθηκε</string>
     <string name="snackbarPasswordCopied">Ο κωδικός αντιγράφηκε</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Ο αριθμός αντιγράφηκε στο πρόχειρο</string>
@@ -711,6 +759,14 @@
     <string name="trashFolder">Κάδος απορριμμάτων</string>
     <string name="tryAgain">Παρακαλώ, δοκιμάστε ξανά.</string>
     <string name="unblockButton">Ξεμπλοκάρισμα</string>
+    <plurals name="unitDays">
+        <item quantity="one">Ημέρα</item>
+        <item quantity="other">Ημέρες</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Ώρα</item>
+        <item quantity="other">Ώρες</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Άγνωστος αποστολέας</string>
     <string name="unknownDialogTitleRecipient">Άγνωστος παραλήπτης</string>
     <string name="unknownRecipientTitle">(άγνωστο)</string>

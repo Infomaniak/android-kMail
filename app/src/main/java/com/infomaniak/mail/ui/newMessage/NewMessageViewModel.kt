@@ -73,6 +73,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
+import com.infomaniak.mail.data.models.draft.ReminderDraftInfo
 import com.infomaniak.mail.data.models.extensions.action
 import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
 import com.infomaniak.mail.data.models.extensions.getDefaultSignatureWithFallback
@@ -149,7 +150,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -256,6 +259,18 @@ class NewMessageViewModel @Inject constructor(
 
     private val _currentMentions = MutableStateFlow<List<String>>(emptyList())
     val currentMentions: StateFlow<List<String>> = _currentMentions.asStateFlow()
+
+    private val _scheduleConfig = MutableStateFlow<ScheduleConfig>(ScheduleConfig.None)
+    val scheduleConfig: StateFlow<ScheduleConfig> = _scheduleConfig.asStateFlow()
+
+    private val _reminderConfig = MutableStateFlow<ReminderConfig>(ReminderConfig.None)
+    val reminderConfig: StateFlow<ReminderConfig> = _reminderConfig.asStateFlow()
+
+    private val _shouldRemindRecipient = MutableStateFlow(DEFAULT_SHOULD_REMIND_RECIPIENT)
+    val shouldRemindRecipient: StateFlow<Boolean> = _shouldRemindRecipient.asStateFlow()
+
+    private val _shouldRequestAcknowledgment = MutableStateFlow(localSettings.askEmailAcknowledgement)
+    val shouldRequestAcknowledgment: StateFlow<Boolean> = _shouldRequestAcknowledgment.asStateFlow()
 
     //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
@@ -460,11 +475,12 @@ class NewMessageViewModel @Inject constructor(
         var previousMessage: Message? = null
 
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+        ackRequest = shouldRequestAcknowledgment.value
         saveNavArgsToSavedState(localUuid)
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
-            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
+            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD, DraftMode.FOLLOW_UP -> {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
@@ -479,6 +495,15 @@ class NewMessageViewModel @Inject constructor(
                         }
                     }
             }
+        }
+
+        if (draftMode == DraftMode.FOLLOW_UP) {
+            initialBody = BodyContentPayload.bodyOf(
+                BodyContentPayload(
+                    appContext.getString(R.string.reminderFollowUpPlaceholderText),
+                    BodyContentType.TEXT_PLAIN_WITH_HTML
+                )
+            )
         }
 
         val signature: Signature
@@ -603,6 +628,9 @@ class NewMessageViewModel @Inject constructor(
             isEncrypted = isEncrypted,
             encryptionPassword = encryptionKey ?: "",
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
+            scheduleDate = scheduleDate,
+            reminderDraftInfo = reminder,
+            shouldRequestAcknowledgment = ackRequest,
         )
     }
 
@@ -638,6 +666,23 @@ class NewMessageViewModel @Inject constructor(
         }
 
         isEncryptionActivated.postValue(isEncrypted)
+
+        scheduleDate?.let { dateString ->
+            SimpleDateFormat(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR, Locale.getDefault())
+                .parse(dateString)
+                ?.time
+                ?.let { epoch ->
+                    setScheduleConfig(ScheduleConfig.Scheduled(epoch))
+                }
+        }
+
+        reminder?.reminderDelta?.let { minutes ->
+            val isCustom = !ReminderPreset.entries.any { preset -> preset.delayMinutes == minutes }
+            setReminderConfig(ReminderConfig.Delayed(minutes, isCustom = isCustom))
+        }
+
+        reminder?.shouldRemindRecipient?.let { setShouldRemindRecipient(it) }
+        setShouldRequestAcknowledgment(ackRequest)
     }
 
     fun setQuotesButtonVisibility(isVisible: Boolean) {
@@ -937,17 +982,6 @@ class NewMessageViewModel @Inject constructor(
         }.cancellable().onFailure(Sentry::captureException)
     }
 
-    fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
-        val localUuid = draftLocalUuid ?: return@launch
-        mailboxContentRealm().write {
-            DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
-                draft.scheduleDate = date?.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
-            }
-        }
-    }
-
-    fun resetScheduledDate() = setScheduleDate(date = null)
-
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
@@ -1039,9 +1073,21 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
-        if (draftAction == DraftAction.SEND) delay = localSettings.cancelDelay
+        ackRequest = shouldRequestAcknowledgment.value
 
-        ackRequest = localSettings.askEmailAcknowledgement
+        scheduleDate = getCurrentScheduleDate()
+
+        if (draftAction == DraftAction.SEND && scheduleDate == null) delay = localSettings.cancelDelay
+
+        val currentReminderDelta = getCurrentReminderDelta()
+        reminder = if (currentReminderDelta != null) {
+            ReminderDraftInfo(
+                reminderDelta = currentReminderDelta,
+                shouldRemindRecipient = shouldRemindRecipient.value,
+            )
+        } else {
+            null
+        }
 
         updateDraftAttachmentsWithLiveData(
             uiAttachments = attachmentsLiveData.valueOrEmpty(),
@@ -1151,6 +1197,16 @@ class NewMessageViewModel @Inject constructor(
         SentryDebug.addDraftBreadcrumbs(draft = this, step)
     }
 
+    private fun getCurrentScheduleDate(): String? {
+        return (scheduleConfig.value as? ScheduleConfig.Scheduled)?.let { schedule ->
+            Date(schedule.epochMillis).format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
+        }
+    }
+
+    private fun getCurrentReminderDelta(): Int? {
+        return (reminderConfig.value as? ReminderConfig.Delayed)?.delayMinutes
+    }
+
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
             draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() &&
@@ -1162,7 +1218,12 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
-                .mapTo(mutableSetOf()) { it.localUuid }
+                .mapTo(mutableSetOf()) { it.localUuid } &&
+                    draftSnapshot.scheduleDate == getCurrentScheduleDate() &&
+                    draftSnapshot.reminderDraftInfo?.reminderDelta == getCurrentReminderDelta() &&
+                    (draftSnapshot.reminderDraftInfo?.shouldRemindRecipient
+                        ?: DEFAULT_SHOULD_REMIND_RECIPIENT) == shouldRemindRecipient.value &&
+                    draftSnapshot.shouldRequestAcknowledgment == shouldRequestAcknowledgment.value
         } ?: false
     }
 
@@ -1245,7 +1306,22 @@ class NewMessageViewModel @Inject constructor(
 
             updatedMentions
         }
+    }
 
+    fun setShouldRemindRecipient(value: Boolean) {
+        _shouldRemindRecipient.value = value
+    }
+
+    fun setShouldRequestAcknowledgment(value: Boolean) {
+        _shouldRequestAcknowledgment.value = value
+    }
+
+    fun setScheduleConfig(config: ScheduleConfig) {
+        _scheduleConfig.value = config
+    }
+
+    fun setReminderConfig(config: ReminderConfig) {
+        _reminderConfig.value = config
     }
 
     enum class ImportationResult {
@@ -1280,12 +1356,17 @@ class NewMessageViewModel @Inject constructor(
         var isEncrypted: Boolean,
         var encryptionPassword: String,
         val attachmentsLocalUuids: Set<String>,
+        val scheduleDate: String?,
+        val reminderDraftInfo: ReminderDraftInfo?,
+        val shouldRequestAcknowledgment: Boolean,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName
+
+        private const val DEFAULT_SHOULD_REMIND_RECIPIENT = true
 
         private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998

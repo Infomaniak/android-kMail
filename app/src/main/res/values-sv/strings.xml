@@ -23,6 +23,7 @@
     <string name="acknowledgementMessageSent">Ett läskvitto har skickats till avsändaren.</string>
     <string name="actionArchive">Arkivera</string>
     <string name="actionBlockSender">Blockera avsändare</string>
+    <string name="actionCallIfNoResponse">Påminn mig om jag inte får svar efter att ha skickat</string>
     <string name="actionCancelSnooze">Avbryt vänteläge</string>
     <string name="actionDelete">Ta bort</string>
     <string name="actionEditMenu">Redigera meny</string>
@@ -35,6 +36,7 @@
     <string name="actionNonSpam">Rapportera som legitim</string>
     <string name="actionPhishing">Rapportera nätfiske</string>
     <string name="actionPrint">Skriv ut</string>
+    <string name="actionReminder">Påminn mig</string>
     <string name="actionRename">Byt namn</string>
     <string name="actionReply">Svara</string>
     <string name="actionReplyAll">Svara alla</string>
@@ -136,7 +138,9 @@
     <string name="buttonCopyPassword">Kopiera lösenord</string>
     <string name="buttonCreate">Skapa</string>
     <string name="buttonCreateFolder">Lägg till en mapp</string>
+    <string name="buttonCustomReminder">Anpassad påminnelse</string>
     <string name="buttonCustomSchedule">Anpassat schema</string>
+    <string name="buttonDisable">Inaktivera</string>
     <string name="buttonDownload">Ladda ner</string>
     <string name="buttonDownloadAll">Ladda ner alla</string>
     <string name="buttonFeedback">Feedback</string>
@@ -175,6 +179,8 @@
     <string name="calendarAllDayLong">Hela dagen</string>
     <string name="calendarNotInvited">Du är inte inbjuden</string>
     <string name="calendarOrganizerName">%s (Arrangör)</string>
+    <string name="callIfNoResponseHeaderTitle">Påminn mig om inget svar: %s efter sändning</string>
+    <string name="callIfNoResponseHeaderTitleWithDate">Påminn mig om det inte finns något svar: %s</string>
     <string name="ccTitle">Kopia:</string>
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
@@ -216,6 +222,7 @@
     <string name="contentDescriptionIconMention">Du har blivit omnämnd.</string>
     <string name="contentDescriptionIconNewMail">Ny</string>
     <string name="contentDescriptionIconQr">Öppna kontaktkort</string>
+    <string name="contentDescriptionIconReminder">Är en påminnelse</string>
     <string name="contentDescriptionIconReply">Svara</string>
     <string name="contentDescriptionIconStorage">Lagringsstatus</string>
     <string name="contentDescriptionOpenMailActions">Öppna e-poståtgärder</string>
@@ -236,8 +243,13 @@
     <string name="contextMenuPhoneNumberDial">Ring</string>
     <string name="contextMenuPhoneNumberSms">Skriv ett SMS</string>
     <string name="createFolderName">Mappens namn</string>
+    <string name="createReminderBottomSheetTitle">Lägg till en påminnelse</string>
     <string name="datePickerTitle">Välj datum och tid</string>
     <string name="dateTitle">Datum:</string>
+    <plurals name="daysBeforeSendingReminder">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dagar</item>
+    </plurals>
     <string name="deleteAccountWarning">Raderingen av ditt konto blir slutgiltig. Du kommer inte att kunna återaktivera ditt konto.</string>
     <string name="deleteFolderDialogDescription">Innehållet i mappen %s kommer att raderas permanent utan att gå via papperskorgen.</string>
     <string name="deleteFolderDialogTitle">Ta bort mapp</string>
@@ -278,7 +290,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Berörda mottagare</string>
     <string name="encryptedMessagePasswordLabel">Dela detta lösenord via privat meddelande. Du kommer inte att kunna kopiera det när du väl har skickat det.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Krypteringen har inaktiverats</string>
-    <string name="encryptedMessageSnackbarScheduledUnavailable">Schemalagda e-postmeddelanden är inte tillgängliga för krypterade meddelanden</string>
+    <string name="encryptedMessageSnackbarScheduledReminderUnavailable">Schemalagd sändning och påminnelser är inte tillgängliga för krypterade meddelanden</string>
     <string name="encryptedMessageUpdatePasswordButton">Ändra lösenord</string>
     <string name="encryptedPasswordProtectionTitle">Lösenordsskydd</string>
     <string name="encryptedProtectionAdDescription">Skydda ditt meddelande från obehörig åtkomst med Infomaniak-kryptering.</string>
@@ -292,6 +304,7 @@
     <string name="encryptedStatePanelIncomplete">Ett lösenord krävs för att slutföra sändningen.</string>
     <string name="encryptedStatePanelStatePartialLabel">Delvis</string>
     <string name="encryptedStatePanelTitle">Kryptering</string>
+    <string name="encryptionDisabledByScheduledOrReminder">Kryptering är inte tillgänglig om schemalagd sändning eller påminnelse är aktiverad</string>
     <string name="enterPasswordTitle">Ange lösenord</string>
     <string name="errorAlreadyLinkedMailbox">Denna e-postadress är redan länkad till ditt konto</string>
     <string name="errorAtLeastOneRecipient">Minst en mottagare krävs</string>
@@ -366,6 +379,10 @@
     <string name="genericMessageTranslated">Meddelande översatt</string>
     <string name="googlePlayServicesAreRequired">Google Play Services krävs</string>
     <string name="groupContactsTitle">Grupp: %s</string>
+    <plurals name="hoursBeforeSendingReminder">
+        <item quantity="one">%d timme</item>
+        <item quantity="other">%d timmar</item>
+    </plurals>
     <string name="inboxFolder">Inkorg</string>
     <string name="kSuiteProQuotasAlertDescription">Din e-postlagring är nästan full. Uppgradera till obegränsad lagring och lås upp nya funktioner.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Din e-postlagring är full. Uppgradera till obegränsad lagring och lås upp nya funktioner.</string>
@@ -473,6 +490,20 @@
     <string name="readMore">Läs mer</string>
     <string name="recentSearchesTitle">Senaste sökningar</string>
     <string name="refreshTokenError">Du har kopplats bort</string>
+    <plurals name="reminderAfterHeaderTitle">
+        <item quantity="one">%1$s väntar på svar sedan %2$s</item>
+        <item quantity="other">%1$s väntar på svar sedan %2$s</item>
+    </plurals>
+    <plurals name="reminderBeforeHeaderTitle">
+        <item quantity="one">%1$s väntar på svar senast %2$s</item>
+        <item quantity="other">%1$s väntar på svar senast %2$s</item>
+    </plurals>
+    <string name="reminderBottomSheetTitle">Skjut upp påminnelsen</string>
+    <string name="reminderFollowUpButton">Uppföljning</string>
+    <string name="reminderFollowUpPlaceholderText">Hej,\nÄr det möjligt att få feedback om detta ämne?\nTack på förhand.</string>
+    <string name="reminderMarkAsDoneButton">Markera som klar</string>
+    <string name="reminderNoResponseHeaderTitle">Påminnelse: inget svar från %1$s på detta e-postmeddelande sedan %2$s</string>
+    <string name="reminderVisibilityTitle">Påminnelsens synlighet</string>
     <string name="renameFolder">Byt namn på mappen</string>
     <string name="reportDisplayProblemDescription">Samtycker du till att dela dina data med våra utvecklare så att de kan hjälpa dig med ditt problem?</string>
     <string name="reportDisplayProblemTitle">Rapportera ett visningsproblem</string>
@@ -495,6 +526,12 @@
     <string name="scheduleSendingTitle">Schemalägg sändning</string>
     <string name="scheduledEmailHeader">Detta e-postmeddelande kommer att skickas detta datum: %s</string>
     <string name="scheduledMessagesFolder">Schemalagda meddelanden</string>
+    <string name="scheduledSendDelayTooShortError">Planerad sändningsfördröjning för kort</string>
+    <string name="scheduledSendMinimumDelayRequirement">En sändning måste planläggas minst 5 minuter i förväg.</string>
+    <string name="scheduledTimeInvalidError">Ogiltig schemalagd sändningstid</string>
+    <string name="scheduledTimeInvalidErrorWithDate">Ogiltig tid för schemalagd sändning: %s</string>
+    <string name="scheduledTimePassedError">Schemalagd sändningstid överskriden</string>
+    <string name="scheduledTimePassedErrorWithDate">Schemalagd sändningstid överskriden: %s</string>
     <string name="searchAllMessages">Alla meddelanden</string>
     <string name="searchFieldPlaceholder">Sök e-post</string>
     <string name="searchFilterAttachment">Bilagor</string>
@@ -505,8 +542,11 @@
     <string name="selectDateDialogTitle">Välj datum</string>
     <string name="selectSignatureNone">Ingen signatur</string>
     <string name="selectTimeDialogTitle">Välj tid</string>
+    <string name="selectionReminderMeOnly">Bara jag</string>
+    <string name="selectionReminderRecipientsAndMe">Mottagare och mig</string>
     <string name="send">Skicka</string>
     <string name="sendConfirmationAction">Skicka bekräftelsen</string>
+    <string name="sendOptions">Skicka-alternativ</string>
     <string name="sentFolder">Skickade meddelanden</string>
     <string name="serverUnavailable">Servrar otillgängliga</string>
     <string name="settingsAccentColor">Accentfärg</string>
@@ -590,11 +630,15 @@
     <string name="shareEmail">Dela e-post</string>
     <string name="snackbarAcknowledgementFailure">Kunde inte skicka</string>
     <string name="snackbarAcknowledgementSuccess">Läskvitto skickat</string>
+    <string name="snackbarAddReminderFailure">Det gick inte att lägga till påminnelsen</string>
+    <string name="snackbarAddReminderSuccess">Påminnelse tillagd</string>
     <string name="snackbarAdminDisabledMessageSending">En administratör har inaktiverat meddelandesändning</string>
     <string name="snackbarBlockUserConfirmation">Avsändaren är nu blockerad</string>
     <string name="snackbarCalendarChoiceSent">Svar beaktat</string>
     <string name="snackbarContactSaved">Ny kontakt registrerad</string>
     <string name="snackbarDeletedConversation">Konversationen finns inte längre</string>
+    <string name="snackbarDisableReminderFailure">Det gick inte att inaktivera påminnelsen</string>
+    <string name="snackbarDisableReminderSuccess">Påminnelsen har inaktiverats</string>
     <string name="snackbarDisplayProblemReported">Visningsproblem rapporterat</string>
     <string name="snackbarDownloadInProgress">Nedladdning pågår…</string>
     <string name="snackbarDraftDeleted">Utkast raderat</string>
@@ -605,9 +649,13 @@
     <string name="snackbarEmailSent">E-post skickad</string>
     <string name="snackbarInvalidUrl">Ogiltig URL</string>
     <string name="snackbarLinkCopiedToClipboard">Länk kopierad till urklipp</string>
+    <string name="snackbarMarkAsDoneReminderFailure">Det gick inte att markera påminnelsen som utförd</string>
+    <string name="snackbarMarkAsDoneReminderSuccess">Påminnelse markerad som klar</string>
     <string name="snackbarMessageDeletedPermanently">Meddelande raderat</string>
     <string name="snackbarMessageMoved">Meddelande flyttat till %s</string>
     <string name="snackbarMessageMovedToSpam">Meddelande flyttat till skräppost och användare blockerad</string>
+    <string name="snackbarModifyReminderFailure">Det gick inte att ändra påminnelsen</string>
+    <string name="snackbarModifyReminderSuccess">Påminnelsen har ändrats</string>
     <string name="snackbarMoveCancelled">Flytt avbruten</string>
     <string name="snackbarPasswordCopied">Lösenord kopierat</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer kopierat till urklipp</string>
@@ -711,6 +759,14 @@
     <string name="trashFolder">Papperskorg</string>
     <string name="tryAgain">Försök igen.</string>
     <string name="unblockButton">Avblockera</string>
+    <plurals name="unitDays">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dagar</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Timme</item>
+        <item quantity="other">Timmar</item>
+    </plurals>
     <string name="unknownDialogTitleExpeditor">Okänd avsändare</string>
     <string name="unknownDialogTitleRecipient">Okänd mottagare</string>
     <string name="unknownRecipientTitle">(okänd)</string>

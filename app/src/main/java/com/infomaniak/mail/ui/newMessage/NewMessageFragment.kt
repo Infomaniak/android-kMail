@@ -47,6 +47,8 @@ import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.common.observe
+import com.infomaniak.core.common.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
@@ -85,9 +87,8 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.RescheduleDraftBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -95,6 +96,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
+import com.infomaniak.mail.ui.newMessage.sendOptions.DraftSendOptionsFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
@@ -120,6 +122,7 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
+import com.infomaniak.mail.utils.date.DateFormatUtils.formatDelayText
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -148,6 +151,7 @@ import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -177,8 +181,10 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
-    private val isScheduledDraftsEnabledLive by lazy {
-        newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.SCHEDULE_DRAFTS) }.distinctUntilChanged()
+    private val isScheduledDraftsOrRemindersEnabledLive by lazy {
+        newMessageViewModel.featureFlagsLive.map {
+            it.contains(FeatureFlag.SCHEDULE_DRAFTS) || it.contains(FeatureFlag.RESPONSE_REQUIRED)
+        }.distinctUntilChanged()
     }
     private val areMentionsAvailableLive by lazy {
         newMessageViewModel.featureFlagsLive.map { it.contains(FeatureFlag.MENTIONS) }.distinctUntilChanged()
@@ -309,6 +315,8 @@ class NewMessageFragment : Fragment() {
         }
 
         observeFeatureFlagUpdates()
+        observeSchedule()
+        observeReminder()
     }
 
     private fun handleEdgeToEdge() = with(binding) {
@@ -329,7 +337,7 @@ class NewMessageFragment : Fragment() {
     private fun setupBackActionHandler() {
 
         fun scheduleDraft(timestamp: Long) {
-            newMessageViewModel.setScheduleDate(Date(timestamp))
+            newMessageViewModel.setScheduleConfig(ScheduleConfig.Scheduled(timestamp))
             tryToSendEmail(isScheduled = true)
         }
 
@@ -468,6 +476,23 @@ class NewMessageFragment : Fragment() {
             },
         )
 
+        scheduleAlert.apply {
+            onAction1 { navigateToScheduleSendBottomSheet() }
+            onAction2 { newMessageViewModel.setScheduleConfig(ScheduleConfig.None) }
+        }
+
+        reminderAlert.apply {
+            onAction1 {
+                trackNewMessageEvent(MatomoName.RescheduleReminderBanner)
+                navigateToScheduleSendBottomSheet()
+            }
+            onAction2 {
+                trackNewMessageEvent(MatomoName.DeactivateReminderBanner)
+                newMessageViewModel.setReminderConfig(ReminderConfig.None)
+                newMessageViewModel.setShouldRemindRecipient(true)
+            }
+        }
+
         recipientFieldsManager.setupAutoCompletionFields()
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
@@ -490,6 +515,48 @@ class NewMessageFragment : Fragment() {
         scrim.setOnClickListener {
             scrim.isClickable = false
             aiManager.closeAiPrompt()
+        }
+    }
+
+    private fun observeSchedule() {
+        newMessageViewModel.scheduleConfig.observe(viewLifecycleOwner) { config ->
+            when (config) {
+                is ScheduleConfig.Scheduled -> {
+                    val date = Date(config.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    val minSelectableTime = System.currentTimeMillis() + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
+                    val isScheduleTooSoon = config.epochMillis < minSelectableTime
+                    val stringRes = if (isScheduleTooSoon) R.string.scheduledTimePassedError else R.string.scheduledEmailHeader
+                    binding.scheduleAlert.apply {
+                        setDescription(getString(stringRes, date))
+                        isVisible = true
+                    }
+                    binding.divider7.isVisible = true
+                }
+                ScheduleConfig.None -> {
+                    binding.scheduleAlert.isVisible = false
+                    binding.divider7.isVisible = false
+                }
+            }
+        }
+    }
+
+    private fun observeReminder() {
+        newMessageViewModel.reminderConfig.observe(viewLifecycleOwner) { config ->
+            when (config) {
+                is ReminderConfig.Delayed -> {
+                    val dateText = requireContext().formatDelayText(config.delayMinutes)
+
+                    binding.reminderAlert.apply {
+                        setDescription(getString(R.string.callIfNoResponseHeaderTitle, dateText))
+                        isVisible = true
+                    }
+                    binding.divider6.isVisible = true
+                }
+                is ReminderConfig.None -> {
+                    binding.reminderAlert.isVisible = false
+                    binding.divider6.isVisible = false
+                }
+            }
         }
     }
 
@@ -610,7 +677,8 @@ class NewMessageFragment : Fragment() {
     private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
         when (newMessageViewModel.draftMode()) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.REPLY_ALL,
+            DraftMode.FOLLOW_UP -> focusBodyField()
             DraftMode.FORWARD -> focusToField()
             DraftMode.NEW_MAIL -> if (isToFieldEmpty) focusToField() else focusBodyField()
         }
@@ -847,8 +915,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeFeatureFlagUpdates() {
-        isScheduledDraftsEnabledLive.observe(viewLifecycleOwner) { isScheduledDraftsEnabled ->
-            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+        isScheduledDraftsOrRemindersEnabledLive.observe(viewLifecycleOwner) { isEnabled ->
+            binding.sendOptionsButton.isVisible = isEnabled
         }
 
         areMentionsAvailableLive.observe(viewLifecycleOwner) { areMentionsAvailable ->
@@ -934,28 +1002,72 @@ class NewMessageFragment : Fragment() {
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener {
+        sendOptionsButton.setOnClickListener {
             if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
-                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
+                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledReminderUnavailable))
                 } else {
+                    trackNewMessageEvent(MatomoName.OpenSendOptionsPanel)
                     navigateToScheduleSendBottomSheet()
                 }
             }
         }
 
-        sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() }
+        onSendButtonClicked(mailbox)
+    }
+
+    private fun onSendButtonClicked(mailbox: Mailbox) {
+        binding.sendButton.setOnClickListener {
+            if (!checkMailboxStorage(mailbox)) return@setOnClickListener
+            val scheduleConfig = newMessageViewModel.scheduleConfig.value
+            val isScheduled = scheduleConfig is ScheduleConfig.Scheduled
+            if (isScheduled && checkIfInvalidSchedule(scheduleConfig)) return@setOnClickListener
+            tryToSendEmail(isScheduled = isScheduled)
+        }
+    }
+
+    private fun checkIfInvalidSchedule(scheduleConfig: ScheduleConfig.Scheduled): Boolean {
+        val now = System.currentTimeMillis()
+        val minSelectableTime = now + MIN_SELECTABLE_DATE_MINUTES.minutes.inWholeMilliseconds
+        val isScheduleTooSoon = scheduleConfig.epochMillis < minSelectableTime
+        val isScheduleInvalid = scheduleConfig.epochMillis < now
+
+        if (isScheduleTooSoon) {
+            val dialogTitleRes = if (isScheduleInvalid) R.string.scheduledTimeInvalidError else R.string.scheduledTimePassedError
+
+            descriptionDialog.show(
+                title = getString(dialogTitleRes),
+                description = getString(R.string.scheduledSendMinimumDelayRequirement),
+                positiveButtonText = R.string.buttonReschedule,
+                negativeButtonText = R.string.buttonDisable,
+                onPositiveButtonClicked = {
+                    val descriptionBannerRes = if (isScheduleInvalid) {
+                        R.string.scheduledTimeInvalidErrorWithDate
+                    } else {
+                        R.string.scheduledTimePassedErrorWithDate
+                    }
+                    val date = Date(scheduleConfig.epochMillis).format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+                    binding.scheduleAlert.setDescription(getString(descriptionBannerRes, date))
+
+                    navigateToScheduleSendBottomSheet()
+                },
+                onNegativeButtonClicked = {
+                    newMessageViewModel.setScheduleConfig(ScheduleConfig.None)
+                },
+            )
+        }
+
+        return isScheduleTooSoon
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
-            resId = R.id.scheduleSendBottomSheetDialog,
-            args = ScheduleSendBottomSheetDialogArgs(
+            resId = R.id.sendOptionsFragment,
+            args = DraftSendOptionsFragmentArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentKSuite = mailbox.kSuite,
                 isAdmin = mailbox.isAdmin,
@@ -969,7 +1081,7 @@ class NewMessageFragment : Fragment() {
             val resultIntent = Intent()
             resultIntent.putExtra(
                 MainActivity.DRAFT_ACTION_KEY,
-                if (isScheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
+                if (isScheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name
             )
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
@@ -1014,7 +1126,7 @@ class NewMessageFragment : Fragment() {
                 trackNewMessageEvent(trackConfirmEvent)
                 hasConfirmed = true
             },
-            onCancel = { if (isScheduled) newMessageViewModel.resetScheduledDate() },
+            onCancel = { if (isScheduled) newMessageViewModel.setScheduleConfig(ScheduleConfig.None) },
             onDismiss = { isSendingCanceled.complete(!hasConfirmed) },
         )
 

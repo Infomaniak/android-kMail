@@ -36,4 +36,6 @@ data class DefaultMessageFlags(
     val isSeen: Boolean,
     @SerialName("acknowledged")
     val isAcknowledged: Boolean,
+    @SerialName("has_reminder")
+    val hasReminder: Boolean,
 ) : MessageFlags
