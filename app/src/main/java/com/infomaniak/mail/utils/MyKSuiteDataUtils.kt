@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.core.auth.networking.HttpClient
+import com.infomaniak.core.auth.networking.AuthHttpClientProvider
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteDataManager
@@ -41,7 +41,7 @@ class MyKSuiteDataUtils @Inject constructor(private val mailboxController: Mailb
         // Only fetch the Data if the current user has a my kSuite mailbox
         if (mailboxController.getMyKSuiteMailboxCount(userId = AccountUtils.currentUserId) == 0L) return@runCatching null
 
-        val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClientWithTokenInterceptor)
+        val apiResponse = ApiRepository.getMyKSuiteData(AuthHttpClientProvider.authOkHttpClient)
         if (apiResponse.data != null) {
             upsertKSuiteData(apiResponse.data!!)
         } else {

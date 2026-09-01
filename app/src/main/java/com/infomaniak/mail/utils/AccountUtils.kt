@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import android.content.Context
 import com.infomaniak.core.auth.CredentialManager
 import com.infomaniak.core.auth.TokenAuthenticator
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.auth.networking.HttpClient
+import com.infomaniak.core.auth.networking.AuthHttpClientProvider
 import com.infomaniak.core.auth.room.UserDatabase
 import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.mail.MainApplication
@@ -78,7 +78,7 @@ object AccountUtils : CredentialManager() {
         }
 
     var currentMailboxEmail: String? = null
-    
+
     suspend fun switchToMailbox(mailboxId: Int) {
         RealmDatabase.backupPreviousMailboxContent()
         currentMailboxId = mailboxId
@@ -117,7 +117,7 @@ object AccountUtils : CredentialManager() {
         userDatabase.userDao().insert(user)
     }
 
-    suspend fun updateCurrentUser(okHttpClient: OkHttpClient = HttpClient.okHttpClientWithTokenInterceptor) {
+    suspend fun updateCurrentUser(okHttpClient: OkHttpClient = AuthHttpClientProvider.authOkHttpClient) {
         with(ApiRepository.getUserProfile(okHttpClient)) {
             if (result != ApiResponseStatus.ERROR) requestUser(remoteUser = data ?: return)
         }
