@@ -4,7 +4,7 @@ desugarJDK = "2.1.5"
 dotsindicator = "5.1.0"
 dragDropSwipeRecyclerView = "1.0.0"
 emoji2 = "1.6.0"
-oldKotlinModules = "1.0.0"
+oldKotlinModules = "1.1.0"
 espresso = "3.7.0"
 espressoContrib = "3.7.0"
 firebaseMessagingKtx = "24.1.2"
@@ -12,7 +12,8 @@ flexbox = "3.0.0"
 fragmentTesting = "1.8.9"
 googleServices = "4.4.4"
 hamcrest = "3.0"
-jsoup = "1.21.2"
+jsoup = "1.23.1"
+jspecify = "1.0.0"
 junitKtx = "1.3.0"
 leakcanaryAndroid = "2.14"
 lifecycleProcess = "2.10.0"
@@ -36,6 +37,7 @@ google-services = { module = "com.google.gms:google-services", version.ref = "go
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 infomaniak-emoji-reaction-models = { module = "com.infomaniak.mail.oldkotlin:emoji-reaction-models", version.ref = "oldKotlinModules" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
