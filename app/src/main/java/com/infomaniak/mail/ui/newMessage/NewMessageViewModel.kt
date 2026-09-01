@@ -75,6 +75,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
 import com.infomaniak.mail.data.models.extensions.action
 import com.infomaniak.mail.data.models.extensions.createValidRecipientOrNull
+import com.infomaniak.mail.data.models.extensions.getCacheFile
 import com.infomaniak.mail.data.models.extensions.getDefaultSignatureWithFallback
 import com.infomaniak.mail.data.models.extensions.getDummySignature
 import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
@@ -1258,6 +1259,19 @@ class NewMessageViewModel @Inject constructor(
             updatedMentions
         }
 
+    }
+
+    fun saveAttachmentsToCacheDir(inlineAttachments: List<Attachment>, onSaved: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            inlineAttachments.forEach { attachment ->
+                attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
+                    attachment.getCacheFile(appContext)?.let { cacheFile ->
+                        LocalStorageUtils.saveAttachmentToCacheDir(inputStream, cacheFile)
+                    }
+                }
+            }
+            onSaved()
+        }
     }
 
     enum class ImportationResult {

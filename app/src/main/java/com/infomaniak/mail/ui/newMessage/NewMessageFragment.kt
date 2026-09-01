@@ -78,8 +78,6 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.DraftAction
-import com.infomaniak.mail.data.models.extensions.getCacheFile
-import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.data.models.extensions.kSuite
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
@@ -116,7 +114,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getMentionsStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getRemoveElementsByIdScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getReplaceSignatureScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetAiContentScript
-import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.EDITOR_LOCAL_SIGNATURE_ID
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME
 import com.infomaniak.mail.utils.MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME
@@ -146,12 +143,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
@@ -852,21 +847,14 @@ class NewMessageFragment : Fragment() {
                 val updatedAttachments = attachmentsLiveData.valueOrEmpty() + inlineAttachments
                 attachmentsLiveData.postValue(updatedAttachments)
 
-                viewLifecycleOwner.lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        inlineAttachments.forEach { attachment ->
-                            attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
-                                attachment.getCacheFile(requireContext())?.let { cacheFile ->
-                                    LocalStorageUtils.saveAttachmentToCacheDir(inputStream, cacheFile)
-                                }
-                            }
+                saveAttachmentsToCacheDir(inlineAttachments) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        refreshEditorWebViewClient(updatedAttachments)
+                        inlineAttachments.mapNotNull(Attachment::contentId).forEach { contentId ->
+                            binding.editorWebView.executeJsMethodWhenEditorIsSetup(
+                                JsExecutableMethod("insertInlineImage", contentId),
+                            )
                         }
-                    }
-                    refreshEditorWebViewClient(updatedAttachments)
-                    inlineAttachments.mapNotNull(Attachment::contentId).forEach { contentId ->
-                        binding.editorWebView.executeJsMethodWhenEditorIsSetup(
-                            JsExecutableMethod("insertInlineImage", contentId),
-                        )
                     }
                 }
             }
