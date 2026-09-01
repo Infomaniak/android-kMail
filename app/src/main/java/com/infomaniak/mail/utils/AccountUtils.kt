@@ -39,7 +39,9 @@ import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import io.sentry.protocol.User as SentryUser
 
-object AccountUtils : CredentialManager() {
+object AccountUtils : CredentialManager(
+    userDataCleanableList = { MainApplication.userDataCleanableList }
+) {
 
     const val NO_MAILBOX_USER_ID_KEY = "noMailboxUserId"
 
@@ -110,11 +112,9 @@ object AccountUtils : CredentialManager() {
         return (getUserById(currentUserId) ?: userDatabase.userDao().getFirst()).also { currentUser = it }
     }
 
-    suspend fun addUser(user: User) {
+    override suspend fun addUser(user: User) {
         currentUser = user
-        val userId = user.id.toLong()
-        MainApplication.userDataCleanableList.forEach { it.resetForUser(userId) }
-        userDatabase.userDao().insert(user)
+        super.addUser(user)
     }
 
     suspend fun updateCurrentUser(okHttpClient: OkHttpClient = AuthHttpClientProvider.authOkHttpClient) {
@@ -135,11 +135,13 @@ object AccountUtils : CredentialManager() {
         }
     }
 
-    suspend fun removeUser(user: User) {
-        val userId = user.id.toLong()
-        MainApplication.userDataCleanableList.forEach { it.resetForUser(userId) }
-        userDatabase.userDao().delete(user)
+    override suspend fun removeUser(userId: Int) {
+        super.removeUser(userId)
     }
 
-    fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
+    suspend fun removeUser(user: User) {
+        removeUser(user.id)
+    }
+
+    suspend fun allUsers(): List<User> = userDatabase.userDao().allUsers()
 }

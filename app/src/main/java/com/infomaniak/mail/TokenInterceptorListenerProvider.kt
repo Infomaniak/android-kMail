@@ -29,7 +29,7 @@ object TokenInterceptorListenerProvider {
     fun tokenInterceptorListener(
         refreshTokenError: (User) -> Unit,
         globalCoroutineScope: CoroutineScope,
-    ) = object : TokenInterceptorListener {
+    ) = object : TokenInterceptorListener(dedicatedUserId = null) {
         val userTokenFlow by lazy { AppSettingsController.getCurrentUserIdFlow().mapToApiToken(globalCoroutineScope) }
 
         override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {

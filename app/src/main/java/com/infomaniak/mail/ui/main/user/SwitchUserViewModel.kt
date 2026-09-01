@@ -53,7 +53,7 @@ class SwitchUserViewModel @Inject constructor(
     ).mapNotNull { it.obj }.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     val accounts: SharedFlow<List<User>> = flow {
-        val users = AccountUtils.getAllUsersSync().sortedBy { it.displayName }
+        val users = AccountUtils.allUsers().sortedBy { it.displayName }
         emit(users)
     }
         .flowOn(ioDispatcher)
