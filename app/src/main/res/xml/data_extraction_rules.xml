@@ -19,6 +19,11 @@
     <cloud-backup>
         <include domain="sharedpref" path="." />
         <include domain="file" path="datastore/" />
+        <include domain="database" path="user_database" />
+
+        <include domain="file" path="AppSettings.realm" />
+        <include domain="file" path="AppSettings.realm.lock" />
+        <include domain="file" path="AppSettings.realm.management/" />
     </cloud-backup>
 
     <device-transfer>
@@ -28,7 +33,6 @@
 
         <include domain="file" path="AppSettings.realm" />
         <include domain="file" path="AppSettings.realm.lock" />
-        <include domain="file" path="AppSettings.realm.note" />
         <include domain="file" path="AppSettings.realm.management/" />
     </device-transfer>
 </data-extraction-rules>

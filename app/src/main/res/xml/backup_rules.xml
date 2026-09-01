@@ -18,4 +18,9 @@
 <full-backup-content>
     <include domain="sharedpref" path="." />
     <include domain="file" path="datastore/" />
+    <include domain="database" path="user_database" />
+
+    <include domain="file" path="AppSettings.realm" />
+    <include domain="file" path="AppSettings.realm.lock" />
+    <include domain="file" path="AppSettings.realm.management/" />
 </full-backup-content>
