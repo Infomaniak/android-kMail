@@ -41,7 +41,6 @@ class MailFullBackupAgent : FullBackupAgent() {
         mode: Long,
         mtime: Long
     ) {
-        println("onRestoreFile($destination, $size)")
         // Always restore the files, regardless of the data extraction rules.
         FullBackup.restoreFile(data, size, type, mode, mtime, destination)
     }
