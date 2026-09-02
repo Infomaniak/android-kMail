@@ -37,7 +37,6 @@ import coil3.SingletonImageLoader
 import com.infomaniak.core.auth.AccessTokenUsageInterceptor
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.auth.networking.HttpClient
 import com.infomaniak.core.coil.ImageLoaderProvider
 import com.infomaniak.core.common.AssociatedUserDataCleanable
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
@@ -241,29 +240,24 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
             apiErrorCodes = ErrorCode.apiErrorCodes,
             apiEnvironment = ApiEnvironment.Prod
         )
-
-        AuthConfiguration.init(
-            appId = BuildConfig.APPLICATION_ID,
-            appVersionCode = BuildConfig.VERSION_CODE,
-            appVersionName = BuildConfig.VERSION_NAME,
-            clientId = BuildConfig.CLIENT_ID,
-            accessType = null,
-        )
     }
 
     private fun configureHttpClient() {
-        AccountUtils.onRefreshTokenError = refreshTokenError
-        val tokenInterceptorListener = tokenInterceptorListener(refreshTokenError, globalCoroutineScope)
+        AuthConfiguration.init(
+            clientId = BuildConfig.CLIENT_ID,
+            accessType = null,
+            tokenInterceptorListener = tokenInterceptorListener(::onRefreshTokenError, globalCoroutineScope)
+        )
+        AccountUtils.onRefreshTokenError = ::onRefreshTokenError
         HttpClientConfig.customInterceptors = listOf(
             AccessTokenUsageInterceptor(
                 previousApiCall = localSettings.accessTokenApiCallRecord,
                 updateLastApiCall = { localSettings.accessTokenApiCallRecord = it },
             ),
         )
-        HttpClient.init(tokenInterceptorListener)
     }
 
-    private val refreshTokenError: (User) -> Unit = { user ->
+    private fun onRefreshTokenError(user: User) {
         val openAppIntent = getLaunchIntent()
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             this, 0, openAppIntent,
@@ -283,7 +277,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
-        return ImageLoaderProvider.newImageLoader(context, tokenInterceptorListener(refreshTokenError, globalCoroutineScope))
+        return ImageLoaderProvider.newImageLoader(context, tokenInterceptorListener(::onRefreshTokenError, globalCoroutineScope))
     }
 
     companion object {

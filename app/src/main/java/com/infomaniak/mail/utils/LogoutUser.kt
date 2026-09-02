@@ -24,7 +24,7 @@ import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.inappreview.AppReviewSettingsRepository
 import com.infomaniak.core.inappupdate.AppUpdateSettingsRepository
-import com.infomaniak.core.network.networking.HttpClient
+import com.infomaniak.core.network.networking.DefaultHttpClientProvider
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -95,7 +95,7 @@ class LogoutUser @Inject constructor(
     private fun User.logoutToken() = globalCoroutineScope.launch(ioDispatcher) {
         runCatching {
             appContext.getInfomaniakLogin().deleteToken(
-                okHttpClient = HttpClient.okHttpClient,
+                okHttpClient = DefaultHttpClientProvider.okHttpClient,
                 token = apiToken,
             )?.let { errorStatus ->
                 SentryLog.i(TAG, "API response error: $errorStatus")

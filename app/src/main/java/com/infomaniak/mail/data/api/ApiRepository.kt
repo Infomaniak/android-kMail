@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.core.auth.api.ApiRepositoryCore
-import com.infomaniak.core.auth.networking.HttpClient
+import com.infomaniak.core.auth.networking.AuthHttpClientProvider
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.common.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.core.common.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
@@ -102,7 +102,7 @@ object ApiRepository : ApiRepositoryCore() {
         url: String,
         method: ApiController.ApiMethod,
         body: Any? = null,
-        okHttpClient: OkHttpClient = HttpClient.okHttpClientWithTokenInterceptor,
+        okHttpClient: OkHttpClient = AuthHttpClientProvider.authOkHttpClient,
     ): T = ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
 
     suspend fun ping(): ApiResponse<String> = callApi(ApiRoutes.ping(), GET)
@@ -132,7 +132,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.signatures(mailboxHostingId, mailboxName),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
+            okHttpClient = okHttpClient ?: AuthHttpClientProvider.authOkHttpClient,
         )
     }
 
@@ -152,7 +152,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     suspend fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
-        return callApi(ApiRoutes.mailboxes(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor)
+        return callApi(ApiRoutes.mailboxes(), GET, okHttpClient = okHttpClient ?: AuthHttpClientProvider.authOkHttpClient)
     }
 
     suspend fun isInfomaniakMailboxes(emails: Set<String>): ApiResponse<List<MailboxHostingStatus>> {
@@ -178,7 +178,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=$encryptionWiths,emoji_reactions_per_message"),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
+            okHttpClient = okHttpClient ?: AuthHttpClientProvider.authOkHttpClient,
         )
     }
 
@@ -309,7 +309,7 @@ object ApiRepository : ApiRepositoryCore() {
         messagesUids: List<String>,
         destinationId: String,
         alsoMoveReactionMessages: Boolean,
-        okHttpClient: OkHttpClient = HttpClient.okHttpClientWithTokenInterceptor,
+        okHttpClient: OkHttpClient = AuthHttpClientProvider.authOkHttpClient,
     ): List<ApiResponse<MoveResult>> = batchOver(messagesUids) {
         callApi(
             url = ApiRoutes.moveMessages(mailboxUuid).withMoveReactions(alsoMoveReactionMessages),
@@ -362,7 +362,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.getDateOrderedMessagesUids(mailboxUuid, folderId),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
+            okHttpClient = okHttpClient ?: AuthHttpClientProvider.authOkHttpClient,
         )
     }
 
@@ -377,7 +377,7 @@ object ApiRepository : ApiRepositoryCore() {
             url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor),
             method = if (uids == null) GET else POST,
             body = if (uids == null) null else mapOf("uids" to uids),
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
+            okHttpClient = okHttpClient ?: AuthHttpClientProvider.authOkHttpClient,
         )
     }
 
@@ -390,7 +390,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, uids),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
+            okHttpClient = okHttpClient ?: AuthHttpClientProvider.authOkHttpClient,
         )
     }
 
@@ -480,7 +480,7 @@ object ApiRepository : ApiRepositoryCore() {
             ApiRoutes.aiConversation(currentMailboxUuid),
             POST,
             body,
-            HttpClient.okHttpClientLongTimeoutWithTokenInterceptor
+            AuthHttpClientProvider.authOkHttpClientLongTimeout
         )
     }
 
@@ -492,7 +492,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!, currentMailboxUuid),
             method = PATCH,
-            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
+            okHttpClient = AuthHttpClientProvider.authOkHttpClientLongTimeout,
         )
     }
 
@@ -506,7 +506,7 @@ object ApiRepository : ApiRepositoryCore() {
             url = ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!, currentMailboxUuid),
             method = POST,
             body = body,
-            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor
+            okHttpClient = AuthHttpClientProvider.authOkHttpClientLongTimeout
         )
     }
 
@@ -515,7 +515,7 @@ object ApiRepository : ApiRepositoryCore() {
             url = ApiRoutes.aiSummary(),
             method = POST,
             body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
-            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
+            okHttpClient = AuthHttpClientProvider.authOkHttpClientLongTimeout,
         )
     }
 
@@ -524,7 +524,7 @@ object ApiRepository : ApiRepositoryCore() {
             url = ApiRoutes.aiTranslate(),
             method = POST,
             body = mapOf("destination_language" to languageCode, "mailbox_uuid" to mailboxUuid, "msg_uid" to msgUid),
-            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
+            okHttpClient = AuthHttpClientProvider.authOkHttpClientLongTimeout,
         )
     }
 
@@ -547,7 +547,7 @@ object ApiRepository : ApiRepositoryCore() {
             .post(formBuilder.build())
             .build()
 
-        val response = HttpClient.okHttpClientWithTokenInterceptor.newCall(request).await()
+        val response = AuthHttpClientProvider.authOkHttpClient.newCall(request).await()
 
         return ApiController.json.decodeFromString(response.bodyAsStringOrNull() ?: "")
 
@@ -565,7 +565,7 @@ object ApiRepository : ApiRepositoryCore() {
             .url(ApiRoutes.resource(resource))
             .headers(HttpUtils.getHeaders(contentType = null))
             .build()
-        return HttpClient.okHttpClientWithTokenInterceptor.newBuilder().build().newCall(request).await()
+        return AuthHttpClientProvider.authOkHttpClient.newBuilder().build().newCall(request).await()
     }
 
     suspend fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {
@@ -598,7 +598,7 @@ object ApiRepository : ApiRepositoryCore() {
             .get()
             .build()
 
-        return HttpClient.okHttpClientWithTokenInterceptor.newCall(request).await()
+        return AuthHttpClientProvider.authOkHttpClient.newCall(request).await()
     }
 
     suspend fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
