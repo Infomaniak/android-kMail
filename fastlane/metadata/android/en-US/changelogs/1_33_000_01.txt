@@ -1,0 +1,4 @@
+- Add inline image insertion in the editor
+- Improve the email composer and attachment handling
+- Various fixes and improvements
+

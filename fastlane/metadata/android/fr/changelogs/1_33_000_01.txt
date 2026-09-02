@@ -1,0 +1,4 @@
+- Ajout de l'insertion d'images dans l'éditeur
+- Amélioration de la rédaction de mails et de la gestion des pièces jointes
+- Diverses corrections et améliorations
+
