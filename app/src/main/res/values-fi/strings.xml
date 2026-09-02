@@ -366,6 +366,8 @@
     <string name="genericMessageTranslated">Viesti käännetty</string>
     <string name="googlePlayServicesAreRequired">Google Play Services vaaditaan</string>
     <string name="groupContactsTitle">Ryhmä: %s</string>
+    <string name="importFilesButton">Tiedostot</string>
+    <string name="importPhotosButton">Kuvat</string>
     <string name="inboxFolder">Saapuneet</string>
     <string name="kSuiteProQuotasAlertDescription">Mail-tallennustilasi on melkein täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>
     <string name="kSuiteProQuotasAlertFullDescription">Mail-tallennustilasi on täynnä. Päivitä rajattomaan tallennustilaan ja avaa uusia ominaisuuksia.</string>

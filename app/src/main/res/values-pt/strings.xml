@@ -366,6 +366,8 @@
     <string name="genericMessageTranslated">Mensagem traduzida</string>
     <string name="googlePlayServicesAreRequired">Os Google Play Services são necessários</string>
     <string name="groupContactsTitle">Grupo: %s</string>
+    <string name="importFilesButton">Ficheiros</string>
+    <string name="importPhotosButton">Fotos</string>
     <string name="inboxFolder">Caixa de entrada</string>
     <string name="kSuiteProQuotasAlertDescription">O espaço de armazenamento do seu Mail está quase cheio. Atualize para armazenamento ilimitado e desbloqueie novas funcionalidades.</string>
     <string name="kSuiteProQuotasAlertFullDescription">O espaço de armazenamento do seu Mail está cheio. Atualize para armazenamento ilimitado e desbloqueie novas funcionalidades.</string>

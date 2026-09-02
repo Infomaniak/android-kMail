@@ -22,6 +22,7 @@ package com.infomaniak.mail.data.models.extensions
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.data.models.draft.Draft
@@ -42,6 +43,10 @@ fun Attachment.setUploadStatus(attachmentUploadStatus: AttachmentUploadStatus, d
 fun Attachment.backupLocalData(oldAttachment: Attachment, draft: Draft) {
     localUuid = oldAttachment.localUuid
     uploadLocalUri = oldAttachment.uploadLocalUri
+    contentId = oldAttachment.contentId
+    if (oldAttachment.disposition == AttachmentDisposition.INLINE) {
+        oldAttachment.contentId?.let { markAsInline(it) }
+    }
     setUploadStatus(AttachmentUploadStatus.UPLOADED, draft, "backupLocalData -> setUploadStatus")
 }
 

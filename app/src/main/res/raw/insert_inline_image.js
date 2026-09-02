@@ -1,0 +1,71 @@
+/*
+ * Infomaniak Mail - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+(function() {
+    function focusEditorIfNeeded() {
+        if (document.activeElement !== document.body) document.body.focus();
+    }
+
+    function getEditor() {
+        return document.getElementById("editor");
+    }
+
+    globalThis.insertInlineImage = function(contentId) {
+        if (!contentId) return;
+
+        focusEditorIfNeeded();
+
+        var img = document.createElement("img");
+        img.src = "cid:" + contentId;
+        img.alt = "";
+        img.style.maxWidth = "100%";
+        img.style.height = "auto";
+
+        var editor = getEditor();
+        var selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            var range = selection.getRangeAt(0);
+            var isInsideEditor = editor.contains(range.commonAncestorContainer);
+
+            if (isInsideEditor) {
+                range.deleteContents();
+
+                var brBefore1 = document.createElement("br");
+                var brBefore2 = document.createElement("br");
+
+                range.insertNode(brBefore1);
+                range.setStartAfter(brBefore1);
+                range.insertNode(brBefore2);
+
+                range.setStartAfter(brBefore2);
+                range.insertNode(img);
+
+                var brAfter = document.createElement("br");
+                range.setStartAfter(img);
+                range.insertNode(brAfter);
+
+                range.setStartAfter(brAfter);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                return;
+            }
+        }
+
+        editor.appendChild(img);
+    };
+})();
