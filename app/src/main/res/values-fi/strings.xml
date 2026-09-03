@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Estä %s</string>
     <string name="buttonAccept">Hyväksy</string>
     <string name="buttonAccountDelete">Poista tili</string>
-    <string name="buttonAccountLogOut">Kirjaudu ulos</string>
     <string name="buttonAccountSwitch">Vaihda tiliä</string>
     <string name="buttonAddAccount">Lisää tili</string>
     <string name="buttonAddEmailAddress">Lisää sähköpostiosoite</string>

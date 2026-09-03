@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Αποκλεισμός %s</string>
     <string name="buttonAccept">Αποδοχή</string>
     <string name="buttonAccountDelete">Διαγραφή λογαριασμού</string>
-    <string name="buttonAccountLogOut">Αποσύνδεση</string>
     <string name="buttonAccountSwitch">Αλλαγή λογαριασμού</string>
     <string name="buttonAddAccount">Προσθήκη λογαριασμού</string>
     <string name="buttonAddEmailAddress">Προσθήκη διεύθυνσης e-mail</string>

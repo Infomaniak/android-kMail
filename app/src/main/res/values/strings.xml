@@ -124,7 +124,6 @@
     <string name="blockExpeditorTitle">Block %s</string>
     <string name="buttonAccept">Accept</string>
     <string name="buttonAccountDelete">Delete account</string>
-    <string name="buttonAccountLogOut">Log out</string>
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
     <string name="buttonAddEmailAddress">Add an email address</string>

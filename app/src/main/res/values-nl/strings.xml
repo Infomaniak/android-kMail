@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">%s blokkeren</string>
     <string name="buttonAccept">Accepteren</string>
     <string name="buttonAccountDelete">Account verwijderen</string>
-    <string name="buttonAccountLogOut">Afmelden</string>
     <string name="buttonAccountSwitch">Account wijzigen</string>
     <string name="buttonAddAccount">Een account toevoegen</string>
     <string name="buttonAddEmailAddress">Een e-mailadres toevoegen</string>

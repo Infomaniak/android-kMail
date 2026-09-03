@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Blockera %s</string>
     <string name="buttonAccept">Acceptera</string>
     <string name="buttonAccountDelete">Ta bort konto</string>
-    <string name="buttonAccountLogOut">Logga ut</string>
     <string name="buttonAccountSwitch">Byt konto</string>
     <string name="buttonAddAccount">Lägg till ett konto</string>
     <string name="buttonAddEmailAddress">Lägg till en e-postadress</string>

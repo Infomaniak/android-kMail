@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Bloquear %s</string>
     <string name="buttonAccept">Aceitar</string>
     <string name="buttonAccountDelete">Eliminar conta</string>
-    <string name="buttonAccountLogOut">Terminar sessão</string>
     <string name="buttonAccountSwitch">Mudar de conta</string>
     <string name="buttonAddAccount">Adicionar uma conta</string>
     <string name="buttonAddEmailAddress">Adicionar um endereço de e-mail</string>
