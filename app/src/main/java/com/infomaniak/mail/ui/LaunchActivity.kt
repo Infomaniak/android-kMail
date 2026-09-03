@@ -41,7 +41,6 @@ import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -78,22 +77,19 @@ class LaunchActivity : AppCompatActivity() {
 
         handleNotificationDestinationIntent()
 
-        lifecycleScope.launch(ioDispatcher) {
+        lifecycleScope.launch {
             val user = AccountUtils.requestCurrentUser()
 
-            withContext(mainDispatcher) {
+            handleShortcuts()
 
-                handleShortcuts()
-
-                if (user == null) {
-                    launchLoginActivity(LoginActivityArgs(isFirstAccount = true, isHelpShortcutPressed))
-                } else {
-                    startApp()
-                }
-                // After starting the destination activity, we run finish to make sure we close the LaunchScreen,
-                // so that even when we return, the activity will still be closed.
-                finish()
+            if (user == null) {
+                launchLoginActivity(LoginActivityArgs(isFirstAccount = true, isHelpShortcutPressed))
+            } else {
+                startApp()
             }
+            // After starting the destination activity, we run finish to make sure we close the LaunchScreen,
+            // so that even when we return, the activity will still be closed.
+            finish()
         }
     }
 
