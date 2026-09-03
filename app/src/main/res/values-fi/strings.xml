@@ -178,8 +178,6 @@
     <string name="comingSoon">Tulossa pian…</string>
     <string name="commercialFolder">Tarjoukset</string>
     <string name="composeMailboxCurrentTitle">Lähetä viesti osoitteella:</string>
-    <string name="confirmLogoutDescription">Haluatko varmasti kirjautua ulos tililtä %s?</string>
-    <string name="confirmLogoutTitle">Kirjaudu ulos</string>
     <string name="confirmationToBlockAnExpeditorText">Kaikki tulevat viestit lähettäjältä %s siirretään roskapostikansioon.</string>
     <string name="contactActionAddToContacts">Lisää yhteystietoihin</string>
     <string name="contactActionCopyEmailAddress">Kopioi sähköpostiosoite</string>

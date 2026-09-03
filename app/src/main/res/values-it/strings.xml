@@ -178,8 +178,6 @@
     <string name="comingSoon">Prossimamente…</string>
     <string name="commercialFolder">Promozioni</string>
     <string name="composeMailboxCurrentTitle">Invia un messaggio con l’indirizzo:</string>
-    <string name="confirmLogoutDescription">Sei sicuro di volerti disconnettere da %s?</string>
-    <string name="confirmLogoutTitle">Disconnettersi</string>
     <string name="confirmationToBlockAnExpeditorText">Tutti i futuri messaggi di %s saranno spostati nella cartella della posta indesiderata.</string>
     <string name="contactActionAddToContacts">Aggiungi ai contatti</string>
     <string name="contactActionCopyEmailAddress">Copia l’indirizzo e-mail</string>

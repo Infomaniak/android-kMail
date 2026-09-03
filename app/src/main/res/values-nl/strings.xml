@@ -178,8 +178,6 @@
     <string name="comingSoon">Binnenkort…</string>
     <string name="commercialFolder">Promoties</string>
     <string name="composeMailboxCurrentTitle">Een bericht versturen met het adres:</string>
-    <string name="confirmLogoutDescription">Weet u zeker dat u wilt afmelden bij %s?</string>
-    <string name="confirmLogoutTitle">Afmelden</string>
     <string name="confirmationToBlockAnExpeditorText">Alle toekomstige berichten van %s worden verplaatst naar de map Ongewenste e-mail.</string>
     <string name="contactActionAddToContacts">Toevoegen aan contacten</string>
     <string name="contactActionCopyEmailAddress">E-mailadres kopiëren</string>

@@ -184,8 +184,6 @@
     <string name="comingSoon">Wkrótce…</string>
     <string name="commercialFolder">Promocje</string>
     <string name="composeMailboxCurrentTitle">Wyślij wiadomość z adresu:</string>
-    <string name="confirmLogoutDescription">Czy na pewno chcesz się wylogować z konta %s?</string>
-    <string name="confirmLogoutTitle">Wyloguj się</string>
     <string name="confirmationToBlockAnExpeditorText">Wszystkie przyszłe wiadomości od %s zostaną przeniesione do folderu Spam.</string>
     <string name="contactActionAddToContacts">Dodaj do kontaktów</string>
     <string name="contactActionCopyEmailAddress">Kopiuj adres e-mail</string>

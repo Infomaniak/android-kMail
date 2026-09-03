@@ -178,8 +178,6 @@
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
     <string name="composeMailboxCurrentTitle">Skicka ett meddelande med adressen:</string>
-    <string name="confirmLogoutDescription">Är du säker på att du vill logga ut från %s?</string>
-    <string name="confirmLogoutTitle">Logga ut</string>
     <string name="confirmationToBlockAnExpeditorText">Alla framtida meddelanden från %s kommer att flyttas till skräppostmappen.</string>
     <string name="contactActionAddToContacts">Lägg till i kontakter</string>
     <string name="contactActionCopyEmailAddress">Kopiera e-postadress</string>
