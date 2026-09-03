@@ -46,13 +46,14 @@ class MailFullBackupAgent : FullBackupAgent() {
     }
 
     private fun realmFiles(excludedDatabases: List<String>): List<File> {
-        val realmExtensions = listOf(".realm", ".realm.lock")
-        val realmFiles = filesDir.list()!!.asSequence()
+        val realmExtension = ".realm"
+        val files = filesDir.list()!!
+        val realmFiles = files.asSequence()
             .filter { fileName ->
-                realmExtensions.any { fileName.endsWith(it) && fileName.substringBefore(it) !in excludedDatabases }
+                fileName.endsWith(realmExtension) && fileName.substringBefore(realmExtension) !in excludedDatabases
             }.map { filesDir.resolve(it) }
         val realmManagementSuffix = ".realm.management"
-        val realmManagementDirs = filesDir.list()!!.asSequence()
+        val realmManagementDirs = files.asSequence()
             .filter { fileName ->
                 fileName.endsWith(realmManagementSuffix) && fileName.substringBefore(realmManagementSuffix) !in excludedDatabases
             }.map { filesDir.resolve(it) }
