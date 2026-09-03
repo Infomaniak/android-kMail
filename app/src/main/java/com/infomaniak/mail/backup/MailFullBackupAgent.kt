@@ -27,7 +27,7 @@ import java.io.File
 class MailFullBackupAgent : FullBackupAgent() {
 
     override fun onFullBackup(data: FullBackupDataOutput) {
-        if (data.isDeviceToDeviceTransfer == true) {
+        if (data.isDeviceToDeviceTransfer) {
             realmFiles(excludedDatabases = listOf("AppSettings")).forEach { fullBackupFile(it, data) }
         }
         super.onFullBackup(data)
