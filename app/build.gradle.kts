@@ -95,6 +95,15 @@ android {
         compose = true
     }
 
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+            )
+        }
+    }
+
     flavorDimensions.add("distribution")
 
     productFlavors {
@@ -104,6 +113,15 @@ android {
         }
         create("fdroid") {
             dimension = "distribution"
+        }
+    }
+
+    sourceSets {
+        getByName("test") {
+            java.srcDir("src/sharedTest/java")
+        }
+        getByName("androidTest") {
+            java.srcDir("src/sharedTest/java")
         }
     }
 }
@@ -241,15 +259,17 @@ dependencies {
 
     // Test
     testImplementation(core.junit)
-    testImplementation(core.mockk.agent)
-    testImplementation(core.mockk.android)
     testImplementation(core.kotlinx.coroutines.test)
+    testImplementation(core.mockk.android)
 
     androidTestImplementation(core.androidx.junit)
     androidTestImplementation(core.androidx.runner)
     androidTestImplementation(core.androidx.test.core)
     androidTestImplementation(core.androidx.test.core.ktx)
     androidTestImplementation(core.junit)
+    androidTestImplementation(core.mockk.agent)
+    androidTestImplementation(core.mockk.android)
+    androidTestImplementation(core.robolectric)
     androidTestImplementation(core.stdlib)
     androidTestImplementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.core)

@@ -20,6 +20,8 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.CoroutineWorker
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.ApiResponseStatus
@@ -57,11 +59,14 @@ import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import splitties.init.injectAsAppCtx
 import java.io.File
 
+@RunWith(AndroidJUnit4::class)
 class MailActionsManagerTest {
 
-    private val context = mockk<Context>()
+    private val context: Context = ApplicationProvider.getApplicationContext()
     private val notificationUtils = mockk<NotificationUtils>()
     private val notificationManagerCompat = mockk<NotificationManagerCompat>()
     private val okHttpClient = mockk<OkHttpClient>()
@@ -69,6 +74,10 @@ class MailActionsManagerTest {
 
     private var draftController = DraftController(mailboxContentRealm)
     private val mailboxInfoRealm: Realm by lazy { RealmDatabase.mailboxInfo }
+
+    init {
+        context.injectAsAppCtx()
+    }
 
     @Before
     fun setup() {
@@ -80,7 +89,7 @@ class MailActionsManagerTest {
     }
 
     @Test
-    fun `test sending email`() = runTest {
+    fun testSendingEmail() = runTest {
         launch {
             draftController.upsertDraft(getDraft())
             assert(draftController.getAllDrafts(mailboxContentRealm()).count() == 1) { "We should have one draft" }
@@ -90,7 +99,7 @@ class MailActionsManagerTest {
     }
 
     @Test
-    fun `test attachments`() = runTest {
+    fun testAttachments() = runTest {
         launch {
             val file = mockk<File>()
             every { file.exists() } answers { true }
