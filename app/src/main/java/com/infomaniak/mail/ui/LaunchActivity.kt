@@ -19,10 +19,14 @@ package com.infomaniak.mail.ui
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
+import com.infomaniak.core.auth.backup.RestoreFromBackupManager
+import com.infomaniak.core.auth.backup.RestoringFromBackupFailedScreen
 import com.infomaniak.core.legacy.extensions.setDefaultLocaleIfNeeded
+import com.infomaniak.core.ui.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.MatomoMail.trackShortcutEvent
@@ -40,6 +44,8 @@ import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -78,6 +84,7 @@ class LaunchActivity : AppCompatActivity() {
         handleNotificationDestinationIntent()
 
         lifecycleScope.launch {
+            handleRestoreFromBackup()
             val user = AccountUtils.requestCurrentUser()
 
             handleShortcuts()
@@ -91,6 +98,21 @@ class LaunchActivity : AppCompatActivity() {
             // so that even when we return, the activity will still be closed.
             finish()
         }
+    }
+
+    private suspend fun handleRestoreFromBackup() {
+        val manager = RestoreFromBackupManager.instance
+        manager.state.transform { state ->
+            when (state) {
+                RestoreFromBackupManager.State.RestoringFromBackup -> {
+                    setContent {}
+                }
+                is RestoreFromBackupManager.State.RestoringFromBackupFailed -> {
+                    setContent { MaterialThemeFromXml { RestoringFromBackupFailedScreen(state) } }
+                }
+                RestoreFromBackupManager.State.Settled -> emit(Unit)
+            }
+        }.first()
     }
 
     private fun startApp() {
