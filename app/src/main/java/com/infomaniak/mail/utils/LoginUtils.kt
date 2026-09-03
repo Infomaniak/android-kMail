@@ -104,7 +104,7 @@ class LoginUtils @Inject constructor(
 
     suspend fun fetchMailbox(user: User, mailboxController: MailboxController): Any {
         val okhttpClient = DefaultHttpClientProvider.okHttpClient.newBuilder().addInterceptor { chain ->
-            val newRequest = changeAccessToken(chain.request(), user.apiToken)
+            val newRequest = changeAccessToken(chain.request(), user.apiToken.accessToken)
             chain.proceed(newRequest)
         }.build()
 

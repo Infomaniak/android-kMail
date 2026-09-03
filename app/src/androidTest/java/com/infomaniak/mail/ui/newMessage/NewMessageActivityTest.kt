@@ -86,6 +86,7 @@ class NewMessageActivityTest : BaseActivityTest(startingActivity = LoginActivity
         onView(isRoot()).perform(waitFor(3.seconds))
 
         onView(withId(R.id.editorAttachment)).perform(click())
+        onView(withText(R.string.importFilesButton)).perform(click())
 
         onViewWithTimeout(matcher = withId(R.id.attachmentsRecyclerView), assertion = matches(isDisplayed()))
         onViewWithTimeout(matcher = withText(fakeAttachment.name), assertion = matches(isDisplayed()))
