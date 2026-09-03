@@ -61,7 +61,7 @@
         app:iconColor="@color/redDestructiveAction"
         app:iconPaddingEnd="@dimen/marginStandardMedium"
         app:iconPaddingStart="@dimen/marginStandard"
-        app:title="@string/buttonAccountLogOut"
+        app:title="@string/buttonLogOut"
         app:titleColor="@color/redDestructiveAction"
         app:visibleDivider="false" />
 

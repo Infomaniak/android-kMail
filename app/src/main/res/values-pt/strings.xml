@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Bloquear %s</string>
     <string name="buttonAccept">Aceitar</string>
     <string name="buttonAccountDelete">Eliminar conta</string>
-    <string name="buttonAccountLogOut">Terminar sessão</string>
     <string name="buttonAccountSwitch">Mudar de conta</string>
     <string name="buttonAddAccount">Adicionar uma conta</string>
     <string name="buttonAddEmailAddress">Adicionar um endereço de e-mail</string>
@@ -179,8 +178,6 @@
     <string name="comingSoon">Brevemente…</string>
     <string name="commercialFolder">Promoções</string>
     <string name="composeMailboxCurrentTitle">Enviar uma mensagem com o endereço:</string>
-    <string name="confirmLogoutDescription">Tem a certeza de que deseja terminar a sessão de %s?</string>
-    <string name="confirmLogoutTitle">Terminar sessão</string>
     <string name="confirmationToBlockAnExpeditorText">Todas as mensagens futuras de %s serão movidas para a pasta de correio não solicitado.</string>
     <string name="contactActionAddToContacts">Adicionar aos contactos</string>
     <string name="contactActionCopyEmailAddress">Copiar endereço de e-mail</string>

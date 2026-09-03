@@ -44,6 +44,7 @@ import com.infomaniak.mail.ui.Utils.onViewWithTimeout
 import org.hamcrest.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import com.infomaniak.core.common.R as RCore
 
 object Scenarios {
 
@@ -73,7 +74,7 @@ object Scenarios {
         clickIfVisible(withContentDescription(R.string.buttonClose))
 
         onViewWithTimeout(matcher = withId(R.id.userAvatar)).perform(click())
-        onViewWithTimeout(matcher = withText(R.string.buttonAccountLogOut)).perform(click())
+        onViewWithTimeout(matcher = withText(RCore.string.buttonLogOut)).perform(click())
         onViewWithTimeout(matcher = withText(R.string.buttonConfirm)).perform(click())
 
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("button_next_onboarding"), 5_000)

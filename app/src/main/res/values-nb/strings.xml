@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Blokker %s</string>
     <string name="buttonAccept">Godta</string>
     <string name="buttonAccountDelete">Slett konto</string>
-    <string name="buttonAccountLogOut">Logg ut</string>
     <string name="buttonAccountSwitch">Bytt konto</string>
     <string name="buttonAddAccount">Legg til konto</string>
     <string name="buttonAddEmailAddress">Legg til e-postadresse</string>
@@ -179,8 +178,6 @@
     <string name="comingSoon">Kommer snart…</string>
     <string name="commercialFolder">Kampanjer</string>
     <string name="composeMailboxCurrentTitle">Send en melding med adressen:</string>
-    <string name="confirmLogoutDescription">Er du sikker på at du vil logge ut fra %s?</string>
-    <string name="confirmLogoutTitle">Logg ut</string>
     <string name="confirmationToBlockAnExpeditorText">Alle fremtidige meldinger fra %s vil bli flyttet til spam-mappen.</string>
     <string name="contactActionAddToContacts">Legg til kontakter</string>
     <string name="contactActionCopyEmailAddress">Kopier e-postadresse</string>

@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Estä %s</string>
     <string name="buttonAccept">Hyväksy</string>
     <string name="buttonAccountDelete">Poista tili</string>
-    <string name="buttonAccountLogOut">Kirjaudu ulos</string>
     <string name="buttonAccountSwitch">Vaihda tiliä</string>
     <string name="buttonAddAccount">Lisää tili</string>
     <string name="buttonAddEmailAddress">Lisää sähköpostiosoite</string>
@@ -179,8 +178,6 @@
     <string name="comingSoon">Tulossa pian…</string>
     <string name="commercialFolder">Tarjoukset</string>
     <string name="composeMailboxCurrentTitle">Lähetä viesti osoitteella:</string>
-    <string name="confirmLogoutDescription">Haluatko varmasti kirjautua ulos tililtä %s?</string>
-    <string name="confirmLogoutTitle">Kirjaudu ulos</string>
     <string name="confirmationToBlockAnExpeditorText">Kaikki tulevat viestit lähettäjältä %s siirretään roskapostikansioon.</string>
     <string name="contactActionAddToContacts">Lisää yhteystietoihin</string>
     <string name="contactActionCopyEmailAddress">Kopioi sähköpostiosoite</string>

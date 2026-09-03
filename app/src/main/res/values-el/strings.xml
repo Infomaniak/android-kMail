@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Αποκλεισμός %s</string>
     <string name="buttonAccept">Αποδοχή</string>
     <string name="buttonAccountDelete">Διαγραφή λογαριασμού</string>
-    <string name="buttonAccountLogOut">Αποσύνδεση</string>
     <string name="buttonAccountSwitch">Αλλαγή λογαριασμού</string>
     <string name="buttonAddAccount">Προσθήκη λογαριασμού</string>
     <string name="buttonAddEmailAddress">Προσθήκη διεύθυνσης e-mail</string>
@@ -179,8 +178,6 @@
     <string name="comingSoon">Έρχεται σύντομα…</string>
     <string name="commercialFolder">Προσφορές</string>
     <string name="composeMailboxCurrentTitle">Αποστολή μηνύματος με τη διεύθυνση:</string>
-    <string name="confirmLogoutDescription">Είστε βέβαιοι ότι θέλετε να αποσυνδεθείτε από %s;</string>
-    <string name="confirmLogoutTitle">Αποσύνδεση</string>
     <string name="confirmationToBlockAnExpeditorText">Όλα τα μελλοντικά μηνύματα από %s θα μετακινηθούν στον φάκελο Ανεπιθύμητη αλληλογραφία.</string>
     <string name="contactActionAddToContacts">Προσθήκη στις επαφές</string>
     <string name="contactActionCopyEmailAddress">Αντιγραφή διεύθυνσης e-mail</string>

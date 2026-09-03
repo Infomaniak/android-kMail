@@ -50,6 +50,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.core.common.R as RCore
 
 @AndroidEntryPoint
 class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
@@ -101,8 +102,9 @@ class AccountBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         logout.setOnClickListener {
             trackAccountEvent(MatomoName.LogOut)
             descriptionDialog.show(
-                title = getString(R.string.confirmLogoutTitle),
-                description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
+                title = getString(RCore.string.confirmLogoutTitle),
+                positiveButtonText = RCore.string.buttonLogOut,
+                description = AccountUtils.currentUser?.let { getString(RCore.string.confirmLogoutDescription, it.email) } ?: "",
                 displayLoader = false,
                 onPositiveButtonClicked = ::logoutCurrentUser,
             )

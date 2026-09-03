@@ -120,7 +120,6 @@
     <string name="blockExpeditorTitle">Bloquer %s</string>
     <string name="buttonAccept">Accepter</string>
     <string name="buttonAccountDelete">Supprimer mon compte</string>
-    <string name="buttonAccountLogOut">Se déconnecter</string>
     <string name="buttonAccountSwitch">Changer de compte</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="buttonAddEmailAddress">Ajouter une adresse mail</string>
@@ -179,8 +178,6 @@
     <string name="comingSoon">À venir…</string>
     <string name="commercialFolder">Promotions</string>
     <string name="composeMailboxCurrentTitle">Envoyer un message avec l’adresse :</string>
-    <string name="confirmLogoutDescription">Êtes-vous sûr de vouloir vous déconnecter du compte %s ?</string>
-    <string name="confirmLogoutTitle">Me déconnecter</string>
     <string name="confirmationToBlockAnExpeditorText">Tous les futurs messages de %s seront déplacés dans le dossier Courrier indésirable.</string>
     <string name="contactActionAddToContacts">Ajouter aux contacts</string>
     <string name="contactActionCopyEmailAddress">Copier l’adresse mail</string>
