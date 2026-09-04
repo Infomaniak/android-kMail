@@ -57,7 +57,7 @@ class SelectMailboxViewModel @Inject constructor(
     }
 
     private suspend fun getUsersAndMailboxes() {
-        _usersWithMailboxes.value = AccountUtils.getAllUsersSync().map { user ->
+        _usersWithMailboxes.value = AccountUtils.allUsers().map { user ->
             UserMailboxesUi(
                 userId = user.id,
                 userEmail = user.email,

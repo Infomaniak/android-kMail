@@ -25,7 +25,6 @@ import com.infomaniak.mail.dataset.DummyFolders.folderInbox
 import com.infomaniak.mail.dataset.DummyFolders.folderSearch
 import com.infomaniak.mail.dataset.DummyFolders.folderSent
 import com.infomaniak.mail.dataset.DummyFolders.folderSnoozed
-import com.infomaniak.mail.dataset.DummyMailboxContent
 import com.infomaniak.mail.dataset.DummyMessages.messageDraft
 import com.infomaniak.mail.dataset.DummyMessages.messageInbox
 import com.infomaniak.mail.dataset.DummyMessages.messageSnoozed
@@ -34,6 +33,7 @@ import com.infomaniak.mail.dataset.DummyThreads.threadInbox
 import com.infomaniak.mail.dataset.DummyThreads.threadSearchInbox
 import com.infomaniak.mail.dataset.DummyThreads.threadSearchSnoozed
 import com.infomaniak.mail.dataset.DummyThreads.threadSnoozed
+import com.infomaniak.mail.dataset.DummyMailboxContent
 import com.infomaniak.mail.utils.FolderRoleUtils
 import io.mockk.mockk
 import io.realm.kotlin.UpdatePolicy

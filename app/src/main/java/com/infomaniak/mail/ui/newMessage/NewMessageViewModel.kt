@@ -338,7 +338,7 @@ class NewMessageViewModel @Inject constructor(
     fun shouldLoadDistantResources() = shouldLoadDistantResources
 
     suspend fun hasMultiMailboxes() = withContext(ioDispatcher) {
-        AccountUtils.getAllUsersSync().flatMap { user ->
+        AccountUtils.allUsers().flatMap { user ->
             mailboxController.getMailboxes(user.id)
         }.size > 1
     }

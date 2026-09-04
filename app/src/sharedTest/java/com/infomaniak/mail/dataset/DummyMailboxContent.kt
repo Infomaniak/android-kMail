@@ -23,9 +23,9 @@ import io.realm.kotlin.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
-private var mailboxContent: Realm? = null
-
 class DummyMailboxContent : MailboxContent() {
+    private var mailboxContent: Realm? = null
+
     override operator fun invoke() = runBlocking(Dispatchers.IO) {
         mailboxContent ?: newMailboxContentInstance(
             userId = -42, mailboxId = -1337, loadDataInMemory = true,

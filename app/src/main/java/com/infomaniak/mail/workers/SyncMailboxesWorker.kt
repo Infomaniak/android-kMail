@@ -68,7 +68,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
         // Refresh current User and its Mailboxes
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
-        AccountUtils.getAllUsersSync().forEach { user ->
+        AccountUtils.allUsers().forEach { user ->
             mailboxController.getMailboxes(user.id).forEach { mailbox ->
                 if (shouldSkip()) return@withContext Result.success()
                 fetchMessagesManager.execute(scope = this, user.id, mailbox)
