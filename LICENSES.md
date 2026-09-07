@@ -28,6 +28,7 @@ excluded). This list may not be exhaustive.
 | [Google Play Services](https://developers.google.com/android/guides/overview) _(standard flavor only)_       | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)    |
 | [Infomaniak Rich HTML Editor](https://github.com/Infomaniak/android-rich-html-editor)                        | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)    |
 | [Jetpack Compose](https://developer.android.com/jetpack/compose)                                             | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)    |
+| [JSpecify](https://jspecify.dev/)                                                                            | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)    |
 | [Kotlin Standard Library](https://kotlinlang.org/)                                                           | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)    |
 | [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines)                                           | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)    |
 | [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization)                                     | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)    |
