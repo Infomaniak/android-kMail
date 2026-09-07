@@ -218,8 +218,6 @@ dependencies {
 
     implementation(libs.rich.html.editor)
 
-    implementation(libs.junit.ktx)
-
     "standardImplementation"(core.infomaniak.core.notifications.registration)
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
@@ -269,7 +267,6 @@ dependencies {
     androidTestImplementation(core.junit)
     androidTestImplementation(core.mockk.agent)
     androidTestImplementation(core.mockk.android)
-    androidTestImplementation(core.robolectric)
     androidTestImplementation(core.stdlib)
     androidTestImplementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.core)
@@ -282,6 +279,7 @@ dependencies {
 
     androidTestUtil(libs.orchestrator)
 
+    debugImplementation(core.androidx.test.core)
     debugImplementation(libs.fragment.testing)
 
     // Debug
