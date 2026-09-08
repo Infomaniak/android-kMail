@@ -8,7 +8,6 @@ plugins {
     alias(core.plugins.android.application)
     alias(core.plugins.dagger.hilt)
     alias(libs.plugins.google.services)
-    alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.serialization)
     alias(core.plugins.ksp)
     alias(core.plugins.navigation.safeargs)
@@ -19,9 +18,10 @@ plugins {
 
 val enableLeakCanary = false
 
-val appCompileSdk: Int by rootProject.extra
-val appMinSdk: Int by rootProject.extra
-val javaVersion: JavaVersion by rootProject.extra
+val appCompileSdk: Int = rootProject.extra["appCompileSdk"] as Int
+val appTargetSdk: Int = rootProject.extra["appTargetSdk"] as Int
+val appMinSdk: Int = rootProject.extra["appMinSdk"] as Int
+val javaVersion: JavaVersion = rootProject.extra["javaVersion"] as JavaVersion
 
 android {
     namespace = "com.infomaniak.mail"
@@ -30,7 +30,7 @@ android {
     defaultConfig {
         applicationId = "com.infomaniak.mail"
         minSdk = appMinSdk
-        targetSdk = appCompileSdk
+        targetSdk = appTargetSdk
         versionCode = 1_33_000_01
         versionName = "1.33.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -51,8 +51,6 @@ android {
                 execution = "ANDROIDX_TEST_ORCHESTRATOR"
             }
         }
-
-        setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
 
         buildConfigField("String", "CLIENT_ID", "\"E90BC22D-67A8-452C-BE93-28DA33588CA4\"")
 
@@ -91,6 +89,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        resValues = true
         viewBinding = true
         compose = true
     }
@@ -118,12 +117,16 @@ android {
 
     sourceSets {
         getByName("test") {
-            java.srcDir("src/sharedTest/java")
+            kotlin.directories += "src/sharedTest/java"
         }
         getByName("androidTest") {
-            java.srcDir("src/sharedTest/java")
+            kotlin.directories += "src/sharedTest/java"
         }
     }
+}
+
+base {
+    archivesName = "infomaniak-mail-${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})"
 }
 
 kotlin {
