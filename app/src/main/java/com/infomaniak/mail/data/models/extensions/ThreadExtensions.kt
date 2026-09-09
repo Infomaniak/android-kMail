@@ -127,9 +127,10 @@ fun Thread.computeThreadListDateDisplay(featureFlags: Mailbox.FeatureFlagSet?, l
 
 fun Thread.computePreview(context: Context): String {
     val message = if (folder.role == FolderRole.SENT) {
-        messages.lastOrNull { it.folderId == folderId } ?: messages.last()
+        messages.lastOrNull { it.folderId == folderId && !it.isHiddenReminder }
+            ?: messages.last()
     } else {
-        messages.last()
+        messages.lastOrNull { !it.isHiddenReminder } ?: messages.last()
     }
 
     return message.getFormattedPreview(context).content
