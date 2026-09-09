@@ -18,31 +18,17 @@
 package com.infomaniak.mail.backup
 
 import android.app.backup.FullBackupDataOutput
-import android.os.ParcelFileDescriptor
-import com.infomaniak.core.common.backup.FullBackup
 import com.infomaniak.core.common.backup.FullBackupAgent
 import com.infomaniak.core.common.backup.isDeviceToDeviceTransfer
 import java.io.File
 
-class MailFullBackupAgent : FullBackupAgent() {
+class MailFullBackupAgent : FullBackupAgent(RestorationPolicy.AllBackedUpFiles) {
 
     override fun onFullBackup(data: FullBackupDataOutput) {
         if (data.isDeviceToDeviceTransfer) {
             realmFiles(excludedDatabases = listOf("AppSettings")).forEach { fullBackupFile(it, data) }
         }
         super.onFullBackup(data)
-    }
-
-    override fun onRestoreFile(
-        data: ParcelFileDescriptor,
-        size: Long,
-        destination: File,
-        type: Int,
-        mode: Long,
-        mtime: Long
-    ) {
-        // Always restore the files, regardless of the data extraction rules.
-        FullBackup.restoreFile(data, size, type, mode, mtime, destination)
     }
 
     private fun realmFiles(excludedDatabases: List<String>): List<File> {
