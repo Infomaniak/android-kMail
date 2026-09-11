@@ -20,7 +20,8 @@
 package com.infomaniak.mail.data.models.extensions
 
 import android.content.Context
-import com.infomaniak.core.auth.firstOrEmpty
+import com.infomaniak.core.avatar.computeFirstAndLastName
+import com.infomaniak.core.avatar.computeInitials
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.data.models.correspondent.Correspondent
@@ -42,19 +43,16 @@ fun Correspondent.isMe(): Boolean {
 
 fun Correspondent.shouldDisplayUserAvatar(): Boolean = isMe() && email.lowercase() == AccountUtils.currentUser?.email?.lowercase()
 
-val Correspondent.initials: String get() = cachedInitials ?: synchronized(this) {
-    cachedInitials ?: computeInitials().also { cachedInitials = it }
-}
+val Correspondent.initials: String
+    get() = cachedInitials ?: synchronized(this) {
+        cachedInitials ?: computeInitials().also { cachedInitials = it }
+    }
 
 fun Correspondent.computeInitials(): String {
     return runCatching {
-        val (firstName, lastName) = computeFirstAndLastName()
-        val first = firstName.removeControlAndPunctuation().ifBlank { firstName }.first()
-        val last = lastName.removeControlAndPunctuation().firstOrEmpty()
-
-        return@runCatching "$first$last".uppercase()
+        getNameOrEmail().computeInitials()
     }.getOrElse { exception ->
-        Sentry.captureException(exception) { scope ->
+        Sentry.captureException(ComputeInitialsException(exception)) { scope ->
             scope.setExtra("email", email)
             scope.setExtra("name size", name.count().toString())
             scope.setExtra("name is blank", name.isBlank().toString())
@@ -65,18 +63,10 @@ fun Correspondent.computeInitials(): String {
     }
 }
 
-fun Correspondent.computeFirstAndLastName(): Pair<String, String> {
-    val words = getNameOrEmail().trim().replace(Regex("\\s+"), " ").split(" ", limit = 2)
+private class ComputeInitialsException(cause: Throwable) : Exception("Failed to compute initials", cause)
 
-    return when (words.count()) {
-        0 -> "" to ""
-        1 -> words.single() to ""
-        else -> words.first() to words.last()
-    }
-}
+fun Correspondent.computeFirstAndLastName(): Pair<String, String> = getNameOrEmail().computeFirstAndLastName()
 
 fun Correspondent.displayedName(context: Context): String {
     return if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
 }
-
-private fun String.removeControlAndPunctuation() = replace(Regex("\\p{Punct}|\\p{C}"), "")
