@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,8 +53,8 @@ internal class CleaningVisitor(
 
         if (elementToSkip != null) return
 
-        when {
-            node is Element -> {
+        when (node) {
+            is Element -> {
                 if (isSafeTag(node)) {
                     val sourceTag = node.tagName()
                     val destinationAttributes = node.attributes().clone()
@@ -65,10 +65,10 @@ internal class CleaningVisitor(
                     elementToSkip = node
                 }
             }
-            node is TextNode -> {
+            is TextNode -> {
                 destination.appendChild(TextNode(node.wholeText))
             }
-            node is DataNode && isSafeTag(node.parent()) -> {
+            is DataNode if isSafeTag(node.parent()) -> {
                 destination.appendChild(DataNode(node.wholeData))
             }
         }
