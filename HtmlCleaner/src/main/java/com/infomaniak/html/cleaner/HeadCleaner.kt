@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
  */
 package com.infomaniak.html.cleaner
 
+import org.jsoup.nodes.Attributes
 import org.jsoup.nodes.DataNode
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -30,7 +31,11 @@ import org.jsoup.parser.Tag
 import org.jsoup.select.NodeTraversor
 import org.jsoup.select.NodeVisitor
 
-private val ALLOWED_TAGS = listOf("style", "meta", "base")
+private val ALLOWED_ATTRIBUTES = mapOf(
+    "style" to setOf("type", "media"),
+    "meta" to setOf("name", "content", "charset"),
+)
+private val ALLOWED_TAGS = ALLOWED_ATTRIBUTES.keys
 
 internal class HeadCleaner {
     fun clean(dirtyDocument: Document, cleanedDocument: Document) {
@@ -50,14 +55,13 @@ internal class CleaningVisitor(
     private var elementToSkip: Element? = null
 
     override fun head(node: Node, depth: Int) {
-
         if (elementToSkip != null) return
 
-        when {
-            node is Element -> {
+        when (node) {
+            is Element -> {
                 if (isSafeTag(node)) {
                     val sourceTag = node.tagName()
-                    val destinationAttributes = node.attributes().clone()
+                    val destinationAttributes = node.safeAttributes()
                     val destinationChild = Element(Tag.valueOf(sourceTag), node.baseUri(), destinationAttributes)
                     destination.appendChild(destinationChild)
                     destination = destinationChild
@@ -65,10 +69,10 @@ internal class CleaningVisitor(
                     elementToSkip = node
                 }
             }
-            node is TextNode -> {
+            is TextNode -> {
                 destination.appendChild(TextNode(node.wholeText))
             }
-            node is DataNode && isSafeTag(node.parent()) -> {
+            is DataNode if isSafeTag(node.parent()) -> {
                 destination.appendChild(DataNode(node.wholeData))
             }
         }
@@ -83,17 +87,19 @@ internal class CleaningVisitor(
     }
 
     private fun isSafeTag(node: Node?): Boolean {
-        if (node == null || isMetaRefresh(node)) return false
-
-        val tag = node.nodeName().lowercase()
-        return tag in ALLOWED_TAGS
+        if (node == null) return false
+        return node.nodeName().lowercase() in ALLOWED_TAGS
     }
 
-    private fun isMetaRefresh(node: Node): Boolean {
-        val tag = node.nodeName().lowercase()
-        if (tag != "meta") return false
+    private fun Element.safeAttributes(): Attributes {
+        val allowedAttributes = ALLOWED_ATTRIBUTES[tagName().lowercase()] ?: return Attributes()
 
-        val attributeValue = node.attributes().getIgnoreCase("http-equiv").trim().lowercase()
-        return attributeValue == "refresh"
+        return Attributes().apply {
+            attributes().forEach { attribute ->
+                if (attribute.key.lowercase() in allowedAttributes) {
+                    put(attribute.key, attribute.value)
+                }
+            }
+        }
     }
 }
