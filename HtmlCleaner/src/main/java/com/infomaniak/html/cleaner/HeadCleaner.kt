@@ -30,7 +30,7 @@ import org.jsoup.parser.Tag
 import org.jsoup.select.NodeTraversor
 import org.jsoup.select.NodeVisitor
 
-private val ALLOWED_TAGS = listOf("style", "meta", "base")
+private val ALLOWED_TAGS = listOf("style", "meta")
 
 internal class HeadCleaner {
     fun clean(dirtyDocument: Document, cleanedDocument: Document) {
