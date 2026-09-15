@@ -92,13 +92,11 @@ internal class CleaningVisitor(
     }
 
     private fun Element.safeAttributes(): Attributes {
-        val allowedAttributes = ALLOWED_ATTRIBUTES[tagName().lowercase()].orEmpty()
+        val allowedAttributes = ALLOWED_ATTRIBUTES[tagName().lowercase()] ?: return Attributes()
 
         return Attributes().apply {
             attributes().forEach { attribute ->
-                val key = attribute.key.lowercase()
-
-                if (key in allowedAttributes) {
+                if (attribute.key.lowercase() in allowedAttributes) {
                     put(attribute.key, attribute.value)
                 }
             }
