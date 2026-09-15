@@ -6,6 +6,7 @@ import java.util.Properties
  */
 plugins {
     alias(core.plugins.android.application)
+    alias(core.plugins.infomaniak.android.debug.signing)
     alias(core.plugins.dagger.hilt)
     alias(libs.plugins.google.services)
     alias(core.plugins.kotlin.serialization)
