@@ -1,0 +1,3 @@
+- Add app data transfer when connecting to a new device
+- Security fixes
+- Fix a crash in the vCard

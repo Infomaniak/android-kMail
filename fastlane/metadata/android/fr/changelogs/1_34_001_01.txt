@@ -1,0 +1,3 @@
+- Support du transfert des données lors d'un changement de téléphone
+- Correctifs de sécurité
+- Correction d'un crash dans les cartes de visite virtuelles
