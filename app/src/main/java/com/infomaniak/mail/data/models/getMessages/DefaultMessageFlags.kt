@@ -36,6 +36,8 @@ data class DefaultMessageFlags(
     val isSeen: Boolean,
     @SerialName("acknowledged")
     val isAcknowledged: Boolean,
+    // The flag hasReminder is true when a message has an active reminder created by the current user.
+    // It stays true until the reminder gets canceled / marked as done by the user.
     @SerialName("has_reminder")
     val hasReminder: Boolean,
 ) : MessageFlags
