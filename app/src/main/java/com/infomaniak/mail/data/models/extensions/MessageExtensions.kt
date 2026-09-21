@@ -140,9 +140,9 @@ fun Message.updateFlags(flags: DefaultMessageFlags) {
     isMessageWithSendDelay = flags.isMessageWithSendDelay
     if (flags.isAcknowledged) acknowledgeStatus = AcknowledgeStatus.Acknowledged
 
-    shouldRefreshReminder = reminder != null
+    shouldRefreshReminder = flags.hasReminder || reminder != null
     // the flag hasReminder only works for the user that sent the reminder, not the recipients. So before removing the banner, we
-    // need to make sure the reminder was created by the user. This can be achieved by checking if the reminder object has an uuid.
+    // need to make sure the reminder was created by the user. This can be achieved by checking if the reminder object has a UUID.
     if (!flags.hasReminder && reminder?.uuid != null) reminder = null
 
     if (flags.isSeen && snoozeState == SnoozeState.Unsnoozed) {
