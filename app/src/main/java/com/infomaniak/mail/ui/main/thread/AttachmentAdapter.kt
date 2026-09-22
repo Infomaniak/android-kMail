@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -37,7 +36,6 @@ class AttachmentAdapter(
 ) : Adapter<AttachmentViewHolder>() {
 
     private val attachments: MutableList<Attachable> = mutableListOf()
-    private var lastClickTime = 0L
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -51,15 +49,7 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         attachmentDetails.setDetails(attachment)
-        onAttachmentClicked?.let { clickListener ->
-            root.setOnClickListener {
-                val now = SystemClock.elapsedRealtime()
-                if (now - lastClickTime >= CLICK_THRESHOLD_MS) {
-                    lastClickTime = now
-                    clickListener(attachment)
-                }
-            }
-        }
+        onAttachmentClicked?.let { root.setOnClickListener { it(attachment) } }
         onAttachmentOptionsClicked?.let { moreButton.setOnClickListener { it(attachment) } }
         toggleEndIconVisibility(shouldDisplayCloseButton)
 
@@ -98,8 +88,4 @@ class AttachmentAdapter(
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : ViewHolder(binding.root)
-
-    companion object {
-        private const val CLICK_THRESHOLD_MS = 600L
-    }
 }
