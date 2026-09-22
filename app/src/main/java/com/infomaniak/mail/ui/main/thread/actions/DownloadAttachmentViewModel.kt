@@ -62,8 +62,8 @@ class DownloadAttachmentViewModel @Inject constructor(
     private var attachment: Attachable? = null
 
     val downloadAttachmentLiveData: LiveData<Attachment?> = liveData(ioCoroutineContext) {
-        val downloadedAttachment = runCatching {
-            withTimeoutOrNull(DOWNLOAD_TIMEOUT) {
+        val downloadedAttachment = withTimeoutOrNull(DOWNLOAD_TIMEOUT) {
+            runCatching {
                 val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
 
                 var isAttachmentCached = localAttachment.hasUsableCache(appContext, localAttachment.getUploadLocalFile())
@@ -77,8 +77,8 @@ class DownloadAttachmentViewModel @Inject constructor(
                 } else {
                     null
                 }
-            }
-        }.cancellable().getOrNull()
+            }.cancellable().getOrNull()
+        }
 
         if (downloadedAttachment == null) {
             deleteIncompleteCacheFile()
