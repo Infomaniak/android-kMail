@@ -103,6 +103,6 @@ class DownloadAttachmentViewModel @Inject constructor(
     }
 
     companion object {
-        const val DOWNLOAD_TIMEOUT = 30_000L
+        const val DOWNLOAD_TIMEOUT = 120_000L
     }
 }
