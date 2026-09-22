@@ -51,14 +51,10 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
                 popBackStackWithError()
             } else {
                 lifecycleScope.launch {
-                    runCatching {
-                        val currentContext = context ?: return@launch
-                        cachedAttachment.getIntentOrGoToAppStore(currentContext, navigationArgs.intentType)?.let { openWithIntent ->
-                            setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
-                        } ?: run { findNavController().popBackStack() }
-                    }.onFailure {
-                        popBackStackWithError()
-                    }
+                    val currentContext = context ?: return@launch
+                    cachedAttachment.getIntentOrGoToAppStore(currentContext, navigationArgs.intentType)?.let { openWithIntent ->
+                        setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
+                    } ?: run { findNavController().popBackStack() }
                 }
             }
         }
