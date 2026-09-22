@@ -84,6 +84,6 @@ abstract class DownloadProgressDialog : DialogFragment() {
     }
 
     companion object {
-        const val DEFAULT_DOWNLOAD_TIMEOUT_MS = 30_000L
+        const val DEFAULT_DOWNLOAD_TIMEOUT_MS = 120_000L
     }
 }
