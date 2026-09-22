@@ -194,6 +194,8 @@ class NewMessageFragment : Fragment() {
         initCallback { uris -> newMessageViewModel.importInlineAttachmentsLiveData.value = uris }
     }
 
+    private var openAttachmentJob: Job? = null
+
     private var addressListPopupWindow: ListPopupWindow? = null
 
     private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
@@ -457,9 +459,10 @@ class NewMessageFragment : Fragment() {
             onDelete = ::onDeleteAttachment,
             onAttachmentClicked = {
                 if (it !is Attachment) return@AttachmentAdapter
+                if (openAttachmentJob?.isActive == true) return@AttachmentAdapter
 
                 trackAttachmentActionsEvent(MatomoName.OpenFromDraft)
-                lifecycleScope.launch {
+                openAttachmentJob = lifecycleScope.launch {
                     it.openAttachment(
                         context = requireContext(),
                         navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->

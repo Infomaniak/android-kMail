@@ -21,6 +21,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.core.legacy.R
@@ -28,6 +29,9 @@ import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
 import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 abstract class DownloadProgressDialog : DialogFragment() {
@@ -36,12 +40,30 @@ abstract class DownloadProgressDialog : DialogFragment() {
     protected val mainViewModel: MainViewModel by activityViewModels()
 
     abstract val dialogTitle: String
+    protected open val timeoutDurationMs: Long = DEFAULT_DOWNLOAD_TIMEOUT_MS
+
+    private var timeoutJob: Job? = null
+    private var isDismissed = false
 
     protected abstract fun download()
 
     override fun onStart() {
+        startTimeoutWatchdog()
         download()
         super.onStart()
+    }
+
+    override fun onStop() {
+        timeoutJob?.cancel()
+        super.onStop()
+    }
+
+    private fun startTimeoutWatchdog() {
+        timeoutJob?.cancel()
+        timeoutJob = lifecycleScope.launch {
+            delay(timeoutDurationMs)
+            popBackStackWithError()
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -54,7 +76,14 @@ abstract class DownloadProgressDialog : DialogFragment() {
     }
 
     protected fun popBackStackWithError() {
+        if (isDismissed || !isAdded) return
+        isDismissed = true
+        timeoutJob?.cancel()
         showSnackbar(title = if (mainViewModel.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection)
-        findNavController().popBackStack()
+        runCatching { findNavController().popBackStack() }
+    }
+
+    companion object {
+        const val DEFAULT_DOWNLOAD_TIMEOUT_MS = 30_000L
     }
 }
