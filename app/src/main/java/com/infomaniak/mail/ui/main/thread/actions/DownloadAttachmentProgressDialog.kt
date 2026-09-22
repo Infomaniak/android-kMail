@@ -36,8 +36,6 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
     private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
 
-    private var isHandled = false
-
     override val dialogTitle: String by lazy { navigationArgs.attachmentName }
     override val timeoutDurationMs: Long = DownloadAttachmentViewModel.DOWNLOAD_TIMEOUT
 
@@ -49,8 +47,6 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
 
     override fun download() {
         downloadAttachmentViewModel.downloadAttachment().observe(this) { cachedAttachment ->
-            if (isHandled) return@observe
-            isHandled = true
             if (cachedAttachment == null) {
                 popBackStackWithError()
             } else {
