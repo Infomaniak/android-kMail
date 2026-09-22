@@ -157,6 +157,7 @@ import com.infomaniak.mail.workers.MailActionsManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.Date
@@ -542,7 +543,10 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
     }
 
+    private var openAttachableJob: Job? = null
+
     private fun onAttachableClicked(attachable: Attachable) {
+        if (openAttachableJob?.isActive == true) return
         when (attachable) {
             is Attachment -> openAttachment(attachable)
             is SwissTransferFile -> {
@@ -554,7 +558,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun openAttachment(attachable: Attachment) {
         trackAttachmentActionsEvent(MatomoName.Open)
-        lifecycleScope.launch {
+        openAttachableJob = lifecycleScope.launch {
             attachable.openAttachment(
                 context = requireContext(),
                 navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->

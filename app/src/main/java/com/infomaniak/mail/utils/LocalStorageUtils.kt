@@ -67,12 +67,10 @@ object LocalStorageUtils {
         fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
 
-            body?.byteStream()?.use { inputStream ->
+            return body?.byteStream()?.use { inputStream ->
                 saveAttachmentToCacheDir(inputStream, outputFile)
-                return true
-            }
-
-            return false
+                outputFile.exists() && outputFile.length() > 0 && outputFile.canRead()
+            } ?: false
         }
 
         val attachment = runCatching {
