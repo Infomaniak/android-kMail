@@ -19,12 +19,14 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachable
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.extensions.getCacheFile
 import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
 import com.infomaniak.mail.data.models.extensions.hasUsableCache
@@ -37,6 +39,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,31 +61,48 @@ class DownloadAttachmentViewModel @Inject constructor(
      */
     private var attachment: Attachable? = null
 
-    fun downloadAttachment() = liveData(ioCoroutineContext) {
+    val downloadAttachmentLiveData: LiveData<Attachment?> = liveData(ioCoroutineContext) {
         val downloadedAttachment = runCatching {
-            val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
+            withTimeoutOrNull(DOWNLOAD_TIMEOUT) {
+                val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
 
-            var isAttachmentCached = localAttachment.hasUsableCache(appContext, localAttachment.getUploadLocalFile())
-            if (!isAttachmentCached) {
-                isAttachmentCached = LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(appContext, localAttachment)
-            }
+                var isAttachmentCached = localAttachment.hasUsableCache(appContext, localAttachment.getUploadLocalFile())
+                if (!isAttachmentCached) {
+                    isAttachmentCached = LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(appContext, localAttachment)
+                }
 
-            return@runCatching if (isAttachmentCached) {
-                attachment = null
-                localAttachment
-            } else {
-                null
+                if (isAttachmentCached) {
+                    attachment = null
+                    localAttachment
+                } else {
+                    null
+                }
             }
         }.cancellable().getOrNull()
 
+        if (downloadedAttachment == null) {
+            deleteIncompleteCacheFile()
+        }
+
         emit(downloadedAttachment)
+    }
+
+    fun downloadAttachment(): LiveData<Attachment?> = downloadAttachmentLiveData
+
+    private suspend fun deleteIncompleteCacheFile() {
+        runCatchingRealm { attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() } }
+        attachment = null
     }
 
     override fun onCleared() {
         // If we end up with an incomplete cached Attachment, we delete it
         cleanupScope.launch {
-            runCatchingRealm { attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() } }
+            deleteIncompleteCacheFile()
         }
         super.onCleared()
+    }
+
+    companion object {
+        const val DOWNLOAD_TIMEOUT = 30_000L
     }
 }
