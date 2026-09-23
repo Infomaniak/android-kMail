@@ -97,6 +97,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.AttachmentDownloadManager
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
@@ -123,7 +124,6 @@ import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.AttachmentExt
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -133,7 +133,6 @@ import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.ime
 import com.infomaniak.mail.utils.extensions.initEditorWebviewBridge
 import com.infomaniak.mail.utils.extensions.initEditorWebviewClient
-import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
@@ -244,6 +243,9 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var attachmentDownloadManager: AttachmentDownloadManager
 
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
@@ -459,19 +461,15 @@ class NewMessageFragment : Fragment() {
                 if (it !is Attachment) return@AttachmentAdapter
 
                 trackAttachmentActionsEvent(MatomoName.OpenFromDraft)
-                lifecycleScope.launch {
-                    it.openAttachment(
-                        context = requireContext(),
-                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                            navigateToDownloadProgressDialog(
-                                attachment,
-                                attachmentIntentType,
-                                NewMessageFragment::class.java.name,
-                            )
-                        },
-                        snackbarManager = snackbarManager,
-                    )
-                }
+                attachmentDownloadManager.downloadAndOpenAttachment(
+                    attachment = it,
+                    scope = viewLifecycleOwner.lifecycleScope,
+                    onDownloadStateChanged = { uuid, isDownloading ->
+                        attachmentAdapter.setAttachmentDownloading(uuid, isDownloading)
+                    },
+                    showSnackbar = { message -> snackbarManager.setValue(message) },
+                    openIntent = { intent -> runCatching { startActivity(intent) } },
+                )
             },
         )
 
@@ -969,6 +967,7 @@ class NewMessageFragment : Fragment() {
 
     private fun onDeleteAttachment(attachable: Attachable) {
         trackAttachmentActionsEvent(MatomoName.Delete)
+        attachmentDownloadManager.cancelDownload(attachable.localUuid)
         if (attachable is Attachment) newMessageViewModel.deleteAttachment(attachable)
     }
 
