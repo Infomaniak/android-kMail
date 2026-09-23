@@ -23,6 +23,8 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import coil3.load
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.legacy.utils.getAttributes
@@ -55,19 +57,26 @@ class AttachmentDetailsView @JvmOverloads constructor(
 
                 fileName.setTextAppearance(displayStyle.fileNameStyle)
                 fileSize.setTextAppearance(displayStyle.fileSizeStyle)
-                icon.apply {
+                iconLayout.apply {
                     layoutParams.height = iconSize
                     layoutParams.width = iconSize
                     setMarginsRelative(start = marginSize, end = marginSize)
                 }
+                progressIndicator.indicatorSize = iconSize
             }
         }
     }
 
-    fun setDetails(attachment: Attachable) = with(binding) {
+    fun setDetails(attachment: Attachable, isDownloading: Boolean = false) = with(binding) {
         fileName.text = attachment.name
         fileSize.text = context.formatShortFileSize(attachment.size)
         icon.load(attachment.getFileTypeFromMimeType().icon)
+        setIsDownloading(isDownloading)
+    }
+
+    fun setIsDownloading(isDownloading: Boolean) = with(binding) {
+        icon.isInvisible = isDownloading
+        progressIndicator.isVisible = isDownloading
     }
 
     private enum class DisplayStyle(
