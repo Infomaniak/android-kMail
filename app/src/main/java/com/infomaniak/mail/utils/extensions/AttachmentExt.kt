@@ -75,7 +75,7 @@ object AttachmentExt {
         }
     }
 
-    private suspend fun Attachment.openWithIntent(context: Context): Intent? {
+    internal suspend fun Attachment.openWithIntent(context: Context): Intent? {
         val file = getUploadLocalFile() ?: getCacheFile(context) ?: return null
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), file)
 
