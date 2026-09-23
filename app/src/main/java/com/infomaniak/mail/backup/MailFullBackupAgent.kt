@@ -21,9 +21,15 @@ import android.app.backup.FullBackupDataOutput
 import com.infomaniak.core.auth.backup.withBlockStoreCredentialsBackup
 import com.infomaniak.core.common.backup.FullBackupAgent
 import com.infomaniak.core.common.backup.isDeviceToDeviceTransfer
+import com.infomaniak.mail.MainApplication
 import java.io.File
 
 class MailFullBackupAgent : FullBackupAgent(RestorationPolicy.AllBackedUpFiles) {
+
+    override fun onCreate() {
+        super.onCreate()
+        MainApplication.configureSentry()
+    }
 
     override fun onFullBackup(data: FullBackupDataOutput) = withBlockStoreCredentialsBackup {
         if (data.isDeviceToDeviceTransfer) {

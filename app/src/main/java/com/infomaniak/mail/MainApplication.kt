@@ -20,6 +20,8 @@ package com.infomaniak.mail
 import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
+import android.app.backup.BackupAgent
+import android.content.Context
 import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.os.StrictMode
@@ -150,7 +152,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
         if (BuildConfig.DEBUG) configureDebugMode()
 
-        configureSentry()
+        configureSentry(localSettings)
         enforceAppTheme()
         configureRoomDatabases()
         configureAppReloading()
@@ -196,25 +198,6 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
     private fun configureMatomoTracking() {
         ContactCardMatomo.init(MatomoMail)
-    }
-
-    /**
-     * Reasons to discard Sentry events :
-     * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
-     * - [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
-     */
-    private fun configureSentry() {
-        this.configureSentry(
-            isDebug = BuildConfig.DEBUG,
-            isSentryTrackingEnabled = { localSettings.isSentryTrackingEnabled },
-            isFilteredException = { exception: Throwable? ->
-                when {
-                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> true
-                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> true
-                    else -> false
-                }
-            },
-        )
     }
 
     private fun enforceAppTheme() {
@@ -282,6 +265,31 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
     companion object {
         private const val FIRST_LAUNCH_TIME = 0L
+
+        context(context: BackupAgent)
+        fun configureSentry() {
+            configureSentry(LocalSettings.getInstance(context))
+        }
+
+        /**
+         * Reasons to discard Sentry events :
+         * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
+         * - [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
+         */
+        context(context: Context)
+        private fun configureSentry(localSettings: LocalSettings) {
+            context.configureSentry(
+                isDebug = BuildConfig.DEBUG,
+                isSentryTrackingEnabled = { localSettings.isSentryTrackingEnabled },
+                isFilteredException = { exception: Throwable? ->
+                    when (exception) {
+                        is ApiErrorException if exception.errorCode == ErrorCode.ACCESS_DENIED -> true
+                        is ApiErrorException if exception.errorCode == ErrorCode.NOT_AUTHORIZED -> true
+                        else -> false
+                    }
+                },
+            )
+        }
 
         @JvmStatic
         var userDataCleanableList: List<AssociatedUserDataCleanable> = emptyList()
