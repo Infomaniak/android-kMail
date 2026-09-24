@@ -127,7 +127,7 @@ import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBott
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.newMessage.AiPropositionFragmentArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel
-import com.infomaniak.mail.utils.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -563,7 +563,6 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             onDownloadStateChanged = { uuid, isDownloading ->
                 threadAdapter.setAttachmentDownloading(uuid, isDownloading)
             },
-            showSnackbar = { message -> snackbarManager.setValue(message) },
             openIntent = { intent -> runCatching { startActivity(intent) } },
         )
     }

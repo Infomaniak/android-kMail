@@ -20,6 +20,9 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import android.content.Intent
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentOperations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -33,6 +36,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AttachmentDownloadManagerTest {
@@ -41,6 +45,7 @@ class AttachmentDownloadManagerTest {
     private val networkManager = mockk<NetworkManager>(relaxed = true)
     private val operations = mockk<AttachmentOperations>(relaxed = true)
     private val testDispatcher = StandardTestDispatcher()
+    private val snackbarManager = mockk<SnackbarManager>(relaxed = true)
 
     private lateinit var attachmentDownloadManager: AttachmentDownloadManager
 
@@ -53,6 +58,7 @@ class AttachmentDownloadManagerTest {
             networkManager = networkManager,
             ioDispatcher = testDispatcher,
             operations = operations,
+            snackbarManager = snackbarManager,
         )
     }
 
@@ -66,11 +72,14 @@ class AttachmentDownloadManagerTest {
         var downloadStateChanged = false
         var snackbarShown = false
 
+        coEvery { snackbarManager.postValue(any()) } answers {
+            snackbarShown = true
+        }
+
         attachmentDownloadManager.downloadAndOpenAttachment(
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, _ -> downloadStateChanged = true },
-            showSnackbar = { snackbarShown = true },
             openIntent = {},
         )
         advanceUntilIdle()
@@ -97,7 +106,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, _ -> downloadStateCalled = true },
-            showSnackbar = {},
             openIntent = { openedIntent = it },
         )
         advanceUntilIdle()
@@ -125,7 +133,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            showSnackbar = {},
             openIntent = { openedIntent = it },
         )
         advanceUntilIdle()
@@ -156,11 +163,11 @@ class AttachmentDownloadManagerTest {
         coEvery { operations.getOpenIntent(attachment2) } returns intent2
 
         coEvery { operations.download(attachment1) } coAnswers {
-            delay(100)
+            delay(100.milliseconds)
             true
         }
         coEvery { operations.download(attachment2) } coAnswers {
-            delay(50)
+            delay(50.milliseconds)
             true
         }
 
@@ -170,7 +177,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment1,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            showSnackbar = {},
             openIntent = { openedIntents.add(it) },
         )
 
@@ -178,7 +184,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment2,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            showSnackbar = {},
             openIntent = { openedIntents.add(it) },
         )
 
@@ -200,7 +205,7 @@ class AttachmentDownloadManagerTest {
         coEvery { operations.hasSupportedApp(attachment) } returns true
         coEvery { operations.isCached(attachment) } returns false
         coEvery { operations.download(attachment) } coAnswers {
-            delay(100)
+            delay(100.milliseconds)
             true
         }
         coEvery { operations.getOpenIntent(attachment) } returns dummyIntent
@@ -211,7 +216,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            showSnackbar = {},
             openIntent = {},
         )
 
@@ -220,7 +224,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            showSnackbar = {},
             openIntent = {},
         )
 
@@ -257,7 +260,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment1,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            showSnackbar = {},
             openIntent = { openedIntents.add(it) },
         )
         advanceUntilIdle()
@@ -269,7 +271,6 @@ class AttachmentDownloadManagerTest {
             attachment = attachment2,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            showSnackbar = {},
             openIntent = { openedIntents.add(it) },
         )
         advanceUntilIdle()
@@ -287,13 +288,14 @@ class AttachmentDownloadManagerTest {
         coEvery { operations.download(attachment) } returns false
 
         var errorSnackbarShown = false
+        coEvery { snackbarManager.postValue(any()) } answers { errorSnackbarShown = true }
+
         val downloadStates = mutableListOf<Boolean>()
 
         attachmentDownloadManager.downloadAndOpenAttachment(
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            showSnackbar = { errorSnackbarShown = true },
             openIntent = {},
         )
         advanceUntilIdle()

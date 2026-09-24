@@ -93,7 +93,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.AttachmentsReminderUtils
+import com.infomaniak.mail.utils.attachment.AttachmentsReminderUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.MENTIONS_STYLE
