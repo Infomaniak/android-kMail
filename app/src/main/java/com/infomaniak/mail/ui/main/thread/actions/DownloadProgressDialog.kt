@@ -40,30 +40,14 @@ abstract class DownloadProgressDialog : DialogFragment() {
     protected val mainViewModel: MainViewModel by activityViewModels()
 
     abstract val dialogTitle: String
-    protected open val timeoutDurationMs: Long = DEFAULT_DOWNLOAD_TIMEOUT_MS
 
-    private var timeoutJob: Job? = null
     private var isDismissed = false
 
     protected abstract fun download()
 
     override fun onStart() {
-        startTimeoutWatchdog()
         download()
         super.onStart()
-    }
-
-    override fun onStop() {
-        timeoutJob?.cancel()
-        super.onStop()
-    }
-
-    private fun startTimeoutWatchdog() {
-        timeoutJob?.cancel()
-        timeoutJob = lifecycleScope.launch {
-            delay(timeoutDurationMs)
-            popBackStackWithError()
-        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -78,12 +62,7 @@ abstract class DownloadProgressDialog : DialogFragment() {
     protected fun popBackStackWithError() {
         if (isDismissed || !isAdded) return
         isDismissed = true
-        timeoutJob?.cancel()
         showSnackbar(title = if (mainViewModel.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection)
-        runCatching { findNavController().popBackStack() }
-    }
-
-    companion object {
-        const val DEFAULT_DOWNLOAD_TIMEOUT_MS = 120_000L
+        findNavController().popBackStack()
     }
 }
