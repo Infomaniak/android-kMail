@@ -37,7 +37,6 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
 
     override val dialogTitle: String by lazy { navigationArgs.attachmentName }
-    override val timeoutDurationMs: Long = DownloadAttachmentViewModel.DOWNLOAD_TIMEOUT
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding.icon.isVisible = true
@@ -51,8 +50,7 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
                 popBackStackWithError()
             } else {
                 lifecycleScope.launch {
-                    val currentContext = context ?: return@launch
-                    cachedAttachment.getIntentOrGoToAppStore(currentContext, navigationArgs.intentType)?.let { openWithIntent ->
+                    cachedAttachment.getIntentOrGoToAppStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
                         setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
                     } ?: run { findNavController().popBackStack() }
                 }

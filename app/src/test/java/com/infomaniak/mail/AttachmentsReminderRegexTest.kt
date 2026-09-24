@@ -18,7 +18,7 @@
 
 package com.infomaniak.mail
 
-import com.infomaniak.mail.utils.AttachmentsReminderUtils
+import com.infomaniak.mail.utils.attachment.AttachmentsReminderUtils
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
