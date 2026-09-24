@@ -45,7 +45,7 @@ class AttachmentAdapter(
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.contains(PAYLOAD_DOWNLOADING_STATE)) {
             val attachment = attachments.getOrNull(position) ?: return
-            holder.binding.attachmentDetails.setIsDownloading(isAttachmentDownloading(attachment.localUuid))
+            holder.binding.attachmentDetails.setIconVisibility(isAttachmentDownloading(attachment.localUuid))
         } else {
             runCatchingRealm { super.onBindViewHolder(holder, position, payloads) }
         }
@@ -54,8 +54,7 @@ class AttachmentAdapter(
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
         val attachment = attachments[position]
 
-        val isDownloading = isAttachmentDownloading(attachment.localUuid)
-        attachmentDetails.setDetails(attachment, isDownloading)
+        attachmentDetails.setDetails(attachment, isDownloading = isAttachmentDownloading(attachment.localUuid))
         onAttachmentClicked?.let { clickListener ->
             root.setOnClickListener {
                 if (!isAttachmentDownloading(attachment.localUuid)) {
@@ -108,9 +107,7 @@ class AttachmentAdapter(
         }
         if (changed) {
             val index = attachments.indexOfFirst { it.localUuid == uuid }
-            if (index != -1) {
-                notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
-            }
+            if (index != -1) notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
         }
     }
 

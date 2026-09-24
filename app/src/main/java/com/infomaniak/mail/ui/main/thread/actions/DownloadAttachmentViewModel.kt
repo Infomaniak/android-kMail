@@ -41,6 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @HiltViewModel
 class DownloadAttachmentViewModel @Inject constructor(
@@ -61,7 +62,7 @@ class DownloadAttachmentViewModel @Inject constructor(
      */
     private var attachment: Attachable? = null
 
-    val downloadAttachmentLiveData: LiveData<Attachment?> = liveData(ioCoroutineContext) {
+    private val downloadAttachmentLiveData: LiveData<Attachment?> = liveData(ioCoroutineContext) {
         val downloadedAttachment = withTimeoutOrNull(DOWNLOAD_TIMEOUT) {
             runCatching {
                 val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
@@ -71,7 +72,7 @@ class DownloadAttachmentViewModel @Inject constructor(
                     isAttachmentCached = LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(appContext, localAttachment)
                 }
 
-                if (isAttachmentCached) {
+                return@runCatching if (isAttachmentCached) {
                     attachment = null
                     localAttachment
                 } else {
@@ -80,9 +81,7 @@ class DownloadAttachmentViewModel @Inject constructor(
             }.cancellable().getOrNull()
         }
 
-        if (downloadedAttachment == null) {
-            deleteIncompleteCacheFile()
-        }
+        if (downloadedAttachment == null) deleteIncompleteCacheFile()
 
         emit(downloadedAttachment)
     }
@@ -103,6 +102,6 @@ class DownloadAttachmentViewModel @Inject constructor(
     }
 
     companion object {
-        const val DOWNLOAD_TIMEOUT = 120_000L
+        val DOWNLOAD_TIMEOUT = 2.minutes
     }
 }

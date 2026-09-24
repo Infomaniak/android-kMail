@@ -23,7 +23,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
-import androidx.core.view.isInvisible
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil3.load
 import com.infomaniak.core.common.FormatterFileSize.formatShortFileSize
@@ -71,11 +71,11 @@ class AttachmentDetailsView @JvmOverloads constructor(
         fileName.text = attachment.name
         fileSize.text = context.formatShortFileSize(attachment.size)
         icon.load(attachment.getFileTypeFromMimeType().icon)
-        setIsDownloading(isDownloading)
+        setIconVisibility(isDownloading)
     }
 
-    fun setIsDownloading(isDownloading: Boolean) = with(binding) {
-        icon.isInvisible = isDownloading
+    fun setIconVisibility(isDownloading: Boolean) = with(binding) {
+        icon.isGone = isDownloading
         progressIndicator.isVisible = isDownloading
     }
 

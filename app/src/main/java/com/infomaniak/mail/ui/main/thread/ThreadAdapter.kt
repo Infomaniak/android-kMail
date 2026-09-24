@@ -191,11 +191,11 @@ class ThreadAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         return if (viewType == DisplayType.MAIL.layout) {
             MessageViewHolder(
-                ItemMessageBinding.inflate(layoutInflater, parent, false),
-                shouldLoadDistantResources,
-                threadAdapterCallbacks?.onContactClicked,
-                threadAdapterCallbacks?.onAttachmentClicked,
-                threadAdapterCallbacks?.onAttachmentOptionsClicked,
+                binding = ItemMessageBinding.inflate(layoutInflater, parent, false),
+                shouldLoadDistantResources = shouldLoadDistantResources,
+                onContactClicked = threadAdapterCallbacks?.onContactClicked,
+                onAttachmentClicked = threadAdapterCallbacks?.onAttachmentClicked,
+                onAttachmentOptionsClicked = threadAdapterCallbacks?.onAttachmentOptionsClicked,
             ).also {
                 activeAttachmentAdapters.add(it.attachmentAdapter)
             }
