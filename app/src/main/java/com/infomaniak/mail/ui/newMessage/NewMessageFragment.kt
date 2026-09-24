@@ -97,7 +97,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
@@ -464,10 +464,7 @@ class NewMessageFragment : Fragment() {
                 attachmentDownloadManager.downloadAndOpenAttachment(
                     attachment = it,
                     scope = viewLifecycleOwner.lifecycleScope,
-                    onDownloadStateChanged = { uuid, isDownloading ->
-                        attachmentAdapter.setAttachmentDownloading(uuid, isDownloading)
-                    },
-                    showSnackbar = { message -> snackbarManager.setValue(message) },
+                    onDownloadStateChanged = attachmentAdapter::setAttachmentDownloading,
                     openIntent = { intent -> runCatching { startActivity(intent) } },
                 )
             },
