@@ -21,7 +21,6 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.core.legacy.R
@@ -29,9 +28,6 @@ import com.infomaniak.core.ui.view.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
 import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 abstract class DownloadProgressDialog : DialogFragment() {
@@ -40,8 +36,6 @@ abstract class DownloadProgressDialog : DialogFragment() {
     protected val mainViewModel: MainViewModel by activityViewModels()
 
     abstract val dialogTitle: String
-
-    private var isDismissed = false
 
     protected abstract fun download()
 
@@ -60,8 +54,6 @@ abstract class DownloadProgressDialog : DialogFragment() {
     }
 
     protected fun popBackStackWithError() {
-        if (isDismissed || !isAdded) return
-        isDismissed = true
         showSnackbar(title = if (mainViewModel.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection)
         findNavController().popBackStack()
     }
