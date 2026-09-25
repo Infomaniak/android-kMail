@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
+package com.infomaniak.mail.utils.attachment
 
 object AttachmentsReminderUtils {
     private val frAttachmentsReminderRegex = listOf(
@@ -277,4 +277,3 @@ object AttachmentsReminderUtils {
 
     fun hasAttachmentKeyword(text: String): Boolean = pattern.containsMatchIn(text)
 }
-

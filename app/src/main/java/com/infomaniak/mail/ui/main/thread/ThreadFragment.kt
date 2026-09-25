@@ -127,6 +127,7 @@ import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBott
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.newMessage.AiPropositionFragmentArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -135,7 +136,6 @@ import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -212,6 +212,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var attachmentDownloadManager: AttachmentDownloadManager
 
     @Inject
     lateinit var subjectFormatter: SubjectFormatter
@@ -554,19 +557,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun openAttachment(attachable: Attachment) {
         trackAttachmentActionsEvent(MatomoName.Open)
-        lifecycleScope.launch {
-            attachable.openAttachment(
-                context = requireContext(),
-                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                    navigateToDownloadProgressDialog(
-                        attachment = attachment,
-                        attachmentIntentType = attachmentIntentType,
-                        currentClassName = ThreadFragment::class.java.name,
-                    )
-                },
-                snackbarManager = snackbarManager,
-            )
-        }
+        attachmentDownloadManager.downloadAndOpenAttachment(
+            attachment = attachable,
+            scope = viewLifecycleOwner.lifecycleScope,
+            onDownloadStateChanged = { uuid, isDownloading ->
+                threadAdapter.setAttachmentDownloading(uuid, isDownloading)
+            },
+            startIntent = { intent -> runCatching { startActivity(intent) } },
+        )
     }
 
     private fun navigateToAttachmentActions(attachable: Attachable) {

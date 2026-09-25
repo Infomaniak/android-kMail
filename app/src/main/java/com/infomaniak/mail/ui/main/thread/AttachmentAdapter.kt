@@ -36,21 +36,35 @@ class AttachmentAdapter(
 ) : Adapter<AttachmentViewHolder>() {
 
     private val attachments: MutableList<Attachable> = mutableListOf()
+    private val downloadingAttachmentUuids: MutableSet<String> = mutableSetOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int, payloads: MutableList<Any>) {
-        runCatchingRealm { super.onBindViewHolder(holder, position, payloads) }
+        if (payloads.contains(PAYLOAD_DOWNLOADING_STATE)) {
+            val attachment = attachments.getOrNull(position) ?: return
+            holder.binding.attachmentDetails.setIconVisibility(isAttachmentDownloading(attachment.localUuid))
+        } else {
+            runCatchingRealm { super.onBindViewHolder(holder, position, payloads) }
+        }
     }
 
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
         val attachment = attachments[position]
 
-        attachmentDetails.setDetails(attachment)
-        onAttachmentClicked?.let { root.setOnClickListener { it(attachment) } }
-        onAttachmentOptionsClicked?.let { moreButton.setOnClickListener { it(attachment) } }
+        attachmentDetails.setDetails(attachment, isDownloading = isAttachmentDownloading(attachment.localUuid))
+        onAttachmentClicked?.let { processClick ->
+            root.setOnClickListener {
+                if (!isAttachmentDownloading(attachment.localUuid)) processClick(attachment)
+            }
+        }
+        onAttachmentOptionsClicked?.let { processClick ->
+            moreButton.setOnClickListener {
+                if (!isAttachmentDownloading(attachment.localUuid)) processClick(attachment)
+            }
+        }
         toggleEndIconVisibility(shouldDisplayCloseButton)
 
         if (shouldDisplayCloseButton) {
@@ -82,10 +96,33 @@ class AttachmentAdapter(
         notifyDataSetChanged()
     }
 
+    fun setDownloadingUuids(uuids: Set<String>) {
+        downloadingAttachmentUuids.clear()
+        downloadingAttachmentUuids.addAll(uuids)
+    }
+
+    fun setAttachmentDownloading(uuid: String, isDownloading: Boolean) {
+        val hasStateChanged = if (isDownloading) {
+            downloadingAttachmentUuids.add(uuid)
+        } else {
+            downloadingAttachmentUuids.remove(uuid)
+        }
+        if (hasStateChanged) {
+            val index = attachments.indexOfFirst { it.localUuid == uuid }
+            if (index != -1) notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
+        }
+    }
+
+    fun isAttachmentDownloading(uuid: String): Boolean = downloadingAttachmentUuids.contains(uuid)
+
     private fun ItemAttachmentBinding.toggleEndIconVisibility(shouldDisplayCloseButton: Boolean) {
         attachmentCloseButton.isVisible = shouldDisplayCloseButton
         moreButton.isVisible = !shouldDisplayCloseButton
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : ViewHolder(binding.root)
+
+    companion object {
+        private const val PAYLOAD_DOWNLOADING_STATE = "payload_downloading_state"
+    }
 }
