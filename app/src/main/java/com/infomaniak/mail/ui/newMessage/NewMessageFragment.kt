@@ -465,7 +465,7 @@ class NewMessageFragment : Fragment() {
                     attachment = it,
                     scope = viewLifecycleOwner.lifecycleScope,
                     onDownloadStateChanged = attachmentAdapter::setAttachmentDownloading,
-                    openIntent = { intent -> runCatching { startActivity(intent) } },
+                    startIntent = { intent -> runCatching { startActivity(intent) } },
                 )
             },
         )
