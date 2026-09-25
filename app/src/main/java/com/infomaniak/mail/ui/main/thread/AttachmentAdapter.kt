@@ -100,12 +100,12 @@ class AttachmentAdapter(
     }
 
     fun setAttachmentDownloading(uuid: String, isDownloading: Boolean) {
-        val changed = if (isDownloading) {
+        val hasStateChanged = if (isDownloading) {
             downloadingAttachmentUuids.add(uuid)
         } else {
             downloadingAttachmentUuids.remove(uuid)
         }
-        if (changed) {
+        if (hasStateChanged) {
             val index = attachments.indexOfFirst { it.localUuid == uuid }
             if (index != -1) notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
         }
