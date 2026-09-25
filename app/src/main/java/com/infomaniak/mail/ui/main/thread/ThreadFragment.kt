@@ -563,7 +563,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
             onDownloadStateChanged = { uuid, isDownloading ->
                 threadAdapter.setAttachmentDownloading(uuid, isDownloading)
             },
-            openIntent = { intent -> runCatching { startActivity(intent) } },
+            startIntent = { intent -> runCatching { startActivity(intent) } },
         )
     }
 

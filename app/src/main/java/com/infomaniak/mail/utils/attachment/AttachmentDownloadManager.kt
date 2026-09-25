@@ -24,19 +24,18 @@ import com.infomaniak.core.legacy.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentViewModel
 import com.infomaniak.mail.utils.NetworkManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
+import javax.inject.Inject
 
-class AttachmentDownloadManager @javax.inject.Inject constructor(
+class AttachmentDownloadManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val networkManager: NetworkManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -57,13 +56,12 @@ class AttachmentDownloadManager @javax.inject.Inject constructor(
         attachment: Attachment,
         scope: CoroutineScope,
         onDownloadStateChanged: (localUuid: String, isDownloading: Boolean) -> Unit,
-        openIntent: (Intent) -> Unit,
+        startIntent: (Intent) -> Unit,
     ) {
         if (isDownloading(attachment.localUuid)) return
 
         val job = scope.launch {
-            val hasApp =
-                withContext(ioDispatcher) { operations.hasSupportedApp(attachment) }
+            val hasApp = withContext(ioDispatcher) { operations.hasSupportedApp(attachment) }
             if (!hasApp) {
                 downloadingJobs.remove(attachment.localUuid)
                 snackbarManager.postValue(context.getString(R.string.errorNoSupportingAppFound))
@@ -73,43 +71,43 @@ class AttachmentDownloadManager @javax.inject.Inject constructor(
             val isAlreadyCached = withContext(ioDispatcher) { operations.isCached(attachment) }
             if (isAlreadyCached) {
                 downloadingJobs.remove(attachment.localUuid)
-                withContext(ioDispatcher) {
-                    operations.getOpenIntent(attachment)?.let { intent ->
-                        isWaitingForFirstToOpen = false
-                        openIntent(intent)
-                    }
-                }
+                openAttachment(attachment, startIntent)
                 return@launch
             }
 
             onDownloadStateChanged(attachment.localUuid, true)
             isWaitingForFirstToOpen = true
 
-            var isSuccess = false
+            var isDownloadSuccess = false
             try {
-                isSuccess = withContext(ioDispatcher) {
-                    withTimeoutOrNull(DownloadAttachmentViewModel.DOWNLOAD_TIMEOUT) {
-                        runCatching { operations.download(attachment) }.cancellable().getOrDefault(false)
-                    } ?: false
+                isDownloadSuccess = withContext(ioDispatcher) {
+                    runCatching { operations.download(attachment) }
+                        .cancellable()
+                        .getOrDefault(false)
                 }
 
-                if (isSuccess) {
-                    if (isWaitingForFirstToOpen) {
-                        isWaitingForFirstToOpen = false
-                        withContext(ioDispatcher) {
-                            operations.getOpenIntent(attachment)?.let(openIntent)
-                        }
-                    }
-                } else if (isActive) {
+                if (isDownloadSuccess) {
+                    if (isWaitingForFirstToOpen) openAttachment(attachment, startIntent)
+                } else {
+                    ensureActive()
                     val errorRes = if (networkManager.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection
                     snackbarManager.postValue(context.getString(errorRes))
                 }
             } finally {
-                cleanUpAttachmentDownload(isSuccess, attachment, onDownloadStateChanged)
+                cleanUpAttachmentDownload(isDownloadSuccess, attachment, onDownloadStateChanged)
             }
         }
 
         downloadingJobs[attachment.localUuid] = job
+    }
+
+    private suspend fun openAttachment(attachment: Attachment, startIntent: (Intent) -> Unit) {
+        withContext(ioDispatcher) {
+            operations.getOpenIntent(attachment)?.let { intent ->
+                isWaitingForFirstToOpen = false
+                startIntent(intent)
+            }
+        }
     }
 
     private suspend fun cleanUpAttachmentDownload(
@@ -122,8 +120,6 @@ class AttachmentDownloadManager @javax.inject.Inject constructor(
         }
         downloadingJobs.remove(attachment.localUuid)
         onDownloadStateChanged(attachment.localUuid, false)
-        if (downloadingJobs.isEmpty()) {
-            isWaitingForFirstToOpen = true
-        }
+        if (downloadingJobs.isEmpty()) isWaitingForFirstToOpen = true
     }
 }
