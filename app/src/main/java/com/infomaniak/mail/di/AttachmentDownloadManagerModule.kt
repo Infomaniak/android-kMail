@@ -26,7 +26,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AttachmentDownloadManagerModule {
+fun interface AttachmentDownloadManagerModule {
     @Binds
-    abstract fun bindAttachmentOperations(impl: DefaultAttachmentOperations): AttachmentOperations
+    fun bindAttachmentOperations(impl: DefaultAttachmentOperations): AttachmentOperations
 }
