@@ -55,14 +55,16 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         attachmentDetails.setDetails(attachment, isDownloading = isAttachmentDownloading(attachment.localUuid))
-        onAttachmentClicked?.let { clickListener ->
+        onAttachmentClicked?.let { processClick ->
             root.setOnClickListener {
-                if (!isAttachmentDownloading(attachment.localUuid)) {
-                    clickListener(attachment)
-                }
+                if (!isAttachmentDownloading(attachment.localUuid)) processClick(attachment)
             }
         }
-        onAttachmentOptionsClicked?.let { moreButton.setOnClickListener { it(attachment) } }
+        onAttachmentOptionsClicked?.let { processClick ->
+            moreButton.setOnClickListener {
+                if (!isAttachmentDownloading(attachment.localUuid)) processClick(attachment)
+            }
+        }
         toggleEndIconVisibility(shouldDisplayCloseButton)
 
         if (shouldDisplayCloseButton) {
