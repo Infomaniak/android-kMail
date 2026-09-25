@@ -80,7 +80,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, _ -> downloadStateChanged = true },
-            openIntent = {},
+            startIntent = {},
         )
         advanceUntilIdle()
 
@@ -106,7 +106,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, _ -> downloadStateCalled = true },
-            openIntent = { openedIntent = it },
+            startIntent = { openedIntent = it },
         )
         advanceUntilIdle()
 
@@ -133,7 +133,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            openIntent = { openedIntent = it },
+            startIntent = { openedIntent = it },
         )
         advanceUntilIdle()
 
@@ -177,14 +177,14 @@ class AttachmentDownloadManagerTest {
             attachment = attachment1,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            openIntent = { openedIntents.add(it) },
+            startIntent = { openedIntents.add(it) },
         )
 
         attachmentDownloadManager.downloadAndOpenAttachment(
             attachment = attachment2,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            openIntent = { openedIntents.add(it) },
+            startIntent = { openedIntents.add(it) },
         )
 
         advanceUntilIdle()
@@ -216,7 +216,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            openIntent = {},
+            startIntent = {},
         )
 
         // Second click while still downloading
@@ -224,7 +224,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            openIntent = {},
+            startIntent = {},
         )
 
         advanceUntilIdle()
@@ -260,7 +260,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment1,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            openIntent = { openedIntents.add(it) },
+            startIntent = { openedIntents.add(it) },
         )
         advanceUntilIdle()
 
@@ -271,7 +271,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment2,
             scope = this,
             onDownloadStateChanged = { _, _ -> },
-            openIntent = { openedIntents.add(it) },
+            startIntent = { openedIntents.add(it) },
         )
         advanceUntilIdle()
 
@@ -296,7 +296,7 @@ class AttachmentDownloadManagerTest {
             attachment = attachment,
             scope = this,
             onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            openIntent = {},
+            startIntent = {},
         )
         advanceUntilIdle()
 
