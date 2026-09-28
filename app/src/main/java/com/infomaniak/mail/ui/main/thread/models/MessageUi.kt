@@ -22,6 +22,8 @@ import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
 
 data class MessageUi(
     val message: Message,
+    // Whether one of the message's "to" recipients sent a newer message in the thread. Used to consider a reminder answered.
+    val isAnsweredByRecipient: Boolean,
     val emojiReactionsState: Map<String, EmojiReactionStateUi>,
     val isReactionsFeatureAvailable: Boolean,
     val unsubscribeState: UnsubscribeState?,

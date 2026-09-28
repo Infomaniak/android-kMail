@@ -210,7 +210,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 NotifyType.UnsubscribeRebind -> bindUnsubscribe(item)
                 NotifyType.AcknowledgeRebind -> bindAcknowledge(item)
-                NotifyType.ReminderRebind -> bindReminder(item.message)
+                NotifyType.ReminderRebind -> bindReminder(item)
                 NotifyType.AiSummaryStateChanged -> holder.bindAiAction(item.message, AiAction.SUMMARY)
                 NotifyType.AiTranslateStateChanged -> holder.bindAiAction(item.message, AiAction.TRANSLATE)
                 is NotifyType.MessagesCollapseStateChanged -> {
@@ -781,7 +781,7 @@ class ThreadAdapter(
 
         bindUnsubscribe(messageUi)
         bindAcknowledge(messageUi)
-        bindReminder(message)
+        bindReminder(messageUi)
         bindSpam(message)
 
         hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
@@ -877,13 +877,22 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindReminder(message: Message) {
+    private fun ItemMessageBinding.bindReminder(messageUi: MessageUi) {
+        val message = messageUi.message
         reminderAlert.isGone = true
         endReminderAlert.isGone = true
         requestResponseAlert.isGone = true
-        iconReminder.isVisible = message.reminder != null && threadAdapterState.isExpandedMap[message.uid] != true
+        iconReminder.isVisible = message.reminder != null &&
+                !messageUi.isAnsweredByRecipient &&
+                threadAdapterState.isExpandedMap[message.uid] != true
 
         if (featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) != true) return
+
+        // A recipient answered: the reminder is considered answered
+        if (messageUi.isAnsweredByRecipient) {
+            hideAlertGroupIfNoneDisplayed()
+            return
+        }
 
         if (message.isScheduledDraft && message.reminder != null) {
             bindScheduledDraftReminderAlert(message)
@@ -1511,7 +1520,8 @@ class ThreadAdapter(
                     message.reminder?.uuid == it.message.reminder?.uuid &&
                             message.reminder?.date == it.message.reminder?.date &&
                             message.reminder?.delta == it.message.reminder?.delta &&
-                            message.reminderAction == it.message.reminderAction
+                            message.reminderAction == it.message.reminderAction &&
+                            isAnsweredByRecipient == it.isAnsweredByRecipient
                 })
 
                 data object Unsubscribe : DiffAspect<MessageUi>({ unsubscribeState == it.unsubscribeState })

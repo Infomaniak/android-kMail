@@ -719,26 +719,35 @@ class ThreadViewModel @Inject constructor(
     private suspend fun <E : Any> List<E>.toUiMessages(
         uiStates: MessageUiStates,
         isReactionsAvailable: Boolean,
-    ): List<Any> = map { item ->
-        if (item is Message) {
-            val localReactions = uiStates.fakeReactions[item.messageId] ?: emptySet()
-            val reactions = item.emojiReactions.toFakedReactions(localReactions)
-            val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
-            val canAcknowledgeOrNull = when {
-                item.isPendingAcknowledgementForMe() -> MessageUi.AcknowledgeState.Pending
-                item.isAcknowledgementCompletedForMe() -> MessageUi.AcknowledgeState.Completed
-                else -> null
+    ): List<Any> {
+        val messages = filterIsInstance<Message>()
+        return map { item ->
+            if (item is Message) {
+                val localReactions = uiStates.fakeReactions[item.messageId] ?: emptySet()
+                val reactions = item.emojiReactions.toFakedReactions(localReactions)
+                val canUnsubscribeOrNull = if (item.hasUnsubscribeLink == true) UnsubscribeState.CanUnsubscribe else null
+                val canAcknowledgeOrNull = when {
+                    item.isPendingAcknowledgementForMe() -> MessageUi.AcknowledgeState.Pending
+                    item.isAcknowledgementCompletedForMe() -> MessageUi.AcknowledgeState.Completed
+                    else -> null
+                }
+                MessageUi(
+                    message = item,
+                    isAnsweredByRecipient = item.isAnsweredByRecipient(messages),
+                    emojiReactionsState = reactions,
+                    isReactionsFeatureAvailable = isReactionsAvailable,
+                    unsubscribeState = uiStates.unsubscribeStates[item.uid] ?: canUnsubscribeOrNull,
+                    acknowledgeState = uiStates.acknowledgeStates[item.uid] ?: canAcknowledgeOrNull,
+                )
+            } else {
+                item
             }
-            MessageUi(
-                message = item,
-                emojiReactionsState = reactions,
-                isReactionsFeatureAvailable = isReactionsAvailable,
-                unsubscribeState = uiStates.unsubscribeStates[item.uid] ?: canUnsubscribeOrNull,
-                acknowledgeState = uiStates.acknowledgeStates[item.uid] ?: canAcknowledgeOrNull,
-            )
-        } else {
-            item
         }
+    }
+
+    private fun Message.isAnsweredByRecipient(threadMessages: List<Message>): Boolean {
+        val recipientEmails = to.map { it.email }.filter { it.isNotEmpty() }.toSet()
+        return threadMessages.any { newer -> newer.internalDate > internalDate && newer.sender?.email in recipientEmails }
     }
 
     private suspend fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {

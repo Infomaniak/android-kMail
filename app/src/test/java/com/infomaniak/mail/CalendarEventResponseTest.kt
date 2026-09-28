@@ -172,6 +172,7 @@ class CalendarEventResponseTest {
 
 private fun Message.toMessageUi(): MessageUi = MessageUi(
     message = this,
+    isAnsweredByRecipient = false,
     emojiReactionsState = emptyMap(),
     isReactionsFeatureAvailable = false,
     unsubscribeState = null,
