@@ -19,9 +19,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
@@ -33,11 +31,15 @@ import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
@@ -51,7 +53,6 @@ class DownloadAttachmentViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private val cleanupScope = CoroutineScope(ioDispatcher)
 
     private val attachmentLocalUuid
@@ -62,7 +63,7 @@ class DownloadAttachmentViewModel @Inject constructor(
      */
     private var attachment: Attachable? = null
 
-    private val downloadAttachmentLiveData: LiveData<Attachment?> = liveData(ioCoroutineContext) {
+    private val downloadAttachmentFlow: Flow<Attachment?> = flow {
         val downloadedAttachment = withTimeoutOrNull(DOWNLOAD_TIMEOUT) {
             runCatching {
                 val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
@@ -84,9 +85,9 @@ class DownloadAttachmentViewModel @Inject constructor(
         if (downloadedAttachment == null) deleteIncompleteCacheFile()
 
         emit(downloadedAttachment)
-    }
+    }.flowOn(ioDispatcher).shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
-    fun downloadAttachment(): LiveData<Attachment?> = downloadAttachmentLiveData
+    fun downloadAttachment(): Flow<Attachment?> = downloadAttachmentFlow
 
     private suspend fun deleteIncompleteCacheFile() {
         runCatchingRealm { attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() } }

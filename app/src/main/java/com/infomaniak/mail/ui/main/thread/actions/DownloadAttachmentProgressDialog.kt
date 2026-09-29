@@ -30,11 +30,14 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToAppStore
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
     private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
+    private var hasStartedDownload = false
 
     override val dialogTitle: String by lazy { navigationArgs.attachmentName }
 
@@ -45,11 +48,14 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     }
 
     override fun download() {
-        downloadAttachmentViewModel.downloadAttachment().observe(this) { cachedAttachment ->
-            if (cachedAttachment == null) {
-                popBackStackWithError()
-            } else {
-                lifecycleScope.launch {
+        if (hasStartedDownload) return
+
+        hasStartedDownload = true
+        lifecycleScope.launch {
+            downloadAttachmentViewModel.downloadAttachment().take(1).collect { cachedAttachment ->
+                if (cachedAttachment == null) {
+                    popBackStackWithError()
+                } else {
                     cachedAttachment.getIntentOrGoToAppStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
                         setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
                     } ?: run { findNavController().popBackStack() }
