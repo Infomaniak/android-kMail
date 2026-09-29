@@ -28,7 +28,6 @@ import com.infomaniak.core.network.models.exceptions.NetworkException
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
@@ -62,8 +61,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.invoke
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -74,14 +71,17 @@ import java.util.Locale
 import java.util.UUID
 
 class MailActionsManager(
-    private val mailboxContentRealm: Realm = RealmDatabase.newMailboxContentInstance,
+    /**
+     * Realm of the [mailbox] targeted by this work, as its Drafts are the only ones that can be sent to this [mailbox].
+     * Don't use the current Mailbox's Realm: the user may have switched to another Mailbox since the work was scheduled.
+     */
+    private val mailboxContentRealm: Realm,
     private val mailboxInfoRealm: Realm,
     private val userId: Int,
     private val mailboxId: Int,
     private val mailbox: Mailbox,
     private val isSnackbarFeedbackNeeded: Boolean = false,
     private val draftLocalUuid: String?,
-    private val draftController: DraftController,
     private val okHttpClient: OkHttpClient,
     private val coroutineWorker: CoroutineWorker,
     private val notificationUtils: NotificationUtils,
@@ -94,7 +94,7 @@ class MailActionsManager(
     suspend fun handleDraftsActions(): ListenableWorker.Result {
 
         SentryDebug.addDraftsBreadcrumbs(
-            drafts = draftController.getAllDrafts(mailboxContentRealm),
+            drafts = DraftController.getAllDrafts(mailboxContentRealm),
             step = "before handleDraftsActions",
         )
 
@@ -111,7 +111,7 @@ class MailActionsManager(
         var trackedUnSendDraftUrl: String? = null
         var trackedDraftEmoji: String? = null
 
-        val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
+        val drafts = DraftController.getDraftsWithActions(mailboxContentRealm)
         SentryLog.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
         if (drafts.isEmpty()) return ListenableWorker.Result.failure()
 
@@ -201,7 +201,7 @@ class MailActionsManager(
         mailboxContentRealm.executeRealmCallbacks(realmActionsOnDraft)
 
         SentryDebug.addDraftsBreadcrumbs(
-            drafts = draftController.getAllDrafts(mailboxContentRealm),
+            drafts = DraftController.getAllDrafts(mailboxContentRealm),
             step = "after handleDraftsActions",
         )
 
@@ -317,7 +317,7 @@ class MailActionsManager(
                     it.action = DraftAction.SAVE
                 }
             }
-            executeDraftAction(Dispatchers.IO { draftController.getDraft(draft.localUuid) }!!, mailbox.uuid)
+            executeDraftAction(DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!, mailbox.uuid)
         }
     }.cancellable()
 
@@ -340,7 +340,7 @@ class MailActionsManager(
             )
 
             // Remove the Draft if it's corrupted instead of sending a Sentry every time the worker starts again
-            draftController.deleteDraft(draft)
+            DraftController.deleteDraft(draft.localUuid, mailboxContentRealm)
             SentryLog.i("CorruptedAttachment", "Remove draft from realm due to corrupted attachment")
 
             return DraftActionResult(
@@ -463,7 +463,7 @@ class MailActionsManager(
 
     private suspend fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
-        updateSignatures(mailbox, mailboxInfoRealm)
+        updateSignatures(mailbox, mailboxInfoRealm, okHttpClient)
 
         val signature = mailbox.getDefaultSignatureWithFallback()
 

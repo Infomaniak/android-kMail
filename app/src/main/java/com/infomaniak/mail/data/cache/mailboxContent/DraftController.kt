@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,18 +36,6 @@ class DraftController @Inject constructor(
 ) {
 
     //region Get data
-    suspend fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
-        return getDraftsWithActionsQuery(realm).findSuspend()
-    }
-
-    suspend fun getDraftsWithActionsCount(): Long {
-        return getDraftsWithActionsCount(mailboxContentRealm())
-    }
-
-    suspend fun getAllDrafts(realm: TypedRealm): RealmResults<Draft> {
-        return getDraftsQuery(realm = realm).findSuspend()
-    }
-
     suspend fun getDraft(localUuid: String): Draft? {
         return getDraft(localUuid, mailboxContentRealm())
     }
@@ -61,12 +49,6 @@ class DraftController @Inject constructor(
     suspend fun upsertDraft(draft: Draft) {
         mailboxContentRealm().write {
             upsertDraftBlocking(draft, realm = this)
-        }
-    }
-
-    suspend fun deleteDraft(draft: Draft) {
-        mailboxContentRealm().write {
-            delete(getDraftQuery(Draft::localUuid.name, draft.localUuid, realm = this))
         }
     }
     //endregion
@@ -106,8 +88,16 @@ class DraftController @Inject constructor(
             return getDraftQuery(Draft::localUuid.name, localUuid, realm).findSuspend()
         }
 
+        suspend fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
+            return getDraftsWithActionsQuery(realm).findSuspend()
+        }
+
         suspend fun getDraftsWithActionsCount(realm: TypedRealm): Long {
             return getDraftsWithActionsQuery(realm).count().findSuspend()
+        }
+
+        suspend fun getAllDrafts(realm: TypedRealm): RealmResults<Draft> {
+            return getDraftsQuery(realm = realm).findSuspend()
         }
 
         fun getOrphanDraftsBlocking(realm: TypedRealm): RealmResults<Draft> {
@@ -130,6 +120,12 @@ class DraftController @Inject constructor(
 
         fun updateDraftBlocking(localUuid: String, realm: MutableRealm, onUpdate: (Draft) -> Unit) {
             getDraftBlocking(localUuid, realm)?.let(onUpdate)
+        }
+
+        suspend fun deleteDraft(localUuid: String, realm: Realm) {
+            realm.write {
+                delete(getDraftQuery(Draft::localUuid.name, localUuid, realm = this))
+            }
         }
         //endregion
 

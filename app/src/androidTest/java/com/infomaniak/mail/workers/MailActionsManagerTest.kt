@@ -92,9 +92,9 @@ class MailActionsManagerTest {
     fun testSendingEmail() = runTest {
         launch {
             draftController.upsertDraft(getDraft())
-            assert(draftController.getAllDrafts(mailboxContentRealm()).count() == 1) { "We should have one draft" }
+            assert(DraftController.getAllDrafts(mailboxContentRealm()).count() == 1) { "We should have one draft" }
             getMailActionManager(mailboxContentRealm()).handleDraftsActions()
-            assert(draftController.getAllDrafts(mailboxContentRealm()).count() == 0) { "Drafts should be empty" }
+            assert(DraftController.getAllDrafts(mailboxContentRealm()).count() == 0) { "Drafts should be empty" }
         }
     }
 
@@ -177,7 +177,6 @@ class MailActionsManagerTest {
             mailbox = Mailbox(),
             isSnackbarFeedbackNeeded = false,
             draftLocalUuid = "",
-            draftController = draftController,
             okHttpClient = okHttpClient,
             coroutineWorker = coroutineWorker,
             isAppInBackground = { false },
