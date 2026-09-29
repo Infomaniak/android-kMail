@@ -146,6 +146,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.invoke
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -164,7 +165,6 @@ class NewMessageViewModel @Inject constructor(
     private val aiSharedData: AiSharedData,
     private val aiDraftCache: AiDraftCache,
     private val globalCoroutineScope: CoroutineScope,
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val addressBookController: AddressBookController,
@@ -285,6 +285,10 @@ class NewMessageViewModel @Inject constructor(
     suspend fun currentMailbox() = _currentMailboxFlow.first()
 
     fun loadMailbox(userId: Int, mailboxId: Int) {
+        // The Mailbox can't change once loaded, as the Draft belongs to it. By default, it's the current Mailbox,
+        // which could have been switched in the meantime when this is called again because the View got recreated.
+        if (mailboxRefFlow.replayCache.isNotEmpty()) return
+
         mailboxRefFlow.tryEmit(MailboxRef(userId, mailboxId))
     }
 
@@ -301,37 +305,34 @@ class NewMessageViewModel @Inject constructor(
     //endregion
 
     //region Draft's Realm
-    private val otherMailboxContentRealmMutex = Mutex()
-    private var otherMailboxContentRealm: Realm? = null
+    private val draftRealmMutex = Mutex()
+    private var _draftRealm: Realm? = null
 
     /**
-     * The Draft has to be stored in the Realm of the Mailbox it belongs to, because the DraftsActionsWorker sending Drafts to
-     * a Mailbox only reads this Mailbox's Realm. This Mailbox isn't always the current one (e.g. when sharing to another one).
+     * The Draft has to be stored in the Realm of its Mailbox, because the DraftsActionsWorker only sends to a Mailbox the Drafts
+     * found in this Mailbox's Realm. This Realm is opened from the Mailbox's own IDs: the shared Realm of the current Mailbox
+     * can't be used, as it may belong to another Mailbox (e.g. when sharing to another Mailbox, or while switching User).
      */
     private suspend fun draftRealm(): Realm {
         val mailbox = currentMailbox()
-        if (mailbox.userId == AccountUtils.currentUserId && mailbox.mailboxId == AccountUtils.currentMailboxId) {
-            return mailboxContentRealm()
-        }
-
-        return otherMailboxContentRealmMutex.withLock {
-            otherMailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(mailbox.userId, mailbox.mailboxId).also {
-                otherMailboxContentRealm = it
-            }
+        return draftRealmMutex.withLock {
+            _draftRealm ?: RealmDatabase.newMailboxContentInstance(mailbox.userId, mailbox.mailboxId).also { _draftRealm = it }
         }
     }
 
     /**
-     * The Draft can still be saved after the ViewModel is cleared (see [waitForBodyAndSubjectToExecuteDraftAction]),
-     * so we need to wait for it before closing the Realm.
+     * The Realm is still used by the ViewModel's ongoing work, and the Draft can be saved after the ViewModel
+     * is cleared (see [waitForBodyAndSubjectToExecuteDraftAction]), so we need to wait for them before closing it.
      */
-    private fun closeOtherMailboxContentRealm() {
+    private fun closeDraftRealm() {
+        val viewModelJob = ioCoroutineContext.job
         val pendingDraftActionJob = subjectAndBodyJob
         globalCoroutineScope.launch(ioDispatcher) {
+            viewModelJob.join()
             pendingDraftActionJob?.join()
-            otherMailboxContentRealmMutex.withLock {
-                otherMailboxContentRealm?.close()
-                otherMailboxContentRealm = null
+            draftRealmMutex.withLock {
+                _draftRealm?.close()
+                _draftRealm = null
             }
         }
     }
@@ -1070,7 +1071,7 @@ class NewMessageViewModel @Inject constructor(
     override fun onCleared() {
         draftLocalUuid?.let { LocalStorageUtils.deleteDraftUploadDir(appContext, draftLocalUuid = it) }
         aiDraftCache.reset()
-        closeOtherMailboxContentRealm()
+        closeDraftRealm()
         super.onCleared()
     }
 
