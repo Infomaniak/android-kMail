@@ -18,21 +18,13 @@
 package com.infomaniak.mail.backup
 
 import android.app.backup.FullBackupDataOutput
-import android.content.Context
 import com.infomaniak.core.auth.backup.withBlockStoreCredentialsBackup
 import com.infomaniak.core.common.backup.FullBackupAgent
 import com.infomaniak.core.common.backup.isDeviceToDeviceTransfer
 import com.infomaniak.mail.MainApplication
-import splitties.init.appCtx
-import splitties.init.injectAsAppCtx
 import java.io.File
 
 class MailFullBackupAgent : FullBackupAgent(RestorationPolicy.AllBackedUpFiles) {
-
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
-        runCatching { appCtx }.onFailure { base.applicationContext.injectAsAppCtx() }
-    }
 
     override fun onCreate() {
         super.onCreate()
