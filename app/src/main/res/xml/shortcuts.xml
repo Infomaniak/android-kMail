@@ -48,6 +48,21 @@
     </shortcut>
 
     <shortcut
+        android:icon="@mipmap/ic_shortcut_contact_card"
+        android:shortcutId="contactCard"
+        android:shortcutLongLabel="@string/contactCardTitle"
+        android:shortcutShortLabel="@string/contactCardTitle">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.infomaniak.mail.ui.LaunchActivity"
+            android:targetPackage="com.infomaniak.mail">
+            <extra
+                android:name="shortcuts_tag"
+                android:value="contactCard" />
+        </intent>
+    </shortcut>
+
+    <shortcut
         android:icon="@mipmap/ic_shortcut_help"
         android:shortcutId="support"
         android:shortcutLongLabel="@string/buttonHelp"
