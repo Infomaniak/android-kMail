@@ -129,5 +129,6 @@ object Utils {
         NEW_MESSAGE("newMessage"),
         SUPPORT("support"),
         SEARCH("search"),
+        CONTACT_CARD("contactCard"),
     }
 }

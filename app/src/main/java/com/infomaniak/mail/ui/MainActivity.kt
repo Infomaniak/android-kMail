@@ -69,6 +69,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.FirebaseNotificationReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.contactcard.ContactCardFragmentArgs
 import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg
 import com.infomaniak.mail.ui.main.easterEgg.EventsEasterEgg.NewYear.Animation
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
@@ -718,6 +719,12 @@ class MainActivity : BaseActivity() {
                 Shortcuts.NEW_MESSAGE.id -> navController.navigate(R.id.newMessageActivity)
                 Shortcuts.SUPPORT.id -> {
                     openShortcutHelp(context = this)
+                }
+                Shortcuts.CONTACT_CARD.id -> {
+                    navController.navigate(
+                        R.id.contactCardFragment,
+                        ContactCardFragmentArgs(userId = AccountUtils.currentUserId).toBundle(),
+                    )
                 }
             }
         }
