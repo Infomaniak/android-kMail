@@ -23,7 +23,7 @@ playServices = "18.11.0"
 richHtmlEditor = "1.1.0"
 uiautomator = "2.3.0"
 uiTestJunit4 = "1.10.0"
-webkit = "1.14.0"
+webkit = "1.17.1"
 
 [libraries]
 compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "compose" }
