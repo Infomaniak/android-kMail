@@ -1,0 +1,2 @@
+- Sauvegarde de vos identifiants avec l'API Block Store pour faciliter la restauration de vos comptes sur un nouvel appareil
+- Correction d'un crash potentiel lors de la restauration des données de l'application

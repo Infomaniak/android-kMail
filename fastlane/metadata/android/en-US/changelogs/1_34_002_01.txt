@@ -1,0 +1,2 @@
+- Back up your credentials with the Block Store API to ease account restoration on new devices
+- Fix a potential crash when restoring app data
