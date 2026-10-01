@@ -22,6 +22,7 @@ import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.network.INFOMANIAK_API_V1
 import com.infomaniak.mail.MAIL_API
 import com.infomaniak.mail.utils.Utils
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URLEncoder
@@ -327,20 +328,23 @@ object ApiRoutes {
     }
 
     fun resource(resource: String): String {
-        require(resource.startsWith("/") && !resource.startsWith("//") && !resource.startsWith("/\\")) {
+        require(isValidResourcePath(resource)) {
             "Invalid resource path: $resource"
         }
         val url = "$MAIL_API$resource".toHttpUrlOrNull()
-        require(
-            url != null &&
-                url.host == mailApiUrl.host &&
-                url.username.isEmpty() &&
-                url.password.isEmpty() &&
-                url.scheme == mailApiUrl.scheme
-        ) {
+        require(isValidResourceUrl(url)) {
             "Invalid resource URL: $resource"
         }
         return url.toString()
+    }
+
+    private fun isValidResourcePath(path: String): Boolean {
+        return path.startsWith("/") && !path.startsWith("//") && !path.startsWith("/\\")
+    }
+
+    private fun isValidResourceUrl(url: HttpUrl?): Boolean {
+        if (url == null || url.host != mailApiUrl.host) return false
+        return url.scheme == mailApiUrl.scheme && url.username.isEmpty() && url.password.isEmpty()
     }
 
     fun bimi(bimi: String): String {

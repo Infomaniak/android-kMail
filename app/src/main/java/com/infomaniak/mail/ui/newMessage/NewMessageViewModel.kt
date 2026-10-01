@@ -399,14 +399,7 @@ class NewMessageViewModel @Inject constructor(
                 .toMutableList()
                 .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox().email)) }
 
-            val isExternalIntent = intent.action in setOf(
-                Intent.ACTION_SEND,
-                Intent.ACTION_SEND_MULTIPLE,
-                Intent.ACTION_VIEW,
-                Intent.ACTION_SENDTO,
-            ) || intent.hasCategory(Intent.CATEGORY_BROWSABLE)
-
-            isNewMessage = isExternalIntent || (!arrivedFromExistingDraft && draftLocalUuid == null)
+            isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
             if (isNewMessage) getNewDraft(signatures, intent, realm) else getExistingDraft(draftLocalUuid)
         }.cancellable().onFailure {
             SentryLog.e(TAG, "Caught exception during draft initialization", it)
@@ -722,7 +715,9 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun fetchDraft(): Draft? {
-        val resource = draftResource?.takeIf { it.startsWith("/") && !it.startsWith("//") && !it.startsWith("/\\") } ?: return null
+        val resource = draftResource?.takeIf {
+            it.startsWith("/") && !it.startsWith("//") && !it.startsWith("/\\")
+        } ?: return null
         return ApiRepository.getDraft(resource).data?.also { draft ->
 
             /**

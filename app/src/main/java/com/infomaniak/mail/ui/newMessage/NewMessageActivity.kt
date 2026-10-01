@@ -70,7 +70,6 @@ class NewMessageActivity : BaseActivity() {
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        sanitizeExternalIntent()
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
@@ -102,25 +101,6 @@ class NewMessageActivity : BaseActivity() {
         }
 
         return true
-    }
-
-    private fun sanitizeExternalIntent() {
-        val isExternalIntent = intent.action in setOf(
-            Intent.ACTION_SEND,
-            Intent.ACTION_SEND_MULTIPLE,
-            Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO,
-        ) || intent.hasCategory(Intent.CATEGORY_BROWSABLE)
-
-        if (isExternalIntent) {
-            intent.removeExtra(NewMessageActivityArgs::arrivedFromExistingDraft.name)
-            intent.removeExtra(NewMessageActivityArgs::draftLocalUuid.name)
-            intent.removeExtra(NewMessageActivityArgs::draftResource.name)
-            intent.removeExtra(NewMessageActivityArgs::messageUid.name)
-            intent.removeExtra(NewMessageActivityArgs::draftMode.name)
-            intent.removeExtra(NewMessageActivityArgs::previousMessageUid.name)
-            intent.removeExtra(NewMessageActivityArgs::notificationId.name)
-        }
     }
 
     private fun setupNavGraphStartDestination() {
