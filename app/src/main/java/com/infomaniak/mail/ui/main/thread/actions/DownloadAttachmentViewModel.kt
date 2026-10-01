@@ -36,6 +36,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -63,7 +64,7 @@ class DownloadAttachmentViewModel @Inject constructor(
      */
     private var attachment: Attachable? = null
 
-    private val downloadAttachmentFlow: Flow<Attachment?> = flow {
+    private val downloadAttachmentFlow: SharedFlow<Attachment?> = flow {
         val downloadedAttachment = withTimeoutOrNull(DOWNLOAD_TIMEOUT) {
             runCatching {
                 val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
@@ -87,7 +88,7 @@ class DownloadAttachmentViewModel @Inject constructor(
         emit(downloadedAttachment)
     }.flowOn(ioDispatcher).shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
-    fun downloadAttachment(): Flow<Attachment?> = downloadAttachmentFlow
+    fun downloadAttachment(): SharedFlow<Attachment?> = downloadAttachmentFlow
 
     private suspend fun deleteIncompleteCacheFile() {
         runCatchingRealm { attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() } }
