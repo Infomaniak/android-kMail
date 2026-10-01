@@ -60,7 +60,7 @@ class AttachmentDownloadManagerTest {
             context = context,
             networkManager = networkManager,
             ioDispatcher = testDispatcher,
-            operations = operations,
+            attachmentOperations = operations,
             snackbarManager = snackbarManager,
         )
     }

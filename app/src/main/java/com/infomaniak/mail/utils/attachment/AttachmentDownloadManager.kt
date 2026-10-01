@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils.attachment
 
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.StringRes
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.common.dynamicLazyMapOfSharedFlow
 import com.infomaniak.core.common.flowForKey
@@ -33,8 +34,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.first
@@ -52,7 +53,7 @@ class AttachmentDownloadManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val networkManager: NetworkManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val operations: AttachmentOperations,
+    private val attachmentOperations: AttachmentOperations,
     private val snackbarManager: SnackbarManager,
 ) {
 
@@ -86,12 +87,10 @@ class AttachmentDownloadManager @Inject constructor(
         startIntent: (Intent) -> Unit,
     ) {
         scope.launch {
-            var hasDownloadStarted = false
             try {
                 val terminalEvent = downloadEvents.flowForKey(attachment.localUuid)
                     .onEach { event ->
                         if (event is DownloadEvent.DownloadStarted) {
-                            hasDownloadStarted = true
                             onDownloadStateChanged(attachment.localUuid, true)
                         }
                     }
@@ -101,27 +100,23 @@ class AttachmentDownloadManager @Inject constructor(
                     is DownloadEvent.ReadyToOpen -> openAttachment(attachment, startIntent)
                     is DownloadEvent.DownloadSucceeded -> openFirstDownloadedAttachment(attachment, startIntent)
                     // DownloadFailed is terminal with nothing to open; DownloadStarted never satisfies the predicate
-                    else -> Unit
+                    is DownloadEvent.DownloadFailed, is DownloadEvent.DownloadStarted -> Unit
                 }
             } finally {
-                if (hasDownloadStarted) {
-                    withContext(NonCancellable) { onDownloadStateChanged(attachment.localUuid, false) }
-                }
+                withContext(NonCancellable) { onDownloadStateChanged(attachment.localUuid, false) }
             }
         }.trackDownloadAndOpenJob(attachment.localUuid)
     }
 
     private fun createDownloadEvents(localUuid: String): Flow<DownloadEvent> = flow {
-        val attachment = operations.getAttachment(localUuid)
-            ?: return@flow emitDownloadFailure()
+        val attachment = attachmentOperations.getAttachment(localUuid) ?: return@flow emitDownloadFailure()
 
-        if (!operations.hasSupportedApp(attachment)) {
-            snackbarManager.postValue(context.getString(R.string.errorNoSupportingAppFound))
-            emit(DownloadEvent.DownloadFailed)
+        if (!attachmentOperations.hasSupportedApp(attachment)) {
+            emitDownloadFailure(R.string.errorNoSupportingAppFound)
             return@flow
         }
 
-        if (operations.isCached(attachment)) {
+        if (attachmentOperations.isCached(attachment)) {
             emit(DownloadEvent.ReadyToOpen)
             return@flow
         }
@@ -131,33 +126,34 @@ class AttachmentDownloadManager @Inject constructor(
 
         var isDownloadSuccess = false
         try {
-            isDownloadSuccess = runCatching { operations.download(attachment) }.cancellable().getOrDefault(false)
+            isDownloadSuccess = runCatching { attachmentOperations.download(attachment) }.cancellable().getOrDefault(false)
+            currentCoroutineContext().ensureActive()
+
             if (isDownloadSuccess) {
                 emit(DownloadEvent.DownloadSucceeded)
             } else {
-                currentCoroutineContext().ensureActive()
                 emitDownloadFailure()
             }
         } finally {
-            if (!isDownloadSuccess) withContext(NonCancellable) { operations.deleteIncompleteCache(attachment) }
+            if (!isDownloadSuccess) withContext(NonCancellable) { attachmentOperations.deleteIncompleteCache(attachment) }
         }
     }
 
-    private suspend fun FlowCollector<DownloadEvent>.emitDownloadFailure() {
-        val errorRes = if (networkManager.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection
+    private suspend fun FlowCollector<DownloadEvent>.emitDownloadFailure(@StringRes customErrorRes: Int? = null) {
+        val errorRes = customErrorRes ?: if (networkManager.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection
         snackbarManager.postValue(context.getString(errorRes))
         emit(DownloadEvent.DownloadFailed)
     }
 
     private suspend fun openAttachment(attachment: Attachment, startIntent: (Intent) -> Unit) {
-        val intent = withContext(ioDispatcher) { operations.getOpenIntent(attachment) } ?: return
+        val intent = withContext(ioDispatcher) { attachmentOperations.getOpenIntent(attachment) } ?: return
         startIntent(intent)
     }
 
     private suspend fun openFirstDownloadedAttachment(attachment: Attachment, startIntent: (Intent) -> Unit) {
         openMutex.withLock {
             if (!canOpenNextDownloadedAttachment.get()) return
-            val intent = withContext(ioDispatcher) { operations.getOpenIntent(attachment) } ?: return
+            val intent = withContext(ioDispatcher) { attachmentOperations.getOpenIntent(attachment) } ?: return
             canOpenNextDownloadedAttachment.set(false)
             startIntent(intent)
         }
