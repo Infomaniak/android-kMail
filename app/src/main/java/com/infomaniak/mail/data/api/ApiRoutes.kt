@@ -340,7 +340,7 @@ object ApiRoutes {
     }
 
     private fun isValidResourceUrl(url: HttpUrl?): Boolean {
-        val mailApiUrl by lazy { MAIL_API.toHttpUrl() }
+        val mailApiUrl = MAIL_API.toHttpUrl()
         if (url == null || url.host != mailApiUrl.host) return false
 
         return url.scheme == mailApiUrl.scheme && url.username.isEmpty() && url.password.isEmpty()

@@ -73,9 +73,9 @@ class ApiRoutesTest {
     @Test
     fun rescheduleDraft_withValidPath_succeeds() {
         val validResource = "/api/mail/123/draft/456"
-        val date = Date(1700000000000L)
+        val dummyDate = Date(0L)
 
-        val result = ApiRoutes.rescheduleDraft(validResource, date)
+        val result = ApiRoutes.rescheduleDraft(validResource, dummyDate)
 
         assert(result.startsWith("$MAIL_API$validResource/schedule?schedule_date="))
     }
@@ -83,10 +83,10 @@ class ApiRoutesTest {
     @Test
     fun rescheduleDraft_withMaliciousPath_throwsIllegalArgumentException() {
         val maliciousResource = "@attacker.example/capture"
-        val date = Date(1700000000000L)
+        val dummyDate = Date(0L)
 
         assertThrows(IllegalArgumentException::class.java) {
-            ApiRoutes.rescheduleDraft(maliciousResource, date)
+            ApiRoutes.rescheduleDraft(maliciousResource, dummyDate)
         }
     }
 }
