@@ -30,8 +30,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToAppStore
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
@@ -52,7 +51,7 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
 
         hasStartedDownload = true
         lifecycleScope.launch {
-            downloadAttachmentViewModel.downloadAttachment().take(1).collect { cachedAttachment ->
+            downloadAttachmentViewModel.downloadAttachment().first().let { cachedAttachment ->
                 if (cachedAttachment == null) {
                     popBackStackWithError()
                 } else {
