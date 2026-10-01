@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.correspondent
 
+import com.infomaniak.mail.data.api.IntOrStringSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
@@ -28,6 +29,8 @@ import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class Contact(
+    @Serializable(with = IntOrStringSerializer::class)
+    val id: String? = null,
     val name: String = "",
     val emails: RealmList<String> = realmListOf(),
     val avatar: String? = null,
