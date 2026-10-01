@@ -715,9 +715,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun fetchDraft(): Draft? {
-        val resource = draftResource?.takeIf {
-            it.startsWith("/") && !it.startsWith("//") && !it.startsWith("/\\")
-        } ?: return null
+        val resource = draftResource ?: return null
         return ApiRepository.getDraft(resource).data?.also { draft ->
 
             /**
