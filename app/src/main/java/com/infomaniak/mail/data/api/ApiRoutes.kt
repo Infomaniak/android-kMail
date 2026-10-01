@@ -29,9 +29,6 @@ import java.net.URLEncoder
 import java.util.Date
 
 object ApiRoutes {
-
-    private val mailApiUrl by lazy { MAIL_API.toHttpUrl() }
-
     //region API V1
     fun getCredentialsPassword(): String {
         return "$INFOMANIAK_API_V1/profile/password"
@@ -343,7 +340,9 @@ object ApiRoutes {
     }
 
     private fun isValidResourceUrl(url: HttpUrl?): Boolean {
+        val mailApiUrl by lazy { MAIL_API.toHttpUrl() }
         if (url == null || url.host != mailApiUrl.host) return false
+
         return url.scheme == mailApiUrl.scheme && url.username.isEmpty() && url.password.isEmpty()
     }
 

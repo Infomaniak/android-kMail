@@ -104,15 +104,13 @@ class NewMessageActivity : BaseActivity() {
         return true
     }
 
+    /**
+     * This Activity is exported, so any app or webpage can start it with a compose Intent.
+     * Such an Intent must never be trusted for security reasons.
+     * Hence, we strip these arguments before `super.onCreate()`, i.e. before the NavController reads them.
+     */
     private fun sanitizeExternalIntent() {
-        val isExternalIntent = intent.action in setOf(
-            Intent.ACTION_SEND,
-            Intent.ACTION_SEND_MULTIPLE,
-            Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO,
-        ) || intent.hasCategory(Intent.CATEGORY_BROWSABLE)
-
-        if (isExternalIntent) {
+        if (intent.isExternalComposeIntent()) {
             intent.removeExtra(NewMessageActivityArgs::arrivedFromExistingDraft.name)
             intent.removeExtra(NewMessageActivityArgs::draftLocalUuid.name)
             intent.removeExtra(NewMessageActivityArgs::draftResource.name)
@@ -233,4 +231,19 @@ class NewMessageActivity : BaseActivity() {
             uiBodyValue = body
         }
     }
+}
+
+private val EXTERNAL_COMPOSE_ACTIONS = setOf(
+    Intent.ACTION_SEND,
+    Intent.ACTION_SEND_MULTIPLE,
+    Intent.ACTION_VIEW,
+    Intent.ACTION_SENDTO,
+)
+
+/**
+ * An Intent is considered external when it comes from one of the `intent-filter`s declared for [NewMessageActivity] in
+ * the manifest, i.e. when it's been crafted by another app or by a webpage, and thus can't be trusted.
+ */
+internal fun Intent.isExternalComposeIntent(): Boolean {
+    return action in EXTERNAL_COMPOSE_ACTIONS || hasCategory(Intent.CATEGORY_BROWSABLE)
 }
