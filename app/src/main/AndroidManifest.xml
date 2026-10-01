@@ -162,14 +162,7 @@
         <activity
             android:name=".ui.newMessage.NewMessageActivity"
             android:configChanges="orientation|screenSize"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".ui.newMessage.ExternalComposeActivity"
-            android:configChanges="orientation|screenSize"
             android:exported="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
