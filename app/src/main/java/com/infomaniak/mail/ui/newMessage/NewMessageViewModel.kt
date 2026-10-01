@@ -399,7 +399,14 @@ class NewMessageViewModel @Inject constructor(
                 .toMutableList()
                 .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox().email)) }
 
-            isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
+            val isExternalIntent = intent.action in setOf(
+                Intent.ACTION_SEND,
+                Intent.ACTION_SEND_MULTIPLE,
+                Intent.ACTION_VIEW,
+                Intent.ACTION_SENDTO,
+            ) || intent.hasCategory(Intent.CATEGORY_BROWSABLE)
+
+            isNewMessage = isExternalIntent || (!arrivedFromExistingDraft && draftLocalUuid == null)
             if (isNewMessage) getNewDraft(signatures, intent, realm) else getExistingDraft(draftLocalUuid)
         }.cancellable().onFailure {
             SentryLog.e(TAG, "Caught exception during draft initialization", it)
@@ -715,7 +722,8 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun fetchDraft(): Draft? {
-        return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
+        val resource = draftResource?.takeIf { it.startsWith("/") && !it.startsWith("//") && !it.startsWith("/\\") } ?: return null
+        return ApiRepository.getDraft(resource).data?.also { draft ->
 
             /**
              * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail), we need to

@@ -22,10 +22,14 @@ import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.network.INFOMANIAK_API_V1
 import com.infomaniak.mail.MAIL_API
 import com.infomaniak.mail.utils.Utils
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URLEncoder
 import java.util.Date
 
 object ApiRoutes {
+
+    private val mailApiUrl by lazy { MAIL_API.toHttpUrl() }
 
     //region API V1
     fun getCredentialsPassword(): String {
@@ -242,7 +246,7 @@ object ApiRoutes {
 
     fun rescheduleDraft(draftResource: String, scheduleDate: Date): String {
         val formatedDate = scheduleDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
-        return "${MAIL_API}${draftResource}/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
+        return "${resource(draftResource)}/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
     }
 
     fun createAttachment(mailboxUuid: String): String {
@@ -323,11 +327,24 @@ object ApiRoutes {
     }
 
     fun resource(resource: String): String {
-        return "$MAIL_API$resource"
+        require(resource.startsWith("/") && !resource.startsWith("//") && !resource.startsWith("/\\")) {
+            "Invalid resource path: $resource"
+        }
+        val url = "$MAIL_API$resource".toHttpUrlOrNull()
+        require(
+            url != null &&
+                url.host == mailApiUrl.host &&
+                url.username.isEmpty() &&
+                url.password.isEmpty() &&
+                url.scheme == mailApiUrl.scheme
+        ) {
+            "Invalid resource URL: $resource"
+        }
+        return url.toString()
     }
 
     fun bimi(bimi: String): String {
-        return "$MAIL_API$bimi"
+        return resource(bimi)
     }
 
     fun shareLink(mailboxUuid: String, folderId: String, mailId: Int): String {
