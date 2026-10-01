@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.FileProvider
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -50,6 +51,7 @@ import com.infomaniak.mail.ui.components.compose.TopAppBarButton
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
 import com.infomaniak.mail.ui.theme.LocalMailThemeColors
 import com.infomaniak.mail.ui.theme.MailTheme
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.infomaniak.core.common.R as RCore
@@ -65,6 +67,7 @@ class ContactCardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.CONTACT_CARD.id)
         descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
     }
 
