@@ -83,7 +83,7 @@ class AttachmentDownloadManagerTest {
         attachmentDownloadManager.downloadAndOpenAttachment(
             attachment = attachment,
             scope = this,
-            onDownloadStateChanged = { _, _ -> downloadStateChanged = true },
+            onDownloadStateChanged = { _, isDownloading -> downloadStateChanged = isDownloading },
             startIntent = {},
         )
         advanceUntilIdle()
@@ -105,17 +105,17 @@ class AttachmentDownloadManagerTest {
         coEvery { operations.getOpenIntent(attachment) } returns dummyIntent
 
         var openedIntent: Intent? = null
-        var downloadStateCalled = false
+        var downloadStateChanged = false
 
         attachmentDownloadManager.downloadAndOpenAttachment(
             attachment = attachment,
             scope = this,
-            onDownloadStateChanged = { _, _ -> downloadStateCalled = true },
+            onDownloadStateChanged = { _, isDownloading -> downloadStateChanged = isDownloading },
             startIntent = { openedIntent = it },
         )
         advanceUntilIdle()
 
-        assertFalse(downloadStateCalled)
+        assertFalse(downloadStateChanged)
         assertEquals(dummyIntent, openedIntent)
         assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
     }
@@ -149,7 +149,7 @@ class AttachmentDownloadManagerTest {
     }
 
     @Test
-    fun downloadAndOpenAttachment_multipleClicked_opensFirstOneToFinish() = runTest(testDispatcher) {
+    fun downloadAndOpenAttachment_multipleClicked_opensTheLastOneClicked() = runTest(testDispatcher) {
         val intent1 = mockk<Intent>()
         val intent2 = mockk<Intent>()
 
@@ -171,11 +171,11 @@ class AttachmentDownloadManagerTest {
         coEvery { operations.getOpenIntent(attachment2) } returns intent2
 
         coEvery { operations.download(attachment1) } coAnswers {
-            delay(100.milliseconds)
+            delay(50.milliseconds)
             true
         }
         coEvery { operations.download(attachment2) } coAnswers {
-            delay(50.milliseconds)
+            delay(100.milliseconds)
             true
         }
 
@@ -197,11 +197,48 @@ class AttachmentDownloadManagerTest {
 
         advanceUntilIdle()
 
-        // attachment2 finished first (50ms vs 100ms), so only intent2 should be opened!
+        // attachment2 was requested last, so only it should open, even though attachment1 finished first
         assertEquals(1, openedIntents.size)
         assertEquals(intent2, openedIntents.first())
+        coVerify(exactly = 1) { operations.download(attachment1) }
+        coVerify(exactly = 1) { operations.download(attachment2) }
         assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
         assertFalse(attachmentDownloadManager.isDownloading("uuid-2"))
+    }
+
+    @Test
+    fun downloadAndOpenAttachment_actionMenuOpen_supersedesPendingAutoOpen() = runTest(testDispatcher) {
+        val intent1 = mockk<Intent>()
+        val attachment1 = mockk<Attachment>(relaxed = true) {
+            every { localUuid } returns "uuid-1"
+        }
+
+        coEvery { operations.getAttachment("uuid-1") } returns attachment1
+        coEvery { operations.hasSupportedApp(attachment1) } returns true
+        coEvery { operations.isCached(attachment1) } returns false
+        coEvery { operations.download(attachment1) } coAnswers {
+            delay(100.milliseconds)
+            true
+        }
+        coEvery { operations.getOpenIntent(attachment1) } returns intent1
+
+        val openedIntents = mutableListOf<Intent>()
+
+        attachmentDownloadManager.downloadAndOpenAttachment(
+            attachment = attachment1,
+            scope = this,
+            onDownloadStateChanged = { _, _ -> },
+            startIntent = { openedIntents.add(it) },
+        )
+
+        // An open from the actions bottom sheet (which downloads through the progress dialog) is
+        // requested without calling downloadAndOpenAttachment, and supersedes the pending auto-open
+        attachmentDownloadManager.setLastRequestedDownload("uuid-2")
+
+        advanceUntilIdle()
+
+        assertTrue(openedIntents.isEmpty())
+        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
     }
 
     @Test
