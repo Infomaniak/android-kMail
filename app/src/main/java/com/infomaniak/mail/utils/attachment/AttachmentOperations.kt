@@ -35,6 +35,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 interface AttachmentOperations {
+    suspend fun getAttachment(localUuid: String): Attachment?
     suspend fun hasSupportedApp(attachment: Attachment): Boolean
     suspend fun isCached(attachment: Attachment): Boolean
     suspend fun getOpenIntent(attachment: Attachment): Intent?
@@ -46,6 +47,10 @@ class DefaultAttachmentOperations @Inject constructor(
     @ApplicationContext private val context: Context,
     private val attachmentController: AttachmentController,
 ) : AttachmentOperations {
+
+    override suspend fun getAttachment(localUuid: String): Attachment? {
+        return runCatchingRealm { attachmentController.getAttachment(localUuid) }.getOrNull()
+    }
 
     override suspend fun hasSupportedApp(attachment: Attachment): Boolean {
         return attachment.openWithIntent(context)?.hasSupportedApplications(context) == true
