@@ -39,6 +39,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
@@ -60,6 +61,9 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var attachmentDownloadManager: AttachmentDownloadManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -90,6 +94,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             openWithItem.setOnClickSuspend(MatomoName.OpenFromBottomsheet) {
                 attachment.openAttachment(
                     context = context,
+                    attachmentDownloadManager = attachmentDownloadManager,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
                     snackbarManager = snackbarManager,
                     popBackIfNeeded = findNavController()::popBackStack,
@@ -98,6 +103,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             kDriveItem.setOnClickSuspend(MatomoName.SaveToKDrive) {
                 attachment.executeIntent(
                     context = context,
+                    attachmentDownloadManager = attachmentDownloadManager,
                     intentType = AttachmentIntentType.SAVE_TO_DRIVE,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
                     popBackIfNeeded = findNavController()::popBackStack,

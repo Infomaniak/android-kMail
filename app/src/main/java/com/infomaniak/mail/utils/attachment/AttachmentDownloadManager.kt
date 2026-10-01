@@ -46,7 +46,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 class AttachmentDownloadManager @Inject constructor(
@@ -71,12 +71,28 @@ class AttachmentDownloadManager @Inject constructor(
     /** [Job]s of active observers, per attachment. Only used to cancel downloads and query [isDownloading]. */
     private val downloadAndOpenJobs = ConcurrentHashMap<String, MutableSet<Job>>()
 
-    private val canOpenNextDownloadedAttachment = AtomicBoolean(true)
+    /**
+     * [Attachment.localUuid] of the download that should open when it completes. Updated at every
+     * click, so only the most recently requested download is opened; earlier ones just finish
+     * downloading in the background.
+     */
+    private val lastRequestedDownloadUuid = AtomicReference<String?>(null)
     private val openMutex = Mutex()
 
     fun isDownloading(localUuid: String): Boolean = downloadAndOpenJobs.containsKey(localUuid)
 
+    /**
+     * Records [localUuid] as the download that should open when it completes. Must be called at
+     * every user click requesting an attachment to open, including clicks on attachments which are
+     * not downloaded by this manager (e.g. an open from the actions bottom sheet which downloads
+     * through the progress dialog).
+     */
+    fun setLastRequestedDownload(localUuid: String) {
+        lastRequestedDownloadUuid.set(localUuid)
+    }
+
     fun cancelDownload(localUuid: String) {
+        consumePendingOpen(localUuid)
         downloadAndOpenJobs.remove(localUuid)?.forEach { job -> job.cancel() }
     }
 
@@ -86,6 +102,7 @@ class AttachmentDownloadManager @Inject constructor(
         onDownloadStateChanged: (localUuid: String, isDownloading: Boolean) -> Unit,
         startIntent: (Intent) -> Unit,
     ) {
+        setLastRequestedDownload(attachment.localUuid)
         scope.launch {
             try {
                 val terminalEvent = downloadEvents.flowForKey(attachment.localUuid)
@@ -98,9 +115,10 @@ class AttachmentDownloadManager @Inject constructor(
 
                 when (terminalEvent) {
                     is DownloadEvent.ReadyToOpen -> openAttachment(attachment, startIntent)
-                    is DownloadEvent.DownloadSucceeded -> openFirstDownloadedAttachment(attachment, startIntent)
+                    is DownloadEvent.DownloadSucceeded -> openLastRequestedDownloadedAttachment(attachment, startIntent)
                     // DownloadFailed is terminal with nothing to open; DownloadStarted never satisfies the predicate
-                    is DownloadEvent.DownloadFailed, is DownloadEvent.DownloadStarted -> Unit
+                    is DownloadEvent.DownloadFailed -> consumePendingOpen(attachment.localUuid)
+                    is DownloadEvent.DownloadStarted -> Unit
                 }
             } finally {
                 withContext(NonCancellable) { onDownloadStateChanged(attachment.localUuid, false) }
@@ -121,7 +139,6 @@ class AttachmentDownloadManager @Inject constructor(
             return@flow
         }
 
-        canOpenNextDownloadedAttachment.set(true)
         emit(DownloadEvent.DownloadStarted)
 
         var isDownloadSuccess = false
@@ -150,14 +167,17 @@ class AttachmentDownloadManager @Inject constructor(
         startIntent(intent)
     }
 
-    private suspend fun openFirstDownloadedAttachment(attachment: Attachment, startIntent: (Intent) -> Unit) {
+    private suspend fun openLastRequestedDownloadedAttachment(attachment: Attachment, startIntent: (Intent) -> Unit) {
         openMutex.withLock {
-            if (!canOpenNextDownloadedAttachment.get()) return
+            if (!consumePendingOpen(attachment.localUuid)) return
             val intent = withContext(ioDispatcher) { attachmentOperations.getOpenIntent(attachment) } ?: return
-            canOpenNextDownloadedAttachment.set(false)
             startIntent(intent)
         }
     }
+
+    /** Consumes the pending open request if it still points to [localUuid]; returns whether it was consumed. */
+    private fun consumePendingOpen(localUuid: String): Boolean =
+        lastRequestedDownloadUuid.compareAndSet(localUuid, null)
 
     private fun Job.trackDownloadAndOpenJob(localUuid: String) {
         downloadAndOpenJobs.computeIfAbsent(localUuid) { ConcurrentHashMap.newKeySet() }.add(this)

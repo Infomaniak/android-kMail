@@ -41,6 +41,7 @@ import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.extensions.state
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
@@ -76,6 +77,9 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var attachmentDownloadManager: AttachmentDownloadManager
 
     init {
         with(binding) {
@@ -129,7 +133,12 @@ class CalendarEventBannerView @JvmOverloads constructor(
         addToCalendarButton.setOnClickListener {
             trackCalendarEventEvent(MatomoName.OpenInMyCalendar)
             findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@launch, snackbarManager)
+                attachment.openAttachment(
+                    context = context,
+                    attachmentDownloadManager = attachmentDownloadManager,
+                    navigateToDownloadProgressDialog = navigateToDownloadProgressDialog ?: return@launch,
+                    snackbarManager = snackbarManager,
+                )
             }
         }
     }
