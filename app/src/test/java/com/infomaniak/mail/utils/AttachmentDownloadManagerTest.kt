@@ -252,4 +252,17 @@ class AttachmentDownloadManagerTest {
         coVerify(exactly = 2) { operations.download(attachment) }
         assertTrue(manager.downloadingUuids.value.isEmpty())
     }
+
+    @Test
+    fun downloadWithoutSupportingApp_isStillAvailableForSaveToDrive() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
+        coEvery { operations.hasSupportedApp(attachment) } returns false
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { operations.download(attachment) }
+        coVerify(exactly = 0) { operations.hasSupportedApp(any()) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
 }
