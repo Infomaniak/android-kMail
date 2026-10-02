@@ -56,7 +56,6 @@ import kotlin.properties.Delegates
 class DraftsActionsWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val draftController: DraftController,
     private val mailboxController: MailboxController,
     private val mainApplication: MainApplication,
     private val notificationManagerCompat: NotificationManagerCompat,
@@ -65,7 +64,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
 ) : BaseCoroutineWorker(appContext, params) {
 
-    private val mailboxContentRealm by lazy { RealmDatabase.newMailboxContentInstance }
+    private var mailboxContentRealm: Realm? = null
 
     private lateinit var okHttpClient: OkHttpClient
     private var mailboxId: Int = -7 // AppSettings.DEFAULT_ID
@@ -80,26 +79,30 @@ class DraftsActionsWorker @AssistedInject constructor(
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         SentryLog.d(TAG, "Work started")
 
-        if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
-        if (AccountUtils.currentMailboxId <= -1) return@withContext Result.failure() // AppSettings.DEFAULT_ID
-
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
         mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
+        if (mailboxId <= -1) return@withContext Result.failure() // AppSettings.DEFAULT_ID
         draftLocalUuid = inputData.getString(DRAFT_LOCAL_UUID_KEY)
 
         userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return@withContext Result.failure()
         mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@withContext Result.failure()
+
+        // Drafts must be read from the Realm of the Mailbox targeted by this work, and not from the current Mailbox's one.
+        // Otherwise, if the user switched to another Mailbox in the meantime, its Drafts would be sent to the targeted Mailbox.
+        val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId).also { mailboxContentRealm = it }
+        if (DraftController.getDraftsWithActionsCount(realm) == 0L) return@withContext Result.success()
+
         okHttpClient = AccountUtils.getHttpClient(userId)
 
         isSnackbarFeedbackNeeded = !mainApplication.isAppInBackground
 
         mailActionsManager = MailActionsManager(
+            mailboxContentRealm = realm,
             userId = userId,
             mailboxId = mailboxId,
             mailbox = mailbox,
             isSnackbarFeedbackNeeded = isSnackbarFeedbackNeeded,
             draftLocalUuid = draftLocalUuid,
-            draftController = draftController,
             okHttpClient = okHttpClient,
             coroutineWorker = this@DraftsActionsWorker,
             notificationUtils = notificationUtils,
@@ -112,7 +115,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     override fun onFinish() {
-        mailboxContentRealm.close()
+        mailboxContentRealm?.close()
         SentryLog.d(TAG, "Work finished")
     }
 
@@ -122,14 +125,14 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     class Scheduler @Inject constructor(
-        private val draftController: DraftController,
         private val workManager: WorkManager,
+        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) {
 
         suspend fun scheduleWork(draftLocalUuid: String? = null, mailboxId: Int, userId: Int) {
 
             if (mailboxId <= -1) return // AppSettings.DEFAULT_ID
-            if (draftController.getDraftsWithActionsCount() == 0L) return
+            if (!hasDraftsWithActions(userId, mailboxId)) return
 
             SentryLog.d(TAG, "Work scheduled")
 
@@ -146,6 +149,16 @@ class DraftsActionsWorker @AssistedInject constructor(
                 .build()
 
             workManager.enqueueUniqueWork("${TAG}_${mailboxId}", ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+        }
+
+        // The Drafts are looked for in the Realm of the targeted Mailbox, because it's not necessarily the current Mailbox.
+        private suspend fun hasDraftsWithActions(userId: Int, mailboxId: Int): Boolean = withContext(ioDispatcher) {
+            val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
+            try {
+                DraftController.getDraftsWithActionsCount(realm) > 0L
+            } finally {
+                realm.close()
+            }
         }
 
         fun getRunningWorkInfoLiveData(): LiveData<List<WorkInfo>> {

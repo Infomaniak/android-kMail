@@ -146,7 +146,10 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.invoke
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import splitties.experimental.ExperimentalSplittiesApi
@@ -161,9 +164,7 @@ class NewMessageViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val aiSharedData: AiSharedData,
     private val aiDraftCache: AiDraftCache,
-    private val draftController: DraftController,
     private val globalCoroutineScope: CoroutineScope,
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val addressBookController: AddressBookController,
@@ -284,6 +285,10 @@ class NewMessageViewModel @Inject constructor(
     suspend fun currentMailbox() = _currentMailboxFlow.first()
 
     fun loadMailbox(userId: Int, mailboxId: Int) {
+        // The Mailbox can't change once loaded, as the Draft belongs to it. By default, it's the current Mailbox,
+        // which could have been switched in the meantime when this is called again because the View got recreated.
+        if (mailboxRefFlow.replayCache.isNotEmpty()) return
+
         mailboxRefFlow.tryEmit(MailboxRef(userId, mailboxId))
     }
 
@@ -297,6 +302,40 @@ class NewMessageViewModel @Inject constructor(
      * in the cases where `mailboxController.getMailbox` returns null
      */
     suspend fun awaitNoMailboxSignal() = exitSignal.join()
+    //endregion
+
+    //region Draft's Realm
+    private val draftRealmMutex = Mutex()
+    private var _draftRealm: Realm? = null
+
+    /**
+     * The Draft has to be stored in the Realm of its Mailbox, because the DraftsActionsWorker only sends to a Mailbox the Drafts
+     * found in this Mailbox's Realm. This Realm is opened from the Mailbox's own IDs: the shared Realm of the current Mailbox
+     * can't be used, as it may belong to another Mailbox (e.g. when sharing to another Mailbox, or while switching User).
+     */
+    private suspend fun draftRealm(): Realm {
+        val mailbox = currentMailbox()
+        return draftRealmMutex.withLock {
+            _draftRealm ?: RealmDatabase.newMailboxContentInstance(mailbox.userId, mailbox.mailboxId).also { _draftRealm = it }
+        }
+    }
+
+    /**
+     * The Realm is still used by the ViewModel's ongoing work, and the Draft can be saved after the ViewModel
+     * is cleared (see [waitForBodyAndSubjectToExecuteDraftAction]), so we need to wait for them before closing it.
+     */
+    private fun closeDraftRealm() {
+        val viewModelJob = ioCoroutineContext.job
+        val pendingDraftActionJob = subjectAndBodyJob
+        globalCoroutineScope.launch(ioDispatcher) {
+            viewModelJob.join()
+            pendingDraftActionJob?.join()
+            draftRealmMutex.withLock {
+                _draftRealm?.close()
+                _draftRealm = null
+            }
+        }
+    }
     //endregion
 
     private val currentMailboxLive = _currentMailboxFlow.asLiveData(ioCoroutineContext)
@@ -350,7 +389,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
 
-        val realm = mailboxContentRealm()
+        val realm = draftRealm()
         var signatures = emptyList<Signature>()
 
         val draft: Draft? = runCatching {
@@ -672,7 +711,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun getLatestLocalDraft(localUuid: String?): Draft? {
-        return localUuid?.let { draftController.getDraft(it) }?.let { Dispatchers.IO { it.copyFromRealm() } }
+        return localUuid?.let { DraftController.getDraft(it, draftRealm()) }?.let { Dispatchers.IO { it.copyFromRealm() } }
     }
 
     private suspend fun fetchDraft(): Draft? {
@@ -886,7 +925,7 @@ class NewMessageViewModel @Inject constructor(
                 it.getUploadLocalFile()?.delete()
                 LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, it.localUuid)
 
-                mailboxContentRealm().write {
+                draftRealm().write {
                     DraftController.updateDraftBlocking(draftLocalUuid!!, realm = this) { draft ->
                         draft.attachments.findSpecificAttachment(it)?.let(::delete)
                     }
@@ -934,7 +973,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun uploadAttachmentsToServer(uiAttachments: List<Attachment>) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-        val realm = mailboxContentRealm()
+        val realm = draftRealm()
 
         realm.write {
             DraftController.getDraftBlocking(localUuid, realm = this)?.also {
@@ -952,7 +991,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-        mailboxContentRealm().write {
+        draftRealm().write {
             DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
                 draft.scheduleDate = date?.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
             }
@@ -1008,7 +1047,7 @@ class NewMessageViewModel @Inject constructor(
             return@with
         }
 
-        val hasFailed = mailboxContentRealm().write {
+        val hasFailed = draftRealm().write {
             DraftController.getDraftBlocking(localUuid, realm = this)
                 ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, bodyWithQuotes, realm = this@write)
                 ?: return@write true
@@ -1032,6 +1071,7 @@ class NewMessageViewModel @Inject constructor(
     override fun onCleared() {
         draftLocalUuid?.let { LocalStorageUtils.deleteDraftUploadDir(appContext, draftLocalUuid = it) }
         aiDraftCache.reset()
+        closeDraftRealm()
         super.onCleared()
     }
 
@@ -1180,7 +1220,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun removeDraftFromRealm(localUuid: String) {
-        mailboxContentRealm().write {
+        draftRealm().write {
             DraftController.getDraftBlocking(localUuid, realm = this)?.let(::delete)
         }
     }

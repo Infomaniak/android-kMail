@@ -99,7 +99,9 @@ object RealmDatabase {
 
     val mailboxInfo get() = openRealmOrDropDbAndReboot(RealmConfig.mailboxInfo)
 
-    val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+    // Only for the shared instance: others must target their Mailbox explicitly, as the current one can change at any time.
+    private val newMailboxContentInstance
+        get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
     fun newMailboxContentInstance(userId: Int, mailboxId: Int, loadDataInMemory: Boolean = false): Realm {
         return openRealmOrDropDbAndReboot(RealmConfig.mailboxContent(userId, mailboxId, loadDataInMemory))
     }
