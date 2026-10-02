@@ -56,14 +56,10 @@ class AttachmentAdapter(
 
         attachmentDetails.setDetails(attachment, isDownloading = isAttachmentDownloading(attachment.localUuid))
         onAttachmentClicked?.let { processClick ->
-            root.setOnClickListener {
-                if (!isAttachmentDownloading(attachment.localUuid)) processClick(attachment)
-            }
+            root.setOnClickListener { processClick(attachment) }
         }
         onAttachmentOptionsClicked?.let { processClick ->
-            moreButton.setOnClickListener {
-                if (!isAttachmentDownloading(attachment.localUuid)) processClick(attachment)
-            }
+            moreButton.setOnClickListener { processClick(attachment) }
         }
         toggleEndIconVisibility(shouldDisplayCloseButton)
 
@@ -97,19 +93,11 @@ class AttachmentAdapter(
     }
 
     fun setDownloadingUuids(uuids: Set<String>) {
+        val changedUuids = (downloadingAttachmentUuids - uuids) + (uuids - downloadingAttachmentUuids)
         downloadingAttachmentUuids.clear()
         downloadingAttachmentUuids.addAll(uuids)
-    }
-
-    fun setAttachmentDownloading(uuid: String, isDownloading: Boolean) {
-        val hasStateChanged = if (isDownloading) {
-            downloadingAttachmentUuids.add(uuid)
-        } else {
-            downloadingAttachmentUuids.remove(uuid)
-        }
-        if (hasStateChanged) {
-            val index = attachments.indexOfFirst { it.localUuid == uuid }
-            if (index != -1) notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
+        attachments.forEachIndexed { index, attachment ->
+            if (attachment.localUuid in changedUuids) notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
         }
     }
 

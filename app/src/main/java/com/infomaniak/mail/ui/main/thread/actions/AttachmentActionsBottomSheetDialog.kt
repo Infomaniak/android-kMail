@@ -36,13 +36,11 @@ import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.extensions.downloadUrl
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -60,10 +58,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     lateinit var permissionUtils: PermissionUtils
 
     @Inject
-    lateinit var snackbarManager: SnackbarManager
-
-    @Inject
-    lateinit var attachmentDownloadManager: AttachmentDownloadManager
+    lateinit var attachmentOpeningManager: AttachmentOpeningManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -91,19 +86,16 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setupListeners(attachment: Attachable) = with(binding) {
         if (attachment is Attachment) {
-            openWithItem.setOnClickSuspend(MatomoName.OpenFromBottomsheet) {
-                attachment.openAttachment(
-                    context = context,
-                    attachmentDownloadManager = attachmentDownloadManager,
-                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                    snackbarManager = snackbarManager,
-                    popBackIfNeeded = findNavController()::popBackStack,
-                )
+            openWithItem.setOnClickListener {
+                trackAttachmentActionsEvent(MatomoName.OpenFromBottomsheet)
+                val scope = requireActivity().lifecycleScope
+                findNavController().popBackStack()
+                attachmentOpeningManager.requestOpen(attachment.localUuid, scope)
             }
             kDriveItem.setOnClickSuspend(MatomoName.SaveToKDrive) {
+                attachmentOpeningManager.cancelPendingOpen()
                 attachment.executeIntent(
                     context = context,
-                    attachmentDownloadManager = attachmentDownloadManager,
                     intentType = AttachmentIntentType.SAVE_TO_DRIVE,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
                     popBackIfNeeded = findNavController()::popBackStack,

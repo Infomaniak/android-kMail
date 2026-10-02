@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.core.common.extensions.goToAppStore
-import com.infomaniak.core.legacy.utils.hasSupportedApplications
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
@@ -39,9 +38,7 @@ import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.data.models.extensions.isInlineCachedFile
 import com.infomaniak.mail.data.models.extensions.safeMimeType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
-import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
@@ -53,7 +50,6 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.S
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
-import com.infomaniak.core.legacy.R as RCore
 
 object AttachmentExt {
 
@@ -99,34 +95,16 @@ object AttachmentExt {
 
     suspend fun Attachment.executeIntent(
         context: Context,
-        attachmentDownloadManager: AttachmentDownloadManager,
         intentType: AttachmentIntentType,
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         popBackIfNeeded: (() -> Unit)? = null,
     ) {
-        // An open from the actions menu supersedes any pending download auto-open
-        attachmentDownloadManager.setLastRequestedDownload(localUuid)
         if (hasUsableCache(context, getUploadLocalFile()) || isInlineCachedFile(context)) {
             getIntentOrGoToAppStore(context, intentType)?.let(context::startActivity)
             popBackIfNeeded?.invoke()
         } else {
             popBackIfNeeded?.invoke()
             navigateToDownloadProgressDialog(this, intentType)
-        }
-    }
-
-    suspend fun Attachment.openAttachment(
-        context: Context,
-        attachmentDownloadManager: AttachmentDownloadManager,
-        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
-        snackbarManager: SnackbarManager,
-        popBackIfNeeded: (() -> Unit)? = null,
-    ) {
-        if (openWithIntent(context)?.hasSupportedApplications(context) == true) {
-            executeIntent(context, attachmentDownloadManager, OPEN_WITH, navigateToDownloadProgressDialog, popBackIfNeeded)
-        } else {
-            popBackIfNeeded?.invoke()
-            snackbarManager.setValue(context.getString(RCore.string.errorNoSupportingAppFound))
         }
     }
 
