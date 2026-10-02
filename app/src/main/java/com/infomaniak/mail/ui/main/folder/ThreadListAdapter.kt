@@ -52,6 +52,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -320,6 +321,8 @@ class ThreadListAdapter @Inject constructor(
             iconMention.isVisible = hasUnseenMentions
             iconCalendar.isGone = true // TODO: See with API when we should display this icon
             iconFavorite.isVisible = isFavorite
+            iconReminder.isVisible = hasReminders &&
+                    callbacks?.getFeatureFlags?.invoke()?.contains(FeatureFlag.RESPONSE_REQUIRED) == true
 
             val messagesCount = getDisplayedMessages(callbacks?.getFeatureFlags?.invoke(), localSettings).count()
             threadCountText.text = "$messagesCount"
