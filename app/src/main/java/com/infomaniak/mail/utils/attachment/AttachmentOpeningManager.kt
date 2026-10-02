@@ -73,11 +73,9 @@ class AttachmentOpeningManager @Inject constructor(
                     }
                 }.cancellable().getOrElse {
                     SentryLog.e(TAG, "Could not check supporting applications for $localUuid", it)
-                    showError(R.string.anErrorHasOccurred)
                     return@async DownloadState.Failed(R.string.anErrorHasOccurred)
                 }
                 if (canOpen == false) {
-                    showError(R.string.errorNoSupportingAppFound)
                     return@async DownloadState.Failed(R.string.errorNoSupportingAppFound)
                 }
             }
@@ -103,7 +101,11 @@ class AttachmentOpeningManager @Inject constructor(
                 try {
                     // Cancelling this waiter does not cancel the independently scoped download.
                     val state = request.download.await()
-                    if (state is DownloadState.Ready) openAttachment(request, state, startIntent)
+                    when (state) {
+                        is DownloadState.Ready -> openAttachment(request, state, startIntent)
+                        is DownloadState.Failed -> if (finishRequest(request)) showError(state.errorRes)
+                        is DownloadState.Downloading -> Unit
+                    }
                 } finally {
                     finishRequest(request)
                 }
