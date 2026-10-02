@@ -40,16 +40,12 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.extensions.state
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
-import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
-import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.findUser
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
 import java.util.Date
 import javax.inject.Inject
@@ -71,15 +67,11 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private var attachmentResource: String = ""
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
-    private var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null
     private var replyToCalendarEvent: ((AttendanceState) -> Unit)? = null
     private var onAttendeesButtonClicked: ((Boolean) -> Unit)? = null
 
     @Inject
-    lateinit var snackbarManager: SnackbarManager
-
-    @Inject
-    lateinit var attachmentDownloadManager: AttachmentDownloadManager
+    lateinit var attachmentOpeningManager: AttachmentOpeningManager
 
     init {
         with(binding) {
@@ -132,13 +124,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
         addToCalendarButton.setOnClickListener {
             trackCalendarEventEvent(MatomoName.OpenInMyCalendar)
-            findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                attachment.openAttachment(
-                    context = context,
-                    attachmentDownloadManager = attachmentDownloadManager,
-                    navigateToDownloadProgressDialog = navigateToDownloadProgressDialog ?: return@launch,
-                    snackbarManager = snackbarManager,
-                )
+            findViewTreeLifecycleOwner()?.lifecycleScope?.let { scope ->
+                attachmentOpeningManager.requestOpen(attachment.localUuid, scope)
             }
         }
     }
@@ -205,12 +192,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     fun initCallback(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
-        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         replyToCalendarEvent: (AttendanceState) -> Unit,
         onAttendeesButtonClicked: (Boolean) -> Unit,
     ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
-        this.navigateToDownloadProgressDialog = navigateToDownloadProgressDialog
         this.replyToCalendarEvent = replyToCalendarEvent
         this.onAttendeesButtonClicked = onAttendeesButtonClicked
     }

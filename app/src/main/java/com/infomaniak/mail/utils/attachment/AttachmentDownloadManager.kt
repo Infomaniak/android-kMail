@@ -18,37 +18,39 @@
 package com.infomaniak.mail.utils.attachment
 
 import android.content.Context
-import android.content.Intent
 import androidx.annotation.StringRes
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.common.dynamicLazyMapOfSharedFlow
 import com.infomaniak.core.common.flowForKey
 import com.infomaniak.core.legacy.R
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.NetworkManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
+@ActivityScoped
 class AttachmentDownloadManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val networkManager: NetworkManager,
@@ -59,141 +61,91 @@ class AttachmentDownloadManager @Inject constructor(
 
     private val downloadScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
-    /**
-     * One [SharedFlow] of [DownloadEvent] per attachment, created lazily by the first request and
-     * shared by every concurrent observer of the same attachment. The flow is removed and cancelled
-     * when its last observer leaves, which aborts a still-running download.
-     */
-    private val downloadEvents = downloadScope.dynamicLazyMapOfSharedFlow { localUuid: String ->
-        createDownloadEvents(localUuid)
+    private val downloads = downloadScope.dynamicLazyMapOfSharedFlow { localUuid: String ->
+        createDownloadStates(localUuid)
     }
 
-    /** [Job]s of active observers, per attachment. Only used to cancel downloads and query [isDownloading]. */
-    private val downloadAndOpenJobs = ConcurrentHashMap<String, MutableSet<Job>>()
+    private val downloadJobs = ConcurrentHashMap<String, Deferred<DownloadState>>()
+    private val _downloadingUuids = MutableStateFlow(emptySet<String>())
+    val downloadingUuids = _downloadingUuids.asStateFlow()
 
     /**
-     * [Attachment.localUuid] of the download that should open when it completes. Updated at every
-     * click, so only the most recently requested download is opened; earlier ones just finish
-     * downloading in the background.
+     * Keeps a download alive independently of the opening request. Re-selecting another attachment
+     * only cancels the opening waiter, not this observer.
      */
-    private val lastRequestedDownloadUuid = AtomicReference<String?>(null)
-    private val openMutex = Mutex()
+    internal fun downloadAttachment(localUuid: String, scope: CoroutineScope): Deferred<DownloadState> {
+        val job = scope.async(start = CoroutineStart.LAZY) {
+            downloads.flowForKey(localUuid)
+                .onEach { state ->
+                    if (state is DownloadState.Downloading) _downloadingUuids.update { it + localUuid }
+                }
+                .first { it !is DownloadState.Downloading }
+        }
+        val existingJob = downloadJobs.putIfAbsent(localUuid, job)
+        if (existingJob != null) {
+            job.cancel()
+            return existingJob
+        }
 
-    fun isDownloading(localUuid: String): Boolean = downloadAndOpenJobs.containsKey(localUuid)
-
-    /**
-     * Records [localUuid] as the download that should open when it completes. Must be called at
-     * every user click requesting an attachment to open, including clicks on attachments which are
-     * not downloaded by this manager (e.g. an open from the actions bottom sheet which downloads
-     * through the progress dialog).
-     */
-    fun setLastRequestedDownload(localUuid: String) {
-        lastRequestedDownloadUuid.set(localUuid)
+        job.invokeOnCompletion {
+            if (downloadJobs.remove(localUuid, job)) _downloadingUuids.update { it - localUuid }
+        }
+        job.start()
+        return job
     }
 
     fun cancelDownload(localUuid: String) {
-        consumePendingOpen(localUuid)
-        downloadAndOpenJobs.remove(localUuid)?.forEach { job -> job.cancel() }
+        downloadJobs[localUuid]?.cancel()
     }
 
-    fun downloadAndOpenAttachment(
-        attachment: Attachment,
-        scope: CoroutineScope,
-        onDownloadStateChanged: (localUuid: String, isDownloading: Boolean) -> Unit,
-        startIntent: (Intent) -> Unit,
-    ) {
-        setLastRequestedDownload(attachment.localUuid)
-        scope.launch {
-            try {
-                val terminalEvent = downloadEvents.flowForKey(attachment.localUuid)
-                    .onEach { event ->
-                        if (event is DownloadEvent.DownloadStarted) {
-                            onDownloadStateChanged(attachment.localUuid, true)
-                        }
-                    }
-                    .first { it.isTerminal }
+    private fun createDownloadStates(localUuid: String): Flow<DownloadState> = flow {
+        val state = runCatching {
+            val attachment = attachmentOperations.getAttachment(localUuid)
+                ?: return@runCatching DownloadState.Failed(downloadErrorRes())
 
-                when (terminalEvent) {
-                    is DownloadEvent.ReadyToOpen -> openAttachment(attachment, startIntent)
-                    is DownloadEvent.DownloadSucceeded -> openLastRequestedDownloadedAttachment(attachment, startIntent)
-                    // DownloadFailed is terminal with nothing to open; DownloadStarted never satisfies the predicate
-                    is DownloadEvent.DownloadFailed -> consumePendingOpen(attachment.localUuid)
-                    is DownloadEvent.DownloadStarted -> Unit
-                }
-            } finally {
-                withContext(NonCancellable) { onDownloadStateChanged(attachment.localUuid, false) }
+            if (!attachmentOperations.hasSupportedApp(attachment)) {
+                return@runCatching DownloadState.Failed(R.string.errorNoSupportingAppFound)
             }
-        }.trackDownloadAndOpenJob(attachment.localUuid)
+
+            if (attachmentOperations.isCached(attachment)) return@runCatching DownloadState.Ready(attachment)
+
+            emit(DownloadState.Downloading)
+            download(attachment)
+        }.cancellable().getOrElse {
+            SentryLog.e(TAG, "Attachment download failed for $localUuid", it)
+            DownloadState.Failed(downloadErrorRes())
+        }
+        if (state is DownloadState.Failed) snackbarManager.postValue(context.getString(state.errorRes))
+        emit(state)
     }
 
-    private fun createDownloadEvents(localUuid: String): Flow<DownloadEvent> = flow {
-        val attachment = attachmentOperations.getAttachment(localUuid) ?: return@flow emitDownloadFailure()
-
-        if (!attachmentOperations.hasSupportedApp(attachment)) {
-            emitDownloadFailure(R.string.errorNoSupportingAppFound)
-            return@flow
-        }
-
-        if (attachmentOperations.isCached(attachment)) {
-            emit(DownloadEvent.ReadyToOpen)
-            return@flow
-        }
-
-        emit(DownloadEvent.DownloadStarted)
-
+    private suspend fun download(attachment: Attachment): DownloadState {
         var isDownloadSuccess = false
         try {
-            isDownloadSuccess = runCatching { attachmentOperations.download(attachment) }.cancellable().getOrDefault(false)
+            isDownloadSuccess = attachmentOperations.download(attachment)
             currentCoroutineContext().ensureActive()
-
-            if (isDownloadSuccess) {
-                emit(DownloadEvent.DownloadSucceeded)
-            } else {
-                emitDownloadFailure()
-            }
+            return if (isDownloadSuccess) DownloadState.Ready(attachment) else DownloadState.Failed(downloadErrorRes())
         } finally {
-            if (!isDownloadSuccess) withContext(NonCancellable) { attachmentOperations.deleteIncompleteCache(attachment) }
-        }
-    }
-
-    private suspend fun FlowCollector<DownloadEvent>.emitDownloadFailure(@StringRes customErrorRes: Int? = null) {
-        val errorRes = customErrorRes ?: if (networkManager.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection
-        snackbarManager.postValue(context.getString(errorRes))
-        emit(DownloadEvent.DownloadFailed)
-    }
-
-    private suspend fun openAttachment(attachment: Attachment, startIntent: (Intent) -> Unit) {
-        val intent = withContext(ioDispatcher) { attachmentOperations.getOpenIntent(attachment) } ?: return
-        startIntent(intent)
-    }
-
-    private suspend fun openLastRequestedDownloadedAttachment(attachment: Attachment, startIntent: (Intent) -> Unit) {
-        openMutex.withLock {
-            if (!consumePendingOpen(attachment.localUuid)) return
-            val intent = withContext(ioDispatcher) { attachmentOperations.getOpenIntent(attachment) } ?: return
-            startIntent(intent)
-        }
-    }
-
-    /** Consumes the pending open request if it still points to [localUuid]; returns whether it was consumed. */
-    private fun consumePendingOpen(localUuid: String): Boolean =
-        lastRequestedDownloadUuid.compareAndSet(localUuid, null)
-
-    private fun Job.trackDownloadAndOpenJob(localUuid: String) {
-        downloadAndOpenJobs.computeIfAbsent(localUuid) { ConcurrentHashMap.newKeySet() }.add(this)
-        invokeOnCompletion {
-            downloadAndOpenJobs.compute(localUuid) { _, jobs ->
-                jobs?.also { it.remove(this) }?.takeIf { it.isNotEmpty() }
+            if (!isDownloadSuccess) {
+                withContext(NonCancellable) {
+                    runCatching { attachmentOperations.deleteIncompleteCache(attachment) }.cancellable().onFailure {
+                        SentryLog.e(TAG, "Could not delete incomplete attachment ${attachment.localUuid}", it)
+                    }
+                }
             }
         }
     }
 
-    private sealed interface DownloadEvent {
-        data object DownloadStarted : DownloadEvent
-        data object ReadyToOpen : DownloadEvent
-        data object DownloadSucceeded : DownloadEvent
-        data object DownloadFailed : DownloadEvent
+    @StringRes
+    private fun downloadErrorRes() = if (networkManager.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection
 
-        val isTerminal: Boolean get() = this !is DownloadStarted
+    internal sealed interface DownloadState {
+        data object Downloading : DownloadState
+        data class Ready(val attachment: Attachment) : DownloadState
+        data class Failed(@StringRes val errorRes: Int) : DownloadState
+    }
+
+    private companion object {
+        const val TAG = "AttachmentDownloadManager"
     }
 }
