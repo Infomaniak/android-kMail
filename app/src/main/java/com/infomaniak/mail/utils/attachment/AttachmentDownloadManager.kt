@@ -103,10 +103,6 @@ class AttachmentDownloadManager @Inject constructor(
             val attachment = attachmentOperations.getAttachment(localUuid)
                 ?: return@runCatching DownloadState.Failed(downloadErrorRes())
 
-            if (!attachmentOperations.hasSupportedApp(attachment)) {
-                return@runCatching DownloadState.Failed(R.string.errorNoSupportingAppFound)
-            }
-
             if (attachmentOperations.isCached(attachment)) return@runCatching DownloadState.Ready(attachment)
 
             emit(DownloadState.Downloading)
