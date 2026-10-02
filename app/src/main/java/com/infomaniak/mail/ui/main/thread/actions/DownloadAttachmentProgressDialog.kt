@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,20 +23,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.core.legacy.utils.setBackNavigationResult
-import com.infomaniak.mail.utils.extensions.AttachmentExt
-import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToAppStore
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
-    private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
     private var hasStartedDownload = false
+
+    @Inject
+    lateinit var attachmentOpeningManager: AttachmentOpeningManager
 
     override val dialogTitle: String by lazy { navigationArgs.attachmentName }
 
@@ -50,16 +50,15 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
         if (hasStartedDownload) return
 
         hasStartedDownload = true
-        lifecycleScope.launch {
-            downloadAttachmentViewModel.downloadAttachment().first().let { cachedAttachment ->
-                if (cachedAttachment == null) {
-                    popBackStackWithError()
-                } else {
-                    cachedAttachment.getIntentOrGoToAppStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
-                        setBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
-                    } ?: run { findNavController().popBackStack() }
-                }
-            }
-        }
+        val navController = findNavController()
+        val backStackEntry = navController.currentBackStackEntry
+        attachmentOpeningManager.requestOpen(
+            localUuid = navigationArgs.attachmentLocalUuid,
+            scope = lifecycleScope,
+            intentType = navigationArgs.intentType,
+            onFinished = {
+                if (navController.currentBackStackEntry === backStackEntry) navController.popBackStack()
+            },
+        )
     }
 }

@@ -147,6 +147,7 @@ import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
+import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.replyWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.toDate
@@ -418,6 +419,9 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onSuperCollapsedBlockClicked = ::expandSuperCollapsedBlock,
                 navigateToAttendeeBottomSheet = ::navigateToAttendees,
                 navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
+                navigateToDownloadProgressDialog = { attachment, intentType ->
+                    navigateToDownloadProgressDialog(attachment, intentType, ThreadFragment::class.java.name)
+                },
                 onUnsubscribeClicked = threadViewModel::unsubscribeMessage,
                 onAcknowledgeClicked = threadViewModel::acknowledgeMessage,
                 moveMessageToSpam = { messageUid ->
