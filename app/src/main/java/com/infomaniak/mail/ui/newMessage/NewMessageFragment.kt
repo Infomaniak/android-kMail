@@ -124,7 +124,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.evaluateJs
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -359,7 +358,6 @@ class NewMessageFragment : Fragment() {
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT, ::scheduleDraft)
 
-        getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {

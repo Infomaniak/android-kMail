@@ -51,6 +51,7 @@ import com.infomaniak.mail.MatomoMail.trackMessageBannerEvent
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.calendar.AttendanceState
@@ -91,6 +92,7 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettin
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.WebViewDisplayCallbacks
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.formatSubject
@@ -343,6 +345,9 @@ class ThreadAdapter(
             initCallback(
                 navigateToAttendeesBottomSheet = { attendees ->
                     threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
+                },
+                navigateToDownloadProgressDialog = { attachment, intentType ->
+                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(attachment, intentType)
                 },
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
@@ -1395,6 +1400,7 @@ class ThreadAdapter(
         var onSuperCollapsedBlockClicked: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
+        var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var onUnsubscribeClicked: ((Message) -> Unit)? = null,
         var onAcknowledgeClicked: ((Message) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
