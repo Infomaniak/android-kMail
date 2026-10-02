@@ -60,6 +60,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executors
 import kotlin.time.Duration.Companion.seconds
@@ -85,7 +86,7 @@ class AttachmentOpeningManagerTest {
         every { SentryLog.e(any(), any(), any()) } just Runs
         every { context.getString(any()) } answers { "error-${firstArg<Int>()}" }
         every { networkManager.hasNetwork } returns true
-        downloadManager = AttachmentDownloadManager(context, networkManager, dispatcher, operations, snackbarManager)
+        downloadManager = AttachmentDownloadManager(networkManager, dispatcher, operations)
         openingManager = AttachmentOpeningManager(context, downloadManager, operations, dispatcher, snackbarManager)
         openingManager.observeOpening(viewScope, openedIntents::add)
     }
@@ -505,6 +506,185 @@ class AttachmentOpeningManagerTest {
     }
 
     @Test
+    fun threeDownloadsFailWithoutNetwork_onlyShowsTheLastRequestedError() = runTest(dispatcher) {
+        every { networkManager.hasNetwork } returns false
+        val attachments = (1..3).map { index ->
+            val (attachment, _) = attachment("uuid-$index")
+            coEvery { operations.download(attachment) } coAnswers {
+                delay(index * 100L)
+                false
+            }
+            attachment
+        }
+
+        attachments.forEach { openingManager.requestOpen(it.localUuid, viewScope) }
+        advanceTimeBy(250)
+        runCurrent()
+
+        assertEquals(setOf("uuid-3"), downloadManager.downloadingUuids.value)
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+
+        advanceUntilIdle()
+
+        assertTrue(openedIntents.isEmpty())
+        assertTrue(downloadManager.downloadingUuids.value.isEmpty())
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.noConnection}") }
+        attachments.forEach { attachment ->
+            coVerify(exactly = 1) { operations.download(attachment) }
+            coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        }
+    }
+
+    @Test
+    fun lastDownloadFailsFirst_earlierFailuresDoNotShowMoreErrorsAfterwards() = runTest(dispatcher) {
+        val (first, _) = attachment("uuid-1")
+        val (second, _) = attachment("uuid-2")
+        val (third, _) = attachment("uuid-3")
+        listOf(third, second, first).forEachIndexed { index, attachment ->
+            coEvery { operations.download(attachment) } coAnswers {
+                delay((index + 1) * 100L)
+                false
+            }
+        }
+
+        listOf(first, second, third).forEach { openingManager.requestOpen(it.localUuid, viewScope) }
+        advanceTimeBy(150)
+        runCurrent()
+
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+        assertEquals(setOf("uuid-1", "uuid-2"), downloadManager.downloadingUuids.value)
+
+        advanceUntilIdle()
+
+        assertTrue(openedIntents.isEmpty())
+        assertTrue(downloadManager.downloadingUuids.value.isEmpty())
+        verify(exactly = 1) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
+    fun lastDownloadSucceeds_earlierFailuresRemainSilent() = runTest(dispatcher) {
+        val (first, _) = attachment("uuid-1")
+        val (_, secondIntent) = attachment("uuid-2", duration = 100)
+        coEvery { operations.download(first) } coAnswers {
+            delay(300)
+            false
+        }
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        openingManager.requestOpen("uuid-2", viewScope)
+        advanceUntilIdle()
+
+        assertEquals(listOf(secondIntent), openedIntents)
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(first) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
+    fun earlierDownloadThrowsAfterTheLastOpening_logsFailureWithoutShowingSnackbar() = runTest(dispatcher) {
+        val (first, _) = attachment("uuid-1")
+        val (_, secondIntent) = attachment("uuid-2", duration = 100)
+        coEvery { operations.download(first) } coAnswers {
+            delay(300)
+            throw IOException("Download failed")
+        }
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        openingManager.requestOpen("uuid-2", viewScope)
+        advanceUntilIdle()
+
+        assertEquals(listOf(secondIntent), openedIntents)
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(first) }
+        verify { SentryLog.e(any(), any(), any()) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
+    fun actionDialogFails_afterEarlierDownloadFailures_closesAndShowsOnlyItsError() = runTest(dispatcher) {
+        val (first, _) = attachment("uuid-1")
+        val (second, _) = attachment("uuid-2")
+        coEvery { operations.download(first) } coAnswers {
+            delay(100)
+            false
+        }
+        coEvery { operations.download(second) } coAnswers {
+            delay(300)
+            false
+        }
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        runCurrent()
+        openingManager.cancelPendingOpen()
+        openingManager.requestOpen("uuid-2", activityScope, onFinished = { dialogClosedCount++ })
+        advanceTimeBy(150)
+        runCurrent()
+
+        assertEquals(0, dialogClosedCount)
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun earlierSupportingAppCheckFails_afterANewRequest_doesNotShowAnError() = runTest(dispatcher) {
+        val (first, _) = attachment("uuid-1")
+        val (_, secondIntent) = attachment("uuid-2", cached = true)
+        coEvery { operations.hasSupportedApp(first) } coAnswers {
+            delay(300)
+            throw IllegalStateException("Cannot query applications")
+        }
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        runCurrent()
+        openingManager.requestOpen("uuid-2", viewScope)
+        advanceUntilIdle()
+
+        assertEquals(listOf(secondIntent), openedIntents)
+        verify { SentryLog.e(any(), any(), any()) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
+    fun earlierAttachmentHasNoSupportingApp_afterANewRequest_doesNotShowAnError() = runTest(dispatcher) {
+        val (first, _) = attachment("uuid-1")
+        val (_, secondIntent) = attachment("uuid-2", cached = true)
+        coEvery { operations.hasSupportedApp(first) } coAnswers {
+            delay(300)
+            false
+        }
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        runCurrent()
+        openingManager.requestOpen("uuid-2", viewScope)
+        advanceUntilIdle()
+
+        assertEquals(listOf(secondIntent), openedIntents)
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
+    fun cancelledOpening_downloadFailureDoesNotShowAnError() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.download(attachment) } coAnswers {
+            delay(300)
+            false
+        }
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        runCurrent()
+        openingManager.cancelPendingOpen()
+        advanceUntilIdle()
+
+        assertTrue(openedIntents.isEmpty())
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
     fun cancelPendingOpen_leavesDownloadsRunningWithoutOpeningAnyAttachment() = runTest(dispatcher) {
         val (first, _) = attachment("uuid-1")
         val (second, _) = attachment("uuid-2")
@@ -655,7 +835,7 @@ class AttachmentOpeningManagerTest {
 
     @Test
     fun twoRapidClicksWithSeparateUiAndIoDispatchers_openOnlyTheLastAttachment() = runBlocking {
-        val ioDownloadManager = AttachmentDownloadManager(context, networkManager, Dispatchers.IO, operations, snackbarManager)
+        val ioDownloadManager = AttachmentDownloadManager(networkManager, Dispatchers.IO, operations)
         val ioOpeningManager = AttachmentOpeningManager(context, ioDownloadManager, operations, Dispatchers.IO, snackbarManager)
         val (first, _) = attachment("uuid-1")
         val (second, secondIntent) = attachment("uuid-2")

@@ -17,12 +17,11 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Context
 import com.infomaniak.core.legacy.R
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DownloadState
 import com.infomaniak.mail.utils.attachment.AttachmentOperations
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -53,10 +52,8 @@ import java.io.IOException
 @OptIn(ExperimentalCoroutinesApi::class)
 class AttachmentDownloadManagerTest {
 
-    private val context = mockk<Context>()
     private val networkManager = mockk<NetworkManager>()
     private val operations = mockk<AttachmentOperations>()
-    private val snackbarManager = mockk<SnackbarManager>(relaxed = true)
     private val dispatcher = StandardTestDispatcher()
     private val scope = CoroutineScope(SupervisorJob() + dispatcher)
 
@@ -66,9 +63,8 @@ class AttachmentDownloadManagerTest {
     fun setUp() {
         mockkObject(SentryLog)
         every { SentryLog.e(any(), any(), any()) } just Runs
-        every { context.getString(any()) } answers { "error-${firstArg<Int>()}" }
         every { networkManager.hasNetwork } returns true
-        manager = AttachmentDownloadManager(context, networkManager, dispatcher, operations, snackbarManager)
+        manager = AttachmentDownloadManager(networkManager, dispatcher, operations)
     }
 
     @After
@@ -162,7 +158,6 @@ class AttachmentDownloadManagerTest {
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test
@@ -176,67 +171,66 @@ class AttachmentDownloadManagerTest {
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test
-    fun downloadFailure_cleansCacheAndShowsError() = runTest(dispatcher) {
+    fun downloadFailure_cleansCacheAndReturnsFailure() = runTest(dispatcher) {
         val attachment = attachment("uuid-1")
         coEvery { operations.download(attachment) } returns false
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
     }
 
     @Test
-    fun downloadException_cleansCacheAndShowsError() = runTest(dispatcher) {
+    fun downloadException_cleansCacheAndReturnsFailure() = runTest(dispatcher) {
         val attachment = attachment("uuid-1")
         coEvery { operations.download(attachment) } throws IOException("Download failed")
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
         verify { SentryLog.e(any(), any(), any()) }
     }
 
     @Test
-    fun failureWithoutNetwork_showsNoConnectionError() = runTest(dispatcher) {
+    fun failureWithoutNetwork_returnsNoConnectionError() = runTest(dispatcher) {
         val attachment = attachment("uuid-1")
         every { networkManager.hasNetwork } returns false
         coEvery { operations.download(attachment) } returns false
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
-        verify { snackbarManager.postValue("error-${R.string.noConnection}") }
+        assertEquals(DownloadState.Failed(R.string.noConnection), download.await())
     }
 
     @Test
     fun preparationException_isReportedInsteadOfLeavingObserversWaitingForever() = runTest(dispatcher) {
         coEvery { operations.getAttachment("uuid-1") } throws IllegalStateException("Attachment unavailable")
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
-        verify { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
     }
 
     @Test
-    fun missingAttachment_showsError() = runTest(dispatcher) {
+    fun missingAttachment_returnsFailure() = runTest(dispatcher) {
         coEvery { operations.getAttachment("uuid-1") } returns null
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
-        verify { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
     }
 
     @Test
@@ -263,23 +257,22 @@ class AttachmentDownloadManagerTest {
 
         coVerify(exactly = 1) { operations.download(attachment) }
         coVerify(exactly = 0) { operations.hasSupportedApp(any()) }
-        verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test
     fun timeout_cleansIncompleteCacheAndReportsFailureAfterTwoMinutes() = runTest(dispatcher) {
         val attachment = attachment("uuid-1", duration = 180_000)
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         advanceTimeBy(119_999)
         runCurrent()
         assertEquals(setOf("uuid-1"), manager.downloadingUuids.value)
-        verify(exactly = 0) { snackbarManager.postValue(any()) }
+        assertTrue(!download.isCompleted)
 
         advanceTimeBy(1)
         runCurrent()
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
     }
 }
