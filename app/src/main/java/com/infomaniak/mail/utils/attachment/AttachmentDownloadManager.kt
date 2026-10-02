@@ -47,8 +47,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @ActivityScoped
 class AttachmentDownloadManager @Inject constructor(
@@ -106,7 +108,7 @@ class AttachmentDownloadManager @Inject constructor(
             if (attachmentOperations.isCached(attachment)) return@runCatching DownloadState.Ready(attachment)
 
             emit(DownloadState.Downloading)
-            download(attachment)
+            withTimeoutOrNull(DOWNLOAD_TIMEOUT) { download(attachment) } ?: DownloadState.Failed(downloadErrorRes())
         }.cancellable().getOrElse {
             SentryLog.e(TAG, "Attachment download failed for $localUuid", it)
             DownloadState.Failed(downloadErrorRes())
@@ -141,7 +143,8 @@ class AttachmentDownloadManager @Inject constructor(
         data class Failed(@StringRes val errorRes: Int) : DownloadState
     }
 
-    private companion object {
-        const val TAG = "AttachmentDownloadManager"
+    companion object {
+        internal val DOWNLOAD_TIMEOUT = 2.minutes
+        private const val TAG = "AttachmentDownloadManager"
     }
 }
