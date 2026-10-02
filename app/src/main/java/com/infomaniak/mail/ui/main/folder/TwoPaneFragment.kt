@@ -50,7 +50,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ActionsViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
-import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.isPhone
 import com.infomaniak.mail.utils.extensions.isTabletOrFoldable
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
@@ -138,7 +137,6 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun observeThreadNavigation() {
-        getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
         getBackNavigationResult(DownloadMessagesProgressDialog.DOWNLOAD_MESSAGES_RESULT, resultActivityResultLauncher::launch)
 
         twoPaneViewModel.newMessageArgs.observe(viewLifecycleOwner) {

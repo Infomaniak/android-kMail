@@ -26,7 +26,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -86,20 +85,11 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setupListeners(attachment: Attachable) = with(binding) {
         if (attachment is Attachment) {
-            openWithItem.setOnClickListener {
-                trackAttachmentActionsEvent(MatomoName.OpenFromBottomsheet)
-                val scope = requireActivity().lifecycleScope
-                findNavController().popBackStack()
-                attachmentOpeningManager.requestOpen(attachment.localUuid, scope)
+            openWithItem.setOnClickSuspend(MatomoName.OpenFromBottomsheet) {
+                executeAttachmentAction(attachment, AttachmentIntentType.OPEN_WITH)
             }
             kDriveItem.setOnClickSuspend(MatomoName.SaveToKDrive) {
-                attachmentOpeningManager.cancelPendingOpen()
-                attachment.executeIntent(
-                    context = context,
-                    intentType = AttachmentIntentType.SAVE_TO_DRIVE,
-                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                    popBackIfNeeded = findNavController()::popBackStack,
-                )
+                executeAttachmentAction(attachment, AttachmentIntentType.SAVE_TO_DRIVE)
             }
         }
 
@@ -107,6 +97,22 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             trackAttachmentActionsEvent(MatomoName.Download)
             scheduleDownloadManager(attachment.downloadUrl, attachment.name)
         }
+    }
+
+    private suspend fun executeAttachmentAction(attachment: Attachment, intentType: AttachmentIntentType) {
+        attachmentOpeningManager.cancelPendingOpen()
+        val scope = requireActivity().lifecycleScope
+        attachment.executeIntent(
+            context = requireContext(),
+            intentType = intentType,
+            openCachedAttachment = { cachedAttachment, type ->
+                attachmentOpeningManager.requestOpen(cachedAttachment.localUuid, scope, type)
+            },
+            navigateToDownloadProgressDialog = { requestedAttachment, type ->
+                navigateToDownloadProgressDialog(requestedAttachment, type, closeAttachmentActions = true)
+            },
+            popBackIfNeeded = findNavController()::popBackStack,
+        )
     }
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {

@@ -55,7 +55,6 @@ object AttachmentExt {
 
     // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
     const val ATTACHMENT_TAG = "attachmentUpload"
-    const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
     //region Intent
     private suspend fun Attachment.saveToDriveIntent(context: Context): Intent? {
@@ -96,14 +95,14 @@ object AttachmentExt {
     suspend fun Attachment.executeIntent(
         context: Context,
         intentType: AttachmentIntentType,
+        openCachedAttachment: (Attachment, AttachmentIntentType) -> Unit,
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         popBackIfNeeded: (() -> Unit)? = null,
     ) {
         if (hasUsableCache(context, getUploadLocalFile()) || isInlineCachedFile(context)) {
-            getIntentOrGoToAppStore(context, intentType)?.let(context::startActivity)
             popBackIfNeeded?.invoke()
+            openCachedAttachment(this, intentType)
         } else {
-            popBackIfNeeded?.invoke()
             navigateToDownloadProgressDialog(this, intentType)
         }
     }
