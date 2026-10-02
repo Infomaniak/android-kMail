@@ -265,4 +265,21 @@ class AttachmentDownloadManagerTest {
         coVerify(exactly = 0) { operations.hasSupportedApp(any()) }
         verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
+
+    @Test
+    fun timeout_cleansIncompleteCacheAndReportsFailureAfterTwoMinutes() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1", duration = 180_000)
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceTimeBy(119_999)
+        runCurrent()
+        assertEquals(setOf("uuid-1"), manager.downloadingUuids.value)
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+
+        advanceTimeBy(1)
+        runCurrent()
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
 }
