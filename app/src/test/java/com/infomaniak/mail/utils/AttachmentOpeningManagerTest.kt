@@ -286,6 +286,28 @@ class AttachmentOpeningManagerTest {
     }
 
     @Test
+    fun actionDialog_downloadTimesOut_closesAndDoesNotOpenAnEarlierAttachment() = runTest(dispatcher) {
+        attachment("uuid-1", duration = 100)
+        val (second, _) = attachment("uuid-2", duration = 180_000)
+        var isDialogVisible = true
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        openingManager.requestOpen("uuid-2", activityScope, onFinished = { isDialogVisible = false })
+        advanceTimeBy(119_999)
+        runCurrent()
+        assertTrue(isDialogVisible)
+        assertTrue(openedIntents.isEmpty())
+
+        advanceTimeBy(1)
+        runCurrent()
+        assertTrue(!isDialogVisible)
+        assertTrue(openedIntents.isEmpty())
+        assertTrue(downloadManager.downloadingUuids.value.isEmpty())
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(second) }
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
     fun actionDialog_noSupportingApp_closesWithoutDownloading() = runTest(dispatcher) {
         val (attachment, _) = attachment("uuid-1")
         coEvery { operations.hasSupportedApp(attachment) } returns false
