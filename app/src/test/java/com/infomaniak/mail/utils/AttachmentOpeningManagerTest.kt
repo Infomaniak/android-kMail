@@ -27,6 +27,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.attachment.AttachmentOperations
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.SAVE_TO_DRIVE
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -153,7 +154,7 @@ class AttachmentOpeningManagerTest {
 
         assertEquals(listOf(intent), openedIntents)
         coVerify(exactly = 1) { operations.download(attachment) }
-        coVerify(exactly = 1) { operations.getAttachment("uuid-1") }
+        coVerify(exactly = 1) { operations.getOpenIntent(attachment) }
     }
 
     @Test
@@ -208,6 +209,184 @@ class AttachmentOpeningManagerTest {
         assertEquals(listOf(secondIntent), openedIntents)
         coVerify(exactly = 1) { operations.download(first) }
         coVerify(exactly = 1) { operations.download(second) }
+    }
+
+    @Test
+    fun actionDialog_staysVisibleUntilDownloadCompletesAndClosesBeforeOpening() = runTest(dispatcher) {
+        val (_, intent) = attachment("uuid-1", duration = 300)
+        val dialogScope = CoroutineScope(SupervisorJob() + dispatcher)
+        var isDialogVisible = true
+        val events = mutableListOf<String>()
+        openingManager.observeOpening(viewScope) {
+            assertTrue(!isDialogVisible)
+            events.add("open")
+            openedIntents.add(it)
+        }
+
+        openingManager.requestOpen("uuid-1", dialogScope, onFinished = {
+            isDialogVisible = false
+            events.add("close")
+            dialogScope.cancel()
+        })
+        advanceTimeBy(150)
+        runCurrent()
+        assertTrue(isDialogVisible)
+        assertTrue(openedIntents.isEmpty())
+
+        advanceUntilIdle()
+        assertEquals(listOf("close", "open"), events)
+        assertEquals(listOf(intent), openedIntents)
+    }
+
+    @Test
+    fun actionDialog_joinsDirectDownloadWithoutOpeningTwice() = runTest(dispatcher) {
+        val (attachment, intent) = attachment("uuid-1", duration = 300)
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", viewScope)
+        runCurrent()
+        openingManager.cancelPendingOpen()
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertEquals(listOf(intent), openedIntents)
+        coVerify(exactly = 1) { operations.download(attachment) }
+    }
+
+    @Test
+    fun restoredActionDialog_requestsBeforeHostObservation_stillClosesAndOpens() = runTest(dispatcher) {
+        val (_, intent) = attachment("uuid-1")
+        val restoredOpeningManager = AttachmentOpeningManager(context, downloadManager, operations, dispatcher, snackbarManager)
+        var dialogClosedCount = 0
+
+        restoredOpeningManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+        assertTrue(openedIntents.isEmpty())
+        assertEquals(0, dialogClosedCount)
+
+        restoredOpeningManager.observeOpening(viewScope, openedIntents::add)
+        advanceUntilIdle()
+        assertEquals(1, dialogClosedCount)
+        assertEquals(listOf(intent), openedIntents)
+    }
+
+    @Test
+    fun actionDialog_downloadFails_closesOnceAndReportsError() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.download(attachment) } returns false
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun actionDialog_noSupportingApp_closesWithoutDownloading() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.hasSupportedApp(attachment) } returns false
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        coVerify(exactly = 0) { operations.download(attachment) }
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.errorNoSupportingAppFound}") }
+    }
+
+    @Test
+    fun actionDialog_supportingAppCheckFails_closesAndReportsError() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.hasSupportedApp(attachment) } throws IllegalStateException("Cannot query applications")
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        coVerify(exactly = 0) { operations.download(attachment) }
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun actionDialog_nullOpeningIntent_closesAndReportsError() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.getOpenIntent(attachment) } returns null
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun actionDialog_intentPreparationFails_closesAndReportsError() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.getOpenIntent(attachment) } throws IllegalStateException("Could not prepare intent")
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun actionDialog_intentPreparationCancelled_closesWithoutSwallowingCancellation() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.getOpenIntent(attachment) } throws CancellationException()
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
+    fun saveToDriveAction_usesSharedDownloadWithoutRequiringAnOpenWithApp() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        val driveIntent = mockk<Intent>()
+        coEvery { operations.hasSupportedApp(attachment) } returns false
+        coEvery { operations.getOpenIntent(attachment, SAVE_TO_DRIVE) } returns driveIntent
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, SAVE_TO_DRIVE, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertEquals(listOf(driveIntent), openedIntents)
+        coVerify(exactly = 1) { operations.download(attachment) }
+        coVerify(exactly = 0) { operations.hasSupportedApp(any()) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+    }
+
+    @Test
+    fun saveToDriveAction_redirectsToStore_closesWithoutReportingAnotherError() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.getOpenIntent(attachment, SAVE_TO_DRIVE) } returns null
+        var dialogClosedCount = 0
+
+        openingManager.requestOpen("uuid-1", activityScope, SAVE_TO_DRIVE, onFinished = { dialogClosedCount++ })
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(openedIntents.isEmpty())
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test

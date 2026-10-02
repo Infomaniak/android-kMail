@@ -28,6 +28,8 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DownloadState
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,6 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -54,9 +57,34 @@ class AttachmentOpeningManager @Inject constructor(
     private val requestedAttachment = MutableStateFlow<OpenRequest?>(null)
     private var observationJob: Job? = null
 
+    /** [onFinished] closes an action dialog before launching the intent, or when the request fails. */
     @MainThread
-    fun requestOpen(localUuid: String, scope: CoroutineScope) {
-        requestedAttachment.value = OpenRequest(localUuid, downloadManager.downloadAttachment(localUuid, scope))
+    fun requestOpen(
+        localUuid: String,
+        scope: CoroutineScope,
+        intentType: AttachmentIntentType = OPEN_WITH,
+        onFinished: () -> Unit = {},
+    ) {
+        val download = scope.async {
+            if (intentType == OPEN_WITH) {
+                val canOpen = runCatching {
+                    withContext(ioDispatcher) {
+                        attachmentOperations.getAttachment(localUuid)?.let { attachmentOperations.hasSupportedApp(it) }
+                    }
+                }.cancellable().getOrElse {
+                    SentryLog.e(TAG, "Could not check supporting applications for $localUuid", it)
+                    showError(R.string.anErrorHasOccurred)
+                    return@async DownloadState.Failed(R.string.anErrorHasOccurred)
+                }
+                if (canOpen == false) {
+                    showError(R.string.errorNoSupportingAppFound)
+                    return@async DownloadState.Failed(R.string.errorNoSupportingAppFound)
+                }
+            }
+
+            downloadManager.downloadAttachment(localUuid, scope).await()
+        }
+        requestedAttachment.value = OpenRequest(localUuid, download, intentType, onFinished)
     }
 
     @MainThread
@@ -68,17 +96,16 @@ class AttachmentOpeningManager @Inject constructor(
     @MainThread
     fun observeOpening(scope: CoroutineScope, startIntent: (Intent) -> Unit) {
         observationJob?.cancel()
-        cancelPendingOpen()
         val job = scope.launch(start = CoroutineStart.LAZY) {
             requestedAttachment.collectLatest { request ->
                 if (request == null) return@collectLatest
 
-                // Cancelling this waiter does not cancel the independently scoped download.
-                val state = request.download.await()
-                if (state is DownloadState.Ready) {
-                    openAttachment(request, state, startIntent)
-                } else {
-                    requestedAttachment.compareAndSet(request, null)
+                try {
+                    // Cancelling this waiter does not cancel the independently scoped download.
+                    val state = request.download.await()
+                    if (state is DownloadState.Ready) openAttachment(request, state, startIntent)
+                } finally {
+                    finishRequest(request)
                 }
             }
         }
@@ -95,16 +122,23 @@ class AttachmentOpeningManager @Inject constructor(
     private suspend fun openAttachment(request: OpenRequest, state: DownloadState.Ready, startIntent: (Intent) -> Unit) {
         val intent = runCatching {
             withContext(ioDispatcher) {
-                requireNotNull(attachmentOperations.getOpenIntent(state.attachment)) {
-                    "No intent for attachment ${request.localUuid}"
-                }
+                attachmentOperations.getOpenIntent(state.attachment, request.intentType)
             }
         }.cancellable().getOrElse {
             SentryLog.e(TAG, "Could not prepare attachment ${request.localUuid}", it)
-            if (requestedAttachment.compareAndSet(request, null)) showError(R.string.anErrorHasOccurred)
+            if (finishRequest(request)) showError(R.string.anErrorHasOccurred)
             return
         }
-        if (!requestedAttachment.compareAndSet(request, null)) return
+        if (!finishRequest(request)) return
+
+        if (intent == null) {
+            // SAVE_TO_DRIVE can return null after redirecting to the store when kDrive is not installed.
+            if (request.intentType == OPEN_WITH) {
+                SentryLog.e(TAG, "No intent for attachment ${request.localUuid}")
+                showError(R.string.anErrorHasOccurred)
+            }
+            return
+        }
 
         try {
             startIntent(intent)
@@ -121,8 +155,20 @@ class AttachmentOpeningManager @Inject constructor(
         snackbarManager.postValue(context.getString(errorRes))
     }
 
+    private fun finishRequest(request: OpenRequest): Boolean {
+        if (!requestedAttachment.compareAndSet(request, null)) return false
+
+        request.onFinished()
+        return true
+    }
+
     // Identity distinguishes a new click on the same attachment from an already consumed request.
-    private class OpenRequest(val localUuid: String, val download: Deferred<DownloadState>)
+    private class OpenRequest(
+        val localUuid: String,
+        val download: Deferred<DownloadState>,
+        val intentType: AttachmentIntentType,
+        val onFinished: () -> Unit,
+    )
 
     private companion object {
         const val TAG = "AttachmentOpeningManager"
