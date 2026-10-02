@@ -28,23 +28,25 @@ import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.data.models.extensions.isInlineCachedFile
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.AttachmentExt
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToAppStore
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openWithIntent
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface AttachmentOperations {
     suspend fun getAttachment(localUuid: String): Attachment?
     suspend fun hasSupportedApp(attachment: Attachment): Boolean
     suspend fun isCached(attachment: Attachment): Boolean
-    suspend fun getOpenIntent(attachment: Attachment): Intent?
+    suspend fun getOpenIntent(attachment: Attachment, intentType: AttachmentIntentType = AttachmentIntentType.OPEN_WITH): Intent?
     suspend fun download(attachment: Attachment): Boolean
     suspend fun deleteIncompleteCache(attachment: Attachment)
 }
 
 class DefaultAttachmentOperations @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
     private val attachmentController: AttachmentController,
 ) : AttachmentOperations {
 
@@ -60,8 +62,10 @@ class DefaultAttachmentOperations @Inject constructor(
         return attachment.hasUsableCache(context, attachment.getUploadLocalFile()) || attachment.isInlineCachedFile(context)
     }
 
-    override suspend fun getOpenIntent(attachment: Attachment): Intent? {
-        return attachment.getIntentOrGoToAppStore(context, AttachmentExt.AttachmentIntentType.OPEN_WITH)
+    override suspend fun getOpenIntent(attachment: Attachment, intentType: AttachmentIntentType): Intent? {
+        return withContext(Dispatchers.Main) {
+            attachment.getIntentOrGoToAppStore(context, intentType)
+        }
     }
 
     override suspend fun download(attachment: Attachment): Boolean {

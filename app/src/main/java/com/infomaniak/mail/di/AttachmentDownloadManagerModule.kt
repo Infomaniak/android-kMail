@@ -22,10 +22,10 @@ import com.infomaniak.mail.utils.attachment.DefaultAttachmentOperations
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ActivityComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ActivityComponent::class)
 fun interface AttachmentDownloadManagerModule {
     @Binds
     fun bindAttachmentOperations(impl: DefaultAttachmentOperations): AttachmentOperations
