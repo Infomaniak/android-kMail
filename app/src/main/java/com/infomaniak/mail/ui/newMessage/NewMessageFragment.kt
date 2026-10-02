@@ -98,6 +98,7 @@ import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCommonMentionsCodeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomEditorStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
@@ -248,6 +249,9 @@ class NewMessageFragment : Fragment() {
     lateinit var attachmentDownloadManager: AttachmentDownloadManager
 
     @Inject
+    lateinit var attachmentOpeningManager: AttachmentOpeningManager
+
+    @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -271,6 +275,7 @@ class NewMessageFragment : Fragment() {
 
         initMailbox()
         initUi()
+        observeAttachmentOpening()
         initializeDraft()
 
         handleOnBackPressed()
@@ -461,12 +466,7 @@ class NewMessageFragment : Fragment() {
                 if (it !is Attachment) return@AttachmentAdapter
 
                 trackAttachmentActionsEvent(MatomoName.OpenFromDraft)
-                attachmentDownloadManager.downloadAndOpenAttachment(
-                    attachment = it,
-                    scope = viewLifecycleOwner.lifecycleScope,
-                    onDownloadStateChanged = attachmentAdapter::setAttachmentDownloading,
-                    startIntent = { intent -> runCatching { startActivity(intent) } },
-                )
+                attachmentOpeningManager.requestOpen(it.localUuid, viewLifecycleOwner.lifecycleScope)
             },
         )
 
@@ -964,8 +964,16 @@ class NewMessageFragment : Fragment() {
 
     private fun onDeleteAttachment(attachable: Attachable) {
         trackAttachmentActionsEvent(MatomoName.Delete)
+        attachmentOpeningManager.cancelPendingOpen(attachable.localUuid)
         attachmentDownloadManager.cancelDownload(attachable.localUuid)
         if (attachable is Attachment) newMessageViewModel.deleteAttachment(attachable)
+    }
+
+    private fun observeAttachmentOpening() {
+        attachmentOpeningManager.observeOpening(viewLifecycleOwner.lifecycleScope, ::startActivity)
+        viewLifecycleOwner.lifecycleScope.launch {
+            attachmentDownloadManager.downloadingUuids.collect(attachmentAdapter::setDownloadingUuids)
+        }
     }
 
     private fun setupSendButtons(mailbox: Mailbox) = with(binding) {

@@ -18,382 +18,238 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.content.Intent
+import com.infomaniak.core.legacy.R
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.attachment.AttachmentOperations
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
+import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import kotlin.time.Duration.Companion.milliseconds
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AttachmentDownloadManagerTest {
 
-    private val context = mockk<Context>(relaxed = true)
-    private val networkManager = mockk<NetworkManager>(relaxed = true)
-    private val operations = mockk<AttachmentOperations>(relaxed = true)
-    private val testDispatcher = StandardTestDispatcher()
+    private val context = mockk<Context>()
+    private val networkManager = mockk<NetworkManager>()
+    private val operations = mockk<AttachmentOperations>()
     private val snackbarManager = mockk<SnackbarManager>(relaxed = true)
+    private val dispatcher = StandardTestDispatcher()
+    private val scope = CoroutineScope(SupervisorJob() + dispatcher)
 
-    private lateinit var attachmentDownloadManager: AttachmentDownloadManager
+    private lateinit var manager: AttachmentDownloadManager
 
     @Before
     fun setUp() {
-        every { context.getString(any()) } returns "Error message"
-
-        attachmentDownloadManager = AttachmentDownloadManager(
-            context = context,
-            networkManager = networkManager,
-            ioDispatcher = testDispatcher,
-            attachmentOperations = operations,
-            snackbarManager = snackbarManager,
-        )
+        mockkObject(SentryLog)
+        every { SentryLog.e(any(), any(), any()) } just Runs
+        every { context.getString(any()) } answers { "error-${firstArg<Int>()}" }
+        every { networkManager.hasNetwork } returns true
+        manager = AttachmentDownloadManager(context, networkManager, dispatcher, operations, snackbarManager)
     }
 
-    @Test
-    fun downloadAndOpenAttachment_noSupportedApp_showsErrorSnackbar() = runTest(testDispatcher) {
-        val attachment = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        coEvery { operations.getAttachment("uuid-1") } returns attachment
-        coEvery { operations.hasSupportedApp(attachment) } returns false
-
-        var downloadStateChanged = false
-        var snackbarShown = false
-
-        coEvery { snackbarManager.postValue(any()) } answers {
-            snackbarShown = true
-        }
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment,
-            scope = this,
-            onDownloadStateChanged = { _, isDownloading -> downloadStateChanged = isDownloading },
-            startIntent = {},
-        )
-        advanceUntilIdle()
-
-        assertFalse(downloadStateChanged)
-        assertTrue(snackbarShown)
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
+    @After
+    fun tearDown() {
+        scope.cancel()
+        dispatcher.scheduler.runCurrent()
+        unmockkObject(SentryLog)
     }
 
-    @Test
-    fun downloadAndOpenAttachment_alreadyCached_opensDirectly() = runTest(testDispatcher) {
-        val dummyIntent = mockk<Intent>()
-        val attachment = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        coEvery { operations.getAttachment("uuid-1") } returns attachment
+    private fun attachment(localUuid: String, cached: Boolean = false, duration: Long = 100): Attachment {
+        val attachment = mockk<Attachment> { every { this@mockk.localUuid } returns localUuid }
+        coEvery { operations.getAttachment(localUuid) } returns attachment
         coEvery { operations.hasSupportedApp(attachment) } returns true
-        coEvery { operations.isCached(attachment) } returns true
-        coEvery { operations.getOpenIntent(attachment) } returns dummyIntent
-
-        var openedIntent: Intent? = null
-        var downloadStateChanged = false
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment,
-            scope = this,
-            onDownloadStateChanged = { _, isDownloading -> downloadStateChanged = isDownloading },
-            startIntent = { openedIntent = it },
-        )
-        advanceUntilIdle()
-
-        assertFalse(downloadStateChanged)
-        assertEquals(dummyIntent, openedIntent)
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
-    }
-
-    @Test
-    fun downloadAndOpenAttachment_notCached_downloadsAndOpens() = runTest(testDispatcher) {
-        val dummyIntent = mockk<Intent>()
-        val attachment = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        coEvery { operations.getAttachment("uuid-1") } returns attachment
-        coEvery { operations.hasSupportedApp(attachment) } returns true
-        coEvery { operations.isCached(attachment) } returns false
-        coEvery { operations.download(attachment) } returns true
-        coEvery { operations.getOpenIntent(attachment) } returns dummyIntent
-
-        val downloadStates = mutableListOf<Boolean>()
-        var openedIntent: Intent? = null
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment,
-            scope = this,
-            onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            startIntent = { openedIntent = it },
-        )
-        advanceUntilIdle()
-
-        assertEquals(listOf(true, false), downloadStates)
-        assertEquals(dummyIntent, openedIntent)
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
-    }
-
-    @Test
-    fun downloadAndOpenAttachment_multipleClicked_opensTheLastOneClicked() = runTest(testDispatcher) {
-        val intent1 = mockk<Intent>()
-        val intent2 = mockk<Intent>()
-
-        val attachment1 = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        val attachment2 = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-2"
-        }
-
-        coEvery { operations.getAttachment("uuid-1") } returns attachment1
-        coEvery { operations.hasSupportedApp(attachment1) } returns true
-        coEvery { operations.isCached(attachment1) } returns false
-        coEvery { operations.getOpenIntent(attachment1) } returns intent1
-
-        coEvery { operations.getAttachment("uuid-2") } returns attachment2
-        coEvery { operations.hasSupportedApp(attachment2) } returns true
-        coEvery { operations.isCached(attachment2) } returns false
-        coEvery { operations.getOpenIntent(attachment2) } returns intent2
-
-        coEvery { operations.download(attachment1) } coAnswers {
-            delay(50.milliseconds)
-            true
-        }
-        coEvery { operations.download(attachment2) } coAnswers {
-            delay(100.milliseconds)
-            true
-        }
-
-        val openedIntents = mutableListOf<Intent>()
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment1,
-            scope = this,
-            onDownloadStateChanged = { _, _ -> },
-            startIntent = { openedIntents.add(it) },
-        )
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment2,
-            scope = this,
-            onDownloadStateChanged = { _, _ -> },
-            startIntent = { openedIntents.add(it) },
-        )
-
-        advanceUntilIdle()
-
-        // attachment2 was requested last, so only it should open, even though attachment1 finished first
-        assertEquals(1, openedIntents.size)
-        assertEquals(intent2, openedIntents.first())
-        coVerify(exactly = 1) { operations.download(attachment1) }
-        coVerify(exactly = 1) { operations.download(attachment2) }
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-2"))
-    }
-
-    @Test
-    fun downloadAndOpenAttachment_actionMenuOpen_supersedesPendingAutoOpen() = runTest(testDispatcher) {
-        val intent1 = mockk<Intent>()
-        val attachment1 = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-
-        coEvery { operations.getAttachment("uuid-1") } returns attachment1
-        coEvery { operations.hasSupportedApp(attachment1) } returns true
-        coEvery { operations.isCached(attachment1) } returns false
-        coEvery { operations.download(attachment1) } coAnswers {
-            delay(100.milliseconds)
-            true
-        }
-        coEvery { operations.getOpenIntent(attachment1) } returns intent1
-
-        val openedIntents = mutableListOf<Intent>()
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment1,
-            scope = this,
-            onDownloadStateChanged = { _, _ -> },
-            startIntent = { openedIntents.add(it) },
-        )
-
-        // An open from the actions bottom sheet (which downloads through the progress dialog) is
-        // requested without calling downloadAndOpenAttachment, and supersedes the pending auto-open
-        attachmentDownloadManager.setLastRequestedDownload("uuid-2")
-
-        advanceUntilIdle()
-
-        assertTrue(openedIntents.isEmpty())
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
-    }
-
-    @Test
-    fun downloadAndOpenAttachment_multipleClicksOnSameAttachment_shareOneDownload() = runTest(testDispatcher) {
-        val dummyIntent = mockk<Intent>()
-        val attachment = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        coEvery { operations.getAttachment("uuid-1") } returns attachment
-        coEvery { operations.hasSupportedApp(attachment) } returns true
-        coEvery { operations.isCached(attachment) } returns false
+        coEvery { operations.isCached(attachment) } returns cached
+        coEvery { operations.deleteIncompleteCache(attachment) } just Runs
         coEvery { operations.download(attachment) } coAnswers {
-            delay(100.milliseconds)
+            delay(duration)
             true
         }
-        coEvery { operations.getOpenIntent(attachment) } returns dummyIntent
-
-        val downloadStates = mutableListOf<Boolean>()
-        val openedIntents = mutableListOf<Intent>()
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment,
-            scope = this,
-            onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            startIntent = { openedIntents.add(it) },
-        )
-
-        // Second click while still downloading: joins the ongoing download
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment,
-            scope = this,
-            onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            startIntent = { openedIntents.add(it) },
-        )
-
-        advanceUntilIdle()
-
-        // Both observers follow the shared download, which itself runs only once, and the file is opened only once
-        assertEquals(listOf(true, true, false, false), downloadStates)
-        coVerify(exactly = 1) { operations.download(attachment) }
-        assertEquals(listOf(dummyIntent), openedIntents)
+        return attachment
     }
 
     @Test
-    fun cancelDownload_cancelsOngoingDownload() = runTest(testDispatcher) {
-        val attachment = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        coEvery { operations.getAttachment("uuid-1") } returns attachment
-        coEvery { operations.hasSupportedApp(attachment) } returns true
-        coEvery { operations.isCached(attachment) } returns false
-        coEvery { operations.download(attachment) } coAnswers {
-            delay(100.milliseconds)
-            true
-        }
+    fun downloadAttachment_downloadsWithoutPreparingAnOpeningIntent() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
 
-        val downloadStates = mutableListOf<Boolean>()
-        var openedIntent: Intent? = null
-        var snackbarShown = false
-        coEvery { snackbarManager.postValue(any()) } answers { snackbarShown = true }
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment,
-            scope = this,
-            onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            startIntent = { openedIntent = it },
-        )
+        manager.downloadAttachment("uuid-1", scope)
         runCurrent()
-
-        assertTrue(attachmentDownloadManager.isDownloading("uuid-1"))
-
-        attachmentDownloadManager.cancelDownload("uuid-1")
+        assertEquals(setOf("uuid-1"), manager.downloadingUuids.value)
         advanceUntilIdle()
 
-        // Download is aborted, its state is cleaned up, and neither the file nor an error snackbar is shown
-        assertEquals(listOf(true, false), downloadStates)
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+        coVerify(exactly = 1) { operations.download(attachment) }
+        coVerify(exactly = 0) { operations.getOpenIntent(any()) }
+    }
+
+    @Test
+    fun duplicateRequests_shareOneDownload() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
+
+        manager.downloadAttachment("uuid-1", scope)
+        manager.downloadAttachment("uuid-1", scope)
+        runCurrent()
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { operations.download(attachment) }
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+    }
+
+    @Test
+    fun independentAttachments_downloadInParallel() = runTest(dispatcher) {
+        val first = attachment("uuid-1", duration = 100)
+        val second = attachment("uuid-2", duration = 300)
+
+        manager.downloadAttachment("uuid-1", scope)
+        manager.downloadAttachment("uuid-2", scope)
+        runCurrent()
+        assertEquals(setOf("uuid-1", "uuid-2"), manager.downloadingUuids.value)
+
+        advanceTimeBy(150)
+        runCurrent()
+        assertEquals(setOf("uuid-2"), manager.downloadingUuids.value)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { operations.download(first) }
+        coVerify(exactly = 1) { operations.download(second) }
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+    }
+
+    @Test
+    fun cachedAttachment_doesNotShowDownloadProgress() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1", cached = true)
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+        coVerify(exactly = 0) { operations.download(attachment) }
+        coVerify(exactly = 0) { operations.getOpenIntent(any()) }
+    }
+
+    @Test
+    fun cancelDownload_deletesIncompleteCacheWithoutReportingAnError() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
+
+        manager.downloadAttachment("uuid-1", scope)
+        runCurrent()
+        manager.cancelDownload("uuid-1")
+        advanceUntilIdle()
+
+        assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
-        assertNull(openedIntent)
-        assertFalse(snackbarShown)
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test
-    fun downloadAndOpenAttachment_afterAllDownloadsComplete_newDownloadCanOpen() = runTest(testDispatcher) {
-        val intent1 = mockk<Intent>()
-        val intent2 = mockk<Intent>()
+    fun leavingTheScreen_cancelsItsDownloads() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
 
-        val attachment1 = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        val attachment2 = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-2"
-        }
-
-        coEvery { operations.getAttachment("uuid-1") } returns attachment1
-        coEvery { operations.hasSupportedApp(attachment1) } returns true
-        coEvery { operations.isCached(attachment1) } returns false
-        coEvery { operations.download(attachment1) } returns true
-        coEvery { operations.getOpenIntent(attachment1) } returns intent1
-
-        coEvery { operations.getAttachment("uuid-2") } returns attachment2
-        coEvery { operations.hasSupportedApp(attachment2) } returns true
-        coEvery { operations.isCached(attachment2) } returns false
-        coEvery { operations.download(attachment2) } returns true
-        coEvery { operations.getOpenIntent(attachment2) } returns intent2
-
-        val openedIntents = mutableListOf<Intent>()
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment1,
-            scope = this,
-            onDownloadStateChanged = { _, _ -> },
-            startIntent = { openedIntents.add(it) },
-        )
+        manager.downloadAttachment("uuid-1", scope)
+        runCurrent()
+        scope.cancel()
         advanceUntilIdle()
 
-        assertEquals(listOf(intent1), openedIntents)
-
-        // Subsequent download now that first has completed
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment2,
-            scope = this,
-            onDownloadStateChanged = { _, _ -> },
-            startIntent = { openedIntents.add(it) },
-        )
-        advanceUntilIdle()
-
-        assertEquals(listOf(intent1, intent2), openedIntents)
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test
-    fun downloadAndOpenAttachment_downloadFails_showsSnackbarAndCleansUp() = runTest(testDispatcher) {
-        val attachment = mockk<Attachment>(relaxed = true) {
-            every { localUuid } returns "uuid-1"
-        }
-        coEvery { operations.getAttachment("uuid-1") } returns attachment
-        coEvery { operations.hasSupportedApp(attachment) } returns true
-        coEvery { operations.isCached(attachment) } returns false
+    fun downloadFailure_cleansCacheAndShowsError() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
         coEvery { operations.download(attachment) } returns false
 
-        var errorSnackbarShown = false
-        coEvery { snackbarManager.postValue(any()) } answers { errorSnackbarShown = true }
-
-        val downloadStates = mutableListOf<Boolean>()
-
-        attachmentDownloadManager.downloadAndOpenAttachment(
-            attachment = attachment,
-            scope = this,
-            onDownloadStateChanged = { _, isDownloading -> downloadStates.add(isDownloading) },
-            startIntent = {},
-        )
+        manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
-        assertEquals(listOf(true, false), downloadStates)
-        assertTrue(errorSnackbarShown)
-        assertFalse(attachmentDownloadManager.isDownloading("uuid-1"))
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun downloadException_cleansCacheAndShowsError() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
+        coEvery { operations.download(attachment) } throws IOException("Download failed")
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+        verify { SentryLog.e(any(), any(), any()) }
+    }
+
+    @Test
+    fun failureWithoutNetwork_showsNoConnectionError() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
+        every { networkManager.hasNetwork } returns false
+        coEvery { operations.download(attachment) } returns false
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        verify { snackbarManager.postValue("error-${R.string.noConnection}") }
+    }
+
+    @Test
+    fun preparationException_isReportedInsteadOfLeavingObserversWaitingForever() = runTest(dispatcher) {
+        coEvery { operations.getAttachment("uuid-1") } throws IllegalStateException("Attachment unavailable")
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        assertTrue(manager.downloadingUuids.value.isEmpty())
+        verify { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun missingAttachment_showsError() = runTest(dispatcher) {
+        coEvery { operations.getAttachment("uuid-1") } returns null
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        verify { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun failedDownload_canBeRetried() = runTest(dispatcher) {
+        val attachment = attachment("uuid-1")
+        coEvery { operations.download(attachment) } returns false andThen true
+
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+        manager.downloadAttachment("uuid-1", scope)
+        advanceUntilIdle()
+
+        coVerify(exactly = 2) { operations.download(attachment) }
+        assertTrue(manager.downloadingUuids.value.isEmpty())
     }
 }

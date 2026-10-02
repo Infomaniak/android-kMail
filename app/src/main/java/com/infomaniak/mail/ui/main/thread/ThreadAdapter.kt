@@ -51,7 +51,6 @@ import com.infomaniak.mail.MatomoMail.trackMessageBannerEvent
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.calendar.AttendanceState
@@ -92,7 +91,6 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettin
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
-import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.WebViewDisplayCallbacks
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.formatSubject
@@ -135,13 +133,10 @@ class ThreadAdapter(
     private val downloadingAttachmentUuids = mutableSetOf<String>()
     private val activeAttachmentAdapters = mutableSetOf<AttachmentAdapter>()
 
-    fun setAttachmentDownloading(uuid: String, isDownloading: Boolean) {
-        if (isDownloading) {
-            downloadingAttachmentUuids.add(uuid)
-        } else {
-            downloadingAttachmentUuids.remove(uuid)
-        }
-        activeAttachmentAdapters.forEach { it.setAttachmentDownloading(uuid, isDownloading) }
+    fun setDownloadingUuids(uuids: Set<String>) {
+        downloadingAttachmentUuids.clear()
+        downloadingAttachmentUuids.addAll(uuids)
+        activeAttachmentAdapters.forEach { it.setDownloadingUuids(uuids) }
     }
 
     private lateinit var recyclerView: RecyclerView
@@ -348,9 +343,6 @@ class ThreadAdapter(
             initCallback(
                 navigateToAttendeesBottomSheet = { attendees ->
                     threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
-                },
-                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(attachment, attachmentIntentType)
                 },
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
@@ -1403,7 +1395,6 @@ class ThreadAdapter(
         var onSuperCollapsedBlockClicked: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
-        var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var onUnsubscribeClicked: ((Message) -> Unit)? = null,
         var onAcknowledgeClicked: ((Message) -> Unit)? = null,
         var moveMessageToSpam: ((String) -> Unit)? = null,
