@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils.attachment
 
-import android.content.Context
 import androidx.annotation.StringRes
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.common.dynamicLazyMapOfSharedFlow
@@ -26,9 +25,7 @@ import com.infomaniak.core.legacy.R
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.NetworkManager
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -54,11 +51,9 @@ import kotlin.time.Duration.Companion.minutes
 
 @ActivityScoped
 class AttachmentDownloadManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val networkManager: NetworkManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val attachmentOperations: AttachmentOperations,
-    private val snackbarManager: SnackbarManager,
 ) {
 
     private val downloadScope = CoroutineScope(SupervisorJob() + ioDispatcher)
@@ -73,7 +68,8 @@ class AttachmentDownloadManager @Inject constructor(
 
     /**
      * Keeps a download alive independently of the opening request. Re-selecting another attachment
-     * only cancels the opening waiter, not this observer.
+     * only cancels the opening waiter, not this observer. Failures are returned to the opening layer,
+     * which decides whether the request is still relevant before displaying feedback.
      */
     internal fun downloadAttachment(localUuid: String, scope: CoroutineScope): Deferred<DownloadState> {
         val job = scope.async(start = CoroutineStart.LAZY) {
@@ -113,7 +109,6 @@ class AttachmentDownloadManager @Inject constructor(
             SentryLog.e(TAG, "Attachment download failed for $localUuid", it)
             DownloadState.Failed(downloadErrorRes())
         }
-        if (state is DownloadState.Failed) snackbarManager.postValue(context.getString(state.errorRes))
         emit(state)
     }
 
