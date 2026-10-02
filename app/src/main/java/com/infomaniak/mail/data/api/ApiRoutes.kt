@@ -22,11 +22,13 @@ import com.infomaniak.core.common.utils.format
 import com.infomaniak.core.network.INFOMANIAK_API_V1
 import com.infomaniak.mail.MAIL_API
 import com.infomaniak.mail.utils.Utils
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URLEncoder
 import java.util.Date
 
 object ApiRoutes {
-
     //region API V1
     fun getCredentialsPassword(): String {
         return "$INFOMANIAK_API_V1/profile/password"
@@ -242,7 +244,7 @@ object ApiRoutes {
 
     fun rescheduleDraft(draftResource: String, scheduleDate: Date): String {
         val formatedDate = scheduleDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
-        return "${MAIL_API}${draftResource}/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
+        return "${resource(draftResource)}/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
     }
 
     fun createAttachment(mailboxUuid: String): String {
@@ -323,11 +325,29 @@ object ApiRoutes {
     }
 
     fun resource(resource: String): String {
-        return "$MAIL_API$resource"
+        require(isValidResourcePath(resource)) {
+            "Invalid resource path: $resource"
+        }
+        val url = "$MAIL_API$resource".toHttpUrlOrNull()
+        require(isValidResourceUrl(url)) {
+            "Invalid resource URL: $resource"
+        }
+        return url.toString()
+    }
+
+    private fun isValidResourcePath(path: String): Boolean {
+        return path.startsWith("/") && !path.startsWith("//") && !path.startsWith("/\\")
+    }
+
+    private fun isValidResourceUrl(url: HttpUrl?): Boolean {
+        val mailApiUrl = MAIL_API.toHttpUrl()
+        if (url == null || url.host != mailApiUrl.host) return false
+
+        return url.scheme == mailApiUrl.scheme && url.username.isEmpty() && url.password.isEmpty()
     }
 
     fun bimi(bimi: String): String {
-        return "$MAIL_API$bimi"
+        return resource(bimi)
     }
 
     fun shareLink(mailboxUuid: String, folderId: String, mailId: Int): String {
