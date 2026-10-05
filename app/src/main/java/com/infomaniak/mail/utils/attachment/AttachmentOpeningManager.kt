@@ -27,7 +27,7 @@ import com.infomaniak.core.legacy.R
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DownloadState
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DownloadResult
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -73,10 +73,10 @@ class AttachmentOpeningManager @Inject constructor(
                     }
                 }.cancellable().getOrElse {
                     SentryLog.e(TAG, "Could not check supporting applications for $localUuid", it)
-                    return@async DownloadState.Failed(R.string.anErrorHasOccurred)
+                    return@async DownloadResult.Failed(R.string.anErrorHasOccurred)
                 }
                 if (canOpen == false) {
-                    return@async DownloadState.Failed(R.string.errorNoSupportingAppFound)
+                    return@async DownloadResult.Failed(R.string.errorNoSupportingAppFound)
                 }
             }
 
@@ -100,11 +100,9 @@ class AttachmentOpeningManager @Inject constructor(
 
                 try {
                     // Cancelling this waiter does not cancel the independently scoped download.
-                    val state = request.download.await()
-                    when (state) {
-                        is DownloadState.Ready -> openAttachment(request, state, startIntent)
-                        is DownloadState.Failed -> if (finishRequest(request)) showError(state.errorRes)
-                        is DownloadState.Downloading -> Unit
+                    when (val result = request.download.await()) {
+                        is DownloadResult.Ready -> openAttachment(request, result, startIntent)
+                        is DownloadResult.Failed -> if (finishRequest(request)) showError(result.errorRes)
                     }
                 } finally {
                     finishRequest(request)
@@ -121,9 +119,9 @@ class AttachmentOpeningManager @Inject constructor(
         job.start()
     }
 
-    private suspend fun openAttachment(request: OpenRequest, state: DownloadState.Ready, startIntent: (Intent) -> Unit) {
+    private suspend fun openAttachment(request: OpenRequest, result: DownloadResult.Ready, startIntent: (Intent) -> Unit) {
         val intent = runCatching {
-            attachmentOperations.getOpenIntent(state.attachment, request.intentType)
+            attachmentOperations.getOpenIntent(result.attachment, request.intentType)
         }.cancellable().getOrElse {
             SentryLog.e(TAG, "Could not prepare attachment ${request.localUuid}", it)
             if (finishRequest(request)) showError(R.string.anErrorHasOccurred)
@@ -165,7 +163,7 @@ class AttachmentOpeningManager @Inject constructor(
     // Identity distinguishes a new click on the same attachment from an already consumed request.
     private class OpenRequest(
         val localUuid: String,
-        val download: Deferred<DownloadState>,
+        val download: Deferred<DownloadResult>,
         val intentType: AttachmentIntentType,
         val onFinished: () -> Unit,
     )

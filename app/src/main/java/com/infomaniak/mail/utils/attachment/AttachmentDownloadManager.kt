@@ -39,6 +39,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
@@ -62,7 +63,7 @@ class AttachmentDownloadManager @Inject constructor(
         createDownloadStates(localUuid)
     }
 
-    private val downloadJobs = ConcurrentHashMap<String, Deferred<DownloadState>>()
+    private val downloadJobs = ConcurrentHashMap<String, Deferred<DownloadResult>>()
     private val _downloadingUuids = MutableStateFlow(emptySet<String>())
     val downloadingUuids = _downloadingUuids.asStateFlow()
 
@@ -71,13 +72,14 @@ class AttachmentDownloadManager @Inject constructor(
      * only cancels the opening waiter, not this observer. Failures are returned to the opening layer,
      * which decides whether the request is still relevant before displaying feedback.
      */
-    internal fun downloadAttachment(localUuid: String, scope: CoroutineScope): Deferred<DownloadState> {
+    internal fun downloadAttachment(localUuid: String, scope: CoroutineScope): Deferred<DownloadResult> {
         val job = scope.async(start = CoroutineStart.LAZY) {
             downloads.flowForKey(localUuid)
                 .onEach { state ->
                     if (state is DownloadState.Downloading) _downloadingUuids.update { it + localUuid }
                 }
-                .first { it !is DownloadState.Downloading }
+                .filterIsInstance<DownloadState.Finished>()
+                .first().result
         }
         val existingJob = downloadJobs.putIfAbsent(localUuid, job)
         if (existingJob != null) {
@@ -97,27 +99,27 @@ class AttachmentDownloadManager @Inject constructor(
     }
 
     private fun createDownloadStates(localUuid: String): Flow<DownloadState> = flow {
-        val state = runCatching {
+        val result = runCatching {
             val attachment = attachmentOperations.getAttachment(localUuid)
-                ?: return@runCatching DownloadState.Failed(downloadErrorRes())
+                ?: return@runCatching DownloadResult.Failed(downloadErrorRes())
 
-            if (attachmentOperations.isCached(attachment)) return@runCatching DownloadState.Ready(attachment)
+            if (attachmentOperations.isCached(attachment)) return@runCatching DownloadResult.Ready(attachment)
 
             emit(DownloadState.Downloading)
-            withTimeoutOrNull(DOWNLOAD_TIMEOUT) { download(attachment) } ?: DownloadState.Failed(downloadErrorRes())
+            withTimeoutOrNull(DOWNLOAD_TIMEOUT) { download(attachment) } ?: DownloadResult.Failed(downloadErrorRes())
         }.cancellable().getOrElse {
             SentryLog.e(TAG, "Attachment download failed for $localUuid", it)
-            DownloadState.Failed(downloadErrorRes())
+            DownloadResult.Failed(downloadErrorRes())
         }
-        emit(state)
+        emit(DownloadState.Finished(result))
     }
 
-    private suspend fun download(attachment: Attachment): DownloadState {
+    private suspend fun download(attachment: Attachment): DownloadResult {
         var isDownloadSuccess = false
         try {
             isDownloadSuccess = attachmentOperations.download(attachment)
             currentCoroutineContext().ensureActive()
-            return if (isDownloadSuccess) DownloadState.Ready(attachment) else DownloadState.Failed(downloadErrorRes())
+            return if (isDownloadSuccess) DownloadResult.Ready(attachment) else DownloadResult.Failed(downloadErrorRes())
         } finally {
             if (!isDownloadSuccess) {
                 withContext(NonCancellable) {
@@ -132,10 +134,14 @@ class AttachmentDownloadManager @Inject constructor(
     @StringRes
     private fun downloadErrorRes() = if (networkManager.hasNetwork) R.string.anErrorHasOccurred else R.string.noConnection
 
-    internal sealed interface DownloadState {
+    private sealed interface DownloadState {
         data object Downloading : DownloadState
-        data class Ready(val attachment: Attachment) : DownloadState
-        data class Failed(@StringRes val errorRes: Int) : DownloadState
+        data class Finished(val result: DownloadResult) : DownloadState
+    }
+
+    internal sealed interface DownloadResult {
+        data class Ready(val attachment: Attachment) : DownloadResult
+        data class Failed(@StringRes val errorRes: Int) : DownloadResult
     }
 
     companion object {
