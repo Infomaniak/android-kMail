@@ -104,12 +104,11 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val scope = requireActivity().lifecycleScope
         attachment.executeIntent(
             context = requireContext(),
-            intentType = intentType,
-            openCachedAttachment = { cachedAttachment, type ->
-                attachmentOpeningManager.requestOpen(cachedAttachment.localUuid, scope, type)
+            openCachedAttachment = {
+                attachmentOpeningManager.requestOpen(attachment.localUuid, scope, intentType)
             },
-            navigateToDownloadProgressDialog = { requestedAttachment, type ->
-                navigateToDownloadProgressDialog(requestedAttachment, type, closeAttachmentActions = true)
+            navigateToDownloadProgressDialog = {
+                navigateToDownloadProgressDialog(attachment, intentType, closeAttachmentActions = true)
             },
             popBackIfNeeded = findNavController()::popBackStack,
         )

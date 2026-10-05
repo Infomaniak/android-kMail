@@ -94,16 +94,15 @@ object AttachmentExt {
 
     suspend fun Attachment.executeIntent(
         context: Context,
-        intentType: AttachmentIntentType,
-        openCachedAttachment: (Attachment, AttachmentIntentType) -> Unit,
-        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
+        openCachedAttachment: () -> Unit,
+        navigateToDownloadProgressDialog: () -> Unit,
         popBackIfNeeded: (() -> Unit)? = null,
     ) {
         if (hasUsableCache(context, getUploadLocalFile()) || isInlineCachedFile(context)) {
             popBackIfNeeded?.invoke()
-            openCachedAttachment(this, intentType)
+            openCachedAttachment()
         } else {
-            navigateToDownloadProgressDialog(this, intentType)
+            navigateToDownloadProgressDialog()
         }
     }
 

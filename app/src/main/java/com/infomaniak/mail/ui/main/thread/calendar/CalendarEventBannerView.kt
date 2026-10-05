@@ -130,13 +130,15 @@ class CalendarEventBannerView @JvmOverloads constructor(
             trackCalendarEventEvent(MatomoName.OpenInMyCalendar)
             attachmentOpeningManager.cancelPendingOpen()
             findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                val navigateToDownload = navigateToDownloadProgressDialog ?: return@launch
                 attachment.executeIntent(
                     context = context,
-                    intentType = AttachmentIntentType.OPEN_WITH,
-                    openCachedAttachment = { cachedAttachment, type ->
-                        attachmentOpeningManager.requestOpen(cachedAttachment.localUuid, this, type)
+                    openCachedAttachment = {
+                        attachmentOpeningManager.requestOpen(attachment.localUuid, this, AttachmentIntentType.OPEN_WITH)
                     },
-                    navigateToDownloadProgressDialog = navigateToDownloadProgressDialog ?: return@launch,
+                    navigateToDownloadProgressDialog = {
+                        navigateToDownload(attachment, AttachmentIntentType.OPEN_WITH)
+                    },
                 )
             }
         }
