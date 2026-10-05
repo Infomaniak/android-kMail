@@ -1,0 +1,2 @@
+- Correctifs de sécurité
+- Ajout d'un raccourci pour accéder rapidement à la carte de contact du compte principal

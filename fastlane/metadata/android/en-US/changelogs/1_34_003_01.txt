@@ -1,0 +1,2 @@
+- Security fixes
+- Add app's shortcut to quickly open the contact card of the current account
