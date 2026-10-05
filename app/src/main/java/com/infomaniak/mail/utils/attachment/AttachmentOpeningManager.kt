@@ -123,9 +123,7 @@ class AttachmentOpeningManager @Inject constructor(
 
     private suspend fun openAttachment(request: OpenRequest, state: DownloadState.Ready, startIntent: (Intent) -> Unit) {
         val intent = runCatching {
-            withContext(ioDispatcher) {
-                attachmentOperations.getOpenIntent(state.attachment, request.intentType)
-            }
+            attachmentOperations.getOpenIntent(state.attachment, request.intentType)
         }.cancellable().getOrElse {
             SentryLog.e(TAG, "Could not prepare attachment ${request.localUuid}", it)
             if (finishRequest(request)) showError(R.string.anErrorHasOccurred)
