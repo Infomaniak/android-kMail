@@ -21,7 +21,7 @@ import com.infomaniak.core.legacy.R
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
-import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DownloadState
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DownloadResult
 import com.infomaniak.mail.utils.attachment.AttachmentOperations
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -183,7 +183,7 @@ class AttachmentDownloadManagerTest {
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
+        assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
     }
 
     @Test
@@ -196,7 +196,7 @@ class AttachmentDownloadManagerTest {
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
+        assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
         verify { SentryLog.e(any(), any(), any()) }
     }
 
@@ -209,7 +209,7 @@ class AttachmentDownloadManagerTest {
         val download = manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
-        assertEquals(DownloadState.Failed(R.string.noConnection), download.await())
+        assertEquals(DownloadResult.Failed(R.string.noConnection), download.await())
     }
 
     @Test
@@ -220,7 +220,7 @@ class AttachmentDownloadManagerTest {
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
-        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
+        assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
     }
 
     @Test
@@ -230,7 +230,7 @@ class AttachmentDownloadManagerTest {
         val download = manager.downloadAttachment("uuid-1", scope)
         advanceUntilIdle()
 
-        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
+        assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
     }
 
     @Test
@@ -273,6 +273,6 @@ class AttachmentDownloadManagerTest {
         runCurrent()
         assertTrue(manager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-        assertEquals(DownloadState.Failed(R.string.anErrorHasOccurred), download.await())
+        assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
     }
 }
