@@ -133,12 +133,12 @@ class ThreadAdapter(
     private val manuallyAllowedMessagesUids = mutableSetOf<String>()
 
     private val downloadingAttachmentUuids = mutableSetOf<String>()
-    private val activeAttachmentAdapters = mutableSetOf<AttachmentAdapter>()
+    private val attachedAttachmentAdapters = mutableSetOf<AttachmentAdapter>()
 
     fun setDownloadingUuids(uuids: Set<String>) {
         downloadingAttachmentUuids.clear()
         downloadingAttachmentUuids.addAll(uuids)
-        activeAttachmentAdapters.forEach { it.setDownloadingUuids(uuids) }
+        attachedAttachmentAdapters.forEach { it.setDownloadingUuids(uuids) }
     }
 
     private lateinit var recyclerView: RecyclerView
@@ -161,6 +161,24 @@ class ThreadAdapter(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
         super.onAttachedToRecyclerView(recyclerView)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        attachedAttachmentAdapters.clear()
+        super.onDetachedFromRecyclerView(recyclerView)
+    }
+
+    override fun onViewAttachedToWindow(holder: ThreadAdapterViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (holder is MessageViewHolder) {
+            holder.attachmentAdapter.setDownloadingUuids(downloadingAttachmentUuids)
+            attachedAttachmentAdapters.add(holder.attachmentAdapter)
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: ThreadAdapterViewHolder) {
+        if (holder is MessageViewHolder) attachedAttachmentAdapters.remove(holder.attachmentAdapter)
+        super.onViewDetachedFromWindow(holder)
     }
 
     override fun onViewRecycled(holder: ThreadAdapterViewHolder) {
@@ -193,9 +211,7 @@ class ThreadAdapter(
                 onContactClicked = threadAdapterCallbacks?.onContactClicked,
                 onAttachmentClicked = threadAdapterCallbacks?.onAttachmentClicked,
                 onAttachmentOptionsClicked = threadAdapterCallbacks?.onAttachmentOptionsClicked,
-            ).also {
-                activeAttachmentAdapters.add(it.attachmentAdapter)
-            }
+            )
         } else {
             SuperCollapsedBlockViewHolder(ItemSuperCollapsedBlockBinding.inflate(layoutInflater, parent, false))
         }
