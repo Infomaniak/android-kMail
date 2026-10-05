@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils.attachment
 
 import androidx.annotation.StringRes
 import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.common.dynamicLazyMap
 import com.infomaniak.core.common.dynamicLazyMapOfSharedFlow
 import com.infomaniak.core.common.flowForKey
 import com.infomaniak.core.legacy.R
@@ -44,6 +45,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.ConcurrentHashMap
@@ -58,6 +61,9 @@ class AttachmentDownloadManager @Inject constructor(
 ) {
 
     private val downloadScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+
+    // The lock stays shared until the producer, including cancellation cleanup, has finished.
+    private val downloadLocks = downloadScope.dynamicLazyMap { _: String -> Mutex() }
 
     private val downloads = downloadScope.dynamicLazyMapOfSharedFlow { localUuid: String ->
         createDownloadStates(localUuid)
@@ -99,19 +105,23 @@ class AttachmentDownloadManager @Inject constructor(
     }
 
     private fun createDownloadStates(localUuid: String): Flow<DownloadState> = flow {
-        val result = runCatching {
-            val attachment = attachmentOperations.getAttachment(localUuid)
-                ?: return@runCatching DownloadResult.Failed(downloadErrorRes())
+        downloadLocks.useElement(localUuid) { lock ->
+            lock.withLock {
+                val result = runCatching {
+                    val attachment = attachmentOperations.getAttachment(localUuid)
+                        ?: return@runCatching DownloadResult.Failed(downloadErrorRes())
 
-            if (attachmentOperations.isCached(attachment)) return@runCatching DownloadResult.Ready(attachment)
+                    if (attachmentOperations.isCached(attachment)) return@runCatching DownloadResult.Ready(attachment)
 
-            emit(DownloadState.Downloading)
-            withTimeoutOrNull(DOWNLOAD_TIMEOUT) { download(attachment) } ?: DownloadResult.Failed(downloadErrorRes())
-        }.cancellable().getOrElse {
-            SentryLog.e(TAG, "Attachment download failed for $localUuid", it)
-            DownloadResult.Failed(downloadErrorRes())
+                    emit(DownloadState.Downloading)
+                    withTimeoutOrNull(DOWNLOAD_TIMEOUT) { download(attachment) } ?: DownloadResult.Failed(downloadErrorRes())
+                }.cancellable().getOrElse {
+                    SentryLog.e(TAG, "Attachment download failed for $localUuid", it)
+                    DownloadResult.Failed(downloadErrorRes())
+                }
+                emit(DownloadState.Finished(result))
+            }
         }
-        emit(DownloadState.Finished(result))
     }
 
     private suspend fun download(attachment: Attachment): DownloadResult {
