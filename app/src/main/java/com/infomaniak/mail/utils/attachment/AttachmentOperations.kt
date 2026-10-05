@@ -69,8 +69,7 @@ class DefaultAttachmentOperations @Inject constructor(
     }
 
     override suspend fun download(attachment: Attachment): Boolean {
-        val localAttachment = attachmentController.getAttachment(attachment.localUuid)
-        return LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(context, localAttachment)
+        return LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(context, attachment)
     }
 
     override suspend fun deleteIncompleteCache(attachment: Attachment) {
