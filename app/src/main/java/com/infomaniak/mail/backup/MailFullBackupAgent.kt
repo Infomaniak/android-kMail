@@ -31,7 +31,7 @@ class MailFullBackupAgent : FullBackupAgent(RestorationPolicy.AllBackedUpFiles) 
         MainApplication.configureSentry()
     }
 
-    override fun onFullBackup(data: FullBackupDataOutput) = withBlockStoreCredentialsBackup {
+    override fun onFullBackup(data: FullBackupDataOutput) = withBlockStoreCredentialsBackup(data) {
         if (data.isDeviceToDeviceTransfer) {
             realmFiles(excludedDatabases = listOf("AppSettings")).forEach { fullBackupFile(it, data) }
         }
