@@ -108,7 +108,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
+import java.util.Collections
 import java.util.Date
+import java.util.WeakHashMap
 import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
@@ -133,7 +135,8 @@ class ThreadAdapter(
     private val manuallyAllowedMessagesUids = mutableSetOf<String>()
 
     private val downloadingAttachmentUuids = mutableSetOf<String>()
-    private val attachedAttachmentAdapters = mutableSetOf<AttachmentAdapter>()
+    private val attachedAttachmentAdapters =
+        Collections.newSetFromMap(WeakHashMap<AttachmentAdapter, Boolean>())
 
     fun setDownloadingUuids(uuids: Set<String>) {
         downloadingAttachmentUuids.clear()
