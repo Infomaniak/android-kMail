@@ -140,6 +140,15 @@ class Message : RealmObject, Snoozable {
         @InternalModelProperties
         set
     var mentions = realmListOf<String>()
+    @SerialName("reminder")
+    var reminder: ReminderMessageInfo? = null
+    @SerialName("reminder_action")
+    var reminderAction: String? = null
+    // isReminder and displayReminder are provided by the backend only for messages that are hidden in the UI
+    @SerialName("is_reminder")
+    var isReminder: Boolean = false
+    @SerialName("display_reminder")
+    var displayReminder: Boolean = true
     //endregion
 
     //region Local data (Transient)
@@ -172,6 +181,8 @@ class Message : RealmObject, Snoozable {
     var hasAttachable: Boolean = false
     @Transient
     var emojiReactions: RealmList<EmojiReactionState> = realmListOf()
+    @Transient
+    var shouldRefreshReminder: Boolean = false
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -204,6 +215,8 @@ class Message : RealmObject, Snoozable {
     val isValidReactionTarget get() = _emojiReactionNotAllowedReason == null
 
     val isReaction get() = emojiReaction != null
+
+    val isHiddenReminder get() = isReminder && !displayReminder
 
     val threads by backlinks(Thread::messages)
 
@@ -238,6 +251,7 @@ class Message : RealmObject, Snoozable {
         this.latestCalendarEventResponse = localValues.latestCalendarEventResponse
         this.swissTransferFiles.replaceContent(localValues.swissTransferFiles)
         this.emojiReactions = localValues.emojiReactions
+        this.shouldRefreshReminder = localValues.shouldRefreshReminder
 
         this.shortUid = uid.toShortUid()
         this.hasAttachable = hasAttachments || swissTransferUuid != null
@@ -253,6 +267,7 @@ class Message : RealmObject, Snoozable {
         latestCalendarEventResponse = latestCalendarEventResponse,
         swissTransferFiles = swissTransferFiles,
         emojiReactions = emojiReactions,
+        shouldRefreshReminder = shouldRefreshReminder,
     )
 
     private fun keepHeavyData(message: Message) {
@@ -301,6 +316,14 @@ class Message : RealmObject, Snoozable {
 
     fun isOrphan(): Boolean = threads.isEmpty() && threadsDuplicatedIn.isEmpty()
 
+    fun extractFromNames(): List<String> {
+        return from.map { it.name.ifBlank { it.email } }
+    }
+
+    fun extractRecipientNames(): List<String> {
+        return allRecipients.map { it.name.ifBlank { it.email } }
+    }
+
     // Be careful when using this method because some folders might contain messages from other folders than itself. This
     // operation should only happen in very specific situations like computing the shortUid of a Message from its uid.
     private fun String.toShortUid(): Int = substringBefore('@').toInt()
@@ -319,6 +342,7 @@ class Message : RealmObject, Snoozable {
         val latestCalendarEventResponse: CalendarEventResponse? = null,
         val swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
         val emojiReactions: RealmList<EmojiReactionState> = realmListOf(),
+        val shouldRefreshReminder: Boolean = false,
     )
 
     companion object {

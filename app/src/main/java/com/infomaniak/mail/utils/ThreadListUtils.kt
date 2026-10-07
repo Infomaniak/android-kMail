@@ -55,4 +55,8 @@ object ThreadListUtils {
             !message.isSeen && message.mentions.any { mention -> mention.lowercase() in normalizedAliases }
         }
     }
+
+    fun hasReminders(messages: List<Message>): Boolean = messages.any { message ->
+        (message.reminder != null || message.shouldRefreshReminder) && !message.isHiddenReminder
+    }
 }

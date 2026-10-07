@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesId
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.computeReactionsPerMessageId
 import com.infomaniak.mail.data.models.thread.overrideWith
+import com.infomaniak.mail.utils.ThreadListUtils.hasReminders
 import com.infomaniak.mail.utils.ThreadListUtils.hasUnseenMentions
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -42,7 +43,9 @@ object ThreadRecomputations {
         // avoid side effects and unnecessary coupling
         val allMessages = messages
 
-        val lastCurrentFolderMessage = allMessages.lastOrNull { it.folderId == folderId }
+        val lastCurrentFolderMessage = allMessages.lastOrNull {
+            it.folderId == folderId && !(it.isHiddenReminder && it.isScheduledDraft)
+        }
         val lastMessage = if (isFromSearch) {
             // In the search, some threads (such as threads from the snooze folder) won't have any messages with the same folderId
             // as the thread folderId. This is an expected behavior and we don't want to delete it in this case. We just need to
@@ -82,6 +85,7 @@ object ThreadRecomputations {
         isForwarded = false
         hasAttachable = false
         hasUnseenMentions = false
+        hasReminders = false
         numberOfScheduledDrafts = 0
         snoozeState = null
         snoozeEndDate = null
@@ -100,6 +104,7 @@ object ThreadRecomputations {
         }
 
         hasUnseenMentions = hasUnseenMentions(aliases?.toList() ?: emptyList(), allMessages)
+        hasReminders = hasReminders(allMessages)
 
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
@@ -124,7 +129,7 @@ object ThreadRecomputations {
             isAnswered = false
         }
         if (message.hasAttachable) hasAttachable = true
-        if (message.isScheduledDraft) numberOfScheduledDrafts++
+        if (message.isScheduledDraft && !message.isHiddenReminder) numberOfScheduledDrafts++
         updateSnoozeStatesBasedOn(message)
     }
 
@@ -176,7 +181,9 @@ object ThreadRecomputations {
 
             val targetMessageIds = message.inReplyTo ?: ""
             val isHiddenEmojiReaction = message.isReaction && isTargetMessageInThread(targetMessageIds, threadMessageIds)
-            if (isHiddenEmojiReaction.not()) messagesWithContent += message
+            val isHiddenReminder = message.isHiddenReminder
+                    && (isTargetMessageInThread(targetMessageIds, threadMessageIds) || message.isScheduledDraft)
+            if (isHiddenEmojiReaction.not() && isHiddenReminder.not()) messagesWithContent += message
         }
     }
 
