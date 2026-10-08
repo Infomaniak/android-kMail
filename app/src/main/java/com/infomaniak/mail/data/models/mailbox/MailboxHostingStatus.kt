@@ -23,8 +23,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MailboxHostingStatus(
     val email: String = "",
-    @SerialName("mailbox_id")
-    val mailboxId: Int? = null,
     @SerialName("is_infomaniak_hosted")
     val isInfomaniakHosted: Boolean = false,
 )
