@@ -127,6 +127,8 @@ import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBott
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.ui.newMessage.AiPropositionFragmentArgs
 import com.infomaniak.mail.ui.newMessage.AiViewModel
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
+import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -135,7 +137,6 @@ import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
@@ -214,6 +215,12 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     lateinit var snackbarManager: SnackbarManager
 
     @Inject
+    lateinit var attachmentDownloadManager: AttachmentDownloadManager
+
+    @Inject
+    lateinit var attachmentOpeningManager: AttachmentOpeningManager
+
+    @Inject
     lateinit var subjectFormatter: SubjectFormatter
 
     private var _binding: FragmentThreadBinding? = null
@@ -245,6 +252,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
         setupUi()
         setupAdapter()
+        observeAttachmentOpening()
         setupDialogs()
         permissionUtils.registerDownloadManagerPermission(fragment = this)
 
@@ -411,8 +419,8 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
                 onSuperCollapsedBlockClicked = ::expandSuperCollapsedBlock,
                 navigateToAttendeeBottomSheet = ::navigateToAttendees,
                 navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
-                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                    navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
+                navigateToDownloadProgressDialog = { attachment, intentType ->
+                    navigateToDownloadProgressDialog(attachment, intentType, ThreadFragment::class.java.name)
                 },
                 onUnsubscribeClicked = threadViewModel::unsubscribeMessage,
                 onAcknowledgeClicked = threadViewModel::acknowledgeMessage,
@@ -554,18 +562,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
 
     private fun openAttachment(attachable: Attachment) {
         trackAttachmentActionsEvent(MatomoName.Open)
-        lifecycleScope.launch {
-            attachable.openAttachment(
-                context = requireContext(),
-                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                    navigateToDownloadProgressDialog(
-                        attachment = attachment,
-                        attachmentIntentType = attachmentIntentType,
-                        currentClassName = ThreadFragment::class.java.name,
-                    )
-                },
-                snackbarManager = snackbarManager,
-            )
+        attachmentOpeningManager.requestOpen(attachable.localUuid, viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeAttachmentOpening() {
+        attachmentOpeningManager.observeOpening(viewLifecycleOwner.lifecycleScope, ::startActivity)
+        viewLifecycleOwner.lifecycleScope.launch {
+            attachmentDownloadManager.downloadingUuids.collect { threadAdapter.setDownloadingUuids(it) }
         }
     }
 
