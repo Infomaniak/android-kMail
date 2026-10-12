@@ -811,6 +811,14 @@ class MainViewModel @Inject constructor(
 
     suspend fun getMessage(messageUid: String): Message? = messageController.getMessage(messageUid)
 
+    suspend fun isLastMessageOfThread(message: Message, threadUid: String): Boolean {
+        val thread = threadController.getThread(threadUid) ?: return false
+        val currentIndex = thread.messages.indexOfFirst { it.uid == message.uid }
+        if (currentIndex == -1) return false
+        val messagesAfter = thread.messages.drop(currentIndex + 1)
+        return messagesAfter.isEmpty() || messagesAfter.all { it.isDraft || it.isHiddenReminder }
+    }
+
     fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
         val folder = folderController.getFolder(FolderRole.DRAFT)
 

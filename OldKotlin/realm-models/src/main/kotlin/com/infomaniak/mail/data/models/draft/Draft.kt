@@ -118,6 +118,9 @@ class Draft : RealmObject {
             delay = null
             field = value
         }
+
+    @SerialName("reminder")
+    var reminder: ReminderDraftInfo? = null
     //endregion
 
     //region Local data (Transient)
@@ -143,6 +146,7 @@ class Draft : RealmObject {
         REPLY_ALL,
         FORWARD,
         NEW_MAIL,
+        FOLLOW_UP,
     }
 
     companion object {

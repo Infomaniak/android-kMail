@@ -26,8 +26,11 @@ import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.ui.view.extension.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSettingRadioButtonBinding
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.Companion.NOT_SET
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.Companion.getDimenOrNull
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import androidx.appcompat.R as RAndroid
 
@@ -58,10 +61,13 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
 
-                root.setOnClickListener {
-                    (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) ?: onClickListener?.onClick(root)
-                }
+                val horizontalPadding = getDimenOrNull(R.styleable.SettingRadioButtonView_horizontalPadding)
+                root.setPaddingRelative(start = horizontalPadding)
             }
+        }
+
+        binding.root.setOnClickListener {
+            (parent as? OnCheckListener)?.onChecked(id) ?: onClickListener?.onClick(binding.root)
         }
     }
 
@@ -78,6 +84,11 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     fun setText(newText: String) {
         binding.text.text = newText
+    }
+
+    fun setDescription(newDescription: String) {
+        binding.description.isVisible = newDescription.isNotBlank()
+        if (newDescription.isNotBlank()) binding.description.text = newDescription
     }
 
     fun setCheckMarkColor(@ColorInt color: Int) {
