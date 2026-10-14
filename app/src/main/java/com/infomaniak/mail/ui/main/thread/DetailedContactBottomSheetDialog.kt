@@ -63,6 +63,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         val bimi = navigationArgs.bimi
         containerInfoCertified.isVisible = bimi?.isCertified == true
         contactDetails.setCorrespondent(navigationArgs.recipient, bimi)
+        addToContacts.isVisible = mainViewModel.shouldShowAddToContacts(navigationArgs.recipient)
 
         setupListeners()
 

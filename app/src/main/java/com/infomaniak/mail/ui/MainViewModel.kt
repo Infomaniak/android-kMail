@@ -307,6 +307,11 @@ class MainViewModel @Inject constructor(
 
     //region Merged Contacts
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
+
+    fun shouldShowAddToContacts(recipient: Recipient): Boolean {
+        val remoteContactId = mergedContactController.getMergedContactFromEmail(recipient.email)?.remoteContactId
+        return remoteContactId.isNullOrBlank()
+    }
     //endregion
 
     //region Share Thread URL
