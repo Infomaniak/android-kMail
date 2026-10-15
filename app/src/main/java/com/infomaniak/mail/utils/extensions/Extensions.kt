@@ -631,11 +631,21 @@ fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
  * @return error string, otherwise null
  */
 private val invalidCharactersRegex by lazy { Regex("[/'\"]") }
-fun Context.getFolderCreationError(folderName: CharSequence, folderController: FolderController): String? {
+fun Context.getFolderCreationError(
+    folderName: CharSequence,
+    folderController: FolderController,
+    parentFolderId: String? = null,
+): String? {
+    val folderAlreadyExists = if (parentFolderId == null) {
+        folderController.getRootFolderBlocking(folderName.toString()) != null
+    } else {
+        folderController.getChildFolderBlocking(parentFolderId, folderName.toString()) != null
+    }
+
     return when {
         folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
         folderName.contains(invalidCharactersRegex) -> getString(R.string.errorNewFolderInvalidCharacter)
-        folderController.getRootFolderBlocking(folderName.toString()) != null -> getString(R.string.errorNewFolderAlreadyExists)
+        folderAlreadyExists -> getString(R.string.errorNewFolderAlreadyExists)
         else -> null
     }
 }
