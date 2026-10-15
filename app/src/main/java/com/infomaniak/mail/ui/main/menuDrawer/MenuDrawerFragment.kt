@@ -214,6 +214,11 @@ class MenuDrawerFragment : Fragment() {
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.addSubfolder -> {
+                    trackCreateFolderEvent(MatomoName.FromFolder)
+                    createFolderDialog.show(parentFolderId = folderId)
+                    true
+                }
                 R.id.modifySettingsFolder -> {
                     trackManageFolderEvent(MatomoName.Rename)
                     modifyNameFolderDialog.setFolderIdAndShow(folderName, folderId)
