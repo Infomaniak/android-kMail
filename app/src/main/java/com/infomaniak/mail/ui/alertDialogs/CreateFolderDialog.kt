@@ -37,19 +37,27 @@ class CreateFolderDialog @Inject constructor(
     private val folderController: FolderController,
 ) : InputAlertDialog(activityContext, ioDispatcher) {
 
-    fun show(@StringRes confirmButtonText: Int = R.string.buttonCreate) = show(
-        title = R.string.newFolderDialogTitle,
-        hint = R.string.newFolderDialogHint,
-        confirmButtonText = confirmButtonText,
-    )
+    private var parentFolderId: String? = null
 
-    fun setCallbacks(onPositiveButtonClicked: (String) -> Unit) = setCallbacks(
+    fun show(
+        @StringRes confirmButtonText: Int = R.string.buttonCreate,
+        parentFolderId: String? = null,
+    ) {
+        this.parentFolderId = parentFolderId
+        show(
+            title = R.string.newFolderDialogTitle,
+            hint = R.string.newFolderDialogHint,
+            confirmButtonText = confirmButtonText,
+        )
+    }
+
+    fun setCallbacks(onPositiveButtonClicked: (String, String?) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
             trackCreateFolderEvent(MatomoName.Confirm)
-            onPositiveButtonClicked(folderName)
+            onPositiveButtonClicked(folderName, parentFolderId)
         },
         onErrorCheck = { folderName ->
-            activityContext.getFolderCreationError(folderName, folderController)
+            activityContext.getFolderCreationError(folderName, folderController, parentFolderId)
         },
     )
 }

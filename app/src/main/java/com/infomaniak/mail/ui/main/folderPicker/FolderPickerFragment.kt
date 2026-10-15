@@ -133,7 +133,7 @@ class FolderPickerFragment : Fragment() {
 
     private fun setupCreateFolderDialog() = with(navigationArgs) {
         createFolderDialog.setCallbacks(
-            onPositiveButtonClicked = { folderName ->
+            onPositiveButtonClicked = { folderName, _ ->
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messagesUids?.toList())
             },
         )
