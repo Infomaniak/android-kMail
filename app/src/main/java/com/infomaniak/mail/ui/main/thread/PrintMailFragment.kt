@@ -73,6 +73,7 @@ class PrintMailFragment : Fragment() {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = true,
             isForPrinting = true,
+            isExternalMailGatewayEnabled = { mainViewModel.currentMailbox.value?.useExternalMailGateway ?: false },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
