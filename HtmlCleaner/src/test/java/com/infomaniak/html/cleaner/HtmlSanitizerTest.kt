@@ -78,6 +78,21 @@ class HtmlSanitizerTest {
         assertEquals(cleaned.html(), resanitized.html())
     }
 
+    /**
+     * Intermediate re-serialization must not alter content: pretty-printing inserts whitespace that becomes real
+     * text on re-parse.
+     */
+    @Test
+    fun `whitespace is preserved through sanitization`() {
+        val html = "<div style=\"white-space: pre-wrap\">A  B\nC<span>D</span></div>"
+
+        val cleaned = sanitize(html)
+        val div = cleaned.body().selectFirst("div")!!
+
+        assertEquals("A  B\nC", div.textNodes().first().wholeText)
+        assertEquals("D", div.selectFirst("span")!!.text())
+    }
+
     @Test
     fun `legitimate email content is preserved`() {
         val cleaned = sanitize(

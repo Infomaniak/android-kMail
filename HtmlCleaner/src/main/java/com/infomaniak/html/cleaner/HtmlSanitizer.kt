@@ -36,8 +36,11 @@ class HtmlSanitizer {
         // parsers can disagree (e.g. mutation XSS through RCDATA elements or foreign content). Re-parse the output
         // and sanitize again until the result is stable, so anything that only becomes dangerous on re-parse gets
         // removed. A well-formed document converges after a single extra pass.
+        //
+        // Serialize compactly: pretty-printing inserts formatting whitespace that would become real text on
+        // re-parse, altering the content (e.g. inside `white-space: pre-wrap` elements).
         repeat(MAX_SANITIZATION_PASSES) {
-            val html = cleanedDocument.html()
+            val html = cleanedDocument.serializeCompactly()
             if (html == previousHtml) return cleanedDocument
 
             previousHtml = html
@@ -46,6 +49,9 @@ class HtmlSanitizer {
 
         return cleanedDocument
     }
+
+    private fun Document.serializeCompactly(): String =
+        outputSettings(Document.OutputSettings().prettyPrint(false)).html()
 
     private fun clean(dirtyDocument: Document): Document {
         val cleanedDocument = bodyCleaner.clean(dirtyDocument)
