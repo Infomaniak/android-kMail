@@ -21,6 +21,7 @@
  */
 package com.infomaniak.html.cleaner
 
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 class HtmlSanitizer {
@@ -28,12 +29,39 @@ class HtmlSanitizer {
     private val bodyCleaner = BodyCleaner()
 
     fun sanitize(dirtyDocument: Document): Document {
+        var cleanedDocument = clean(dirtyDocument)
+        var previousHtml: String? = null
+
+        // A sanitized document can re-parse into HTML that the allow-list would have rejected: serializers and
+        // parsers can disagree (e.g. mutation XSS through RCDATA elements or foreign content). Re-parse the output
+        // and sanitize again until the result is stable, so anything that only becomes dangerous on re-parse gets
+        // removed. A well-formed document converges after a single extra pass.
+        //
+        // Serialize compactly: pretty-printing inserts formatting whitespace that would become real text on
+        // re-parse, altering the content (e.g. inside `white-space: pre-wrap` elements).
+        repeat(MAX_SANITIZATION_PASSES) {
+            val html = cleanedDocument.serializeCompactly()
+            if (html == previousHtml) return cleanedDocument
+
+            previousHtml = html
+            cleanedDocument = clean(Jsoup.parse(html))
+        }
+
+        return cleanedDocument
+    }
+
+    private fun Document.serializeCompactly(): String =
+        outputSettings(Document.OutputSettings().prettyPrint(false)).html()
+
+    private fun clean(dirtyDocument: Document): Document {
         val cleanedDocument = bodyCleaner.clean(dirtyDocument)
         headCleaner.clean(dirtyDocument, cleanedDocument)
         return cleanedDocument
     }
 
     companion object {
+        private const val MAX_SANITIZATION_PASSES = 3
+
         @Volatile
         private var INSTANCE: HtmlSanitizer? = null
 

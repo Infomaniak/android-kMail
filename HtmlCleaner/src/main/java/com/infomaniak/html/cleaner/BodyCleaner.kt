@@ -44,7 +44,6 @@ internal class BodyCleaner {
                 "map",
                 "samp",
                 "style",
-                "title",
                 "tt",
                 "var",
                 "wbr",

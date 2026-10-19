@@ -48,19 +48,23 @@ class MessageDisplayWebViewClient(
 ) {
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         request.url?.let { uri ->
+            val scheme = uri.scheme?.lowercase()
 
-            if (uri.scheme == "mailto") {
+            if (scheme == "mailto") {
                 navigateToNewMessageActivity?.invoke(uri)
                 return true
             }
 
-            runCatching {
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-            }.onFailure {
-                context.showToast(R.string.startActivityCantHandleAction)
+            if (scheme in ALLOWED_NAVIGATION_SCHEMES) {
+                runCatching {
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                }.onFailure {
+                    context.showToast(R.string.startActivityCantHandleAction)
+                }
             }
+            // Ignore any other scheme: remote content must never be able to fire arbitrary intents (e.g. "intent:")
         }
         return true
     }
@@ -90,5 +94,11 @@ class MessageDisplayWebViewClient(
             webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, $escapedMessageUid)")
             onPageFinished?.invoke()
         }
+    }
+
+    private companion object {
+        // Mirrors the protocols allowed on `a[href]` by the HTML sanitizer. Anything else (e.g. "intent:") must not
+        // be launched from remote content.
+        val ALLOWED_NAVIGATION_SCHEMES = setOf("http", "https", "tel", "geo")
     }
 }
