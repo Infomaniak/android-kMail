@@ -38,4 +38,5 @@ kotlin {
 dependencies {
     api(libs.jsoup)
     implementation(libs.jspecify)
+    testImplementation(core.junit)
 }
