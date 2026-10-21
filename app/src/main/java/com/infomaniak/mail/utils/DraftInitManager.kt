@@ -66,15 +66,13 @@ class DraftInitManager @Inject constructor(
             }
             DraftMode.FORWARD -> {
                 forwardedUid = previousMessage.uid
+                addAttachmentToForward(previousMessage)
+            }
+            DraftMode.FOLLOW_UP -> {
+                to = previousMessage.to.toRealmList()
+                cc = previousMessage.cc.toRealmList()
 
-                val mailboxUuid = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
-                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
-                    attachments += attachment.apply {
-                        resource = previousMessage.attachments.find { it.name == name }?.resource
-                        setUploadStatus(AttachmentUploadStatus.UPLOADED)
-                    }
-                    SentryDebug.addDraftBreadcrumbs(this, step = "set previousMessage when reply/replyAll/Forward")
-                }
+                addAttachmentToForward(previousMessage)
             }
             DraftMode.NEW_MAIL -> Unit
         }
@@ -86,7 +84,7 @@ class DraftInitManager @Inject constructor(
     fun createQuote(draftMode: DraftMode, previousMessage: Message, attachments: List<Attachment>): String? {
         return when (draftMode) {
             DraftMode.REPLY, DraftMode.REPLY_ALL -> replyForwardFooterManager.createReplyFooter(previousMessage)
-            DraftMode.FORWARD -> replyForwardFooterManager.createForwardFooter(previousMessage, attachments)
+            DraftMode.FORWARD, DraftMode.FOLLOW_UP -> replyForwardFooterManager.createForwardFooter(previousMessage, attachments)
             DraftMode.NEW_MAIL -> null
         }
     }
@@ -194,10 +192,26 @@ class DraftInitManager @Inject constructor(
         val prefix = when (draftMode) {
             DraftMode.REPLY, DraftMode.REPLY_ALL -> if (subject.isReply()) "" else PREFIX_REPLY
             DraftMode.FORWARD -> if (subject.isForward()) "" else PREFIX_FORWARD
+            DraftMode.FOLLOW_UP -> ""
             DraftMode.NEW_MAIL -> error("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
         }
 
         return prefix + subject
+    }
+
+    private suspend fun Draft.addAttachmentToForward(previousMessage: Message) {
+        val mailboxUuid = mailboxController.getMailbox(
+            userId = AccountUtils.currentUserId,
+            mailboxId = AccountUtils.currentMailboxId
+        )?.uuid ?: return
+
+        ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
+            attachments += attachment.apply {
+                resource = previousMessage.attachments.find { it.name == name }?.resource
+                setUploadStatus(AttachmentUploadStatus.UPLOADED)
+            }
+            SentryDebug.addDraftBreadcrumbs(this, step = "set previousMessage when reply/replyAll/Forward")
+        }
     }
 
     private enum class SignatureScore(private val weight: Int) {
