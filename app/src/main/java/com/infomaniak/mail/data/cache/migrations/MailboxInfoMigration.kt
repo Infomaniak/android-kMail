@@ -34,6 +34,7 @@ fun mailboxInfoMigration() = AutomaticSchemaMigration { migrationContext ->
     migrationContext.migrateQuotasSizeField()
     migrationContext.computeHaveSignaturesBeenFetchedAfterFifteenthMigration()
     migrationContext.copyEmailToEmailIdnAfterSixteenthMigration()
+    migrationContext.keepDefaultValuesAfterTwentiethMigration()
 }
 
 //region Use default property values when adding a new column in a migration
@@ -156,6 +157,15 @@ private fun MigrationContext.copyEmailToEmailIdnAfterSixteenthMigration() {
                 val email = oldObject.getValue<String>("email")
                 set(propertyName = "emailIdn", value = email)
             }
+        }
+    }
+}
+
+// Migrate from version #19
+private fun MigrationContext.keepDefaultValuesAfterTwentiethMigration() {
+    if (oldRealm.schemaVersion() <= 19L) {
+        enumerate(className = "Mailbox") { _, newObject: DynamicMutableRealmObject? ->
+            newObject?.set(propertyName = "useExternalMailGateway", value = false)
         }
     }
 }
