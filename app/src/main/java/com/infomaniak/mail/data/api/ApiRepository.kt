@@ -86,8 +86,8 @@ import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.toSafeFileName
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
+import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -536,9 +536,8 @@ object ApiRepository : ApiRepositoryCore() {
 
     suspend fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> = runCatching {
 
-        val formBuilder = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("name", "Infomaniak Sync - ${Date().format(FORMAT_FULL_DATE_WITH_HOUR)}")
+        val formBuilder = FormBody.Builder()
+            .add("name", "Infomaniak Sync - ${Date().format(FORMAT_FULL_DATE_WITH_HOUR)}")
 
         @OptIn(ManualAuthorizationRequired::class)
         val request = Request.Builder()
