@@ -26,7 +26,7 @@ import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.InternalModelProperties
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.utils.AttachableMimeTypeUtils
+import com.infomaniak.mail.utils.attachment.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.SentryDebug
 
 val Attachment.isCalendarEvent: Boolean get() = AttachableMimeTypeUtils.calendarMatches.contains(mimeType)

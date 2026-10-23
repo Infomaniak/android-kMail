@@ -23,15 +23,36 @@
     tools:orientation="horizontal"
     tools:parentTag="android.widget.LinearLayout">
 
-    <ImageView
-        android:id="@+id/icon"
+    <FrameLayout
+        android:id="@+id/iconLayout"
         android:layout_width="@dimen/standardIconSize"
         android:layout_height="@dimen/standardIconSize"
         android:layout_gravity="center_vertical"
         android:layout_marginVertical="@dimen/marginStandardVerySmall"
-        android:importantForAccessibility="no"
-        tools:layout_marginHorizontal="@dimen/marginStandardSmall"
-        tools:src="@drawable/ic_file_pdf" />
+        tools:layout_marginHorizontal="@dimen/marginStandardSmall">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            tools:src="@drawable/ic_file_pdf" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/contentDescriptionDownloadIndicator"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/primary"
+            app:indicatorInset="0dp"
+            app:indicatorSize="@dimen/standardIconSize"
+            app:trackColor="@color/divider"
+            app:trackThickness="2dp"
+            tools:visibility="visible" />
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/textsLayout"
