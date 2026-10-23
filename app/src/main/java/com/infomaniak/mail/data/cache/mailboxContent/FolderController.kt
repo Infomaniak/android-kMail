@@ -74,6 +74,10 @@ class FolderController @Inject constructor(
         query<Folder>("$isRootFolder AND ${Folder::name.name} == $0", name).first().find()
     }
 
+    fun getChildFolderBlocking(parentFolderId: String, name: String): Folder? {
+        return getFolderBlocking(parentFolderId, mailboxContentRealm())?.children?.firstOrNull { it.name == name }
+    }
+
     fun getFolderAsync(id: String): Flow<Folder> {
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).asFlow().mapNotNull { it.obj }
     }

@@ -36,6 +36,7 @@
     <string name="actionPhishing">Signaler comme hameçonnage</string>
     <string name="actionPrint">Imprimer</string>
     <string name="actionRename">Renommer</string>
+    <string name="actionAddSubfolder">Ajouter un sous-dossier</string>
     <string name="actionReply">Répondre</string>
     <string name="actionReplyAll">Répondre à tous</string>
     <string name="actionReportDisplayProblem">Signaler un problème d’affichage</string>

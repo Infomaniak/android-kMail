@@ -40,6 +40,7 @@
     <string name="actionPhishing">Report phishing</string>
     <string name="actionPrint">Print</string>
     <string name="actionRename">Rename</string>
+    <string name="actionAddSubfolder">Add subfolder</string>
     <string name="actionReply">Reply</string>
     <string name="actionReplyAll">Reply all</string>
     <string name="actionReportDisplayProblem">Report a display problem</string>

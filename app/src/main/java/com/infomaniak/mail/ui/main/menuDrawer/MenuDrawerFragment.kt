@@ -136,7 +136,9 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun setupManageFolderDialog() {
-        createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
+        createFolderDialog.setCallbacks { folderName, parentFolderId ->
+            mainViewModel.createNewFolder(folderName, parentFolderId)
+        }
         modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
     }
 
@@ -214,6 +216,11 @@ class MenuDrawerFragment : Fragment() {
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.addSubfolder -> {
+                    trackCreateFolderEvent(MatomoName.FromFolder)
+                    createFolderDialog.show(parentFolderId = folderId)
+                    true
+                }
                 R.id.modifySettingsFolder -> {
                     trackManageFolderEvent(MatomoName.Rename)
                     modifyNameFolderDialog.setFolderIdAndShow(folderName, folderId)
