@@ -85,8 +85,9 @@ class HtmlFormatter(private val html: String) {
     }
 
     private fun Element.injectCss() {
-        cssList.forEach { (css, styleId) ->
-            appendElement("style")
+        // Prepend so the mail's own styles come after ours and can override them. Reversed to keep our styles' order.
+        cssList.asReversed().forEach { (css, styleId) ->
+            prependElement("style")
                 .attr("type", "text/css")
                 .appendText(css)
                 .also { element -> styleId?.let(element::id) }
