@@ -63,8 +63,6 @@
         <item quantity="one">%d email is invalid</item>
         <item quantity="other">%d emails are invalid</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
-    <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
     <string name="addUnknownRecipientTitle">Add a recipient</string>
     <string name="addressBookTitle">Address Book: %s</string>
     <string name="aiButtonInsert">Insert</string>

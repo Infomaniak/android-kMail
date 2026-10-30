@@ -59,8 +59,6 @@
         <item quantity="one">%d email is ongeldig</item>
         <item quantity="other">%d emails zijn ongeldig</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">Het e-mailadres wordt al gebruikt</string>
-    <string name="addUnknownRecipientInvalidEmail">Het e-mailadres is ongeldig</string>
     <string name="addUnknownRecipientTitle">Een ontvanger toevoegen</string>
     <string name="addressBookTitle">Adresboek: %s</string>
     <string name="aiButtonInsert">Invoegen</string>

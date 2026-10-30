@@ -59,8 +59,6 @@
         <item quantity="one">%d email είναι μη έγκυρο</item>
         <item quantity="other">%d emails είναι μη έγκυρα</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">Το e-mail χρησιμοποιείται ήδη</string>
-    <string name="addUnknownRecipientInvalidEmail">Το e-mail δεν είναι έγκυρο</string>
     <string name="addUnknownRecipientTitle">Προσθήκη παραλήπτη</string>
     <string name="addressBookTitle">Ευρετήριο διευθύνσεων: %s</string>
     <string name="aiButtonInsert">Εισαγωγή</string>
