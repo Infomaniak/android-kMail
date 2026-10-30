@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2022-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.UnknownConta
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.extensions.standardize
 import com.infomaniak.mail.utils.extensions.toSearchableForm
+import com.infomaniak.core.common.R as RCore
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
@@ -156,7 +157,7 @@ class ContactAdapter(
         root.setOnClickListener {
             trackNewMessageEvent(MatomoName.AddNewRecipient)
             if (usedEmails.contains(searchQuery)) {
-                snackbarManager.setValue(context.getString(R.string.addUnknownRecipientAlreadyUsed))
+                snackbarManager.setValue(context.getString(RCore.string.emailAlreadyUsed))
             } else {
                 onAddUnrecognizedContact()
             }

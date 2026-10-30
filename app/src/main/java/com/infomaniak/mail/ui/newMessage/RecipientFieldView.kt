@@ -60,7 +60,8 @@ import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.min
-import com.infomaniak.core.legacy.R as RCore
+import com.infomaniak.core.common.R as RCore
+import com.infomaniak.core.legacy.R as RCoreLegacy
 
 @AndroidEntryPoint
 class RecipientFieldView @JvmOverloads constructor(
@@ -404,7 +405,7 @@ class RecipientFieldView @JvmOverloads constructor(
         val recipient = Recipient.createValidRecipientOrNull(email = email, name = name)
 
         if (recipient == null) {
-            snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
+            snackbarManager.setValue(context.getString(RCore.string.emailInvalid))
             return
         }
 
@@ -711,8 +712,9 @@ class RecipientFieldView @JvmOverloads constructor(
             chipIcon = icon?.let { ResourcesCompat.getDrawable(resources, it, null) }
             chipIconTint = iconTint?.let(context::getColorStateList)
             setChipIconSizeResource(R.dimen.iconImageSize)
-            setIconStartPaddingResource(RCore.dimen.marginStandardVerySmall)
-            val textStartPadding = if (icon == null) RCore.dimen.marginStandardSmall else RCore.dimen.marginStandardVerySmall
+            setIconStartPaddingResource(RCoreLegacy.dimen.marginStandardVerySmall)
+            val textStartPadding =
+                if (icon == null) RCoreLegacy.dimen.marginStandardSmall else RCoreLegacy.dimen.marginStandardVerySmall
             setTextStartPaddingResource(textStartPadding)
         }
     }

@@ -59,8 +59,6 @@
         <item quantity="one">%d email no es válido</item>
         <item quantity="other">%d emails no son válidos</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">El correo electrónico ya está utilizado</string>
-    <string name="addUnknownRecipientInvalidEmail">El correo electrónico no es válido</string>
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="addressBookTitle">Libreta de direcciones: %s</string>
     <string name="aiButtonInsert">Inserte</string>

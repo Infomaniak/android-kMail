@@ -59,8 +59,6 @@
         <item quantity="one">%d e-mail est invalide</item>
         <item quantity="other">%d e-mails sont invalides</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
-    <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
     <string name="addUnknownRecipientTitle">Ajouter un destinataire</string>
     <string name="addressBookTitle">Carnet d’adresses : %s</string>
     <string name="aiButtonInsert">Insérer</string>

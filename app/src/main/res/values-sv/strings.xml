@@ -59,8 +59,6 @@
         <item quantity="one">%d email är ogiltig</item>
         <item quantity="other">%d emails är ogiltiga</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">E-postadressen används redan</string>
-    <string name="addUnknownRecipientInvalidEmail">E-postadressen är ogiltig</string>
     <string name="addUnknownRecipientTitle">Lägg till mottagare</string>
     <string name="addressBookTitle">Adressbok: %s</string>
     <string name="aiButtonInsert">Infoga</string>

@@ -59,8 +59,6 @@
         <item quantity="one">%d email on virheellinen</item>
         <item quantity="other">%d emailia ovat virheellisiä</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">Sähköpostiosoite on jo käytössä</string>
-    <string name="addUnknownRecipientInvalidEmail">Sähköpostiosoite on virheellinen</string>
     <string name="addUnknownRecipientTitle">Lisää vastaanottaja</string>
     <string name="addressBookTitle">Osoitekirja: %s</string>
     <string name="aiButtonInsert">Lisää</string>

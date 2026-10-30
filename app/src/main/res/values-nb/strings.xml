@@ -59,8 +59,6 @@
         <item quantity="one">%d email er ugyldig</item>
         <item quantity="other">%d emails er ugyldige</item>
     </plurals>
-    <string name="addUnknownRecipientAlreadyUsed">E-postadressen er allerede i bruk</string>
-    <string name="addUnknownRecipientInvalidEmail">E-postadressen er ugyldig</string>
     <string name="addUnknownRecipientTitle">Legg til mottaker</string>
     <string name="addressBookTitle">Adressebok: %s</string>
     <string name="aiButtonInsert">Sett inn</string>
