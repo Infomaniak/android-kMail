@@ -670,16 +670,27 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Manage Folder
-    private suspend fun createNewFolderSync(name: String): String? {
+    private suspend fun createNewFolderSync(name: String, parentFolderId: String? = null): String? {
         val mailbox = currentMailbox.value ?: return null
-        val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
+        val parentFolder = parentFolderId?.let { folderController.getFolder(it) }
+        if (parentFolderId != null && parentFolder == null) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            newFolderResultTrigger.postValue(Unit)
+            return null
+        }
+        val apiResponse = ApiRepository.createFolder(mailbox.uuid, name, parentFolder?.path)
 
         newFolderResultTrigger.postValue(Unit)
+
+        if (apiResponse.isSuccess() && parentFolderId != null) {
+            folderController.updateFolder(parentFolderId) { it.isCollapsed = false }
+        }
 
         return apiResponseIsSuccess(apiResponse, mailbox)
     }
 
-    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
+    fun createNewFolder(name: String, parentFolderId: String? = null) =
+        viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name, parentFolderId) }
 
     fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value ?: return@launch

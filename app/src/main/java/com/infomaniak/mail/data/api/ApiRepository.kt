@@ -161,8 +161,12 @@ object ApiRepository : ApiRepositoryCore() {
 
     suspend fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
-    suspend fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
-        return callApi(ApiRoutes.folders(mailboxUuid), POST, mapOf("name" to name))
+    suspend fun createFolder(mailboxUuid: String, name: String, parentPath: String? = null): ApiResponse<Folder> {
+        val body = buildMap {
+            put("name", name)
+            parentPath?.let { put("path", it) }
+        }
+        return callApi(ApiRoutes.folders(mailboxUuid), POST, body)
     }
 
     suspend fun renameFolder(mailboxUuid: String, folderId: String, name: String): ApiResponse<Folder> {
