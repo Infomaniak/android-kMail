@@ -108,7 +108,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
+import java.util.Collections
 import java.util.Date
+import java.util.WeakHashMap
 import androidx.appcompat.R as RAndroid
 import com.google.android.material.R as RMaterial
 
@@ -132,6 +134,16 @@ class ThreadAdapter(
 
     private val manuallyAllowedMessagesUids = mutableSetOf<String>()
 
+    private val downloadingAttachmentUuids = mutableSetOf<String>()
+    private val attachedAttachmentAdapters =
+        Collections.newSetFromMap(WeakHashMap<AttachmentAdapter, Boolean>())
+
+    fun setDownloadingUuids(uuids: Set<String>) {
+        downloadingAttachmentUuids.clear()
+        downloadingAttachmentUuids.addAll(uuids)
+        attachedAttachmentAdapters.forEach { it.setDownloadingUuids(uuids) }
+    }
+
     private lateinit var recyclerView: RecyclerView
 
     private var canSendEmails: Boolean = true
@@ -152,6 +164,24 @@ class ThreadAdapter(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
         super.onAttachedToRecyclerView(recyclerView)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        attachedAttachmentAdapters.clear()
+        super.onDetachedFromRecyclerView(recyclerView)
+    }
+
+    override fun onViewAttachedToWindow(holder: ThreadAdapterViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (holder is MessageViewHolder) {
+            holder.attachmentAdapter.setDownloadingUuids(downloadingAttachmentUuids)
+            attachedAttachmentAdapters.add(holder.attachmentAdapter)
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: ThreadAdapterViewHolder) {
+        if (holder is MessageViewHolder) attachedAttachmentAdapters.remove(holder.attachmentAdapter)
+        super.onViewDetachedFromWindow(holder)
     }
 
     override fun onViewRecycled(holder: ThreadAdapterViewHolder) {
@@ -179,11 +209,11 @@ class ThreadAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         return if (viewType == DisplayType.MAIL.layout) {
             MessageViewHolder(
-                ItemMessageBinding.inflate(layoutInflater, parent, false),
-                shouldLoadDistantResources,
-                threadAdapterCallbacks?.onContactClicked,
-                threadAdapterCallbacks?.onAttachmentClicked,
-                threadAdapterCallbacks?.onAttachmentOptionsClicked,
+                binding = ItemMessageBinding.inflate(layoutInflater, parent, false),
+                shouldLoadDistantResources = shouldLoadDistantResources,
+                onContactClicked = threadAdapterCallbacks?.onContactClicked,
+                onAttachmentClicked = threadAdapterCallbacks?.onAttachmentClicked,
+                onAttachmentOptionsClicked = threadAdapterCallbacks?.onAttachmentOptionsClicked,
             )
         } else {
             SuperCollapsedBlockViewHolder(ItemSuperCollapsedBlockBinding.inflate(layoutInflater, parent, false))
@@ -335,8 +365,8 @@ class ThreadAdapter(
                 navigateToAttendeesBottomSheet = { attendees ->
                     threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
                 },
-                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(attachment, attachmentIntentType)
+                navigateToDownloadProgressDialog = { attachment, intentType ->
+                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(attachment, intentType)
                 },
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
@@ -1027,6 +1057,7 @@ class ThreadAdapter(
             )
         }
 
+        attachmentAdapter.setDownloadingUuids(downloadingAttachmentUuids)
         attachmentAdapter.submitList(attachments)
 
         attachmentLayout.attachmentsSizeText.text = totalAttachmentsSize

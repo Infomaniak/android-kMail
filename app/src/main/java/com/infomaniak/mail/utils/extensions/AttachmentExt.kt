@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.core.common.extensions.goToAppStore
-import com.infomaniak.core.legacy.utils.hasSupportedApplications
 import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
@@ -39,7 +38,6 @@ import com.infomaniak.mail.data.models.extensions.hasUsableCache
 import com.infomaniak.mail.data.models.extensions.isInlineCachedFile
 import com.infomaniak.mail.data.models.extensions.safeMimeType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
@@ -52,13 +50,11 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.S
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
-import com.infomaniak.core.legacy.R as RCore
 
 object AttachmentExt {
 
     // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
     const val ATTACHMENT_TAG = "attachmentUpload"
-    const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
     //region Intent
     private suspend fun Attachment.saveToDriveIntent(context: Context): Intent? {
@@ -75,7 +71,7 @@ object AttachmentExt {
         }
     }
 
-    private suspend fun Attachment.openWithIntent(context: Context): Intent? {
+    internal suspend fun Attachment.openWithIntent(context: Context): Intent? {
         val file = getUploadLocalFile() ?: getCacheFile(context) ?: return null
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), file)
 
@@ -98,30 +94,15 @@ object AttachmentExt {
 
     suspend fun Attachment.executeIntent(
         context: Context,
-        intentType: AttachmentIntentType,
-        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
+        openCachedAttachment: () -> Unit,
+        navigateToDownloadProgressDialog: () -> Unit,
         popBackIfNeeded: (() -> Unit)? = null,
     ) {
         if (hasUsableCache(context, getUploadLocalFile()) || isInlineCachedFile(context)) {
-            getIntentOrGoToAppStore(context, intentType)?.let(context::startActivity)
             popBackIfNeeded?.invoke()
+            openCachedAttachment()
         } else {
-            popBackIfNeeded?.invoke()
-            navigateToDownloadProgressDialog(this, intentType)
-        }
-    }
-
-    suspend fun Attachment.openAttachment(
-        context: Context,
-        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
-        snackbarManager: SnackbarManager,
-        popBackIfNeeded: (() -> Unit)? = null,
-    ) {
-        if (openWithIntent(context)?.hasSupportedApplications(context) == true) {
-            executeIntent(context, OPEN_WITH, navigateToDownloadProgressDialog, popBackIfNeeded)
-        } else {
-            popBackIfNeeded?.invoke()
-            snackbarManager.setValue(context.getString(RCore.string.errorNoSupportingAppFound))
+            navigateToDownloadProgressDialog()
         }
     }
 
