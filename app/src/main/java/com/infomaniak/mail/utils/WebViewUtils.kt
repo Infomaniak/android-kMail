@@ -80,7 +80,7 @@ class WebViewUtils(private val context: Context) {
     private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, aliases: List<String>) {
         registerScript(messageDisplayJsBridgeScript)
         registerCss(improveRenderingStyle)
-        registerCss(customStyle)
+        registerCss(customStyle, prepend = true)
         registerCss(messageDisplayStyle)
         registerCss(getDynamicMentionsStyle(context, aliases, isDisplayedInDarkMode))
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)

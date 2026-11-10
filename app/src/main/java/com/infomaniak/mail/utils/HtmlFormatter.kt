@@ -37,14 +37,16 @@ import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
 
-    private val cssList = mutableListOf<Pair<String, String?>>()
+    private val prependedCssList = mutableListOf<Pair<String, String?>>()
+    private val appendedCssList = mutableListOf<Pair<String, String?>>()
     private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
     private var needsBodyEncapsulation = false
     private var breakLongWords = false
     private var printData: PrintData? = null
 
-    fun registerCss(css: String, styleId: String? = null) {
+    fun registerCss(css: String, styleId: String? = null, prepend: Boolean = false) {
+        val cssList = if (prepend) prependedCssList else appendedCssList
         cssList.add(css to styleId)
     }
 
@@ -85,7 +87,13 @@ class HtmlFormatter(private val html: String) {
     }
 
     private fun Element.injectCss() {
-        cssList.forEach { (css, styleId) ->
+        prependedCssList.asReversed().forEach { (css, styleId) ->
+            prependElement("style")
+                .attr("type", "text/css")
+                .appendText(css)
+                .also { element -> styleId?.let(element::id) }
+        }
+        appendedCssList.forEach { (css, styleId) ->
             appendElement("style")
                 .attr("type", "text/css")
                 .appendText(css)
