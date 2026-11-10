@@ -36,6 +36,7 @@
     <string name="actionPhishing">Phishing melden</string>
     <string name="actionPrint">Afdrukken</string>
     <string name="actionRename">Hernoemen</string>
+    <string name="actionAddSubfolder">Submap toevoegen</string>
     <string name="actionReply">Beantwoorden</string>
     <string name="actionReplyAll">Allen beantwoorden</string>
     <string name="actionReportDisplayProblem">Weergaveprobleem melden</string>

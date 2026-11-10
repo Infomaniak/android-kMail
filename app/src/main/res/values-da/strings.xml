@@ -36,6 +36,7 @@
     <string name="actionPhishing">Rapportér phishing</string>
     <string name="actionPrint">Udskriv</string>
     <string name="actionRename">Omdøb</string>
+    <string name="actionAddSubfolder">Tilføj undermappe</string>
     <string name="actionReply">Besvar</string>
     <string name="actionReplyAll">Besvar alle</string>
     <string name="actionReportDisplayProblem">Rapportér et visningsproblem</string>
