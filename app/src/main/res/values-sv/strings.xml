@@ -36,6 +36,7 @@
     <string name="actionPhishing">Rapportera nätfiske</string>
     <string name="actionPrint">Skriv ut</string>
     <string name="actionRename">Byt namn</string>
+    <string name="actionAddSubfolder">Lägg till undermapp</string>
     <string name="actionReply">Svara</string>
     <string name="actionReplyAll">Svara alla</string>
     <string name="actionReportDisplayProblem">Rapportera visningsproblem</string>

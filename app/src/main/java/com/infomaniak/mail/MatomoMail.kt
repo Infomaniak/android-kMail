@@ -188,6 +188,7 @@ object MatomoMail : Matomo {
         Forward("forward"),
         FriendlyWriting("friendlyWriting"),
         FromHistory("fromHistory"),
+        FromFolder("fromFolder"),
         FromMenuDrawer("fromMenuDrawer"),
         FromMove("fromMove"),
         Generate("generate"),

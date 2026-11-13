@@ -36,6 +36,7 @@
     <string name="actionPhishing">Zgłoś phishing</string>
     <string name="actionPrint">Drukuj</string>
     <string name="actionRename">Zmień nazwę</string>
+    <string name="actionAddSubfolder">Dodaj podfolder</string>
     <string name="actionReply">Odpowiedz</string>
     <string name="actionReplyAll">Odpowiedz wszystkim</string>
     <string name="actionReportDisplayProblem">Zgłoś problem wyświetlania</string>
