@@ -902,9 +902,11 @@ class ThreadAdapter(
         message.reminder?.date?.toDate()?.let { reminderDate ->
             val now = Date()
             val isExpired = reminderDate.before(now)
-            when {
-                message.from.any { it.isMe() } -> bindSenderReminderAlert(message, reminderDate, isExpired)
-                message.allRecipients.any { it.isMe() } -> bindRecipientReminderAlert(message, reminderDate, isExpired)
+            // Only reminders created by the current user have a UUID.
+            if (message.reminder?.uuid != null) {
+                bindSenderReminderAlert(message, reminderDate, isExpired)
+            } else if (message.to.any { it.isMe() }) {
+                bindRecipientReminderAlert(message, reminderDate, isExpired)
             }
         }
         hideAlertGroupIfNoneDisplayed()
