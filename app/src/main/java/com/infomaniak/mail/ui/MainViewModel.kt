@@ -689,8 +689,9 @@ class MainViewModel @Inject constructor(
         return apiResponseIsSuccess(apiResponse, mailbox)
     }
 
-    fun createNewFolder(name: String, parentFolderId: String? = null) =
-        viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name, parentFolderId) }
+    fun createNewFolder(name: String, parentFolderId: String? = null) = viewModelScope.launch(ioCoroutineContext) {
+        createNewFolderSync(name, parentFolderId)
+    }
 
     fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value ?: return@launch
