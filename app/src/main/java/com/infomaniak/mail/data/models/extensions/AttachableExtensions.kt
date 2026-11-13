@@ -26,7 +26,7 @@ import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.AttachmentType
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.AttachableMimeTypeUtils
+import com.infomaniak.mail.utils.attachment.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.resolveContainedFileName
