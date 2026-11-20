@@ -338,6 +338,7 @@ class SearchFragment : TwoPaneFragment(), MultiSelectionHost, SwipeActionHost {
                     }
                 }
                 override val getFeatureFlags: () -> FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
+                override val getMailbox = { mainViewModel.currentMailbox.value }
             },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by multiselectionViewModel::isMultiSelectOn

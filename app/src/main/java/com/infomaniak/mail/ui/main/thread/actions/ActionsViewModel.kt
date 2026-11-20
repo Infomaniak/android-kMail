@@ -41,6 +41,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.useCases.MessagesActions
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.DownloadThreadsStatusManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -63,7 +64,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -848,19 +849,24 @@ class ActionsViewModel @Inject constructor(
     }
 
     fun refreshFoldersAfterSend(sendDelay: Int, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        // Wait for the send action to fully commit before refreshing folders:
-        // - If a send delay is set: wait for the delay plus 2 extra seconds to ensure
-        //   the backend has finished sending the message before refreshing folders.
-        // - If no delay: wait 4 seconds to ensure the backend has finished sending the message before refreshing the folders.
         val delayBeforeRefresh = if (sendDelay > 0) sendDelay + 2 else 4
-        delay((delayBeforeRefresh * 1_000L).milliseconds)
-        refreshFoldersAsync(
-            mailbox,
-            ImpactedFolders(mutableSetOf(FolderRole.DRAFT, FolderRole.SENT)),
-            destinationFolderId = folderController.getFolder(FolderRole.SENT)?.id,
-            parentFolderId = folderController.getFolder(FolderRole.DRAFT)?.id,
-        )
+        delay(delayBeforeRefresh.seconds)
 
+        repeat(3) { attempt ->
+            if (mailbox.userId != AccountUtils.currentUserId || mailbox.mailboxId != AccountUtils.currentMailboxId) return@launch
+
+            val draftsFolderId = folderController.getFolder(FolderRole.DRAFT)?.id
+            sharedUtils.refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = ImpactedFolders(mutableSetOf(FolderRole.DRAFT, FolderRole.SENT)),
+                destinationFolderId = folderController.getFolder(FolderRole.SENT)?.id,
+            )
+
+            // The cancellable draft can still be present after the first refresh, before the server moves it to Sent.
+            if (attempt == 2 || draftsFolderId == null || !messageController.hasPendingSends(draftsFolderId)) return@launch
+
+            delay(5.seconds)
+        }
     }
 
     private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {

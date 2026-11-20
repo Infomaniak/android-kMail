@@ -19,7 +19,9 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeRelatedReminderVisibility
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.extensions.action
 import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
@@ -33,13 +35,13 @@ import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
 import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
+import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
@@ -50,10 +52,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.invoke
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class MessageController @Inject constructor(
@@ -61,24 +62,42 @@ class MessageController @Inject constructor(
     private val localSettings: LocalSettings,
 ) {
 
-    //region Queries
-    private suspend fun getSortedAndNotDeletedMessagesQuery(
-        threadUid: String,
-        featureFlags: Mailbox.FeatureFlagSet?,
-    ): RealmQuery<Message>? {
-        return ThreadController.getThread(threadUid, mailboxContentRealm())
-            ?.getDisplayedMessages(featureFlags, localSettings)
-            ?.query("${Message::isDeletedOnApi.name} == false")
-            ?.sort(Message::internalDate.name, Sort.ASCENDING)
-    }
-    //endregion
+    private val refreshReminderMutex = Mutex()
 
     suspend fun getMessage(uid: String): Message? {
         return getMessage(uid, mailboxContentRealm())
     }
 
+    suspend fun refreshReminderIfNeeded(messageUid: String, mailbox: Mailbox) {
+        refreshReminderMutex.withLock {
+            // Another emission may have already refreshed the message since it was queued.
+            val realm = mailboxContentRealm()
+            val message = getMessage(messageUid, realm) ?: return@withLock
+            if (!message.shouldRefreshReminder || !message.isFullyDownloaded()) return@withLock
+
+            val apiResponse = ApiRepository.getMessage(message.resource)
+            if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
+
+            val remoteMessage = apiResponse.data ?: return@withLock
+            realm.write {
+                getMessageBlocking(messageUid, realm = this)?.let { localMessage ->
+                    remoteMessage.keepLocalValues(localMessage)
+                    remoteMessage.shouldRefreshReminder = false
+                    upsertMessageBlocking(remoteMessage, realm = this).recomputeRelatedReminderVisibility(mailbox)
+                }
+            }
+        }
+    }
+
     suspend fun getMessages(uids: List<String>): List<Message> {
         return getMessagesByUids(uids, mailboxContentRealm())
+    }
+
+    suspend fun hasPendingSends(draftsFolderId: String): Boolean {
+        return mailboxContentRealm().query<Message>(
+            "${Message::folderId.name} == $0 AND ${Message::isMessageWithSendDelay.name} == true",
+            draftsFolderId,
+        ).count().findSuspend() > 0
     }
 
     suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
@@ -194,14 +213,6 @@ class MessageController @Inject constructor(
         } else {
             query<Message>(filtersQuery)
         }.findSuspend().let { Dispatchers.IO { it.copyFromRealm() } }
-    }
-
-    fun getSortedAndNotDeletedMessagesAsync(
-        threadUid: String,
-        featureFlags: Mailbox.FeatureFlagSet?,
-    ): Flow<ResultsChange<Message>> = flow {
-        val query = getSortedAndNotDeletedMessagesQuery(threadUid, featureFlags)
-        emitAll(query?.asFlow() ?: emptyFlow())
     }
 
     fun getMessageAsync(messageUid: String): Flow<SingleQueryChange<Message>> {

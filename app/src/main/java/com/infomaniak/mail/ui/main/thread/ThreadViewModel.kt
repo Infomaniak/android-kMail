@@ -30,6 +30,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.common.R as RCore
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.network.models.ApiResponseStatus
@@ -44,12 +45,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeRelatedReminderVisibility
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AcknowledgeStatus
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.calendar.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
+import com.infomaniak.mail.data.models.extensions.ThreadReminders
 import com.infomaniak.mail.data.models.extensions.calendarAttachment
 import com.infomaniak.mail.data.models.extensions.folder
 import com.infomaniak.mail.data.models.extensions.getDisplayedMessages
@@ -88,7 +90,6 @@ import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -219,16 +220,19 @@ class ThreadViewModel @Inject constructor(
         combine(
             threadOpeningModeFlow,
             threadState.hasSuperCollapsedBlockBeenClicked,
-            featureFlagsFlow,
+            currentMailboxFlow,
             messageUiStates,
-            transform = { mode, _, featureFlags, uiStates ->
-                CombineMessageToBuildMessageUi(mode, featureFlags, uiStates)
+            transform = { mode, _, mailbox, uiStates ->
+                CombineMessageToBuildMessageUi(mode, mailbox, uiStates)
             },
-        ).flatMapLatest { (mode, featureFlags, uiStates) ->
-            val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
-            mode.getMessages(featureFlags).mapLatest { (items, messagesToFetch) ->
-                items.toUiMessages(uiStates, isReactionsAvailable) to messagesToFetch
+        ).flatMapLatest { (mode, mailbox, uiStates) ->
+            val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(mailbox.featureFlags, localSettings)
+            mode.getMessages(mailbox.featureFlags).mapLatest { (items, messagesToFetch, allMessages) ->
+                val reminders = ThreadReminders(allMessages, mailbox.email, mailbox.aliases)
+                items.toUiMessages(uiStates, isReactionsAvailable, reminders) to messagesToFetch
             }
+        }.onEach { (items, _) ->
+            items.filterIsInstance<MessageUi>().forEach { refreshMessageIfNeeded(it.message) }
         }
 
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> = messagesFlow.asLiveData(ioCoroutineContext)
@@ -285,10 +289,6 @@ class ThreadViewModel @Inject constructor(
                     }
                 }
 
-                displayedMessages.forEach { message ->
-                    if (threadState.isExpandedMap[message.uid] == true) refreshMessageIfNeeded(message)
-                }
-
                 if (threadState.isFirstOpening) {
                     threadState.isFirstOpening = false
                     sendMatomoAboutThreadMessagesCount(thread, featureFlags)
@@ -302,9 +302,9 @@ class ThreadViewModel @Inject constructor(
         return isSnoozeAvailable(mailbox?.featureFlags, localSettings) && folder.role == FolderRole.SNOOZED
     }
 
-    private suspend fun mapRealmMessagesResult(
-        messages: RealmResults<Message>,
-        threadUid: String,
+    private suspend fun mapThreadMessages(
+        messages: List<Message>,
+        thread: Thread,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> = with(threadState) {
 
         if (messages.isEmpty()) return emptyList<Any>() to emptyList()
@@ -313,7 +313,6 @@ class ThreadViewModel @Inject constructor(
             it.copy(messagesUids = it.messagesUids.toMutableSet())
         } ?: SuperCollapsedBlock()
 
-        val thread = messages.first().threads.single { it.uid == threadUid }
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
         newBlock.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), newBlock, firstIndexAfterBlock)
 
@@ -339,7 +338,7 @@ class ThreadViewModel @Inject constructor(
         return formatLists(listOf(message), threadState.superCollapsedBlock) { _, _ -> MessageBehavior.DISPLAYED }
     }
 
-    private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
+    private fun computeFirstIndexAfterBlock(thread: Thread, list: List<Message>): Int {
 
         val firstDefaultIndex = list.count() - 2
         val firstUnreadIndex = if (thread.isSeen) null else list.indexOfFirstOrNull { it.hasUnreadContent() }
@@ -365,7 +364,7 @@ class ThreadViewModel @Inject constructor(
             firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
 
     private suspend fun formatListWithNewBlock(
-        messages: RealmResults<Message>,
+        messages: List<Message>,
         block: SuperCollapsedBlock,
         firstIndexAfterBlock: Int,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
@@ -380,7 +379,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun formatListWithExistingBlock(
-        messages: RealmResults<Message>,
+        messages: List<Message>,
         block: SuperCollapsedBlock,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
@@ -525,7 +524,7 @@ class ThreadViewModel @Inject constructor(
             }
             if (messagesToFetch.isEmpty()) return@launch
 
-            val (deleted, failed) = ThreadController.fetchMessagesHeavyData(messagesToFetch, realm)
+            val (deleted, failed) = ThreadController.fetchMessagesHeavyData(messagesToFetch, realm, mailbox = mailbox())
             if (deleted.isNotEmpty() || failed.isNotEmpty()) {
 
                 // TODO: A race condition exists between the two notify in the ThreadAdapter.
@@ -719,8 +718,8 @@ class ThreadViewModel @Inject constructor(
     private suspend fun <E : Any> List<E>.toUiMessages(
         uiStates: MessageUiStates,
         isReactionsAvailable: Boolean,
+        reminders: ThreadReminders,
     ): List<Any> {
-        val messages = filterIsInstance<Message>()
         return map { item ->
             if (item is Message) {
                 val localReactions = uiStates.fakeReactions[item.messageId] ?: emptySet()
@@ -733,7 +732,7 @@ class ThreadViewModel @Inject constructor(
                 }
                 MessageUi(
                     message = item,
-                    isAnsweredByRecipient = item.isAnsweredByRecipient(messages),
+                    reminderAudience = reminders.audienceFor(item),
                     emojiReactionsState = reactions,
                     isReactionsFeatureAvailable = isReactionsAvailable,
                     unsubscribeState = uiStates.unsubscribeStates[item.uid] ?: canUnsubscribeOrNull,
@@ -743,11 +742,6 @@ class ThreadViewModel @Inject constructor(
                 item
             }
         }
-    }
-
-    private fun Message.isAnsweredByRecipient(threadMessages: List<Message>): Boolean {
-        val recipientEmails = to.map { it.email }.filter { it.isNotEmpty() }.toSet()
-        return threadMessages.any { newer -> newer.internalDate > internalDate && newer.sender?.email in recipientEmails }
     }
 
     private suspend fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
@@ -938,11 +932,10 @@ class ThreadViewModel @Inject constructor(
                         uuid = result.uuid
                         date = result.date
                     }
+                    localMessage?.shouldRefreshReminder = false
                 }
 
-                MessageController.getMessageBlocking(message.uid, realm = this)?.threads?.forEach { thread ->
-                    thread.recomputeThread(realm = this, aliases = mailbox.aliases)
-                }
+                MessageController.getMessageBlocking(message.uid, realm = this)?.recomputeRelatedReminderVisibility(mailbox)
             }
         }
 
@@ -960,11 +953,10 @@ class ThreadViewModel @Inject constructor(
             MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
                 localMessage?.reminder = null
                 localMessage?.reminderAction = null
+                localMessage?.shouldRefreshReminder = false
             }
 
-            MessageController.getMessageBlocking(message.uid, realm = this)?.threads?.forEach { thread ->
-                thread.recomputeThread(realm = this, aliases = mailbox.aliases)
-            }
+            MessageController.getMessageBlocking(message.uid, realm = this)?.recomputeRelatedReminderVisibility(mailbox)
         }
 
         refreshController.refreshThreads(
@@ -1012,21 +1004,9 @@ class ThreadViewModel @Inject constructor(
         if (!message.shouldRefreshReminder || !message.isFullyDownloaded()) return
 
         viewModelScope.launch(ioCoroutineContext) {
-            val apiResponse = ApiRepository.getMessage(message.resource)
-            val remoteMessage = apiResponse.data ?: return@launch
-            if (!apiResponse.isSuccess()) return@launch
-
-            updateMessageWithRefetchedData(message.uid, remoteMessage)
-        }
-    }
-
-    private suspend fun updateMessageWithRefetchedData(messageUid: String, remoteMessage: Message) {
-        mailboxContentRealm().write {
-            MessageController.getMessageBlocking(messageUid, realm = this)?.let { localMessage ->
-                remoteMessage.keepLocalValues(localMessage)
-                remoteMessage.shouldRefreshReminder = false
-                MessageController.upsertMessageBlocking(remoteMessage, realm = this)
-            }
+            runCatching { messageController.refreshReminderIfNeeded(message.uid, mailbox()) }
+                .cancellable()
+                .onFailure(Sentry::captureException)
         }
     }
 
@@ -1071,8 +1051,14 @@ class ThreadViewModel @Inject constructor(
 
     private data class CombineMessageToBuildMessageUi(
         val mode: ThreadOpeningMode,
-        val featureFlags: Mailbox.FeatureFlagSet,
+        val mailbox: Mailbox,
         val uiStates: MessageUiStates,
+    )
+
+    data class ThreadMessages(
+        val items: ThreadAdapterItems,
+        val messagesToFetch: MessagesWithoutHeavyData,
+        val allMessages: List<Message>,
     )
 
     private enum class MessageBehavior {
@@ -1099,7 +1085,7 @@ class ThreadViewModel @Inject constructor(
 
     sealed interface ThreadOpeningMode {
         val threadUid: String?
-        fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>
+        fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<ThreadMessages>
     }
 
     sealed class ReminderAction(open val message: Message) {
@@ -1110,18 +1096,26 @@ class ThreadViewModel @Inject constructor(
     inner class SingleMessage(val messageUid: String) : ThreadOpeningMode {
         override val threadUid: String? = null
 
-        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
+        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<ThreadMessages> {
             return messageController.getMessageAsync(messageUid).mapNotNull {
-                it.obj?.let { message -> mapRealmMessagesResultWithoutSuperCollapsedBlock(message) }
+                it.obj?.let { message ->
+                    val (items, messagesToFetch) = mapRealmMessagesResultWithoutSuperCollapsedBlock(message)
+                    ThreadMessages(items, messagesToFetch, listOf(message))
+                }
             }
         }
     }
 
     inner class AllMessages(override val threadUid: String) : ThreadOpeningMode {
-        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
-            return messageController
-                .getSortedAndNotDeletedMessagesAsync(threadUid, featureFlags)
-                .mapLatest { mapMessagesMutex.withLock { mapRealmMessagesResult(it.list, threadUid) } }
+        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<ThreadMessages> {
+            return threadController.getThreadAsync(threadUid).mapLatest { change ->
+                val thread = change.obj ?: return@mapLatest ThreadMessages(emptyList(), emptyList(), emptyList())
+                val displayedMessages = thread.getDisplayedMessages(featureFlags, localSettings)
+                    .filterNot { it.isDeletedOnApi }
+                    .sortedBy { it.internalDate }
+                val (items, messagesToFetch) = mapMessagesMutex.withLock { mapThreadMessages(displayedMessages, thread) }
+                ThreadMessages(items, messagesToFetch, thread.messages)
+            }
         }
     }
 

@@ -17,13 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.thread.models
 
+import com.infomaniak.mail.data.models.extensions.ReminderAudience
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
 
 data class MessageUi(
     val message: Message,
-    // Whether one of the message's "to" recipients sent a newer message in the thread. Used to consider a reminder answered.
-    val isAnsweredByRecipient: Boolean,
+    val reminderAudience: ReminderAudience?,
     val emojiReactionsState: Map<String, EmojiReactionStateUi>,
     val isReactionsFeatureAvailable: Boolean,
     val unsubscribeState: UnsubscribeState?,

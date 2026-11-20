@@ -29,5 +29,6 @@ interface ThreadListAdapterCallbacks {
     var onPositionClickedChanged: (position: Int, previousPosition: Int) -> Unit
     var deleteThreadInRealm: (threadUid: String) -> Unit
     val getFeatureFlags: () -> Mailbox.FeatureFlagSet?
+    val getMailbox: () -> Mailbox?
     var onContactClicked: ((MergedContact) -> Unit)?
 }

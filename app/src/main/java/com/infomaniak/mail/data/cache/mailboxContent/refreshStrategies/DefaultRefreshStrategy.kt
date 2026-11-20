@@ -68,7 +68,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         if (thread.getNumberOfMessagesInFolder() == 0) {
             realm.delete(thread)
         } else {
-            thread.recomputeThread(realm, mailbox?.aliases)
+            thread.recomputeThread(realm, aliases = mailbox?.aliases, mailboxEmail = mailbox?.email)
         }
     }
 

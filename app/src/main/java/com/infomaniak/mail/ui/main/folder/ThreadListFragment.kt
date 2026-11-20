@@ -426,6 +426,7 @@ class ThreadListFragment : TwoPaneFragment(), PickerEmojiObserver, MultiSelectio
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
                 override val getFeatureFlags: () -> FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
+                override val getMailbox = { mainViewModel.currentMailbox.value }
 
                 override var onContactClicked: ((MergedContact) -> Unit)? = null
             },

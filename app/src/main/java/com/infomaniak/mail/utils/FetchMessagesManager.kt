@@ -219,7 +219,7 @@ class FetchMessagesManager @Inject constructor(
         fun Message.getNotificationPreview(totalUnseenReactionOnLastEmoji: Int): String =
             getFormattedPreview(appContext, totalUnseenReactionOnLastEmoji).content
 
-        ThreadController.fetchMessagesHeavyData(getDisplayedMessages(mailbox.featureFlags, localSettings), realm, okHttpClient)
+        ThreadController.fetchMessagesHeavyData(getDisplayedMessages(mailbox.featureFlags, localSettings), realm, okHttpClient, mailbox)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)

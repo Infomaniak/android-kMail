@@ -362,8 +362,12 @@ class MainActivity : BaseActivity() {
                 }
                 DraftAction.SEND, DraftAction.SEND_REACTION -> {
                     val mailbox = mainViewModel.currentMailbox.value ?: return
+                    if (mailbox.uuid == getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY) &&
+                        mailbox.userId == getInt(DraftsActionsWorker.RESULT_USER_ID_KEY, 0)
+                    ) {
+                        actionsViewModel.refreshFoldersAfterSend(localSettings.cancelDelay, mailbox)
+                    }
 
-                    actionsViewModel.refreshFoldersAfterSend(localSettings.cancelDelay, mailbox)
                     val cancelResourceUrl = getString(DraftsActionsWorker.CANCEL_RESOURCE_URL_KEY)
 
                     showSentDraftSnackbar(

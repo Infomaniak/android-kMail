@@ -22,12 +22,14 @@ import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeRelatedReminderVisibility
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.ThreadFilter
@@ -264,11 +266,13 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
          * @param realm The realm context in which the heavy data fetching and updates should occur.
          * @param okHttpClient An optional OkHttpClient instance to use for making network requests.
          *                     If not provided, a default client will be used.
+         * @param mailbox Identity used to update reminder visibility in associated threads.
          */
         suspend fun fetchMessagesHeavyData(
             messages: List<Message>,
             realm: Realm,
             okHttpClient: OkHttpClient? = null,
+            mailbox: Mailbox? = null,
         ): Pair<List<String>, List<String>> {
 
             val deletedMessagesUids = mutableListOf<String>()
@@ -296,6 +300,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
                                     draftLocalUuid = remoteMessage.getDraftLocalUuidBlocking(realm),
                                     isDeletedOnApi = false,
                                     swissTransferFiles = swissTransferFiles,
+                                    shouldRefreshReminder = false,
                                 )
                             )
 
@@ -303,11 +308,19 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
                             localMessage.body?.let { localBody -> remoteMessage.body?.keepLocalValues(localBody) }
 
-                            MessageController.upsertMessageBlocking(remoteMessage, realm = this)
+                            val updatedMessage = MessageController.upsertMessageBlocking(remoteMessage, realm = this)
+                            if (mailbox != null && (localMessage.reminder != null || localMessage.shouldRefreshReminder ||
+                                        updatedMessage.reminder != null)
+                            ) {
+                                updatedMessage.recomputeRelatedReminderVisibility(mailbox)
+                            }
                         }
                     } else {
                         if (apiResponse.error?.code == ErrorCode.MESSAGE_NOT_FOUND) {
-                            MessageController.getMessageBlocking(localMessage.uid, realm = this)?.isDeletedOnApi = true
+                            MessageController.getMessageBlocking(localMessage.uid, realm = this)?.apply {
+                                isDeletedOnApi = true
+                                if (mailbox != null) recomputeRelatedReminderVisibility(mailbox)
+                            }
                             deletedMessagesUids.add(localMessage.uid)
                         } else {
                             failedMessagesUids.add(localMessage.uid)

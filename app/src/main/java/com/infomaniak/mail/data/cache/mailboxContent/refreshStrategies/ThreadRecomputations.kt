@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.data.models.thread.Thread
@@ -36,7 +37,7 @@ import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmList
 
 object ThreadRecomputations {
-    fun Thread.recomputeThread(realm: MutableRealm? = null, aliases: List<String>?) {
+    fun Thread.recomputeThread(realm: MutableRealm? = null, aliases: List<String>?, mailboxEmail: String? = null) {
         messages.sortBy { it.internalDate }
         // All of the following methods should not be inside of Thread to begin with. At least the input list of messages is
         // extracted once so every other following logic is forced to base its processing on this unique list of messages. We
@@ -65,6 +66,7 @@ object ThreadRecomputations {
         resetThread()
 
         updateThread(lastMessage, allMessages, aliases)
+        recomputeReminderVisibility(mailboxEmail, aliases)
 
         recomputeMessagesWithContent(allMessages)
 
@@ -104,13 +106,21 @@ object ThreadRecomputations {
         }
 
         hasUnseenMentions = hasUnseenMentions(aliases?.toList() ?: emptyList(), allMessages)
-        hasReminders = hasReminders(allMessages)
 
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = allMessages.first().subject
 
         isLastInboxMessageSnoozed = allMessages.isLastInboxMessageSnoozed(folderId)
+    }
+
+    fun Thread.recomputeReminderVisibility(mailboxEmail: String?, aliases: List<String>?) {
+        hasReminders = hasReminders(messages, mailboxEmail, aliases)
+    }
+
+    fun Message.recomputeRelatedReminderVisibility(mailbox: Mailbox?) {
+        threads.forEach { it.recomputeReminderVisibility(mailbox?.email, mailbox?.aliases) }
+        threadsDuplicatedIn.forEach { it.recomputeReminderVisibility(mailbox?.email, mailbox?.aliases) }
     }
 
     private fun Thread.processMessage(message: Message) {

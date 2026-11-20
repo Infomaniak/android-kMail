@@ -27,6 +27,7 @@ import com.infomaniak.core.common.utils.isToday
 import com.infomaniak.core.common.utils.isYesterday
 import com.infomaniak.core.legacy.utils.capitalizeFirstChar
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.extensions.ThreadReminders
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.isLastWeek
@@ -56,7 +57,10 @@ object ThreadListUtils {
         }
     }
 
-    fun hasReminders(messages: List<Message>): Boolean = messages.any { message ->
-        (message.reminder != null || message.shouldRefreshReminder) && !message.isHiddenReminder
+    fun hasReminders(messages: List<Message>, mailboxEmail: String?, aliases: List<String>?): Boolean {
+        if (messages.none { it.reminder != null || it.shouldRefreshReminder }) return false
+
+        val reminders = ThreadReminders(messages, mailboxEmail, aliases)
+        return messages.any(reminders::hasVisibleReminder)
     }
 }

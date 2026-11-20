@@ -62,6 +62,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.extensions.calendarAttachment
 import com.infomaniak.mail.data.models.extensions.displayedName
 import com.infomaniak.mail.data.models.extensions.isInSpamFolder
+import com.infomaniak.mail.data.models.extensions.ReminderAudience
 import com.infomaniak.mail.data.models.extensions.isMe
 import com.infomaniak.mail.data.models.extensions.isReplyAuthorized
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -214,9 +215,13 @@ class ThreadAdapter(
                 NotifyType.AiSummaryStateChanged -> holder.bindAiAction(item.message, AiAction.SUMMARY)
                 NotifyType.AiTranslateStateChanged -> holder.bindAiAction(item.message, AiAction.TRANSLATE)
                 is NotifyType.MessagesCollapseStateChanged -> {
-                    holder.handleMessagesCollapseStatePayload(item.message, isCollapsible = payload.isCollapsible)
+                    holder.handleMessagesCollapseStatePayload(item, isCollapsible = payload.isCollapsible)
                 }
                 NotifyType.UpdatePermissions -> holder.handlePermissionsPayload(canSendEmails)
+            }
+
+            if (payload != NotifyType.ReminderRebind && NotifyType.ReminderRebind in payloads) {
+                bindReminder(item)
             }
         }
     }.getOrDefault(Unit)
@@ -255,11 +260,11 @@ class ThreadAdapter(
         emojiReactions.bindEmojiReactions(message)
     }
 
-    private fun MessageViewHolder.handleMessagesCollapseStatePayload(message: Message, isCollapsible: Boolean) {
-        handleHeaderClick(message, isCollapsible)
+    private fun MessageViewHolder.handleMessagesCollapseStatePayload(messageUi: MessageUi, isCollapsible: Boolean) {
+        handleHeaderClick(isCollapsible)
         if (!isCollapsible) {
-            threadAdapterState.isExpandedMap[message.uid] = true
-            onExpandOrCollapseMessage(message, shouldTrack = false)
+            threadAdapterState.isExpandedMap[messageUi.message.uid] = true
+            onExpandOrCollapseMessage(messageUi, shouldTrack = false)
         }
     }
 
@@ -311,7 +316,7 @@ class ThreadAdapter(
         bindContent(messageUi.message)
         bindEmojiReactions(messageUi)
 
-        onExpandOrCollapseMessage(messageUi.message, shouldTrack = false)
+        onExpandOrCollapseMessage(messageUi, shouldTrack = false)
         handlePermissionsPayload(canSendEmails)
     }
 
@@ -502,7 +507,7 @@ class ThreadAdapter(
 
         setDetailedFieldsVisibility(message)
 
-        handleHeaderClick(message, areMessagesCollapsibles())
+        handleHeaderClick(areMessagesCollapsibles())
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -697,7 +702,7 @@ class ThreadAdapter(
         bccGroup.isVisible = message.bcc.isNotEmpty()
     }
 
-    private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsible: Boolean) = with(threadAdapterState) {
+    private fun MessageViewHolder.handleHeaderClick(isCollapsible: Boolean) = with(threadAdapterState) {
         // Disable ripple animation of `messageHeader` if `isCollapsible` is false
         binding.messageHeader.isEnabled = isCollapsible
 
@@ -707,18 +712,20 @@ class ThreadAdapter(
         }
 
         binding.messageHeader.setOnClickListener {
+            val messageUi = items.getOrNull(bindingAdapterPosition) as? MessageUi ?: return@setOnClickListener
+            val message = messageUi.message
             val isExpanded = isExpandedMap[message.uid] == true
             val isUnscheduledDraft = message.isDraft && !message.isMessageWithSendDelay
 
             when {
                 isExpanded -> {
                     isExpandedMap[message.uid] = false
-                    onExpandOrCollapseMessage(message, shouldTrack = true)
+                    onExpandOrCollapseMessage(messageUi, shouldTrack = true)
                 }
                 isUnscheduledDraft -> threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                 else -> {
                     isExpandedMap[message.uid] = true
-                    onExpandOrCollapseMessage(message, shouldTrack = true)
+                    onExpandOrCollapseMessage(messageUi, shouldTrack = true)
                     threadAdapterCallbacks?.onMessageExpanded?.invoke(message)
                 }
             }
@@ -882,35 +889,36 @@ class ThreadAdapter(
         reminderAlert.isGone = true
         endReminderAlert.isGone = true
         requestResponseAlert.isGone = true
-        iconReminder.isVisible = message.reminder != null &&
-                !messageUi.isAnsweredByRecipient &&
-                threadAdapterState.isExpandedMap[message.uid] != true
+        bindReminderIcon(messageUi, isExpanded = threadAdapterState.isExpandedMap[message.uid] == true)
 
-        if (featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) != true) return
-
-        // A recipient answered: the reminder is considered answered
-        if (messageUi.isAnsweredByRecipient) {
+        val audience = messageUi.reminderAudience
+        if (!isReminderFeatureEnabled() || audience == null) {
             hideAlertGroupIfNoneDisplayed()
             return
         }
 
-        if (message.isScheduledDraft && message.reminder != null) {
+        if (audience == ReminderAudience.ScheduledDraft) {
             bindScheduledDraftReminderAlert(message)
+            hideAlertGroupIfNoneDisplayed()
             return
         }
 
         message.reminder?.date?.toDate()?.let { reminderDate ->
-            val now = Date()
-            val isExpired = reminderDate.before(now)
-            // Only reminders created by the current user have a UUID.
-            if (message.reminder?.uuid != null) {
+            val isExpired = reminderDate.before(Date())
+            if (audience == ReminderAudience.Sender) {
                 bindSenderReminderAlert(message, reminderDate, isExpired)
-            } else if (message.to.any { it.isMe() }) {
+            } else {
                 bindRecipientReminderAlert(message, reminderDate, isExpired)
             }
         }
         hideAlertGroupIfNoneDisplayed()
     }
+
+    private fun ItemMessageBinding.bindReminderIcon(messageUi: MessageUi, isExpanded: Boolean) {
+        iconReminder.isVisible = isReminderFeatureEnabled() && messageUi.reminderAudience != null && !isExpanded
+    }
+
+    private fun isReminderFeatureEnabled(): Boolean = featureFlags?.contains(FeatureFlag.RESPONSE_REQUIRED) == true
 
     private fun ItemMessageBinding.bindScheduledDraftReminderAlert(message: Message) {
         val delayMinutes = message.reminder?.delta ?: return
@@ -1327,12 +1335,14 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean) = with(binding) {
+    private fun MessageViewHolder.onExpandOrCollapseMessage(messageUi: MessageUi, shouldTrack: Boolean) = with(binding) {
+        val message = messageUi.message
         val isExpanded = threadAdapterState.isExpandedMap[message.uid] == true
 
         if (shouldTrack) trackMessageEvent(MatomoName.OpenMessage, isExpanded)
 
         setHeaderState(message, isExpanded)
+        bindReminderIcon(messageUi, isExpanded)
         content.isVisible = isExpanded
         if (isExpanded) loadContentAndQuote(message)
     }
@@ -1357,7 +1367,6 @@ class ThreadAdapter(
             setOnClickListener { threadAdapterCallbacks?.onAskEuriaClicked?.invoke(message) }
         }
         sendingProgressText.isVisible = message.isMessageWithSendDelay
-        iconReminder.isVisible = message.reminder != null && !isExpanded
 
         recipient.text = if (isExpanded) getAllRecipientsFormatted(message) else context.formatSubject(message.subject)
         recipientChevron.isVisible = isExpanded
@@ -1449,14 +1458,21 @@ class ThreadAdapter(
 
             if (oldItem !is MessageUi || newItem !is MessageUi) return null
 
-            // TODO: Handle the case where there are multiple aspects that changed at once
+            // A reminder change must also be bound if another aspect changes in the same update.
+            if (MessageDiffAspect.Reminder.areDifferent(oldItem, newItem)) {
+                return if (MessageDiffAspect.entries.any { it != MessageDiffAspect.Reminder && it.areDifferent(oldItem, newItem) }) {
+                    null
+                } else {
+                    NotifyType.ReminderRebind
+                }
+            }
+
             return when {
                 // null means "bind the whole item again"
                 MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
                 MessageDiffAspect.Unsubscribe.areDifferent(oldItem, newItem) -> NotifyType.UnsubscribeRebind
                 MessageDiffAspect.Acknowledge.areDifferent(oldItem, newItem) -> NotifyType.AcknowledgeRebind
-                MessageDiffAspect.Reminder.areDifferent(oldItem, newItem) -> NotifyType.ReminderRebind
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
@@ -1523,7 +1539,7 @@ class ThreadAdapter(
                             message.reminder?.date == it.message.reminder?.date &&
                             message.reminder?.delta == it.message.reminder?.delta &&
                             message.reminderAction == it.message.reminderAction &&
-                            isAnsweredByRecipient == it.isAnsweredByRecipient
+                            reminderAudience == it.reminderAudience
                 })
 
                 data object Unsubscribe : DiffAspect<MessageUi>({ unsubscribeState == it.unsubscribeState })

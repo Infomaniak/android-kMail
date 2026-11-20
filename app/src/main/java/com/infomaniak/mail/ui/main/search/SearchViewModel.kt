@@ -437,7 +437,7 @@ class SearchViewModel @Inject constructor(
             val searchThreads = searchUtils.convertRemoteThreadsToSearchThreads(
                 remoteThreads,
                 folder,
-                currentMailboxFlow.first().aliases
+                currentMailboxFlow.first(),
             )
             threadController.saveSearchThreads(searchThreads)
         }.getOrElse { exception ->
@@ -460,7 +460,7 @@ class SearchViewModel @Inject constructor(
         )
         val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(
             searchMessages,
-            currentMailboxFlow.first().aliases
+            currentMailboxFlow.first(),
         )
         threadController.saveSearchThreads(searchThreads)
     }

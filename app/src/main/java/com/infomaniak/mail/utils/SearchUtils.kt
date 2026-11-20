@@ -24,7 +24,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeMessagesWithContent
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeReminderVisibility
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.FolderRole
 import com.infomaniak.mail.data.models.extensions.folderNameRes
@@ -94,14 +96,14 @@ class SearchUtils @Inject constructor(
         }
     }
 
-    fun convertLocalMessagesToSearchThreads(searchMessages: List<Message>, aliases: List<String>?): List<Thread> {
+    fun convertLocalMessagesToSearchThreads(searchMessages: List<Message>, mailbox: Mailbox): List<Thread> {
         val cachedNamedFolders = mutableMapOf<String, NamedFolder>()
         return searchMessages.mapNotNull { message ->
             message.toThread().apply {
                 uid = "search-${message.uid}"
                 isFromSearch = true
                 removeHiddenReminders()
-                recomputeThread(aliases = aliases)
+                recomputeThread(aliases = mailbox.aliases, mailboxEmail = mailbox.email)
                 sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }.takeIf { it.messagesWithContent.isNotEmpty() }
         }
@@ -118,7 +120,7 @@ class SearchUtils @Inject constructor(
     suspend fun convertRemoteThreadsToSearchThreads(
         remoteThreads: List<Thread>,
         filterFolder: Folder?,
-        aliases: List<String>?
+        mailbox: Mailbox,
     ): List<Thread> {
         val cachedNamedFolders = mutableMapOf<String, NamedFolder>()
         return remoteThreads.map { remoteThread ->
@@ -128,8 +130,9 @@ class SearchUtils @Inject constructor(
                 isFromSearch = true
                 setFolderId(filterFolder)
                 removeHiddenReminders()
-                recomputeThread(aliases = aliases)
+                recomputeThread(aliases = mailbox.aliases, mailboxEmail = mailbox.email)
                 keepOldMessagesData(filterFolder, mailboxContentRealm())
+                recomputeReminderVisibility(mailbox.email, mailbox.aliases)
                 sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }
         }.filter { it.messagesWithContent.isNotEmpty() }
