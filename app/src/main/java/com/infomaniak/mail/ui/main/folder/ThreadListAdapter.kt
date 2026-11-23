@@ -311,6 +311,7 @@ class ThreadListAdapter @Inject constructor(
                 dateDisplay.iconColorRes?.let { imageTintList = ColorStateList.valueOf(context.getColor(it)) }
             }
             draftPrefix.isVisible = hasDrafts
+            sendingSuffix.isVisible = messages.any { it.isMessageWithSendDelay }
 
             val (isIconReplyVisible, isIconForwardVisible) = computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded)
             iconReply.isVisible = isIconReplyVisible
