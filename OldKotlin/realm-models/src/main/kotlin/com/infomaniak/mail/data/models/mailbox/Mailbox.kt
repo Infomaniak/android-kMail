@@ -62,6 +62,8 @@ class Mailbox : RealmObject {
     var aliases = realmListOf<String>()
     @SerialName("is_spam_filter")
     var isSpamFiltered: Boolean = false
+    @SerialName("useExternalMailGateway")
+    var useExternalMailGateway: Boolean = false
     @SerialName("is_free")
     var isKSuitePerso: Boolean = false // Means it's any [KSuite.Perso.*] tier
     @SerialName("is_limited")

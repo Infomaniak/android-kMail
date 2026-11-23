@@ -116,6 +116,7 @@ class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
     private val isSpamFilterActivated: () -> Boolean = { false },
+    private val isExternalMailGatewayEnabled: () -> Boolean = { false },
     private val areMessagesCollapsibles: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val aliases: () -> List<String>,
@@ -943,7 +944,8 @@ class ThreadAdapter(
             isMessageSpam && !message.isInSpamFolder() && isSpamFilterActivated() -> {
                 SpamAction.MoveToSpam
             }
-            isMessageSpam && !message.isInSpamFolder() && !isSpamFilterActivated() && !isExpeditorAuthorized -> {
+            isMessageSpam && !message.isInSpamFolder() && !isSpamFilterActivated() &&
+                !isExternalMailGatewayEnabled() && !isExpeditorAuthorized -> {
                 SpamAction.EnableFilter
             }
             !isMessageSpam && message.isInSpamFolder() && isExpeditorBlocked -> {

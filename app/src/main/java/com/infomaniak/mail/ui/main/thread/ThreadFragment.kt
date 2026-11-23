@@ -374,6 +374,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
+            isExternalMailGatewayEnabled = { mainViewModel.currentMailbox.value?.useExternalMailGateway ?: false },
             areMessagesCollapsibles = { threadViewModel.messagesAreCollapsiblesFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             aliases = { mainViewModel.currentMailbox.value?.aliases?.toList() ?: emptyList() },
