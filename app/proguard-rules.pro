@@ -21,6 +21,20 @@
 -keepnames class com.infomaniak.mail.data.models.** implements io.realm.kotlin.types.RealmObject
 -keepnames class com.infomaniak.mail.data.models.** implements io.realm.kotlin.types.EmbeddedRealmObject
 
+# Notification PendingIntents can survive an app upgrade. Preserve the Parcelable
+# and the Serializable classes and fields contained in their extras.
+-keep class com.infomaniak.mail.utils.NotificationPayload { *; }
+-keep class com.infomaniak.mail.utils.NotificationPayload$NotificationBehavior { *; }
+-keep class com.infomaniak.mail.utils.NotificationPayload$NotificationBehavior$NotificationType { *; }
+
+# AI request bodies are serialized by Gson, including recipients in message vars.
+-keepclassmembers class com.infomaniak.mail.data.models.ai.AiMessage {
+    !static !transient <fields>;
+}
+-keepclassmembers class com.infomaniak.mail.data.models.correspondent.Recipient {
+    !static !transient <fields>;
+}
+
 # Core's Room converters use Gson, including fields without @SerializedName.
 -keepclassmembers class com.infomaniak.core.auth.models.OrganizationAccount {
     !static !transient <fields>;

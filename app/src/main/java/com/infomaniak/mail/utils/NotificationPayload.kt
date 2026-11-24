@@ -61,5 +61,10 @@ data class NotificationPayload(
             SUMMARY,
             UNDO,
         }
+
+        private companion object {
+            // Matches notifications serialized by the unminified release.
+            private const val serialVersionUID = -3483401863179988985L
+        }
     }
 }
