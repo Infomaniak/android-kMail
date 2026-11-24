@@ -301,6 +301,7 @@ class ThreadListAdapter @Inject constructor(
         with(thread) {
             expeditor.text = formatRecipientNames(computeDisplayedRecipients())
             mailSubject.text = context.formatSubject(subject)
+            sendingProgressText.isVisible = shouldShowSendingStatus(folderRole)
             mailBodyPreview.text = computePreview(context)
 
             val dateDisplay = computeThreadListDateDisplay(callbacks?.getFeatureFlags?.invoke(), localSettings)

@@ -246,7 +246,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
-                    app:layout_constraintEnd_toStartOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/sendingProgressText"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/mailSubject">
 
@@ -274,6 +274,21 @@
                 </FrameLayout>
 
                 <TextView
+                    android:id="@+id/sendingProgressText"
+                    style="@style/BodySmall.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardVerySmall"
+                    android:text="@string/messageIsSending"
+                    android:textStyle="italic"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/mailSubject"
+                    app:layout_constraintStart_toEndOf="@id/iconReplyOrForwardLayout"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    tools:visibility="visible" />
+
+                <TextView
                     android:id="@+id/mailSubject"
                     style="@style/Body"
                     android:layout_width="0dp"
@@ -282,7 +297,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
-                    app:layout_constraintStart_toEndOf="@id/iconReplyOrForwardLayout"
+                    app:layout_constraintStart_toEndOf="@id/sendingProgressText"
                     app:layout_constraintTop_toBottomOf="@id/mailAddress"
                     tools:text="@tools:sample/lorem[10]" />
 

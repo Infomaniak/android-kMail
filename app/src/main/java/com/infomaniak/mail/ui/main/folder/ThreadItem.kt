@@ -29,3 +29,7 @@ sealed interface ThreadListItem {
     data object LoadMore : ThreadListItem
     data object Spacer : ThreadListItem
 }
+
+internal fun Thread.shouldShowSendingStatus(folderRole: FolderRole?): Boolean {
+    return folderRole == FolderRole.DRAFT && messages.any { it.folderId == folderId && it.isMessageWithSendDelay }
+}
