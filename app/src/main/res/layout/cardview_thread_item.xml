@@ -281,10 +281,24 @@
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
+                    app:layout_constraintEnd_toStartOf="@id/sendingSuffix"
                     app:layout_constraintStart_toEndOf="@id/iconReplyOrForwardLayout"
                     app:layout_constraintTop_toBottomOf="@id/mailAddress"
                     tools:text="@tools:sample/lorem[10]" />
+
+                <TextView
+                    android:id="@+id/sendingSuffix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardVerySmall"
+                    android:text="@string/messageIsSending"
+                    android:textColor="@color/secondaryTextColor"
+                    android:textStyle="italic"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
+                    app:layout_constraintStart_toEndOf="@id/mailSubject"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject" />
 
                 <TextView
                     android:id="@+id/folderNameCompactMode"
@@ -296,7 +310,7 @@
                     app:layout_constraintEnd_toStartOf="@id/iconMention"
                     app:layout_constraintHorizontal_bias="1"
                     app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toEndOf="@id/mailSubject"
+                    app:layout_constraintStart_toEndOf="@id/sendingSuffix"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
                     tools:background="@color/folderTagBackground"
                     tools:gravity="center"
