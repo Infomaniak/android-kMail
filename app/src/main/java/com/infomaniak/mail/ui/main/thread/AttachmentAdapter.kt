@@ -43,11 +43,13 @@ class AttachmentAdapter(
     }
 
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.contains(PAYLOAD_DOWNLOADING_STATE)) {
-            val attachment = attachments.getOrNull(position) ?: return
-            holder.binding.attachmentDetails.setIconVisibility(isAttachmentDownloading(attachment.localUuid))
-        } else {
-            runCatchingRealm { super.onBindViewHolder(holder, position, payloads) }
+        runCatchingRealm {
+            if (payloads.contains(PAYLOAD_DOWNLOADING_STATE)) {
+                val attachment = attachments.getOrNull(position) ?: return
+                holder.binding.attachmentDetails.setIconVisibility(isAttachmentDownloading(attachment.localUuid))
+            } else {
+                super.onBindViewHolder(holder, position, payloads)
+            }
         }
     }
 
@@ -97,7 +99,8 @@ class AttachmentAdapter(
         downloadingAttachmentUuids.clear()
         downloadingAttachmentUuids.addAll(uuids)
         attachments.forEachIndexed { index, attachment ->
-            if (attachment.localUuid in changedUuids) notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
+            val uuid = runCatchingRealm { attachment.localUuid }.getOrNull()
+            if (uuid in changedUuids) notifyItemChanged(index, PAYLOAD_DOWNLOADING_STATE)
         }
     }
 

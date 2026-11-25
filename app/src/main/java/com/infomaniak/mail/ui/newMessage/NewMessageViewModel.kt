@@ -1305,11 +1305,9 @@ class NewMessageViewModel @Inject constructor(
     fun saveAttachmentsToCacheDir(inlineAttachments: List<Attachment>, onSaved: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             inlineAttachments.forEach { attachment ->
-                attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
-                    attachment.getCacheFile(appContext)?.let { cacheFile ->
-                        LocalStorageUtils.saveAttachmentToCacheDir(inputStream, cacheFile)
-                    }
-                }
+                val localFile = attachment.getUploadLocalFile() ?: return@forEach
+                val cacheFile = attachment.getCacheFile(appContext) ?: return@forEach
+                LocalStorageUtils.saveAttachmentToCacheDir(localFile.inputStream(), cacheFile, attachment.size)
             }
             onSaved()
         }

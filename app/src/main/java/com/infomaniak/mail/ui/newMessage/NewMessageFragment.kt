@@ -464,7 +464,7 @@ class NewMessageFragment : Fragment() {
                 if (it !is Attachment) return@AttachmentAdapter
 
                 trackAttachmentActionsEvent(MatomoName.OpenFromDraft)
-                attachmentOpeningManager.requestOpen(it.localUuid, viewLifecycleOwner.lifecycleScope)
+                attachmentOpeningManager.requestOpen(it, viewLifecycleOwner.lifecycleScope, newMessageViewModel::currentMailbox)
             },
         )
 
@@ -968,7 +968,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAttachmentOpening() {
-        attachmentOpeningManager.observeOpening(viewLifecycleOwner.lifecycleScope, ::startActivity)
+        attachmentOpeningManager.observeOpening(viewLifecycleOwner, ::startActivity)
         viewLifecycleOwner.lifecycleScope.launch {
             attachmentDownloadManager.downloadingUuids.collect(attachmentAdapter::setDownloadingUuids)
         }

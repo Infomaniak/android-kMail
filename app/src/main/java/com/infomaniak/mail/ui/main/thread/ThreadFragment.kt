@@ -566,7 +566,7 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun observeAttachmentOpening() {
-        attachmentOpeningManager.observeOpening(viewLifecycleOwner.lifecycleScope, ::startActivity)
+        attachmentOpeningManager.observeOpening(viewLifecycleOwner, ::startActivity)
         viewLifecycleOwner.lifecycleScope.launch {
             attachmentDownloadManager.downloadingUuids.collect { threadAdapter.setDownloadingUuids(it) }
         }
@@ -587,7 +587,14 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun observeThreadOpening() {
-        twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
+        var previousThreadUid: String? = null
+        twoPaneViewModel.currentThreadUid.distinctUntilChanged().observe(viewLifecycleOwner) { threadUid ->
+            if (previousThreadUid != null && previousThreadUid != threadUid) {
+                attachmentOpeningManager.cancelPendingOpen(closeDialog = true)
+            }
+            previousThreadUid = threadUid
+            if (threadUid == null) return@observe
+
             aiActionsViewModel.reset()
             displayThreadView()
             threadViewModel.updateCurrentThreadUid(threadViewModel.AllMessages(threadUid))

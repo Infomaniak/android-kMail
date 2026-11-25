@@ -19,30 +19,32 @@ package com.infomaniak.mail.utils.attachment
 
 import android.content.Context
 import android.content.Intent
+import com.infomaniak.core.common.extensions.goToAppStore
 import com.infomaniak.core.legacy.utils.hasSupportedApplications
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.extensions.getCacheFile
-import com.infomaniak.mail.data.models.extensions.getUploadLocalFile
-import com.infomaniak.mail.data.models.extensions.hasUsableCache
-import com.infomaniak.mail.data.models.extensions.isInlineCachedFile
+import com.infomaniak.mail.data.models.extensions.hasFileForOpening
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.SaveOnKDriveUtils
+import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
-import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToAppStore
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.SAVE_TO_DRIVE
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openWithIntent
+import com.infomaniak.mail.utils.extensions.AttachmentExt.saveToDriveIntent
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface AttachmentOperations {
     suspend fun getAttachment(localUuid: String): Attachment?
-    suspend fun hasSupportedApp(attachment: Attachment): Boolean
-    suspend fun isCached(attachment: Attachment): Boolean
-    suspend fun getOpenIntent(attachment: Attachment, intentType: AttachmentIntentType = AttachmentIntentType.OPEN_WITH): Intent?
-    suspend fun download(attachment: Attachment): Boolean
-    suspend fun deleteIncompleteCache(attachment: Attachment)
+    suspend fun hasSupportedApp(attachment: Attachment, mailbox: Mailbox? = null): Boolean
+    suspend fun isCached(attachment: Attachment, mailbox: Mailbox? = null): Boolean
+    suspend fun getOpenIntent(attachment: Attachment, intentType: AttachmentIntentType = OPEN_WITH, mailbox: Mailbox? = null): Intent?
+    suspend fun download(attachment: Attachment, mailbox: Mailbox? = null): Boolean
+    fun canSaveOnKDrive(): Boolean
+    fun openDriveAppStore()
 }
 
 class DefaultAttachmentOperations @Inject constructor(
@@ -54,27 +56,26 @@ class DefaultAttachmentOperations @Inject constructor(
         return runCatchingRealm { attachmentController.getAttachment(localUuid) }.getOrNull()
     }
 
-    override suspend fun hasSupportedApp(attachment: Attachment): Boolean {
-        return attachment.openWithIntent(context)?.hasSupportedApplications(context) == true
+    override suspend fun hasSupportedApp(attachment: Attachment, mailbox: Mailbox?): Boolean {
+        return attachment.openWithIntent(context, mailbox)?.hasSupportedApplications(context) == true
     }
 
-    override suspend fun isCached(attachment: Attachment): Boolean {
-        return attachment.hasUsableCache(context, attachment.getUploadLocalFile()) || attachment.isInlineCachedFile(context)
+    override suspend fun isCached(attachment: Attachment, mailbox: Mailbox?): Boolean {
+        return attachment.hasFileForOpening(context, mailbox)
     }
 
-    override suspend fun getOpenIntent(attachment: Attachment, intentType: AttachmentIntentType): Intent? {
-        return withContext(Dispatchers.Main) {
-            attachment.getIntentOrGoToAppStore(context, intentType)
+    override suspend fun getOpenIntent(attachment: Attachment, intentType: AttachmentIntentType, mailbox: Mailbox?): Intent? {
+        return when (intentType) {
+            OPEN_WITH -> attachment.openWithIntent(context, mailbox)
+            SAVE_TO_DRIVE -> attachment.saveToDriveIntent(context, mailbox)
         }
     }
 
-    override suspend fun download(attachment: Attachment): Boolean {
-        return LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(context, attachment)
+    override suspend fun download(attachment: Attachment, mailbox: Mailbox?): Boolean {
+        return LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(context, attachment, mailbox)
     }
 
-    override suspend fun deleteIncompleteCache(attachment: Attachment) {
-        runCatchingRealm {
-            attachment.getCacheFile(context)?.apply { if (exists()) delete() }
-        }
-    }
+    override fun canSaveOnKDrive(): Boolean = SaveOnKDriveUtils.canSaveOnKDrive(context)
+
+    override fun openDriveAppStore() = context.goToAppStore(DRIVE_PACKAGE)
 }

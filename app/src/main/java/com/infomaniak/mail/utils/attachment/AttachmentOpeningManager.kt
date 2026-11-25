@@ -22,22 +22,34 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.MainThread
 import androidx.annotation.StringRes
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.legacy.R
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DownloadResult
+import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager.DraftAttachment
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.SAVE_TO_DRIVE
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -64,52 +76,72 @@ class AttachmentOpeningManager @Inject constructor(
         scope: CoroutineScope,
         intentType: AttachmentIntentType = OPEN_WITH,
         onFinished: () -> Unit = {},
-    ) {
-        val download = scope.async {
-            if (intentType == OPEN_WITH) {
-                val canOpen = runCatching {
-                    withContext(ioDispatcher) {
-                        attachmentOperations.getAttachment(localUuid)?.let { attachmentOperations.hasSupportedApp(it) }
-                    }
-                }.cancellable().getOrElse {
-                    SentryLog.e(TAG, "Could not check supporting applications for $localUuid", it)
-                    return@async DownloadResult.Failed(R.string.anErrorHasOccurred)
-                }
-                if (canOpen == false) {
-                    return@async DownloadResult.Failed(R.string.errorNoSupportingAppFound)
-                }
-            }
+    ) = requestOpen(localUuid, scope, intentType, onFinished) { null }
 
-            downloadManager.downloadAttachment(localUuid, scope).await()
+    @MainThread
+    internal fun requestOpen(attachment: Attachment, scope: CoroutineScope, mailbox: suspend () -> Mailbox) {
+        requestOpen(attachment.localUuid, scope, OPEN_WITH, onFinished = {}) { DraftAttachment(attachment, mailbox()) }
+    }
+
+    private fun requestOpen(
+        localUuid: String,
+        scope: CoroutineScope,
+        intentType: AttachmentIntentType,
+        onFinished: () -> Unit,
+        draftAttachment: suspend () -> DraftAttachment?,
+    ) {
+        val download = scope.async(start = CoroutineStart.LAZY) {
+            runCatching {
+                val draft = draftAttachment()
+                if (intentType == OPEN_WITH) {
+                    val canOpen = withContext(ioDispatcher) {
+                        val attachment = draft?.attachment ?: attachmentOperations.getAttachment(localUuid)
+                        attachment?.let { attachmentOperations.hasSupportedApp(it, draft?.mailbox) }
+                    }
+                    if (canOpen == false) return@runCatching DownloadResult.Failed(R.string.errorNoSupportingAppFound)
+                }
+
+                downloadManager.downloadAttachment(localUuid, scope, draft).await()
+            }.cancellable().getOrElse {
+                SentryLog.e(TAG, "Could not prepare download for attachment $localUuid", it)
+                DownloadResult.Failed(R.string.anErrorHasOccurred)
+            }
         }
         requestedAttachment.value = OpenRequest(localUuid, download, intentType, onFinished)
+        download.start()
     }
 
     @MainThread
-    fun cancelPendingOpen(localUuid: String? = null) {
+    fun cancelPendingOpen(localUuid: String? = null, closeDialog: Boolean = false) {
         val request = requestedAttachment.value ?: return
-        if (localUuid == null || request.localUuid == localUuid) requestedAttachment.compareAndSet(request, null)
+        if (localUuid != null && request.localUuid != localUuid) return
+
+        if (requestedAttachment.compareAndSet(request, null) && closeDialog) request.onFinished()
     }
 
     @MainThread
-    fun observeOpening(scope: CoroutineScope, startIntent: (Intent) -> Unit) {
-        observationJob?.cancel()
-        val job = scope.launch(start = CoroutineStart.LAZY) {
-            requestedAttachment.collectLatest { request ->
-                if (request == null) return@collectLatest
+    fun observeOpening(owner: LifecycleOwner, startIntent: (Intent) -> Unit) {
+        val previousJob = observationJob
+        val lifecycle = owner.lifecycle
+        val job = owner.lifecycleScope.launch(start = CoroutineStart.LAZY) {
+            lifecycle.repeatOnLifecycle(RESUMED) {
+                requestedAttachment.collectLatest { request ->
+                    if (request == null) return@collectLatest
 
-                try {
-                    // Cancelling this waiter does not cancel the independently scoped download.
-                    when (val result = request.download.await()) {
-                        is DownloadResult.Ready -> openAttachment(request, result, startIntent)
-                        is DownloadResult.Failed -> if (finishRequest(request)) showError(result.errorRes)
+                    try {
+                        when (val result = request.download.await()) {
+                            is DownloadResult.Ready -> openAttachment(request, result, lifecycle, startIntent)
+                            is DownloadResult.Failed -> if (finishRequest(request, lifecycle)) showError(result.errorRes)
+                        }
+                    } catch (_: CancellationException) {
+                        // Only consume an operation's cancellation, not a cancelled lifecycle waiter.
+                        finishRequest(request, lifecycle)
                     }
-                } finally {
-                    finishRequest(request)
                 }
             }
         }
         observationJob = job
+        previousJob?.cancel()
         job.invokeOnCompletion {
             if (observationJob === job) {
                 cancelPendingOpen()
@@ -119,27 +151,31 @@ class AttachmentOpeningManager @Inject constructor(
         job.start()
     }
 
-    private suspend fun openAttachment(request: OpenRequest, result: DownloadResult.Ready, startIntent: (Intent) -> Unit) {
+    private suspend fun openAttachment(
+        request: OpenRequest,
+        result: DownloadResult.Ready,
+        lifecycle: Lifecycle,
+        startIntent: (Intent) -> Unit,
+    ) {
+        val openStore = request.intentType == SAVE_TO_DRIVE && !attachmentOperations.canSaveOnKDrive()
         val intent = runCatching {
-            attachmentOperations.getOpenIntent(result.attachment, request.intentType)
+            if (openStore) null else attachmentOperations.getOpenIntent(result.attachment, request.intentType, result.mailbox)
         }.cancellable().getOrElse {
             SentryLog.e(TAG, "Could not prepare attachment ${request.localUuid}", it)
-            if (finishRequest(request)) showError(R.string.anErrorHasOccurred)
+            if (finishRequest(request, lifecycle)) showError(R.string.anErrorHasOccurred)
             return
         }
-        if (!finishRequest(request)) return
-
-        if (intent == null) {
-            // SAVE_TO_DRIVE can return null after redirecting to the store when kDrive is not installed.
-            if (request.intentType == OPEN_WITH) {
-                SentryLog.e(TAG, "No intent for attachment ${request.localUuid}")
-                showError(R.string.anErrorHasOccurred)
-            }
-            return
-        }
+        if (!finishRequest(request, lifecycle)) return
 
         try {
-            startIntent(intent)
+            when {
+                openStore -> attachmentOperations.openDriveAppStore()
+                intent != null -> startIntent(intent)
+                else -> {
+                    SentryLog.e(TAG, "No intent for attachment ${request.localUuid}")
+                    showError(R.string.anErrorHasOccurred)
+                }
+            }
         } catch (exception: ActivityNotFoundException) {
             SentryLog.e(TAG, "No application could open attachment ${request.localUuid}", exception)
             showError(R.string.errorNoSupportingAppFound)
@@ -153,8 +189,9 @@ class AttachmentOpeningManager @Inject constructor(
         snackbarManager.postValue(context.getString(errorRes))
     }
 
-    private fun finishRequest(request: OpenRequest): Boolean {
-        if (!requestedAttachment.compareAndSet(request, null)) return false
+    private suspend fun finishRequest(request: OpenRequest, lifecycle: Lifecycle): Boolean {
+        currentCoroutineContext().ensureActive()
+        if (lifecycle.currentState != RESUMED || !requestedAttachment.compareAndSet(request, null)) return false
 
         request.onFinished()
         return true

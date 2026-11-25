@@ -32,7 +32,6 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -46,7 +45,6 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -82,7 +80,6 @@ class AttachmentDownloadManagerTest {
         coEvery { operations.getAttachment(localUuid) } returns attachment
         coEvery { operations.hasSupportedApp(attachment) } returns true
         coEvery { operations.isCached(attachment) } returns cached
-        coEvery { operations.deleteIncompleteCache(attachment) } just Runs
         coEvery { operations.download(attachment) } coAnswers {
             delay(duration)
             true
@@ -151,192 +148,55 @@ class AttachmentDownloadManagerTest {
     }
 
     @Test
-    fun cancelDownload_deletesIncompleteCacheWithoutReportingAnError() = runTest(dispatcher) {
+    fun cancelDownload_cancelsTheDeferredAndClearsProgress() = runTest(dispatcher) {
         val attachment = attachment("uuid-1")
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         runCurrent()
         manager.cancelDownload("uuid-1")
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        assertTrue(download.isCancelled)
+        coVerify(exactly = 1) { operations.download(attachment) }
     }
 
     @Test
-    fun retryAfterCancellation_waitsForCleanupAndKeepsItsSuccessfulCache() = runTest(dispatcher) {
+    fun retryAfterCancellation_canCompleteASeparateAttempt() = runTest(dispatcher) {
         val attachment = attachment("uuid-1")
-        val cleanupStarted = CompletableDeferred<Unit>()
-        val allowCleanup = CompletableDeferred<Unit>()
         var attempts = 0
-        var cacheExists = false
         coEvery { operations.download(attachment) } coAnswers {
-            attempts++
-            if (attempts == 1) awaitCancellation()
-            cacheExists = true
+            if (++attempts == 1) awaitCancellation()
             true
-        }
-        coEvery { operations.deleteIncompleteCache(attachment) } coAnswers {
-            cleanupStarted.complete(Unit)
-            allowCleanup.await()
-            cacheExists = false
         }
 
         manager.downloadAttachment("uuid-1", scope)
         runCurrent()
         manager.cancelDownload("uuid-1")
         runCurrent()
-        assertTrue(cleanupStarted.isCompleted)
 
         val retry = manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        val retryStartedBeforeCleanup = attempts > 1
-        val retryFinishedBeforeCleanup = retry.isCompleted
-
-        allowCleanup.complete(Unit)
         advanceUntilIdle()
 
-        assertFalse(retryStartedBeforeCleanup)
-        assertFalse(retryFinishedBeforeCleanup)
         assertEquals(DownloadResult.Ready(attachment), retry.await())
-        assertTrue(cacheExists)
-        assertTrue(manager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
-    }
-
-    @Test
-    fun cleanupOfOneAttachment_doesNotBlockAnotherAttachment() = runTest(dispatcher) {
-        val first = attachment("uuid-1")
-        val second = attachment("uuid-2", duration = 0)
-        val allowCleanup = CompletableDeferred<Unit>()
-        coEvery { operations.download(first) } coAnswers { awaitCancellation() }
-        coEvery { operations.deleteIncompleteCache(first) } coAnswers { allowCleanup.await() }
-
-        manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        manager.cancelDownload("uuid-1")
-        runCurrent()
-        val download = manager.downloadAttachment("uuid-2", scope)
-        runCurrent()
-        val completedBeforeCleanup = download.isCompleted
-
-        allowCleanup.complete(Unit)
-        advanceUntilIdle()
-
-        assertTrue(completedBeforeCleanup)
-        assertEquals(DownloadResult.Ready(second), download.await())
-    }
-
-    @Test
-    fun retryFromANewScreen_waitsForThePreviousScreenCleanup() = runTest(dispatcher) {
-        val attachment = attachment("uuid-1")
-        val allowCleanup = CompletableDeferred<Unit>()
-        var attempts = 0
-        coEvery { operations.download(attachment) } coAnswers {
-            attempts++
-            if (attempts == 1) awaitCancellation()
-            true
-        }
-        coEvery { operations.deleteIncompleteCache(attachment) } coAnswers { allowCleanup.await() }
-
-        manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        scope.cancel()
-        runCurrent()
-
-        val newScreenScope = CoroutineScope(SupervisorJob() + dispatcher)
-        try {
-            val retry = manager.downloadAttachment("uuid-1", newScreenScope)
-            runCurrent()
-            val retryStartedBeforeCleanup = attempts > 1
-            allowCleanup.complete(Unit)
-            advanceUntilIdle()
-
-            assertFalse(retryStartedBeforeCleanup)
-            assertEquals(DownloadResult.Ready(attachment), retry.await())
-        } finally {
-            allowCleanup.complete(Unit)
-            newScreenScope.cancel()
-        }
-    }
-
-    @Test
-    fun duplicateRetriesDuringCleanup_shareOneNewDownload() = runTest(dispatcher) {
-        val attachment = attachment("uuid-1")
-        val allowCleanup = CompletableDeferred<Unit>()
-        var attempts = 0
-        coEvery { operations.download(attachment) } coAnswers {
-            attempts++
-            if (attempts == 1) awaitCancellation()
-            true
-        }
-        coEvery { operations.deleteIncompleteCache(attachment) } coAnswers { allowCleanup.await() }
-
-        manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        manager.cancelDownload("uuid-1")
-        runCurrent()
-
-        val firstRetry = manager.downloadAttachment("uuid-1", scope)
-        val secondRetry = manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        val attemptsBeforeCleanup = attempts
-        allowCleanup.complete(Unit)
-        advanceUntilIdle()
-
-        assertEquals(1, attemptsBeforeCleanup)
         assertEquals(2, attempts)
-        assertEquals(DownloadResult.Ready(attachment), firstRetry.await())
-        assertEquals(firstRetry.await(), secondRetry.await())
-    }
-
-    @Test
-    fun cancellingARetryDuringCleanup_doesNotLetAFollowingRetryBypassCleanup() = runTest(dispatcher) {
-        val attachment = attachment("uuid-1")
-        val allowCleanup = CompletableDeferred<Unit>()
-        var attempts = 0
-        coEvery { operations.download(attachment) } coAnswers {
-            attempts++
-            if (attempts == 1) awaitCancellation()
-            true
-        }
-        coEvery { operations.deleteIncompleteCache(attachment) } coAnswers { allowCleanup.await() }
-
-        manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        manager.cancelDownload("uuid-1")
-        runCurrent()
-        manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        manager.cancelDownload("uuid-1")
-        runCurrent()
-        val retry = manager.downloadAttachment("uuid-1", scope)
-        runCurrent()
-        val attemptsBeforeCleanup = attempts
-        allowCleanup.complete(Unit)
-        advanceUntilIdle()
-
-        assertEquals(1, attemptsBeforeCleanup)
-        assertEquals(2, attempts)
-        assertEquals(DownloadResult.Ready(attachment), retry.await())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
     }
 
     @Test
     fun leavingTheScreen_cancelsItsDownloads() = runTest(dispatcher) {
-        val attachment = attachment("uuid-1")
+        attachment("uuid-1")
 
-        manager.downloadAttachment("uuid-1", scope)
+        val download = manager.downloadAttachment("uuid-1", scope)
         runCurrent()
         scope.cancel()
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
+        assertTrue(download.isCancelled)
     }
 
     @Test
-    fun downloadFailure_cleansCacheAndReturnsFailure() = runTest(dispatcher) {
+    fun downloadFailure_clearsProgressAndReturnsFailure() = runTest(dispatcher) {
         val attachment = attachment("uuid-1")
         coEvery { operations.download(attachment) } returns false
 
@@ -344,12 +204,11 @@ class AttachmentDownloadManagerTest {
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
         assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
     }
 
     @Test
-    fun downloadException_cleansCacheAndReturnsFailure() = runTest(dispatcher) {
+    fun downloadException_clearsProgressAndReturnsFailure() = runTest(dispatcher) {
         val attachment = attachment("uuid-1")
         coEvery { operations.download(attachment) } throws IOException("Download failed")
 
@@ -357,7 +216,6 @@ class AttachmentDownloadManagerTest {
         advanceUntilIdle()
 
         assertTrue(manager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
         assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
         verify { SentryLog.e(any(), any(), any()) }
     }
@@ -422,8 +280,8 @@ class AttachmentDownloadManagerTest {
     }
 
     @Test
-    fun timeout_cleansIncompleteCacheAndReportsFailureAfterTwoMinutes() = runTest(dispatcher) {
-        val attachment = attachment("uuid-1", duration = 180_000)
+    fun timeout_reportsFailureAfterTwoMinutes() = runTest(dispatcher) {
+        attachment("uuid-1", duration = 180_000)
 
         val download = manager.downloadAttachment("uuid-1", scope)
         advanceTimeBy(119_999)
@@ -434,7 +292,6 @@ class AttachmentDownloadManagerTest {
         advanceTimeBy(1)
         runCurrent()
         assertTrue(manager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
         assertEquals(DownloadResult.Failed(R.string.anErrorHasOccurred), download.await())
     }
 }

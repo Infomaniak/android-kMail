@@ -19,12 +19,12 @@ package com.infomaniak.mail.utils.attachment
 
 import androidx.annotation.StringRes
 import com.infomaniak.core.common.cancellable
-import com.infomaniak.core.common.dynamicLazyMap
 import com.infomaniak.core.common.dynamicLazyMapOfSharedFlow
 import com.infomaniak.core.common.flowForKey
 import com.infomaniak.core.legacy.R
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.NetworkManager
 import dagger.hilt.android.scopes.ActivityScoped
@@ -32,11 +32,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,9 +42,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -62,12 +56,7 @@ class AttachmentDownloadManager @Inject constructor(
 
     private val downloadScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
-    // The lock stays shared until the producer, including cancellation cleanup, has finished.
-    private val downloadLocks = downloadScope.dynamicLazyMap { _: String -> Mutex() }
-
-    private val downloads = downloadScope.dynamicLazyMapOfSharedFlow { localUuid: String ->
-        createDownloadStates(localUuid)
-    }
+    private val downloads = downloadScope.dynamicLazyMapOfSharedFlow { target: DownloadTarget -> createDownloadStates(target) }
 
     private val downloadJobs = ConcurrentHashMap<String, Deferred<DownloadResult>>()
     private val _downloadingUuids = MutableStateFlow(emptySet<String>())
@@ -78,9 +67,13 @@ class AttachmentDownloadManager @Inject constructor(
      * only cancels the opening waiter, not this observer. Failures are returned to the opening layer,
      * which decides whether the request is still relevant before displaying feedback.
      */
-    internal fun downloadAttachment(localUuid: String, scope: CoroutineScope): Deferred<DownloadResult> {
+    internal fun downloadAttachment(
+        localUuid: String,
+        scope: CoroutineScope,
+        draft: DraftAttachment? = null,
+    ): Deferred<DownloadResult> {
         val job = scope.async(start = CoroutineStart.LAZY) {
-            downloads.flowForKey(localUuid)
+            downloads.flowForKey(DownloadTarget(localUuid, draft))
                 .onEach { state ->
                     if (state is DownloadState.Downloading) _downloadingUuids.update { it + localUuid }
                 }
@@ -104,41 +97,23 @@ class AttachmentDownloadManager @Inject constructor(
         downloadJobs[localUuid]?.cancel()
     }
 
-    private fun createDownloadStates(localUuid: String): Flow<DownloadState> = flow {
-        downloadLocks.useElement(localUuid) { lock ->
-            lock.withLock {
-                val result = runCatching {
-                    val attachment = attachmentOperations.getAttachment(localUuid)
-                        ?: return@runCatching DownloadResult.Failed(downloadErrorRes())
+    private fun createDownloadStates(target: DownloadTarget): Flow<DownloadState> = flow {
+        val result = runCatching {
+            val attachment = target.draft?.attachment ?: attachmentOperations.getAttachment(target.localUuid)
+                ?: return@runCatching DownloadResult.Failed(downloadErrorRes())
+            val mailbox = target.draft?.mailbox
 
-                    if (attachmentOperations.isCached(attachment)) return@runCatching DownloadResult.Ready(attachment)
-
-                    emit(DownloadState.Downloading)
-                    withTimeoutOrNull(DOWNLOAD_TIMEOUT) { download(attachment) } ?: DownloadResult.Failed(downloadErrorRes())
-                }.cancellable().getOrElse {
-                    SentryLog.e(TAG, "Attachment download failed for $localUuid", it)
-                    DownloadResult.Failed(downloadErrorRes())
-                }
-                emit(DownloadState.Finished(result))
+            if (!attachmentOperations.isCached(attachment, mailbox)) {
+                emit(DownloadState.Downloading)
+                val isSuccess = withTimeoutOrNull(DOWNLOAD_TIMEOUT) { attachmentOperations.download(attachment, mailbox) }
+                if (isSuccess != true) return@runCatching DownloadResult.Failed(downloadErrorRes())
             }
+            DownloadResult.Ready(attachment, mailbox)
+        }.cancellable().getOrElse {
+            SentryLog.e(TAG, "Attachment download failed for ${target.localUuid}", it)
+            DownloadResult.Failed(downloadErrorRes())
         }
-    }
-
-    private suspend fun download(attachment: Attachment): DownloadResult {
-        var isDownloadSuccess = false
-        try {
-            isDownloadSuccess = attachmentOperations.download(attachment)
-            currentCoroutineContext().ensureActive()
-            return if (isDownloadSuccess) DownloadResult.Ready(attachment) else DownloadResult.Failed(downloadErrorRes())
-        } finally {
-            if (!isDownloadSuccess) {
-                withContext(NonCancellable) {
-                    runCatching { attachmentOperations.deleteIncompleteCache(attachment) }.cancellable().onFailure {
-                        SentryLog.e(TAG, "Could not delete incomplete attachment ${attachment.localUuid}", it)
-                    }
-                }
-            }
-        }
+        emit(DownloadState.Finished(result))
     }
 
     @StringRes
@@ -150,9 +125,13 @@ class AttachmentDownloadManager @Inject constructor(
     }
 
     internal sealed interface DownloadResult {
-        data class Ready(val attachment: Attachment) : DownloadResult
+        data class Ready(val attachment: Attachment, val mailbox: Mailbox? = null) : DownloadResult
         data class Failed(@StringRes val errorRes: Int) : DownloadResult
     }
+
+    internal data class DraftAttachment(val attachment: Attachment, val mailbox: Mailbox)
+
+    private data class DownloadTarget(val localUuid: String, val draft: DraftAttachment?)
 
     companion object {
         internal val DOWNLOAD_TIMEOUT = 2.minutes

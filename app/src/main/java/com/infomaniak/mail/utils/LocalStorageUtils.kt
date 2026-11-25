@@ -19,19 +19,25 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
-import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.extensions.getCacheFile
+import com.infomaniak.mail.data.models.extensions.isUsableAttachmentFile
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import okhttp3.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption.ATOMIC_MOVE
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import com.infomaniak.core.legacy.R as RCore
 
 object LocalStorageUtils {
@@ -62,38 +68,35 @@ object LocalStorageUtils {
         return cacheRoot.resolveContainedPath(attachmentPath)
     }
 
-    suspend fun downloadThenSaveAttachmentToCacheDir(context: Context, localAttachment: Attachment): Boolean {
+    suspend fun downloadThenSaveAttachmentToCacheDir(
+        context: Context,
+        attachment: Attachment,
+        mailbox: Mailbox? = null,
+    ): Boolean {
+        val cacheFile = attachment.getCacheFile(context, mailbox) ?: return false
+        val resource = attachment.resource ?: return false
 
-        fun Response.saveAttachmentTo(outputFile: File): Boolean {
-            if (!isSuccessful) return false
-
-            return body.byteStream().use { inputStream ->
-                saveAttachmentToCacheDir(inputStream, outputFile)
-                outputFile.exists() && outputFile.length() > 0 && outputFile.canRead()
-            }
+        return ApiRepository.downloadAttachment(resource, mailbox?.userId).use { response ->
+            response.isSuccessful && saveAttachmentToCacheDir(response.body.byteStream(), cacheFile, attachment.size)
         }
-
-        val attachment = runCatching {
-            localAttachment.resource?.let { ApiRepository.downloadAttachment(it) }
-        }.cancellable().getOrNull()
-
-        val cacheFile = localAttachment.getCacheFile(context) ?: return false
-
-        return attachment?.saveAttachmentTo(cacheFile) == true
     }
 
-    /**
-     * Save the Attachment in disk memory.
-     * The file remains unreadable as long as it's being processed.
-     */
-    fun saveAttachmentToCacheDir(inputStream: InputStream, outputFile: File) = with(outputFile) {
-        if (exists()) delete()
-        inputStream.buffered().use {
-            parentFile?.mkdirs()
-            if (createNewFile()) {
-                setReadable(false)
-                outputStream().use(inputStream::copyTo)
-                setReadable(true)
+    suspend fun saveAttachmentToCacheDir(inputStream: InputStream, outputFile: File, expectedSize: Long): Boolean {
+        return inputStream.use {
+            val parent = checkNotNull(outputFile.parentFile)
+            parent.mkdirs()
+            val stagedFile = File.createTempFile("attachment-", ".part", parent)
+            try {
+                stagedFile.outputStream().use(inputStream::copyTo)
+                if (!stagedFile.isUsableAttachmentFile(expectedSize)) return@use false
+
+                currentCoroutineContext().ensureActive()
+                Files.move(stagedFile.toPath(), outputFile.toPath(), ATOMIC_MOVE, REPLACE_EXISTING)
+                true
+            } finally {
+                if (stagedFile.exists() && !stagedFile.delete()) {
+                    SentryLog.e("LocalStorageUtils", "Could not delete staged attachment")
+                }
             }
         }
     }

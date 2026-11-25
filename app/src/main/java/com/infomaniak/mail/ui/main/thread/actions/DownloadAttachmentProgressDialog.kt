@@ -54,7 +54,7 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
         val backStackEntry = navController.currentBackStackEntry
         attachmentOpeningManager.requestOpen(
             localUuid = navigationArgs.attachmentLocalUuid,
-            scope = lifecycleScope,
+            scope = requireActivity().lifecycleScope,
             intentType = navigationArgs.intentType,
             onFinished = {
                 if (navController.currentBackStackEntry === backStackEntry) navController.popBackStack()

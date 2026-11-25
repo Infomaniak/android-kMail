@@ -20,13 +20,21 @@ package com.infomaniak.mail.utils
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.Lifecycle.State.CREATED
+import androidx.lifecycle.Lifecycle.State.DESTROYED
+import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import com.infomaniak.core.legacy.R
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.attachment.AttachmentDownloadManager
 import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.attachment.AttachmentOperations
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.SAVE_TO_DRIVE
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -51,8 +59,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.junit.After
@@ -75,6 +85,7 @@ class AttachmentOpeningManagerTest {
     private val dispatcher = StandardTestDispatcher()
     private val viewScope = CoroutineScope(SupervisorJob() + dispatcher)
     private val activityScope = CoroutineScope(SupervisorJob() + dispatcher)
+    private val viewOwner = TestLifecycleOwner()
     private val openedIntents = mutableListOf<Intent>()
 
     private lateinit var downloadManager: AttachmentDownloadManager
@@ -82,20 +93,25 @@ class AttachmentOpeningManagerTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(dispatcher)
+        viewOwner.lifecycle.currentState = RESUMED
         mockkObject(SentryLog)
         every { SentryLog.e(any(), any(), any()) } just Runs
         every { context.getString(any()) } answers { "error-${firstArg<Int>()}" }
         every { networkManager.hasNetwork } returns true
+        every { operations.canSaveOnKDrive() } returns true
         downloadManager = AttachmentDownloadManager(networkManager, dispatcher, operations)
         openingManager = AttachmentOpeningManager(context, downloadManager, operations, dispatcher, snackbarManager)
-        openingManager.observeOpening(viewScope, openedIntents::add)
+        openingManager.observeOpening(viewOwner, openedIntents::add)
     }
 
     @After
     fun tearDown() {
+        viewOwner.lifecycle.currentState = DESTROYED
         viewScope.cancel()
         activityScope.cancel()
         dispatcher.scheduler.runCurrent()
+        Dispatchers.resetMain()
         unmockkObject(SentryLog)
     }
 
@@ -107,7 +123,6 @@ class AttachmentOpeningManagerTest {
         coEvery { operations.hasSupportedApp(attachment) } returns true
         coEvery { operations.isCached(attachment) } answers { isCached }
         coEvery { operations.getOpenIntent(attachment) } returns intent
-        coEvery { operations.deleteIncompleteCache(attachment) } just Runs
         coEvery { operations.download(attachment) } coAnswers {
             delay(duration)
             isCached = true
@@ -218,7 +233,7 @@ class AttachmentOpeningManagerTest {
         val dialogScope = CoroutineScope(SupervisorJob() + dispatcher)
         var isDialogVisible = true
         val events = mutableListOf<String>()
-        openingManager.observeOpening(viewScope) {
+        openingManager.observeOpening(viewOwner) {
             assertTrue(!isDialogVisible)
             events.add("open")
             openedIntents.add(it)
@@ -266,10 +281,75 @@ class AttachmentOpeningManagerTest {
         assertTrue(openedIntents.isEmpty())
         assertEquals(0, dialogClosedCount)
 
-        restoredOpeningManager.observeOpening(viewScope, openedIntents::add)
+        restoredOpeningManager.observeOpening(viewOwner, openedIntents::add)
         advanceUntilIdle()
         assertEquals(1, dialogClosedCount)
         assertEquals(listOf(intent), openedIntents)
+    }
+
+    @Test
+    fun backgroundDownloadFailure_doesNotCloseDialogOrReportErrorUntilResumed() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        coEvery { operations.download(attachment) } coAnswers {
+            delay(100)
+            false
+        }
+        var dialogClosedCount = 0
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        runCurrent()
+        viewOwner.lifecycle.currentState = CREATED
+        advanceUntilIdle()
+
+        assertTrue(downloadManager.downloadingUuids.value.isEmpty())
+        assertEquals(0, dialogClosedCount)
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
+
+        viewOwner.lifecycle.currentState = RESUMED
+        advanceUntilIdle()
+        assertEquals(1, dialogClosedCount)
+        verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
+    }
+
+    @Test
+    fun pausingDuringIntentPreparation_retriesDeliveryWithoutRedownloadingOrClosingEarly() = runTest(dispatcher) {
+        val (attachment, intent) = attachment("uuid-1", duration = 0)
+        coEvery { operations.getOpenIntent(attachment) } coAnswers {
+            delay(100)
+            intent
+        }
+        var dialogClosedCount = 0
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        runCurrent()
+        coVerify(exactly = 1) { operations.getOpenIntent(attachment) }
+
+        viewOwner.lifecycle.currentState = STARTED
+        advanceUntilIdle()
+        assertTrue(openedIntents.isEmpty())
+        assertEquals(0, dialogClosedCount)
+
+        viewOwner.lifecycle.currentState = RESUMED
+        advanceUntilIdle()
+        assertEquals(listOf(intent), openedIntents)
+        assertEquals(1, dialogClosedCount)
+        coVerify(exactly = 1) { operations.download(attachment) }
+    }
+
+    @Test
+    fun draftAttachment_usesTheSuppliedAttachmentAndMailboxWithoutQueryingTheActiveRealm() = runTest(dispatcher) {
+        val attachment = mockk<Attachment> { every { localUuid } returns "draft-uuid" }
+        val draftMailbox = mockk<Mailbox>()
+        val intent = mockk<Intent>()
+        coEvery { operations.hasSupportedApp(attachment, draftMailbox) } returns true
+        coEvery { operations.isCached(attachment, draftMailbox) } returns false
+        coEvery { operations.download(attachment, draftMailbox) } returns true
+        coEvery { operations.getOpenIntent(attachment, OPEN_WITH, draftMailbox) } returns intent
+
+        openingManager.requestOpen(attachment, viewScope) { draftMailbox }
+        advanceUntilIdle()
+
+        assertEquals(listOf(intent), openedIntents)
+        coVerify(exactly = 0) { operations.getAttachment(any()) }
+        coVerify(exactly = 1) { operations.download(attachment, draftMailbox) }
     }
 
     @Test
@@ -289,7 +369,7 @@ class AttachmentOpeningManagerTest {
     @Test
     fun actionDialog_downloadTimesOut_closesAndDoesNotOpenAnEarlierAttachment() = runTest(dispatcher) {
         attachment("uuid-1", duration = 100)
-        val (second, _) = attachment("uuid-2", duration = 180_000)
+        attachment("uuid-2", duration = 180_000)
         var isDialogVisible = true
 
         openingManager.requestOpen("uuid-1", viewScope)
@@ -304,7 +384,6 @@ class AttachmentOpeningManagerTest {
         assertTrue(!isDialogVisible)
         assertTrue(openedIntents.isEmpty())
         assertTrue(downloadManager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(second) }
         verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
     }
 
@@ -400,14 +479,22 @@ class AttachmentOpeningManagerTest {
 
     @Test
     fun saveToDriveAction_redirectsToStore_closesWithoutReportingAnotherError() = runTest(dispatcher) {
-        val (attachment, _) = attachment("uuid-1")
-        coEvery { operations.getOpenIntent(attachment, SAVE_TO_DRIVE) } returns null
-        var dialogClosedCount = 0
+        attachment("uuid-1")
+        every { operations.canSaveOnKDrive() } returns false
+        val events = mutableListOf<String>()
+        every { operations.openDriveAppStore() } answers { events.add("store") }
 
-        openingManager.requestOpen("uuid-1", activityScope, SAVE_TO_DRIVE, onFinished = { dialogClosedCount++ })
+        openingManager.requestOpen("uuid-1", activityScope, SAVE_TO_DRIVE, onFinished = { events.add("close") })
+        viewOwner.lifecycle.currentState = STARTED
         advanceUntilIdle()
 
-        assertEquals(1, dialogClosedCount)
+        assertTrue(events.isEmpty())
+        verify(exactly = 0) { operations.canSaveOnKDrive() }
+
+        viewOwner.lifecycle.currentState = RESUMED
+        advanceUntilIdle()
+
+        assertEquals(listOf("close", "store"), events)
         assertTrue(openedIntents.isEmpty())
         verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
@@ -501,7 +588,6 @@ class AttachmentOpeningManagerTest {
         assertTrue(openedIntents.isEmpty())
         assertTrue(downloadManager.downloadingUuids.value.isEmpty())
         coVerify(exactly = 1) { operations.download(first) }
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(second) }
         verify(exactly = 1) { snackbarManager.postValue("error-${R.string.anErrorHasOccurred}") }
     }
 
@@ -531,7 +617,6 @@ class AttachmentOpeningManagerTest {
         verify(exactly = 1) { snackbarManager.postValue("error-${R.string.noConnection}") }
         attachments.forEach { attachment ->
             coVerify(exactly = 1) { operations.download(attachment) }
-            coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
         }
     }
 
@@ -575,7 +660,7 @@ class AttachmentOpeningManagerTest {
         advanceUntilIdle()
 
         assertEquals(listOf(secondIntent), openedIntents)
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(first) }
+        coVerify(exactly = 1) { operations.download(first) }
         verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
@@ -593,7 +678,6 @@ class AttachmentOpeningManagerTest {
         advanceUntilIdle()
 
         assertEquals(listOf(secondIntent), openedIntents)
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(first) }
         verify { SentryLog.e(any(), any(), any()) }
         verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
@@ -680,7 +764,6 @@ class AttachmentOpeningManagerTest {
         advanceUntilIdle()
 
         assertTrue(openedIntents.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
         verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
@@ -698,12 +781,30 @@ class AttachmentOpeningManagerTest {
         assertTrue(openedIntents.isEmpty())
         coVerify(exactly = 1) { operations.download(first) }
         coVerify(exactly = 1) { operations.download(second) }
-        coVerify(exactly = 0) { operations.deleteIncompleteCache(any()) }
+    }
+
+    @Test
+    fun cancelPendingOpenWhenLeavingThread_closesDialogAndLetsTransferFinishSilently() = runTest(dispatcher) {
+        val (attachment, _) = attachment("uuid-1")
+        var dialogClosedCount = 0
+        openingManager.requestOpen("uuid-1", activityScope, onFinished = { dialogClosedCount++ })
+        runCurrent()
+
+        openingManager.cancelPendingOpen(closeDialog = true)
+        assertEquals(1, dialogClosedCount)
+        assertEquals(setOf("uuid-1"), downloadManager.downloadingUuids.value)
+        advanceUntilIdle()
+
+        assertEquals(1, dialogClosedCount)
+        assertTrue(downloadManager.downloadingUuids.value.isEmpty())
+        assertTrue(openedIntents.isEmpty())
+        coVerify(exactly = 1) { operations.download(attachment) }
+        verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test
     fun deletingTheSelectedAttachment_cancelsItsDownloadAndOpening() = runTest(dispatcher) {
-        val (attachment, _) = attachment("uuid-1")
+        attachment("uuid-1")
 
         openingManager.requestOpen("uuid-1", viewScope)
         runCurrent()
@@ -713,13 +814,12 @@ class AttachmentOpeningManagerTest {
 
         assertTrue(openedIntents.isEmpty())
         assertTrue(downloadManager.downloadingUuids.value.isEmpty())
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(attachment) }
         verify(exactly = 0) { snackbarManager.postValue(any()) }
     }
 
     @Test
     fun deletingAnEarlierAttachment_doesNotCancelTheLastOpening() = runTest(dispatcher) {
-        val (first, _) = attachment("uuid-1")
+        attachment("uuid-1")
         val (_, secondIntent) = attachment("uuid-2")
 
         openingManager.requestOpen("uuid-1", viewScope)
@@ -730,7 +830,6 @@ class AttachmentOpeningManagerTest {
         advanceUntilIdle()
 
         assertEquals(listOf(secondIntent), openedIntents)
-        coVerify(exactly = 1) { operations.deleteIncompleteCache(first) }
     }
 
     @Test
@@ -781,7 +880,7 @@ class AttachmentOpeningManagerTest {
     fun startActivityFailure_showsErrorAndKeepsTheOpeningObserverAlive() = runTest(dispatcher) {
         val (_, firstIntent) = attachment("uuid-1", cached = true)
         val (_, secondIntent) = attachment("uuid-2", cached = true)
-        openingManager.observeOpening(viewScope) { intent ->
+        openingManager.observeOpening(viewOwner) { intent ->
             if (intent == firstIntent) throw ActivityNotFoundException("No viewer")
             openedIntents.add(intent)
         }
@@ -798,7 +897,7 @@ class AttachmentOpeningManagerTest {
     @Test
     fun securityFailureWhenStartingActivity_showsError() = runTest(dispatcher) {
         attachment("uuid-1", cached = true)
-        openingManager.observeOpening(viewScope) { throw SecurityException("Access denied") }
+        openingManager.observeOpening(viewOwner) { throw SecurityException("Access denied") }
 
         openingManager.requestOpen("uuid-1", viewScope)
         advanceUntilIdle()
@@ -812,12 +911,14 @@ class AttachmentOpeningManagerTest {
 
         openingManager.requestOpen("uuid-1", activityScope)
         runCurrent()
-        viewScope.cancel()
+        viewOwner.lifecycle.currentState = DESTROYED
         runCurrent()
-        openingManager.observeOpening(activityScope, openedIntents::add)
+        val nextOwner = TestLifecycleOwner().apply { lifecycle.currentState = RESUMED }
+        openingManager.observeOpening(nextOwner, openedIntents::add)
         advanceUntilIdle()
 
         assertTrue(openedIntents.isEmpty())
+        nextOwner.lifecycle.currentState = DESTROYED
     }
 
     @Test
@@ -856,9 +957,12 @@ class AttachmentOpeningManagerTest {
 
         Executors.newSingleThreadExecutor().asCoroutineDispatcher().use { uiDispatcher ->
             val scope = CoroutineScope(SupervisorJob() + uiDispatcher)
+            val owner = TestLifecycleOwner()
+            Dispatchers.setMain(uiDispatcher)
             try {
                 withContext(uiDispatcher) {
-                    ioOpeningManager.observeOpening(scope) {
+                    owner.lifecycle.currentState = RESUMED
+                    ioOpeningManager.observeOpening(owner) {
                         realOpenedIntents.add(it)
                         opened.complete(it)
                     }
@@ -877,8 +981,14 @@ class AttachmentOpeningManagerTest {
                 coVerify(exactly = 1) { operations.download(first) }
                 coVerify(exactly = 1) { operations.download(second) }
             } finally {
+                withContext(uiDispatcher) { owner.lifecycle.currentState = DESTROYED }
                 scope.cancel()
+                Dispatchers.setMain(dispatcher)
             }
         }
+    }
+
+    private class TestLifecycleOwner : LifecycleOwner {
+        override val lifecycle = LifecycleRegistry.createUnsafe(this)
     }
 }
