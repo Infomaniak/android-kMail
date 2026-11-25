@@ -73,7 +73,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -166,7 +167,7 @@ sentry {
     // Enables or disables the automatic upload of mapping files during a build.
     // If you disable this, you'll need to manually upload the mapping files with sentry-cli when you do a release.
     // Default is enabled.
-    autoUploadProguardMapping = true
+    autoUploadProguardMapping = isRelease
 
     // Disables or enables the automatic configuration of Native Symbols for Sentry.
     // This executes sentry-cli automatically so you don't need to do it manually.
