@@ -26,7 +26,7 @@ import android.webkit.WebViewClient
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.extensions.getCacheFile
-import com.infomaniak.mail.data.models.extensions.hasUsableCache
+import com.infomaniak.mail.data.models.extensions.isUsableAttachmentFile
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -49,22 +49,20 @@ abstract class MessageWebViewClient(
         if (url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
             val cid = url.schemeSpecificPart
             return cidDictionary[cid]?.let { attachment ->
-                val (cacheFile, hasUsableCache) = runBlocking {
-                    val file = attachment.getCacheFile(context)
-                    return@runBlocking file to attachment.hasUsableCache(context, file)
-                }
+                val cacheFile = runBlocking { attachment.getCacheFile(context) } ?: return@runCatchingRealm null
 
-                if (cacheFile == null) return@runCatchingRealm null
-
-                val data = if (hasUsableCache) {
+                val data = if (cacheFile.isUsableAttachmentFile(attachment.size)) {
                     cacheFile.inputStream()
                 } else {
-                    runCatching {
-                        val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
-                        runBlocking { ApiRepository.downloadAttachment(resource) }
-                    }.getOrNull()?.body?.byteStream()?.readBytes()?.let {
-                        LocalStorageUtils.saveAttachmentToCacheDir(it.inputStream(), cacheFile)
-                        it.inputStream()
+                    val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
+                    runBlocking {
+                        ApiRepository.downloadAttachment(resource).use { response ->
+                            if (!response.isSuccessful) return@use null
+
+                            val bytes = response.body.bytes()
+                            val saved = LocalStorageUtils.saveAttachmentToCacheDir(bytes.inputStream(), cacheFile, attachment.size)
+                            if (saved) bytes.inputStream() else null
+                        }
                     }
                 }
 

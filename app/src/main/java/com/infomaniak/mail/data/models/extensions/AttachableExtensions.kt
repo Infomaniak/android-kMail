@@ -22,11 +22,11 @@ import com.infomaniak.core.legacy.utils.guessMimeType
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.AttachmentType
 import com.infomaniak.mail.data.models.SwissTransferFile
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.AttachableMimeTypeUtils
+import com.infomaniak.mail.utils.attachment.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.resolveContainedFileName
@@ -40,26 +40,21 @@ val Attachable.safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) name
 
 fun Attachable.getFileTypeFromMimeType(): AttachmentType = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
-suspend fun Attachable.hasUsableCache(
-    context: Context,
-    file: File? = null,
-    userId: Int = AccountUtils.currentUserId,
-    mailboxId: Int = AccountUtils.currentMailboxId,
-): Boolean = when (this) {
-    is Attachment -> {
-        val cachedFile = file ?: getCacheFile(context, userId, mailboxId)
-        val hasUsableCache = withContext(Dispatchers.IO) { cachedFile != null && cachedFile.length() > 0 && cachedFile.canRead() }
-        hasUsableCache
+internal fun File.isUsableAttachmentFile(expectedSize: Long): Boolean =
+    isFile && canRead() && (expectedSize == 0L || length() > 0)
+
+internal suspend fun Attachment.getFileForOpening(context: Context, mailbox: Mailbox? = null): File? {
+    return withContext(Dispatchers.IO) {
+        getUploadLocalFile()?.takeIf { it.isUsableAttachmentFile(size) } ?: getCacheFile(context, mailbox)
     }
-    is SwissTransferFile -> false
 }
 
-suspend fun Attachable.isInlineCachedFile(context: Context): Boolean = when (this) {
-    is Attachment -> {
-        val isAlreadyCached = withContext(Dispatchers.IO) { getCacheFile(context)?.exists() == true }
-        isAlreadyCached && disposition == AttachmentDisposition.INLINE
-    }
-    is SwissTransferFile -> false
+internal suspend fun Attachment.hasFileForOpening(context: Context, mailbox: Mailbox? = null): Boolean {
+    return withContext(Dispatchers.IO) { getFileForOpening(context, mailbox)?.isUsableAttachmentFile(size) == true }
+}
+
+internal suspend fun Attachment.getCacheFile(context: Context, mailbox: Mailbox?): File? {
+    return if (mailbox == null) getCacheFile(context) else getCacheFile(context, mailbox.userId, mailbox.mailboxId)
 }
 
 suspend fun Attachable.getCacheFile(

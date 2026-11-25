@@ -26,7 +26,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -36,12 +35,11 @@ import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.extensions.downloadUrl
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.multiselection.MultiselectionViewModel
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -59,7 +57,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     lateinit var permissionUtils: PermissionUtils
 
     @Inject
-    lateinit var snackbarManager: SnackbarManager
+    lateinit var attachmentOpeningManager: AttachmentOpeningManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -88,20 +86,10 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun setupListeners(attachment: Attachable) = with(binding) {
         if (attachment is Attachment) {
             openWithItem.setOnClickSuspend(MatomoName.OpenFromBottomsheet) {
-                attachment.openAttachment(
-                    context = context,
-                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                    snackbarManager = snackbarManager,
-                    popBackIfNeeded = findNavController()::popBackStack,
-                )
+                executeAttachmentAction(attachment, AttachmentIntentType.OPEN_WITH)
             }
             kDriveItem.setOnClickSuspend(MatomoName.SaveToKDrive) {
-                attachment.executeIntent(
-                    context = context,
-                    intentType = AttachmentIntentType.SAVE_TO_DRIVE,
-                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                    popBackIfNeeded = findNavController()::popBackStack,
-                )
+                executeAttachmentAction(attachment, AttachmentIntentType.SAVE_TO_DRIVE)
             }
         }
 
@@ -109,6 +97,21 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             trackAttachmentActionsEvent(MatomoName.Download)
             scheduleDownloadManager(attachment.downloadUrl, attachment.name)
         }
+    }
+
+    private suspend fun executeAttachmentAction(attachment: Attachment, intentType: AttachmentIntentType) {
+        attachmentOpeningManager.cancelPendingOpen()
+        val scope = requireActivity().lifecycleScope
+        attachment.executeIntent(
+            context = requireContext(),
+            openCachedAttachment = {
+                attachmentOpeningManager.requestOpen(attachment.localUuid, scope, intentType)
+            },
+            navigateToDownloadProgressDialog = {
+                navigateToDownloadProgressDialog(attachment, intentType, closeAttachmentActions = true)
+            },
+            popBackIfNeeded = findNavController()::popBackStack,
+        )
     }
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {

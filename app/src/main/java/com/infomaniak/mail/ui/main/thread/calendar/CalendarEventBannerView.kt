@@ -40,10 +40,10 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.extensions.state
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
-import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.attachment.AttachmentOpeningManager
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
+import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
 import com.infomaniak.mail.utils.extensions.findUser
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,7 +75,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private var onAttendeesButtonClicked: ((Boolean) -> Unit)? = null
 
     @Inject
-    lateinit var snackbarManager: SnackbarManager
+    lateinit var attachmentOpeningManager: AttachmentOpeningManager
 
     init {
         with(binding) {
@@ -128,8 +128,18 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
         addToCalendarButton.setOnClickListener {
             trackCalendarEventEvent(MatomoName.OpenInMyCalendar)
+            attachmentOpeningManager.cancelPendingOpen()
             findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@launch, snackbarManager)
+                val navigateToDownload = navigateToDownloadProgressDialog ?: return@launch
+                attachment.executeIntent(
+                    context = context,
+                    openCachedAttachment = {
+                        attachmentOpeningManager.requestOpen(attachment.localUuid, this, AttachmentIntentType.OPEN_WITH)
+                    },
+                    navigateToDownloadProgressDialog = {
+                        navigateToDownload(attachment, AttachmentIntentType.OPEN_WITH)
+                    },
+                )
             }
         }
     }

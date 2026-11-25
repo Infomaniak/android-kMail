@@ -115,19 +115,42 @@ fun Fragment.navigateToDownloadProgressDialog(
     attachment: Attachment,
     attachmentIntentType: AttachmentExt.AttachmentIntentType,
     currentClassName: String = AttachmentActionsBottomSheetDialog::class.java.name,
+    closeAttachmentActions: Boolean = false,
 ) {
-    safeNavigate(
+    safeNavigateToDialog(
         resId = R.id.downloadAttachmentProgressDialog,
         args = attachment.createDownloadDialogNavArgs(attachmentIntentType),
         currentClassName = currentClassName,
+        navOptions = if (closeAttachmentActions) {
+            NavOptions.Builder().setPopUpTo(R.id.attachmentActionsBottomSheetDialog, inclusive = true).build()
+        } else {
+            null
+        },
     )
 }
 
 fun Fragment.navigateToDownloadMessagesProgressDialog(messageUids: List<String>? = null, currentClassName: String) {
-    safeNavigate(
+    safeNavigateToDialog(
         resId = R.id.downloadMessagesProgressDialog,
         args = DownloadMessagesProgressDialogArgs(messageUids = messageUids?.toTypedArray()).toBundle(),
         currentClassName = currentClassName,
+    )
+}
+
+private fun Fragment.safeNavigateToDialog(
+    @IdRes resId: Int,
+    args: Bundle? = null,
+    currentClassName: String? = null,
+    navOptions: NavOptions? = null,
+) {
+    val navController = runCatching { findNavController() }.getOrNull() ?: return
+    if (navController.currentDestination?.id == resId) return
+
+    safeNavigate(
+        resId = resId,
+        args = args,
+        currentClassName = currentClassName,
+        navOptions = navOptions,
     )
 }
 

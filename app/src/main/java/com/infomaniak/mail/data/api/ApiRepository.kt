@@ -562,13 +562,14 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.swissTransferContainer(containerUuid), method = GET)
     }
 
-    suspend fun downloadAttachment(resource: String): Response {
+    suspend fun downloadAttachment(resource: String, userId: Int? = null): Response {
         @OptIn(ManualAuthorizationRequired::class)
         val request = Request.Builder()
             .url(ApiRoutes.resource(resource))
             .headers(HttpUtils.getHeaders(contentType = null))
             .build()
-        return AuthHttpClientProvider.authOkHttpClient.newBuilder().build().newCall(request).await()
+        val client = if (userId == null) AuthHttpClientProvider.authOkHttpClient else AccountUtils.getHttpClient(userId)
+        return client.newCall(request).await()
     }
 
     suspend fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {

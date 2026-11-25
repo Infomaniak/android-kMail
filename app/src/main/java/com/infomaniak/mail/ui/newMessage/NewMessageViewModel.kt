@@ -93,7 +93,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.useCases.MessagesActions
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.AttachmentsReminderUtils
+import com.infomaniak.mail.utils.attachment.AttachmentsReminderUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.MENTIONS_STYLE
@@ -1305,11 +1305,9 @@ class NewMessageViewModel @Inject constructor(
     fun saveAttachmentsToCacheDir(inlineAttachments: List<Attachment>, onSaved: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             inlineAttachments.forEach { attachment ->
-                attachment.getUploadLocalFile()?.inputStream()?.use { inputStream ->
-                    attachment.getCacheFile(appContext)?.let { cacheFile ->
-                        LocalStorageUtils.saveAttachmentToCacheDir(inputStream, cacheFile)
-                    }
-                }
+                val localFile = attachment.getUploadLocalFile() ?: return@forEach
+                val cacheFile = attachment.getCacheFile(appContext) ?: return@forEach
+                LocalStorageUtils.saveAttachmentToCacheDir(localFile.inputStream(), cacheFile, attachment.size)
             }
             onSaved()
         }
