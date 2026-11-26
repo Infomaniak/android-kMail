@@ -33,8 +33,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.work.Data
@@ -566,9 +568,13 @@ class ThreadFragment : Fragment(), PickerEmojiObserver {
     }
 
     private fun observeAttachmentOpening() {
-        attachmentOpeningManager.observeOpening(viewLifecycleOwner, ::startActivity)
-        viewLifecycleOwner.lifecycleScope.launch {
-            attachmentDownloadManager.downloadingUuids.collect { threadAdapter.setDownloadingUuids(it) }
+        val owner = viewLifecycleOwner
+        val updateDownloadingUuids = threadAdapter::setDownloadingUuids
+        attachmentOpeningManager.observeOpening(owner, ::startActivity)
+        owner.lifecycleScope.launch {
+            owner.repeatOnLifecycle(STARTED) {
+                attachmentDownloadManager.downloadingUuids.collect(updateDownloadingUuids)
+            }
         }
     }
 
