@@ -20,6 +20,8 @@ package com.infomaniak.mail.ui.newMessage.encryption
 import androidx.core.view.isVisible
 import androidx.lifecycle.distinctUntilChanged
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackEncryptionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
@@ -146,6 +148,8 @@ class EncryptionMessageManager @Inject constructor(
                 )
             )
         } else {
+            trackEncryptionEvent(MatomoName.Enable)
+
             if (navigateToDiscoveryBottomSheetIfFirstTime()) return
             newMessageViewModel.isEncryptionActivated.value = true
         }
