@@ -1,0 +1,3 @@
+- Added the ability to create subfolders under your custom folders
+- Improved, non-blocking attachment downloads
+- New indicator when drafts are being sent in the conversation list
